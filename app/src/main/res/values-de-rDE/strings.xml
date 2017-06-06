@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="left_slider_desktop">Desktop</string>
+    <string name="left_slider_categories">Kategorien</string>
+    <string name="left_slider_template">Schablone</string>
+    <string name="left_slider_no_category">Nicht Zugeordnet</string>
+    <string name="left_slider_course">Verlauf</string>
+    <string name="left_slider_standing_order">Daueraufträge</string>
+    <string name="left_slider_planned_bookings">geplante Buchungen</string>
+    <string name="left_slider_transfers">Überweisungen</string>
+    <string name="left_slider_backup">Sicherheitskopie</string>
+    <string name="left_slider_import_export">Import, Export</string>
+    <string name="left_slider_store">Store</string>
+    <string name="left_slider_preferences">Einstellungen</string>
+    <string name="left_slider_follow_us">Folge uns</string>
+    <string name="left_slider_rate_the_app">Bewerten Sie unsere App</string>
+    <string name="left_slider_about">Über</string>
+
+
+    <string name="app_name">HaushaltsManager</string>
+
+    <string name="navigation_drawer_open">Öffne Menü</string>
+    <string name="navigation_drawer_close">Schließe Menü</string>
+
+    <string name="action_settings">Einstellungen</string>
+</resources>

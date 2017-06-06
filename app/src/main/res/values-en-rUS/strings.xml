@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="left_slider_desktop">Desktop</string>
+    <string name="left_slider_categories">Categories</string>
+    <string name="left_slider_template">Templates</string>
+    <string name="left_slider_no_category">No Category</string>
+    <string name="left_slider_course">Course</string>
+    <string name="left_slider_standing_order">Standing Orders</string>
+    <string name="left_slider_planned_bookings">Planned Bookings</string>
+    <string name="left_slider_transfers">Transfers</string>
+    <string name="left_slider_backup">Backup</string>
+    <string name="left_slider_import_export">Import, Export</string>
+    <string name="left_slider_store">Store</string>
+    <string name="left_slider_preferences">Preferences</string>
+    <string name="left_slider_follow_us">Follow Us</string>
+    <string name="left_slider_rate_the_app">Rate our App</string>
+    <string name="left_slider_about">About</string>
+    <string name="app_name">ExpenseManager</string>
+    <string name="action_settings">Preferences</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+</resources>

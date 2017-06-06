@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <!--
+        <group android:checkableBehavior="single">
+            <item
+                android:id="@+id/nav_camera"
+                android:icon="@drawable/ic_menu_camera"
+                android:title="Desktop" />
+            <item
+                android:id="@+id/nav_gallery"
+                android:icon="@drawable/ic_menu_gallery"
+                android:title="Kategorien" />
+            <item
+                android:id="@+id/nav_slideshow"
+                android:icon="@drawable/ic_menu_slideshow"
+                android:title="Schablonen" />
+            <item
+                android:id="@+id/nav_manage"
+                android:icon="@drawable/ic_menu_manage"
+                android:title="Tools" />
+        </group>
+
+        <item android:title="Communicate">
+            <menu>
+                <item
+                    android:id="@+id/nav_share"
+                    android:icon="@drawable/ic_menu_share"
+                    android:title="Share" />
+                <item
+                    android:id="@+id/nav_send"
+                    android:icon="@drawable/ic_menu_send"
+                    android:title="Send" />
+            </menu>
+        </item>
+    -->
+    <item
+        android:id="@+id/no_category"
+        android:icon="@drawable/ic_menu_camera"
+        android:title="@string/left_slider_no_category" />
+    <item
+        android:id="@+id/course"
+        android:icon="@drawable/ic_menu_camera"
+        android:title="@string/left_slider_course" />
+    <item
+        android:id="@+id/standing_orders"
+        android:icon="@drawable/ic_menu_camera"
+        android:title="@string/left_slider_standing_order" />
+    <item
+        android:id="@+id/planne_bookings"
+        android:icon="@drawable/ic_menu_camera"
+        android:title="@string/left_slider_planned_bookings" />
+    <item
+        android:id="@+id/tranfers"
+        android:icon="@drawable/ic_menu_camera"
+        android:title="@string/left_slider_transfers" />
+    <group>
+        <item
+            android:id="@+id/desktop"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="@string/left_slider_desktop" />
+        <item
+            android:id="@+id/categories"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="@string/left_slider_categories" />
+        <item
+            android:id="@+id/templates"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="@string/left_slider_template" />
+    </group>
+
+    <group>
+        <item
+            android:id="@+id/backup"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="@string/left_slider_backup" />
+        <item
+            android:id="@+id/import_export"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="@string/left_slider_import_export" />
+    </group>
+
+    <group>
+        <item
+            android:id="@+id/store"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="@string/left_slider_store" />
+        <item
+            android:id="@+id/preferences"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="@string/left_slider_preferences" />
+        <item
+            android:id="@+id/follow_us"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="@string/left_slider_follow_us" />
+        <item
+            android:id="@+id/rate_the_app"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="@string/left_slider_rate_the_app" />
+        <item
+            android:id="@+id/about"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="@string/left_slider_about" />
+    </group>
+
+</menu>
