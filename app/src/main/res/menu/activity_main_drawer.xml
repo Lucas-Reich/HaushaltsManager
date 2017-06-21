@@ -47,10 +47,6 @@
         android:icon="@drawable/ic_menu_camera"
         android:title="@string/left_slider_standing_order" />
     <item
-        android:id="@+id/planne_bookings"
-        android:icon="@drawable/ic_menu_camera"
-        android:title="@string/left_slider_planned_bookings" />
-    <item
         android:id="@+id/tranfers"
         android:icon="@drawable/ic_menu_camera"
         android:title="@string/left_slider_transfers" />
@@ -107,5 +103,9 @@
         <item></item>
         <item></item>
     </group>
+    <item
+        android:id="@+id/planne_bookings"
+        android:icon="@drawable/ic_menu_camera"
+        android:title="@string/left_slider_planned_bookings" />
 
 </menu>
