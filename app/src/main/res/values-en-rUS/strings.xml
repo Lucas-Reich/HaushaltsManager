@@ -19,4 +19,18 @@
     <string name="action_settings">Preferences</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="expense_screen_category">Choose category</string>
+    <string name="expense_screen_type_income">Income</string>
+    <string name="expense_screen_type_expense">Expense</string>
+    <string name="epxpense_screen_title">Input title</string>
+    <string name="epxpense_screen_tag">Tag</string>
+    <string name="epxpense_screen_notice">Input notice</string>
+    <string name="epxpense_screen_date">date_placeholder</string>
+    <string name="epxpense_screen_account">account_placeholder</string>
+    <string name="epxpense_screen_template">Create a new Template</string>
+    <string name="epxpense_screen_recurring">Recurring</string>
+    <string name="epxpense_screen_amount">0.00$</string>
+    <string name="expense_pop_up_close">Cancel</string>
+    <string name="expense_pop_up_ok">OK</string>
+    <string name="expense_pop_up_title">title_placeholder</string>
 </resources>

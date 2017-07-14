@@ -21,4 +21,18 @@
     <string name="left_slider_follow_us">Follow Us</string>
     <string name="left_slider_rate_the_app">Rate our App</string>
     <string name="left_slider_about">About</string>
+    <string name="expense_screen_category">Choose category</string>
+    <string name="expense_screen_type_income">Income</string>
+    <string name="expense_screen_type_expense">Expense</string>
+    <string name="epxpense_screen_title">Input title</string>
+    <string name="epxpense_screen_tag">Tag</string>
+    <string name="epxpense_screen_notice">Input notice</string>
+    <string name="epxpense_screen_date">date_placeholder</string>
+    <string name="epxpense_screen_account">account_placeholder</string>
+    <string name="epxpense_screen_amount">0.00$</string>
+    <string name="epxpense_screen_template">Create a new template</string>
+    <string name="epxpense_screen_recurring">Recurring</string>
+    <string name="expense_pop_up_ok">OK</string>
+    <string name="expense_pop_up_title">title_placeholder</string>
+    <string name="expense_pop_up_close">Cancel</string>
 </resources>
