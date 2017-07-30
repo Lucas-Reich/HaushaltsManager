@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.widget.EditText;
+import android.widget.TextView;
 
 public class ExpenseInputDialogFragment extends DialogFragment {
 
@@ -39,6 +40,11 @@ public class ExpenseInputDialogFragment extends DialogFragment {
 
         final Bundle args = getArguments();
 
+        final Activity activ = getActivity();
+        TextView amount = (TextView) activ.findViewById(R.id.expense_screen_amount);
+        amount.setText("Test");
+
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         final EditText input = new EditText(getContext());
@@ -53,7 +59,7 @@ public class ExpenseInputDialogFragment extends DialogFragment {
             }
         });
 
-        builder.setNegativeButton(R.string.expense_pop_up_close, new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.expense_pop_up_cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 

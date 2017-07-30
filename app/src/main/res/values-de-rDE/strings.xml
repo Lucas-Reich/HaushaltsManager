@@ -35,7 +35,7 @@
     <string name="expense_screen_template">Neue Schablone erstellen</string>
     <string name="expense_screen_recurring">Dauerauftrag</string>
     <string name="expense_screen_amount">0,00€</string>
-    <string name="expense_pop_up_close">Abbrechen</string>
+    <string name="expense_pop_up_cancel">Abbrechen</string>
     <string name="expense_pop_up_ok">OK</string>
     <string name="expense_pop_up_title">title_placeholder</string>
 </resources>

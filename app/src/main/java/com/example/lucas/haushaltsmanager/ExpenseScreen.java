@@ -16,12 +16,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Calendar;
-import java.util.Date;
 
 public class ExpenseScreen extends AppCompatActivity implements ExpenseInputDialogFragment.NoticeDialogListener, AccountPickerDialogFragment.NoticeDialogListener {
 
     private Calendar cal = Calendar.getInstance();
-    private ExpenseObject expense;
+    private ExpenseObject expense = new ExpenseObject();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +103,23 @@ public class ExpenseScreen extends AppCompatActivity implements ExpenseInputDial
             callingButton.setText(args.getString("user_input"));
             callingButton.setTextColor(Color.BLACK);
         }
+
+        switch (callingButton.getId()) {
+
+            case R.id.expense_screen_title:
+
+                expense.setExpenditureName(callingButton.getText().toString());
+                break;
+
+            case R.id.expense_screen_tag:
+
+                expense.setTag(callingButton.getText().toString());
+                break;
+
+            case R.id.expense_screen_notice:
+
+                expense.setNotice(callingButton.getText().toString());
+        }
     }
 
     public void onDialogNegativeClick(DialogFragment dialog) {
@@ -113,16 +129,9 @@ public class ExpenseScreen extends AppCompatActivity implements ExpenseInputDial
 
     public void onItemSelected(DialogFragment dialog) {
 
-        Bundle args = dialog.getArguments();
-        Button btnAccount = (Button) findViewById(R.id.expense_screen_account);
+        Button account_btn = (Button) findViewById(R.id.expense_screen_account);
 
-        String selectedAccount = getResources().getStringArray(R.array.dummy_accounts)[args.getInt("selected_account")];
-
-        btnAccount.setText(selectedAccount);
-        btnAccount.setTextColor(Color.BLACK);
-
-
-        // Das Fragment muss sich noch selbst schließen
+        expense.setAccount(account_btn.getText().toString());
     }
 
     private void updateDate() {
@@ -141,7 +150,7 @@ public class ExpenseScreen extends AppCompatActivity implements ExpenseInputDial
             Button btn_date = (Button) findViewById(R.id.expense_screen_date);
             btn_date.setText(dayOfMonth + "-" + (month + 1) + "-" + year);
 
-            expense.setExpendituredate(expenditureDate);
+            expense.setExpenditureDate(expenditureDate);
         }
     };
 

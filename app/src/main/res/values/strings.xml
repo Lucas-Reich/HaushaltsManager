@@ -34,7 +34,7 @@
     <string name="expense_screen_recurring">Recurring</string>
     <string name="expense_pop_up_ok">OK</string>
     <string name="expense_pop_up_title">title_placeholder</string>
-    <string name="expense_pop_up_close">Cancel</string>
+    <string name="expense_pop_up_cancel">Cancel</string>
 
     <string-array
         name="dummy_accounts">

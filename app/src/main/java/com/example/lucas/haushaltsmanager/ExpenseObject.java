@@ -2,15 +2,17 @@ package com.example.lucas.haushaltsmanager;
 
 import java.util.Calendar;
 
-public class ExpenseObject {
+class ExpenseObject {
 
-    private Calendar expendituredate;
+    private Calendar expenditureDate;
     private String expenditureName;
     private int expenditureAmount;
     private long id;
     private boolean expenditure;
     private String category;
-    private String token;
+    private String tag;
+    private String notice;
+    private String account;
 
 
     public ExpenseObject(String expenditureName, int expenditureAmount, long id, boolean expenditure, String category, String token) {
@@ -20,7 +22,7 @@ public class ExpenseObject {
         this.id = id;
         this.expenditure = expenditure;
         this.category = category;
-        this.token = token;
+        this.tag = token;
     }
 
     public ExpenseObject(String expenditureName, int expenditureAmount, boolean expenditure, String category) {
@@ -31,12 +33,21 @@ public class ExpenseObject {
         this.category = category;
     }
 
-    public Calendar getExpendituredate() {
-        return expendituredate;
+    public ExpenseObject() {}
+
+    @Override
+    public String toString() {
+
+        String output = expenditureAmount + " x " + expenditureName;
+        return output;
     }
 
-    void setExpendituredate(Calendar expendituredate) {
-        this.expendituredate = expendituredate;
+    public Calendar getExpenditureDate() {
+        return expenditureDate;
+    }
+
+    void setExpenditureDate(Calendar expenditureDate) {
+        this.expenditureDate = expenditureDate;
     }
 
     public String getExpenditureName() {
@@ -79,18 +90,27 @@ public class ExpenseObject {
         this.category = category;
     }
 
-    public String getToken() {
-        return token;
+    public String getTag() {
+        return tag;
     }
 
-    void setToken(String token) {
-        this.token = token;
+    void setTag(String tag) {
+        this.tag = tag;
     }
 
-    @Override
-    public String toString() {
+    public String getNotice() {
+        return notice;
+    }
 
-        String output = expenditureAmount + " x " + expenditureName;
-        return output;
+    public void setNotice(String notice) {
+        this.notice = notice;
+    }
+
+    public String getAccount() {
+        return account;
+    }
+
+    public void setAccount(String account) {
+        this.account = account;
     }
 }

@@ -6,6 +6,7 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
+import android.widget.Button;
 
 public class AccountPickerDialogFragment extends DialogFragment {
 
@@ -32,6 +33,8 @@ public class AccountPickerDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
         final Bundle args = getArguments();
+        final Activity activity = getActivity();
+        final Button btn = (Button) activity.findViewById(R.id.expense_screen_account);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
@@ -42,8 +45,8 @@ public class AccountPickerDialogFragment extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int selectedAccount) {
 
-                args.putInt("selected_account", selectedAccount);
                 mListener.onItemSelected(AccountPickerDialogFragment.this);
+                btn.setText(getResources().getStringArray(R.array.dummy_accounts)[selectedAccount]);
             }
         });
 
