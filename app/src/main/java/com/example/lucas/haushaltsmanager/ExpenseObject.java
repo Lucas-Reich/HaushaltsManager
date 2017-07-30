@@ -1,7 +1,10 @@
 package com.example.lucas.haushaltsmanager;
 
+import java.util.Calendar;
+
 public class ExpenseObject {
 
+    private Calendar expendituredate;
     private String expenditureName;
     private int expenditureAmount;
     private long id;
@@ -28,11 +31,19 @@ public class ExpenseObject {
         this.category = category;
     }
 
+    public Calendar getExpendituredate() {
+        return expendituredate;
+    }
+
+    void setExpendituredate(Calendar expendituredate) {
+        this.expendituredate = expendituredate;
+    }
+
     public String getExpenditureName() {
         return expenditureName;
     }
 
-    public void setExpenditureName(String expenditureName) {
+    void setExpenditureName(String expenditureName) {
         this.expenditureName = expenditureName;
     }
 
@@ -40,7 +51,7 @@ public class ExpenseObject {
         return expenditureAmount;
     }
 
-    public void setExpenditureAmount(int expenditureAmount) {
+    void setExpenditureAmount(int expenditureAmount) {
         this.expenditureAmount = expenditureAmount;
     }
 
@@ -48,7 +59,7 @@ public class ExpenseObject {
         return id;
     }
 
-    public void setId(long id) {
+    void setId(long id) {
         this.id = id;
     }
 
@@ -56,7 +67,7 @@ public class ExpenseObject {
         return expenditure;
     }
 
-    public void setExpenditure(boolean expenditure) {
+    void setExpenditure(boolean expenditure) {
         this.expenditure = expenditure;
     }
 
@@ -64,7 +75,7 @@ public class ExpenseObject {
         return category;
     }
 
-    public void setCategory(String category) {
+    void setCategory(String category) {
         this.category = category;
     }
 
@@ -72,7 +83,7 @@ public class ExpenseObject {
         return token;
     }
 
-    public void setToken(String token) {
+    void setToken(String token) {
         this.token = token;
     }
 
