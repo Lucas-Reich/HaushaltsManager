@@ -4,66 +4,65 @@ import java.util.Calendar;
 
 class ExpenseObject {
 
-    private Calendar expenditureDate;
-    private String expenditureName;
-    private int expenditureAmount;
+    private Calendar date;
+    private String title = "";
+    private int amount;
     private long id;
     private boolean expenditure;
-    private String category;
-    private String tag;
-    private String notice;
-    private String account;
+    private String category = "";
+    private String tag = "";
+    private String notice = "";
+    private String account = "";
 
 
-    public ExpenseObject(String expenditureName, int expenditureAmount, long id, boolean expenditure, String category, String token) {
+    public ExpenseObject(String title, int amount, long id, boolean expenditure, String category, String token) {
 
-        this.expenditureName = expenditureName;
-        this.expenditureAmount = expenditureAmount;
+        this.title = title;
+        this.amount = amount;
         this.id = id;
         this.expenditure = expenditure;
         this.category = category;
         this.tag = token;
     }
 
-    public ExpenseObject(String expenditureName, int expenditureAmount, boolean expenditure, String category) {
+    public ExpenseObject(String title, int amount, boolean expenditure, String category) {
 
-        this.expenditureName = expenditureName;
-        this.expenditureAmount = expenditureAmount;
+        this.title = title;
+        this.amount = amount;
         this.expenditure = expenditure;
         this.category = category;
     }
 
-    public ExpenseObject() {}
+    ExpenseObject() {}
 
     @Override
     public String toString() {
 
-        String output = expenditureAmount + " x " + expenditureName;
-        return output;
+        return amount + " x " + title;
     }
 
-    public Calendar getExpenditureDate() {
-        return expenditureDate;
+    String getDate() {
+        return date.get(Calendar.DAY_OF_MONTH) + "-" + (date.get(Calendar.MONTH) + 1) + "-" + date.get(Calendar.YEAR);
     }
 
-    void setExpenditureDate(Calendar expenditureDate) {
-        this.expenditureDate = expenditureDate;
+    void setDate(Calendar date) {
+        this.date = date;
     }
 
-    public String getExpenditureName() {
-        return expenditureName;
+    String getTitle() {
+        return title;
     }
 
-    void setExpenditureName(String expenditureName) {
-        this.expenditureName = expenditureName;
+    void setTitle(String title) {
+        this.title = title;
     }
 
-    public int getExpenditureAmount() {
-        return expenditureAmount;
+    int getAmount() {
+        return amount;
     }
 
-    void setExpenditureAmount(int expenditureAmount) {
-        this.expenditureAmount = expenditureAmount;
+    void setAmount(int amount) {
+        this.amount = amount;
     }
 
     public long getId() {
@@ -74,7 +73,7 @@ class ExpenseObject {
         this.id = id;
     }
 
-    public boolean isExpenditure() {
+    boolean getExpenditure() {
         return expenditure;
     }
 
@@ -82,7 +81,7 @@ class ExpenseObject {
         this.expenditure = expenditure;
     }
 
-    public String getCategory() {
+    String getCategory() {
         return category;
     }
 
@@ -102,15 +101,15 @@ class ExpenseObject {
         return notice;
     }
 
-    public void setNotice(String notice) {
+    void setNotice(String notice) {
         this.notice = notice;
     }
 
-    public String getAccount() {
+    String getAccount() {
         return account;
     }
 
-    public void setAccount(String account) {
+    void setAccount(String account) {
         this.account = account;
     }
 }

@@ -4,58 +4,50 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
+import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 public class ExpenseInputDialogFragment extends DialogFragment {
-
-
-    public interface NoticeDialogListener {
-
-        void onDialogPositiveClick(DialogFragment dialog);
-
-        void onDialogNegativeClick(DialogFragment dialog);
-    }
-
-
-    NoticeDialogListener mListener;
-
-
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-
-        try {
-
-            mListener = (NoticeDialogListener) activity;
-        } catch (ClassCastException e) {
-
-            throw new ClassCastException(activity.toString() + "must implement NoticeDialogListener");
-        }
-    }
-
 
     public Dialog onCreateDialog(final Bundle savedInstances) {
 
         final Bundle args = getArguments();
-
-        final Activity activ = getActivity();
-        TextView amount = (TextView) activ.findViewById(R.id.expense_screen_amount);
-        amount.setText("Test");
-
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-
+        final Activity activity = getActivity();
+        final ExpenseScreen expenseScreen = (ExpenseScreen) getActivity();
         final EditText input = new EditText(getContext());
+
+
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+
+        builder.setTitle(args.getString("original_title"));
+
         builder.setView(input);
 
         builder.setPositiveButton(R.string.expense_pop_up_ok, new DialogInterface.OnClickListener() {
+
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                args.putString("user_input", input.getText().toString());
-                mListener.onDialogPositiveClick(ExpenseInputDialogFragment.this);
+                Button btn = (Button) activity.findViewById(args.getInt("button_id"));
+
+                if (input.getText().toString().length() != 0) {
+
+                    setExpense(args.getInt("button_id"), expenseScreen.EXPENSE, input.getText().toString());
+                    btn.setText(input.getText().toString());
+                    btn.setTextColor(Color.BLACK);
+                } else {
+
+                    setExpense(args.getInt("button_id"), expenseScreen.EXPENSE, "");
+                    btn.setText(args.getString("original_title"));
+                    btn.setTextColor(Color.DKGRAY);
+                }
+
+                Log.d("ExpenseScreen", "set button text to " + btn.getText().toString());
             }
         });
 
@@ -63,13 +55,34 @@ public class ExpenseInputDialogFragment extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                args.putString("user_input", "");
-                mListener.onDialogNegativeClick(ExpenseInputDialogFragment.this);
+                dismiss();
             }
         });
 
-        builder.setTitle(args.getString("original_title"));
-
         return builder.create();
+    }
+
+    private void setExpense(int buttonId, ExpenseObject expense, String btnText) {
+
+        switch (buttonId) {
+
+            case R.id.expense_screen_title:
+
+                expense.setTitle(btnText);
+                break;
+
+            case R.id.expense_screen_tag:
+
+                expense.setTag(btnText);
+                break;
+
+            case R.id.expense_screen_notice:
+
+                expense.setNotice(btnText);
+                break;
+
+            default:
+                break;
+        }
     }
 }

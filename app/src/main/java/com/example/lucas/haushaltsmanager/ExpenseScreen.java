@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -17,10 +18,11 @@ import android.widget.Toast;
 
 import java.util.Calendar;
 
-public class ExpenseScreen extends AppCompatActivity implements ExpenseInputDialogFragment.NoticeDialogListener, AccountPickerDialogFragment.NoticeDialogListener {
+public class ExpenseScreen extends AppCompatActivity {
 
-    private Calendar cal = Calendar.getInstance();
-    private ExpenseObject expense = new ExpenseObject();
+    private Calendar CAL = Calendar.getInstance();
+    public ExpenseObject EXPENSE = new ExpenseObject();
+    private String LOGTAG = "ExpenseScreen: ";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,24 +35,31 @@ public class ExpenseScreen extends AppCompatActivity implements ExpenseInputDial
 
         // set the displayed date to the current one
         Button setDate = (Button) findViewById(R.id.expense_screen_date);
-        String today = cal.get(Calendar.DAY_OF_MONTH) + "-" + (cal.get(Calendar.MONTH) + 1) + "-" + cal.get(Calendar.YEAR);
+        String today = CAL.get(Calendar.DAY_OF_MONTH) + "-" + (CAL.get(Calendar.MONTH) + 1) + "-" + CAL.get(Calendar.YEAR);
         setDate.setText(today);
+        EXPENSE.setDate(CAL);
+        Log.d(LOGTAG, "set date to " + today + "");
 
         // set the account to the current main account
-        Button setAccout = (Button) findViewById(R.id.expense_screen_account);
+        Button accountBtn = (Button) findViewById(R.id.expense_screen_account);
         String activeAccount = "Kreditkarte";
-        setAccout.setText(activeAccount);
+        accountBtn.setText(activeAccount);
+        EXPENSE.setAccount(activeAccount);
+        Log.d(LOGTAG, "set active account to " + activeAccount);
 
-        // set the expense type to "expense"
+        // set the EXPENSE type to "EXPENSE"
         RadioGroup expenseType = (RadioGroup) findViewById(R.id.expense_screen_expense_type);
         expenseType.check(R.id.expense_screen_radio_expense);
+        EXPENSE.setExpenditure(false);
+        Log.d(LOGTAG, "set expense type to " + false);
 
         TextView amount = (TextView) findViewById(R.id.expense_screen_amount);
         amount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                Toast.makeText(ExpenseScreen.this, "Du möchtest den Betrag setzen", Toast.LENGTH_SHORT).show();
+                EXPENSE.setAmount(1);
+                Log.d(LOGTAG, "set amount to 1");
             }
         });
 
@@ -78,65 +87,29 @@ public class ExpenseScreen extends AppCompatActivity implements ExpenseInputDial
 
                 if (checkedId == R.id.expense_screen_radio_expense) {
 
-                    Toast.makeText(ExpenseScreen.this, "Das ist eine Ausgabe", Toast.LENGTH_SHORT).show();
-                    expense.setExpenditure(true);
+                    EXPENSE.setExpenditure(true);
+                    Log.d(LOGTAG, "set expense type to " + true);
                 } else {
 
-                    Toast.makeText(ExpenseScreen.this, "Das ist eine Einnahme", Toast.LENGTH_SHORT).show();
-                    expense.setExpenditure(false);
+                    EXPENSE.setExpenditure(false);
+                    Log.d(LOGTAG, "set expense type to " + false);
                 }
+            }
+        });
+
+        Button saveExpense = (Button) findViewById(R.id.expense_screen_create_booking);
+        saveExpense.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Log.d(LOGTAG, EXPENSE.toString());
             }
         });
     }
 
-    public void onDialogPositiveClick(DialogFragment dialog) {
-
-        Bundle args = dialog.getArguments();
-        Button callingButton = (Button) findViewById(args.getInt("button_id"));
-
-        if (args.getString("user_input").length() == 0) {
-
-            callingButton.setText(args.getString("original_title"));
-            callingButton.setTextColor(Color.DKGRAY);
-        } else {
-
-            callingButton.setText(args.getString("user_input"));
-            callingButton.setTextColor(Color.BLACK);
-        }
-
-        switch (callingButton.getId()) {
-
-            case R.id.expense_screen_title:
-
-                expense.setExpenditureName(callingButton.getText().toString());
-                break;
-
-            case R.id.expense_screen_tag:
-
-                expense.setTag(callingButton.getText().toString());
-                break;
-
-            case R.id.expense_screen_notice:
-
-                expense.setNotice(callingButton.getText().toString());
-        }
-    }
-
-    public void onDialogNegativeClick(DialogFragment dialog) {
-
-        // do nothing
-    }
-
-    public void onItemSelected(DialogFragment dialog) {
-
-        Button account_btn = (Button) findViewById(R.id.expense_screen_account);
-
-        expense.setAccount(account_btn.getText().toString());
-    }
-
     private void updateDate() {
 
-        new DatePickerDialog(ExpenseScreen.this, d, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show();
+        new DatePickerDialog(ExpenseScreen.this, d, CAL.get(Calendar.YEAR), CAL.get(Calendar.MONTH), CAL.get(Calendar.DAY_OF_MONTH)).show();
     }
 
     DatePickerDialog.OnDateSetListener d = new DatePickerDialog.OnDateSetListener() {
@@ -150,7 +123,8 @@ public class ExpenseScreen extends AppCompatActivity implements ExpenseInputDial
             Button btn_date = (Button) findViewById(R.id.expense_screen_date);
             btn_date.setText(dayOfMonth + "-" + (month + 1) + "-" + year);
 
-            expense.setExpenditureDate(expenditureDate);
+            EXPENSE.setDate(expenditureDate);
+            Log.d(LOGTAG, "set date to " + dayOfMonth + "-" + (month + 1) + "-" + year);
         }
     };
 
@@ -196,16 +170,18 @@ public class ExpenseScreen extends AppCompatActivity implements ExpenseInputDial
 
             case R.id.expense_screen_account:
 
+                Button accountBtn = (Button) findViewById(R.id.expense_screen_account);
                 bundle.putString("original_title", "Choose Account");
+                bundle.putString("current_account", accountBtn.getText().toString());
                 break;
         }
-
 
         if (btn.getId() == R.id.expense_screen_account) {
 
             AccountPickerDialogFragment accountPicker = new AccountPickerDialogFragment();
             accountPicker.setArguments(bundle);
             accountPicker.show(getFragmentManager(), "account_picker");
+            Log.d("test", "test");
         } else if (btn.getId() != R.id.expense_screen_date){
 
             ExpenseInputDialogFragment expenseDialog = new ExpenseInputDialogFragment();
