@@ -4,19 +4,19 @@
     <!--
         <group android:checkableBehavior="single">
             <item
-                android:id="@+id/nav_camera"
+                android:index="@+index/nav_camera"
                 android:icon="@drawable/ic_menu_camera"
                 android:title="Desktop" />
             <item
-                android:id="@+id/nav_gallery"
+                android:index="@+index/nav_gallery"
                 android:icon="@drawable/ic_menu_gallery"
                 android:title="Kategorien" />
             <item
-                android:id="@+id/nav_slideshow"
+                android:index="@+index/nav_slideshow"
                 android:icon="@drawable/ic_menu_slideshow"
                 android:title="Schablonen" />
             <item
-                android:id="@+id/nav_manage"
+                android:index="@+index/nav_manage"
                 android:icon="@drawable/ic_menu_manage"
                 android:title="Tools" />
         </group>
@@ -24,77 +24,77 @@
         <item android:title="Communicate">
             <menu>
                 <item
-                    android:id="@+id/nav_share"
+                    android:index="@+index/nav_share"
                     android:icon="@drawable/ic_menu_share"
                     android:title="Share" />
                 <item
-                    android:id="@+id/nav_send"
+                    android:index="@+index/nav_send"
                     android:icon="@drawable/ic_menu_send"
                     android:title="Send" />
             </menu>
         </item>
     -->
     <item
-        android:id="@+id/no_category"
+        android:index="@+index/no_category"
         android:icon="@drawable/ic_menu_camera"
         android:title="@string/left_slider_no_category" />
     <item
-        android:id="@+id/course"
+        android:index="@+index/course"
         android:icon="@drawable/ic_menu_camera"
         android:title="@string/left_slider_course" />
     <item
-        android:id="@+id/standing_orders"
+        android:index="@+index/standing_orders"
         android:icon="@drawable/ic_menu_camera"
         android:title="@string/left_slider_standing_order" />
     <item
-        android:id="@+id/tranfers"
+        android:index="@+index/tranfers"
         android:icon="@drawable/ic_menu_camera"
         android:title="@string/left_slider_transfers" />
     <group>
         <item
-            android:id="@+id/desktop"
+            android:index="@+index/desktop"
             android:icon="@drawable/ic_menu_camera"
             android:title="@string/left_slider_desktop" />
         <item
-            android:id="@+id/categories"
+            android:index="@+index/categories"
             android:icon="@drawable/ic_menu_camera"
             android:title="@string/left_slider_categories" />
         <item
-            android:id="@+id/templates"
+            android:index="@+index/templates"
             android:icon="@drawable/ic_menu_camera"
             android:title="@string/left_slider_template" />
     </group>
 
     <group>
         <item
-            android:id="@+id/backup"
+            android:index="@+index/backup"
             android:icon="@drawable/ic_menu_camera"
             android:title="@string/left_slider_backup" />
         <item
-            android:id="@+id/import_export"
+            android:index="@+index/import_export"
             android:icon="@drawable/ic_menu_camera"
             android:title="@string/left_slider_import_export" />
     </group>
 
     <group>
         <item
-            android:id="@+id/store"
+            android:index="@+index/store"
             android:icon="@drawable/ic_menu_camera"
             android:title="@string/left_slider_store" />
         <item
-            android:id="@+id/preferences"
+            android:index="@+index/preferences"
             android:icon="@drawable/ic_menu_camera"
             android:title="@string/left_slider_preferences" />
         <item
-            android:id="@+id/follow_us"
+            android:index="@+index/follow_us"
             android:icon="@drawable/ic_menu_camera"
             android:title="@string/left_slider_follow_us" />
         <item
-            android:id="@+id/rate_the_app"
+            android:index="@+index/rate_the_app"
             android:icon="@drawable/ic_menu_camera"
             android:title="@string/left_slider_rate_the_app" />
         <item
-            android:id="@+id/about"
+            android:index="@+index/about"
             android:icon="@drawable/ic_menu_camera"
             android:title="@string/left_slider_about" />
     </group>
@@ -104,7 +104,7 @@
         <item></item>
     </group>
     <item
-        android:id="@+id/planne_bookings"
+        android:index="@+index/planne_bookings"
         android:icon="@drawable/ic_menu_camera"
         android:title="@string/left_slider_planned_bookings" />
 

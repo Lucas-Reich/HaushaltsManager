@@ -4,22 +4,22 @@ import java.util.Calendar;
 
 class ExpenseObject {
 
-    private Calendar date;
-    private String title = "";
-    private int amount;
-    private long id;
-    private boolean expenditure;
-    private String category = "";
+    private Calendar date;// set by default
+    private String title = "";// required
+    private double amount = 0;// required
+    private long index;
+    private boolean expenditure;// set by default
+    private String category = "";// required
     private String tag = "";
     private String notice = "";
-    private String account = "";
+    private String account = "";// set by default
 
 
-    public ExpenseObject(String title, int amount, long id, boolean expenditure, String category, String token) {
+    public ExpenseObject(String title, int amount, long index, boolean expenditure, String category, String token) {
 
         this.title = title;
         this.amount = amount;
-        this.id = id;
+        this.index = index;
         this.expenditure = expenditure;
         this.category = category;
         this.tag = token;
@@ -38,9 +38,16 @@ class ExpenseObject {
     @Override
     public String toString() {
 
-        return amount + " x " + title;
+        String toDisplay = "Book " + this.title + " " + this.amount + " times as an " + this.expenditure;
+        String toDisplay2 = "The booking belongs to " + this.category + ", happened at the " + date.get(Calendar.DAY_OF_MONTH) + "-" + (date.get(Calendar.MONTH) + 1) + "-" + date.get(Calendar.YEAR);
+        String toDisplay3 = " and has to be inserted to " + this.account;
+
+
+        return toDisplay + toDisplay2 + toDisplay3;
     }
 
+    //TODO return date String depending on the locale of the user
+    //TODO implement a getDisplayDate and getDate method
     String getDate() {
         return date.get(Calendar.DAY_OF_MONTH) + "-" + (date.get(Calendar.MONTH) + 1) + "-" + date.get(Calendar.YEAR);
     }
@@ -57,20 +64,20 @@ class ExpenseObject {
         this.title = title;
     }
 
-    int getAmount() {
+    double getAmount() {
         return amount;
     }
 
-    void setAmount(int amount) {
+    void setAmount(double amount) {
         this.amount = amount;
     }
 
-    public long getId() {
-        return id;
+    public long getIndex() {
+        return index;
     }
 
-    void setId(long id) {
-        this.id = id;
+    void setIndex(long index) {
+        this.index = index;
     }
 
     boolean getExpenditure() {
@@ -111,5 +118,10 @@ class ExpenseObject {
 
     void setAccount(String account) {
         this.account = account;
+    }
+
+    boolean isSet() {
+
+        return !this.title.isEmpty() && this.amount != 0 && !this.category.isEmpty();
     }
 }

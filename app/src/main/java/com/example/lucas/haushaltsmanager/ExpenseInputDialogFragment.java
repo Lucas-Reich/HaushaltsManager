@@ -81,6 +81,12 @@ public class ExpenseInputDialogFragment extends DialogFragment {
                 expense.setNotice(btnText);
                 break;
 
+            //TODO remove category from ExpenseInputDialogFragment
+            case R.id.expense_screen_category:
+
+                expense.setCategory(btnText);
+                break;
+
             default:
                 break;
         }

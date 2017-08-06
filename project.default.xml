@@ -21,14 +21,14 @@
         </annotationProcessing>
       </component>
       <component name="ProjectLevelVcsManager" settingsEditedManually="false">
-        <OptionsSetting value="true" id="Add" />
-        <OptionsSetting value="true" id="Remove" />
-        <OptionsSetting value="true" id="Checkout" />
-        <OptionsSetting value="true" id="Update" />
-        <OptionsSetting value="true" id="Status" />
-        <OptionsSetting value="true" id="Edit" />
-        <ConfirmationsSetting value="0" id="Add" />
-        <ConfirmationsSetting value="0" id="Remove" />
+        <OptionsSetting value="true" index="Add" />
+        <OptionsSetting value="true" index="Remove" />
+        <OptionsSetting value="true" index="Checkout" />
+        <OptionsSetting value="true" index="Update" />
+        <OptionsSetting value="true" index="Status" />
+        <OptionsSetting value="true" index="Edit" />
+        <ConfirmationsSetting value="0" index="Add" />
+        <ConfirmationsSetting value="0" index="Remove" />
       </component>
       <component name="ProjectRootManager" version="2" languageLevel="JDK_1_3" default="true" assert-keyword="false" jdk-15="false" />
       <component name="PropertiesComponent">
