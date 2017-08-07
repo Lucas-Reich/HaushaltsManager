@@ -6,6 +6,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.List;
+
 class ExpensesDataSource {
 
     private static final String LOG_TAG = ExpensesDataSource.class.getSimpleName();
@@ -13,7 +17,7 @@ class ExpensesDataSource {
     private SQLiteDatabase database;
     private ExpensesDbHelper dbHelper;
 
-    public ExpensesDataSource(Context context) {
+    ExpensesDataSource(Context context) {
 
         Log.d(LOG_TAG, "Unsere DataSource erzeugt jetzt den dbHelper.");
         dbHelper = new ExpensesDbHelper(context);
@@ -36,28 +40,39 @@ class ExpensesDataSource {
         Calendar cal = Calendar.getInstance();
 
         int idIndex = cursor.getColumnIndex(ExpensesDbHelper.TAGS_COL_ID);
-        //int idAmount = cursor.getColumnIndex(ExpensesDbHelper.EXPENSES.COL.AMOUNT);
-        //int idCategory = cursor.getColumnIndex(ExpensesDbHelper.CATEGORIES.COL.CATEGORY);
-        //int idExpenditure = cursor.getColumnIndex(ExpensesDbHelper.EXPENSES.COL.EXPENDITURE);
-        //int idTitle = cursor.getColumnIndex(ExpensesDbHelper.EXPENSES.COL.TITLE);
-        //int idTag = cursor.getColumnIndex(ExpensesDbHelper.TAGS.COL.TAG);
-        //int idDate = cursor.getColumnIndex(ExpensesDbHelper.EXPENSES.COL.DATE);
-        //int idNotice = cursor.getColumnIndex(ExpensesDbHelper.EXPENSES.COL.NOTICE);
+        int idAmount = cursor.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_PRICE);
+        int idCategory = cursor.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_F_CATEGORY_ID);
+        int idExpenditure = cursor.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_EXPENDITURE);
+        int idTitle = cursor.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_TITLE);
+        int idDate = cursor.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_DATE);
+        int idNotice = cursor.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_NOTICE);
         int idAccount = cursor.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_ACCOUNT);
 
         expense.setIndex(cursor.getInt(idIndex));
-        //expense.setAmount(cursor.getInt(idAmount));
-        //expense.setExpenditure(cursor.getInt(idExpenditure));
-        //expense.setTitle(cursor.getString(idTitle));
-        //expense.setTag(cursor.getString(idTag));
-        //String expenseDate = cursor.getString(idDate);
-        //int day = Integer.parseInt(expenseDate.substring(0,1));
-        //int month = Integer.parseInt(expenseDate.substring(3,4));
-        //int year = Integer.parseInt(expenseDate.substring(6,7));
-        //cal.set(year, month, day);
-        //expense.setDate(cursor.getString(cal));
-        //expense.setNotice(cursor.getString(idNotice));
-        expense.setAccount(cursor.getString(idAccount));
+
+        expense.setPrice(cursor.getDouble(idAmount));
+
+        expense.setExpenditure(cursor.getInt(idExpenditure));
+
+        expense.setTitle(cursor.getString(idTitle));
+
+        String category = getCategoryById(cursor.getLong(idCategory));
+        expense.setCategory(category);
+
+        List<String> allTags = Arrays.asList(getAllTagsToBooking(idIndex));
+        expense.setTags(allTags);
+
+        String expenseDate = cursor.getString(idDate);
+        int day = Integer.parseInt(expenseDate.substring(0,1));
+        int month = Integer.parseInt(expenseDate.substring(3,4));
+        int year = Integer.parseInt(expenseDate.substring(6,7));
+        cal.set(year, month, day);
+        expense.setDate(cal);
+
+        expense.setNotice(cursor.getString(idNotice));
+
+        String account = getTagById(cursor.getLong(idAccount));
+        expense.setAccount(account);
 
         return expense;
     }
@@ -66,27 +81,28 @@ class ExpensesDataSource {
     /**
      * Convenience Method for creating a new Account
      *
-     * @param account_name name of the account which should be created
+     * @param accountName name of the account which should be created
      * @return the id of the created tag. -1 if the insertion failed
      */
-    public long createAccount(String account_name) {
+    public long createAccount(String accountName) {
 
         ContentValues values = new ContentValues();
-        values.put(ExpensesDbHelper.ACCOUNTS_COL_ACCOUNT, account_name);
+        values.put(ExpensesDbHelper.ACCOUNTS_COL_ACCOUNT, accountName);
 
+        Log.d(LOG_TAG, "created " + accountName + " at Accounts table");
         return database.insert(ExpensesDbHelper.TABLE_ACCOUNTS, null, values);
     }
 
     /**
      * Convenience Method for getting an specific Account
      *
-     * @param account_id Id of the account which should be selected
+     * @param accountId Id of the account which should be selected
      * @return The tag at the specified index
      */
-    public String getAccount(long account_id) {
+    public String getAccountByName(long accountId) {
 
         String account = "";
-        String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_ACCOUNTS + " WHERE " + ExpensesDbHelper.ACCOUNTS_COL_ID + " = " + account_id;
+        String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_ACCOUNTS + " WHERE " + ExpensesDbHelper.ACCOUNTS_COL_ID + " = " + accountId;
         Log.d(LOG_TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
@@ -100,6 +116,25 @@ class ExpensesDataSource {
         c.close();
 
         return account;
+    }
+
+    public long getAccountByName(String accountName) {
+
+        long accountId = 0;
+        String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_ACCOUNTS + " WHERE " + ExpensesDbHelper.ACCOUNTS_COL_ACCOUNT + " = " + accountId;
+        Log.d(LOG_TAG, selectQuery);
+
+        Cursor c = database.rawQuery(selectQuery, null);
+
+        if (c != null) {
+
+            c.moveToFirst();
+            accountId = c.getLong(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_ACCOUNT));
+        }
+
+        c.close();
+
+        return accountId;
     }
 
     /**
@@ -133,57 +168,57 @@ class ExpensesDataSource {
     /**
      * Convenience Method for updating a Account
      *
-     * @param account_id Id of the Account which should be updated
-     * @param new_account_name New name of the Account
+     * @param accountId Id of the Account which should be updated
+     * @param newAccountName New name of the Account
      * @return The number of rows affected
      */
-    public int updateAccount(long account_id, String new_account_name) {
+    public int updateAccount(long accountId, String newAccountName) {
 
         ContentValues values = new ContentValues();
-        values.put(ExpensesDbHelper.ACCOUNTS_COL_ACCOUNT, new_account_name);
+        values.put(ExpensesDbHelper.ACCOUNTS_COL_ACCOUNT, newAccountName);
 
-        return database.update(ExpensesDbHelper.TABLE_ACCOUNTS, values, ExpensesDbHelper.ACCOUNTS_COL_ID + " = ?", new String[] {account_id + ""});
+        return database.update(ExpensesDbHelper.TABLE_ACCOUNTS, values, ExpensesDbHelper.ACCOUNTS_COL_ID + " = ?", new String[] {accountId + ""});
     }
 
     /**
      * Convenience Method for deleting a Account
      *
-     * @param account_id the id of the entry which should be deleted
+     * @param accountId the id of the entry which should be deleted
      * @return the number of affected rows
      */
     //TODO cant delete Account if it's still assigned to an Booking
-    public int deleteAccount(long account_id) {
+    public int deleteAccount(long accountId) {
 
-        Log.d(LOG_TAG, "deleted account at index " + account_id);
-        return database.delete(ExpensesDbHelper.TABLE_ACCOUNTS, ExpensesDbHelper.ACCOUNTS_COL_ID + " = ?", new String[] {"" + account_id});
+        Log.d(LOG_TAG, "deleted account at index " + accountId);
+        return database.delete(ExpensesDbHelper.TABLE_ACCOUNTS, ExpensesDbHelper.ACCOUNTS_COL_ID + " = ?", new String[] {"" + accountId});
     }
 
 
     /**
      * Convenience Method for creating a new Tag
      *
-     * @param tag_name name of the tag which should be created
+     * @param tagName name of the tag which should be created
      * @return the id of the created tag. -1 if the insertion failed
      */
-    public long createTag(String tag_name) {
+    public long createTag(String tagName) {
 
         ContentValues values = new ContentValues();
-        values.put(ExpensesDbHelper.TAGS_COL_TAG_NAME, tag_name);
+        values.put(ExpensesDbHelper.TAGS_COL_TAG_NAME, tagName);
 
-        Log.d(LOG_TAG, "created " + tag_name + " at Tag table");
+        Log.d(LOG_TAG, "created " + tagName + " at Tag table");
         return database.insert(ExpensesDbHelper.TABLE_TAGS, null, values);
     }
 
     /**
      * Convenience Method for getting an specific Tag
      *
-     * @param tag_id Id of the tag which should be selected
+     * @param tagId Id of the tag which should be selected
      * @return The tag at the specified index
      */
-    public String getTag(long tag_id) {
+    public String getTagById(long tagId) {
 
         String tag = "";
-        String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_TAGS + " WHERE " + ExpensesDbHelper.TAGS_COL_ID + " = " + tag_id;
+        String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_TAGS + " WHERE " + ExpensesDbHelper.TAGS_COL_ID + " = " + tagId;
         Log.d(LOG_TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
@@ -230,18 +265,17 @@ class ExpensesDataSource {
     /**
      * Convenience Method for updating a Tag
      *
-     * @param tag_id Id of the Tag which should be updated
-     * @param new_tag_name New name of the Tag
+     * @param tagId Id of the Tag which should be updated
+     * @param newTagName New name of the Tag
      * @return The number of rows affected
      */
-    public int updateTag(long tag_id, String new_tag_name) {
+    public int updateTag(long tagId, String newTagName) {
 
         ContentValues values = new ContentValues();
-        values.put(ExpensesDbHelper.TAGS_COL_TAG_NAME, new_tag_name);
+        values.put(ExpensesDbHelper.TAGS_COL_TAG_NAME, newTagName);
 
-        return database.update(ExpensesDbHelper.TABLE_TAGS, values, ExpensesDbHelper.TAGS_COL_ID + " = ?", new String[] {tag_id + ""});
+        return database.update(ExpensesDbHelper.TABLE_TAGS, values, ExpensesDbHelper.TAGS_COL_ID + " = ?", new String[] {tagId + ""});
     }
-
     /**
      * Convenience Method for deleting a Tag
      *
@@ -261,7 +295,7 @@ class ExpensesDataSource {
         return
     }
 
-    private long[] getAllTagsToBooking(long bookingId) {
+    private String[] getAllTagsToBooking(long bookingId) {
 
 
     }
@@ -277,23 +311,127 @@ class ExpensesDataSource {
     }
 
 
+    /**
+     * Convenience Method for creating a Booking
+     *
+     * @param expense The expense which has to be stored in the DB
+     * @return Id of the created Booking
+     */
     public long createBooking(ExpenseObject expense) {
 
+        ContentValues values = new ContentValues();
+        values.put("price", expense.getPrice());
 
+        //TODO if Category does not exist already create it
+        long categoryId = getCategoryByName(expense.getCategory());
+        values.put("f_category_id", categoryId);
+        values.put("expenditure", expense.getExpenditure());
+        values.put("title", expense.getTitle());
+        values.put("date", expense.getDate());
+        values.put("notice", expense.getNotice());
+
+        //TODO if Account does not exist already create it
+        long accountId = getAccountByName(expense.getAccount());
+        values.put("f_account_id", accountId);
+
+        Log.d(LOG_TAG, "created expense at Booking table");
+        return database.insert(ExpensesDbHelper.TABLE_BOOKINGS, null, values);
     }
 
-    public ExpenseObject getBooking(long bookingId) {
+    /**
+     * Convenience Method for getting a Booking
+     *
+     * @param bookingId Get the Booking values to the selected id
+     * @return The requested expense
+     */
+    public ExpenseObject getBookingById(long bookingId) {
 
         ExpenseObject expense;
-        Cursor c = database.rawQuery(   );
+        String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_BOOKINGS + " WHERE " + ExpensesDbHelper.BOOKINGS_COL_BOOKING_ID + " = " + bookingId;
+        Log.d(LOG_TAG, selectQuery);
+        Cursor c = database.rawQuery(selectQuery, null);
 
         expense = cursorToExpense(c);
         c.close();
         return expense;
     }
 
+    /**
+     * Convenience Method for updating a Booking
+     *
+     * @param bookingId Id of the Booking which should be changed
+     * @param newExpense Expense with the new values
+     * @return the number of affected rows
+     */
+    public int updateBooking(long bookingId, ExpenseObject newExpense) {
+
+        ContentValues values = new ContentValues();
+        values.put("price", newExpense.getPrice());
+
+        //TODO if Category does not exist already create it
+        long categoryId = getCategoryByName(newExpense.getCategory());
+        values.put("f_category_id", categoryId);
+        values.put("expenditure", newExpense.getExpenditure());
+        values.put("title", newExpense.getTitle());
+        values.put("date", newExpense.getDate());
+        values.put("notice", newExpense.getNotice());
+
+        //TODO if Account does not exist already create it
+        long accountId = getAccountByName(newExpense.getAccount());
+        values.put("f_account_id", accountId);
+
+        Log.d(LOG_TAG, "changed booking " + bookingId);
+        return database.update(ExpensesDbHelper.TABLE_BOOKINGS, values, ExpensesDbHelper.BOOKINGS_COL_BOOKING_ID + " = ?", new String[] {"" + bookingId});
+    }
+
+    /**
+     * Convenience Method for deleting a Booking
+     *
+     * @param bookingId Id of the Booking which should be deleted
+     * @return the number of affected rows
+     */
     public int deleteBooking(long bookingId) {
 
+        Log.d(LOG_TAG, "deleted booking at index " + bookingId);
+        return database.delete(ExpensesDbHelper.TABLE_BOOKINGS, ExpensesDbHelper.BOOKINGS_COL_BOOKING_ID + " = ?", new String[] {"" + bookingId});
+    }
 
+
+    private long getCategoryByName(String category) {
+
+        long categoryId = 0;
+        String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_CATEGORIES + " WHERE " + ExpensesDbHelper.CATEGORIES_COL_CATEGORY_NAME + " = " + category;
+        Log.d(LOG_TAG, selectQuery);
+
+        Cursor c = database.rawQuery(selectQuery, null);
+
+        if (c != null) {
+
+            c.moveToFirst();
+            categoryId = c.getLong(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_CATEGORY_NAME));
+        }
+
+        c.close();
+
+        return categoryId;
+    }
+
+    public String getCategoryById(long categoryId) {
+
+        String categoryId = "";
+        String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_CATEGORIES + " WHERE " + ExpensesDbHelper.CATEGORIES_COL_ID + " = " + categoryId;
+        Log.d(LOG_TAG, selectQuery);
+
+        Cursor c = database.rawQuery(selectQuery, null);
+
+        if (c != null) {
+
+            c.moveToFirst();
+            categoryId = c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_ID));
+        }
+
+        c.close();
+
+        return categoryId;
     }
 }

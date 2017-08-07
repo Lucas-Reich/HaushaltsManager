@@ -1,44 +1,44 @@
 package com.example.lucas.haushaltsmanager;
 
 import java.util.Calendar;
+import java.util.List;
 
 class ExpenseObject {
 
     private Calendar date;// set by default
     private String title = "";// required
-    private double amount = 0;// required
+    private double price = 0;// required
     private long index;
     private boolean expenditure;// set by default
     private String category = "";// required
-    private String tag = "";
+    private List<String> tag;
     private String notice = "";
     private String account = "";// set by default
 
 
-    public ExpenseObject(String title, int amount, long index, boolean expenditure, String category, String token) {
+    public ExpenseObject(String title, double price, boolean expenditure, String category, String tag) {
 
         this.title = title;
-        this.amount = amount;
-        this.index = index;
+        this.price = price;
         this.expenditure = expenditure;
         this.category = category;
-        this.tag = token;
+        this.tag.add(tag);
     }
 
-    public ExpenseObject(String title, int amount, boolean expenditure, String category) {
+    public ExpenseObject(String title, double price, boolean expenditure, String category) {
 
-        this.title = title;
-        this.amount = amount;
-        this.expenditure = expenditure;
-        this.category = category;
+        this(title, price, expenditure, category, "");
     }
 
-    ExpenseObject() {}
+    ExpenseObject() {
+
+        this("", 0.0, true, "", "");
+    }
 
     @Override
     public String toString() {
 
-        String toDisplay = "Book " + this.title + " " + this.amount + " times as an " + this.expenditure;
+        String toDisplay = "Book " + this.title + " " + this.price + " times as an " + this.expenditure;
         String toDisplay2 = "The booking belongs to " + this.category + ", happened at the " + date.get(Calendar.DAY_OF_MONTH) + "-" + (date.get(Calendar.MONTH) + 1) + "-" + date.get(Calendar.YEAR);
         String toDisplay3 = " and has to be inserted to " + this.account;
 
@@ -64,12 +64,12 @@ class ExpenseObject {
         this.title = title;
     }
 
-    double getAmount() {
-        return amount;
+    double getPrice() {
+        return price;
     }
 
-    void setAmount(double amount) {
-        this.amount = amount;
+    void setPrice(double price) {
+        this.price = price;
     }
 
     public long getIndex() {
@@ -88,6 +88,11 @@ class ExpenseObject {
         this.expenditure = expenditure;
     }
 
+    void setExpenditure(int expenditure) {
+
+        this.expenditure = expenditure == 0;
+    }
+
     String getCategory() {
         return category;
     }
@@ -96,12 +101,18 @@ class ExpenseObject {
         this.category = category;
     }
 
-    public String getTag() {
+    public List<String> getTags() {
         return tag;
     }
 
     void setTag(String tag) {
-        this.tag = tag;
+
+        this.tag.add(tag);
+    }
+
+    void setTags(List<String> tags) {
+
+        this.tag = tags;
     }
 
     public String getNotice() {
@@ -122,6 +133,6 @@ class ExpenseObject {
 
     boolean isSet() {
 
-        return !this.title.isEmpty() && this.amount != 0 && !this.category.isEmpty();
+        return !this.title.isEmpty() && this.price != 0 && !this.category.isEmpty();
     }
 }

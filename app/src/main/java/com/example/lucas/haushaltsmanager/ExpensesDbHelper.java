@@ -17,23 +17,23 @@ public class ExpensesDbHelper extends SQLiteOpenHelper {
 
     public static final String BOOKINGS_COL_BOOKING_ID = "_id";
     public static final String BOOKINGS_COL_PRICE = "price";
-    public static final String BOOKINGS_COL_F_ID_CATEGORY = "f_category_id";
+    public static final String BOOKINGS_COL_F_CATEGORY_ID = "f_category_id";
     public static final String BOOKINGS_COL_EXPENDITURE = "expenditure";
     public static final String BOOKINGS_COL_TITLE = "title";
     public static final String BOOKINGS_COL_DATE = "date";
     public static final String BOOKINGS_COL_NOTICE = "notice";
-    public static final String BOOKINGS_COL_F_ID_ACCOUNT = "f_account_id";
+    public static final String BOOKINGS_COL_F_ACCOUNT_ID = "f_account_id";
 
     private static final String CREATE_BOOKINGS = "CREATE TABLE " + TABLE_BOOKINGS
             + "("
             + BOOKINGS_COL_BOOKING_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + BOOKINGS_COL_PRICE + " REAL NOT NULL, "
-            + BOOKINGS_COL_F_ID_CATEGORY + " INTEGER NOT NULL, "
+            + BOOKINGS_COL_F_CATEGORY_ID + " INTEGER NOT NULL, "
             + BOOKINGS_COL_EXPENDITURE + " INTEGER NOT NULL, "
             + BOOKINGS_COL_TITLE + " TEXT NOT NULL, "
             + BOOKINGS_COL_DATE + " TEXT NOT NULL, "
             + BOOKINGS_COL_NOTICE + " TEXT, "
-            + BOOKINGS_COL_F_ID_ACCOUNT + " INTEGER NOT NULL"
+            + BOOKINGS_COL_F_ACCOUNT_ID + " INTEGER NOT NULL"
             + ");";
 
 

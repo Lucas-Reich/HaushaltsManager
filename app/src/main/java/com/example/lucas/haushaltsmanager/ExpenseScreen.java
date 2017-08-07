@@ -64,7 +64,7 @@ public class ExpenseScreen extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                EXPENSE.setAmount(1);
+                EXPENSE.setPrice(1);
                 Log.d(LOGTAG, "set amount to 1");
             }
         });
@@ -116,7 +116,7 @@ public class ExpenseScreen extends AppCompatActivity {
                 if (EXPENSE.isSet()) {
 
                     ExpenseObject testExpense = new ExpenseObject();
-                    testExpense.setAmount(100);
+                    testExpense.setPrice(100);
                     testExpense.setCategory("Test Kategorie");
                     testExpense.setExpenditure(true);
                     testExpense.setTitle("Test Ausgabe");
