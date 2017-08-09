@@ -289,7 +289,7 @@ class ExpensesDataSource {
         return database.delete(ExpensesDbHelper.TABLE_TAGS, ExpensesDbHelper.TAGS_COL_ID + " = ?", new String[] {"" + tag_id});
     }
 
-
+//TODO finish CRUD methods for BookingsTags table
     private long assignTagToBooking(long bookingId, long tagId) {
 
         return
@@ -396,7 +396,12 @@ class ExpensesDataSource {
         return database.delete(ExpensesDbHelper.TABLE_BOOKINGS, ExpensesDbHelper.BOOKINGS_COL_BOOKING_ID + " = ?", new String[] {"" + bookingId});
     }
 
-
+    /**
+     * Convenience Method for getting a Category by its name
+     *
+     * @param category Name of the category
+     * @return Returns the index of the given category
+     */
     private long getCategoryByName(String category) {
 
         long categoryId = 0;
@@ -416,9 +421,15 @@ class ExpensesDataSource {
         return categoryId;
     }
 
+    /**
+     * Convenience Method for getting a Category
+     *
+     * @param categoryId index of the desired Category
+     * @return Returns the name of the category
+     */
     public String getCategoryById(long categoryId) {
 
-        String categoryId = "";
+        String categoryName = "";
         String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_CATEGORIES + " WHERE " + ExpensesDbHelper.CATEGORIES_COL_ID + " = " + categoryId;
         Log.d(LOG_TAG, selectQuery);
 
@@ -427,11 +438,12 @@ class ExpensesDataSource {
         if (c != null) {
 
             c.moveToFirst();
-            categoryId = c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_ID));
+            categoryName = c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_ID));
         }
 
         c.close();
 
-        return categoryId;
+        return categoryName;
     }
+    //TODO finish CRUD methods for Catgory table
 }

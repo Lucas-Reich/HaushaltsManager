@@ -1,18 +1,18 @@
 package com.example.lucas.haushaltsmanager;
 
-import android.app.DatePickerDialog;
-import android.os.Bundle;
-import android.support.annotation.IdRes;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.app.DatePickerDialog;//
+import android.os.Bundle;//
+import android.support.annotation.IdRes;//
+import android.support.v7.app.AppCompatActivity;//
+import android.support.v7.widget.Toolbar;//
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.DatePicker;
-import android.widget.RadioGroup;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.view.View;//
+import android.widget.Button;//
+import android.widget.CheckBox;//
+import android.widget.DatePicker;//
+import android.widget.RadioGroup;//
+import android.widget.TextView;//
+import android.widget.Toast;//
 
 import java.util.Calendar;
 
