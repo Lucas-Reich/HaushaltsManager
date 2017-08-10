@@ -113,11 +113,13 @@ public class ExpenseScreen extends AppCompatActivity {
                 Log.d(LOGTAG, EXPENSE.toString());
                 Log.d(LOGTAG, "" + EXPENSE.isSet());
 
+                expensesDataSource.open();
+
                 if (EXPENSE.isSet()) {
 
                     ExpenseObject testExpense = new ExpenseObject();
                     testExpense.setPrice(100);
-                    testExpense.setCategory("Test Kategorie");
+                    testExpense.setCategory(new Category());
                     testExpense.setExpenditure(true);
                     testExpense.setTitle("Test Ausgabe");
                     testExpense.setDate(CAL);

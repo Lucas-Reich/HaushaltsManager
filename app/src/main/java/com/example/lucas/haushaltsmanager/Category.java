@@ -1,46 +1,45 @@
 package com.example.lucas.haushaltsmanager;
 
-public class Category {
+class Category {
 
     private long index;
     private String categoryName;
     private int color;
 
 
-
-    public Category (long index, String categoryName, int color) {
+    Category (long index, String categoryName, int color) {
 
         this.index = index;
         this.categoryName = categoryName;
         this.color = color;
     }
 
-    public Category() {
+    Category() {
 
         this(0, "", 0);
     }
 
-    public long getIndex() {
+    long getIndex() {
         return index;
     }
 
-    public void setIndex(long index) {
+    void setIndex(long index) {
         this.index = index;
     }
 
-    public String getCategoryName() {
+    String getCategoryName() {
         return categoryName;
     }
 
-    public void setCategoryName(String categoryName) {
+    void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
     }
 
-    public int getColor() {
+    int getColor() {
         return color;
     }
 
-    public void setColor(int color) {
+    void setColor(int color) {
         this.color = color;
     }
 }

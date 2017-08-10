@@ -1,6 +1,7 @@
 package com.example.lucas.haushaltsmanager;
 
 import java.util.Calendar;
+import java.util.LinkedList;
 import java.util.List;
 
 class ExpenseObject {
@@ -11,7 +12,7 @@ class ExpenseObject {
     private long index;
     private boolean expenditure;// set by default
     private Category category;// required
-    private List<String> tag;
+    private List<String> tag = new LinkedList<String>();
     private String notice = "";
     private String account = "";// set by default
 
