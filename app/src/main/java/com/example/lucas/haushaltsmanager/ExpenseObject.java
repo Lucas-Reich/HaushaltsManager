@@ -10,13 +10,13 @@ class ExpenseObject {
     private double price = 0;// required
     private long index;
     private boolean expenditure;// set by default
-    private String category = "";// required
+    private Category category;// required
     private List<String> tag;
     private String notice = "";
     private String account = "";// set by default
 
 
-    public ExpenseObject(String title, double price, boolean expenditure, String category, String tag) {
+    public ExpenseObject(String title, double price, boolean expenditure, Category category, String tag) {
 
         this.title = title;
         this.price = price;
@@ -25,14 +25,14 @@ class ExpenseObject {
         this.tag.add(tag);
     }
 
-    public ExpenseObject(String title, double price, boolean expenditure, String category) {
+    public ExpenseObject(String title, double price, boolean expenditure, Category category) {
 
         this(title, price, expenditure, category, "");
     }
 
     ExpenseObject() {
 
-        this("", 0.0, true, "", "");
+        this("", 0.0, true, new Category(), "");
     }
 
     @Override
@@ -93,11 +93,11 @@ class ExpenseObject {
         this.expenditure = expenditure == 0;
     }
 
-    String getCategory() {
+    Category getCategory() {
         return category;
     }
 
-    void setCategory(String category) {
+    void setCategory(Category category) {
         this.category = category;
     }
 
@@ -133,6 +133,6 @@ class ExpenseObject {
 
     boolean isSet() {
 
-        return !this.title.isEmpty() && this.price != 0 && !this.category.isEmpty();
+        return !this.title.isEmpty() && this.price != 0 && this.category.getCategoryName().isEmpty();
     }
 }

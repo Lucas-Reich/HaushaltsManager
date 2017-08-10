@@ -68,14 +68,12 @@ public class ExpensesDbHelper extends SQLiteOpenHelper {
 
     public static final String CATEGORIES_COL_ID = "_id";
     public static final String CATEGORIES_COL_CATEGORY_NAME = "category_name";
-    public static final String CATEGORIES_COL_CATEGORY_SUB_NAME = "category_sub_name";
     public static final String CATEGORIES_COL_COLOR = "color";
 
     private final static String CREATE_CATEGORIES = "CREATE TABLE " + TABLE_CATEGORIES
             + "("
             + CATEGORIES_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + CATEGORIES_COL_CATEGORY_NAME + " TEXT NOT NULL, "
-            + CATEGORIES_COL_CATEGORY_SUB_NAME + " TEXT NOT NULL, "
             + CATEGORIES_COL_COLOR + " INTEGER NOT NULL"
             + ");";
 
