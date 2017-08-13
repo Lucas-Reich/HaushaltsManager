@@ -104,10 +104,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.standing_orders:
                 //do smth
                 break;
-            case R.id.planne_bookings:
-                //do smth
-                break;
-            case R.id.tranfers:
+            case R.id.transfers:
                 //do smth
                 break;
             case R.id.backup:

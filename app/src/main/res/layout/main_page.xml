@@ -29,17 +29,10 @@
                 android:text="Right" />
 
             <android.support.design.widget.TabItem
-                android:index="@+index/tabItem"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Tab4" />
         </android.support.design.widget.TabLayout>
     </android.support.v4.widget.NestedScrollView>
-
-    <TextView
-        android:index="@+index/textView5"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TextView" />
 
 </android.support.design.widget.CoordinatorLayout>

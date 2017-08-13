@@ -2,6 +2,7 @@
   <dictionary name="LabberToasT">
     <words>
       <w>logtag</w>
+      <w>sqlite</w>
     </words>
   </dictionary>
 </component>

@@ -5,24 +5,24 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-public class ExpensesDbHelper extends SQLiteOpenHelper {
+class ExpensesDbHelper extends SQLiteOpenHelper {
 
     private static final String LOG_TAG = ExpensesDbHelper.class.getSimpleName();
 
-    static final String DB_NAME = "expenses.db";
-    static final int DB_VERSION = 1;
+    private static final String DB_NAME = "expenses.db";
+    private static final int DB_VERSION = 1;
 
     // define table Bookings
-    public static final String TABLE_BOOKINGS = "BOOKINGS";
+    static final String TABLE_BOOKINGS = "BOOKINGS";
 
-    public static final String BOOKINGS_COL_BOOKING_ID = "_id";
-    public static final String BOOKINGS_COL_PRICE = "price";
-    public static final String BOOKINGS_COL_F_CATEGORY_ID = "f_category_id";
-    public static final String BOOKINGS_COL_EXPENDITURE = "expenditure";
-    public static final String BOOKINGS_COL_TITLE = "title";
-    public static final String BOOKINGS_COL_DATE = "date";
-    public static final String BOOKINGS_COL_NOTICE = "notice";
-    public static final String BOOKINGS_COL_F_ACCOUNT_ID = "f_account_id";
+    static final String BOOKINGS_COL_BOOKING_ID = "_id";
+    static final String BOOKINGS_COL_PRICE = "price";
+    static final String BOOKINGS_COL_F_CATEGORY_ID = "f_category_id";
+    static final String BOOKINGS_COL_EXPENDITURE = "expenditure";
+    static final String BOOKINGS_COL_TITLE = "title";
+    static final String BOOKINGS_COL_DATE = "date";
+    static final String BOOKINGS_COL_NOTICE = "notice";
+    static final String BOOKINGS_COL_F_ACCOUNT_ID = "f_account_id";
 
     private static final String CREATE_BOOKINGS = "CREATE TABLE " + TABLE_BOOKINGS
             + "("
@@ -38,23 +38,25 @@ public class ExpensesDbHelper extends SQLiteOpenHelper {
 
 
     // define table Accounts
-    public static final String TABLE_ACCOUNTS = "ACCOUNTS";
+    static final String TABLE_ACCOUNTS = "ACCOUNTS";
 
-    public static final String ACCOUNTS_COL_ID = "_id";
-    public static final String ACCOUNTS_COL_ACCOUNT = "account_name";
+    static final String ACCOUNTS_COL_ID = "_id";
+    static final String ACCOUNTS_COL_ACCOUNT = "account_name";
+    static final String ACCOUNTS_COL_BALANCE = "balance";
 
     private static final String CREATE_ACCOUNTS = "CREATE TABLE " + TABLE_ACCOUNTS
             + "("
             + ACCOUNTS_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + ACCOUNTS_COL_ACCOUNT + " TEXT NOT NULL"
+            + ACCOUNTS_COL_ACCOUNT + " TEXT NOT NULL, "
+            + ACCOUNTS_COL_BALANCE + " INTEGER"
             + ");";
 
 
     // define table Tags
-    public static final String TABLE_TAGS = "TAGS";
+    static final String TABLE_TAGS = "TAGS";
 
-    public static final String TAGS_COL_ID = "_id";
-    public static final String TAGS_COL_TAG_NAME = "tag_name";
+    static final String TAGS_COL_ID = "_id";
+    static final String TAGS_COL_TAG_NAME = "tag_name";
 
     private static final String CREATE_TAGS = "CREATE TABLE " + TABLE_TAGS
             + "("
@@ -64,28 +66,26 @@ public class ExpensesDbHelper extends SQLiteOpenHelper {
 
 
     // define table Categories
-    public static final String TABLE_CATEGORIES = "CATEGORIES";
+    static final String TABLE_CATEGORIES = "CATEGORIES";
 
-    public static final String CATEGORIES_COL_ID = "_id";
-    public static final String CATEGORIES_COL_CATEGORY_NAME = "category_name";
-    public static final String CATEGORIES_COL_CATEGORY_SUB_NAME = "category_sub_name";
-    public static final String CATEGORIES_COL_COLOR = "color";
+    static final String CATEGORIES_COL_ID = "_id";
+    static final String CATEGORIES_COL_CATEGORY_NAME = "category_name";
+    static final String CATEGORIES_COL_COLOR = "color";
 
     private final static String CREATE_CATEGORIES = "CREATE TABLE " + TABLE_CATEGORIES
             + "("
             + CATEGORIES_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + CATEGORIES_COL_CATEGORY_NAME + " TEXT NOT NULL, "
-            + CATEGORIES_COL_CATEGORY_SUB_NAME + " TEXT NOT NULL, "
             + CATEGORIES_COL_COLOR + " INTEGER NOT NULL"
             + ");";
 
 
     // define table Booking_Tags
-    public static final String TABLE_BOOKINGS_TAGS = "BOOKING_TAGS";
+    static final String TABLE_BOOKINGS_TAGS = "BOOKING_TAGS";
 
-    public static final String BOOKINGS_TAGS_COL_ID = "_id";
-    public static final String BOOKINGS_TAGS_COL_F_BOOKING_ID = "f_booking_id";
-    public static final String BOOKINGS_TAGS_COL_F_TAG_ID = "f_tag_id";
+    static final String BOOKINGS_TAGS_COL_ID = "_id";
+    static final String BOOKINGS_TAGS_COL_F_BOOKING_ID = "f_booking_id";
+    static final String BOOKINGS_TAGS_COL_F_TAG_ID = "f_tag_id";
 
     private static final String CREATE_BOOKINGS_TAGS = "CREATE TABLE " + TABLE_BOOKINGS_TAGS
             + "("
@@ -95,7 +95,7 @@ public class ExpensesDbHelper extends SQLiteOpenHelper {
             + ");";
 
 
-    public ExpensesDbHelper(Context context) {
+    ExpensesDbHelper(Context context) {
 
         super(context, DB_NAME, null, DB_VERSION);
         Log.d(LOG_TAG, "DbHelper hat die Datenbank " + getDatabaseName() + " erzeugt");

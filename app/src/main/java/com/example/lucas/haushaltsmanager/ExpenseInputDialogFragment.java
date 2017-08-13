@@ -28,7 +28,7 @@ public class ExpenseInputDialogFragment extends DialogFragment {
 
         builder.setView(input);
 
-        builder.setPositiveButton(R.string.expense_pop_up_ok, new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.btn_ok, new DialogInterface.OnClickListener() {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -51,7 +51,7 @@ public class ExpenseInputDialogFragment extends DialogFragment {
             }
         });
 
-        builder.setNegativeButton(R.string.expense_pop_up_cancel, new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.btn_cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
@@ -84,7 +84,7 @@ public class ExpenseInputDialogFragment extends DialogFragment {
             //TODO remove category from ExpenseInputDialogFragment
             case R.id.expense_screen_category:
 
-                expense.setCategory(btnText);
+                expense.setCategory(new Category());
                 break;
 
             default:

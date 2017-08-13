@@ -1,22 +1,28 @@
 package com.example.lucas.haushaltsmanager;
 
+import android.util.Log;
+
 import java.util.Calendar;
+import java.util.LinkedList;
 import java.util.List;
 
 class ExpenseObject {
 
-    private Calendar date;// set by default
-    private String title = "";// required
-    private double price = 0;// required
+    private Calendar date;
+    private String title = "";
+    private double price = 0;
     private long index;
-    private boolean expenditure;// set by default
-    private String category = "";// required
-    private List<String> tag;
+    private boolean expenditure;
+    private Category category;
+    private List<String> tag = new LinkedList<>();
     private String notice = "";
-    private String account = "";// set by default
+    private Account account;
 
 
-    public ExpenseObject(String title, double price, boolean expenditure, String category, String tag) {
+    private ExpensesDataSource expensesDataSource;
+
+
+    public ExpenseObject(String title, double price, boolean expenditure, Category category, String tag) {
 
         this.title = title;
         this.price = price;
@@ -25,14 +31,14 @@ class ExpenseObject {
         this.tag.add(tag);
     }
 
-    public ExpenseObject(String title, double price, boolean expenditure, String category) {
+    public ExpenseObject(String title, double price, boolean expenditure, Category category) {
 
         this(title, price, expenditure, category, "");
     }
 
     ExpenseObject() {
 
-        this("", 0.0, true, "", "");
+        this("", 0.0, true, new Category(), "");
     }
 
     @Override
@@ -72,7 +78,7 @@ class ExpenseObject {
         this.price = price;
     }
 
-    public long getIndex() {
+    long getIndex() {
         return index;
     }
 
@@ -93,12 +99,17 @@ class ExpenseObject {
         this.expenditure = expenditure == 0;
     }
 
-    String getCategory() {
+    Category getCategory() {
         return category;
     }
 
-    void setCategory(String category) {
+    void setCategory(Category category) {
         this.category = category;
+    }
+
+    void setCategory(String categoryName, int color) {
+
+        this.category = new Category(categoryName, color);
     }
 
     public List<String> getTags() {
@@ -115,7 +126,7 @@ class ExpenseObject {
         this.tag = tags;
     }
 
-    public String getNotice() {
+    String getNotice() {
         return notice;
     }
 
@@ -123,16 +134,30 @@ class ExpenseObject {
         this.notice = notice;
     }
 
-    String getAccount() {
+    Account getAccount() {
         return account;
     }
 
-    void setAccount(String account) {
+    void setAccount(Account account) {
         this.account = account;
     }
 
     boolean isSet() {
 
-        return !this.title.isEmpty() && this.price != 0 && !this.category.isEmpty();
+        return !this.title.isEmpty() && this.price != 0.0 && !this.category.getCategoryName().isEmpty();
+    }
+
+    void toConsole() {
+
+        Log.d("ExpenseObject index: " , "" + index);
+        Log.d("ExpenseObject cat: " , "" + category.getCategoryName());
+        Log.d("ExpenseObject price: " , "" + price);
+        Log.d("ExpenseObject expend: " , "" + expenditure);
+        Log.d("ExpenseObject title: " , "" + title);
+        Log.d("ExpenseObject tag: " , "" + tag);
+        Log.d("ExpenseObject date: " , "" + getDate());
+        Log.d("ExpenseObject notice: " , "" + notice);
+        Log.d("ExpenseObject account: " , "" + account.getAccountName());
+
     }
 }
