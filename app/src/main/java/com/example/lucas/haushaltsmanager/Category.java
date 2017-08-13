@@ -14,6 +14,11 @@ class Category {
         this.color = color;
     }
 
+    Category(String categoryName, int color) {
+
+        this(0, categoryName, color);
+    }
+
     Category() {
 
         this(0, "", 0);

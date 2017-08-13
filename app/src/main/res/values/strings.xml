@@ -32,15 +32,15 @@
     <string name="expense_screen_amount">0.00$</string>
     <string name="expense_screen_template">Create a new template</string>
     <string name="expense_screen_recurring">Recurring</string>
-    <string name="expense_pop_up_ok">OK</string>
+    <string name="btn_ok">OK</string>
     <string name="expense_pop_up_title">title_placeholder</string>
-    <string name="expense_pop_up_cancel">Cancel</string>
+    <string name="btn_cancel">Cancel</string>
 
-    <string-array
-        name="dummy_accounts">
-        <item>Girokonto</item>
-        <item>Kreditkarte</item>
-        <item>Girokonto 2</item>
-        <item>Sparschwein</item>
-    </string-array>
+    <string name="expense_screen_dsp_tag">Add Tag</string>
+    <string name="expense_screen_dsp_category">Choose Category</string>
+    <string name="expense_screen_dsp_title">Input Title</string>
+    <string name="expense_screen_dsp_notice">Input Notice</string>
+    <string name="expense_screen_dsp_account">Choose Account</string>
+
+    <string name="expense_screen_error_create">Error while creating the expense. Create at least a Title, Amount and a Category!</string>
 </resources>

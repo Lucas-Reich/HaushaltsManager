@@ -46,10 +46,10 @@ public class ExpenseScreen extends AppCompatActivity {
         // set the account to the current main account
         Button accountBtn = (Button) findViewById(R.id.expense_screen_account);
         //TODO change activeAccount from an hardcoded var to an account which the users decided beforehand
-        String activeAccount = "Kreditkarte";
-        accountBtn.setText(activeAccount);
+        Account activeAccount = new Account("Kreditkarte", 0);
+        accountBtn.setText(activeAccount.getAccountName());
         EXPENSE.setAccount(activeAccount);
-        Log.d(LOGTAG, "set active account to " + activeAccount);
+        Log.d(LOGTAG, "set active account to " + activeAccount.getAccountName());
 
         // set the EXPENSE type to "EXPENSE"
         RadioGroup expenseType = (RadioGroup) findViewById(R.id.expense_screen_expense_type);
@@ -110,31 +110,24 @@ public class ExpenseScreen extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                Log.d(LOGTAG, EXPENSE.toString());
-                Log.d(LOGTAG, "" + EXPENSE.isSet());
-
-                expensesDataSource.open();
+                EXPENSE.setCategory(new Category(1, "Meine Kategorie", 1));
 
                 if (EXPENSE.isSet()) {
 
-                    ExpenseObject testExpense = new ExpenseObject();
-                    testExpense.setPrice(100);
-                    testExpense.setCategory(new Category());
-                    testExpense.setExpenditure(true);
-                    testExpense.setTitle("Test Ausgabe");
-                    testExpense.setDate(CAL);
-                    testExpense.setAccount("Kreditkarte");
-                    //TODO save EXPENSE in db
+                    expensesDataSource.open();
+                    EXPENSE.setIndex(expensesDataSource.createBooking(EXPENSE));
+                    expensesDataSource.getBookingById(EXPENSE.getIndex()).toConsole();
+                    expensesDataSource.close();
 
-
-                    //TODO go to main Activity
+                    Toast.makeText(ExpenseScreen.this, "Created booking \"" + EXPENSE.getTitle() + "\"", Toast.LENGTH_SHORT).show();
 
                 } else {
 
-                    //TODO change hardcoded text to an variable depending on the users language
-                    Toast.makeText(ExpenseScreen.this, "The Expense is not properly set", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ExpenseScreen.this, getResources().getString(R.string.expense_screen_error_create), Toast.LENGTH_LONG).show();
+                    EXPENSE.toConsole();
                 }
             }
+
         });
     }
 
@@ -165,7 +158,7 @@ public class ExpenseScreen extends AppCompatActivity {
         Bundle bundle = new Bundle();
         Button btn = (Button) findViewById(view.getId());
 
-        switch(btn.getId()) {
+        switch (btn.getId()) {
 
             case R.id.expense_screen_amount:
 
@@ -174,19 +167,19 @@ public class ExpenseScreen extends AppCompatActivity {
             case R.id.expense_screen_category:
 
                 //TODO choose category from an given activity
-                bundle.putString("original_title", "Kategorie wählen");
+                bundle.putString("original_title", getResources().getString(R.string.expense_screen_dsp_category));
                 bundle.putInt("button_id", view.getId());
                 break;
 
             case R.id.expense_screen_title:
 
-                bundle.putString("original_title", "Titel eingeben");
+                bundle.putString("original_title", getResources().getString(R.string.expense_screen_dsp_title));
                 bundle.putInt("button_id", R.id.expense_screen_title);
                 break;
 
             case R.id.expense_screen_tag:
 
-                bundle.putString("original_title", "Merkmale hinzufügen");
+                bundle.putString("original_title", getResources().getString(R.string.expense_screen_dsp_tag));
                 bundle.putInt("button_id", view.getId());
                 break;
 
@@ -197,14 +190,14 @@ public class ExpenseScreen extends AppCompatActivity {
 
             case R.id.expense_screen_notice:
 
-                bundle.putString("original_title", "Notiz eingeben");
+                bundle.putString("original_title", getResources().getString(R.string.expense_screen_dsp_notice));
                 bundle.putInt("button_id", view.getId());
                 break;
 
             case R.id.expense_screen_account:
 
                 Button accountBtn = (Button) findViewById(R.id.expense_screen_account);
-                bundle.putString("original_title", "Choose Account");
+                bundle.putString("original_title", getResources().getString(R.string.expense_screen_dsp_account));
                 bundle.putString("current_account", accountBtn.getText().toString());
                 break;
         }
@@ -214,8 +207,7 @@ public class ExpenseScreen extends AppCompatActivity {
             AccountPickerDialogFragment accountPicker = new AccountPickerDialogFragment();
             accountPicker.setArguments(bundle);
             accountPicker.show(getFragmentManager(), "account_picker");
-            Log.d("test", "test");
-        } else if (btn.getId() != R.id.expense_screen_date){
+        } else if (btn.getId() != R.id.expense_screen_date) {
 
             ExpenseInputDialogFragment expenseDialog = new ExpenseInputDialogFragment();
             expenseDialog.setArguments(bundle);

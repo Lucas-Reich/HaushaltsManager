@@ -5,41 +5,47 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.widget.Button;
 
 public class AccountPickerDialogFragment extends DialogFragment {
 
+    private ExpensesDataSource expensesDataSource;
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-        Log.d("test", "bla");
+        expensesDataSource = new ExpensesDataSource(getActivity());
+        expensesDataSource.open();
+
         final Bundle args = getArguments();
         final ExpenseScreen expenseScreen = (ExpenseScreen) getActivity();
-        final String[] accounts = getResources().getStringArray(R.array.dummy_accounts);
-        int selectedAccount = getIndexOfCurrentAccount(args.getString("current_account"), accounts);
+        final Account[] accounts = expensesDataSource.getAllAccounts();
+        final int activeAccount = (int)getActiveAccount(args.getString("current_account"), accounts).getIndex();
         final Button btn = (Button) expenseScreen.findViewById(R.id.expense_screen_account);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         builder.setTitle(args.getString("original_title"));
 
-        builder.setSingleChoiceItems(accounts, selectedAccount, new DialogInterface.OnClickListener() {
+        builder.setSingleChoiceItems(accountsToStrings(accounts), activeAccount - 1, new DialogInterface.OnClickListener() {
 
             @Override
             public void onClick(DialogInterface dialog, int selectedAccount) {
 
-                btn.setText(accounts[selectedAccount]);
+                btn.setText(accounts[selectedAccount].getAccountName());
                 expenseScreen.EXPENSE.setAccount(accounts[selectedAccount]);
-                Log.d("ExpenseScreen", "set account to " + accounts[selectedAccount]);
+
+
+                expensesDataSource.close();
                 dismiss();
             }
         });
 
-        builder.setNegativeButton(R.string.expense_pop_up_cancel, new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.btn_cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
+                expensesDataSource.close();
                 dismiss();
             }
         });
@@ -47,16 +53,34 @@ public class AccountPickerDialogFragment extends DialogFragment {
         return builder.create();
     }
 
-    private int getIndexOfCurrentAccount(String currentAccount, String[] accounts) {
+    private Account getActiveAccount(String currentAccount, Account[] accounts) {
 
-        for(int i = 0; i < accounts.length; i++) {
+        for (Account account : accounts) {
 
-            if (accounts[i].equals(currentAccount)) {
+            if (account.getAccountName().equals(currentAccount)) {
 
-                return i;
+                return account;
             }
         }
 
-        return -1;
+        return new Account();
+    }
+
+    private String[] accountsToStrings(Account[] accounts){
+
+        String[] accountStrings = new String[accounts.length];
+
+        for (int i = 0; i < accounts.length; i++) {
+
+            accountStrings[i] = accounts[i].getAccountName();
+        }
+
+        return accountStrings;
+    }
+
+    public void onStop() {
+        super.onStop();
+
+        expensesDataSource.close();
     }
 }
