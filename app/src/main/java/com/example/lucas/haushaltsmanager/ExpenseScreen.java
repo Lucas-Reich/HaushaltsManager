@@ -1,6 +1,7 @@
 package com.example.lucas.haushaltsmanager;
 
 import android.app.DatePickerDialog;//
+import android.content.Intent;
 import android.os.Bundle;//
 import android.support.annotation.IdRes;//
 import android.support.v7.app.AppCompatActivity;//
@@ -121,8 +122,6 @@ public class ExpenseScreen extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                EXPENSE.setCategory(new Category(1, "Meine Kategorie", 1));
-
                 if (EXPENSE.isSet()) {
 
                     expensesDataSource.open();
@@ -132,6 +131,11 @@ public class ExpenseScreen extends AppCompatActivity {
 
                     Toast.makeText(ExpenseScreen.this, "Created booking \"" + EXPENSE.getTitle() + "\"", Toast.LENGTH_SHORT).show();
 
+
+                    Intent intent = new Intent(ExpenseScreen.this, MainActivity.class);
+                    intent.putExtra("key", 10); //Optional parameters
+                    ExpenseScreen.this.startActivity(intent);
+
                 } else {
 
                     Toast.makeText(ExpenseScreen.this, getResources().getString(R.string.expense_screen_error_create), Toast.LENGTH_LONG).show();
@@ -140,6 +144,33 @@ public class ExpenseScreen extends AppCompatActivity {
             }
 
         });
+
+
+
+
+        Button createAcc = (Button) findViewById(R.id.create_account);
+        createAcc.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                CreateAccountDialogFragment createAccount = new CreateAccountDialogFragment();
+                createAccount.show(getFragmentManager(), "create_new_account");
+            }
+        });
+
+
+
+        Button createCat = (Button) findViewById(R.id.create_category);
+        createCat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                CreateCategoryAlertDialog categoryDialog = new CreateCategoryAlertDialog();
+                categoryDialog.show(getFragmentManager(), "create_new_category");
+            }
+        });
+
+
     }
 
     //TODO extract the input date logic to the DatePickerDialogFragment

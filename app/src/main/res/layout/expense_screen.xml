@@ -263,12 +263,34 @@
                 android:layout_height="wrap_content"
                 android:text="@string/expense_screen_recurring" />
 
-            <Button
-                android:id="@+id/expense_screen_create_booking"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:text="Button" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/create_category"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Cat" />
+
+                <Button
+                    android:id="@+id/create_account"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Acc" />
+
+                <Button
+                    android:id="@+id/expense_screen_create_booking"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:layout_weight="1"
+                    android:text="erstelle Buchung" />
+
+            </LinearLayout>
 
         </LinearLayout>
     </ScrollView>

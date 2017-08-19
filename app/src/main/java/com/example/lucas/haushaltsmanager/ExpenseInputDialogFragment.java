@@ -84,7 +84,13 @@ public class ExpenseInputDialogFragment extends DialogFragment {
             //TODO remove category from ExpenseInputDialogFragment
             case R.id.expense_screen_category:
 
-                expense.setCategory(new Category());
+
+                ExpensesDataSource expenseDataSource = new ExpensesDataSource(getContext());
+                expenseDataSource.open();
+
+                expense.setCategory(expenseDataSource.getCategoryByName(btnText));
+
+                expenseDataSource.close();
                 break;
 
             default:

@@ -12,8 +12,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+
+
+    ArrayList<ExpenseObject> expenseObjects;
+    ListView listView;
+    private static CustomAdapter adapter;
+
+    ExpensesDataSource expensesDataSource;
+
 
 
     @Override
@@ -23,6 +34,40 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+
+
+        expensesDataSource = new ExpensesDataSource(this);
+
+        listView = (ListView) findViewById(R.id.booking_listview);
+
+        expensesDataSource.open();
+
+        expenseObjects = expensesDataSource.getAllBookings();
+
+        adapter = new CustomAdapter(expenseObjects, getApplicationContext());
+
+        listView.setAdapter(adapter);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {

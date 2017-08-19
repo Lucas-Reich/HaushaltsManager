@@ -7,6 +7,7 @@ import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
@@ -83,7 +84,7 @@ class ExpensesDataSource {
         Account account = getAccountById(cursor.getLong(idAccount));
         expense.setAccount(account);
 
-        getAllBookings();
+        getAllBoookings();
         return expense;
     }
 
@@ -537,6 +538,30 @@ class ExpensesDataSource {
         return expense;
     }
 
+    ArrayList<ExpenseObject> getAllBookings(){
+
+        ArrayList<ExpenseObject> bookings= new ArrayList<>();
+
+        String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_BOOKINGS;
+        Log.d(LOG_TAG, selectQuery);
+
+        Cursor c = database.rawQuery(selectQuery, null);
+        Log.d(LOG_TAG, DatabaseUtils.dumpCursorToString(c));
+        c.moveToFirst();
+
+        if (!c.isAfterLast()) {
+
+            while(!c.isAfterLast()) {
+
+                bookings.add(cursorToExpense(c));
+                c.moveToNext();
+            }
+        }
+
+        return bookings;
+
+    }
+
     /**
      * Convenience Method for updating a Booking
      *
@@ -695,7 +720,7 @@ class ExpensesDataSource {
         return database.delete(ExpensesDbHelper.TABLE_CATEGORIES, ExpensesDbHelper.CATEGORIES_COL_ID + " = ?", new String[]{"" + categoryId});
     }
 
-    void getAllBookings(){
+    void getAllBoookings(){
 
         String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_BOOKINGS;
         Log.d(LOG_TAG, selectQuery);
