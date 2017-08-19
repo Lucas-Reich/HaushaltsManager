@@ -83,6 +83,7 @@ class ExpensesDataSource {
         Account account = getAccountById(cursor.getLong(idAccount));
         expense.setAccount(account);
 
+        getAllBookings();
         return expense;
     }
 
@@ -117,10 +118,11 @@ class ExpensesDataSource {
         Log.d(LOG_TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
+        Log.d(LOG_TAG, DatabaseUtils.dumpCursorToString(c));
 
-        if (c != null) {
+        c.moveToFirst();
+        if (!c.isAfterLast()) {
 
-            c.moveToFirst();
             String accountName = c.getString(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_ACCOUNT));
             int accountBalance = c.getInt(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_BALANCE));
 
@@ -129,7 +131,7 @@ class ExpensesDataSource {
         }
 
         c.close();
-        return account = new Account();
+        return new Account();
 
     }
 
@@ -139,10 +141,11 @@ class ExpensesDataSource {
         Log.d(LOG_TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
+        Log.d(LOG_TAG, DatabaseUtils.dumpCursorToString(c));
 
-        if (c != null) {
+        c.moveToFirst();
+        if (!c.isAfterLast()) {
 
-            c.moveToFirst();
             long index = c.getLong(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_ID));
             String name = c.getString(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_ACCOUNT));
             int balance = c.getInt(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_BALANCE));
@@ -167,9 +170,9 @@ class ExpensesDataSource {
         Log.d(LOG_TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
+        Log.d(LOG_TAG, DatabaseUtils.dumpCursorToString(c));
 
         c.moveToFirst();
-
         accounts = new Account[c.getCount()];
 
         for (int i = 0; i < c.getCount(); i++) {
@@ -194,6 +197,7 @@ class ExpensesDataSource {
         Log.d(LOG_TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
+        Log.d(LOG_TAG, DatabaseUtils.dumpCursorToString(c));
         c.moveToFirst();
 
         accounts = new String[c.getCount()];
@@ -267,10 +271,11 @@ class ExpensesDataSource {
         Log.d(LOG_TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
+        Log.d(LOG_TAG, DatabaseUtils.dumpCursorToString(c));
 
-        if (c != null) {
+        c.moveToFirst();
+        if (!c.isAfterLast()) {
 
-            c.moveToFirst();
             tag = c.getString(c.getColumnIndex(ExpensesDbHelper.TAGS_COL_ID));
         }
 
@@ -291,6 +296,7 @@ class ExpensesDataSource {
         Log.d(LOG_TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
+        Log.d(LOG_TAG, DatabaseUtils.dumpCursorToString(c));
 
         c.moveToFirst();
 
@@ -422,10 +428,11 @@ class ExpensesDataSource {
         Log.d(LOG_TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
+        Log.d(LOG_TAG, DatabaseUtils.dumpCursorToString(c));
 
-        if (c != null) {
+        c.moveToFirst();
+        if (!c.isAfterLast()) {
 
-            c.moveToFirst();
             int counter = 0;
             bookings = new long[c.getCount()];
 
@@ -461,6 +468,7 @@ class ExpensesDataSource {
         Log.d(LOG_TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
+        Log.d(LOG_TAG, DatabaseUtils.dumpCursorToString(c));
 
         c.moveToFirst();
 
@@ -519,6 +527,7 @@ class ExpensesDataSource {
         String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_BOOKINGS + " WHERE " + ExpensesDbHelper.BOOKINGS_COL_BOOKING_ID + " = " + bookingId;
         Log.d(LOG_TAG, selectQuery);
         Cursor c = database.rawQuery(selectQuery, null);
+        Log.d(LOG_TAG, DatabaseUtils.dumpCursorToString(c));
 
         c.moveToFirst();
 
@@ -591,11 +600,12 @@ class ExpensesDataSource {
         Log.d(LOG_TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
+        Log.d(LOG_TAG, DatabaseUtils.dumpCursorToString(c));
+        c.moveToFirst();
         Category category1 = new Category();
 
-        if (c != null) {
+        if (!c.isAfterLast()) {
 
-            c.moveToFirst();
             category1.setIndex(c.getLong(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_ID)));
             category1.setCategoryName(c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_CATEGORY_NAME)));
             category1.setColor(c.getInt(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_COLOR)));
@@ -623,9 +633,10 @@ class ExpensesDataSource {
 
         Category category = new Category();
 
-        if (c != null) {
+        c.moveToFirst();
 
-            c.moveToFirst();
+        if (!c.isAfterLast()) {
+
             category.setIndex(c.getLong(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_ID)));
             category.setCategoryName(c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_CATEGORY_NAME)));
             category.setColor(c.getInt(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_COLOR)));
@@ -682,5 +693,17 @@ class ExpensesDataSource {
 
         Log.d(LOG_TAG, "delete Category + " + categoryId);
         return database.delete(ExpensesDbHelper.TABLE_CATEGORIES, ExpensesDbHelper.CATEGORIES_COL_ID + " = ?", new String[]{"" + categoryId});
+    }
+
+    void getAllBookings(){
+
+        String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_BOOKINGS;
+        Log.d(LOG_TAG, selectQuery);
+
+        Cursor c = database.rawQuery(selectQuery, null);
+
+        Log.d(LOG_TAG, DatabaseUtils.dumpCursorToString(c));
+
+        c.close();
     }
 }

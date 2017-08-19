@@ -112,7 +112,7 @@ class ExpenseObject {
         this.category = new Category(categoryName, color);
     }
 
-    public List<String> getTags() {
+    List<String> getTags() {
         return tag;
     }
 

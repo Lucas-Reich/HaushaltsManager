@@ -26,6 +26,14 @@ public class ExpenseScreen extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+
+
+        //TODO change activeAccount from an hardcoded var to an account which the users decided beforehand
+        Account activeAccount = new Account("Kreditkarte", 0);
+
+
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.expense_screen);
 
@@ -45,8 +53,6 @@ public class ExpenseScreen extends AppCompatActivity {
 
         // set the account to the current main account
         Button accountBtn = (Button) findViewById(R.id.expense_screen_account);
-        //TODO change activeAccount from an hardcoded var to an account which the users decided beforehand
-        Account activeAccount = new Account("Kreditkarte", 0);
         accountBtn.setText(activeAccount.getAccountName());
         EXPENSE.setAccount(activeAccount);
         Log.d(LOGTAG, "set active account to " + activeAccount.getAccountName());
@@ -64,8 +70,13 @@ public class ExpenseScreen extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                EXPENSE.setPrice(1);
-                Log.d(LOGTAG, "set amount to 1");
+                Bundle bundle = new Bundle();
+                bundle.putString("original_title", "0,00€");
+                bundle.putInt("button_id", v.getId());
+
+                PriceInputDialogFragment priceDialog = new PriceInputDialogFragment();
+                priceDialog.setArguments(bundle);
+                priceDialog.show(getFragmentManager(), "expense_screen_price");
             }
         });
 

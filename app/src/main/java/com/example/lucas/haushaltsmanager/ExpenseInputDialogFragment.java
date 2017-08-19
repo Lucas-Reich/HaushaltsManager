@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
+import android.text.InputType;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,7 +20,6 @@ public class ExpenseInputDialogFragment extends DialogFragment {
         final Activity activity = getActivity();
         final ExpenseScreen expenseScreen = (ExpenseScreen) getActivity();
         final EditText input = new EditText(getContext());
-
 
 
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
