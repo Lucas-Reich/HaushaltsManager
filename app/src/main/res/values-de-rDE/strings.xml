@@ -44,4 +44,7 @@
     <string name="expense_screen_dsp_title">Input Title</string>
     <string name="expense_screen_dsp_account">Choose Account</string>
     <string name="expense_screen_error_create">Fehler beim erstellen der Buchung. Gib mindestens einen Betrag, einen Titel und eine Kategorie an!</string>
+    <string name="tab_one_title">Ausgaben</string>
+    <string name="tab_three_title">Placeholder</string>
+    <string name="tab_two_title">Placeholder</string>
 </resources>

@@ -133,7 +133,7 @@ public class ExpenseScreen extends AppCompatActivity {
                     Toast.makeText(ExpenseScreen.this, "Created booking \"" + EXPENSE.getTitle() + "\"", Toast.LENGTH_SHORT).show();
 
 
-                    Intent intent = new Intent(ExpenseScreen.this, MainActivity.class);
+                    Intent intent = new Intent(ExpenseScreen.this, MainActivityTab.class);
                     intent.putExtra("key", 10); //Optional parameters
                     ExpenseScreen.this.startActivity(intent);
 

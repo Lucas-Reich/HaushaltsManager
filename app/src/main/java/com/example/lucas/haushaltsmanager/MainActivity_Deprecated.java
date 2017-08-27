@@ -16,12 +16,12 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity_Deprecated extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
 
     ArrayList<ExpenseObject> expenseObjects;
     ListView listView;
-    private static BookingAdapter adapter;
+    static BookingAdapter adapter;
 
     ExpensesDataSource expensesDataSource;
 
@@ -75,9 +75,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onClick(View view) {
 
-                Intent intent = new Intent(MainActivity.this, ExpenseScreen.class);
+                Intent intent = new Intent(MainActivity_Deprecated.this, ExpenseScreen.class);
                 intent.putExtra("key", 10); //Optional parameters
-                MainActivity.this.startActivity(intent);
+                MainActivity_Deprecated.this.startActivity(intent);
             }
         });
 
@@ -90,16 +90,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-    }
-
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
     }
 
     @Override
@@ -124,6 +114,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -136,8 +136,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.categories:
 
-                Intent intent = new Intent(MainActivity.this, Categories.class);
-                MainActivity.this.startActivity(intent);
+                Intent intent = new Intent(MainActivity_Deprecated.this, Categories.class);
+                MainActivity_Deprecated.this.startActivity(intent);
                 break;
             case R.id.templates:
                 //do smth

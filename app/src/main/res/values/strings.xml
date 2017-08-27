@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">HaushaltsManager</string>
 
+    <string name="tab_one_title">Bookings</string>
+    <string name="tab_two_title">Placeholder</string>
+    <string name="tab_three_title">Placeholder</string>
+
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
@@ -43,4 +47,6 @@
     <string name="expense_screen_dsp_account">Choose Account</string>
 
     <string name="expense_screen_error_create">Error while creating the expense. Create at least a Title, Amount and a Category!</string>
+    <string name="title_activity_main_tab">MainActivityTab</string>
+    <string name="section_format">Hello World from section: %1$d</string>
 </resources>

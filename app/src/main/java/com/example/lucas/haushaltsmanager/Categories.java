@@ -22,34 +22,6 @@ public class Categories extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_categories);
         expensesDataSource = new ExpensesDataSource(this);
-/*
-        String[] categoriesArray = {
-                "Mittagessen",
-                "Computer",
-                "Kategorie 3",
-                "Kategorie 4",
-                "Kategorie 5",
-                "Kategorie 6",
-                "Kategorie 7"
-        };
-
-
-        List<String> categoryList = new ArrayList<>(Arrays.asList(categoriesArray));
-
-        ArrayAdapter<String> categoriesAdapter = new ArrayAdapter<String>(this, R.layout.category_item, R.id.category_item, categoryList);
-
-        ListView categoriesListView = (ListView) findViewById(R.id.categories_listview);
-        categoriesListView.setAdapter(categoriesAdapter);*/
-
-
-
-
-
-
-
-
-
-
 
         listView = (ListView) findViewById(R.id.categories_listview);
 
