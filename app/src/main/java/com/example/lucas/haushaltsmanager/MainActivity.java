@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     ArrayList<ExpenseObject> expenseObjects;
     ListView listView;
-    private static CustomAdapter adapter;
+    private static BookingAdapter adapter;
 
     ExpensesDataSource expensesDataSource;
 
@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         expenseObjects = expensesDataSource.getAllBookings();
 
-        adapter = new CustomAdapter(expenseObjects, getApplicationContext());
+        adapter = new BookingAdapter(expenseObjects, getApplicationContext());
 
         listView.setAdapter(adapter);
 
@@ -135,7 +135,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 //do smth
                 break;
             case R.id.categories:
-                //do smth
+
+                Intent intent = new Intent(MainActivity.this, Categories.class);
+                MainActivity.this.startActivity(intent);
                 break;
             case R.id.templates:
                 //do smth

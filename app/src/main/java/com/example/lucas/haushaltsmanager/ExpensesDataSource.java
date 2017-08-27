@@ -613,6 +613,34 @@ class ExpensesDataSource {
         return database.insert(ExpensesDbHelper.TABLE_CATEGORIES, null, values);
     }
 
+    ArrayList<Category> getAllCategories() {
+
+        ArrayList<Category> allCategories = new ArrayList<>();
+        String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_CATEGORIES;
+        Log.d(LOG_TAG, selectQuery);
+
+        Cursor c = database.rawQuery(selectQuery, null);
+        Log.d(LOG_TAG, DatabaseUtils.dumpCursorToString(c));
+
+        c.moveToFirst();
+
+        if (!c.isAfterLast()) {
+
+            while(!c.isAfterLast()) {
+
+
+                long index = c.getLong(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_ID));
+                String categoryName = c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_CATEGORY_NAME));
+                int color = c.getInt(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_COLOR));
+
+                allCategories.add(new Category(index, categoryName, color));
+                c.moveToNext();
+            }
+        }
+
+        return allCategories;
+    }
+
     /**
      * Convenience Method for getting a Category by its name
      *

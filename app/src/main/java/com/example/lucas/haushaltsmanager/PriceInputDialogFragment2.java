@@ -4,13 +4,12 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
-import android.text.InputType;
 import android.util.Log;
-import android.widget.EditText;
-import android.widget.TextView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
 
 public class PriceInputDialogFragment2 extends DialogFragment {
 
@@ -22,10 +21,29 @@ public class PriceInputDialogFragment2 extends DialogFragment {
 
         final Bundle args = getArguments();
         final Activity activity = getActivity();
-        final ExpenseScreen expenseScreen = (ExpenseScreen) getActivity();
-        final EditText input = new EditText(getContext());
 
-        input.setInputType(InputType.TYPE_CLASS_NUMBER);
+
+        LayoutInflater inflater = activity.getLayoutInflater();
+        View priceInputView = inflater.inflate(R.layout.price_input, null);
+        Button btn = (Button) priceInputView.findViewById(R.id.price_input_one);
+        Log.d("Test", "bound an click listener to one");
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                calcPrice(0.0);
+                Log.d("Test", "hier habe ich ein richtig geile test nachricht um zu gucken ob das hier überhaupt funktioniert");
+            }
+        });
+
+        priceInputView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Log.d("Test", "hier habe ich ein richtig geile test nachricht um zu gucken ob das hier überhaupt funktioniert");
+            }
+        });
+
 
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 
@@ -58,5 +76,6 @@ public class PriceInputDialogFragment2 extends DialogFragment {
     private void calcPrice(double number) {
 
         price += number;
+        Log.d("ExpenseScreen", "Hallo aus der calcPrice Methode, um den preis einzugeben");
     }
 }

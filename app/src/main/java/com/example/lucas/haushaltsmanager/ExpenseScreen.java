@@ -30,15 +30,16 @@ public class ExpenseScreen extends AppCompatActivity {
 
 
         //TODO change activeAccount from an hardcoded var to an account which the users decided beforehand
-        Account activeAccount = new Account("Kreditkarte", 0);
+        expensesDataSource = new ExpensesDataSource(this);
+        expensesDataSource.open();
+        Account activeAccount = expensesDataSource.getAccountByName("Kreditkarte");
+        expensesDataSource.close();
 
 
 
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.expense_screen);
-
-        expensesDataSource = new ExpensesDataSource(this);
 
         //TODO implement the correct Toolbar functionality (back arrow, overflow menu which holds the load template button)
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -75,7 +76,7 @@ public class ExpenseScreen extends AppCompatActivity {
                 bundle.putString("original_title", "0,00€");
                 bundle.putInt("button_id", v.getId());
 
-                PriceInputDialogFragment priceDialog = new PriceInputDialogFragment();
+                PriceInputDialogFragment2 priceDialog = new PriceInputDialogFragment2();
                 priceDialog.setArguments(bundle);
                 priceDialog.show(getFragmentManager(), "expense_screen_price");
             }

@@ -23,8 +23,6 @@ public class PriceInputDialogFragment extends DialogFragment {
         final ExpenseScreen expenseScreen = (ExpenseScreen) getActivity();
         final EditText input = new EditText(getContext());
 
-        input.setInputType(InputType.TYPE_CLASS_NUMBER);
-
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 
         builder.setTitle(args.getString("original_title"));

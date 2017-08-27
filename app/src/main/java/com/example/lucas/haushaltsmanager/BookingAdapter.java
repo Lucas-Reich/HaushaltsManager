@@ -9,11 +9,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-/**
- * Created by LabberToasT on 19.08.2017.
- */
-
-public class CustomAdapter extends ArrayAdapter<ExpenseObject> implements View.OnClickListener {
+public class BookingAdapter extends ArrayAdapter<ExpenseObject> implements View.OnClickListener {
 
     private ArrayList<ExpenseObject> dataSet;
     Context mContext;
@@ -24,7 +20,7 @@ public class CustomAdapter extends ArrayAdapter<ExpenseObject> implements View.O
         TextView txtAccount;
     }
 
-    public CustomAdapter(ArrayList<ExpenseObject> data, Context context) {
+    public BookingAdapter(ArrayList<ExpenseObject> data, Context context) {
         super(context, R.layout.booking_item, data);
         this.dataSet = data;
         this.mContext = context;
