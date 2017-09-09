@@ -1,11 +1,15 @@
 package com.example.lucas.haushaltsmanager;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -14,6 +18,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 public class MainActivityTab extends AppCompatActivity {
 
@@ -35,7 +40,8 @@ public class MainActivityTab extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main_tab);
+        //setContentView(R.layout.activity_main_tab);
+        setContentView(R.layout.tab_main_mit_nav_drawer);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -60,6 +66,99 @@ public class MainActivityTab extends AppCompatActivity {
                 MainActivityTab.this.startActivity(intent);
             }
         });
+
+
+
+
+
+
+
+
+
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_2);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_2);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                // Handle navigation view item clicks here.
+
+                switch (item.getItemId()) {
+
+                    case R.id.desktop:
+                        //do smth
+                        break;
+                    case R.id.categories:
+
+                        Intent intent = new Intent(MainActivityTab.this, Categories.class);
+                        MainActivityTab.this.startActivity(intent);
+                        break;
+                    case R.id.templates:
+                        //do smth
+                        break;
+                    case R.id.no_category:
+                        //do smth
+                        break;
+                    case R.id.course:
+                        //do smth
+                        break;
+                    case R.id.standing_orders:
+                        //do smth
+                        break;
+                    case R.id.transfers:
+                        //do smth
+                        break;
+                    case R.id.backup:
+                        //do smth
+                        break;
+                    case R.id.import_export:
+                        //do smth
+                        break;
+                    case R.id.store:
+                        //do smth
+                        break;
+                    case R.id.preferences:
+                        //do smth
+                        break;
+                    case R.id.follow_us:
+                        //do smth
+                        break;
+                    case R.id.rate_the_app:
+                        //do smth
+                        break;
+                    case R.id.about:
+                        //do smth
+                        break;
+                }
+
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_2);
+                drawer.closeDrawer(GravityCompat.START);
+                return true;
+            }
+        });
+        //navigationView.setNavigationItemSelectedListener(this);
+
+
+
+
+
+
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_2);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override

@@ -76,7 +76,7 @@ public class ExpenseScreen extends AppCompatActivity {
                 bundle.putString("original_title", "0,00€");
                 bundle.putInt("button_id", v.getId());
 
-                PriceInputDialogFragment2 priceDialog = new PriceInputDialogFragment2();
+                PriceInputDialogFragment priceDialog = new PriceInputDialogFragment();
                 priceDialog.setArguments(bundle);
                 priceDialog.show(getFragmentManager(), "expense_screen_price");
             }
