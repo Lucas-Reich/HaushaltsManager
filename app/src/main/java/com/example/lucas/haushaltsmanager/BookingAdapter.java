@@ -36,8 +36,6 @@ public class BookingAdapter extends ArrayAdapter<ExpenseObject> implements View.
         ExpenseObject expenseObject = getItem(position);
         ViewHolder viewHolder;
 
-        final View result;
-
         if (convertView == null) {
 
             viewHolder = new ViewHolder();
@@ -47,13 +45,10 @@ public class BookingAdapter extends ArrayAdapter<ExpenseObject> implements View.
             viewHolder.txtPrice = (TextView) convertView.findViewById(R.id.listview_price);
             viewHolder.txtAccount = (TextView) convertView.findViewById(R.id.listview_account);
 
-            result = convertView;
-
             convertView.setTag(viewHolder);
         } else {
 
             viewHolder = (ViewHolder) convertView.getTag();
-            result = convertView;
         }
 
         viewHolder.txtTitle.setText(expenseObject.getTitle());

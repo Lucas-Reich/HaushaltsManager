@@ -16,6 +16,7 @@ public class TabOneBookings extends Fragment{
     ArrayList<ExpenseObject> expenseObjects;
     ListView listView;
     static BookingAdapter adapter;
+    static BookingAdapterVer2 adapterVer2;
 
     ExpensesDataSource expensesDataSource;
 
@@ -31,10 +32,14 @@ public class TabOneBookings extends Fragment{
         expensesDataSource.open();
 
         expenseObjects = expensesDataSource.getAllBookings();
-
+/*
         adapter = new BookingAdapter(expenseObjects, getContext());
 
         listView.setAdapter(adapter);
+*/
+        adapterVer2 = new BookingAdapterVer2(expenseObjects, getContext());
+
+        listView.setAdapter(adapterVer2);
 
         return rootView;
     }
