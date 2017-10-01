@@ -27,7 +27,7 @@ class BookingAdapterVer2 extends ArrayAdapter<ExpenseObject> implements View.OnC
     }
 
     BookingAdapterVer2(ArrayList<ExpenseObject> data, Context context) {
-        super(context, R.layout.booking_item_ver2, data);
+        super(context, R.layout.booking_item_ver3, data);
         this.dataSet = data;
         this.mContext = context;
     }
@@ -47,16 +47,16 @@ class BookingAdapterVer2 extends ArrayAdapter<ExpenseObject> implements View.OnC
 
             viewHolder = new ViewHolder();
             LayoutInflater inflater = LayoutInflater.from(getContext());
-            convertView = inflater.inflate(R.layout.booking_item_ver2, parent, false);
+            convertView = inflater.inflate(R.layout.booking_item_ver3, parent, false);
 
 
             viewHolder.circleLetter = (TextView) convertView.findViewById(R.id.booking_item_circle);
             viewHolder.txtTitle = (TextView) convertView.findViewById(R.id.booking_item_title);
             viewHolder.txtPerson = (TextView) convertView.findViewById(R.id.booking_item_person);
             viewHolder.txtPaidPrice = (TextView) convertView.findViewById(R.id.booking_item_paid_price);
-            viewHolder.txtBaseCurrency = (TextView) convertView.findViewById(R.id.booking_item_currency_paid);
+            viewHolder.txtBaseCurrency = (TextView) convertView.findViewById(R.id.booking_item_currency_base);
             viewHolder.txtCalcPrice = (TextView) convertView.findViewById(R.id.booking_item_booking_price);
-            viewHolder.txtPaidCurrency = (TextView) convertView.findViewById(R.id.booking_item_currency_base);
+            viewHolder.txtPaidCurrency = (TextView) convertView.findViewById(R.id.booking_item_currency_paid);
 
             convertView.setTag(viewHolder);
         } else {

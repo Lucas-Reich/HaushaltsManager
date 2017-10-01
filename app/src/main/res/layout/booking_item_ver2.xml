@@ -5,7 +5,7 @@
     android:orientation="vertical">
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
@@ -17,7 +17,6 @@
             android:layout_marginLeft="10dp"
             android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
-            android:layout_weight="1"
             android:background="@drawable/rounded_textview"
             android:gravity="center"
             android:text="A"
@@ -25,10 +24,10 @@
             android:textSize="22sp" />
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:layout_weight="17">
+            android:layout_weight="1"
+            android:orientation="horizontal">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -95,7 +94,7 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/booking_item_currency_base"
+                    android:id="@+id/booking_item_currency_paid"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="$"
@@ -103,7 +102,7 @@
                     android:textSize="16sp" />
 
                 <TextView
-                    android:id="@+id/booking_item_currency_paid"
+                    android:id="@+id/booking_item_currency_base"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="€"
