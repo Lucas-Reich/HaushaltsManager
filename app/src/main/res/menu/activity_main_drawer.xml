@@ -98,11 +98,6 @@
             android:icon="@drawable/ic_menu_camera"
             android:title="@string/left_slider_about" />
     </group>
-    <group>
-        <item></item>
-        <item></item>
-        <item></item>
-    </group>
     <item
         android:icon="@drawable/ic_menu_camera"
         android:title="@string/left_slider_planned_bookings" />

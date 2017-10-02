@@ -91,12 +91,14 @@ public class MainActivityTab extends AppCompatActivity {
                 switch (item.getItemId()) {
 
                     case R.id.desktop:
-                        //do smth
+
+                        Intent testIntent = new Intent(MainActivityTab.this, PieChartTest.class);
+                        MainActivityTab.this.startActivity(testIntent);
                         break;
                     case R.id.categories:
 
-                        Intent intent = new Intent(MainActivityTab.this, Categories.class);
-                        MainActivityTab.this.startActivity(intent);
+                        Intent categoryIntent = new Intent(MainActivityTab.this, Categories.class);
+                        MainActivityTab.this.startActivity(categoryIntent);
                         break;
                     case R.id.templates:
                         //do smth

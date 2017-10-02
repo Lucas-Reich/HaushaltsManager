@@ -40,6 +40,6 @@
     <string name="expense_screen_dsp_account">Konto wählen</string>
     <string name="expense_screen_error_create">Error while creating the expense. Create at least a Title, Amount and a Category!</string>
     <string name="tab_one_title">Bookings</string>
-    <string name="tab_three_title">Placeholder</string>
-    <string name="tab_two_title">Placeholder</string>
+    <string name="tab_three_title">Report</string>
+    <string name="tab_two_title">Monthly Overview</string>
 </resources>

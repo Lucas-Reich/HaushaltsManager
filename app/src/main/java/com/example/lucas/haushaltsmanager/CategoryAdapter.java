@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class CategroyAdapter extends ArrayAdapter<Category> implements View.OnClickListener {
+public class CategoryAdapter extends ArrayAdapter<Category> implements View.OnClickListener {
 
     private ArrayList<Category> dataSet;
     Context mContext;
@@ -18,7 +18,7 @@ public class CategroyAdapter extends ArrayAdapter<Category> implements View.OnCl
         TextView txtCategoryName;
     }
 
-    public CategroyAdapter(ArrayList<Category> data, Context context) {
+    public CategoryAdapter(ArrayList<Category> data, Context context) {
         super(context, R.layout.category_item, data);
         this.dataSet = data;
         this.mContext = context;

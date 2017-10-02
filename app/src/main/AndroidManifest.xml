@@ -25,7 +25,11 @@
             android:parentActivityName=".MainActivityTab" />
         <activity android:name=".Categories"
             android:label="HaushaltsManager"
-            android:parentActivityName=".MainActivityTab"/>
+            android:parentActivityName=".MainActivityTab" />
+        <activity
+            android:name=".PieChartTest"
+            android:label="HaushaltsManager"
+            android:parentActivityName=".MainActivityTab" />
     </application>
 
 </manifest>

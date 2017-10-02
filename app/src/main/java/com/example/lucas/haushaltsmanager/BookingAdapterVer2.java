@@ -79,6 +79,4 @@ class BookingAdapterVer2 extends ArrayAdapter<ExpenseObject> implements View.OnC
 
         return convertView;
     }
-
-
 }

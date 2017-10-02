@@ -2,19 +2,16 @@ package com.example.lucas.haushaltsmanager;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class Categories extends AppCompatActivity {
 
     ExpensesDataSource expensesDataSource;
     ListView listView;
     ArrayList<Category> categories;
-    private static CategroyAdapter adapter;
+    CategoryAdapter adapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -29,7 +26,7 @@ public class Categories extends AppCompatActivity {
 
         categories = expensesDataSource.getAllCategories();
 
-        adapter = new CategroyAdapter(categories, getApplicationContext());
+        adapter = new CategoryAdapter(categories, getApplicationContext());
 
         listView.setAdapter(adapter);
 

@@ -2,8 +2,8 @@
     <string name="app_name">HaushaltsManager</string>
 
     <string name="tab_one_title">Bookings</string>
-    <string name="tab_two_title">Placeholder</string>
-    <string name="tab_three_title">Placeholder</string>
+    <string name="tab_two_title">Monthly Overview</string>
+    <string name="tab_three_title">Report</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

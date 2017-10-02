@@ -39,6 +39,8 @@ public class TabOneBookings extends Fragment{
 */
         adapterVer2 = new BookingAdapterVer2(expenseObjects, getContext());
 
+        expensesDataSource.close();
+
         listView.setAdapter(adapterVer2);
 
         return rootView;
