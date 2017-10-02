@@ -374,7 +374,7 @@ class ExpensesDataSource {
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.BOOKINGS_TAGS_COL_F_BOOKING_ID, bookingId);
         values.put(ExpensesDbHelper.BOOKINGS_TAGS_COL_F_TAG_ID, tagId);
-        index =  database.insert(ExpensesDbHelper.TABLE_BOOKINGS_TAGS, null, values);
+        index = database.insert(ExpensesDbHelper.TABLE_BOOKINGS_TAGS, null, values);
 
         Log.d(LOG_TAG, "assigned tag with id " + index + " to booking " + bookingId);
         return index;
@@ -538,11 +538,27 @@ class ExpensesDataSource {
         return expense;
     }
 
-    ArrayList<ExpenseObject> getAllBookings(){
+    /**
+     * @return ArrayList<> of all bookings
+     */
+    ArrayList<ExpenseObject> getAllBookings() {
 
-        ArrayList<ExpenseObject> bookings= new ArrayList<>();
+        return getAllBookings("", "");
+    }
 
-        String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_BOOKINGS;
+    ArrayList<ExpenseObject> getAllBookings(String startDate, String endDate) {//TODO ich muss sicherstellen dass das datum immer im richtigen (yyyy-mm-dd) format ist
+
+        ArrayList<ExpenseObject> bookings = new ArrayList<>();
+
+        String selectQuery;
+
+        if (startDate.length() != 0 && endDate.length() != 0) {
+
+            selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_BOOKINGS + " WHERE " + ExpensesDbHelper.BOOKINGS_COL_DATE + " >= '" + startDate + "' AND <= '" + endDate + "'";
+        } else {
+
+            selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_BOOKINGS;
+        }
         Log.d(LOG_TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
@@ -551,7 +567,7 @@ class ExpensesDataSource {
 
         if (!c.isAfterLast()) {
 
-            while(!c.isAfterLast()) {
+            while (!c.isAfterLast()) {
 
                 bookings.add(cursorToExpense(c));
                 c.moveToNext();
@@ -559,7 +575,6 @@ class ExpensesDataSource {
         }
 
         return bookings;
-
     }
 
     /**
@@ -626,7 +641,7 @@ class ExpensesDataSource {
 
         if (!c.isAfterLast()) {
 
-            while(!c.isAfterLast()) {
+            while (!c.isAfterLast()) {
 
 
                 long index = c.getLong(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_ID));
@@ -748,7 +763,7 @@ class ExpensesDataSource {
         return database.delete(ExpensesDbHelper.TABLE_CATEGORIES, ExpensesDbHelper.CATEGORIES_COL_ID + " = ?", new String[]{"" + categoryId});
     }
 
-    void getAllBoookings(){
+    void getAllBoookings() {
 
         String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_BOOKINGS;
         Log.d(LOG_TAG, selectQuery);

@@ -10,9 +10,12 @@ class MonthlyReport {
     private String account;
     private String currency;
 
-    public MonthlyReport() {
+    public MonthlyReport(String month, ArrayList<ExpenseObject> expenses, String account, String currency) {
 
-
+        this.month = month;
+        this.expenses = expenses;
+        this.account = account;
+        this.currency = currency;
     }
 
     public String getMonth() {

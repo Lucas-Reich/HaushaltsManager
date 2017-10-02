@@ -23,9 +23,9 @@ import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.util.ArrayList;
 
-class MonthlyOverviewAdapter extends ArrayAdapter<ExpenseObject> implements View.OnClickListener, OnChartValueSelectedListener {
+class MonthlyOverviewAdapter extends ArrayAdapter<MonthlyReport> implements View.OnClickListener, OnChartValueSelectedListener {
 
-    private ArrayList<ExpenseObject> dataSet;
+    private ArrayList<MonthlyReport> dataSet;
     private Context mContext;
 
     private static class ViewHolder {
@@ -40,7 +40,7 @@ class MonthlyOverviewAdapter extends ArrayAdapter<ExpenseObject> implements View
         PieChart pieChart;
     }
 
-    MonthlyOverviewAdapter(ArrayList<ExpenseObject> data, Context context) {
+    MonthlyOverviewAdapter(ArrayList<MonthlyReport> data, Context context) {
         super(context, R.layout.monthly_overview_item_v1, data);
         this.dataSet = data;
         this.mContext = context;
@@ -54,6 +54,7 @@ class MonthlyOverviewAdapter extends ArrayAdapter<ExpenseObject> implements View
 
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
 
+        MonthlyReport monthlyReport = getItem(position);
         ViewHolder viewHolder;
 
         if (convertView == null) {
@@ -77,14 +78,15 @@ class MonthlyOverviewAdapter extends ArrayAdapter<ExpenseObject> implements View
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        viewHolder.txtMonth.setText("01/2017");
-        viewHolder.txtInbound.setText("300");
-        viewHolder.txtOutbound.setText("200");
-        viewHolder.txtTotal.setText("100");
-        viewHolder.txtTotalBookings.setText("100 Buchungen");
-        viewHolder.txtAccountCurrency.setText("€");
+        //TODO setText mit platzhaltern füllen, sodass sich die ide nicht mehr beschwehrt
+        viewHolder.txtMonth.setText(monthlyReport.getMonth() + "/2017");
+        viewHolder.txtInbound.setText(monthlyReport.countIncomingMoney() + "");
+        viewHolder.txtOutbound.setText(monthlyReport.countOutgoingMoney() + "");
+        viewHolder.txtTotal.setText(monthlyReport.calcMonthlyTotal() + "");
+        viewHolder.txtTotalBookings.setText(monthlyReport.countBookings() + " Buchungen");
+        viewHolder.txtAccountCurrency.setText(monthlyReport.getCurrency());
         viewHolder.colorCategory.setText("red");
-        viewHolder.txtCategory.setText("Penis Enlargement");
+        viewHolder.txtCategory.setText(monthlyReport.getMostStressedCategory());
 
         viewHolder.pieChart.setUsePercentValues(true);
         viewHolder.pieChart.setOnChartValueSelectedListener(this);
@@ -96,6 +98,7 @@ class MonthlyOverviewAdapter extends ArrayAdapter<ExpenseObject> implements View
 
     private void addDataSet(PieChart chart) {
 
+        //TODO dataset muss sich die information für das diegramm noch aus dem aktuellen item ziehen
         ArrayList<Entry> yValues = new ArrayList<>();
 
         yValues.add(new Entry(55f, 0));
@@ -133,7 +136,7 @@ class MonthlyOverviewAdapter extends ArrayAdapter<ExpenseObject> implements View
         chart.invalidate();
     }
 
-    @Override
+    @Override//TODO brauche ich überhaut ein klickbares diagramm??
     public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
 
         if (e != null) {
