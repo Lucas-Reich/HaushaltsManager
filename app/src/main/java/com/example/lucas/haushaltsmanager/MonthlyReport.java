@@ -1,5 +1,7 @@
 package com.example.lucas.haushaltsmanager;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,18 +9,17 @@ class MonthlyReport {
 
     private String month;
     private List<ExpenseObject> expenses;
-    private String account;
     private String currency;
+    private String TAG = "MonthlyReport";
 
-    public MonthlyReport(String month, ArrayList<ExpenseObject> expenses, String account, String currency) {
+    MonthlyReport(String month, ArrayList<ExpenseObject> expenses, String currency) {
 
         this.month = month;
         this.expenses = expenses;
-        this.account = account;
         this.currency = currency;
     }
 
-    public String getMonth() {
+    String getMonth() {
         return month;
     }
 
@@ -30,85 +31,64 @@ class MonthlyReport {
         return expenses;
     }
 
-    public void setExpenses(List<ExpenseObject> expenses) {
-        this.expenses = expenses;
-    }
-
-    public String getAccount() {
-        return account;
-    }
-
-    public void setAccount(String account) {
-        this.account = account;
-    }
-
-    public void setCurrency(String currency) {
-
-        this.currency = currency;
-    }
-
-    public String getCurrency() {
+    String getCurrency() {
 
         return currency;
     }
 
-    public int countBookings() {
+    int countBookings() {
 
         return expenses.size();
     }
 
-    public  double countIncomingMoney() {
+    double countIncomingMoney() {
 
         double incomingMoney = 0;
 
         for (ExpenseObject expense : expenses) {
 
-            double temp = expense.getPrice();
+            if (!expense.getExpenditure()) {
 
-            if (temp >= 0) {
-
-                incomingMoney += temp;
+                incomingMoney += expense.getPrice();
             }
         }
 
         return incomingMoney;
     }
 
-    public double countOutgoingMoney() {
+    double countOutgoingMoney() {
 
         double outgoingMoney = 0;
 
         for (ExpenseObject expense : expenses) {
 
-            double temp = expense.getPrice();
+            if (expense.getExpenditure()) {
 
-            if (temp <= 0) {
-
-                outgoingMoney += temp;
+                outgoingMoney += expense.getPrice();
             }
         }
 
         return outgoingMoney;
     }
 
-    public double calcMonthlyTotal() {
+    double calcMonthlyTotal() {
 
-        return (countIncomingMoney() + countOutgoingMoney());
+        return (countIncomingMoney() - countOutgoingMoney());
     }
 
-    public String getMostStressedCategory() {
+    String getMostStressedCategory() {
 
         MonthlyExpenses mostStressedCategory = new MonthlyExpenses("", 0);
 
         ArrayList<MonthlyExpenses> monthlyExpenses = new ArrayList<>();
 
-        for(ExpenseObject expense : expenses) {
+        for (ExpenseObject expense : expenses) {
 
             String categoryName = expense.getCategory().getCategoryName();
 
             for (int i = 0; i < monthlyExpenses.size(); i++) {
 
-                if (monthlyExpenses.get(i).getCategory() == categoryName) {
+                if (monthlyExpenses.get(i).getCategory().equals(categoryName)) {
 
                     double money = monthlyExpenses.get(i).getSpendMoney();
                     monthlyExpenses.get(i).setSpendMoney(money + expense.getPrice());
@@ -126,6 +106,8 @@ class MonthlyReport {
                 mostStressedCategory = monthlyExpense;
             }
         }
+
+        Log.d(TAG, "getMostStressedCategory: " + mostStressedCategory.getCategory());
 
         return mostStressedCategory.getCategory();
     }

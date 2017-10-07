@@ -2,13 +2,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:paddingLeft="12dp">
 
     <LinearLayout
         android:id="@+id/monthly_text_wrapper"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_weight="0.20">
 
         <TextView
             android:id="@+id/monthly_item_month"
@@ -113,7 +115,8 @@
 
         <com.github.mikephil.charting.charts.PieChart
             android:id="@+id/monthly_item_pie_chart"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_width="218dp"
+            android:layout_height="119dp"
+            android:layout_gravity="right" />
     </LinearLayout>
 </LinearLayout>

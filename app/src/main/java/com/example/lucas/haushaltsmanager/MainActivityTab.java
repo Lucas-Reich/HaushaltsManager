@@ -18,7 +18,6 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 public class MainActivityTab extends AppCompatActivity {
 
@@ -204,7 +203,7 @@ public class MainActivityTab extends AppCompatActivity {
                     TabOneBookings tabOne = new TabOneBookings();
                     return tabOne;
                 case 1:
-                    TabTwo tabTwo = new TabTwo();
+                    TabTwoMonthlyReports tabTwo = new TabTwoMonthlyReports();
                     return tabTwo;
                 case 2:
                     TabThree tabThree = new TabThree();

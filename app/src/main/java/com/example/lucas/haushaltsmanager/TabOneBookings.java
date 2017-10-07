@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -37,6 +38,15 @@ public class TabOneBookings extends Fragment{
         expensesDataSource.close();
 
         listView.setAdapter(bookingAdapter);
+
+        listView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+
+                Toast.makeText(getContext(), "möglichkeit um die Buchung zu löschen", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        });
 
         return rootView;
     }
