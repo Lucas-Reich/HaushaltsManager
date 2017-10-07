@@ -15,13 +15,15 @@ import android.widget.RadioGroup;//
 import android.widget.TextView;//
 import android.widget.Toast;//
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 public class ExpenseScreen extends AppCompatActivity {
 
     public ExpenseObject EXPENSE = new ExpenseObject();
     private Calendar CAL = Calendar.getInstance();
-    private String LOGTAG = "ExpenseScreen: ";
+    private String TAG = "ExpenseScreen: ";
     private ExpensesDataSource expensesDataSource;
 
     @Override
@@ -48,22 +50,24 @@ public class ExpenseScreen extends AppCompatActivity {
         // set the displayed date to the current one
         Button setDate = (Button) findViewById(R.id.expense_screen_date);
         //TODO today should be a string which looks like 01.01.2017 and not 1-1-2017
-        String today = CAL.get(Calendar.DAY_OF_MONTH) + "-" + (CAL.get(Calendar.MONTH) + 1) + "-" + CAL.get(Calendar.YEAR);
+        //String today = CAL.get(Calendar.DAY_OF_MONTH) + "-" + (CAL.get(Calendar.MONTH) + 1) + "-" + CAL.get(Calendar.YEAR);
+        Date date = new Date();
+        String today = new SimpleDateFormat("yyyy-MM-dd").format(date);
         setDate.setText(today);
         EXPENSE.setDate(CAL);
-        Log.d(LOGTAG, "set date to " + today + "");
+        Log.d(TAG, "set date to " + today);
 
         // set the account to the current main account
         Button accountBtn = (Button) findViewById(R.id.expense_screen_account);
         accountBtn.setText(activeAccount.getAccountName());
         EXPENSE.setAccount(activeAccount);
-        Log.d(LOGTAG, "set active account to " + activeAccount.getAccountName());
+        Log.d(TAG, "set active account to " + activeAccount.getAccountName());
 
         // set the EXPENSE type to "EXPENSE"
         RadioGroup expenseType = (RadioGroup) findViewById(R.id.expense_screen_expense_type);
         expenseType.check(R.id.expense_screen_radio_expense);
         EXPENSE.setExpenditure(false);
-        Log.d(LOGTAG, "set expense type to " + false);
+        Log.d(TAG, "set expense type to " + false);
 
 
         //TODO implement AlertDialog which enables the user to input a number for the expense amount
@@ -109,11 +113,11 @@ public class ExpenseScreen extends AppCompatActivity {
                 if (checkedId == R.id.expense_screen_radio_expense) {
 
                     EXPENSE.setExpenditure(true);
-                    Log.d(LOGTAG, "set expense type to " + true);
+                    Log.d(TAG, "set expense type to " + true);
                 } else {
 
                     EXPENSE.setExpenditure(false);
-                    Log.d(LOGTAG, "set expense type to " + false);
+                    Log.d(TAG, "set expense type to " + false);
                 }
             }
         });
@@ -180,6 +184,7 @@ public class ExpenseScreen extends AppCompatActivity {
         new DatePickerDialog(ExpenseScreen.this, d, CAL.get(Calendar.YEAR), CAL.get(Calendar.MONTH), CAL.get(Calendar.DAY_OF_MONTH)).show();
     }
 
+    //TODO die datumsangabe sieht nicht schön aus und muss noch ein wenig geändert werden
     DatePickerDialog.OnDateSetListener d = new DatePickerDialog.OnDateSetListener() {
 
         @Override
@@ -188,11 +193,23 @@ public class ExpenseScreen extends AppCompatActivity {
             Calendar expenditureDate = Calendar.getInstance();
             expenditureDate.set(year, (month + 1), dayOfMonth);
 
+            String dateString = year + "-";
+            if (month < 9 ) {
+                dateString += "0" + (month + 1) + "-";
+            } else {
+                dateString += (month + 1) + "-";
+            }
+            if (dayOfMonth < 10){
+                dateString += "0" + dayOfMonth;
+            } else {
+                dateString += dayOfMonth;
+            }
+
             Button btn_date = (Button) findViewById(R.id.expense_screen_date);
-            btn_date.setText(dayOfMonth + "-" + (month + 1) + "-" + year);
+            btn_date.setText(dateString);
 
             EXPENSE.setDate(expenditureDate);
-            Log.d(LOGTAG, "set date to " + dayOfMonth + "-" + (month + 1) + "-" + year);
+            Log.d(TAG, "updated date to " + dateString);
         }
     };
 

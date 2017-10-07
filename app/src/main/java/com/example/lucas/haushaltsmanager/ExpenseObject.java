@@ -1,8 +1,12 @@
 package com.example.lucas.haushaltsmanager;
 
 import android.util.Log;
+import android.widget.Toast;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -55,7 +59,29 @@ class ExpenseObject {
     //TODO return date String depending on the locale of the user
     //TODO implement a getDisplayDate and getDate method
     String getDate() {
-        return date.get(Calendar.DAY_OF_MONTH) + "-" + (date.get(Calendar.MONTH) + 1) + "-" + date.get(Calendar.YEAR);
+
+        //String test = date.get(Calendar.YEAR) + "-" + (date.get(Calendar.MONTH) + 1) + "-" + date.get(Calendar.DAY_OF_MONTH);
+        int day = date.get(Calendar.DAY_OF_MONTH);
+        int month = date.get(Calendar.MONTH);
+        int year = date.get(Calendar.YEAR);
+        String rightDate = year + "";
+
+        if (month < 10) {
+
+            rightDate += "-0" + month;
+        } else {
+
+            rightDate += "-" + month;
+        }
+
+        if (day < 10) {
+
+            rightDate += "-0" + day;
+        } else {
+
+            rightDate += "-" + day;
+        }
+        return rightDate;
     }
 
     void setDate(Calendar date) {
@@ -149,15 +175,15 @@ class ExpenseObject {
 
     void toConsole() {
 
-        Log.d("ExpenseObject index: " , "" + index);
-        Log.d("ExpenseObject cat: " , "" + category.getCategoryName());
-        Log.d("ExpenseObject price: " , "" + price);
-        Log.d("ExpenseObject expend: " , "" + expenditure);
-        Log.d("ExpenseObject title: " , "" + title);
-        Log.d("ExpenseObject tag: " , "" + tag);
-        Log.d("ExpenseObject date: " , "" + getDate());
-        Log.d("ExpenseObject notice: " , "" + notice);
-        Log.d("ExpenseObject account: " , "" + account.getAccountName());
+        Log.d("ExpenseObject index: ", "" + index);
+        Log.d("ExpenseObject cat: ", "" + category.getCategoryName());
+        Log.d("ExpenseObject price: ", "" + price);
+        Log.d("ExpenseObject expend: ", "" + expenditure);
+        Log.d("ExpenseObject title: ", "" + title);
+        Log.d("ExpenseObject tag: ", "" + tag);
+        Log.d("ExpenseObject date: ", "" + getDate());
+        Log.d("ExpenseObject notice: ", "" + notice);
+        Log.d("ExpenseObject account: ", "" + account.getAccountName());
 
     }
 }

@@ -16,26 +16,26 @@ class ExpensesDataSource {
 
     //TODO wenn ein cursor nichts findet in einer datenbank dann kann man nicht mit c != null abfragen ob er leer ist || die abfrage ob ein cursor leer ist muss neu gemacht werden
 
-    private static final String LOG_TAG = ExpensesDataSource.class.getSimpleName();
+    private static final String TAG = ExpensesDataSource.class.getSimpleName();
 
     private SQLiteDatabase database;
     private ExpensesDbHelper dbHelper;
 
     ExpensesDataSource(Context context) {
 
-        Log.d(LOG_TAG, "Unsere DataSource erzeugt jetzt den dbHelper.");
+        Log.d(TAG, "Unsere DataSource erzeugt jetzt den dbHelper.");
         dbHelper = new ExpensesDbHelper(context);
     }
 
     void open() {
-        Log.d(LOG_TAG, "Asked for a reference to a DB.");
+        Log.d(TAG, "Asked for a reference to a DB.");
         database = dbHelper.getWritableDatabase();
-        Log.d(LOG_TAG, "Obtained a reference to a Db. Way to Db: " + database.getPath());
+        Log.d(TAG, "Obtained a reference to a Db. Way to Db: " + database.getPath());
     }
 
     void close() {
         dbHelper.close();
-        Log.d(LOG_TAG, "Closed Db with the help of dbHelper.");
+        Log.d(TAG, "Closed Db with the help of dbHelper.");
     }
 
     /**
@@ -72,10 +72,10 @@ class ExpensesDataSource {
         List<String> allTags = Arrays.asList(getTagsToBookingByBookingId(expense.getIndex()));
         expense.setTags(allTags);
 
-        String expenseDate = cursor.getString(idDate);
-        int day = Integer.parseInt(expenseDate.substring(0, 1));
-        int month = Integer.parseInt(expenseDate.substring(3, 4));
-        int year = Integer.parseInt(expenseDate.substring(6, 7));
+        String[] expenseDate = cursor.getString(idDate).split("-");
+        int day = Integer.parseInt(expenseDate[2]);
+        int month = Integer.parseInt(expenseDate[1]);
+        int year = Integer.parseInt(expenseDate[0]);
         cal.set(year, month, day);
         expense.setDate(cal);
 
@@ -84,7 +84,6 @@ class ExpensesDataSource {
         Account account = getAccountById(cursor.getLong(idAccount));
         expense.setAccount(account);
 
-        getAllBoookings();
         return expense;
     }
 
@@ -101,7 +100,7 @@ class ExpensesDataSource {
         values.put(ExpensesDbHelper.ACCOUNTS_COL_ACCOUNT, account.getAccountName());
         values.put(ExpensesDbHelper.ACCOUNTS_COL_BALANCE, account.getBalance());
 
-        Log.d(LOG_TAG, "created account " + account.getAccountName() + " with a balance of " + account.getBalance());
+        Log.d(TAG, "created account " + account.getAccountName() + " with a balance of " + account.getBalance());
 
         return database.insert(ExpensesDbHelper.TABLE_ACCOUNTS, null, values);
     }
@@ -116,10 +115,10 @@ class ExpensesDataSource {
 
         Account account;
         String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_ACCOUNTS + " WHERE " + ExpensesDbHelper.ACCOUNTS_COL_ID + " = " + accountId;
-        Log.d(LOG_TAG, selectQuery);
+        Log.d(TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
-        Log.d(LOG_TAG, DatabaseUtils.dumpCursorToString(c));
+        Log.d(TAG, DatabaseUtils.dumpCursorToString(c));
 
         c.moveToFirst();
         if (!c.isAfterLast()) {
@@ -133,16 +132,20 @@ class ExpensesDataSource {
 
         c.close();
         return new Account();
-
     }
 
+    /**
+     *
+     * @param accountName
+     * @return
+     */
     Account getAccountByName(String accountName) {
 
         String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_ACCOUNTS + " WHERE " + ExpensesDbHelper.ACCOUNTS_COL_ACCOUNT + " = \"" + accountName + "\"";
-        Log.d(LOG_TAG, selectQuery);
+        Log.d(TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
-        Log.d(LOG_TAG, DatabaseUtils.dumpCursorToString(c));
+        Log.d(TAG, DatabaseUtils.dumpCursorToString(c));
 
         c.moveToFirst();
         if (!c.isAfterLast()) {
@@ -156,7 +159,6 @@ class ExpensesDataSource {
 
         c.close();
         return new Account();
-
     }
 
     /**
@@ -168,10 +170,10 @@ class ExpensesDataSource {
 
         Account[] accounts;
         String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_ACCOUNTS;
-        Log.d(LOG_TAG, selectQuery);
+        Log.d(TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
-        Log.d(LOG_TAG, DatabaseUtils.dumpCursorToString(c));
+        Log.d(TAG, DatabaseUtils.dumpCursorToString(c));
 
         c.moveToFirst();
         accounts = new Account[c.getCount()];
@@ -191,14 +193,18 @@ class ExpensesDataSource {
         return accounts;
     }
 
+    /**
+     *
+     * @return
+     */
     String[] getAccountNames() {
 
         String[] accounts;
         String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_ACCOUNTS;
-        Log.d(LOG_TAG, selectQuery);
+        Log.d(TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
-        Log.d(LOG_TAG, DatabaseUtils.dumpCursorToString(c));
+        Log.d(TAG, DatabaseUtils.dumpCursorToString(c));
         c.moveToFirst();
 
         accounts = new String[c.getCount()];
@@ -225,7 +231,7 @@ class ExpensesDataSource {
         values.put(ExpensesDbHelper.ACCOUNTS_COL_ACCOUNT, account.getAccountName());
 
         String oldAccount = getAccountById(account.getIndex()).getAccountName();
-        Log.d(LOG_TAG, "updated account " + oldAccount + " to " + account.getAccountName());
+        Log.d(TAG, "updated account " + oldAccount + " to " + account.getAccountName());
 
         return database.update(ExpensesDbHelper.TABLE_ACCOUNTS, values, ExpensesDbHelper.ACCOUNTS_COL_ID + " = ?", new String[]{account.getIndex() + ""});
     }
@@ -236,10 +242,10 @@ class ExpensesDataSource {
      * @param account Account object which should be deleted
      * @return the number of affected rows
      */
-    //TODO cant delete Account if it's still assigned to an Booking
     int deleteAccount(Account account) {
 
-        Log.d(LOG_TAG, "deleted account " + account.getAccountName() + " at index " + account.getIndex());
+        //TODO ein konto kann nicht gelöscht werden wenn noch eine buchung für das konto existiert
+        Log.d(TAG, "deleted account " + account.getAccountName() + " at index " + account.getIndex());
         return database.delete(ExpensesDbHelper.TABLE_ACCOUNTS, ExpensesDbHelper.ACCOUNTS_COL_ID + " = ?", new String[]{"" + account.getIndex()});
     }
 
@@ -255,7 +261,7 @@ class ExpensesDataSource {
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.TAGS_COL_TAG_NAME, tagName);
 
-        Log.d(LOG_TAG, "created " + tagName + " at Tag table");
+        Log.d(TAG, "created " + tagName + " at Tag table");
         return database.insert(ExpensesDbHelper.TABLE_TAGS, null, values);
     }
 
@@ -269,10 +275,10 @@ class ExpensesDataSource {
 
         String tag = "";
         String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_TAGS + " WHERE " + ExpensesDbHelper.TAGS_COL_ID + " = " + tagId;
-        Log.d(LOG_TAG, selectQuery);
+        Log.d(TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
-        Log.d(LOG_TAG, DatabaseUtils.dumpCursorToString(c));
+        Log.d(TAG, DatabaseUtils.dumpCursorToString(c));
 
         c.moveToFirst();
         if (!c.isAfterLast()) {
@@ -294,10 +300,10 @@ class ExpensesDataSource {
 
         String[] allTags;
         String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_TAGS;
-        Log.d(LOG_TAG, selectQuery);
+        Log.d(TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
-        Log.d(LOG_TAG, DatabaseUtils.dumpCursorToString(c));
+        Log.d(TAG, DatabaseUtils.dumpCursorToString(c));
 
         c.moveToFirst();
 
@@ -335,10 +341,10 @@ class ExpensesDataSource {
      * @param tag_id the id of the entry which should be deleted
      * @return the number of affected rows
      */
-    //TODO cant delete Tag if it's still assigned to an Booking
     int deleteTag(long tag_id) {
 
-        Log.d(LOG_TAG, "deleted tag at index " + tag_id);
+        //TODO ein tag kann nicht gelöscht werden, wenn es noch einer buchung zugeordnet ist
+        Log.d(TAG, "deleted tag at index " + tag_id);
         return database.delete(ExpensesDbHelper.TABLE_TAGS, ExpensesDbHelper.TAGS_COL_ID + " = ?", new String[]{"" + tag_id});
     }
 
@@ -356,10 +362,16 @@ class ExpensesDataSource {
         values.put(ExpensesDbHelper.BOOKINGS_TAGS_COL_F_BOOKING_ID, tagId);
         values.put(ExpensesDbHelper.BOOKINGS_TAGS_COL_F_BOOKING_ID, bookingId);
 
-        Log.d(LOG_TAG, "assigned tag " + tagId + " to booking " + bookingId);
+        Log.d(TAG, "assigned tag " + tagId + " to booking " + bookingId);
         return database.insert(ExpensesDbHelper.TABLE_BOOKINGS_TAGS, null, values);
     }
 
+    /**
+     *
+     * @param bookingId
+     * @param tagName
+     * @return
+     */
     private long assignTagToBooking(long bookingId, String tagName) {
 //TODO if booking has already tags (e.g. you are editing an existing booking) assigned to it don't create a duplicate
         long tagId = getTagByName(tagName);
@@ -376,7 +388,7 @@ class ExpensesDataSource {
         values.put(ExpensesDbHelper.BOOKINGS_TAGS_COL_F_TAG_ID, tagId);
         index = database.insert(ExpensesDbHelper.TABLE_BOOKINGS_TAGS, null, values);
 
-        Log.d(LOG_TAG, "assigned tag with id " + index + " to booking " + bookingId);
+        Log.d(TAG, "assigned tag with id " + index + " to booking " + bookingId);
         return index;
     }
 
@@ -390,12 +402,12 @@ class ExpensesDataSource {
 
         String[] tags;
         String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_BOOKINGS_TAGS + " WHERE " + ExpensesDbHelper.BOOKINGS_TAGS_COL_F_BOOKING_ID + " = " + bookingId;
-        Log.d(LOG_TAG, selectQuery);
+        Log.d(TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
         c.moveToFirst();
 
-        Log.d(LOG_TAG, DatabaseUtils.dumpCursorToString(c));
+        Log.d(TAG, DatabaseUtils.dumpCursorToString(c));
 
         if (!c.isAfterLast()) {
 
@@ -426,10 +438,10 @@ class ExpensesDataSource {
 
         long[] bookings;
         String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_BOOKINGS_TAGS + " WHERE " + ExpensesDbHelper.BOOKINGS_TAGS_COL_F_TAG_ID + " = " + tagId;
-        Log.d(LOG_TAG, selectQuery);
+        Log.d(TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
-        Log.d(LOG_TAG, DatabaseUtils.dumpCursorToString(c));
+        Log.d(TAG, DatabaseUtils.dumpCursorToString(c));
 
         c.moveToFirst();
         if (!c.isAfterLast()) {
@@ -459,17 +471,21 @@ class ExpensesDataSource {
      */
     private int removeTagFromBooking(long bookingTagId) {
 
-        Log.d(LOG_TAG, "deleted tag from booking at index " + bookingTagId);
+        Log.d(TAG, "deleted tag from booking at index " + bookingTagId);
         return database.delete(ExpensesDbHelper.TABLE_BOOKINGS_TAGS, ExpensesDbHelper.BOOKINGS_TAGS_COL_ID + " = ?", new String[]{"" + bookingTagId});
     }
 
+    /**
+     * @param tagName
+     * @return
+     */
     private long getTagByName(String tagName) {
 
         String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_TAGS + " WHERE " + ExpensesDbHelper.TAGS_COL_TAG_NAME + " = \"" + tagName + "\"";
-        Log.d(LOG_TAG, selectQuery);
+        Log.d(TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
-        Log.d(LOG_TAG, DatabaseUtils.dumpCursorToString(c));
+        Log.d(TAG, DatabaseUtils.dumpCursorToString(c));
 
         c.moveToFirst();
 
@@ -495,6 +511,7 @@ class ExpensesDataSource {
         values.put("price", expense.getPrice());
 
         //TODO if Category does not exist already create it
+        //TODO sicherstelen, dass das datumsformat immer gleich ist (yyyy-mm-dd)
         long categoryId = expense.getCategory().getIndex();
         values.put("f_category_id", categoryId);
         values.put("expenditure", expense.getExpenditure());
@@ -512,7 +529,7 @@ class ExpensesDataSource {
             assignTagToBooking(expense.getIndex(), tag);
         }
 
-        Log.d(LOG_TAG, "created expense at Booking table");
+        Log.d(TAG, "created expense at Booking table");
         return database.insert(ExpensesDbHelper.TABLE_BOOKINGS, null, values);
     }
 
@@ -526,13 +543,13 @@ class ExpensesDataSource {
 
         ExpenseObject expense;
         String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_BOOKINGS + " WHERE " + ExpensesDbHelper.BOOKINGS_COL_BOOKING_ID + " = " + bookingId;
-        Log.d(LOG_TAG, selectQuery);
+        Log.d(TAG, selectQuery);
         Cursor c = database.rawQuery(selectQuery, null);
-        Log.d(LOG_TAG, DatabaseUtils.dumpCursorToString(c));
+        Log.d(TAG, DatabaseUtils.dumpCursorToString(c));
 
         c.moveToFirst();
 
-        Log.d(LOG_TAG, DatabaseUtils.dumpCursorToString(c));
+        Log.d(TAG, DatabaseUtils.dumpCursorToString(c));
         expense = cursorToExpense(c);
         c.close();
         return expense;
@@ -546,6 +563,11 @@ class ExpensesDataSource {
         return getAllBookings("", "");
     }
 
+    /**
+     * @param startDate
+     * @param endDate
+     * @return
+     */
     ArrayList<ExpenseObject> getAllBookings(String startDate, String endDate) {//TODO ich muss sicherstellen dass das datum immer im richtigen (yyyy-mm-dd) format ist
 
         ArrayList<ExpenseObject> bookings = new ArrayList<>();
@@ -554,15 +576,17 @@ class ExpensesDataSource {
 
         if (startDate.length() != 0 && endDate.length() != 0) {
 
-            selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_BOOKINGS + " WHERE " + ExpensesDbHelper.BOOKINGS_COL_DATE + " >= '" + startDate + "' AND <= '" + endDate + "'";
+            selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_BOOKINGS;
+            selectQuery += " WHERE " + ExpensesDbHelper.BOOKINGS_COL_DATE + " BETWEEN '" + startDate + "' AND '" + endDate + "'";
+            selectQuery += " ORDER BY " + ExpensesDbHelper.BOOKINGS_COL_DATE + " ASC;";
         } else {
 
             selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_BOOKINGS;
         }
-        Log.d(LOG_TAG, selectQuery);
+        Log.d(TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
-        Log.d(LOG_TAG, DatabaseUtils.dumpCursorToString(c));
+        Log.d(TAG, DatabaseUtils.dumpCursorToString(c));
         c.moveToFirst();
 
         if (!c.isAfterLast()) {
@@ -601,7 +625,7 @@ class ExpensesDataSource {
         long accountId = newExpense.getAccount().getIndex();
         values.put("f_account_id", accountId);
 
-        Log.d(LOG_TAG, "changed booking " + bookingId);
+        Log.d(TAG, "changed booking " + bookingId);
         return database.update(ExpensesDbHelper.TABLE_BOOKINGS, values, ExpensesDbHelper.BOOKINGS_COL_BOOKING_ID + " = ?", new String[]{"" + bookingId});
     }
 
@@ -613,29 +637,37 @@ class ExpensesDataSource {
      */
     int deleteBooking(long bookingId) {
 
-        Log.d(LOG_TAG, "deleted booking at index " + bookingId);
+        Log.d(TAG, "deleted booking at index " + bookingId);
         return database.delete(ExpensesDbHelper.TABLE_BOOKINGS, ExpensesDbHelper.BOOKINGS_COL_BOOKING_ID + " = ?", new String[]{"" + bookingId});
     }
 
 
+    /**
+     * @param categoryName
+     * @param color
+     * @return
+     */
     long createCategory(String categoryName, int color) {
 
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.CATEGORIES_COL_CATEGORY_NAME, categoryName);
         values.put(ExpensesDbHelper.CATEGORIES_COL_COLOR, color);
-        Log.d(LOG_TAG, "created new category " + categoryName);
+        Log.d(TAG, "created new category " + categoryName);
 
         return database.insert(ExpensesDbHelper.TABLE_CATEGORIES, null, values);
     }
 
+    /**
+     * @return
+     */
     ArrayList<Category> getAllCategories() {
 
         ArrayList<Category> allCategories = new ArrayList<>();
         String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_CATEGORIES;
-        Log.d(LOG_TAG, selectQuery);
+        Log.d(TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
-        Log.d(LOG_TAG, DatabaseUtils.dumpCursorToString(c));
+        Log.d(TAG, DatabaseUtils.dumpCursorToString(c));
 
         c.moveToFirst();
 
@@ -665,10 +697,10 @@ class ExpensesDataSource {
     Category getCategoryByName(String category) {
 
         String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_CATEGORIES + " WHERE " + ExpensesDbHelper.CATEGORIES_COL_CATEGORY_NAME + " = \"" + category + "\"";
-        Log.d(LOG_TAG, selectQuery);
+        Log.d(TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
-        Log.d(LOG_TAG, DatabaseUtils.dumpCursorToString(c));
+        Log.d(TAG, DatabaseUtils.dumpCursorToString(c));
         c.moveToFirst();
         Category category1 = new Category();
 
@@ -693,11 +725,11 @@ class ExpensesDataSource {
     Category getCategoryById(long categoryId) {
 
         String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_CATEGORIES + " WHERE " + ExpensesDbHelper.CATEGORIES_COL_ID + " = " + categoryId;
-        Log.d(LOG_TAG, selectQuery);
+        Log.d(TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
 
-        Log.d(LOG_TAG, DatabaseUtils.dumpCursorToString(c));
+        Log.d(TAG, DatabaseUtils.dumpCursorToString(c));
 
         Category category = new Category();
 
@@ -728,7 +760,7 @@ class ExpensesDataSource {
         values.put(ExpensesDbHelper.CATEGORIES_COL_COLOR, color);
         values.put(ExpensesDbHelper.CATEGORIES_COL_CATEGORY_NAME, getCategoryById(categoryId).getCategoryName());
 
-        Log.d(LOG_TAG, "update category " + categoryId);
+        Log.d(TAG, "update category " + categoryId);
 
         return database.update(ExpensesDbHelper.TABLE_CATEGORIES, values, ExpensesDbHelper.CATEGORIES_COL_ID + " = ?", new String[]{"" + categoryId});
     }
@@ -746,7 +778,7 @@ class ExpensesDataSource {
         values.put(ExpensesDbHelper.CATEGORIES_COL_COLOR, getCategoryById(categoryId).getColor());
         values.put(ExpensesDbHelper.CATEGORIES_COL_CATEGORY_NAME, categoryName);
 
-        Log.d(LOG_TAG, "update category " + categoryId);
+        Log.d(TAG, "update category " + categoryId);
 
         return database.update(ExpensesDbHelper.TABLE_CATEGORIES, values, ExpensesDbHelper.CATEGORIES_COL_ID + " = ?", new String[]{"" + categoryId});
     }
@@ -759,19 +791,7 @@ class ExpensesDataSource {
      */
     int deleteCategory(long categoryId) {
 
-        Log.d(LOG_TAG, "delete Category + " + categoryId);
+        Log.d(TAG, "delete Category + " + categoryId);
         return database.delete(ExpensesDbHelper.TABLE_CATEGORIES, ExpensesDbHelper.CATEGORIES_COL_ID + " = ?", new String[]{"" + categoryId});
-    }
-
-    void getAllBoookings() {
-
-        String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_BOOKINGS;
-        Log.d(LOG_TAG, selectQuery);
-
-        Cursor c = database.rawQuery(selectQuery, null);
-
-        Log.d(LOG_TAG, DatabaseUtils.dumpCursorToString(c));
-
-        c.close();
     }
 }
