@@ -1,7 +1,5 @@
 package com.example.lucas.haushaltsmanager;
 
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +8,6 @@ class MonthlyReport {
     private String month;
     private List<ExpenseObject> expenses;
     private String currency;
-    private String TAG = "MonthlyReport";
 
     MonthlyReport(String month, ArrayList<ExpenseObject> expenses, String currency) {
 
@@ -78,38 +75,61 @@ class MonthlyReport {
 
     String getMostStressedCategory() {
 
-        MonthlyExpenses mostStressedCategory = new MonthlyExpenses("", 0);
+        MonthlyExpenses mostStressedCategory = new MonthlyExpenses("Keine Ausgaben", 0);
 
         ArrayList<MonthlyExpenses> monthlyExpenses = new ArrayList<>();
 
         for (ExpenseObject expense : expenses) {
 
-            String categoryName = expense.getCategory().getCategoryName();
+            int index = containsHelper(monthlyExpenses, expense.getCategory().getCategoryName());
 
-            for (int i = 0; i < monthlyExpenses.size(); i++) {
+            if (index == -1) {
 
-                if (monthlyExpenses.get(i).getCategory().equals(categoryName)) {
+                monthlyExpenses.add(new MonthlyExpenses(expense.getCategory().getCategoryName(), expense.getPrice()));
+            } else {
 
-                    double money = monthlyExpenses.get(i).getSpendMoney();
-                    monthlyExpenses.get(i).setSpendMoney(money + expense.getPrice());
+                MonthlyExpenses monthly = monthlyExpenses.get(index);
+
+                if (expense.getExpenditure()){
+
+                    monthly.spendMoney += expense.getPrice();
                 } else {
 
-                    monthlyExpenses.add(new MonthlyExpenses(categoryName, expense.getPrice()));
+                    monthly.spendMoney -= expense.getPrice();
                 }
+                monthlyExpenses.set(index, monthly);
             }
         }
 
+
         for (MonthlyExpenses monthlyExpense : monthlyExpenses) {
 
-            if (monthlyExpense.getSpendMoney() > mostStressedCategory.getSpendMoney()) {
+            if (monthlyExpense.getSpendMoney() >= mostStressedCategory.getSpendMoney()) {
 
                 mostStressedCategory = monthlyExpense;
             }
         }
 
-        Log.d(TAG, "getMostStressedCategory: " + mostStressedCategory.getCategory());
-
         return mostStressedCategory.getCategory();
+    }
+
+    /**
+     *
+     * @param monthlyExpenses ArrayList of monthly expenses
+     * @param category Category name which has to be found
+     *
+     * @return index of the category name if found or -1 if not in List
+     */
+    private int containsHelper(ArrayList<MonthlyExpenses> monthlyExpenses, String category) {
+
+        for (MonthlyExpenses monthlyExpense : monthlyExpenses) {
+
+            if (monthlyExpense.getCategory().equals(category)) {
+
+                return monthlyExpenses.indexOf(monthlyExpense);
+            }
+        }
+        return -1;
     }
 
     private class MonthlyExpenses {

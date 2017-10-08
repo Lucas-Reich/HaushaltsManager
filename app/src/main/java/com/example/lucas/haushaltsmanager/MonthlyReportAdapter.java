@@ -3,7 +3,6 @@ package com.example.lucas.haushaltsmanager;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,15 +16,14 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.formatter.PercentFormatter;
-import com.github.mikephil.charting.utils.ColorTemplate;
 
+import java.text.DateFormatSymbols;
 import java.util.ArrayList;
 
 class MonthlyReportAdapter extends ArrayAdapter<MonthlyReport> implements View.OnClickListener {
 
     private ArrayList<MonthlyReport> dataSet;
     private Context mContext;
-    String TAG = "MonthlyReportAdapter";
 
     private static class ViewHolder {
         TextView txtMonth;
@@ -51,14 +49,10 @@ class MonthlyReportAdapter extends ArrayAdapter<MonthlyReport> implements View.O
         Toast.makeText(mContext, "du hast gecklickt", Toast.LENGTH_SHORT).show();
     }
 
-    private int lastPosition = -1;
-
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
 
         MonthlyReport monthlyReport = getItem(position);
         ViewHolder viewHolder;
-
-        final View result;
 
         if (convertView == null) {
 
@@ -76,52 +70,55 @@ class MonthlyReportAdapter extends ArrayAdapter<MonthlyReport> implements View.O
             viewHolder.txtCategory = (TextView) convertView.findViewById(R.id.monthly_item_category);
             viewHolder.pieChart = (PieChart) convertView.findViewById(R.id.monthly_item_pie_chart);
 
-            result = convertView;
-
             convertView.setTag(viewHolder);
         } else {
 
             viewHolder = (ViewHolder) convertView.getTag();
-            result = convertView;
         }
 
-        lastPosition = position;
-
         //TODO setText mit platzhaltern füllen, sodass sich die ide nicht mehr beschwehrt
-        viewHolder.txtMonth.setText(monthlyReport.getMonth() + "/2017");
+        viewHolder.txtMonth.setText(getMonth(Integer.parseInt(monthlyReport.getMonth())));
         viewHolder.txtInbound.setText(monthlyReport.countIncomingMoney() + "");
         viewHolder.txtOutbound.setText(monthlyReport.countOutgoingMoney() + "");
         viewHolder.txtTotal.setText(monthlyReport.calcMonthlyTotal() + "");
-        viewHolder.txtTotalBookings.setText(monthlyReport.countBookings() + " Buchungen");
+
+        if (monthlyReport.countBookings() <= 1) {
+
+            viewHolder.txtTotalBookings.setText(monthlyReport.countBookings() + " " + mContext.getResources().getString(R.string.month_report_booking));
+        } else {
+
+            viewHolder.txtTotalBookings.setText(monthlyReport.countBookings() + " " + mContext.getResources().getString(R.string.month_report_bookings));
+        }
         viewHolder.txtAccountCurrency.setText(monthlyReport.getCurrency());
+
         viewHolder.colorCategory.setText("red");
         viewHolder.txtCategory.setText(monthlyReport.getMostStressedCategory());
 
         viewHolder.pieChart.setUsePercentValues(true);
-        addDataSet(viewHolder.pieChart);
+        addDataSet(viewHolder.pieChart, monthlyReport.countIncomingMoney(), monthlyReport.countOutgoingMoney());
 
         return convertView;
     }
 
 
-    private void addDataSet(PieChart chart) {
+    private void addDataSet(PieChart chart, double incoming, double outgoing) {
 
-        //TODO dataset muss sich die information für das diegramm noch aus dem aktuellen item ziehen
         ArrayList<Entry> yValues = new ArrayList<>();
 
-        yValues.add(new Entry(55f, 0));
-        yValues.add(new Entry(45f, 1));
+        double totalMoney = incoming + outgoing;
+
+        yValues.add(new Entry((float) (totalMoney / incoming), 0));
+        yValues.add(new Entry((float) (totalMoney / outgoing), 1));
 
         ArrayList<String> xValues = new ArrayList<>();
 
-        xValues.add("Inbound");
         xValues.add("Outbound");
+        xValues.add("Inbound");
 
         PieDataSet pieDataSet = new PieDataSet(yValues, "Expenses");
-        pieDataSet.setSliceSpace(2);
         pieDataSet.setValueTextSize(12);
 
-        pieDataSet.setColors(ColorTemplate.PASTEL_COLORS);
+        pieDataSet.setColors(new int[]{Color.rgb(235, 49, 50), Color.rgb(117, 165, 73)});
 
         Legend legend = chart.getLegend();
         legend.setForm(Legend.LegendForm.CIRCLE);
@@ -141,8 +138,15 @@ class MonthlyReportAdapter extends ArrayAdapter<MonthlyReport> implements View.O
         chart.setNoDataText("No Available Data");
         chart.setDrawSliceText(false);
 
+        chart.setTouchEnabled(false);
+
 
         chart.setData(pieData);
         chart.invalidate();
+    }
+
+    private String getMonth(int month) {
+
+        return new DateFormatSymbols().getMonths()[month - 1];
     }
 }

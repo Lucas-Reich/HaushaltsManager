@@ -49,4 +49,7 @@
     <string name="expense_screen_error_create">Error while creating the expense. Create at least a Title, Amount and a Category!</string>
     <string name="title_activity_main_tab">MainActivityTab</string>
     <string name="section_format">Hello World from section: %1$d</string>
+
+    <string name="month_report_booking">Booking</string>
+    <string name="month_report_bookings">Bookings</string>
 </resources>

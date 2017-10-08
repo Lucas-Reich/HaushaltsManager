@@ -14,7 +14,7 @@ public class CreateCategoryAlertDialog extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-        final EditText input = (EditText) new EditText(getContext());
+        final EditText input = new EditText(getContext());
         expensesDataSource = new ExpensesDataSource(getContext());
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());

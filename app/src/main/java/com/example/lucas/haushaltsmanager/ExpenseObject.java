@@ -116,13 +116,20 @@ class ExpenseObject {
         return expenditure;
     }
 
+    /**
+     *
+     * @param expenditure true or false
+     *
+     *                    true: when money goes out
+     *                    false: when money comes in
+     */
     void setExpenditure(boolean expenditure) {
         this.expenditure = expenditure;
     }
 
     void setExpenditure(int expenditure) {
 
-        this.expenditure = expenditure == 0;
+        this.expenditure = expenditure != 0;
     }
 
     Category getCategory() {
