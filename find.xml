@@ -1,8 +1,11 @@
 <application>
   <component name="FindSettings">
+    <option name="customScope" value="Directory '[app] - ...\app\src\main\java\com\example\lucas\haushaltsmanager'" />
+    <option name="defaultScopeName" value="Directory '[app] - ...\app\src\main\java\com\example\lucas\haushaltsmanager'" />
     <option name="localCaseSensitive" value="true" />
     <option name="localRegularExpressions" value="true" />
     <option name="LOCAL_CASE_SENSITIVE_SEARCH" value="true" />
     <option name="LOCAL_REGULAR_EXPRESSIONS" value="true" />
+    <option name="SEARCH_SCOPE" value="Directory '[app] - ...\app\src\main\java\com\example\lucas\haushaltsmanager'" />
   </component>
 </application>
