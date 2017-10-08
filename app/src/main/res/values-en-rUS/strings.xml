@@ -42,4 +42,6 @@
     <string name="tab_one_title">Bookings</string>
     <string name="tab_three_title">Report</string>
     <string name="tab_two_title">Monthly Overview</string>
+    <string name="month_report_booking">Booking</string>
+    <string name="month_report_bookings">Bookings</string>
 </resources>

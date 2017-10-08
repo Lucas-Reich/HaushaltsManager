@@ -66,8 +66,24 @@ public class ExpenseScreen extends AppCompatActivity {
         // set the EXPENSE type to "EXPENSE"
         RadioGroup expenseType = (RadioGroup) findViewById(R.id.expense_screen_expense_type);
         expenseType.check(R.id.expense_screen_radio_expense);
-        EXPENSE.setExpenditure(false);
-        Log.d(TAG, "set expense type to " + false);
+        EXPENSE.setExpenditure(true);
+        Log.d(TAG, "set expense type to " + true);
+
+        expenseType.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (v.getId() == R.id.expense_screen_radio_expense) {
+
+                    EXPENSE.setExpenditure(true);
+                    Log.d(TAG, "set expense type to " + true);
+                } else {
+
+                    EXPENSE.setExpenditure(false);
+                    Log.d(TAG, "set expense type to " + false);
+                }
+            }
+        });
 
 
         //TODO implement AlertDialog which enables the user to input a number for the expense amount
