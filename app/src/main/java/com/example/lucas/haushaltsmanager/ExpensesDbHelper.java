@@ -7,7 +7,7 @@ import android.util.Log;
 
 class ExpensesDbHelper extends SQLiteOpenHelper {
 
-    private static final String LOG_TAG = ExpensesDbHelper.class.getSimpleName();
+    private static final String TAG = ExpensesDbHelper.class.getSimpleName();
 
     private static final String DB_NAME = "expenses.db";
     private static final int DB_VERSION = 1;
@@ -34,6 +34,33 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
             + BOOKINGS_COL_DATE + " TEXT NOT NULL, "
             + BOOKINGS_COL_NOTICE + " TEXT, "
             + BOOKINGS_COL_F_ACCOUNT_ID + " INTEGER NOT NULL"
+            + ");";
+
+
+    // define table Child_Bookings
+    static final String TABLE_CHILD_BOOKINGS = "CHILD_BOOKINGS";
+
+    static final String CHILD_BOOKINGS_COL_BOOKING_ID = "_id";
+    static final String CHILD_BOOKINGS_COL_F_PARENT_BOOKING_ID = "f_booking_id";
+    static final String CHILD_BOOKINGS_COL_PRICE = "price";
+    static final String CHILD_BOOKINGS_COL_F_CATEGORY_ID = "f_category_id";
+    static final String CHILD_BOOKINGS_COL_EXPENDITURE = "expenditure";
+    static final String CHILD_BOOKINGS_COL_TITLE = "title";
+    static final String CHILD_BOOKINGS_COL_DATE = "date";
+    static final String CHILD_BOOKINGS_COL_NOTICE = "notice";
+    static final String CHILD_BOOKINGS_COL_F_ACCOUNT_ID = "f_account_id";
+
+    private static final String CREATE_CHILD_BOOKINGS = "CREATE TABLE " + TABLE_CHILD_BOOKINGS
+            + "("
+            + CHILD_BOOKINGS_COL_BOOKING_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + CHILD_BOOKINGS_COL_F_PARENT_BOOKING_ID + " INTEGER NOT NULL, "
+            + CHILD_BOOKINGS_COL_PRICE + " REAL NOT NULL, "
+            + CHILD_BOOKINGS_COL_F_CATEGORY_ID + " INTEGER NOT NULL, "
+            + CHILD_BOOKINGS_COL_EXPENDITURE + " INTEGER NOT NULL, "
+            + CHILD_BOOKINGS_COL_TITLE + " TEXT NOT NULL, "
+            + CHILD_BOOKINGS_COL_DATE + " TEXT NOT NULL, "
+            + CHILD_BOOKINGS_COL_NOTICE + " TEXT, "
+            + CHILD_BOOKINGS_COL_F_ACCOUNT_ID + " INTEGER NOT NULL"
             + ");";
 
 
@@ -98,7 +125,7 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
     ExpensesDbHelper(Context context) {
 
         super(context, DB_NAME, null, DB_VERSION);
-        Log.d(LOG_TAG, "DbHelper hat die Datenbank " + getDatabaseName() + " erzeugt");
+        Log.d(TAG, "DbHelper hat die Datenbank " + getDatabaseName() + " erzeugt");
     }
 
     @Override
@@ -106,23 +133,26 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
 
         try {
 
-            Log.d(LOG_TAG, "Die Tabelle Bookings wird mit SQL-Befehl: " + CREATE_BOOKINGS + " angelegt.");
+            Log.d(TAG, "Die Tabelle Bookings wird mit SQL-Befehl: " + CREATE_BOOKINGS + " angelegt.");
             db.execSQL(CREATE_BOOKINGS);
 
-            Log.d(LOG_TAG, "Die Tabelle Accounts wird mit SQL-Befehl: " + CREATE_ACCOUNTS + " angelegt.");
+            Log.d(TAG, "Die Tabelle Child_Bookings wird mit dem SQL-Befehl: " + CREATE_CHILD_BOOKINGS + " angelegt.");
+            db.execSQL(CREATE_CHILD_BOOKINGS);
+
+            Log.d(TAG, "Die Tabelle Accounts wird mit SQL-Befehl: " + CREATE_ACCOUNTS + " angelegt.");
             db.execSQL(CREATE_ACCOUNTS);
 
-            Log.d(LOG_TAG, "Die Tabelle Tags wird mit SQL-Befehl: " + CREATE_TAGS + " angelegt.");
+            Log.d(TAG, "Die Tabelle Tags wird mit SQL-Befehl: " + CREATE_TAGS + " angelegt.");
             db.execSQL(CREATE_TAGS);
 
-            Log.d(LOG_TAG, "Die Tabelle Categories wird mit SQL-Befehl: " + CREATE_CATEGORIES + " angelegt.");
+            Log.d(TAG, "Die Tabelle Categories wird mit SQL-Befehl: " + CREATE_CATEGORIES + " angelegt.");
             db.execSQL(CREATE_CATEGORIES);
 
-            Log.d(LOG_TAG, "Die Tabelle Bookings_Tags wird mit SQL-Befehl: " + CREATE_BOOKINGS_TAGS + " angelegt.");
+            Log.d(TAG, "Die Tabelle Bookings_Tags wird mit SQL-Befehl: " + CREATE_BOOKINGS_TAGS + " angelegt.");
             db.execSQL(CREATE_BOOKINGS_TAGS);
         } catch (Exception ex) {
 
-            Log.e(LOG_TAG, "Fehler beim Anlegen der Tabelle: " + ex.getMessage());
+            Log.e(TAG, "Fehler beim Anlegen der Tabelle: " + ex.getMessage());
         }
     }
 
@@ -130,6 +160,7 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOKINGS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CHILD_BOOKINGS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_TAGS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_ACCOUNTS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORIES);

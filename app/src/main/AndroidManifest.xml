@@ -23,11 +23,17 @@
             android:name=".ExpenseScreen"
             android:label="HaushaltsManager"
             android:parentActivityName=".MainActivityTab" />
-        <activity android:name=".Categories"
+        <activity
+            android:name=".Categories"
             android:label="HaushaltsManager"
             android:parentActivityName=".MainActivityTab" />
         <activity
             android:name=".PieChartTest"
+            android:label="HaushaltsManager"
+            android:parentActivityName=".MainActivityTab" />
+
+        <activity
+            android:name=".ExpandableLIstViewTest"
             android:label="HaushaltsManager"
             android:parentActivityName=".MainActivityTab" />
     </application>

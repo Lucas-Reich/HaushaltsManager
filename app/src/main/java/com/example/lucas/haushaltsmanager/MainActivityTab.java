@@ -100,7 +100,9 @@ public class MainActivityTab extends AppCompatActivity {
                         MainActivityTab.this.startActivity(categoryIntent);
                         break;
                     case R.id.templates:
-                        //do smth
+
+                        Intent testListViewIntent = new Intent(MainActivityTab.this, ExpandableLIstViewTest.class);
+                        MainActivityTab.this.startActivity(testListViewIntent);
                         break;
                     case R.id.no_category:
                         //do smth
