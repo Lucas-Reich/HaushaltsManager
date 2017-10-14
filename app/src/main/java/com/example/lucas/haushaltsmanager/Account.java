@@ -5,12 +5,14 @@ public class Account {
     private long index;
     private String accountName;
     private int balance;
+    private String currencySym;
 
     public Account(long index, String accountName, int balance) {
 
         this.index = index;
         this.accountName = accountName;
         this.balance = balance;
+        this.currencySym = "€";
     }
 
     public Account(String accountName, int balance) {
@@ -45,5 +47,13 @@ public class Account {
 
     public void setBalance(int balance) {
         this.balance = balance;
+    }
+
+    public String getCurrencySym() {
+        return currencySym;
+    }
+
+    public void setCurrencySym(String currencySym) {
+        this.currencySym = currencySym;
     }
 }

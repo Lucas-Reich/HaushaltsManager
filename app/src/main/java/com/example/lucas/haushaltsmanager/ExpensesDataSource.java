@@ -135,7 +135,6 @@ class ExpensesDataSource {
     }
 
     /**
-     *
      * @param accountName
      * @return
      */
@@ -194,7 +193,6 @@ class ExpensesDataSource {
     }
 
     /**
-     *
      * @return
      */
     String[] getAccountNames() {
@@ -367,7 +365,6 @@ class ExpensesDataSource {
     }
 
     /**
-     *
      * @param bookingId
      * @param tagName
      * @return
@@ -639,6 +636,89 @@ class ExpensesDataSource {
 
         Log.d(TAG, "deleted booking at index " + bookingId);
         return database.delete(ExpensesDbHelper.TABLE_BOOKINGS, ExpensesDbHelper.BOOKINGS_COL_BOOKING_ID + " = ?", new String[]{"" + bookingId});
+    }
+
+
+    long createChildBooking(ExpenseObject expense, long parentId) {
+
+        ContentValues values = new ContentValues();
+        values.put("price", expense.getPrice());
+        values.put("f_booking_id", parentId);
+
+        //TODO if Category does not exist already create it
+        //TODO sicherstelen, dass das datumsformat immer gleich ist (yyyy-mm-dd)
+        values.put("f_category_id", expense.getCategory().getIndex());
+        values.put("expenditure", expense.getExpenditure());
+        values.put("title", expense.getTitle());
+        values.put("date", expense.getDate());
+        values.put("notice", expense.getNotice());
+
+        //TODO if Account does not exist already create it
+        values.put("f_account_id", expense.getAccount().getIndex());
+
+        //assign all chosen tags to the booking
+        for (String tag : expense.getTags()) {
+
+            assignTagToBooking(expense.getIndex(), tag);
+        }
+
+        Log.d(TAG, "created expense at Child_Booking table");
+        return database.insert(ExpensesDbHelper.TABLE_CHILD_BOOKINGS, null, values);
+    }
+
+    ArrayList<ExpenseObject> getChildsToParent(long parentId) {
+
+        ArrayList<ExpenseObject> childBookings = new ArrayList<>();
+
+        String selectQuery;
+
+        selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS;
+        selectQuery += " WHERE " + ExpensesDbHelper.CHILD_BOOKINGS_COL_F_PARENT_BOOKING_ID + " = '" + parentId;
+        selectQuery += "' ORDER BY " + ExpensesDbHelper.BOOKINGS_COL_DATE + " ASC;";
+
+        Log.d(TAG, selectQuery);
+
+        Cursor c = database.rawQuery(selectQuery, null);
+        Log.d(TAG, DatabaseUtils.dumpCursorToString(c));
+        c.moveToFirst();
+
+        if (!c.isAfterLast()) {
+
+            while (!c.isAfterLast()) {
+
+                childBookings.add(cursorToExpense(c));
+                c.moveToNext();
+            }
+        }
+
+        return childBookings;
+    }
+
+    int updateChildBooking(long childId, ExpenseObject updatedChild) {
+
+        ContentValues values = new ContentValues();
+        values.put("price", updatedChild.getPrice());
+
+        //TODO child booking kann momentan nicht einem neuen parent zugewiesen werden, sondern nur der content der booking geändert werden
+
+        //TODO if Category does not exist already create it
+        values.put("f_category_id", updatedChild.getCategory().getIndex());
+        values.put("expenditure", updatedChild.getExpenditure());
+        values.put("title", updatedChild.getTitle());
+        values.put("date", updatedChild.getDate());
+        values.put("notice", updatedChild.getNotice());
+
+        //TODO if Account does not exist already create it
+        values.put("f_account_id", updatedChild.getAccount().getIndex());
+
+        Log.d(TAG, "changed child booking " + childId);
+        return database.update(ExpensesDbHelper.TABLE_CHILD_BOOKINGS, values, ExpensesDbHelper.CHILD_BOOKINGS_COL_BOOKING_ID + " = ?", new String[]{"" + childId});
+    }
+
+    int deleteChildBooking(long childId) {
+
+        Log.d(TAG, "deleted child booking at index " + childId);
+        return database.delete(ExpensesDbHelper.TABLE_CHILD_BOOKINGS, ExpensesDbHelper.CHILD_BOOKINGS_COL_BOOKING_ID + " = ?", new String[]{"" + childId});
     }
 
 

@@ -192,6 +192,26 @@ public class ExpenseScreen extends AppCompatActivity {
         });
 
 
+        Button createChild = (Button) findViewById(R.id.create_child);
+        createChild.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                ExpenseObject child = new ExpenseObject();
+                child.setExpenditure(true);
+                child.setPrice(100);
+                child.setTitle("test");
+                child.setCategory(new Category("testCat", 0));
+                child.setAccount(new Account("testAcc", 100));
+                child.setDate(CAL);
+
+                expensesDataSource.open();
+                expensesDataSource.createChildBooking(child, 1);
+                expensesDataSource.close();
+            }
+        });
+
+
     }
 
     //TODO extract the input date logic to the DatePickerDialogFragment
