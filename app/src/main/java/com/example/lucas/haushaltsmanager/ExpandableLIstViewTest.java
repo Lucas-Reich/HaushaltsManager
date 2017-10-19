@@ -7,9 +7,12 @@ import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import static android.content.ContentValues.TAG;
 
@@ -102,12 +105,10 @@ public class ExpandableLIstViewTest extends Activity {
         expensesDataSource = new ExpensesDataSource(this);
 
         expensesDataSource.open();
+        Calendar cal = Calendar.getInstance();
+        expenses = expensesDataSource.getAllBookings(cal.get(Calendar.YEAR) + "-01-01", new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(cal.getTime()));
 
-        //TODO change date range to first day of the month and current date
-        expenses = expensesDataSource.getAllBookings("2017-01-01", "2017-10-19");
-        //expenses = expensesDataSource.getAllBookings();
-
-
+        //assigning child/s to expenses
         for (ExpenseObject expense : expenses) {
 
             listDataHeader.add(expense);
