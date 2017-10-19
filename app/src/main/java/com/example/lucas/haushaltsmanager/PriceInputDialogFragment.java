@@ -25,7 +25,7 @@ public class PriceInputDialogFragment extends DialogFragment {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 
-        builder.setTitle(args.getString("original_title"));
+        builder.setTitle(args.getDouble("original_title") + "");
 
         builder.setView(input);
 
@@ -39,13 +39,13 @@ public class PriceInputDialogFragment extends DialogFragment {
 
                     expenseScreen.EXPENSE.setPrice(Double.parseDouble(input.getText().toString()));
                     Log.d("PriceInput", "set price to " + expenseScreen.EXPENSE.getPrice());
-                    txtView.setText(input.getText().toString());
+                    txtView.setText(expenseScreen.EXPENSE.getPrice() + expenseScreen.EXPENSE.getAccount().getCurrencySym());
                     txtView.setTextColor(Color.BLACK);
                 } else {
 
                     expenseScreen.EXPENSE.setPrice(0.0);
                     Log.d("PriceInput", "set price to " + expenseScreen.EXPENSE.getPrice());
-                    txtView.setText(args.getString("original_title"));
+                    txtView.setText(args.getDouble("original_title") + "");
                     txtView.setTextColor(Color.DKGRAY);
                 }
             }

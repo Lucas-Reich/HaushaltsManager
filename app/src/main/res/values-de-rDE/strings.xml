@@ -34,7 +34,7 @@
     <string name="expense_screen_account">account_placeholder</string>
     <string name="expense_screen_template">Neue Schablone erstellen</string>
     <string name="expense_screen_recurring">Dauerauftrag</string>
-    <string name="expense_screen_amount">0,00€</string>
+    <string name="expense_screen_amount">0,00</string>
     <string name="btn_cancel">Abbrechen</string>
     <string name="btn_ok">OK</string>
     <string name="expense_pop_up_title">title_placeholder</string>
@@ -49,4 +49,5 @@
     <string name="tab_two_title">Übersicht Monat</string>
     <string name="month_report_booking">Buchung</string>
     <string name="month_report_bookings">Buchungen</string>
+    <string name="expense_screen_amount_currency">€</string>
 </resources>

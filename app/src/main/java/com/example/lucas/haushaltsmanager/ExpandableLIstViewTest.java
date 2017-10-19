@@ -2,6 +2,7 @@ package com.example.lucas.haushaltsmanager;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
@@ -9,6 +10,8 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import static android.content.ContentValues.TAG;
 
 public class ExpandableLIstViewTest extends Activity {
 
@@ -101,10 +104,11 @@ public class ExpandableLIstViewTest extends Activity {
         expensesDataSource.open();
 
         //TODO change date range to first day of the month and current date
-        expenses = expensesDataSource.getAllBookings("2017-01-01", "2017-09-01");
+        expenses = expensesDataSource.getAllBookings("2017-01-01", "2017-10-19");
+        //expenses = expensesDataSource.getAllBookings();
 
 
-        for(ExpenseObject expense : expenses) {
+        for (ExpenseObject expense : expenses) {
 
             listDataHeader.add(expense);
             listDataChild.put(expense, expensesDataSource.getChildsToParent(expense.getIndex()));

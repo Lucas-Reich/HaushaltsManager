@@ -29,7 +29,7 @@
     <string name="expense_screen_account">account_placeholder</string>
     <string name="expense_screen_template">Create a new Template</string>
     <string name="expense_screen_recurring">Recurring</string>
-    <string name="expense_screen_amount">0.00$</string>
+    <string name="expense_screen_amount">0.00</string>
     <string name="btn_cancel">Cancel</string>
     <string name="btn_ok">OK</string>
     <string name="expense_pop_up_title">title_placeholder</string>
@@ -44,4 +44,5 @@
     <string name="tab_two_title">Monthly Overview</string>
     <string name="month_report_booking">Booking</string>
     <string name="month_report_bookings">Bookings</string>
+    <string name="expense_screen_amount_currency">$</string>
 </resources>

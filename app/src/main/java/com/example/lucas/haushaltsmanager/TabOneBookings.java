@@ -1,10 +1,12 @@
 package com.example.lucas.haushaltsmanager;
 
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -39,12 +41,15 @@ public class TabOneBookings extends Fragment{
 
         listView.setAdapter(bookingAdapter);
 
-        listView.setOnLongClickListener(new View.OnLongClickListener() {
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public boolean onLongClick(View v) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                Toast.makeText(getContext(), "möglichkeit um die Buchung zu löschen", Toast.LENGTH_SHORT).show();
-                return false;
+                Object o = listView.getItemAtPosition(position);
+                ExpenseObject test = (ExpenseObject) o;
+                Intent openExpense = new Intent(getActivity(), ExpenseScreen.class);
+                openExpense.putExtra("index", test.getIndex());
+                startActivity(openExpense);
             }
         });
 

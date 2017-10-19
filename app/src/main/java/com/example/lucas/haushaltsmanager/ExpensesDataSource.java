@@ -7,10 +7,12 @@ import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 class ExpensesDataSource {
 
@@ -513,7 +515,8 @@ class ExpensesDataSource {
         values.put("f_category_id", categoryId);
         values.put("expenditure", expense.getExpenditure());
         values.put("title", expense.getTitle());
-        values.put("date", expense.getDate());
+        //values.put("date", expense.getOldDate());
+        values.put("date", new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(expense.getDate().getTime()));
         values.put("notice", expense.getNotice());
 
         //TODO if Account does not exist already create it
@@ -583,7 +586,7 @@ class ExpensesDataSource {
         Log.d(TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
-        Log.d(TAG, DatabaseUtils.dumpCursorToString(c));
+        Log.d(TAG,"found: " + DatabaseUtils.dumpCursorToString(c));
         c.moveToFirst();
 
         if (!c.isAfterLast()) {
@@ -615,7 +618,8 @@ class ExpensesDataSource {
         values.put("f_category_id", categoryId);
         values.put("expenditure", newExpense.getExpenditure());
         values.put("title", newExpense.getTitle());
-        values.put("date", newExpense.getDate());
+        //values.put("date", newExpense.getOldDate());
+        values.put("date", new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(newExpense.getDate().getTime()));
         values.put("notice", newExpense.getNotice());
 
         //TODO if Account does not exist already create it
@@ -650,7 +654,8 @@ class ExpensesDataSource {
         values.put("f_category_id", expense.getCategory().getIndex());
         values.put("expenditure", expense.getExpenditure());
         values.put("title", expense.getTitle());
-        values.put("date", expense.getDate());
+        //values.put("date", expense.getOldDate());
+        values.put("date", new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(expense.getDate().getTime()));
         values.put("notice", expense.getNotice());
 
         //TODO if Account does not exist already create it
@@ -705,7 +710,8 @@ class ExpensesDataSource {
         values.put("f_category_id", updatedChild.getCategory().getIndex());
         values.put("expenditure", updatedChild.getExpenditure());
         values.put("title", updatedChild.getTitle());
-        values.put("date", updatedChild.getDate());
+        //values.put("date", updatedChild.getOldDate());
+        values.put("date", new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(updatedChild.getDate().getTime()));
         values.put("notice", updatedChild.getNotice());
 
         //TODO if Account does not exist already create it

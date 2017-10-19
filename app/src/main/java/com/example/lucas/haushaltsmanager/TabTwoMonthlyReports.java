@@ -73,12 +73,12 @@ public class TabTwoMonthlyReports extends Fragment {
             try {
 
                 // wenn die nächste buchung noch im gleichen monat gemacht wurde
-                if (current.getDate().split("-")[1].equals(expenses.get(index + 1).getDate().split("-")[1])) {
+                if (current.getOldDate().split("-")[1].equals(expenses.get(index + 1).getOldDate().split("-")[1])) {
 
                     tempBookingList.add(current);
                     index++;
                     // wenn im aktuellen monat keine buchung gemacht wurde
-                } else if (Integer.parseInt(current.getDate().split("-")[1]) != currentMonth) {
+                } else if (Integer.parseInt(current.getOldDate().split("-")[1]) != currentMonth) {
 
                     monthlyReports.add(new MonthlyReport((currentMonth + ""), tempBookingList, MAINCURRENCY));
                     tempBookingList.clear();
@@ -96,7 +96,7 @@ public class TabTwoMonthlyReports extends Fragment {
             } catch (IndexOutOfBoundsException e) {
 
                 // wenn die aktuelle buchung die letzte ist, aber vor dieser buchung ein monat ist indem keine buchungen gemacht wurden
-                if (Integer.parseInt(current.getDate().split("-")[1]) != currentMonth) {
+                if (Integer.parseInt(current.getOldDate().split("-")[1]) != currentMonth) {
 
                     monthlyReports.add(new MonthlyReport((currentMonth + ""), tempBookingList, MAINCURRENCY));
                     tempBookingList.clear();

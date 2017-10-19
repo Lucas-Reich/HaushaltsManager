@@ -58,9 +58,8 @@ class ExpenseObject {
 
     //TODO return date String depending on the locale of the user
     //TODO implement a getDisplayDate and getDate method
-    String getDate() {
+    String getOldDate() {//deprecated use getDate instead
 
-        //String test = date.get(Calendar.YEAR) + "-" + (date.get(Calendar.MONTH) + 1) + "-" + date.get(Calendar.DAY_OF_MONTH);
         int day = date.get(Calendar.DAY_OF_MONTH);
         int month = date.get(Calendar.MONTH);
         int year = date.get(Calendar.YEAR);
@@ -82,6 +81,11 @@ class ExpenseObject {
             rightDate += "-" + day;
         }
         return rightDate;
+    }
+
+    Calendar getDate() {
+
+        return this.date;
     }
 
     void setDate(Calendar date) {
