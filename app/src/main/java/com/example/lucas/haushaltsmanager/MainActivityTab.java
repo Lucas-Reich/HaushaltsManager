@@ -1,6 +1,7 @@
 package com.example.lucas.haushaltsmanager;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
@@ -18,6 +19,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 public class MainActivityTab extends AppCompatActivity {
 
@@ -38,6 +40,15 @@ public class MainActivityTab extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        // saving the current activeAccount into the user preferences
+        //TODO extract activeAccount placement into its actual place
+        SharedPreferences settings = getSharedPreferences("UserSettings", 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putLong("activeAccount", 1);
+        editor.commit();
+
+
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.activity_main_tab);
         setContentView(R.layout.tab_main_mit_nav_drawer);
@@ -101,8 +112,8 @@ public class MainActivityTab extends AppCompatActivity {
                         break;
                     case R.id.templates:
 
-                        Intent testListViewIntent = new Intent(MainActivityTab.this, ExpandableLIstViewTest.class);
-                        MainActivityTab.this.startActivity(testListViewIntent);
+                        Intent templateIntent = new Intent(MainActivityTab.this, BookingTemplates.class);
+                        MainActivityTab.this.startActivity(templateIntent);
                         break;
                     case R.id.no_category:
                         //do smth
@@ -111,7 +122,9 @@ public class MainActivityTab extends AppCompatActivity {
                         //do smth
                         break;
                     case R.id.standing_orders:
-                        //do smth
+
+                        Intent recurringIntent = new Intent(MainActivityTab.this, RecurringBookings.class);
+                        MainActivityTab.this.startActivity(recurringIntent);
                         break;
                     case R.id.transfers:
                         //do smth
@@ -132,7 +145,9 @@ public class MainActivityTab extends AppCompatActivity {
                         //do smth
                         break;
                     case R.id.rate_the_app:
-                        //do smth
+
+                        Intent testListViewIntent = new Intent(MainActivityTab.this, ExpandableListViewTest.class);
+                        MainActivityTab.this.startActivity(testListViewIntent);
                         break;
                     case R.id.about:
                         //do smth
@@ -144,14 +159,6 @@ public class MainActivityTab extends AppCompatActivity {
                 return true;
             }
         });
-        //navigationView.setNavigationItemSelectedListener(this);
-
-
-
-
-
-
-
     }
 
     @Override
@@ -192,7 +199,8 @@ public class MainActivityTab extends AppCompatActivity {
      */
     private class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-        public SectionsPagerAdapter(FragmentManager fm) {
+        SectionsPagerAdapter(FragmentManager fm) {
+
             super(fm);
         }
 
@@ -202,14 +210,11 @@ public class MainActivityTab extends AppCompatActivity {
             switch (position) {
 
                 case 0:
-                    TabOneBookings tabOne = new TabOneBookings();
-                    return tabOne;
+                    return new TabOneBookings();
                 case 1:
-                    TabTwoMonthlyReports tabTwo = new TabTwoMonthlyReports();
-                    return tabTwo;
+                    return new TabTwoMonthlyReports();
                 case 2:
-                    TabThree tabThree = new TabThree();
-                    return tabThree;
+                    return new TabThree();
                 default:
                     return null;
             }
@@ -223,7 +228,9 @@ public class MainActivityTab extends AppCompatActivity {
 
         @Override
         public CharSequence getPageTitle(int position) {
+
             switch (position) {
+
                 case 0:
                     return getString(R.string.tab_one_title);
                 case 1:

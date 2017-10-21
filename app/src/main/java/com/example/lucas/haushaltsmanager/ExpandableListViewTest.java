@@ -16,7 +16,7 @@ import java.util.Locale;
 
 import static android.content.ContentValues.TAG;
 
-public class ExpandableLIstViewTest extends Activity {
+public class ExpandableListViewTest extends Activity {
 
     ExpandableListAdapter listAdapter;
     ExpandableListView listView;
@@ -92,7 +92,6 @@ public class ExpandableLIstViewTest extends Activity {
             }
         });
     }
-
 
     /**
      * Preparing the list Data

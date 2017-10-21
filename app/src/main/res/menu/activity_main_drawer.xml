@@ -98,8 +98,5 @@
             android:icon="@drawable/ic_menu_camera"
             android:title="@string/left_slider_about" />
     </group>
-    <item
-        android:icon="@drawable/ic_menu_camera"
-        android:title="@string/left_slider_planned_bookings" />
 
 </menu>

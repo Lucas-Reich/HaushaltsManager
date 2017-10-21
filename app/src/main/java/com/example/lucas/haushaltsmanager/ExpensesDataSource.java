@@ -14,9 +14,9 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-class ExpensesDataSource {
+import static java.lang.Math.toIntExact;
 
-    //TODO wenn ein cursor nichts findet in einer datenbank dann kann man nicht mit c != null abfragen ob er leer ist || die abfrage ob ein cursor leer ist muss neu gemacht werden
+class ExpensesDataSource {
 
     private static final String TAG = ExpensesDataSource.class.getSimpleName();
 
@@ -455,7 +455,7 @@ class ExpensesDataSource {
             }
         } else {
 
-            bookings = new long[]{};
+            bookings = new long[]{ };
         }
 
         c.close();
@@ -586,7 +586,7 @@ class ExpensesDataSource {
         Log.d(TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
-        Log.d(TAG,"found: " + DatabaseUtils.dumpCursorToString(c));
+        Log.d(TAG, "found: " + DatabaseUtils.dumpCursorToString(c));
         c.moveToFirst();
 
         if (!c.isAfterLast()) {
@@ -840,7 +840,7 @@ class ExpensesDataSource {
      * @param categoryId Id of the Category which should be changed
      * @return The id of the affected row
      */
-    int updateCategory(int color, long categoryId) {
+    int updateCategoryColor(int color, long categoryId) {
 
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.CATEGORIES_COL_COLOR, color);
@@ -858,7 +858,7 @@ class ExpensesDataSource {
      * @param categoryId   Id of the Category which should be changed
      * @return The id of the affected row
      */
-    int updateCategory(String categoryName, long categoryId) {
+    int updateCategoryName(String categoryName, long categoryId) {
 
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.CATEGORIES_COL_COLOR, getCategoryById(categoryId).getColor());
@@ -879,5 +879,195 @@ class ExpensesDataSource {
 
         Log.d(TAG, "delete Category + " + categoryId);
         return database.delete(ExpensesDbHelper.TABLE_CATEGORIES, ExpensesDbHelper.CATEGORIES_COL_ID + " = ?", new String[]{"" + categoryId});
+    }
+
+
+    long createTemplateBooking(long templateBookingId) {
+
+        ContentValues values = new ContentValues();
+        values.put(ExpensesDbHelper.TEMPLATE_COL_F_BOOKING_ID, templateBookingId);
+        Log.d(TAG, "createTemplateBooking: " + templateBookingId);
+
+        return database.insert(ExpensesDbHelper.TABLE_TEMPLATE_BOOKINGS, null, values);
+    }
+
+    ArrayList<ExpenseObject> getTemplates() {
+
+        ArrayList<ExpenseObject> allTemplates = new ArrayList<>();
+        String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_TEMPLATE_BOOKINGS;
+        Log.d(TAG, "getTemplates: " + selectQuery);
+
+        Cursor c = database.rawQuery(selectQuery, null);
+        Log.d(TAG, "getTemplates: " + DatabaseUtils.dumpCursorToString(c));
+
+        c.moveToFirst();
+
+        if (!c.isAfterLast()) {
+
+            while (!c.isAfterLast()) {
+
+                long index = c.getLong(c.getColumnIndex(ExpensesDbHelper.TEMPLATE_COL_F_BOOKING_ID));
+                allTemplates.add(getBookingById(index));
+
+                c.moveToNext();
+            }
+        }
+
+        return allTemplates;
+    }
+
+    ExpenseObject getTemplate(long index) {
+
+        String selectQuery = "SELECT * FROM "
+                + ExpensesDbHelper.TABLE_TEMPLATE_BOOKINGS
+                + " WHERE "
+                + ExpensesDbHelper.TEMPLATE_COL_F_BOOKING_ID
+                + " = "
+                + index;
+        Log.d(TAG, "getTemplate: " + selectQuery);
+
+        Cursor c = database.rawQuery(selectQuery, null);
+        Log.d(TAG, "getTemplate: " + DatabaseUtils.dumpCursorToString(c));
+
+        c.moveToFirst();
+
+        if (!c.isAfterLast()) {
+
+            return getBookingById(c.getLong(c.getColumnIndex(ExpensesDbHelper.TEMPLATE_COL_F_BOOKING_ID)));
+        } else {
+
+            return new ExpenseObject();
+        }
+    }
+
+    int updateTemplate(long index, ExpenseObject newTemplate) {
+
+        ContentValues values = new ContentValues();
+        values.put(ExpensesDbHelper.TEMPLATE_COL_F_BOOKING_ID, newTemplate.getIndex());
+        Log.d(TAG, "updateTemplate: " + newTemplate.getIndex());
+
+        return database.update(ExpensesDbHelper.TABLE_TEMPLATE_BOOKINGS, values, ExpensesDbHelper.TEMPLATE_COL_ID + " = ?", new String[]{"" + newTemplate.getIndex()});
+    }
+
+    int deleteTemplate(long index) {
+
+        Log.d(TAG, "deleteTemplate: " + index);
+        return database.delete(ExpensesDbHelper.TABLE_TEMPLATE_BOOKINGS, ExpensesDbHelper.TEMPLATE_COL_ID + " = ?", new String[]{"" + index});
+    }
+
+
+    long createRecurringBooking(long recurringBookingId, Calendar start, int frequency, Calendar end) {
+
+        ContentValues values = new ContentValues();
+        values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_F_BOOKING_ID, recurringBookingId);
+        values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_START, new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(start.getTime()));
+        values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_FREQUENCY, frequency);
+        values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_END, new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(end.getTime()));
+        Log.d(TAG, "createRecurringBooking: " + recurringBookingId);
+
+        return database.insert(ExpensesDbHelper.TABLE_RECURRING_BOOKINGS, null, values);
+    }
+
+    ArrayList<ExpenseObject> getRecurringBookings(Calendar dateRngStart, Calendar endDate) {//TODO nicht ganz zufrieden mit der funktion, bitte überdenken
+
+        ArrayList<ExpenseObject> allRecurringBookings = new ArrayList<>();
+
+        //exclude all events which end before the given date range
+        String selectQuery = "SELECT * FROM "
+                + ExpensesDbHelper.TABLE_RECURRING_BOOKINGS
+                + " WHERE "
+                + ExpensesDbHelper.RECURRING_BOOKINGS_COL_END
+                + " > "
+                + new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(dateRngStart.getTime());
+        Log.d(TAG, "getRecurringBookings: " + selectQuery);
+
+        Cursor c = database.rawQuery(selectQuery, null);
+        Log.d(TAG, "getRecurringBookings: " + DatabaseUtils.dumpCursorToString(c));
+
+        c.moveToFirst();
+        ExpenseObject expense;
+        Calendar start = Calendar.getInstance();
+        Calendar end = Calendar.getInstance();
+
+        while (!c.isAfterLast()) {
+
+            //get start date of recurring booking
+            String[] tmp = c.getString(c.getColumnIndex(ExpensesDbHelper.RECURRING_BOOKINGS_COL_START)).split("-");
+            start.set(Integer.parseInt(tmp[0]), Integer.parseInt(tmp[1]), Integer.parseInt(tmp[2]));
+
+            //get end date of recurring booking
+            tmp = c.getString(c.getColumnIndex(ExpensesDbHelper.RECURRING_BOOKINGS_COL_END)).split("-");
+            end.set(Integer.parseInt(tmp[0]), Integer.parseInt(tmp[1]), Integer.parseInt(tmp[2]));
+
+            //get frequency
+            int frequency = c.getInt(c.getColumnIndex(ExpensesDbHelper.RECURRING_BOOKINGS_COL_FREQUENCY));
+
+            //get the time difference between the last occurrence and the start of the date range in hours
+            int temp = 0 - ((int) ((start.getTimeInMillis() - dateRngStart.getTimeInMillis()) / 3600000) % frequency);
+
+            //set start date of recurring event to the first date of the date range
+            start.setTimeInMillis(dateRngStart.getTimeInMillis());
+
+            //set start date of recurring event to the last occurrence of the event
+            start.add(Calendar.HOUR, temp);
+
+            //as long as the start date is before the end of its cycle and also before the end of the given date range
+            while(start.before(end) && start.before(endDate)) {
+
+                if (start.after(dateRngStart)) {
+
+                    expense = getBookingById(c.getLong(c.getColumnIndex(ExpensesDbHelper.RECURRING_BOOKINGS_COL_F_BOOKING_ID)));
+                    expense.setDate(start);
+                    allRecurringBookings.add(expense);
+                }
+
+                start.add(Calendar.HOUR, frequency);
+            }
+            c.moveToNext();
+        }
+
+        return allRecurringBookings;
+    }
+
+    ExpenseObject getRecurringBooking(long index) {
+
+        String selectQuery = "SELECT * FROM "
+                + ExpensesDbHelper.TABLE_RECURRING_BOOKINGS
+                + " WHERE "
+                + ExpensesDbHelper.RECURRING_BOOKINGS_COL_ID
+                + " = "
+                + index;
+        Log.d(TAG, "getRecurringBooking: " + selectQuery);
+
+        Cursor c = database.rawQuery(selectQuery, null);
+        Log.d(TAG, "getRecurringBooking: " + DatabaseUtils.dumpCursorToString(c));
+
+        c.moveToFirst();
+
+        if (!c.isAfterLast()) {
+
+            return getBookingById(c.getLong(c.getColumnIndex(ExpensesDbHelper.RECURRING_BOOKINGS_COL_ID)));
+        } else {
+
+            return new ExpenseObject();
+        }
+    }
+
+    int updateRecurringBooking(ExpenseObject newRecurringBooking, String startDate, int frequency, String endDate, long index) {
+
+        ContentValues values = new ContentValues();
+        values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_F_BOOKING_ID, newRecurringBooking.getIndex());
+        values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_START, startDate);
+        values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_FREQUENCY, frequency);
+        values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_END, endDate);
+        Log.d(TAG, "updateRecurringBooking: " + index);
+
+        return database.update(ExpensesDbHelper.TABLE_RECURRING_BOOKINGS, values, ExpensesDbHelper.RECURRING_BOOKINGS_COL_ID + " = ?", new String[]{"" + index});
+    }
+
+    int deleteRecurringBooking(long index) {
+
+        Log.d(TAG, "deleteRecurringBooking: " + index);
+        return database.delete(ExpensesDbHelper.TABLE_RECURRING_BOOKINGS, ExpensesDbHelper.RECURRING_BOOKINGS_COL_ID + "= ?", new String[]{"" + index});
     }
 }

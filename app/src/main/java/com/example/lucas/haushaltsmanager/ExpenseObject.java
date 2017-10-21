@@ -121,11 +121,7 @@ class ExpenseObject {
     }
 
     /**
-     *
-     * @param expenditure true or false
-     *
-     *                    true: when money goes out
-     *                    false: when money comes in
+     * @param expenditure true (for outgoing money) or false (for incoming money)
      */
     void setExpenditure(boolean expenditure) {
         this.expenditure = expenditure;

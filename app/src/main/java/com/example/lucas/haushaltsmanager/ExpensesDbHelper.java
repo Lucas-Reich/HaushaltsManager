@@ -12,6 +12,37 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
     private static final String DB_NAME = "expenses.db";
     private static final int DB_VERSION = 1;
 
+    //define table Template_Bookings
+    static final String TABLE_TEMPLATE_BOOKINGS = "TEMPLATE_BOOKINGS";
+
+    static final String TEMPLATE_COL_ID = "_id";
+    static final String TEMPLATE_COL_F_BOOKING_ID = "f_booking_id";
+
+    private static final String CREATE_TEMPLATE_BOOKINGS = "CREATE TABLE " + TABLE_TEMPLATE_BOOKINGS
+            + "("
+            + TEMPLATE_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + TEMPLATE_COL_F_BOOKING_ID + " INTEGER NOT NULL"
+            + ");";
+
+    //define table Recurring Bookings
+    static final String TABLE_RECURRING_BOOKINGS = "RECURRING_BOOKINGS";
+
+    static final String RECURRING_BOOKINGS_COL_ID = "_id";
+    static final String RECURRING_BOOKINGS_COL_F_BOOKING_ID = "f_booking_id";
+    static final String RECURRING_BOOKINGS_COL_START = "start";
+    static final String RECURRING_BOOKINGS_COL_FREQUENCY = "frequency";
+    static final String RECURRING_BOOKINGS_COL_END = "end";
+
+    private static final String CREATE_RECURRING_BOOKINGS = "CREATE TABLE " + TABLE_RECURRING_BOOKINGS
+            + "("
+            + RECURRING_BOOKINGS_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + RECURRING_BOOKINGS_COL_F_BOOKING_ID + " INTEGER NOT NULL, "
+            + RECURRING_BOOKINGS_COL_START + " TEXT NOT NULL, "
+            + RECURRING_BOOKINGS_COL_FREQUENCY + " INTEGER NOT NULL, "
+            + RECURRING_BOOKINGS_COL_END + " TEXT NOT NULL"
+            + ");";
+
+
     // define table Bookings
     static final String TABLE_BOOKINGS = "BOOKINGS";
 
@@ -150,6 +181,12 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
 
             Log.d(TAG, "Die Tabelle Bookings_Tags wird mit SQL-Befehl: " + CREATE_BOOKINGS_TAGS + " angelegt.");
             db.execSQL(CREATE_BOOKINGS_TAGS);
+
+            Log.d(TAG, "Die Tabelle Template_Bookings wird mit SQL-Befehl: " + CREATE_TEMPLATE_BOOKINGS + " angelegt.");
+            db.execSQL(CREATE_TEMPLATE_BOOKINGS);
+
+            Log.d(TAG, "Die Tabelle Recurring_Bookings wird mit SQL-Befehl: " + CREATE_RECURRING_BOOKINGS + " angelegt.");
+            db.execSQL(CREATE_RECURRING_BOOKINGS);
         } catch (Exception ex) {
 
             Log.e(TAG, "Fehler beim Anlegen der Tabelle: " + ex.getMessage());
@@ -165,6 +202,8 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_ACCOUNTS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORIES);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOKINGS_TAGS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_TEMPLATE_BOOKINGS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_RECURRING_BOOKINGS);
 
         onCreate(db);
     }

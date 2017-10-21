@@ -2,6 +2,7 @@ package com.example.lucas.haushaltsmanager;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
@@ -24,42 +25,37 @@ public class ExpenseScreen extends AppCompatActivity {
     private Calendar CAL = Calendar.getInstance();
     private String TAG = "ExpenseScreen: ";
     private ExpensesDataSource expensesDataSource;
+    private boolean template = false, recurring = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        //TODO change activeAccount from an hardcoded var to an account which the users decided beforehand
-        expensesDataSource = new ExpensesDataSource(this);
-        expensesDataSource.open();
-        Account activeAccount = expensesDataSource.getAccountByName("test");
-        expensesDataSource.close();
 
         /**
-         * wenn ExpenseScreen von einer bereits bestehenden Buchung aufgerufen wird, dann soll diese buchung aus dem datenbank geholt werden
+         * wenn ExpenseScreen von einer bereits bestehenden Buchung aufgerufen wird, dann soll diese buchung aus der datenbank geholt werden
          */
+        expensesDataSource = new ExpensesDataSource(this);
+        expensesDataSource.open();
+        SharedPreferences preferences = getSharedPreferences("UserSettings", 0);
         final Bundle bundle = getIntent().getExtras();
+
         if (bundle.get("index") != null) {
 
-            expensesDataSource = new ExpensesDataSource(this);
-            expensesDataSource.open();
             EXPENSE = expensesDataSource.getBookingById(bundle.getLong("index"));
-            expensesDataSource.close();
         } else {
 
             // dummy expense befülllen
             EXPENSE.setCategory(new Category(getResources().getString(R.string.expense_screen_dsp_category), 0));// dummy Kategorie
-            //EXPENSE.setTitle("");
             EXPENSE.setTitle(getResources().getString(R.string.expense_screen_title));
             EXPENSE.setTag(getResources().getString(R.string.expense_screen_dsp_tag));
             EXPENSE.setPrice(0);
-            //EXPENSE.setNotice("");
             EXPENSE.setNotice(getResources().getString(R.string.expense_screen_dsp_notice));
-            //EXPENSE.setTag("");
             EXPENSE.setTag(getResources().getString(R.string.expense_screen_dsp_tag));
             EXPENSE.setDate(CAL);
-            EXPENSE.setAccount(activeAccount);
+            EXPENSE.setAccount(expensesDataSource.getAccountById(preferences.getLong("activeAccount", 0)));
             EXPENSE.setExpenditure(true);
         }
+        expensesDataSource.close();
 
 
         super.onCreate(savedInstanceState);
@@ -146,22 +142,22 @@ public class ExpenseScreen extends AppCompatActivity {
         TextView expenseNotice = (TextView) findViewById(R.id.expense_screen_notice);
         expenseNotice.setText(EXPENSE.getNotice());
 
-        //TODO implement the template functionality
-        CheckBox template = (CheckBox) findViewById(R.id.expense_screen_template);
-        template.setOnClickListener(new View.OnClickListener() {
+        final CheckBox templateChk = (CheckBox) findViewById(R.id.expense_screen_template);
+        templateChk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
+                template = true;
                 Toast.makeText(ExpenseScreen.this, "Du möchtest die Ausgabe als Vorlage speichern", Toast.LENGTH_SHORT).show();
             }
         });
 
-        //TODO implement the recurring event functionality
-        CheckBox recurring = (CheckBox) findViewById(R.id.expense_screen_recurring);
-        recurring.setOnClickListener(new View.OnClickListener() {
+        CheckBox recurringChk = (CheckBox) findViewById(R.id.expense_screen_recurring);
+        recurringChk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
+                recurring = true;
                 Toast.makeText(ExpenseScreen.this, "Du möchtest die Ausgabe als wiederkehrendes Event speichern", Toast.LENGTH_SHORT).show();
             }
         });
@@ -173,22 +169,37 @@ public class ExpenseScreen extends AppCompatActivity {
 
                 if (EXPENSE.isSet()) {
 
+                    expensesDataSource.open();
                     if (bundle.get("parentIndex") != null) {
 
-                        expensesDataSource.open();
-                        expensesDataSource.createChildBooking(EXPENSE, bundle.getLong("parentIndex"));
-                        Log.d(TAG, "created child");
-                        expensesDataSource.close();
+                        EXPENSE.setIndex(expensesDataSource.createChildBooking(EXPENSE, bundle.getLong("parentIndex")));
 
+                        Toast.makeText(ExpenseScreen.this, "Added Child " + EXPENSE.getTitle() + " to its Parent " + bundle.getLong("parentIndex"), Toast.LENGTH_SHORT).show();
                     } else {
-                        expensesDataSource.open();
+
                         EXPENSE.setIndex(expensesDataSource.createBooking(EXPENSE));
                         expensesDataSource.getBookingById(EXPENSE.getIndex()).toConsole();
-                        expensesDataSource.close();
 
                         Toast.makeText(ExpenseScreen.this, "Created booking \"" + EXPENSE.getTitle() + "\"", Toast.LENGTH_SHORT).show();
                     }
 
+                    if (recurring) {
+
+                        //TODO implement the recurring event functionality
+                        // frequency is saved as duration in hours, endDate is saved as Calendar object
+                        int frequency = 24;
+                        Calendar endDate = Calendar.getInstance();
+                        endDate.set(2017, 10, 21);
+                        long index = expensesDataSource.createRecurringBooking(EXPENSE.getIndex(), CAL, frequency, endDate);
+                        Log.d(TAG, "created recurring booking event at index: " + index);
+                    }
+
+                    if (template) {
+
+                        long index = expensesDataSource.createTemplateBooking(EXPENSE.getIndex());
+                        Log.d(TAG, "created template for bookings at index: " + index);
+                    }
+                    expensesDataSource.close();
                     Intent intent = new Intent(ExpenseScreen.this, MainActivityTab.class);
                     intent.putExtra("key", 10); //Optional parameters
                     ExpenseScreen.this.startActivity(intent);
