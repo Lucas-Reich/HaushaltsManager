@@ -210,7 +210,7 @@ public class MainActivityTab extends AppCompatActivity {
             switch (position) {
 
                 case 0:
-                    return new TabOneBookings();
+                    return new TabOneBookingsVer2();
                 case 1:
                     return new TabTwoMonthlyReports();
                 case 2:

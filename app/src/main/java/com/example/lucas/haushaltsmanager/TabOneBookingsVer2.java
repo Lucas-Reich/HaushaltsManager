@@ -1,8 +1,10 @@
 package com.example.lucas.haushaltsmanager;
 
-import android.app.Activity;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
 
@@ -13,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-public class ExpandableListViewTest extends Activity {
+public class TabOneBookingsVer2 extends Fragment {
 
     ExpandableListAdapter listAdapter;
     ExpandableListView listView;
@@ -23,18 +25,16 @@ public class ExpandableListViewTest extends Activity {
     ExpensesDataSource expensesDataSource;
 
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstances) {
 
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_test_exp_listview);
+        View rootView = inflater.inflate(R.layout.activity_test_exp_listview, container, false);
 
         //get ListView
-        listView = (ExpandableListView) findViewById(R.id.lvExp);
+        listView = (ExpandableListView) rootView.findViewById(R.id.lvExp);
 
         prepareListData();
 
-        listAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild);
+        listAdapter = new ExpandableListAdapter(getContext(), listDataHeader, listDataChild);
 
         //setting list adapter
         listView.setAdapter(listAdapter);
@@ -59,7 +59,7 @@ public class ExpandableListViewTest extends Activity {
             @Override
             public void onGroupExpand(int groupPosition) {
 
-                Toast.makeText(getApplicationContext(), listDataHeader.get(groupPosition) + " Expanded", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), listDataHeader.get(groupPosition) + " Expanded", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -68,7 +68,7 @@ public class ExpandableListViewTest extends Activity {
             @Override
             public void onGroupCollapse(int groupPosition) {
 
-                Toast.makeText(getApplicationContext(), listDataHeader.get(groupPosition) + " Collapsed", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), listDataHeader.get(groupPosition) + " Collapsed", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -78,7 +78,7 @@ public class ExpandableListViewTest extends Activity {
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
 
                 Toast.makeText(
-                        getApplicationContext(),
+                        getContext(),
                         listDataHeader.get(groupPosition)
                                 + " : "
                                 + listDataChild.get(
@@ -88,6 +88,8 @@ public class ExpandableListViewTest extends Activity {
                 return false;
             }
         });
+
+        return rootView;
     }
 
     /**
@@ -98,7 +100,7 @@ public class ExpandableListViewTest extends Activity {
         listDataHeader = new ArrayList<>();
         listDataChild = new HashMap<>();
         ArrayList<ExpenseObject> expenses;
-        expensesDataSource = new ExpensesDataSource(this);
+        expensesDataSource = new ExpensesDataSource(getContext());
 
         expensesDataSource.open();
         Calendar cal = Calendar.getInstance();
