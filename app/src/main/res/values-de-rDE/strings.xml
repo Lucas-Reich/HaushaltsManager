@@ -50,4 +50,6 @@
     <string name="month_report_booking">Buchung</string>
     <string name="month_report_bookings">Buchungen</string>
     <string name="expense_screen_amount_currency">€</string>
+    <string name="expense_screen_recurring_end">Enddatum auswählen</string>
+    <string name="expense_screen_recurring_frequency">Häufigkeit auswählen</string>
 </resources>

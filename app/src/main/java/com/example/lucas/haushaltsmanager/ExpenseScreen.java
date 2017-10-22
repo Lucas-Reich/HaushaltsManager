@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
+import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,6 +27,8 @@ public class ExpenseScreen extends AppCompatActivity {
     private String TAG = "ExpenseScreen: ";
     private ExpensesDataSource expensesDataSource;
     private boolean template = false, recurring = false;
+    private Calendar recurringEndDate = Calendar.getInstance();
+    public int frequency = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -152,13 +155,48 @@ public class ExpenseScreen extends AppCompatActivity {
             }
         });
 
-        CheckBox recurringChk = (CheckBox) findViewById(R.id.expense_screen_recurring);
+        final CheckBox recurringChk = (CheckBox) findViewById(R.id.expense_screen_recurring);
         recurringChk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                recurring = true;
-                Toast.makeText(ExpenseScreen.this, "Du möchtest die Ausgabe als wiederkehrendes Event speichern", Toast.LENGTH_SHORT).show();
+                ImageView imgFrequency = (ImageView) findViewById(R.id.img_frequency);
+                Button recurringFrequency = (Button) findViewById(R.id.expense_screen_recurring_frequency);
+                recurringFrequency.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        FrequencyAlertDialog freqDia = new FrequencyAlertDialog();
+                        freqDia.show(getFragmentManager(), "expense_screen_frequency_dialog");
+                    }
+                });
+
+                ImageView imgEnd = (ImageView) findViewById(R.id.img_end);
+                Button recurringEnd = (Button) findViewById(R.id.expense_screen_recurring_end);
+                recurringEnd.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        updateDate("frequencyDate");
+                    }
+                });
+                if (recurringChk.isChecked()) {
+
+                    imgFrequency.setVisibility(ImageView.VISIBLE);
+                    recurringFrequency.setVisibility(Button.VISIBLE);
+
+                    imgEnd.setVisibility(ImageView.VISIBLE);
+                    recurringEnd.setVisibility(Button.VISIBLE);
+                    recurring = true;
+                } else {
+
+                    imgFrequency.setVisibility(ImageView.GONE);
+                    recurringFrequency.setVisibility(Button.GONE);
+
+                    imgEnd.setVisibility(ImageView.GONE);
+                    recurringEnd.setVisibility(Button.GONE);
+                    recurring = false;
+                }
             }
         });
 
@@ -185,12 +223,8 @@ public class ExpenseScreen extends AppCompatActivity {
 
                     if (recurring) {
 
-                        //TODO implement the recurring event functionality
                         // frequency is saved as duration in hours, endDate is saved as Calendar object
-                        int frequency = 24;
-                        Calendar endDate = Calendar.getInstance();
-                        endDate.set(2017, 10, 21);
-                        long index = expensesDataSource.createRecurringBooking(EXPENSE.getIndex(), CAL, frequency, endDate);
+                        long index = expensesDataSource.createRecurringBooking(EXPENSE.getIndex(), CAL, frequency, recurringEndDate);
                         Log.d(TAG, "created recurring booking event at index: " + index);
                     }
 
@@ -250,9 +284,15 @@ public class ExpenseScreen extends AppCompatActivity {
 
 
     //TODO extract the input date logic to the DatePickerDialogFragment
-    private void updateDate() {
+    private void updateDate(String caller) {
 
-        new DatePickerDialog(ExpenseScreen.this, d, EXPENSE.getDate().get(Calendar.YEAR), EXPENSE.getDate().get(Calendar.MONTH), EXPENSE.getDate().get(Calendar.DAY_OF_MONTH)).show();
+        if (caller.equals("expenseDate")) {
+
+            new DatePickerDialog(ExpenseScreen.this, d, EXPENSE.getDate().get(Calendar.YEAR), EXPENSE.getDate().get(Calendar.MONTH), EXPENSE.getDate().get(Calendar.DAY_OF_MONTH)).show();
+        } else {
+
+            new DatePickerDialog(ExpenseScreen.this, d2, CAL.get(Calendar.YEAR), CAL.get(Calendar.MONTH), CAL.get(Calendar.DAY_OF_MONTH)).show();
+        }
     }
 
     DatePickerDialog.OnDateSetListener d = new DatePickerDialog.OnDateSetListener() {
@@ -268,6 +308,18 @@ public class ExpenseScreen extends AppCompatActivity {
 
             EXPENSE.setDate(expenditureDate);
             Log.d(TAG, "updated date to " + btn_date.getText());
+        }
+    };
+
+    DatePickerDialog.OnDateSetListener d2 = new DatePickerDialog.OnDateSetListener() {
+
+        @Override
+        public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+
+            recurringEndDate.set(year, month, dayOfMonth);
+
+            Button recurringEnd = (Button) findViewById(R.id.expense_screen_recurring_end);
+            recurringEnd.setText(DateUtils.formatDateTime(getBaseContext(), recurringEndDate.getTimeInMillis(), DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_NUMERIC_DATE | DateUtils.FORMAT_SHOW_YEAR));
         }
     };
 
@@ -304,7 +356,7 @@ public class ExpenseScreen extends AppCompatActivity {
 
             case R.id.expense_screen_date:
 
-                updateDate();
+                updateDate("expenseDate");
                 break;
 
             case R.id.expense_screen_notice:

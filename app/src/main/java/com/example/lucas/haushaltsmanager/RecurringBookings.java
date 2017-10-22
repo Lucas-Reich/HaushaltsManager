@@ -25,7 +25,8 @@ public class RecurringBookings extends AppCompatActivity {
         setContentView(R.layout.activity_recurring_bookings);
 
         //TODO make date range variable
-        startDate.set(2017, 9, 1);
+        startDate.set(2017, 10, 1);
+        endDate.set(2017, 10, 31);
 
 
         expensesDataSource = new ExpensesDataSource(this);

@@ -45,4 +45,6 @@
     <string name="month_report_booking">Booking</string>
     <string name="month_report_bookings">Bookings</string>
     <string name="expense_screen_amount_currency">$</string>
+    <string name="expense_screen_recurring_end">Choose last occurrence</string>
+    <string name="expense_screen_recurring_frequency">Choose frequency</string>
 </resources>
