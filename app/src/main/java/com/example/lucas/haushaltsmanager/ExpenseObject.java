@@ -1,12 +1,9 @@
 package com.example.lucas.haushaltsmanager;
 
 import android.util.Log;
-import android.widget.Toast;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -21,9 +18,7 @@ class ExpenseObject {
     private List<String> tag = new LinkedList<>();
     private String notice = "";
     private Account account;
-
-
-    private ExpensesDataSource expensesDataSource;
+    private List<ExpenseObject> children = new ArrayList<>();
 
 
     public ExpenseObject(String title, double price, boolean expenditure, Category category, String tag) {
@@ -56,8 +51,6 @@ class ExpenseObject {
         return toDisplay + toDisplay2 + toDisplay3;
     }
 
-    //TODO return date String depending on the locale of the user
-    //TODO implement a getDisplayDate and getDate method
     String getOldDate() {//deprecated use getDate instead
 
         int day = date.get(Calendar.DAY_OF_MONTH);
@@ -173,6 +166,31 @@ class ExpenseObject {
 
     void setAccount(Account account) {
         this.account = account;
+    }
+
+    void addChild(ExpenseObject child) {
+
+        children.add(child);
+    }
+
+    void addChildren(List<ExpenseObject> children) {
+
+        this.children.addAll(children);
+    }
+
+    List<ExpenseObject> getChildren() {
+
+        return this.children;
+    }
+
+    int countChildren() {
+
+        return this.children.size();
+    }
+
+    boolean hasChildren() {
+
+        return !this.children.isEmpty();
     }
 
     boolean isSet() {

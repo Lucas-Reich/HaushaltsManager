@@ -104,7 +104,7 @@ public class TabOneBookingsVer2 extends Fragment {
 
         expensesDataSource.open();
         Calendar cal = Calendar.getInstance();
-        expenses = expensesDataSource.getAllBookings(cal.get(Calendar.YEAR) + "-01-01", new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(cal.getTime()));
+        expenses = expensesDataSource.getAllBookings(cal.get(Calendar.YEAR) + "-01-01 00:00:00", new SimpleDateFormat("yyyy-MM-dd 23:59:59", Locale.US).format(cal.getTime()));
 
         //assigning child/s to expenses
         for (ExpenseObject expense : expenses) {
