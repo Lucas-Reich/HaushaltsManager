@@ -301,7 +301,7 @@ public class ExpenseScreen extends AppCompatActivity {
         public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
 
             Calendar expenditureDate = Calendar.getInstance();
-            expenditureDate.set(year, (month + 1), dayOfMonth);
+            expenditureDate.set(year, (month + 1), dayOfMonth, 0, 0, 0);
 
             Button btn_date = (Button) findViewById(R.id.expense_screen_date);
             btn_date.setText(DateUtils.formatDateTime(getBaseContext(), expenditureDate.getTimeInMillis(), DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_NUMERIC_DATE | DateUtils.FORMAT_SHOW_YEAR));
@@ -316,7 +316,7 @@ public class ExpenseScreen extends AppCompatActivity {
         @Override
         public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
 
-            recurringEndDate.set(year, month, dayOfMonth);
+            recurringEndDate.set(year, month, dayOfMonth, 0, 0, 0);
 
             Button recurringEnd = (Button) findViewById(R.id.expense_screen_recurring_end);
             recurringEnd.setText(DateUtils.formatDateTime(getBaseContext(), recurringEndDate.getTimeInMillis(), DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_NUMERIC_DATE | DateUtils.FORMAT_SHOW_YEAR));

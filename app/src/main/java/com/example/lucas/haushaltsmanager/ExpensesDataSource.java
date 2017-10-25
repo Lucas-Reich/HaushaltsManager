@@ -14,8 +14,6 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-import static java.lang.Math.toIntExact;
-
 class ExpensesDataSource {
 
     private static final String TAG = ExpensesDataSource.class.getSimpleName();
@@ -74,17 +72,34 @@ class ExpensesDataSource {
         List<String> allTags = Arrays.asList(getTagsToBookingByBookingId(expense.getIndex()));
         expense.setTags(allTags);
 
-        String[] expenseDate = cursor.getString(idDate).split("-");
-        int day = Integer.parseInt(expenseDate[2]);
-        int month = Integer.parseInt(expenseDate[1]);
+        String[] fullDate = cursor.getString(idDate).split(" ");
+        String[] expenseDate = fullDate[0].split("-");
+        String[] expenseTime = fullDate[1].split(":");
+
         int year = Integer.parseInt(expenseDate[0]);
-        cal.set(year, month, day);
+        int month = Integer.parseInt(expenseDate[1]);
+        int day = Integer.parseInt(expenseDate[2]);
+        int hour = Integer.parseInt(expenseTime[0]);
+        int minute = Integer.parseInt(expenseTime[1]);
+        int second = Integer.parseInt(expenseTime[2]);
+
+        cal.set(year, month, day, hour, minute, second);
         expense.setDate(cal);
 
         expense.setNotice(cursor.getString(idNotice));
 
-        Account account = getAccountById(cursor.getLong(idAccount));
-        expense.setAccount(account);
+        //Account account = getAccountById(cursor.getLong(idAccount));
+        //expense.setAccount(account);
+
+        //booking has children trigger
+        if (cursor.getLong(idAccount) == 9999) {
+
+            expense.addChildren(getChildsToParent(expense.getIndex()));
+            expense.setAccount(new Account(9999, "", 0));
+        } else {
+
+            expense.setAccount(getAccountById(cursor.getLong(idAccount)));
+        }
 
         return expense;
     }
@@ -475,8 +490,8 @@ class ExpensesDataSource {
     }
 
     /**
-     * @param tagName
-     * @return
+     * @param tagName name of the tag
+     * @return db id of the tag
      */
     private long getTagByName(String tagName) {
 
@@ -515,8 +530,7 @@ class ExpensesDataSource {
         values.put("f_category_id", categoryId);
         values.put("expenditure", expense.getExpenditure());
         values.put("title", expense.getTitle());
-        //values.put("date", expense.getOldDate());
-        values.put("date", new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(expense.getDate().getTime()));
+        values.put("date", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(expense.getDate().getTime()));
         values.put("notice", expense.getNotice());
 
         //TODO if Account does not exist already create it
@@ -618,8 +632,7 @@ class ExpensesDataSource {
         values.put("f_category_id", categoryId);
         values.put("expenditure", newExpense.getExpenditure());
         values.put("title", newExpense.getTitle());
-        //values.put("date", newExpense.getOldDate());
-        values.put("date", new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(newExpense.getDate().getTime()));
+        values.put("date", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(newExpense.getDate().getTime()));
         values.put("notice", newExpense.getNotice());
 
         //TODO if Account does not exist already create it
@@ -655,7 +668,7 @@ class ExpensesDataSource {
         values.put("expenditure", expense.getExpenditure());
         values.put("title", expense.getTitle());
         //values.put("date", expense.getOldDate());
-        values.put("date", new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(expense.getDate().getTime()));
+        values.put("date", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(expense.getDate().getTime()));
         values.put("notice", expense.getNotice());
 
         //TODO if Account does not exist already create it
@@ -710,8 +723,7 @@ class ExpensesDataSource {
         values.put("f_category_id", updatedChild.getCategory().getIndex());
         values.put("expenditure", updatedChild.getExpenditure());
         values.put("title", updatedChild.getTitle());
-        //values.put("date", updatedChild.getOldDate());
-        values.put("date", new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(updatedChild.getDate().getTime()));
+        values.put("date", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(updatedChild.getDate().getTime()));
         values.put("notice", updatedChild.getNotice());
 
         //TODO if Account does not exist already create it
@@ -960,9 +972,9 @@ class ExpensesDataSource {
 
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_F_BOOKING_ID, recurringBookingId);
-        values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_START, new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(start.getTime()));
+        values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_START, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(start.getTime()));
         values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_FREQUENCY, frequency);
-        values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_END, new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(end.getTime()));
+        values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_END, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(end.getTime()));
         Log.d(TAG, "createRecurringBooking: " + recurringBookingId);
 
         return database.insert(ExpensesDbHelper.TABLE_RECURRING_BOOKINGS, null, values);
@@ -978,7 +990,7 @@ class ExpensesDataSource {
                 + " WHERE "
                 + ExpensesDbHelper.RECURRING_BOOKINGS_COL_END
                 + " > "
-                + new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(dateRngStart.getTime());
+                + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(dateRngStart.getTime());
         Log.d(TAG, "getRecurringBookings: " + selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
@@ -1012,7 +1024,7 @@ class ExpensesDataSource {
             start.add(Calendar.HOUR, temp);
 
             //as long as the start date is before the end of its cycle and also before the end of the given date range
-            while(start.before(end) && start.before(endDate)) {
+            while (start.before(end) && start.before(endDate)) {
 
                 if (start.after(dateRngStart)) {
 
