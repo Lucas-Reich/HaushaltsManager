@@ -1,6 +1,7 @@
 <application>
   <component name="FileTypeManager" version="17">
     <extensionMap>
+      <mapping ext="db" type="Android Room SQL" />
       <mapping pattern="test" type="PLAIN_TEXT" />
     </extensionMap>
   </component>
