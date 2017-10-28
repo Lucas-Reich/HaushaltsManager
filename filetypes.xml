@@ -3,6 +3,7 @@
     <extensionMap>
       <mapping ext="db" type="Android Room SQL" />
       <mapping pattern="test" type="PLAIN_TEXT" />
+      <mapping ext="db-journal" type="PLAIN_TEXT" />
     </extensionMap>
   </component>
 </application>
