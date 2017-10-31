@@ -41,11 +41,11 @@ public class MainActivityTab extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        // saving the current activeAccount into the user preferences
-        //TODO extract activeAccount placement into its actual place
+        //TODO die shared preferences in den dafür vorgehenen bereich bringen
         SharedPreferences settings = getSharedPreferences("UserSettings", 0);
         SharedPreferences.Editor editor = settings.edit();
         editor.putLong("activeAccount", 1);
+        editor.putString("mainCurrency", "€");
         editor.commit();
 
 
@@ -203,7 +203,7 @@ public class MainActivityTab extends AppCompatActivity {
             switch (position) {
 
                 case 0:
-                    return new TabOneBookingsVer2();
+                    return new TabOneBookings();
                 case 1:
                     return new TabTwoMonthlyReports();
                 case 2:

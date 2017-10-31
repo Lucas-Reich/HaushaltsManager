@@ -39,7 +39,7 @@ public class PriceInputDialogFragment extends DialogFragment {
 
                     expenseScreen.EXPENSE.setPrice(Double.parseDouble(input.getText().toString()));
                     Log.d("PriceInput", "set price to " + expenseScreen.EXPENSE.getPrice());
-                    txtView.setText(expenseScreen.EXPENSE.getPrice() + expenseScreen.EXPENSE.getAccount().getCurrencySym());
+                    txtView.setText(expenseScreen.EXPENSE.getPrice() + "");
                     txtView.setTextColor(Color.BLACK);
                 } else {
 

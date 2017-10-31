@@ -1,5 +1,6 @@
 package com.example.lucas.haushaltsmanager;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,6 +19,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 public class ExpenseScreen extends AppCompatActivity {
@@ -32,14 +34,14 @@ public class ExpenseScreen extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
+        SharedPreferences preferences = getSharedPreferences("UserSettings", 0);
 
         /**
          * wenn ExpenseScreen von einer bereits bestehenden Buchung aufgerufen wird, dann soll diese buchung aus der datenbank geholt werden
          */
         expensesDataSource = new ExpensesDataSource(this);
         expensesDataSource.open();
-        SharedPreferences preferences = getSharedPreferences("UserSettings", 0);
+
         final Bundle bundle = getIntent().getExtras();
 
         if (bundle.get("index") != null) {
@@ -57,6 +59,7 @@ public class ExpenseScreen extends AppCompatActivity {
             EXPENSE.setDate(CAL);
             EXPENSE.setAccount(expensesDataSource.getAccountById(preferences.getLong("activeAccount", 0)));
             EXPENSE.setExpenditure(true);
+
         }
         expensesDataSource.close();
 
@@ -70,7 +73,8 @@ public class ExpenseScreen extends AppCompatActivity {
 
         // set the displayed date to the current one
         Button setDate = (Button) findViewById(R.id.expense_screen_date);
-        setDate.setText(DateUtils.formatDateTime(this, EXPENSE.getDate().getTimeInMillis(), DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_NUMERIC_DATE | DateUtils.FORMAT_SHOW_YEAR));
+        setDate.setText(EXPENSE.getDate().get(Calendar.YEAR) + "-" + EXPENSE.getDate().get(Calendar.MONTH) + "-" + EXPENSE.getDate().get(Calendar.DAY_OF_MONTH));
+        //setDate.setText(DateUtils.formatDateTime(this, EXPENSE.getDate().getTimeInMillis(), DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_NUMERIC_DATE | DateUtils.FORMAT_SHOW_YEAR));
         Log.d(TAG, "set date to " + setDate.getText());
 
 
@@ -218,6 +222,7 @@ public class ExpenseScreen extends AppCompatActivity {
                         EXPENSE.setIndex(expensesDataSource.createBooking(EXPENSE));
                         expensesDataSource.getBookingById(EXPENSE.getIndex()).toConsole();
 
+
                         Toast.makeText(ExpenseScreen.this, "Created booking \"" + EXPENSE.getTitle() + "\"", Toast.LENGTH_SHORT).show();
                     }
 
@@ -301,13 +306,13 @@ public class ExpenseScreen extends AppCompatActivity {
         public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
 
             Calendar expenditureDate = Calendar.getInstance();
-            expenditureDate.set(year, (month + 1), dayOfMonth, 0, 0, 0);
+            expenditureDate.set(year, month, dayOfMonth, 0, 0, 0);
 
             Button btn_date = (Button) findViewById(R.id.expense_screen_date);
             btn_date.setText(DateUtils.formatDateTime(getBaseContext(), expenditureDate.getTimeInMillis(), DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_NUMERIC_DATE | DateUtils.FORMAT_SHOW_YEAR));
 
             EXPENSE.setDate(expenditureDate);
-            Log.d(TAG, "updated date to " + btn_date.getText());
+            Log.d(TAG, "updated date to " + EXPENSE.getDate().get(Calendar.DAY_OF_MONTH) + "-" + EXPENSE.getDate().get(Calendar.MONTH) + "-" + EXPENSE.getDate().get(Calendar.YEAR));
         }
     };
 
@@ -340,6 +345,9 @@ public class ExpenseScreen extends AppCompatActivity {
                 //TODO choose category from an given activity
                 bundle.putString("original_title", getResources().getString(R.string.expense_screen_dsp_category));
                 bundle.putInt("button_id", view.getId());
+
+                Intent bla = new Intent(ExpenseScreen.this, Categories.class);
+                ExpenseScreen.this.startActivityForResult(bla, 1);
                 break;
 
             case R.id.expense_screen_title:
@@ -383,6 +391,28 @@ public class ExpenseScreen extends AppCompatActivity {
             ExpenseInputDialogFragment expenseDialog = new ExpenseInputDialogFragment();
             expenseDialog.setArguments(bundle);
             expenseDialog.show(getFragmentManager(), "expenseDialog");
+        }
+    }
+
+
+    /**
+     * Methode um die Daten die von dieser Activity aufgerufende Activities zurückgegeben werden weiter zu verarbeiten.
+     *
+     * @param requestCode der Anfrage Code der beim aufrufen der 2. Activity erstellt wird, siehe case: R.id.expense_screen_category
+     * @param resultCode  der Code der von der Aufgerufenden Kategorie zurückgegeben wird, um den status der daten zu signalisieren
+     * @param data        die Daten die von der aufgerufenden KAtegorie zurückgegebn werden
+     */
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode == 1) {
+
+            if (resultCode == Activity.RESULT_OK) {
+
+                Category result = data.getParcelableExtra("categoryObj");
+
+                Button category = (Button) findViewById(R.id.expense_screen_category);
+                category.setText(result.getCategoryName());
+            }
         }
     }
 }

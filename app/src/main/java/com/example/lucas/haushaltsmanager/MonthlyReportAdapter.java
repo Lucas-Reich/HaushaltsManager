@@ -22,7 +22,7 @@ import java.util.ArrayList;
 
 class MonthlyReportAdapter extends ArrayAdapter<MonthlyReport> implements View.OnClickListener {
 
-    private ArrayList<MonthlyReport> dataSet;
+    private MonthlyReport[] dataSet;
     private Context mContext;
 
     private static class ViewHolder {
@@ -37,7 +37,8 @@ class MonthlyReportAdapter extends ArrayAdapter<MonthlyReport> implements View.O
         PieChart pieChart;
     }
 
-    MonthlyReportAdapter(ArrayList<MonthlyReport> data, Context context) {
+    MonthlyReportAdapter(MonthlyReport[] data, Context context) {
+
         super(context, R.layout.monthly_overview_item_v1, data);
         this.dataSet = data;
         this.mContext = context;

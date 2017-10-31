@@ -16,6 +16,11 @@ class MonthlyReport {
         this.currency = currency;
     }
 
+    public void addExpense(ExpenseObject expense) {
+
+        this.expenses.add(expense);
+    }
+
     String getMonth() {
         return month;
     }
@@ -114,7 +119,6 @@ class MonthlyReport {
     }
 
     /**
-     *
      * @param monthlyExpenses ArrayList of monthly expenses
      * @param category Category name which has to be found
      *

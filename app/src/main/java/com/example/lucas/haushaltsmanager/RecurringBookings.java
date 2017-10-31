@@ -2,6 +2,7 @@ package com.example.lucas.haushaltsmanager;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.Calendar;
 public class RecurringBookings extends AppCompatActivity {
 
 
+    private static final String TAG = "RecurringBookings: ";
     ArrayList<ExpenseObject> expenseObjects;
     ListView listView;
     static BookingAdapterVer2 bookingAdapter;
@@ -25,8 +27,10 @@ public class RecurringBookings extends AppCompatActivity {
         setContentView(R.layout.activity_recurring_bookings);
 
         //TODO make date range variable
-        startDate.set(2017, 10, 1);
-        endDate.set(2017, 10, 31);
+        startDate.set(2017, Calendar.OCTOBER, 1);
+        endDate.set(2017, Calendar.OCTOBER, 31);
+
+        Log.d(TAG, "onCreate: " + startDate.getTime());
 
 
         expensesDataSource = new ExpensesDataSource(this);

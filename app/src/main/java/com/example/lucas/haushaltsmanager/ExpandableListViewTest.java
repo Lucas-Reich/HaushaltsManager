@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ExpandableListView;
-import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -47,9 +46,7 @@ public class ExpandableListViewTest extends Activity {
             @Override
             public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
 
-                // Toast.makeText(getApplicationContext(),
-                // "Group Clicked " + listDataHeader.get(groupPosition),
-                // Toast.LENGTH_SHORT).show();
+                //TODO create onClickListener functionality
                 return false;
             }
         });
@@ -59,7 +56,7 @@ public class ExpandableListViewTest extends Activity {
             @Override
             public void onGroupExpand(int groupPosition) {
 
-                Toast.makeText(getApplicationContext(), listDataHeader.get(groupPosition) + " Expanded", Toast.LENGTH_SHORT).show();
+                //TODO create onClickListener functionality
             }
         });
 
@@ -68,7 +65,7 @@ public class ExpandableListViewTest extends Activity {
             @Override
             public void onGroupCollapse(int groupPosition) {
 
-                Toast.makeText(getApplicationContext(), listDataHeader.get(groupPosition) + " Collapsed", Toast.LENGTH_SHORT).show();
+                //TODO create onClickListener functionality
             }
         });
 
@@ -77,14 +74,7 @@ public class ExpandableListViewTest extends Activity {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
 
-                Toast.makeText(
-                        getApplicationContext(),
-                        listDataHeader.get(groupPosition)
-                                + " : "
-                                + listDataChild.get(
-                                listDataHeader.get(groupPosition)).get(
-                                childPosition), Toast.LENGTH_SHORT)
-                        .show();
+                //TODO create onClickListener functionality
                 return false;
             }
         });
@@ -102,13 +92,14 @@ public class ExpandableListViewTest extends Activity {
 
         expensesDataSource.open();
         Calendar cal = Calendar.getInstance();
-        expenses = expensesDataSource.getAllBookings(cal.get(Calendar.YEAR) + "-01-01", new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(cal.getTime()));
+        cal.set(Calendar.MONTH, cal.get(Calendar.MONTH) - 1);
+        expenses = expensesDataSource.getAllBookings(cal.get(Calendar.YEAR) + "-01-01 00:00:00", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(cal.getTime()));
 
         //assigning child/s to expenses
         for (ExpenseObject expense : expenses) {
 
             listDataHeader.add(expense);
-            listDataChild.put(expense, expensesDataSource.getChildsToParent(expense.getIndex()));
+            listDataChild.put(expense, expense.getChildren());
         }
 
         expensesDataSource.close();

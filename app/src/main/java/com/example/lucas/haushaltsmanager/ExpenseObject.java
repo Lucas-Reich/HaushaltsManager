@@ -81,7 +81,21 @@ class ExpenseObject {
         return this.date;
     }
 
+    String getDBDate() {
+
+        String dbDate = this.date.get(Calendar.YEAR) + "-";
+        if (this.date.get(Calendar.MONTH) <= 9) {
+
+            dbDate += "0";
+        }
+        dbDate += this.date.get(Calendar.MONTH);
+        dbDate += "-" + this.date.get(Calendar.DAY_OF_MONTH) + " " + this.date.get(Calendar.HOUR_OF_DAY) + ":" + this.date.get(Calendar.MINUTE) + ":" + this.date.get(Calendar.SECOND);
+
+        return dbDate;
+    }
+
     void setDate(Calendar date) {
+
         this.date = date;
     }
 

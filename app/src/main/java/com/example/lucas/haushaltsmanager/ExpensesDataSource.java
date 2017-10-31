@@ -525,12 +525,12 @@ class ExpensesDataSource {
         values.put("price", expense.getPrice());
 
         //TODO if Category does not exist already create it
-        //TODO sicherstelen, dass das datumsformat immer gleich ist (yyyy-mm-dd)
         long categoryId = expense.getCategory().getIndex();
         values.put("f_category_id", categoryId);
         values.put("expenditure", expense.getExpenditure());
         values.put("title", expense.getTitle());
-        values.put("date", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(expense.getDate().getTime()));
+        //values.put("date", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(expense.getDate().getTime()));
+        values.put("date", expense.getDBDate());
         values.put("notice", expense.getNotice());
 
         //TODO if Account does not exist already create it
@@ -582,7 +582,7 @@ class ExpensesDataSource {
      * @param endDate
      * @return
      */
-    ArrayList<ExpenseObject> getAllBookings(String startDate, String endDate) {//TODO ich muss sicherstellen dass das datum immer im richtigen (yyyy-mm-dd) format ist
+    ArrayList<ExpenseObject> getAllBookings(String startDate, String endDate) {
 
         ArrayList<ExpenseObject> bookings = new ArrayList<>();
 
@@ -656,29 +656,34 @@ class ExpensesDataSource {
     }
 
 
-    long createChildBooking(ExpenseObject expense, long parentId) {
+    long createChildBooking(ExpenseObject childExpense, long parentId) {
 
         ContentValues values = new ContentValues();
-        values.put("price", expense.getPrice());
+        values.put("price", childExpense.getPrice());
         values.put("f_booking_id", parentId);
 
         //TODO if Category does not exist already create it
         //TODO sicherstelen, dass das datumsformat immer gleich ist (yyyy-mm-dd)
-        values.put("f_category_id", expense.getCategory().getIndex());
-        values.put("expenditure", expense.getExpenditure());
-        values.put("title", expense.getTitle());
-        //values.put("date", expense.getOldDate());
-        values.put("date", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(expense.getDate().getTime()));
-        values.put("notice", expense.getNotice());
+        values.put("f_category_id", childExpense.getCategory().getIndex());
+        values.put("expenditure", childExpense.getExpenditure());
+        values.put("title", childExpense.getTitle());
+        values.put("date", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(childExpense.getDate().getTime()));
+        values.put("notice", childExpense.getNotice());
 
         //TODO if Account does not exist already create it
-        values.put("f_account_id", expense.getAccount().getIndex());
+        values.put("f_account_id", childExpense.getAccount().getIndex());
 
         //assign all chosen tags to the booking
-        for (String tag : expense.getTags()) {
+        for (String tag : childExpense.getTags()) {
 
-            assignTagToBooking(expense.getIndex(), tag);
+            assignTagToBooking(childExpense.getIndex(), tag);
         }
+
+        //TODO dirty hack: wenn ein kind zu einer buchung hinzugefügt wird dann wird irgendwie auchd er monat um eins erhöht und um dem entgegen zu wirken ziehe ich hier immer einen mmonat ab, wenn ein kind hinzugefügt wird
+        ExpenseObject parent = getBookingById(parentId);
+        parent.setAccount(new Account(9999, "", 0));
+        parent.getDate().set(Calendar.MONTH, (parent.getDate().get(Calendar.MONTH) - 1));
+        updateBooking(parentId, parent);
 
         Log.d(TAG, "created expense at Child_Booking table");
         return database.insert(ExpensesDbHelper.TABLE_CHILD_BOOKINGS, null, values);
@@ -958,7 +963,7 @@ class ExpensesDataSource {
         values.put(ExpensesDbHelper.TEMPLATE_COL_F_BOOKING_ID, newTemplate.getIndex());
         Log.d(TAG, "updateTemplate: " + newTemplate.getIndex());
 
-        return database.update(ExpensesDbHelper.TABLE_TEMPLATE_BOOKINGS, values, ExpensesDbHelper.TEMPLATE_COL_ID + " = ?", new String[]{"" + newTemplate.getIndex()});
+        return database.update(ExpensesDbHelper.TABLE_TEMPLATE_BOOKINGS, values, ExpensesDbHelper.TEMPLATE_COL_ID + " = ?", new String[]{"" + index});
     }
 
     int deleteTemplate(long index) {
@@ -989,8 +994,9 @@ class ExpensesDataSource {
                 + ExpensesDbHelper.TABLE_RECURRING_BOOKINGS
                 + " WHERE "
                 + ExpensesDbHelper.RECURRING_BOOKINGS_COL_END
-                + " > "
-                + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(dateRngStart.getTime());
+                + " > '"
+                + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(dateRngStart.getTime())
+                + "';";
         Log.d(TAG, "getRecurringBookings: " + selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
