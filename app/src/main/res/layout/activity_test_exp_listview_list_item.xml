@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -10,7 +10,9 @@
         android:orientation="horizontal"
         android:paddingLeft="?android:attr/expandableListPreferredChildPaddingLeft"
         android:paddingStart="?android:attr/expandableListPreferredChildPaddingLeft">
-
+<!--
+        android:background="@drawable/row_highlighter"
+-->
         <TextView
             android:id="@+id/exp_listview_item_circle"
             android:layout_width="wrap_content"
@@ -20,7 +22,7 @@
             android:gravity="center"
             android:text="A"
             android:textColor="@android:color/white"
-            android:textSize="22sp" />
+            android:textSize="22sp"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -44,30 +46,30 @@
                         android:id="@+id/exp_listview_item_title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="start"
                         android:layout_weight="1"
                         android:text="Kategorie"
                         android:textAlignment="viewStart"
-                        android:layout_gravity="start"
                         android:textColor="@android:color/black"
-                        android:textSize="21sp" />
+                        android:textSize="21sp"/>
 
                     <TextView
                         android:id="@+id/exp_listview_item_paid_price"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="end"
                         android:text="17"
                         android:textAlignment="textEnd"
-                        android:layout_gravity="end"
-                        android:textSize="16sp" />
+                        android:textSize="16sp"/>
 
                     <TextView
                         android:id="@+id/exp_listview_item_currency_paid"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="start"
                         android:text="$"
                         android:textAlignment="viewStart"
-                        android:layout_gravity="start"
-                        android:textSize="16sp" />
+                        android:textSize="16sp"/>
                 </TableRow>
 
                 <TableRow
@@ -78,30 +80,30 @@
                         android:id="@+id/exp_listview_item_person"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="start"
                         android:layout_weight="1"
                         android:text="Lucas"
                         android:textAlignment="viewStart"
-                        android:layout_gravity="start"
                         android:textColor="@android:color/black"
-                        android:textSize="12sp" />
+                        android:textSize="12sp"/>
 
                     <TextView
                         android:id="@+id/exp_listview_item_booking_price"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="end"
                         android:text="15"
                         android:textAlignment="textEnd"
-                        android:layout_gravity="end"
-                        android:textSize="10sp" />
+                        android:textSize="10sp"/>
 
                     <TextView
                         android:id="@+id/exp_listview_item_currency_base"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="start"
                         android:text="€"
                         android:textAlignment="viewStart"
-                        android:layout_gravity="start"
-                        android:textSize="10sp" />
+                        android:textSize="10sp"/>
                 </TableRow>
 
             </TableLayout>

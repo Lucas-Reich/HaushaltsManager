@@ -1,7 +1,6 @@
 package com.example.lucas.haushaltsmanager;
 
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
@@ -77,7 +76,19 @@ public class ExpandableListViewTest extends Activity {
         listView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+/*
+highlighter für kindern einer buchung
+gesehen: http://vardhan-justlikethat.blogspot.de/2013/10/android-highlighting-selected-item-in.html
+                int index = parent.getFlatListPosition(listView.getPackedPositionForChild(groupPosition, childPosition));
 
+                if (parent.isItemChecked(index)) {
+
+                    parent.setItemChecked(index, false);
+                } else {
+
+                    parent.setItemChecked(index, true);
+                }
+*/
                 //TODO create onClickListener functionality
                 return false;
             }
@@ -88,27 +99,26 @@ public class ExpandableListViewTest extends Activity {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
-                if (ExpandableListView.getPackedPositionType(id) == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
+                if (ExpandableListView.getPackedPositionType(id) == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
 
                     int groupPosition = ExpandableListView.getPackedPositionGroup(id);
                     int childPosition = ExpandableListView.getPackedPositionChild(id);
 
-                    Toast.makeText(ExpandableListViewTest.this, "TEEEEEST", Toast.LENGTH_SHORT).show();
+                    view.setBackgroundColor(Color.GREEN);
+
+                    Toast.makeText(ExpandableListViewTest.this, "PARENT", Toast.LENGTH_SHORT).show();
+                    return true;
+                } else if (ExpandableListView.getPackedPositionType(id) == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
+
+                    int groupPosition = ExpandableListView.getPackedPositionGroup(id);
+                    int childPosition = ExpandableListView.getPackedPositionChild(id);
+
+                    view.setBackgroundColor(Color.BLACK);
+
+                    Toast.makeText(ExpandableListViewTest.this, "CHILD", Toast.LENGTH_SHORT).show();
                     return true;
                 }
 
-                return false;
-            }
-        });
-
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-
-                Toast.makeText(ExpandableListViewTest.this, "teststsststst", Toast.LENGTH_SHORT).show();
-
-                view.setBackgroundColor(Color.RED);
-                view.setSelected(true);
                 return false;
             }
         });
