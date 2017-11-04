@@ -342,10 +342,6 @@ public class ExpenseScreen extends AppCompatActivity {
 
             case R.id.expense_screen_category:
 
-                //TODO choose category from an given activity
-                bundle.putString("original_title", getResources().getString(R.string.expense_screen_dsp_category));
-                bundle.putInt("button_id", view.getId());
-
                 Intent bla = new Intent(ExpenseScreen.this, Categories.class);
                 ExpenseScreen.this.startActivityForResult(bla, 1);
                 break;
@@ -386,7 +382,7 @@ public class ExpenseScreen extends AppCompatActivity {
             AccountPickerDialogFragment accountPicker = new AccountPickerDialogFragment();
             accountPicker.setArguments(bundle);
             accountPicker.show(getFragmentManager(), "account_picker");
-        } else if (btn.getId() != R.id.expense_screen_date) {
+        } else if (btn.getId() != R.id.expense_screen_date && btn.getId() != R.id.expense_screen_category) {
 
             ExpenseInputDialogFragment expenseDialog = new ExpenseInputDialogFragment();
             expenseDialog.setArguments(bundle);
@@ -409,6 +405,7 @@ public class ExpenseScreen extends AppCompatActivity {
             if (resultCode == Activity.RESULT_OK) {
 
                 Category result = data.getParcelableExtra("categoryObj");
+                EXPENSE.setCategory(result);
 
                 Button category = (Button) findViewById(R.id.expense_screen_category);
                 category.setText(result.getCategoryName());

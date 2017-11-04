@@ -56,7 +56,6 @@ class Category implements Parcelable {
 
 
     //make class Parcelable
-
     /**
      * This will be only used by ParcelableCategories
      * see: http://prasanta-paul.blogspot.de/2010/06/android-parcelable-example.html (Parcelable ArrayList)
