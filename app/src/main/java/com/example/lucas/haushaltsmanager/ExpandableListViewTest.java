@@ -1,9 +1,13 @@
 package com.example.lucas.haushaltsmanager;
 
 import android.app.Activity;
+import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ExpandableListView;
+import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -78,6 +82,36 @@ public class ExpandableListViewTest extends Activity {
                 return false;
             }
         });
+
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+                if (ExpandableListView.getPackedPositionType(id) == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
+
+                    int groupPosition = ExpandableListView.getPackedPositionGroup(id);
+                    int childPosition = ExpandableListView.getPackedPositionChild(id);
+
+                    Toast.makeText(ExpandableListViewTest.this, "TEEEEEST", Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+
+                return false;
+            }
+        });
+
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+                Toast.makeText(ExpandableListViewTest.this, "teststsststst", Toast.LENGTH_SHORT).show();
+
+                view.setBackgroundColor(Color.RED);
+                view.setSelected(true);
+                return false;
+            }
+        });
     }
 
     /**
@@ -92,7 +126,7 @@ public class ExpandableListViewTest extends Activity {
 
         expensesDataSource.open();
         Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.MONTH, cal.get(Calendar.MONTH) - 1);
+        //cal.set(Calendar.MONTH, cal.get(Calendar.MONTH) - 1);
         expenses = expensesDataSource.getAllBookings(cal.get(Calendar.YEAR) + "-01-01 00:00:00", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(cal.getTime()));
 
         //assigning child/s to expenses

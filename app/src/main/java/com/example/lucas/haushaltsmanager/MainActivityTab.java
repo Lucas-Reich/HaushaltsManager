@@ -19,7 +19,8 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 
 public class MainActivityTab extends AppCompatActivity {
 
@@ -37,6 +38,10 @@ public class MainActivityTab extends AppCompatActivity {
      * The {@link ViewPager} that will host the section contents.
      */
     ViewPager mViewPager;
+
+    FloatingActionButton fab, fabDelete, fabCombine;
+    Animation fabOpen, fabClose, rotateForward, rotateBackward;
+    boolean isOpen = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,16 +71,45 @@ public class MainActivityTab extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+
+
+        // FloatingActionButtons
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View v) {
+
+                animateFab();
+            }
+        });
+
+        fabCombine = (FloatingActionButton) findViewById(R.id.fab_combine);
+        fabCombine.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                animateFab();
+            }
+        });
+
+        fabDelete = (FloatingActionButton) findViewById(R.id.fab_delete);
+        fabDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
                 Intent intent = new Intent(MainActivityTab.this, ExpenseScreen.class);
                 intent.putExtra("key", 10); //Optional parameters
                 MainActivityTab.this.startActivity(intent);
             }
         });
+
+        fabOpen = AnimationUtils.loadAnimation(this, R.anim.fab_open);
+        fabClose = AnimationUtils.loadAnimation(this, R.anim.fab_close);
+
+        rotateForward = AnimationUtils.loadAnimation(this, R.anim.rotate_forward);
+        rotateBackward = AnimationUtils.loadAnimation(this, R.anim.rotate_backward);
+
+
 
 
 
@@ -152,6 +186,33 @@ public class MainActivityTab extends AppCompatActivity {
                 return true;
             }
         });
+    }
+
+    private void animateFab() {
+
+        if (isOpen) {
+
+            fab.startAnimation(rotateBackward);
+
+            fabDelete.startAnimation(fabClose);
+            fabDelete.setClickable(false);
+
+            fabCombine.startAnimation(fabClose);
+            fabCombine.setClickable(false);
+
+            isOpen = false;
+        } else {
+
+            fab.startAnimation(rotateForward);
+
+            fabDelete.startAnimation(fabOpen);
+            fabDelete.setClickable(true);
+
+            fabCombine.startAnimation(fabOpen);
+            fabCombine.setClickable(true);
+
+            isOpen = true;
+        }
     }
 
     @Override
