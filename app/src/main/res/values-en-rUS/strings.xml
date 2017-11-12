@@ -47,4 +47,6 @@
     <string name="expense_screen_amount_currency">$</string>
     <string name="expense_screen_recurring_end">Choose last occurrence</string>
     <string name="expense_screen_recurring_frequency">Choose frequency</string>
+    <string name="choose_account">Choose Account</string>
+    <string name="account">Accounts</string>
 </resources>

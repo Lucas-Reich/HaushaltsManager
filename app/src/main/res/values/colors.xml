@@ -4,5 +4,5 @@
     <color name="colorPrimaryDark">#0D9690</color> // angepasst (der kleine balken oben, wo die zeit usw. steht)
     <color name="colorAccent">#EF7196</color> // angepasst (Highlights wie FAB button farbe, aktuelle tabauswahl farbe, ...)
     <color name="accentColor">#009688</color>
-    <color name="mainColor">#FFFFFF</color>
+    <color name="mainColor">#ffffff</color>
 </resources>

@@ -19,7 +19,7 @@ public class AccountPickerDialogFragment extends DialogFragment {
 
         final Bundle args = getArguments();
         final ExpenseScreen expenseScreen = (ExpenseScreen) getActivity();
-        final Account[] accounts = expensesDataSource.getAllAccounts();
+        final Account[] accounts = expensesDataSource.getAllAccountsOld();
         final int activeAccount = (int)getActiveAccount(args.getString("current_account"), accounts).getIndex();
         final Button btn = (Button) expenseScreen.findViewById(R.id.expense_screen_account);
 

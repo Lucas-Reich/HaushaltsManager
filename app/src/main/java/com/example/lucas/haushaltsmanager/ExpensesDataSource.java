@@ -88,9 +88,6 @@ class ExpensesDataSource {
 
         expense.setNotice(cursor.getString(idNotice));
 
-        //Account account = getAccountById(cursor.getLong(idAccount));
-        //expense.setAccount(account);
-
         //booking has children trigger
         if (cursor.getLong(idAccount) == 9999) {
 
@@ -177,12 +174,36 @@ class ExpensesDataSource {
         return new Account();
     }
 
+    ArrayList<Account> getAllAccounts() {
+
+        ArrayList<Account> accounts = new ArrayList<>();
+
+        String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_ACCOUNTS;
+        Log.d(TAG, selectQuery);
+
+        Cursor c = database.rawQuery(selectQuery, null);
+        Log.d(TAG, DatabaseUtils.dumpCursorToString(c));
+
+        c.moveToFirst();
+        while(!c.isAfterLast()) {
+
+            long index = c.getLong(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_ID));
+            String accountName = c.getString(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_ACCOUNT));
+            int balance = c.getInt(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_BALANCE));
+
+            accounts.add(new Account(index, accountName, balance));
+            c.moveToNext();
+        }
+
+        return accounts;
+    }
+
     /**
      * Convenience Method for getting all available Accounts
      *
      * @return An array of strings with all Accounts inside TABLE_ACCOUNTS
      */
-    Account[] getAllAccounts() {
+    Account[] getAllAccountsOld() {
 
         Account[] accounts;
         String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_ACCOUNTS;
@@ -663,7 +684,6 @@ class ExpensesDataSource {
         values.put("f_booking_id", parentId);
 
         //TODO if Category does not exist already create it
-        //TODO sicherstelen, dass das datumsformat immer gleich ist (yyyy-mm-dd)
         values.put("f_category_id", childExpense.getCategory().getIndex());
         values.put("expenditure", childExpense.getExpenditure());
         values.put("title", childExpense.getTitle());

@@ -62,7 +62,7 @@
         android:layout_marginEnd="@dimen/fab_margin"
         android:layout_marginRight="@dimen/fab_margin"
         android:visibility="invisible"
-        app:srcCompat="@android:drawable/ic_input_add"/>
+        app:srcCompat="@android:drawable/ic_menu_delete"/>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_combine"
@@ -73,6 +73,6 @@
         android:layout_marginEnd="@dimen/fab_margin"
         android:layout_marginRight="@dimen/fab_margin"
         android:visibility="invisible"
-        app:srcCompat="@android:drawable/ic_input_add"/>
+        app:srcCompat="?android:attr/actionModeCopyDrawable"/>
 
 </android.support.design.widget.CoordinatorLayout>

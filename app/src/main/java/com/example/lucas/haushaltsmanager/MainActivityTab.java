@@ -2,25 +2,27 @@ package com.example.lucas.haushaltsmanager;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
-import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
+import android.widget.Toast;
 
 public class MainActivityTab extends AppCompatActivity {
 
@@ -51,6 +53,7 @@ public class MainActivityTab extends AppCompatActivity {
         SharedPreferences.Editor editor = settings.edit();
         editor.putLong("activeAccount", 1);
         editor.putString("mainCurrency", "€");
+
         editor.commit();
 
 
@@ -70,7 +73,6 @@ public class MainActivityTab extends AppCompatActivity {
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
-
 
 
         // FloatingActionButtons
@@ -108,9 +110,6 @@ public class MainActivityTab extends AppCompatActivity {
 
         rotateForward = AnimationUtils.loadAnimation(this, R.anim.rotate_forward);
         rotateBackward = AnimationUtils.loadAnimation(this, R.anim.rotate_backward);
-
-
-
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_2);
@@ -192,7 +191,7 @@ public class MainActivityTab extends AppCompatActivity {
 
         if (isOpen) {
 
-            fab.startAnimation(rotateBackward);
+            fab.startAnimation(rotateForward);
 
             fabDelete.startAnimation(fabClose);
             fabDelete.setClickable(false);
@@ -203,7 +202,7 @@ public class MainActivityTab extends AppCompatActivity {
             isOpen = false;
         } else {
 
-            fab.startAnimation(rotateForward);
+            fab.startAnimation(rotateBackward);
 
             fabDelete.startAnimation(fabOpen);
             fabDelete.setClickable(true);
@@ -234,14 +233,24 @@ public class MainActivityTab extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (item.getItemId()) {
+
+            case R.id.action_settings:
+
+                Toast.makeText(this, "replace", Toast.LENGTH_SHORT).show();
+                break;
+
+            case R.id.choose_account:
+
+                ChooseAccountsDialogFragment test = new ChooseAccountsDialogFragment();
+                test.show(getFragmentManager(), "test");
+                break;
+
+            default:
+
+                Toast.makeText(this, "This should never happen!", Toast.LENGTH_SHORT).show();
+                break;
         }
 
         return super.onOptionsItemSelected(item);

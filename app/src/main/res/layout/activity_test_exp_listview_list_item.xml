@@ -10,9 +10,9 @@
         android:orientation="horizontal"
         android:paddingLeft="?android:attr/expandableListPreferredChildPaddingLeft"
         android:paddingStart="?android:attr/expandableListPreferredChildPaddingLeft">
-<!--
-        android:background="@drawable/row_highlighter"
--->
+        <!--
+                android:background="@drawable/row_highlighter"
+        -->
         <TextView
             android:id="@+id/exp_listview_item_circle"
             android:layout_width="wrap_content"

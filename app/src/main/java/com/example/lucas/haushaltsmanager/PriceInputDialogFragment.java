@@ -3,12 +3,14 @@ package com.example.lucas.haushaltsmanager;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.util.Log;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -22,6 +24,7 @@ public class PriceInputDialogFragment extends DialogFragment {
         final Activity activity = getActivity();
         final ExpenseScreen expenseScreen = (ExpenseScreen) getActivity();
         final EditText input = new EditText(getContext());
+        input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 

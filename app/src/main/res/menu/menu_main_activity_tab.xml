@@ -7,4 +7,9 @@
         android:orderInCategory="100"
         android:title="@string/action_settings"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/choose_account"
+        android:icon="@android:drawable/ic_menu_add"
+        android:title="@string/choose_account"
+        app:showAsAction="ifRoom"/>
 </menu>
