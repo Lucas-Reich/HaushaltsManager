@@ -1,12 +1,17 @@
 package com.example.lucas.haushaltsmanager;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.CheckBox;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -16,12 +21,15 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     private Context mContext;
     private List<ExpenseObject> listDataHeader;
     private HashMap<ExpenseObject, List<ExpenseObject>> listDataChild;
+    private String TAG = "ExpandableListAdapter";
+    private ArrayList<Long> selectedGroups;
 
     public ExpandableListAdapter(Context context, List<ExpenseObject> listDataHeader, HashMap<ExpenseObject, List<ExpenseObject>> listChildData) {
 
         this.mContext = context;
         this.listDataHeader = listDataHeader;
         this.listDataChild = listChildData;
+        this.selectedGroups = new ArrayList<>();
     }
 
     @Override
@@ -111,6 +119,12 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             TextView txtBaseCurrency = (TextView) convertView.findViewById(R.id.booking_item_currency_base);
 
 
+            if (selectedGroups.contains(getGroupId(groupPosition))) {
+
+                convertView.setBackgroundColor(Color.GREEN);
+            }
+
+
             String category = header.getCategory().getCategoryName();
             circleLetter.setText(category.substring(0, 1).toUpperCase());
             txtTitle.setText(header.getTitle());
@@ -178,5 +192,49 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     public boolean isChildSelectable(int groupPosition, int childPosition) {
 
         return true;
+    }
+
+
+    public boolean setGroupSelected(Long groupId) {
+
+        return this.selectedGroups.add(groupId);
+    }
+
+    public boolean isSelected(Long groupId) {
+
+        return this.selectedGroups.contains(groupId);
+    }
+
+    public boolean removeGroup(Long groupId) {
+
+        return this.selectedGroups.remove(groupId);
+    }
+
+    public boolean deselectAll() {
+
+        this.selectedGroups.clear();
+        return true;
+    }
+
+    public ArrayList<Long> getSelectedGroupIds() {
+
+        return this.selectedGroups;
+    }
+
+    public int getSelectedCount() {
+
+        return this.selectedGroups.size();
+    }
+
+    public ArrayList<ExpenseObject> getSelectedGroupData() {
+
+        ArrayList<ExpenseObject> groupData = new ArrayList<>();
+
+        for (long groupId : this.selectedGroups) {
+
+            groupData.add(listDataHeader.get((int) groupId));
+        }
+
+        return groupData;
     }
 }

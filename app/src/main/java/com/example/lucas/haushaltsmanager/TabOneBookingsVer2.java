@@ -1,5 +1,7 @@
 package com.example.lucas.haushaltsmanager;
 
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -48,37 +50,36 @@ public class TabOneBookingsVer2 extends Fragment {
             @Override
             public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
 
-                // Toast.makeText(getApplicationContext(),
-                // "Group Clicked " + listDataHeader.get(groupPosition),
-                // Toast.LENGTH_SHORT).show();
+                //get expense
+                Object o = listView.getItemAtPosition(groupPosition);
+                ExpenseObject expense = (ExpenseObject) o;
+
+                //start ExpenseScreen with selected Expense only when the expense has no children
+                if (!expense.hasChildren()) {
+
+                    Intent openExpense = new Intent(getContext(), ExpenseScreen.class);
+                    openExpense.putExtra("parentExpense", expense.getIndex());
+                    startActivity(openExpense);
+                }
                 return false;
             }
         });
 
-        //ListView Group expanded listener
-        listView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
-            @Override
-            public void onGroupExpand(int groupPosition) {
-
-                Toast.makeText(getContext(), listDataHeader.get(groupPosition) + " Expanded", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        //ListView Group collapsed listener
-        listView.setOnGroupCollapseListener(new ExpandableListView.OnGroupCollapseListener() {
-            @Override
-            public void onGroupCollapse(int groupPosition) {
-
-                Toast.makeText(getContext(), listDataHeader.get(groupPosition) + " Collapsed", Toast.LENGTH_SHORT).show();
-            }
-        });
 
         //ListView Child click listener
         listView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
 
+                //get expense
+                Object o = listView.getItemAtPosition(groupPosition);
+                ExpenseObject expense = (ExpenseObject) o;
 
+                //start expenseScreen with selected expense
+                Intent openExpense = new Intent(getContext(), ExpenseScreen.class);
+                openExpense.putExtra("childExpense", expense.getIndex());
+                startActivity(openExpense);
                 return false;
             }
         });
@@ -88,20 +89,38 @@ public class TabOneBookingsVer2 extends Fragment {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
-                if (ExpandableListView.getPackedPositionType(id) == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
+                MainActivityTab test = (MainActivityTab) getActivity();
 
-                    int groupPosition = ExpandableListView.getPackedPositionGroup(id);
-                    int childPosition = ExpandableListView.getPackedPositionChild(id);
 
-                    Toast.makeText(getContext(), "TEEEEEEST", Toast.LENGTH_SHORT).show();
+                int groupPosition = ExpandableListView.getPackedPositionGroup(id);
+                int childPosition = ExpandableListView.getPackedPositionChild(id);
+
+                if (ExpandableListView.getPackedPositionType(id) == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
+
+                    if (listAdapter.isSelected(listAdapter.getGroupId(groupPosition))) {
+
+                        listAdapter.removeGroup(listAdapter.getGroupId(groupPosition));
+                        view.setBackgroundColor(Color.WHITE);
+                    } else {
+
+                        listAdapter.setGroupSelected(listAdapter.getGroupId(groupPosition));
+                        view.setBackgroundColor(Color.GREEN);
+                    }
+
+                    Toast.makeText(test, "" + listAdapter.getSelectedCount(), Toast.LENGTH_SHORT).show();
+
+                    animateFabs(test, listAdapter.getSelectedCount());
+                    return true;
+                } else if (ExpandableListView.getPackedPositionType(id) == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
+
+
+                    Toast.makeText(getContext(), "CHILD", Toast.LENGTH_SHORT).show();
                     return true;
                 }
 
                 return false;
             }
         });
-
-
 
         return rootView;
     }
@@ -118,15 +137,43 @@ public class TabOneBookingsVer2 extends Fragment {
 
         expensesDataSource.open();
         Calendar cal = Calendar.getInstance();
-        expenses = expensesDataSource.getAllBookings(cal.get(Calendar.YEAR) + "-01-01 00:00:00", new SimpleDateFormat("yyyy-MM-dd 23:59:59", Locale.US).format(cal.getTime()));
+        expenses = expensesDataSource.getAllBookings(cal.get(Calendar.YEAR) + "-01-01 00:00:00", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(cal.getTime()));
 
         //assigning child/s to expenses
         for (ExpenseObject expense : expenses) {
 
             listDataHeader.add(expense);
-            listDataChild.put(expense, expensesDataSource.getChildsToParent(expense.getIndex()));
+            listDataChild.put(expense, expense.getChildren());
+            //listDataChild.put(expense, expensesDataSource.getChildsToParent(expense.getIndex()));
         }
 
         expensesDataSource.close();
+    }
+
+    /**
+     * animating the FloatingActionButtons
+     *
+     * @param activity parent activity
+     */
+    private void animateFabs(MainActivityTab activity, int selectedCount) {
+
+        switch (selectedCount) {
+
+            case 0:
+                activity.closeCombine();
+                activity.closeDelete();
+                activity.closeFab();
+                break;
+            case 1:
+                activity.openDelete();
+                activity.closeCombine();
+                activity.openFab();
+                break;
+            default:
+                activity.openCombine();
+                activity.openDelete();
+                activity.openFab();
+                break;
+        }
     }
 }

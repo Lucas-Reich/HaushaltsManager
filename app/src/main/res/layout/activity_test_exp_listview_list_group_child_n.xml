@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:descendantFocusability="blocksDescendants">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -26,6 +27,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginEnd="12dp"
+            android:layout_marginRight="12dp"
             android:layout_weight="1"
             android:orientation="horizontal">
 
@@ -46,6 +48,7 @@
                         android:layout_weight="1"
                         android:text="Kategorie"
                         android:textAlignment="viewStart"
+                        android:layout_gravity="start"
                         android:textColor="@android:color/black"
                         android:textSize="21sp" />
 
@@ -55,6 +58,7 @@
                         android:layout_height="wrap_content"
                         android:text="17"
                         android:textAlignment="textEnd"
+                        android:layout_gravity="end"
                         android:textSize="16sp" />
 
                     <TextView
@@ -63,6 +67,7 @@
                         android:layout_height="wrap_content"
                         android:text="$"
                         android:textAlignment="viewStart"
+                        android:layout_gravity="start"
                         android:textSize="16sp" />
                 </TableRow>
 
@@ -77,6 +82,7 @@
                         android:layout_weight="1"
                         android:text="Lucas"
                         android:textAlignment="viewStart"
+                        android:layout_gravity="start"
                         android:textColor="@android:color/black"
                         android:textSize="12sp" />
 
@@ -86,6 +92,7 @@
                         android:layout_height="wrap_content"
                         android:text="15"
                         android:textAlignment="textEnd"
+                        android:layout_gravity="end"
                         android:textSize="10sp" />
 
                     <TextView
@@ -94,6 +101,7 @@
                         android:layout_height="wrap_content"
                         android:text="€"
                         android:textAlignment="viewStart"
+                        android:layout_gravity="start"
                         android:textSize="10sp" />
                 </TableRow>
 

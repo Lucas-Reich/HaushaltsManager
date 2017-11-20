@@ -41,34 +41,13 @@ public class ExpandableListViewTest extends Activity {
         //setting list adapter
         listView.setAdapter(listAdapter);
 
-
-        //OnClickMethods
-
         //ListView Group click listener
         listView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
             @Override
             public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
 
-                //TODO create onClickListener functionality
+                //TODO check if group has children.. if not open the ExpenseScreen with this expense else do nothing
                 return false;
-            }
-        });
-
-        //ListView Group expanded listener
-        listView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
-            @Override
-            public void onGroupExpand(int groupPosition) {
-
-                //TODO create onClickListener functionality
-            }
-        });
-
-        //ListView Group collapsed listener
-        listView.setOnGroupCollapseListener(new ExpandableListView.OnGroupCollapseListener() {
-            @Override
-            public void onGroupCollapse(int groupPosition) {
-
-                //TODO create onClickListener functionality
             }
         });
 
@@ -89,7 +68,6 @@ gesehen: http://vardhan-justlikethat.blogspot.de/2013/10/android-highlighting-se
                     parent.setItemChecked(index, true);
                 }
 */
-                //TODO create onClickListener functionality
                 return false;
             }
         });
@@ -104,6 +82,16 @@ gesehen: http://vardhan-justlikethat.blogspot.de/2013/10/android-highlighting-se
                     int groupPosition = ExpandableListView.getPackedPositionGroup(id);
                     int childPosition = ExpandableListView.getPackedPositionChild(id);
 
+                    Toast.makeText(ExpandableListViewTest.this, "isActivated: " + view.isActivated(), Toast.LENGTH_SHORT).show();
+
+                    if(view.isActivated()) {
+
+                        view.setActivated(false);
+                    } else {
+
+                        view.setActivated(true);
+                    }
+
                     view.setBackgroundColor(Color.GREEN);
 
                     Toast.makeText(ExpandableListViewTest.this, "PARENT", Toast.LENGTH_SHORT).show();
@@ -114,6 +102,7 @@ gesehen: http://vardhan-justlikethat.blogspot.de/2013/10/android-highlighting-se
                     int childPosition = ExpandableListView.getPackedPositionChild(id);
 
                     view.setBackgroundColor(Color.BLACK);
+                    view.setSelected(true);
 
                     Toast.makeText(ExpandableListViewTest.this, "CHILD", Toast.LENGTH_SHORT).show();
                     return true;

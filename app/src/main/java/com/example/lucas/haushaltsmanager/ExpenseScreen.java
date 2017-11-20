@@ -44,9 +44,12 @@ public class ExpenseScreen extends AppCompatActivity {
 
         final Bundle bundle = getIntent().getExtras();
 
-        if (bundle.get("index") != null) {
+        if (bundle != null && bundle.get("parentExpense") != null) {
 
-            EXPENSE = expensesDataSource.getBookingById(bundle.getLong("index"));
+            EXPENSE = expensesDataSource.getBookingById(bundle.getLong("parentExpense"));
+        } else if (bundle != null && bundle.get("childExpense") != null) {
+
+            EXPENSE = expensesDataSource.getChildBookingById(bundle.getLong("childExpense"));
         } else {
 
             // dummy expense befülllen

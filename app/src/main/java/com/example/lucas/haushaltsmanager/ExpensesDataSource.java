@@ -568,6 +568,14 @@ class ExpensesDataSource {
         return database.insert(ExpensesDbHelper.TABLE_BOOKINGS, null, values);
     }
 
+    void createBookings(List<ExpenseObject> bookings) {
+
+        for (ExpenseObject booking : bookings) {
+
+            createBooking(booking);
+        }
+    }
+
     /**
      * Convenience Method for getting a Booking
      *
@@ -676,6 +684,19 @@ class ExpensesDataSource {
         return database.delete(ExpensesDbHelper.TABLE_BOOKINGS, ExpensesDbHelper.BOOKINGS_COL_BOOKING_ID + " = ?", new String[]{"" + bookingId});
     }
 
+    int deleteBookings(long bookingIds[]) {
+
+        int affectedRows = 0;
+
+        for (long bookingId : bookingIds) {
+
+            deleteBooking(bookingId);
+            affectedRows++;
+        }
+
+        return affectedRows;
+    }
+
 
     long createChildBooking(ExpenseObject childExpense, long parentId) {
 
@@ -709,6 +730,33 @@ class ExpensesDataSource {
         return database.insert(ExpensesDbHelper.TABLE_CHILD_BOOKINGS, null, values);
     }
 
+    long createChildBooking(List<ExpenseObject> childs, long parentId) {
+
+        for(ExpenseObject child : childs) {
+
+            createChildBooking(child, parentId);
+        }
+
+        return parentId;
+    }
+
+    long cerateChildBooking(List<ExpenseObject> childs) {
+
+        ExpenseObject dummyParent = new ExpenseObject();
+        dummyParent.setTitle("DummyParent");
+        dummyParent.setPrice(0);
+        dummyParent.setAccount(new Account(9999, "", 0));
+
+        long parentId = createBooking(dummyParent);
+
+        for (ExpenseObject child : childs) {
+
+            createChildBooking(child, parentId);
+        }
+
+        return parentId;
+    }
+
     ArrayList<ExpenseObject> getChildsToParent(long parentId) {
 
         ArrayList<ExpenseObject> childBookings = new ArrayList<>();
@@ -735,6 +783,29 @@ class ExpensesDataSource {
         }
 
         return childBookings;
+    }
+
+    ExpenseObject getChildBookingById(long index) {
+
+        ExpenseObject child = new ExpenseObject();
+
+        String selectQuery;
+
+        selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS;
+        selectQuery += " WHERE " + ExpensesDbHelper.CHILD_BOOKINGS_COL_F_PARENT_BOOKING_ID + " = " + index + ";";
+
+        Log.d(TAG, "getChildBookingById: " + selectQuery);
+
+        Cursor c = database.rawQuery(selectQuery, null);
+        Log.d(TAG, DatabaseUtils.dumpCursorToString(c));
+        c.moveToFirst();
+
+        if (!c.isAfterLast()) {
+
+            child = cursorToExpense(c);
+        }
+
+        return child;
     }
 
     int updateChildBooking(long childId, ExpenseObject updatedChild) {
@@ -765,11 +836,6 @@ class ExpensesDataSource {
     }
 
 
-    /**
-     * @param categoryName
-     * @param color
-     * @return
-     */
     long createCategory(String categoryName, int color) {
 
         ContentValues values = new ContentValues();
@@ -780,9 +846,6 @@ class ExpensesDataSource {
         return database.insert(ExpensesDbHelper.TABLE_CATEGORIES, null, values);
     }
 
-    /**
-     * @return
-     */
     ArrayList<Category> getAllCategories() {
 
         ArrayList<Category> allCategories = new ArrayList<>();

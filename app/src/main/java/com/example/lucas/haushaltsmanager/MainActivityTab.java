@@ -21,7 +21,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.Toast;
 
 public class MainActivityTab extends AppCompatActivity {
@@ -42,8 +41,8 @@ public class MainActivityTab extends AppCompatActivity {
     ViewPager mViewPager;
 
     FloatingActionButton fab, fabDelete, fabCombine;
-    Animation fabOpen, fabClose, rotateForward, rotateBackward;
-    boolean isOpen = false;
+    Animation test, fabClose, rotateForward, rotateBackward;
+    boolean isOpen = false, combOpen = false, delOpen = false, fabOpen = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +80,18 @@ public class MainActivityTab extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                animateFab();
+                if (delOpen || combOpen) {
+
+                    /* until OnClickListener is moved to TabOneBookingsVer2 20.11.17
+                    listAdapter.deselectAll();
+                    */
+                    closeFab();
+                    //TODO refresh expandableListView
+                } else {
+
+                    Intent intent = new Intent(MainActivityTab.this, ExpenseScreen.class);
+                    MainActivityTab.this.startActivity(intent);
+                }
             }
         });
 
@@ -90,7 +100,13 @@ public class MainActivityTab extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                animateFab();
+                /* until OnClickListener is moved to TabOneBookingsVer2 20.11.17
+                database.createChildBooking(listAdapter.getSelectedGroupData());
+                listAdapter.deselectAll();
+                Toast.makeText(MainActivityTab.this, "Done!", Toast.LENGTH_SHORT).show();
+                */
+                closeCombine();
+                //TODO refresh expandableListView Data
             }
         });
 
@@ -99,13 +115,17 @@ public class MainActivityTab extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                Intent intent = new Intent(MainActivityTab.this, ExpenseScreen.class);
-                intent.putExtra("key", 10); //Optional parameters
-                MainActivityTab.this.startActivity(intent);
+                /* until OnClickListener is moved to TabOneBookingsVer2 20.11.17
+                database.deleteBookings(listAdapter.getSelectedGroupData());
+                listAdapter.deselectAll();
+                Toast.makeText(MainActivityTab.this, "Deleted all Bookings", Toast.LENGTH_SHORT).show();
+                */
+                closeDelete();
+                //TODO refresg expandableListView Data
             }
         });
 
-        fabOpen = AnimationUtils.loadAnimation(this, R.anim.fab_open);
+        test = AnimationUtils.loadAnimation(this, R.anim.fab_open);
         fabClose = AnimationUtils.loadAnimation(this, R.anim.fab_close);
 
         rotateForward = AnimationUtils.loadAnimation(this, R.anim.rotate_forward);
@@ -187,11 +207,11 @@ public class MainActivityTab extends AppCompatActivity {
         });
     }
 
-    private void animateFab() {
+    public void animateFab() {
 
         if (isOpen) {
 
-            fab.startAnimation(rotateForward);
+            fab.startAnimation(rotateBackward);
 
             fabDelete.startAnimation(fabClose);
             fabDelete.setClickable(false);
@@ -202,15 +222,77 @@ public class MainActivityTab extends AppCompatActivity {
             isOpen = false;
         } else {
 
-            fab.startAnimation(rotateBackward);
+            fab.startAnimation(rotateForward);
 
-            fabDelete.startAnimation(fabOpen);
+            fabDelete.startAnimation(test);
             fabDelete.setClickable(true);
 
-            fabCombine.startAnimation(fabOpen);
+            fabCombine.startAnimation(test);
             fabCombine.setClickable(true);
 
             isOpen = true;
+        }
+    }
+
+    public void openFab() {
+
+        if (!fabOpen) {
+
+            fab.startAnimation(rotateForward);
+            fabOpen = true;
+        }
+    }
+
+    public void closeFab() {
+
+        if (fabOpen) {
+
+            fab.startAnimation(rotateBackward);
+            fabOpen = false;
+        }
+    }
+
+    public void openDelete() {
+
+        if (!delOpen) {
+
+            fabDelete.startAnimation(test);
+            fabDelete.setClickable(true);
+
+            delOpen = true;
+        }
+    }
+
+    public void closeDelete() {
+
+        if (delOpen) {
+
+            fabDelete.startAnimation(fabClose);
+            fabDelete.setClickable(false);
+
+            delOpen = false;
+        }
+    }
+
+    public void openCombine() {
+
+        if (!combOpen) {
+
+            fabCombine.startAnimation(test);
+            fabCombine.setClickable(true);
+
+            combOpen = true;
+        }
+    }
+
+    public void closeCombine() {
+
+        if (combOpen) {
+
+            fabCombine.startAnimation(fabClose);
+            fabCombine.setClickable(false);
+
+            combOpen = false;
         }
     }
 
@@ -273,7 +355,7 @@ public class MainActivityTab extends AppCompatActivity {
             switch (position) {
 
                 case 0:
-                    return new TabOneBookings();
+                    return new TabOneBookingsVer2();
                 case 1:
                     return new TabTwoMonthlyReports();
                 case 2:
@@ -285,6 +367,7 @@ public class MainActivityTab extends AppCompatActivity {
 
         @Override
         public int getCount() {
+
             // Show 3 total pages.
             return 3;
         }

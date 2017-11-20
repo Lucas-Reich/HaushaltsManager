@@ -1,5 +1,7 @@
 package com.example.lucas.haushaltsmanager;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -7,7 +9,7 @@ import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 
-class ExpenseObject {
+class ExpenseObject implements Parcelable {
 
     private Calendar date;
     private String title = "";
@@ -19,6 +21,8 @@ class ExpenseObject {
     private String notice = "";
     private Account account;
     private List<ExpenseObject> children = new ArrayList<>();
+
+    private String TAG = "ExpenseObject: ";
 
 
     public ExpenseObject(String title, double price, boolean expenditure, Category category, String tag) {
@@ -225,4 +229,85 @@ class ExpenseObject {
         Log.d("ExpenseObject account: ", "" + account.getAccountName());
 
     }
+
+
+    //make class Parcelable
+
+    /**
+     * This will be only used by ParcelableCategories
+     * see: http://prasanta-paul.blogspot.de/2010/06/android-parcelable-example.html (Parcelable ArrayList)
+     * and: https://stackoverflow.com/questions/2139134/how-to-send-an-object-from-one-android-activity-to-another-using-intents for further explanations (Parcelable Object)
+     * <p>
+     * this constructor converts our parcelable object back into an Category object
+     *
+     * @param source .
+     */
+    public ExpenseObject(Parcel source) {
+
+        Calendar cal = Calendar.getInstance();
+
+        Log.v(TAG, "ParcelData (Parcel source): time to put back parcel data");
+        cal.setTimeInMillis(source.readLong());
+        date = cal;
+        title = source.readString();
+        price = source.readDouble();
+        index = source.readLong();
+        expenditure = source.readByte() != 0;
+        category = source.readParcelable(Category.class.getClassLoader());
+        tag = source.createStringArrayList();
+        notice = source.readString();
+        account = source.readParcelable(Account.class.getClassLoader());
+        children = source.createTypedArrayList(ExpenseObject.CREATOR);
+    }
+
+    /**
+     * can be ignored mostly
+     *
+     * @return int
+     */
+    @Override
+    public int describeContents() {
+
+        return 0;
+    }
+
+    /**
+     * converting the custom object into an parcelable object
+     *
+     * @param dest  destination Parcel
+     * @param flags flags
+     */
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+
+        Log.v(TAG, "write to parcel..." + flags);
+        dest.writeLong(date.getTimeInMillis());
+        dest.writeString(title);
+        dest.writeDouble(price);
+        dest.writeLong(index);
+        dest.writeByte((byte) (expenditure ? 1 : 0));
+        dest.writeParcelable(category, flags);
+        dest.writeList(tag);
+        dest.writeString(notice);
+        dest.writeParcelable(account, flags);
+        dest.writeList(children);
+    }
+
+    /**
+     * regenerating the parcelable object back into our Category object
+     */
+    public static final Parcelable.Creator<ExpenseObject> CREATOR = new Parcelable.Creator<ExpenseObject>() {
+
+        @Override
+        public ExpenseObject createFromParcel(Parcel in) {
+
+            return new ExpenseObject(in);
+        }
+
+        @Override
+        public ExpenseObject[] newArray(int size) {
+
+            return new ExpenseObject[size];
+        }
+    };
 }
