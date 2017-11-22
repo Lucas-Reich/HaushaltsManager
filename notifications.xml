@@ -1,5 +1,6 @@
 <application>
   <component name="NotificationConfiguration">
+    <notification groupId="Device File Explorer" shouldLog="false" />
     <notification groupId="Localization and Internationalization" displayType="NONE" shouldLog="false" />
   </component>
 </application>
