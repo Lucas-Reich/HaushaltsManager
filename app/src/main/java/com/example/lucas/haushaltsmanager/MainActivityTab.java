@@ -18,9 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 
 public class MainActivityTab extends AppCompatActivity {
@@ -72,64 +70,6 @@ public class MainActivityTab extends AppCompatActivity {
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
-
-
-        // FloatingActionButtons
-        fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                if (delOpen || combOpen) {
-
-                    /* until OnClickListener is moved to TabOneBookingsVer2 20.11.17
-                    listAdapter.deselectAll();
-                    */
-                    closeFab();
-                    //TODO refresh expandableListView
-                } else {
-
-                    Intent intent = new Intent(MainActivityTab.this, ExpenseScreen.class);
-                    MainActivityTab.this.startActivity(intent);
-                }
-            }
-        });
-
-        fabCombine = (FloatingActionButton) findViewById(R.id.fab_combine);
-        fabCombine.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                /* until OnClickListener is moved to TabOneBookingsVer2 20.11.17
-                database.createChildBooking(listAdapter.getSelectedGroupData());
-                listAdapter.deselectAll();
-                Toast.makeText(MainActivityTab.this, "Done!", Toast.LENGTH_SHORT).show();
-                */
-                closeCombine();
-                //TODO refresh expandableListView Data
-            }
-        });
-
-        fabDelete = (FloatingActionButton) findViewById(R.id.fab_delete);
-        fabDelete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                /* until OnClickListener is moved to TabOneBookingsVer2 20.11.17
-                database.deleteBookings(listAdapter.getSelectedGroupData());
-                listAdapter.deselectAll();
-                Toast.makeText(MainActivityTab.this, "Deleted all Bookings", Toast.LENGTH_SHORT).show();
-                */
-                closeDelete();
-                //TODO refresg expandableListView Data
-            }
-        });
-
-        test = AnimationUtils.loadAnimation(this, R.anim.fab_open);
-        fabClose = AnimationUtils.loadAnimation(this, R.anim.fab_close);
-
-        rotateForward = AnimationUtils.loadAnimation(this, R.anim.rotate_forward);
-        rotateBackward = AnimationUtils.loadAnimation(this, R.anim.rotate_backward);
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_2);
@@ -207,107 +147,22 @@ public class MainActivityTab extends AppCompatActivity {
         });
     }
 
-    public void animateFab() {
-
-        if (isOpen) {
-
-            fab.startAnimation(rotateBackward);
-
-            fabDelete.startAnimation(fabClose);
-            fabDelete.setClickable(false);
-
-            fabCombine.startAnimation(fabClose);
-            fabCombine.setClickable(false);
-
-            isOpen = false;
-        } else {
-
-            fab.startAnimation(rotateForward);
-
-            fabDelete.startAnimation(test);
-            fabDelete.setClickable(true);
-
-            fabCombine.startAnimation(test);
-            fabCombine.setClickable(true);
-
-            isOpen = true;
-        }
-    }
-
-    public void openFab() {
-
-        if (!fabOpen) {
-
-            fab.startAnimation(rotateForward);
-            fabOpen = true;
-        }
-    }
-
-    public void closeFab() {
-
-        if (fabOpen) {
-
-            fab.startAnimation(rotateBackward);
-            fabOpen = false;
-        }
-    }
-
-    public void openDelete() {
-
-        if (!delOpen) {
-
-            fabDelete.startAnimation(test);
-            fabDelete.setClickable(true);
-
-            delOpen = true;
-        }
-    }
-
-    public void closeDelete() {
-
-        if (delOpen) {
-
-            fabDelete.startAnimation(fabClose);
-            fabDelete.setClickable(false);
-
-            delOpen = false;
-        }
-    }
-
-    public void openCombine() {
-
-        if (!combOpen) {
-
-            fabCombine.startAnimation(test);
-            fabCombine.setClickable(true);
-
-            combOpen = true;
-        }
-    }
-
-    public void closeCombine() {
-
-        if (combOpen) {
-
-            fabCombine.startAnimation(fabClose);
-            fabCombine.setClickable(false);
-
-            combOpen = false;
-        }
-    }
-
     @Override
     public void onBackPressed() {
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_2);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
+
             drawer.closeDrawer(GravityCompat.START);
         } else {
+
             super.onBackPressed();
         }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main_activity_tab, menu);
         return true;
@@ -355,12 +210,16 @@ public class MainActivityTab extends AppCompatActivity {
             switch (position) {
 
                 case 0:
+
                     return new TabOneBookingsVer2();
                 case 1:
+
                     return new TabTwoMonthlyReports();
                 case 2:
+
                     return new TabThree();
                 default:
+
                     return null;
             }
         }
@@ -378,10 +237,13 @@ public class MainActivityTab extends AppCompatActivity {
             switch (position) {
 
                 case 0:
+
                     return getString(R.string.tab_one_title);
                 case 1:
+
                     return getString(R.string.tab_two_title);
                 case 2:
+
                     return getString(R.string.tab_three_title);
             }
             return null;

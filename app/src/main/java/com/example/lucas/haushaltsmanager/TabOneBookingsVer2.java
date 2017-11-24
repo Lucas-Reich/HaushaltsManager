@@ -1,12 +1,16 @@
 package com.example.lucas.haushaltsmanager;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
@@ -21,37 +25,108 @@ import java.util.Locale;
 public class TabOneBookingsVer2 extends Fragment {
 
     ExpandableListAdapter listAdapter;
-    ExpandableListView listView;
+    ExpandableListView expListView;
     List<ExpenseObject> listDataHeader;
     HashMap<ExpenseObject, List<ExpenseObject>> listDataChild;
 
-    ExpensesDataSource expensesDataSource;
+    ExpensesDataSource database;
+
+    FloatingActionButton fab, fabDelete, fabCombine;
+    Animation test, fabClose, rotateForward, rotateBackward;
+    boolean combOpen = false, delOpen = false, fabOpen = false;
 
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstances) {
 
-        View rootView = inflater.inflate(R.layout.activity_test_exp_listview, container, false);
+        //View rootView = inflater.inflate(R.layout.activity_test_exp_listview, container, false);
+        View rootView = inflater.inflate(R.layout.tab_one_bookings_ver3, container, false);
 
         //get ListView
-        listView = (ExpandableListView) rootView.findViewById(R.id.lvExp);
+        expListView = (ExpandableListView) rootView.findViewById(R.id.lvExp);
 
         prepareListData();
 
         listAdapter = new ExpandableListAdapter(getContext(), listDataHeader, listDataChild);
 
         //setting list adapter
-        listView.setAdapter(listAdapter);
+        expListView.setAdapter(listAdapter);
 
 
-        //OnClickMethods
+        final Activity mainTab = getActivity();
+        database = new ExpensesDataSource(getContext());
 
-        //ListView Group click listener
-        listView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+        // Animated Floating Action Buttons
+        fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                if (delOpen || combOpen) {
+
+                    listAdapter.deselectAll();
+                    closeDelete();
+                    closeCombine();
+                    closeFab();
+
+                    listAdapter.notifyDataSetChanged();
+                } else {
+
+                    Intent intent = new Intent(mainTab, ExpenseScreen.class);
+                    mainTab.startActivity(intent);
+                }
+            }
+        });
+
+        fabCombine = (FloatingActionButton) rootView.findViewById(R.id.fab_combine);
+        fabCombine.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                database.open();
+                database.createChildBooking(listAdapter.getSelectedGroupData());
+                database.close();
+                listAdapter.deselectAll();
+                Toast.makeText(mainTab, "Done!", Toast.LENGTH_SHORT).show();
+                closeCombine();
+                listAdapter.notifyDataSetChanged();
+            }
+        });
+
+        fabDelete = (FloatingActionButton) rootView.findViewById(R.id.fab_delete);
+        fabDelete.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                database.open();
+                database.deleteBookings(listAdapter.getSelectedBookingIds());
+                database.close();
+                listAdapter.deselectAll();
+                Toast.makeText(mainTab, "Deleted all Bookings", Toast.LENGTH_SHORT).show();
+                closeDelete();
+                listAdapter.notifyDataSetChanged();
+            }
+        });
+
+
+        test = AnimationUtils.loadAnimation(mainTab, R.anim.fab_open);
+        fabClose = AnimationUtils.loadAnimation(mainTab, R.anim.fab_close);
+
+        rotateForward = AnimationUtils.loadAnimation(mainTab, R.anim.rotate_forward);
+        rotateBackward = AnimationUtils.loadAnimation(mainTab, R.anim.rotate_backward);
+
+
+        //OnClickMethods for ExpandableListView
+
+        //ExpandableListView Group click listener
+        expListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
             @Override
             public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
 
                 //get expense
-                Object o = listView.getItemAtPosition(groupPosition);
+                Object o = expListView.getItemAtPosition(groupPosition);
                 ExpenseObject expense = (ExpenseObject) o;
 
                 //start ExpenseScreen with selected Expense only when the expense has no children
@@ -66,14 +141,14 @@ public class TabOneBookingsVer2 extends Fragment {
         });
 
 
-        //ListView Child click listener
-        listView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+        //ExpandableListView Child click listener
+        expListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
 
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
 
                 //get expense
-                Object o = listView.getItemAtPosition(groupPosition);
+                Object o = expListView.getItemAtPosition(groupPosition);
                 ExpenseObject expense = (ExpenseObject) o;
 
                 //start expenseScreen with selected expense
@@ -84,13 +159,11 @@ public class TabOneBookingsVer2 extends Fragment {
             }
         });
 
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+        //ExpandableListView Long click listener for selecting multiple groups
+        expListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-
-                MainActivityTab test = (MainActivityTab) getActivity();
-
 
                 int groupPosition = ExpandableListView.getPackedPositionGroup(id);
                 int childPosition = ExpandableListView.getPackedPositionChild(id);
@@ -103,13 +176,11 @@ public class TabOneBookingsVer2 extends Fragment {
                         view.setBackgroundColor(Color.WHITE);
                     } else {
 
-                        listAdapter.setGroupSelected(listAdapter.getGroupId(groupPosition));
+                        listAdapter.selectGroup(listAdapter.getGroupId(groupPosition));
                         view.setBackgroundColor(Color.GREEN);
                     }
 
-                    Toast.makeText(test, "" + listAdapter.getSelectedCount(), Toast.LENGTH_SHORT).show();
-
-                    animateFabs(test, listAdapter.getSelectedCount());
+                    animateFabs(listAdapter.getSelectedCount());
                     return true;
                 } else if (ExpandableListView.getPackedPositionType(id) == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
 
@@ -133,47 +204,111 @@ public class TabOneBookingsVer2 extends Fragment {
         listDataHeader = new ArrayList<>();
         listDataChild = new HashMap<>();
         ArrayList<ExpenseObject> expenses;
-        expensesDataSource = new ExpensesDataSource(getContext());
+        database = new ExpensesDataSource(getContext());
 
-        expensesDataSource.open();
+        //TODO nur die Buchungen für den aktuellen monat aus der datenbank holen
+        database.open();
         Calendar cal = Calendar.getInstance();
-        expenses = expensesDataSource.getAllBookings(cal.get(Calendar.YEAR) + "-01-01 00:00:00", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(cal.getTime()));
+        expenses = database.getAllBookings(cal.get(Calendar.YEAR) + "-01-01 00:00:00", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(cal.getTime()));
 
         //assigning child/s to expenses
         for (ExpenseObject expense : expenses) {
 
             listDataHeader.add(expense);
             listDataChild.put(expense, expense.getChildren());
-            //listDataChild.put(expense, expensesDataSource.getChildsToParent(expense.getIndex()));
         }
 
-        expensesDataSource.close();
+        database.close();
     }
 
     /**
      * animating the FloatingActionButtons
+     * <p>
+     * TODO die ganzen animations methoden noch einmal neu schreiben da ich mit den aktuellen nicht zufrieden bin
      *
-     * @param activity parent activity
+     * @param selectedCount number of selected entries
      */
-    private void animateFabs(MainActivityTab activity, int selectedCount) {
+    private void animateFabs(int selectedCount) {
 
         switch (selectedCount) {
 
             case 0:
-                activity.closeCombine();
-                activity.closeDelete();
-                activity.closeFab();
+                closeCombine();
+                closeDelete();
+                closeFab();
                 break;
             case 1:
-                activity.openDelete();
-                activity.closeCombine();
-                activity.openFab();
+                openDelete();
+                closeCombine();
+                openFab();
                 break;
             default:
-                activity.openCombine();
-                activity.openDelete();
-                activity.openFab();
+                openCombine();
+                openDelete();
+                openFab();
                 break;
+        }
+    }
+
+    public void openFab() {
+
+        if (!fabOpen) {
+
+            fab.startAnimation(rotateForward);
+            fabOpen = true;
+        }
+    }
+
+    public void closeFab() {
+
+        if (fabOpen) {
+
+            fab.startAnimation(rotateBackward);
+            fabOpen = false;
+        }
+    }
+
+    public void openDelete() {
+
+        if (!delOpen) {
+
+            fabDelete.startAnimation(test);
+            fabDelete.setClickable(true);
+
+            delOpen = true;
+        }
+    }
+
+    public void closeDelete() {
+
+        if (delOpen) {
+
+            fabDelete.startAnimation(fabClose);
+            fabDelete.setClickable(false);
+
+            delOpen = false;
+        }
+    }
+
+    public void openCombine() {
+
+        if (!combOpen) {
+
+            fabCombine.startAnimation(test);
+            fabCombine.setClickable(true);
+
+            combOpen = true;
+        }
+    }
+
+    public void closeCombine() {
+
+        if (combOpen) {
+
+            fabCombine.startAnimation(fabClose);
+            fabCombine.setClickable(false);
+
+            combOpen = false;
         }
     }
 }

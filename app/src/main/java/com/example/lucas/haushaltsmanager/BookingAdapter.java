@@ -52,7 +52,7 @@ public class BookingAdapter extends ArrayAdapter<ExpenseObject> implements View.
         }
 
         viewHolder.txtTitle.setText(expenseObject.getTitle());
-        viewHolder.txtPrice.setText(expenseObject.getPrice() + "");
+        viewHolder.txtPrice.setText(expenseObject.getUnsignedPrice() + "");
         viewHolder.txtAccount.setText(expenseObject.getAccount().getAccountName());
 
         return convertView;

@@ -49,14 +49,14 @@ class ExpensesDataSource {
         ExpenseObject expense = new ExpenseObject();
         Calendar cal = Calendar.getInstance();
 
-        int idIndex = cursor.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_BOOKING_ID);
+        int idIndex = cursor.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_ID);
         int idAmount = cursor.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_PRICE);
-        int idCategory = cursor.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_F_CATEGORY_ID);
+        int idCategory = cursor.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID);
         int idExpenditure = cursor.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_EXPENDITURE);
         int idTitle = cursor.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_TITLE);
         int idDate = cursor.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_DATE);
         int idNotice = cursor.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_NOTICE);
-        int idAccount = cursor.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_F_ACCOUNT_ID);
+        int idAccount = cursor.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID);
 
         expense.setIndex(cursor.getLong(idIndex));
 
@@ -101,6 +101,19 @@ class ExpensesDataSource {
         return expense;
     }
 
+    private long createDummyExpense() {
+
+        ExpenseObject dummyExpense = new ExpenseObject();
+        dummyExpense.setTitle("Dummy");
+        dummyExpense.setPrice(0);
+        dummyExpense.setExpenditure(true);
+        dummyExpense.setCategory(new Category());
+        dummyExpense.setAccount(new Account(9999, "", 0));
+        dummyExpense.setDate(Calendar.getInstance());
+
+        return createBooking(dummyExpense);
+    }
+
 
     /**
      * Convenience Method for creating a new Account
@@ -110,8 +123,12 @@ class ExpensesDataSource {
      */
     long createAccount(Account account) {
 
+
+        //TODO erstelle einen Account nur wenn es ihn noch nicht gibt
+        //wenn es ihn gibt frage nach und überschreibe dann
+
         ContentValues values = new ContentValues();
-        values.put(ExpensesDbHelper.ACCOUNTS_COL_ACCOUNT, account.getAccountName());
+        values.put(ExpensesDbHelper.ACCOUNTS_COL_NAME, account.getAccountName());
         values.put(ExpensesDbHelper.ACCOUNTS_COL_BALANCE, account.getBalance());
 
         Log.d(TAG, "created account " + account.getAccountName() + " with a balance of " + account.getBalance());
@@ -137,7 +154,7 @@ class ExpensesDataSource {
         c.moveToFirst();
         if (!c.isAfterLast()) {
 
-            String accountName = c.getString(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_ACCOUNT));
+            String accountName = c.getString(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_NAME));
             int accountBalance = c.getInt(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_BALANCE));
 
             account = new Account(accountId, accountName, accountBalance);
@@ -154,7 +171,7 @@ class ExpensesDataSource {
      */
     Account getAccountByName(String accountName) {
 
-        String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_ACCOUNTS + " WHERE " + ExpensesDbHelper.ACCOUNTS_COL_ACCOUNT + " = \"" + accountName + "\"";
+        String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_ACCOUNTS + " WHERE " + ExpensesDbHelper.ACCOUNTS_COL_NAME + " = \"" + accountName + "\"";
         Log.d(TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
@@ -164,7 +181,7 @@ class ExpensesDataSource {
         if (!c.isAfterLast()) {
 
             long index = c.getLong(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_ID));
-            String name = c.getString(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_ACCOUNT));
+            String name = c.getString(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_NAME));
             int balance = c.getInt(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_BALANCE));
 
             return new Account(index, name, balance);
@@ -185,10 +202,10 @@ class ExpensesDataSource {
         Log.d(TAG, DatabaseUtils.dumpCursorToString(c));
 
         c.moveToFirst();
-        while(!c.isAfterLast()) {
+        while (!c.isAfterLast()) {
 
             long index = c.getLong(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_ID));
-            String accountName = c.getString(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_ACCOUNT));
+            String accountName = c.getString(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_NAME));
             int balance = c.getInt(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_BALANCE));
 
             accounts.add(new Account(index, accountName, balance));
@@ -218,7 +235,7 @@ class ExpensesDataSource {
         for (int i = 0; i < c.getCount(); i++) {
 
             long index = c.getLong(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_ID));
-            String accountName = c.getString(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_ACCOUNT));
+            String accountName = c.getString(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_NAME));
             int balance = c.getInt(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_BALANCE));
 
             accounts[i] = new Account(index, accountName, balance);
@@ -247,7 +264,7 @@ class ExpensesDataSource {
         int counter = 0;
         while (!c.isAfterLast()) {
 
-            accounts[counter] = c.getString(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_ACCOUNT));
+            accounts[counter] = c.getString(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_NAME));
             counter++;
             c.moveToNext();
         }
@@ -264,7 +281,7 @@ class ExpensesDataSource {
     int updateAccount(Account account) {
 
         ContentValues values = new ContentValues();
-        values.put(ExpensesDbHelper.ACCOUNTS_COL_ACCOUNT, account.getAccountName());
+        values.put(ExpensesDbHelper.ACCOUNTS_COL_NAME, account.getAccountName());
 
         String oldAccount = getAccountById(account.getIndex()).getAccountName();
         Log.d(TAG, "updated account " + oldAccount + " to " + account.getAccountName());
@@ -294,8 +311,10 @@ class ExpensesDataSource {
      */
     long createTag(String tagName) {
 
+
+        //TODO create tag wenn es noch nicht existiert
         ContentValues values = new ContentValues();
-        values.put(ExpensesDbHelper.TAGS_COL_TAG_NAME, tagName);
+        values.put(ExpensesDbHelper.TAGS_COL_NAME, tagName);
 
         Log.d(TAG, "created " + tagName + " at Tag table");
         return database.insert(ExpensesDbHelper.TABLE_TAGS, null, values);
@@ -366,7 +385,7 @@ class ExpensesDataSource {
     int updateTag(long tagId, String newTagName) {
 
         ContentValues values = new ContentValues();
-        values.put(ExpensesDbHelper.TAGS_COL_TAG_NAME, newTagName);
+        values.put(ExpensesDbHelper.TAGS_COL_NAME, newTagName);
 
         return database.update(ExpensesDbHelper.TABLE_TAGS, values, ExpensesDbHelper.TAGS_COL_ID + " = ?", new String[]{tagId + ""});
     }
@@ -395,8 +414,8 @@ class ExpensesDataSource {
     private long assignTagToBooking(long bookingId, long tagId) {
 
         ContentValues values = new ContentValues();
-        values.put(ExpensesDbHelper.BOOKINGS_TAGS_COL_F_BOOKING_ID, tagId);
-        values.put(ExpensesDbHelper.BOOKINGS_TAGS_COL_F_BOOKING_ID, bookingId);
+        values.put(ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_ID, tagId);
+        values.put(ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_ID, bookingId);
 
         Log.d(TAG, "assigned tag " + tagId + " to booking " + bookingId);
         return database.insert(ExpensesDbHelper.TABLE_BOOKINGS_TAGS, null, values);
@@ -419,8 +438,8 @@ class ExpensesDataSource {
         }
 
         ContentValues values = new ContentValues();
-        values.put(ExpensesDbHelper.BOOKINGS_TAGS_COL_F_BOOKING_ID, bookingId);
-        values.put(ExpensesDbHelper.BOOKINGS_TAGS_COL_F_TAG_ID, tagId);
+        values.put(ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_ID, bookingId);
+        values.put(ExpensesDbHelper.BOOKINGS_TAGS_COL_TAG_ID, tagId);
         index = database.insert(ExpensesDbHelper.TABLE_BOOKINGS_TAGS, null, values);
 
         Log.d(TAG, "assigned tag with id " + index + " to booking " + bookingId);
@@ -436,7 +455,7 @@ class ExpensesDataSource {
     private String[] getTagsToBookingByBookingId(long bookingId) {
 
         String[] tags;
-        String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_BOOKINGS_TAGS + " WHERE " + ExpensesDbHelper.BOOKINGS_TAGS_COL_F_BOOKING_ID + " = " + bookingId;
+        String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_BOOKINGS_TAGS + " WHERE " + ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_ID + " = " + bookingId;
         Log.d(TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
@@ -451,7 +470,7 @@ class ExpensesDataSource {
 
             while (!c.isAfterLast()) {
 
-                tags[counter] = c.getString(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_TAGS_COL_F_BOOKING_ID));
+                tags[counter] = c.getString(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_ID));
                 counter++;
             }
         } else {
@@ -472,7 +491,7 @@ class ExpensesDataSource {
     private long[] getBookingsToTagByTagId(long tagId) {
 
         long[] bookings;
-        String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_BOOKINGS_TAGS + " WHERE " + ExpensesDbHelper.BOOKINGS_TAGS_COL_F_TAG_ID + " = " + tagId;
+        String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_BOOKINGS_TAGS + " WHERE " + ExpensesDbHelper.BOOKINGS_TAGS_COL_TAG_ID + " = " + tagId;
         Log.d(TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
@@ -486,7 +505,7 @@ class ExpensesDataSource {
 
             while (!c.isAfterLast()) {
 
-                bookings[counter] = c.getLong(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_TAGS_COL_F_TAG_ID));
+                bookings[counter] = c.getLong(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_TAGS_COL_TAG_ID));
                 counter++;
             }
         } else {
@@ -516,7 +535,7 @@ class ExpensesDataSource {
      */
     private long getTagByName(String tagName) {
 
-        String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_TAGS + " WHERE " + ExpensesDbHelper.TAGS_COL_TAG_NAME + " = \"" + tagName + "\"";
+        String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_TAGS + " WHERE " + ExpensesDbHelper.TAGS_COL_NAME + " = \"" + tagName + "\"";
         Log.d(TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
@@ -543,25 +562,19 @@ class ExpensesDataSource {
     long createBooking(ExpenseObject expense) {
 
         ContentValues values = new ContentValues();
-        values.put("price", expense.getPrice());
-
-        //TODO if Category does not exist already create it
-        long categoryId = expense.getCategory().getIndex();
-        values.put("f_category_id", categoryId);
-        values.put("expenditure", expense.getExpenditure());
-        values.put("title", expense.getTitle());
-        //values.put("date", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(expense.getDate().getTime()));
-        values.put("date", expense.getDBDate());
-        values.put("notice", expense.getNotice());
-
-        //TODO if Account does not exist already create it
-        long accountId = expense.getAccount().getIndex();
-        values.put("f_account_id", accountId);
+        values.put(ExpensesDbHelper.BOOKINGS_COL_PRICE, expense.getUnsignedPrice());
+        values.put(ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID, expense.getCategory().getIndex());
+        values.put(ExpensesDbHelper.BOOKINGS_COL_EXPENDITURE, expense.getExpenditure());
+        values.put(ExpensesDbHelper.BOOKINGS_COL_TITLE, expense.getTitle());
+        values.put(ExpensesDbHelper.BOOKINGS_COL_DATE, expense.getDBDate());
+        values.put(ExpensesDbHelper.BOOKINGS_COL_NOTICE, expense.getNotice());
+        values.put(ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID, expense.getAccount().getIndex());
 
         //assign all chosen tags to the booking
         for (String tag : expense.getTags()) {
 
-            assignTagToBooking(expense.getIndex(), tag);
+            //TODO enable tag behaviour
+            //habe es verboten da aus irgendeinem grund zu jeder buchung 2 booking_tags angelegt wurden ohne das die buchung tag hatte
         }
 
         Log.d(TAG, "created expense at Booking table");
@@ -584,22 +597,23 @@ class ExpensesDataSource {
      */
     ExpenseObject getBookingById(long bookingId) {
 
-        ExpenseObject expense;
-        String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_BOOKINGS + " WHERE " + ExpensesDbHelper.BOOKINGS_COL_BOOKING_ID + " = " + bookingId;
+        String selectQuery;
+        selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_BOOKINGS;
+        selectQuery += " WHERE " + ExpensesDbHelper.BOOKINGS_COL_ID;
+        selectQuery += " = " + bookingId + ";";
         Log.d(TAG, selectQuery);
+
         Cursor c = database.rawQuery(selectQuery, null);
         Log.d(TAG, DatabaseUtils.dumpCursorToString(c));
 
         c.moveToFirst();
-
-        Log.d(TAG, DatabaseUtils.dumpCursorToString(c));
-        expense = cursorToExpense(c);
-        c.close();
-        return expense;
+        return cursorToExpense(c);
     }
 
     /**
-     * @return ArrayList<> of all bookings
+     * Get all available bookings
+     *
+     * @return ExpenseObject ArrayList
      */
     ArrayList<ExpenseObject> getAllBookings() {
 
@@ -653,23 +667,20 @@ class ExpensesDataSource {
      */
     int updateBooking(long bookingId, ExpenseObject newExpense) {
 
+        //TODO update funktionen sollten nur noch die geänderten teile einer buchung ändern und nicht gleich die ganze buchung ändern
         ContentValues values = new ContentValues();
-        values.put("price", newExpense.getPrice());
-
-        //TODO if Category does not exist already create it
+        values.put("price", newExpense.getUnsignedPrice());
         long categoryId = newExpense.getCategory().getIndex();
-        values.put("f_category_id", categoryId);
+        values.put("category_id", categoryId);
         values.put("expenditure", newExpense.getExpenditure());
         values.put("title", newExpense.getTitle());
         values.put("date", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(newExpense.getDate().getTime()));
         values.put("notice", newExpense.getNotice());
-
-        //TODO if Account does not exist already create it
         long accountId = newExpense.getAccount().getIndex();
-        values.put("f_account_id", accountId);
+        values.put("account_id", accountId);
 
         Log.d(TAG, "changed booking " + bookingId);
-        return database.update(ExpensesDbHelper.TABLE_BOOKINGS, values, ExpensesDbHelper.BOOKINGS_COL_BOOKING_ID + " = ?", new String[]{"" + bookingId});
+        return database.update(ExpensesDbHelper.TABLE_BOOKINGS, values, ExpensesDbHelper.BOOKINGS_COL_ID + " = ?", new String[]{"" + bookingId});
     }
 
     /**
@@ -680,8 +691,9 @@ class ExpensesDataSource {
      */
     int deleteBooking(long bookingId) {
 
+        //TODO es müssen auch alle verbindungen (tags, kinder) zu der angegebenen Buchung gelöscht werden
         Log.d(TAG, "deleted booking at index " + bookingId);
-        return database.delete(ExpensesDbHelper.TABLE_BOOKINGS, ExpensesDbHelper.BOOKINGS_COL_BOOKING_ID + " = ?", new String[]{"" + bookingId});
+        return database.delete(ExpensesDbHelper.TABLE_BOOKINGS, ExpensesDbHelper.BOOKINGS_COL_ID + " = ?", new String[]{"" + bookingId});
     }
 
     int deleteBookings(long bookingIds[]) {
@@ -698,56 +710,74 @@ class ExpensesDataSource {
     }
 
 
-    long createChildBooking(ExpenseObject childExpense, long parentId) {
+    /**
+     * Function to add child to parentId
+     *
+     * @param child    child to append to parent
+     * @param parentId Id of parent booking
+     * @return index of inserted child
+     */
+    private long addChild(ExpenseObject child, long parentId) {
 
         ContentValues values = new ContentValues();
-        values.put("price", childExpense.getPrice());
-        values.put("f_booking_id", parentId);
+        values.put("price", child.getUnsignedPrice());
+        values.put("booking_id", parentId);
+        values.put("category_id", child.getCategory().getIndex());
+        values.put("expenditure", child.getExpenditure());
+        values.put("title", child.getTitle());
+        values.put("date", child.getDBDate());
+        values.put("notice", child.getNotice());
+        values.put("account_id", child.getAccount().getIndex());
 
-        //TODO if Category does not exist already create it
-        values.put("f_category_id", childExpense.getCategory().getIndex());
-        values.put("expenditure", childExpense.getExpenditure());
-        values.put("title", childExpense.getTitle());
-        values.put("date", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(childExpense.getDate().getTime()));
-        values.put("notice", childExpense.getNotice());
+        for (String tag : child.getTags()) {
 
-        //TODO if Account does not exist already create it
-        values.put("f_account_id", childExpense.getAccount().getIndex());
-
-        //assign all chosen tags to the booking
-        for (String tag : childExpense.getTags()) {
-
-            assignTagToBooking(childExpense.getIndex(), tag);
+            //TODO
+            //assignTagToBooking(expense.getIndex(), tag);
         }
-
-        //TODO dirty hack: wenn ein kind zu einer buchung hinzugefügt wird dann wird irgendwie auchd er monat um eins erhöht und um dem entgegen zu wirken ziehe ich hier immer einen mmonat ab, wenn ein kind hinzugefügt wird
-        ExpenseObject parent = getBookingById(parentId);
-        parent.setAccount(new Account(9999, "", 0));
-        parent.getDate().set(Calendar.MONTH, (parent.getDate().get(Calendar.MONTH) - 1));
-        updateBooking(parentId, parent);
 
         Log.d(TAG, "created expense at Child_Booking table");
         return database.insert(ExpensesDbHelper.TABLE_CHILD_BOOKINGS, null, values);
     }
 
-    long createChildBooking(List<ExpenseObject> childs, long parentId) {
+    /**
+     * Functions ensures that the parent expense is no child itself.
+     * It also checks whether the parent expense has children attached to it or not.
+     * If the parent expense has no children then a dummy expense is created and the parent and the child are attached to it.
+     *
+     * @param childExpense expense to add to the parent
+     * @param parentId     ID of parent expense
+     * @return ID of parent
+     */
+    long createChildBooking(ExpenseObject childExpense, long parentId) {
 
-        for(ExpenseObject child : childs) {
+        if (!isChild(parentId)) {
 
-            createChildBooking(child, parentId);
+            ExpenseObject parent = getBookingById(parentId);
+
+            if (parent.hasChildren()) {
+
+                addChild(childExpense, parentId);
+
+                return parentId;
+            } else {
+
+                parentId = createDummyExpense();
+                addChild(parent, parentId);
+                deleteBooking(parent.getIndex());
+                addChild(childExpense, parentId);
+
+                return parentId;
+            }
+        } else {
+
+            Log.w(TAG, "createChildBooking: Error while adding child to Parent! Parent is Child");
+            return -1;
         }
-
-        return parentId;
     }
 
-    long cerateChildBooking(List<ExpenseObject> childs) {
+    long createChildBooking(List<ExpenseObject> childs) {
 
-        ExpenseObject dummyParent = new ExpenseObject();
-        dummyParent.setTitle("DummyParent");
-        dummyParent.setPrice(0);
-        dummyParent.setAccount(new Account(9999, "", 0));
-
-        long parentId = createBooking(dummyParent);
+        long parentId = createDummyExpense();
 
         for (ExpenseObject child : childs) {
 
@@ -764,7 +794,7 @@ class ExpensesDataSource {
         String selectQuery;
 
         selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS;
-        selectQuery += " WHERE " + ExpensesDbHelper.CHILD_BOOKINGS_COL_F_PARENT_BOOKING_ID + " = '" + parentId;
+        selectQuery += " WHERE " + ExpensesDbHelper.CHILD_BOOKINGS_COL_PARENT_BOOKING_ID + " = '" + parentId;
         selectQuery += "' ORDER BY " + ExpensesDbHelper.BOOKINGS_COL_DATE + " ASC;";
 
         Log.d(TAG, selectQuery);
@@ -787,12 +817,10 @@ class ExpensesDataSource {
 
     ExpenseObject getChildBookingById(long index) {
 
-        ExpenseObject child = new ExpenseObject();
-
         String selectQuery;
 
         selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS;
-        selectQuery += " WHERE " + ExpensesDbHelper.CHILD_BOOKINGS_COL_F_PARENT_BOOKING_ID + " = " + index + ";";
+        selectQuery += " WHERE " + ExpensesDbHelper.CHILD_BOOKINGS_COL_PARENT_BOOKING_ID + " = " + index + ";";
 
         Log.d(TAG, "getChildBookingById: " + selectQuery);
 
@@ -800,46 +828,58 @@ class ExpensesDataSource {
         Log.d(TAG, DatabaseUtils.dumpCursorToString(c));
         c.moveToFirst();
 
-        if (!c.isAfterLast()) {
+        return c.isAfterLast() ? new ExpenseObject() : cursorToExpense(c);
+    }
 
-            child = cursorToExpense(c);
-        }
+    boolean isChild(long expenseId) {
 
-        return child;
+        String selectQuery;
+
+        selectQuery = "SELECT COUNT(1) 'exists' FROM " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS;
+        selectQuery += " WHERE " + ExpensesDbHelper.CHILD_BOOKINGS_COL_ID;
+        selectQuery += " = " + expenseId + ";";
+
+        Log.d(TAG, "isChild: " + selectQuery);
+
+        Cursor c = database.rawQuery(selectQuery, null);
+        c.moveToFirst();
+
+
+        return c.getInt(c.getColumnIndex("exists")) != 0;
     }
 
     int updateChildBooking(long childId, ExpenseObject updatedChild) {
 
         ContentValues values = new ContentValues();
-        values.put("price", updatedChild.getPrice());
+        values.put("price", updatedChild.getUnsignedPrice());
 
         //TODO child booking kann momentan nicht einem neuen parent zugewiesen werden, sondern nur der content der booking geändert werden
 
-        //TODO if Category does not exist already create it
-        values.put("f_category_id", updatedChild.getCategory().getIndex());
+        values.put("category_id", updatedChild.getCategory().getIndex());
         values.put("expenditure", updatedChild.getExpenditure());
         values.put("title", updatedChild.getTitle());
         values.put("date", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(updatedChild.getDate().getTime()));
         values.put("notice", updatedChild.getNotice());
-
-        //TODO if Account does not exist already create it
-        values.put("f_account_id", updatedChild.getAccount().getIndex());
+        values.put("account_id", updatedChild.getAccount().getIndex());
 
         Log.d(TAG, "changed child booking " + childId);
-        return database.update(ExpensesDbHelper.TABLE_CHILD_BOOKINGS, values, ExpensesDbHelper.CHILD_BOOKINGS_COL_BOOKING_ID + " = ?", new String[]{"" + childId});
+        return database.update(ExpensesDbHelper.TABLE_CHILD_BOOKINGS, values, ExpensesDbHelper.CHILD_BOOKINGS_COL_ID + " = ?", new String[]{"" + childId});
     }
 
     int deleteChildBooking(long childId) {
 
+        //TODO wenn das kind das letzte des parents war muss der parent wieder als normale buchung eingefügt werden
         Log.d(TAG, "deleted child booking at index " + childId);
-        return database.delete(ExpensesDbHelper.TABLE_CHILD_BOOKINGS, ExpensesDbHelper.CHILD_BOOKINGS_COL_BOOKING_ID + " = ?", new String[]{"" + childId});
+        return database.delete(ExpensesDbHelper.TABLE_CHILD_BOOKINGS, ExpensesDbHelper.CHILD_BOOKINGS_COL_ID + " = ?", new String[]{"" + childId});
     }
 
 
     long createCategory(String categoryName, int color) {
 
+
+        //TODO erstelle neue Kategorie wenn sie nicht bereits existiert
         ContentValues values = new ContentValues();
-        values.put(ExpensesDbHelper.CATEGORIES_COL_CATEGORY_NAME, categoryName);
+        values.put(ExpensesDbHelper.CATEGORIES_COL_NAME, categoryName);
         values.put(ExpensesDbHelper.CATEGORIES_COL_COLOR, color);
         Log.d(TAG, "created new category " + categoryName);
 
@@ -856,20 +896,31 @@ class ExpensesDataSource {
         Log.d(TAG, DatabaseUtils.dumpCursorToString(c));
 
         c.moveToFirst();
-
+/* überarbeitung 24.11.17
         if (!c.isAfterLast()) {
 
             while (!c.isAfterLast()) {
 
 
                 long index = c.getLong(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_ID));
-                String categoryName = c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_CATEGORY_NAME));
+                String categoryName = c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_NAME));
                 int color = c.getInt(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_COLOR));
 
                 allCategories.add(new Category(index, categoryName, color));
                 c.moveToNext();
             }
         }
+*/
+        while(!c.isAfterLast()) {
+
+            long index = c.getLong(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_ID));
+            String categoryName = c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_NAME));
+            int color = c.getInt(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_COLOR));
+
+            allCategories.add(new Category(index, categoryName, color));
+            c.moveToNext();
+        }
+
 
         return allCategories;
     }
@@ -882,7 +933,7 @@ class ExpensesDataSource {
      */
     Category getCategoryByName(String category) {
 
-        String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_CATEGORIES + " WHERE " + ExpensesDbHelper.CATEGORIES_COL_CATEGORY_NAME + " = \"" + category + "\"";
+        String selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_CATEGORIES + " WHERE " + ExpensesDbHelper.CATEGORIES_COL_NAME + " = \"" + category + "\"";
         Log.d(TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
@@ -893,7 +944,7 @@ class ExpensesDataSource {
         if (!c.isAfterLast()) {
 
             category1.setIndex(c.getLong(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_ID)));
-            category1.setCategoryName(c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_CATEGORY_NAME)));
+            category1.setCategoryName(c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_NAME)));
             category1.setColor(c.getInt(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_COLOR)));
         }
 
@@ -924,7 +975,7 @@ class ExpensesDataSource {
         if (!c.isAfterLast()) {
 
             category.setIndex(c.getLong(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_ID)));
-            category.setCategoryName(c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_CATEGORY_NAME)));
+            category.setCategoryName(c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_NAME)));
             category.setColor(c.getInt(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_COLOR)));
         }
 
@@ -944,7 +995,7 @@ class ExpensesDataSource {
 
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.CATEGORIES_COL_COLOR, color);
-        values.put(ExpensesDbHelper.CATEGORIES_COL_CATEGORY_NAME, getCategoryById(categoryId).getCategoryName());
+        values.put(ExpensesDbHelper.CATEGORIES_COL_NAME, getCategoryById(categoryId).getCategoryName());
 
         Log.d(TAG, "update category " + categoryId);
 
@@ -962,7 +1013,7 @@ class ExpensesDataSource {
 
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.CATEGORIES_COL_COLOR, getCategoryById(categoryId).getColor());
-        values.put(ExpensesDbHelper.CATEGORIES_COL_CATEGORY_NAME, categoryName);
+        values.put(ExpensesDbHelper.CATEGORIES_COL_NAME, categoryName);
 
         Log.d(TAG, "update category " + categoryId);
 
@@ -977,6 +1028,7 @@ class ExpensesDataSource {
      */
     int deleteCategory(long categoryId) {
 
+        //TODO kategorien können nicht gelöscht werden, wenn es noch buchungen gibt, die in dieser Kategorie gemacht wurden
         Log.d(TAG, "delete Category + " + categoryId);
         return database.delete(ExpensesDbHelper.TABLE_CATEGORIES, ExpensesDbHelper.CATEGORIES_COL_ID + " = ?", new String[]{"" + categoryId});
     }

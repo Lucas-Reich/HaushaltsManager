@@ -19,7 +19,6 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 
 public class ExpenseScreen extends AppCompatActivity {
@@ -55,10 +54,9 @@ public class ExpenseScreen extends AppCompatActivity {
             // dummy expense befülllen
             EXPENSE.setCategory(new Category(getResources().getString(R.string.expense_screen_dsp_category), 0));// dummy Kategorie
             EXPENSE.setTitle(getResources().getString(R.string.expense_screen_title));
-            EXPENSE.setTag(getResources().getString(R.string.expense_screen_dsp_tag));
+            EXPENSE.setTag("");
             EXPENSE.setPrice(0);
-            EXPENSE.setNotice(getResources().getString(R.string.expense_screen_dsp_notice));
-            EXPENSE.setTag(getResources().getString(R.string.expense_screen_dsp_tag));
+            EXPENSE.setNotice("");
             EXPENSE.setDate(CAL);
             EXPENSE.setAccount(expensesDataSource.getAccountById(preferences.getLong("activeAccount", 0)));
             EXPENSE.setExpenditure(true);
@@ -76,8 +74,7 @@ public class ExpenseScreen extends AppCompatActivity {
 
         // set the displayed date to the current one
         Button setDate = (Button) findViewById(R.id.expense_screen_date);
-        setDate.setText(EXPENSE.getDate().get(Calendar.YEAR) + "-" + EXPENSE.getDate().get(Calendar.MONTH) + "-" + EXPENSE.getDate().get(Calendar.DAY_OF_MONTH));
-        //setDate.setText(DateUtils.formatDateTime(this, EXPENSE.getDate().getTimeInMillis(), DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_NUMERIC_DATE | DateUtils.FORMAT_SHOW_YEAR));
+        setDate.setText(EXPENSE.getDisplayableDate(ExpenseScreen.this));
         Log.d(TAG, "set date to " + setDate.getText());
 
 
@@ -116,13 +113,13 @@ public class ExpenseScreen extends AppCompatActivity {
 
         //TODO implement AlertDialog which enables the user to input a number for the expense amount
         TextView amount = (TextView) findViewById(R.id.expense_screen_amount);
-        amount.setText(EXPENSE.getPrice() + "");
+        amount.setText(EXPENSE.getUnsignedPrice() + "");
         amount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 Bundle bundle = new Bundle();
-                bundle.putDouble("original_title", EXPENSE.getPrice());
+                bundle.putDouble("original_title", EXPENSE.getUnsignedPrice());
                 bundle.putInt("button_id", v.getId());
 
                 PriceInputDialogFragment priceDialog = new PriceInputDialogFragment();
@@ -212,10 +209,13 @@ public class ExpenseScreen extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+
+                //TODO buchungen die in der zukunft sind (nach dem aktuellen datum) sollten als einmalige wiederauftretende buchung in die liste eingefügt werden
+                //wenn der nutzer versucht eine buchung in der zukunft einzugeben wird nachgefragt (mit alertdialog) ob er sie als wie oben speichern möchte oder nicht
                 if (EXPENSE.isSet()) {
 
                     expensesDataSource.open();
-                    if (bundle.get("parentIndex") != null) {
+                    if (bundle != null && bundle.get("parentIndex") != null) {
 
                         EXPENSE.setIndex(expensesDataSource.createChildBooking(EXPENSE, bundle.getLong("parentIndex")));
 
@@ -311,11 +311,11 @@ public class ExpenseScreen extends AppCompatActivity {
             Calendar expenditureDate = Calendar.getInstance();
             expenditureDate.set(year, month, dayOfMonth, 0, 0, 0);
 
-            Button btn_date = (Button) findViewById(R.id.expense_screen_date);
-            btn_date.setText(DateUtils.formatDateTime(getBaseContext(), expenditureDate.getTimeInMillis(), DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_NUMERIC_DATE | DateUtils.FORMAT_SHOW_YEAR));
-
             EXPENSE.setDate(expenditureDate);
-            Log.d(TAG, "updated date to " + EXPENSE.getDate().get(Calendar.DAY_OF_MONTH) + "-" + EXPENSE.getDate().get(Calendar.MONTH) + "-" + EXPENSE.getDate().get(Calendar.YEAR));
+            Log.d(TAG, "updated date to " + EXPENSE.getDisplayableDate(ExpenseScreen.this));
+
+            Button btn_date = (Button) findViewById(R.id.expense_screen_date);
+            btn_date.setText(EXPENSE.getDisplayableDate(ExpenseScreen.this));
         }
     };
 

@@ -28,7 +28,7 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
     static final String TABLE_RECURRING_BOOKINGS = "RECURRING_BOOKINGS";
 
     static final String RECURRING_BOOKINGS_COL_ID = "_id";
-    static final String RECURRING_BOOKINGS_COL_F_BOOKING_ID = "f_booking_id";
+    static final String RECURRING_BOOKINGS_COL_F_BOOKING_ID = "booking_id";
     static final String RECURRING_BOOKINGS_COL_START = "start";
     static final String RECURRING_BOOKINGS_COL_FREQUENCY = "frequency";
     static final String RECURRING_BOOKINGS_COL_END = "end";
@@ -46,52 +46,56 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
     // define table Bookings
     static final String TABLE_BOOKINGS = "BOOKINGS";
 
-    static final String BOOKINGS_COL_BOOKING_ID = "_id";
+    static final String BOOKINGS_COL_ID = "_id";
+    static final String BOOKINGS_COL_CREATED_AT = "created_at";
     static final String BOOKINGS_COL_PRICE = "price";
-    static final String BOOKINGS_COL_F_CATEGORY_ID = "f_category_id";
+    static final String BOOKINGS_COL_CATEGORY_ID = "category_id";
     static final String BOOKINGS_COL_EXPENDITURE = "expenditure";
     static final String BOOKINGS_COL_TITLE = "title";
     static final String BOOKINGS_COL_DATE = "date";
     static final String BOOKINGS_COL_NOTICE = "notice";
-    static final String BOOKINGS_COL_F_ACCOUNT_ID = "f_account_id";
+    static final String BOOKINGS_COL_ACCOUNT_ID = "account_id";
 
     private static final String CREATE_BOOKINGS = "CREATE TABLE " + TABLE_BOOKINGS
             + "("
-            + BOOKINGS_COL_BOOKING_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + BOOKINGS_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + BOOKINGS_COL_CREATED_AT + " DATETIME DEFAULT CURRENT_TIMESTAMP, "
             + BOOKINGS_COL_PRICE + " REAL NOT NULL, "
-            + BOOKINGS_COL_F_CATEGORY_ID + " INTEGER NOT NULL, "
+            + BOOKINGS_COL_CATEGORY_ID + " INTEGER NOT NULL, "
             + BOOKINGS_COL_EXPENDITURE + " INTEGER NOT NULL, "
             + BOOKINGS_COL_TITLE + " TEXT NOT NULL, "
             + BOOKINGS_COL_DATE + " TEXT NOT NULL, "
             + BOOKINGS_COL_NOTICE + " TEXT, "
-            + BOOKINGS_COL_F_ACCOUNT_ID + " INTEGER NOT NULL"
+            + BOOKINGS_COL_ACCOUNT_ID + " INTEGER NOT NULL"
             + ");";
 
 
     // define table Child_Bookings
     static final String TABLE_CHILD_BOOKINGS = "CHILD_BOOKINGS";
 
-    static final String CHILD_BOOKINGS_COL_BOOKING_ID = "_id";
-    static final String CHILD_BOOKINGS_COL_F_PARENT_BOOKING_ID = "f_booking_id";
+    static final String CHILD_BOOKINGS_COL_ID = "_id";
+    static final String CHILD_BOOKINGS_COL_CREATED_AT = "created_at";
+    static final String CHILD_BOOKINGS_COL_PARENT_BOOKING_ID = "booking_id";
     static final String CHILD_BOOKINGS_COL_PRICE = "price";
-    static final String CHILD_BOOKINGS_COL_F_CATEGORY_ID = "f_category_id";
+    static final String CHILD_BOOKINGS_COL_CATEGORY_ID = "category_id";
     static final String CHILD_BOOKINGS_COL_EXPENDITURE = "expenditure";
     static final String CHILD_BOOKINGS_COL_TITLE = "title";
     static final String CHILD_BOOKINGS_COL_DATE = "date";
     static final String CHILD_BOOKINGS_COL_NOTICE = "notice";
-    static final String CHILD_BOOKINGS_COL_F_ACCOUNT_ID = "f_account_id";
+    static final String CHILD_BOOKINGS_COL_ACCOUNT_ID = "account_id";
 
     private static final String CREATE_CHILD_BOOKINGS = "CREATE TABLE " + TABLE_CHILD_BOOKINGS
             + "("
-            + CHILD_BOOKINGS_COL_BOOKING_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + CHILD_BOOKINGS_COL_F_PARENT_BOOKING_ID + " INTEGER NOT NULL, "
+            + CHILD_BOOKINGS_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + CHILD_BOOKINGS_COL_CREATED_AT + "DATETIME DEFAULT CURRENT_TIMESTAMP, "
+            + CHILD_BOOKINGS_COL_PARENT_BOOKING_ID + " INTEGER NOT NULL, "
             + CHILD_BOOKINGS_COL_PRICE + " REAL NOT NULL, "
-            + CHILD_BOOKINGS_COL_F_CATEGORY_ID + " INTEGER NOT NULL, "
+            + CHILD_BOOKINGS_COL_CATEGORY_ID + " INTEGER NOT NULL, "
             + CHILD_BOOKINGS_COL_EXPENDITURE + " INTEGER NOT NULL, "
             + CHILD_BOOKINGS_COL_TITLE + " TEXT NOT NULL, "
             + CHILD_BOOKINGS_COL_DATE + " TEXT NOT NULL, "
             + CHILD_BOOKINGS_COL_NOTICE + " TEXT, "
-            + CHILD_BOOKINGS_COL_F_ACCOUNT_ID + " INTEGER NOT NULL"
+            + CHILD_BOOKINGS_COL_ACCOUNT_ID + " INTEGER NOT NULL"
             + ");";
 
 
@@ -99,13 +103,13 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
     static final String TABLE_ACCOUNTS = "ACCOUNTS";
 
     static final String ACCOUNTS_COL_ID = "_id";
-    static final String ACCOUNTS_COL_ACCOUNT = "account_name";
+    static final String ACCOUNTS_COL_NAME = "name";
     static final String ACCOUNTS_COL_BALANCE = "balance";
 
     private static final String CREATE_ACCOUNTS = "CREATE TABLE " + TABLE_ACCOUNTS
             + "("
             + ACCOUNTS_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + ACCOUNTS_COL_ACCOUNT + " TEXT NOT NULL, "
+            + ACCOUNTS_COL_NAME + " TEXT NOT NULL, "
             + ACCOUNTS_COL_BALANCE + " INTEGER"
             + ");";
 
@@ -114,12 +118,12 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
     static final String TABLE_TAGS = "TAGS";
 
     static final String TAGS_COL_ID = "_id";
-    static final String TAGS_COL_TAG_NAME = "tag_name";
+    static final String TAGS_COL_NAME = "name";
 
     private static final String CREATE_TAGS = "CREATE TABLE " + TABLE_TAGS
             + "("
             + TAGS_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + TAGS_COL_TAG_NAME + " TEXT NOT NULL"
+            + TAGS_COL_NAME + " TEXT NOT NULL"
             + ");";
 
 
@@ -127,13 +131,13 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
     static final String TABLE_CATEGORIES = "CATEGORIES";
 
     static final String CATEGORIES_COL_ID = "_id";
-    static final String CATEGORIES_COL_CATEGORY_NAME = "category_name";
+    static final String CATEGORIES_COL_NAME = "name";
     static final String CATEGORIES_COL_COLOR = "color";
 
     private final static String CREATE_CATEGORIES = "CREATE TABLE " + TABLE_CATEGORIES
             + "("
             + CATEGORIES_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + CATEGORIES_COL_CATEGORY_NAME + " TEXT NOT NULL, "
+            + CATEGORIES_COL_NAME + " TEXT NOT NULL, "
             + CATEGORIES_COL_COLOR + " INTEGER NOT NULL"
             + ");";
 
@@ -142,14 +146,14 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
     static final String TABLE_BOOKINGS_TAGS = "BOOKING_TAGS";
 
     static final String BOOKINGS_TAGS_COL_ID = "_id";
-    static final String BOOKINGS_TAGS_COL_F_BOOKING_ID = "f_booking_id";
-    static final String BOOKINGS_TAGS_COL_F_TAG_ID = "f_tag_id";
+    static final String BOOKINGS_TAGS_COL_BOOKING_ID = "booking_id";
+    static final String BOOKINGS_TAGS_COL_TAG_ID = "tag_id";
 
     private static final String CREATE_BOOKINGS_TAGS = "CREATE TABLE " + TABLE_BOOKINGS_TAGS
             + "("
             + BOOKINGS_TAGS_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + BOOKINGS_TAGS_COL_F_BOOKING_ID + " INTEGER NOT NULL, "
-            + BOOKINGS_TAGS_COL_F_TAG_ID + " INTEGER NOT NULL "
+            + BOOKINGS_TAGS_COL_BOOKING_ID + " INTEGER NOT NULL, "
+            + BOOKINGS_TAGS_COL_TAG_ID + " INTEGER NOT NULL "
             + ");";
 
 

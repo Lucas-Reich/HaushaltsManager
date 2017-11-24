@@ -1,20 +1,24 @@
 package com.example.lucas.haushaltsmanager;
 
+import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.format.DateUtils;
 import android.util.Log;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 class ExpenseObject implements Parcelable {
 
+    private long index;
     private Calendar date;
     private String title = "";
     private double price = 0;
-    private long index;
     private boolean expenditure;
     private Category category;
     private List<String> tag = new LinkedList<>();
@@ -24,6 +28,14 @@ class ExpenseObject implements Parcelable {
 
     private String TAG = "ExpenseObject: ";
 
+    public ExpenseObject(String title, double price, boolean expenditure, Category category, List<String> tags) {
+
+        this.title = title;
+        this.price = price;
+        this.expenditure = expenditure;
+        this.category = category;
+        this.tag.addAll(tags);
+    }
 
     public ExpenseObject(String title, double price, boolean expenditure, Category category, String tag) {
 
@@ -55,36 +67,13 @@ class ExpenseObject implements Parcelable {
         return toDisplay + toDisplay2 + toDisplay3;
     }
 
-    String getOldDate() {//deprecated use getDate instead
-
-        int day = date.get(Calendar.DAY_OF_MONTH);
-        int month = date.get(Calendar.MONTH);
-        int year = date.get(Calendar.YEAR);
-        String rightDate = year + "";
-
-        if (month < 10) {
-
-            rightDate += "-0" + month;
-        } else {
-
-            rightDate += "-" + month;
-        }
-
-        if (day < 10) {
-
-            rightDate += "-0" + day;
-        } else {
-
-            rightDate += "-" + day;
-        }
-        return rightDate;
-    }
-
     Calendar getDate() {
 
         return this.date;
     }
 
+/*deprecated since 22.11.17 ersetzt mit getDBDate()
+ *
     String getDBDate() {
 
         String dbDate = this.date.get(Calendar.YEAR) + "-";
@@ -96,6 +85,18 @@ class ExpenseObject implements Parcelable {
         dbDate += "-" + this.date.get(Calendar.DAY_OF_MONTH) + " " + this.date.get(Calendar.HOUR_OF_DAY) + ":" + this.date.get(Calendar.MINUTE) + ":" + this.date.get(Calendar.SECOND);
 
         return dbDate;
+    }
+ *
+ */
+
+    String getDBDate() {
+
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(this.date.getTime());
+    }
+
+    String getDisplayableDate(Context context) {
+
+        return DateUtils.formatDateTime(context, this.date.getTimeInMillis(), DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_NUMERIC_DATE | DateUtils.FORMAT_SHOW_YEAR);
     }
 
     void setDate(Calendar date) {
@@ -111,12 +112,33 @@ class ExpenseObject implements Parcelable {
         this.title = title;
     }
 
-    double getPrice() {
+    double getUnsignedPrice() {
         return price;
+    }
+
+    double getSignedPrice() {
+
+        return this.expenditure ? 0 - this.price : price;
     }
 
     void setPrice(double price) {
         this.price = price;
+    }
+
+    void addToPrice(double toAdd) {
+
+        double newPrice = toAdd + getSignedPrice();
+
+        // wenn der preis positiv ist und auch sein soll
+        if ((newPrice >= 0) && expenditure) {
+
+            this.price = newPrice;
+            this.expenditure = false;
+        } else if ((newPrice < 0) && !expenditure) {
+
+            this.price = 0 - (newPrice);
+            this.expenditure = true;
+        }
     }
 
     long getIndex() {
@@ -175,6 +197,7 @@ class ExpenseObject implements Parcelable {
     }
 
     void setNotice(String notice) {
+
         this.notice = notice;
     }
 
@@ -231,7 +254,8 @@ class ExpenseObject implements Parcelable {
     }
 
 
-    //make class Parcelable
+    //make class Parcelable || Parcelable is super slow DO NOT USE IN PRODUCTION
+    //TODO make faster!!
 
     /**
      * This will be only used by ParcelableCategories

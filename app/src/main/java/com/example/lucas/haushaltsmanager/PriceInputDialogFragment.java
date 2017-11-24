@@ -3,14 +3,12 @@ package com.example.lucas.haushaltsmanager;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.util.Log;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -41,13 +39,13 @@ public class PriceInputDialogFragment extends DialogFragment {
                 if (input.getText().toString().length() != 0) {
 
                     expenseScreen.EXPENSE.setPrice(Double.parseDouble(input.getText().toString()));
-                    Log.d("PriceInput", "set price to " + expenseScreen.EXPENSE.getPrice());
-                    txtView.setText(expenseScreen.EXPENSE.getPrice() + "");
+                    Log.d("PriceInput", "set price to " + expenseScreen.EXPENSE.getUnsignedPrice());
+                    txtView.setText(expenseScreen.EXPENSE.getUnsignedPrice() + "");
                     txtView.setTextColor(Color.BLACK);
                 } else {
 
                     expenseScreen.EXPENSE.setPrice(0.0);
-                    Log.d("PriceInput", "set price to " + expenseScreen.EXPENSE.getPrice());
+                    Log.d("PriceInput", "set price to " + expenseScreen.EXPENSE.getUnsignedPrice());
                     txtView.setText(args.getDouble("original_title") + "");
                     txtView.setTextColor(Color.DKGRAY);
                 }

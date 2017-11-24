@@ -58,7 +58,7 @@ public class ExpandableListViewTest extends Activity {
 /*
 highlighter für kindern einer buchung
 gesehen: http://vardhan-justlikethat.blogspot.de/2013/10/android-highlighting-selected-item-in.html
-                int index = parent.getFlatListPosition(listView.getPackedPositionForChild(groupPosition, childPosition));
+                int index = parent.getFlatListPosition(expListView.getPackedPositionForChild(groupPosition, childPosition));
 
                 if (parent.isItemChecked(index)) {
 

@@ -2,14 +2,11 @@ package com.example.lucas.haushaltsmanager;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
-import android.widget.CheckBox;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -74,31 +71,6 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         return false;
     }
 
-    /*
-        --ursprüngliche version, ohne visuellen unterschied zwischen buchungen mit kindern und buchungen ohne kinder
-        @Override
-        public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
-
-            HeaderObject header = (HeaderObject) getGroup(groupPosition);
-
-            if (convertView == null) {
-
-                LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                convertView = inflater.inflate(R.layout.activity_test_exp_listview_list_group_child_y, null);
-            }
-
-            TextView txtTitle = (TextView) convertView.findViewById(R.id.exp_listview_header_name);
-            TextView txtTotalAmount = (TextView) convertView.findViewById(R.id.exp_listview_header_total_amount);
-            TextView txtBaseCurrency = (TextView) convertView.findViewById(R.id.exp_listview_header_base_currency);
-
-            txtTitle.setText(header.getTitle());
-            txtTotalAmount.setText(header.getTotalPrice() + "");
-            txtBaseCurrency.setText(header.getBaseCurrency());
-
-            return convertView;
-        }
-    */
-
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
 
@@ -130,7 +102,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             txtTitle.setText(header.getTitle());
             //TODO wenn es eine Multiuser funktionalität muss hier der benutzer eingetragen werden, der das Geld ausgegeben hat
             txtPerson.setText("");
-            txtPaidPrice.setText(String.format("%s", header.getPrice()));
+            txtPaidPrice.setText(String.format("%s", header.getUnsignedPrice()));
             txtPaidCurrency.setText(header.getAccount().getCurrencySym());
             //TODO wenn eine buchung in einer Ausländischen währung vorliegt, muss der Preis in der standartwährung ausgegeben werden und auch das standartwährungsreichen angezeigt werden
             txtCalcPrice.setText("");
@@ -145,7 +117,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             TextView txtBaseCurrency = (TextView) convertView.findViewById(R.id.exp_listview_header_base_currency);
 
             txtTitle.setText(header.getTitle());
-            txtTotalAmount.setText(header.getPrice() + "");
+            txtTotalAmount.setText(header.getUnsignedPrice() + "");
             txtBaseCurrency.setText("€");
         }
 
@@ -178,7 +150,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         txtTitle.setText(child.getTitle());
         //TODO wenn es eine Multiuser funktionalität muss hier der benutzer eingetragen werden, der das Geld ausgegeben hat
         txtPerson.setText("");
-        txtPaidPrice.setText(String.format("%s", child.getPrice()));
+        txtPaidPrice.setText(String.format("%s", child.getUnsignedPrice()));
         //TODO währung muss noch dynamisch gemacht werden, um mehrere Währungen zu unterstützen
         txtPaidCurrency.setText(child.getAccount().getCurrencySym());
         //TODO wenn eine buchung in einer Ausländischen währung vorliegt, muss der Preis in der standartwährung ausgegeben werden und auch das standartwährungsreichen angezeigt werden
@@ -195,38 +167,33 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     }
 
 
-    public boolean setGroupSelected(Long groupId) {
+    boolean selectGroup(Long groupId) {
 
         return this.selectedGroups.add(groupId);
     }
 
-    public boolean isSelected(Long groupId) {
+    boolean isSelected(Long groupId) {
 
         return this.selectedGroups.contains(groupId);
     }
 
-    public boolean removeGroup(Long groupId) {
+    boolean removeGroup(Long groupId) {
 
         return this.selectedGroups.remove(groupId);
     }
 
-    public boolean deselectAll() {
+    boolean deselectAll() {
 
         this.selectedGroups.clear();
         return true;
     }
 
-    public ArrayList<Long> getSelectedGroupIds() {
-
-        return this.selectedGroups;
-    }
-
-    public int getSelectedCount() {
+    int getSelectedCount() {
 
         return this.selectedGroups.size();
     }
 
-    public ArrayList<ExpenseObject> getSelectedGroupData() {
+    ArrayList<ExpenseObject> getSelectedGroupData() {
 
         ArrayList<ExpenseObject> groupData = new ArrayList<>();
 
@@ -236,5 +203,19 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         }
 
         return groupData;
+    }
+
+    long[] getSelectedBookingIds() {
+
+        long bookingIds[] = new long[this.selectedGroups.size()];
+        int counter = 0;
+
+        for (long groupId : this.selectedGroups) {
+
+            bookingIds[counter] = this.listDataHeader.get((int) groupId).getIndex();
+            counter++;
+        }
+
+        return bookingIds;
     }
 }
