@@ -2,15 +2,19 @@ package com.example.lucas.haushaltsmanager;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -20,9 +24,12 @@ class ExpensesDataSource {
 
     private SQLiteDatabase database;
     private ExpensesDbHelper dbHelper;
+    private Context mContext;
+    private Calendar CAL;
 
     ExpensesDataSource(Context context) {
 
+        this.mContext = context;
         Log.d(TAG, "Unsere DataSource erzeugt jetzt den dbHelper.");
         dbHelper = new ExpensesDbHelper(context);
     }
@@ -39,7 +46,7 @@ class ExpensesDataSource {
     }
 
     /**
-     * Convenience Method for mapping an Cursor to a Booking
+     * Convenience Method for mapping a Cursor to a Booking
      *
      * @param cursor Cursor object obtained by a SQLITE search query
      * @return An remapped ExpenseObject
@@ -47,31 +54,50 @@ class ExpensesDataSource {
     private ExpenseObject cursorToExpense(Cursor cursor) {
 
         ExpenseObject expense = new ExpenseObject();
-        Calendar cal = Calendar.getInstance();
 
         int idIndex = cursor.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_ID);
-        int idAmount = cursor.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_PRICE);
-        int idCategory = cursor.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID);
-        int idExpenditure = cursor.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_EXPENDITURE);
-        int idTitle = cursor.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_TITLE);
-        int idDate = cursor.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_DATE);
-        int idNotice = cursor.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_NOTICE);
-        int idAccount = cursor.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID);
-
         expense.setIndex(cursor.getLong(idIndex));
 
+        int idAmount = cursor.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_PRICE);
         expense.setPrice(cursor.getDouble(idAmount));
 
-        expense.setExpenditure(cursor.getInt(idExpenditure));
-
-        expense.setTitle(cursor.getString(idTitle));
-
+        int idCategory = cursor.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID);
         Category category1 = getCategoryById(cursor.getLong(idCategory));
         expense.setCategory(category1);
+
+        int idExpenditure = cursor.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_EXPENDITURE);
+        expense.setExpenditure(cursor.getInt(idExpenditure));
+
+        int idTitle = cursor.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_TITLE);
+        expense.setTitle(cursor.getString(idTitle));
+
+        int idDate = cursor.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_DATE);
+        expense.setDate(cursor.getString(idDate));
+
+        int idNotice = cursor.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_NOTICE);
+        expense.setNotice(cursor.getString(idNotice));
+
+        int idAccount = cursor.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID);
+        //booking has children trigger
+        if (cursor.getLong(idAccount) == 9999) {
+
+            expense.addChildren(getChildsToParent(expense.getIndex()));
+            expense.setAccount(new Account(9999, "", 0));
+        } else {
+
+            expense.setAccount(getAccountById(cursor.getLong(idAccount)));
+        }
+
 
         List<String> allTags = Arrays.asList(getTagsToBookingByBookingId(expense.getIndex()));
         expense.setTags(allTags);
 
+
+
+
+
+/*veraltet seit 25.11.17 nun wird setDate(String) methode von ExpenseObject benutzt
+        CAL = Calendar.getInstance();
         String[] fullDate = cursor.getString(idDate).split(" ");
         String[] expenseDate = fullDate[0].split("-");
         String[] expenseTime = fullDate[1].split(":");
@@ -83,20 +109,11 @@ class ExpensesDataSource {
         int minute = Integer.parseInt(expenseTime[1]);
         int second = Integer.parseInt(expenseTime[2]);
 
-        cal.set(year, month, day, hour, minute, second);
-        expense.setDate(cal);
+        CAL.set(year, month, day, hour, minute, second);
 
-        expense.setNotice(cursor.getString(idNotice));
+        expense.setDate(CAL);
+*/
 
-        //booking has children trigger
-        if (cursor.getLong(idAccount) == 9999) {
-
-            expense.addChildren(getChildsToParent(expense.getIndex()));
-            expense.setAccount(new Account(9999, "", 0));
-        } else {
-
-            expense.setAccount(getAccountById(cursor.getLong(idAccount)));
-        }
 
         return expense;
     }
@@ -911,7 +928,7 @@ class ExpensesDataSource {
             }
         }
 */
-        while(!c.isAfterLast()) {
+        while (!c.isAfterLast()) {
 
             long index = c.getLong(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_ID));
             String categoryName = c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_NAME));
@@ -1223,4 +1240,176 @@ class ExpensesDataSource {
         Log.d(TAG, "deleteRecurringBooking: " + index);
         return database.delete(ExpensesDbHelper.TABLE_RECURRING_BOOKINGS, ExpensesDbHelper.RECURRING_BOOKINGS_COL_ID + "= ?", new String[]{"" + index});
     }
+
+
+    long createCurrency(Currency currency) {
+
+        ContentValues values = new ContentValues();
+        values.put(ExpensesDbHelper.CURRENCIES_COL_NAME, currency.getCurrencyName());
+        values.put(ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME, currency.getCurrencyShortName());
+        values.put(ExpensesDbHelper.CURRENCIES_COL_SYMBOL, currency.getCurrencySymbol());
+
+        return database.insert(ExpensesDbHelper.TABLE_CURRENCIES, null, values);
+    }
+
+    @Nullable
+    Currency getCurrency(long index) {
+
+        String selectQuery;
+        selectQuery = "SELECT * FROM ";
+        selectQuery += ExpensesDbHelper.TABLE_CURRENCIES;
+        selectQuery += " WHERE " + ExpensesDbHelper.CURRENCIES_COL_ID;
+        selectQuery += " = " + index + ";";
+        Log.d(TAG, "getCurrency: " + selectQuery);
+
+        Cursor c = database.rawQuery(selectQuery, null);
+        c.moveToFirst();
+
+        if (!c.isAfterLast()) {
+
+            long currIndex = c.getLong(c.getColumnIndex(ExpensesDbHelper.CURRENCIES_COL_ID));
+            String currName = c.getString(c.getColumnIndex(ExpensesDbHelper.CURRENCIES_COL_NAME));
+            String currShortName = c.getString(c.getColumnIndex(ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME));
+            String currSymbol = c.getString(c.getColumnIndex(ExpensesDbHelper.CURRENCIES_COL_SYMBOL));
+            Double rateToBase = getRateToBase(currIndex, null);
+
+            c.close();
+            return new Currency(currIndex, currName, currShortName, currSymbol, rateToBase);
+        } else {
+
+            c.close();
+            return null;
+        }
+    }
+
+    Long getCurrencyId(String curShortName) {
+
+        String selectQuery;
+        selectQuery = "SELECT _id FROM ";
+        selectQuery += ExpensesDbHelper.TABLE_CURRENCIES;
+        selectQuery += " WHERE " + ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME;
+        selectQuery += " = \"" + curShortName.toUpperCase() + "\";";
+        Log.d(TAG, "getCurrency: " + selectQuery);
+
+        Cursor c = database.rawQuery(selectQuery, null);
+        c.moveToFirst();
+
+        if (!c.isAfterLast()) {
+
+            //c.close();
+            return c.getLong(c.getColumnIndex(ExpensesDbHelper.CURRENCIES_COL_ID));
+        } else {
+
+            //c.close();
+            return null;
+        }
+    }
+
+    int updateCurrency(long index, Currency newCurrency) {
+
+        ContentValues values = new ContentValues();
+        values.put(ExpensesDbHelper.CURRENCIES_COL_NAME, newCurrency.getCurrencyName());
+        values.put(ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME, newCurrency.getCurrencyShortName());
+        values.put(ExpensesDbHelper.CURRENCIES_COL_SYMBOL, newCurrency.getCurrencySymbol());
+
+        return database.update(ExpensesDbHelper.TABLE_CURRENCIES, values, ExpensesDbHelper.CURRENCIES_COL_ID + " = ?", new String[]{"" + index});
+    }
+
+    int deleteCurrency(long index) {
+
+        Log.d(TAG, "deleteCurrency at index: " + index);
+        return database.delete(ExpensesDbHelper.TABLE_CURRENCIES, ExpensesDbHelper.CURRENCIES_COL_ID + " = ?", new String[]{"" + index});
+    }
+
+
+    long createExchangeRate(Currency fromCur, Currency toCur, double rate, String serverDate) {
+
+        return createExchangeRate(fromCur.getIndex(), toCur.getIndex(), rate, serverDate);
+    }
+
+    long createExchangeRate(String fromCur, String toCur, double rate, String serverDate) {
+
+        return createExchangeRate(getCurrencyId(fromCur), getCurrencyId(toCur), rate, serverDate);
+    }
+
+    long createExchangeRate(long fromCurIndex, long toCurIndex, double rate, String serverDate) {
+
+        ContentValues values = new ContentValues();
+        values.put(ExpensesDbHelper.CURRENCY_EXCHANGE_RATES_COL_FROM_CURRENCY_ID, fromCurIndex);
+        values.put(ExpensesDbHelper.CURRENCY_EXCHANGE_RATES_COL_TO_CURRENCY_ID, toCurIndex);
+        values.put(ExpensesDbHelper.CURRENCY_EXCHANGE_RATES_COL_EXCHANGE_RATE, rate);
+        values.put(ExpensesDbHelper.CURRENCY_EXCHANGE_RATES_COL_SERVER_DATE, serverDate);
+
+        return database.insert(ExpensesDbHelper.TABLE_CURRENCY_EXCHANGE_RATES, null, values);
+    }
+
+    /**
+     * Method for recieving ExchangeRates between two Currencies
+     *
+     * @param fromCurIndex Id of first Currency
+     * @param toCurIndex   Id of second Currency
+     * @param date         optional parameter which specifies the date of the ExchangeRate
+     * @return The ExchangeRate if available null if not
+     */
+    @Nullable
+    Double getExchangeRate(long fromCurIndex, long toCurIndex, String date) {
+
+        String selectQuery;
+        selectQuery = "SELECT " + ExpensesDbHelper.CURRENCY_EXCHANGE_RATES_COL_EXCHANGE_RATE + " FROM ";
+        selectQuery += ExpensesDbHelper.TABLE_CURRENCY_EXCHANGE_RATES;
+        selectQuery += " WHERE " + ExpensesDbHelper.CURRENCY_EXCHANGE_RATES_COL_FROM_CURRENCY_ID;
+        selectQuery += " = " + fromCurIndex;
+        selectQuery += " AND " + ExpensesDbHelper.CURRENCY_EXCHANGE_RATES_COL_TO_CURRENCY_ID;
+        selectQuery += " = " + toCurIndex;
+
+        if (date != null) {
+
+            selectQuery += " AND " + ExpensesDbHelper.CURRENCY_EXCHANGE_RATES_COL_TIMESTAMP;
+            selectQuery += " = \"" + date + "\"";
+        }
+
+        selectQuery += ";";
+        Log.d(TAG, "getExchangeRate: " + selectQuery);
+
+        Cursor c = database.rawQuery(selectQuery, null);
+        c.moveToFirst();
+
+        if (!c.isAfterLast()) {
+
+            c.close();
+            return c.getDouble(c.getColumnIndex(ExpensesDbHelper.CURRENCY_EXCHANGE_RATES_COL_EXCHANGE_RATE));
+        } else {
+
+            Log.w(TAG, "getRateToBase: No ExchangeRate in database between " + fromCurIndex + " and " + toCurIndex);
+            c.close();
+            return null;
+        }
+    }
+
+    @Nullable
+    Double getRateToBase(long toCurIndex, String date) {
+
+        SharedPreferences preferences = mContext.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
+        long baseCurIndex = preferences.getLong("mainCurrencyIndex", 0);
+
+        return getExchangeRate(baseCurIndex, toCurIndex, date);
+    }
+
+    int deleteExchangeRate(long index) {
+
+        Log.d(TAG, "deleteExchangeRate index: " + index);
+        return database.delete(ExpensesDbHelper.TABLE_CURRENCY_EXCHANGE_RATES, ExpensesDbHelper.CURRENCY_EXCHANGE_RATES_COL_ID + " = ?", new String[] {"" + index});
+    }
 }
+/*
+else{
+
+        CAL=Calendar.getInstance();
+        if(CAL.get(Calendar.HOUR_OF_DAY)< 17){
+
+        CAL.set(Calendar.DAY_OF_MONTH,Calendar.DAY_OF_MONTH-1);
+        }
+
+        selectQuery+=" = "+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",Locale.US).format(CAL.getTime());
+        }
+*/

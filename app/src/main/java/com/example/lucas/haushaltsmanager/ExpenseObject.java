@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import android.text.format.DateUtils;
 import android.util.Log;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -102,6 +103,19 @@ class ExpenseObject implements Parcelable {
     void setDate(Calendar date) {
 
         this.date = date;
+    }
+
+    void setDate(String date) {
+
+        try {
+
+            this.date = Calendar.getInstance();
+            this.date.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).parse(date));
+        } catch (ParseException e) {
+
+            this.date = Calendar.getInstance();
+            e.printStackTrace();
+        }
     }
 
     String getTitle() {

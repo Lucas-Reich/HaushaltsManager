@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.example.lucas.haushaltsmanager">
 
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -45,6 +47,10 @@
             android:name=".RecurringBookings"
             android:label="HaushaltsManager"
             android:parentActivityName=".MainActivityTab"/>
+
+        <service
+            android:name=".ExchangeRateService"
+            android:label="ExchangeService"/>
     </application>
 
 </manifest>

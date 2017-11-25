@@ -18,6 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.animation.Animation;
 import android.widget.Toast;
 
@@ -38,10 +39,6 @@ public class MainActivityTab extends AppCompatActivity {
      */
     ViewPager mViewPager;
 
-    FloatingActionButton fab, fabDelete, fabCombine;
-    Animation test, fabClose, rotateForward, rotateBackward;
-    boolean isOpen = false, combOpen = false, delOpen = false, fabOpen = false;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -50,6 +47,7 @@ public class MainActivityTab extends AppCompatActivity {
         SharedPreferences.Editor editor = settings.edit();
         editor.putLong("activeAccount", 1);
         editor.putString("mainCurrency", "€");
+        editor.putLong("mainCurrencyIndex", 1);
 
         editor.commit();
 
@@ -57,6 +55,19 @@ public class MainActivityTab extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.activity_main_tab);
         setContentView(R.layout.tab_main_mit_nav_drawer);
+
+
+        FloatingActionButton testServcie = (FloatingActionButton) findViewById(R.id.service_fab);
+        testServcie.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent serviceIntent = new Intent(getBaseContext(), ExchangeRateService.class);
+                startService(serviceIntent);
+            }
+        });
+
+
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

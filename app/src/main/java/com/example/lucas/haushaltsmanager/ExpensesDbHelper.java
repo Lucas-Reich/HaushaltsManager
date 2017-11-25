@@ -1,9 +1,12 @@
 package com.example.lucas.haushaltsmanager;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+
+import java.util.ArrayList;
 
 class ExpensesDbHelper extends SQLiteOpenHelper {
 
@@ -59,7 +62,7 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
     private static final String CREATE_BOOKINGS = "CREATE TABLE " + TABLE_BOOKINGS
             + "("
             + BOOKINGS_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + BOOKINGS_COL_CREATED_AT + " DATETIME DEFAULT CURRENT_TIMESTAMP, "
+            + BOOKINGS_COL_CREATED_AT + " DEFAULT CURRENT_TIMESTAMP, "
             + BOOKINGS_COL_PRICE + " REAL NOT NULL, "
             + BOOKINGS_COL_CATEGORY_ID + " INTEGER NOT NULL, "
             + BOOKINGS_COL_EXPENDITURE + " INTEGER NOT NULL, "
@@ -87,7 +90,7 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
     private static final String CREATE_CHILD_BOOKINGS = "CREATE TABLE " + TABLE_CHILD_BOOKINGS
             + "("
             + CHILD_BOOKINGS_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + CHILD_BOOKINGS_COL_CREATED_AT + "DATETIME DEFAULT CURRENT_TIMESTAMP, "
+            + CHILD_BOOKINGS_COL_CREATED_AT + " DEFAULT CURRENT_TIMESTAMP, "
             + CHILD_BOOKINGS_COL_PARENT_BOOKING_ID + " INTEGER NOT NULL, "
             + CHILD_BOOKINGS_COL_PRICE + " REAL NOT NULL, "
             + CHILD_BOOKINGS_COL_CATEGORY_ID + " INTEGER NOT NULL, "
@@ -157,6 +160,46 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
             + ");";
 
 
+    //defining table Currencies
+    static final String TABLE_CURRENCIES = "CURRENCIES";
+
+    static final String CURRENCIES_COL_ID = "_id";
+    static final String CURRENCIES_COL_TIMESTAMP = "timestamp";
+    static final String CURRENCIES_COL_SYMBOL = "symbol";
+    static final String CURRENCIES_COL_NAME = "name";
+    static final String CURRENCIES_COL_SHORT_NAME = "short_name";
+
+    private static final String CREATE_CURRENCIES = "CREATE TABLE " + TABLE_CURRENCIES
+            + "("
+            + CURRENCIES_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + CURRENCIES_COL_TIMESTAMP + " DEFAULT CURRENT_TIMESTAMP, "
+            + CURRENCIES_COL_SYMBOL + " TEXT, "
+            + CURRENCIES_COL_NAME + " TEXT NOT NULL, "
+            + CURRENCIES_COL_SHORT_NAME + " TEXT NOT NULL"
+            + ");";
+
+
+    //defining table Currency_Exchange_Rates
+    static final String TABLE_CURRENCY_EXCHANGE_RATES = "CURRENCY_EXCHANGE_RATES";
+
+    static final String CURRENCY_EXCHANGE_RATES_COL_ID = "_id";
+    static final String CURRENCY_EXCHANGE_RATES_COL_FROM_CURRENCY_ID = "from_currency_id";
+    static final String CURRENCY_EXCHANGE_RATES_COL_TO_CURRENCY_ID = "to_currency_id";
+    static final String CURRENCY_EXCHANGE_RATES_COL_EXCHANGE_RATE = "exchange_rate";
+    static final String CURRENCY_EXCHANGE_RATES_COL_TIMESTAMP = "created_at";
+    static final String CURRENCY_EXCHANGE_RATES_COL_SERVER_DATE = "server_date";
+
+    private static String CREATE_CURRENCY_EXCHANGE_RATES = "CREATE TABLE " + TABLE_CURRENCY_EXCHANGE_RATES
+            + "("
+            + CURRENCIES_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + CURRENCY_EXCHANGE_RATES_COL_TIMESTAMP + " DEFAULT CURRENT_TIMESTAMP, "
+            + CURRENCY_EXCHANGE_RATES_COL_FROM_CURRENCY_ID + " INTEGER NOT NULL, "
+            + CURRENCY_EXCHANGE_RATES_COL_TO_CURRENCY_ID + " INTEGER NOT NULL, "
+            + CURRENCY_EXCHANGE_RATES_COL_EXCHANGE_RATE + " INTEGER NOT NULL, "
+            + CURRENCY_EXCHANGE_RATES_COL_SERVER_DATE + " TEXT NOT NULL "
+            + ");";
+
+
     ExpensesDbHelper(Context context) {
 
         super(context, DB_NAME, null, DB_VERSION);
@@ -191,6 +234,13 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
 
             Log.d(TAG, "Die Tabelle Recurring_Bookings wird mit SQL-Befehl: " + CREATE_RECURRING_BOOKINGS + " angelegt.");
             db.execSQL(CREATE_RECURRING_BOOKINGS);
+
+            Log.d(TAG, "Die Tabelle Currencies wird mit SQL-Befehl: " + CREATE_CURRENCIES + " angelegt.");
+            db.execSQL(CREATE_CURRENCIES);
+            insertCurrencies(db);
+
+            Log.d(TAG, "Die Tabelle Currency_Exchange_Rates wird mit SQL-Befehl: " + CREATE_CURRENCY_EXCHANGE_RATES + " angelegt.");
+            db.execSQL(CREATE_CURRENCY_EXCHANGE_RATES);
         } catch (Exception ex) {
 
             Log.e(TAG, "Fehler beim Anlegen der Tabelle: " + ex.getMessage());
@@ -208,7 +258,57 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOKINGS_TAGS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_TEMPLATE_BOOKINGS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_RECURRING_BOOKINGS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CURRENCIES);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CURRENCY_EXCHANGE_RATES);
 
         onCreate(db);
+    }
+
+    private void insertCurrencies(SQLiteDatabase db) {
+
+        //details from: https://developers.google.com/public-data/docs/canonical/currencies_csv
+        ArrayList<String[]> currencies = new ArrayList<>();
+        currencies.add(new String[]{"AUD", "Australian Dollar", "$"});
+        currencies.add(new String[]{"BGN", "Bulgarian Lev", "лв"});
+        currencies.add(new String[]{"BRL", "Brazilian Real", "R$"});
+        currencies.add(new String[]{"CAD", "Canadian Dollar", "$"});
+        currencies.add(new String[]{"CHF", "Swiss Franc", "CHF"});
+        currencies.add(new String[]{"CNY", "Yuan Reminbi", "¥"});
+        currencies.add(new String[]{"CZK", "Czech Koruna", "Kč"});
+        currencies.add(new String[]{"DKK", "Danish Krone", "kr"});
+        currencies.add(new String[]{"GBP", "Pound Sterling", "£"});
+        currencies.add(new String[]{"HKD", "Hong Kong Dollar", "$"});
+        currencies.add(new String[]{"HRK", "Croatian Kuna", "kn"});
+        currencies.add(new String[]{"HUF", "Forint", "Ft"});
+        currencies.add(new String[]{"IDR", "Rupiah", "Rp"});
+        currencies.add(new String[]{"ILS", "New Israeli Sheqel", "₪"});
+        currencies.add(new String[]{"INR", "Indian Rupee", null});
+        currencies.add(new String[]{"JPY", "Yen", "¥"});
+        currencies.add(new String[]{"KRW", "Won", "₩"});
+        currencies.add(new String[]{"MXN", "Mexican Peso", "$"});
+        currencies.add(new String[]{"MYR", "Malaysian Ringgit", "RM"});
+        currencies.add(new String[]{"NOK", "Norwegian Krone", "kr"});
+        currencies.add(new String[]{"NZD", "New Zealand Dollar", "$"});
+        currencies.add(new String[]{"PHP", "Philippine Peso", "Php"});
+        currencies.add(new String[]{"PLN", "Zloty", "zł"});
+        currencies.add(new String[]{"RON", "Romanian Leu", "lei"});
+        currencies.add(new String[]{"RUB", "Russian Ruble", "руб"});
+        currencies.add(new String[]{"SEK", "Swedish Krona", "kr"});
+        currencies.add(new String[]{"SGD", "Singapore Dollar", "$"});
+        currencies.add(new String[]{"THB", "Baht", "฿"});
+        currencies.add(new String[]{"TRY", "Turkish Lira", "TL"});
+        currencies.add(new String[]{"USD", "US Dollar", "$"});
+        currencies.add(new String[]{"ZAR", "Rand", "R"});
+        currencies.add(new String[]{"EUR", "Euro", "€"});
+
+        for (String[] entry : currencies) {
+
+            ContentValues values = new ContentValues();
+            values.put(CURRENCIES_COL_SHORT_NAME, entry[0]);
+            values.put(CURRENCIES_COL_NAME, entry[1]);
+            values.put(CURRENCIES_COL_SYMBOL, entry[2]);
+
+            db.insert(TABLE_CURRENCIES, null, values);
+        }
     }
 }
