@@ -351,13 +351,6 @@
                     android:text="Cat" />
 
                 <Button
-                    android:id="@+id/create_account"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Acc" />
-
-                <Button
                     android:id="@+id/expense_screen_create_booking"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

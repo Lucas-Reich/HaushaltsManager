@@ -9,26 +9,21 @@ class Account implements Parcelable {
     private long index;
     private String accountName;
     private int balance;
-    private String currencySym;
+    private Currency currency;
 
-    private String TAG = "Account: ";
+    private String TAG = Account.class.getSimpleName();
 
-    public Account(long index, String accountName, int balance) {
+    public Account(long index, String accountName, int balance, Currency currency) {
 
         this.index = index;
         this.accountName = accountName;
         this.balance = balance;
-        this.currencySym = "€";
+        this.currency = currency;
     }
 
-    public Account(String accountName, int balance) {
+    public Account(String accountName, Integer balance, Currency currency) {
 
-        this(0, accountName, balance);
-    }
-
-    public Account() {
-
-        this(0, "", 0);
+        this(0, accountName, balance != null ? balance : 0, currency);
     }
 
     public long getIndex() {
@@ -55,12 +50,12 @@ class Account implements Parcelable {
         this.balance = balance;
     }
 
-    public String getCurrencySym() {
-        return currencySym;
+    public Currency getCurrency() {
+        return currency;
     }
 
-    public void setCurrencySym(String currencySym) {
-        this.currencySym = currencySym;
+    public void setCurrency(Currency currency) {
+        this.currency = currency;
     }
 
 
@@ -80,7 +75,7 @@ class Account implements Parcelable {
         index = source.readLong();
         accountName = source.readString();
         balance = source.readInt();
-        currencySym = source.readString();
+        currency = source.readParcelable(Account.class.getClassLoader());
     }
 
     /**
@@ -107,7 +102,7 @@ class Account implements Parcelable {
         dest.writeLong(index);
         dest.writeString(accountName);
         dest.writeInt(balance);
-        dest.writeString(currencySym);
+        dest.writeParcelable(currency, flags);
     }
 
     /**

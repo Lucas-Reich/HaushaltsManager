@@ -311,4 +311,9 @@ public class TabOneBookingsVer2 extends Fragment {
             combOpen = false;
         }
     }
+
+    public void updateExpListView() {
+
+        listAdapter.notifyDataSetChanged();
+    }
 }

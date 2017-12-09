@@ -57,7 +57,7 @@ public class ExpenseScreen extends AppCompatActivity {
             EXPENSE.setTag("");
             EXPENSE.setPrice(0);
             EXPENSE.setNotice("");
-            EXPENSE.setDate(CAL);
+            EXPENSE.setDateTime(CAL);
             EXPENSE.setAccount(expensesDataSource.getAccountById(preferences.getLong("activeAccount", 0)));
             EXPENSE.setExpenditure(true);
 
@@ -74,14 +74,17 @@ public class ExpenseScreen extends AppCompatActivity {
 
         // set the displayed date to the current one
         Button setDate = (Button) findViewById(R.id.expense_screen_date);
-        setDate.setText(EXPENSE.getDisplayableDate(ExpenseScreen.this));
+        setDate.setText(EXPENSE.getDisplayableDateTime(ExpenseScreen.this));
         Log.d(TAG, "set date to " + setDate.getText());
 
 
         // set the account to the current main account
         Button accountBtn = (Button) findViewById(R.id.expense_screen_account);
-        accountBtn.setText(EXPENSE.getAccount().getAccountName());
-        Log.d(TAG, "set active account to: " + EXPENSE.getAccount().getAccountName());
+        if (EXPENSE.getAccount() != null) {
+
+            accountBtn.setText(EXPENSE.getAccount().getAccountName());
+            Log.d(TAG, "set active account to: " + EXPENSE.getAccount().getAccountName());
+        }
 
         // set the EXPENSE type
         RadioGroup expenseType = (RadioGroup) findViewById(R.id.expense_screen_expense_type);
@@ -130,7 +133,13 @@ public class ExpenseScreen extends AppCompatActivity {
 
         //set account currency symbol
         TextView expenseCurrency = (TextView) findViewById(R.id.expense_screen_amount_currency);
-        expenseCurrency.setText(EXPENSE.getAccount().getCurrencySym());
+        if (EXPENSE.getAccount() != null) {
+
+            expenseCurrency.setText(EXPENSE.getAccount().getCurrency().getCurrencySymbol());
+        } else {
+
+            expenseCurrency.setText(preferences.getString("mainCurrency", "€"));
+        }
 
         //set display category
         TextView category = (TextView) findViewById(R.id.expense_screen_category);
@@ -256,17 +265,6 @@ public class ExpenseScreen extends AppCompatActivity {
         });
 
 
-        Button createAcc = (Button) findViewById(R.id.create_account);
-        createAcc.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                CreateAccountDialogFragment createAccount = new CreateAccountDialogFragment();
-                createAccount.show(getFragmentManager(), "create_new_account");
-            }
-        });
-
-
         Button createCat = (Button) findViewById(R.id.create_category);
         createCat.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -296,7 +294,7 @@ public class ExpenseScreen extends AppCompatActivity {
 
         if (caller.equals("expenseDate")) {
 
-            new DatePickerDialog(ExpenseScreen.this, d, EXPENSE.getDate().get(Calendar.YEAR), EXPENSE.getDate().get(Calendar.MONTH), EXPENSE.getDate().get(Calendar.DAY_OF_MONTH)).show();
+            new DatePickerDialog(ExpenseScreen.this, d, EXPENSE.getDateTime().get(Calendar.YEAR), EXPENSE.getDateTime().get(Calendar.MONTH), EXPENSE.getDateTime().get(Calendar.DAY_OF_MONTH)).show();
         } else {
 
             new DatePickerDialog(ExpenseScreen.this, d2, CAL.get(Calendar.YEAR), CAL.get(Calendar.MONTH), CAL.get(Calendar.DAY_OF_MONTH)).show();
@@ -311,11 +309,11 @@ public class ExpenseScreen extends AppCompatActivity {
             Calendar expenditureDate = Calendar.getInstance();
             expenditureDate.set(year, month, dayOfMonth, 0, 0, 0);
 
-            EXPENSE.setDate(expenditureDate);
-            Log.d(TAG, "updated date to " + EXPENSE.getDisplayableDate(ExpenseScreen.this));
+            EXPENSE.setDateTime(expenditureDate);
+            Log.d(TAG, "updated date to " + EXPENSE.getDisplayableDateTime(ExpenseScreen.this));
 
             Button btn_date = (Button) findViewById(R.id.expense_screen_date);
-            btn_date.setText(EXPENSE.getDisplayableDate(ExpenseScreen.this));
+            btn_date.setText(EXPENSE.getDisplayableDateTime(ExpenseScreen.this));
         }
     };
 
@@ -374,9 +372,8 @@ public class ExpenseScreen extends AppCompatActivity {
 
             case R.id.expense_screen_account:
 
-                Button accountBtn = (Button) findViewById(R.id.expense_screen_account);
                 bundle.putString("original_title", getResources().getString(R.string.expense_screen_dsp_account));
-                bundle.putString("current_account", accountBtn.getText().toString());
+                bundle.putParcelable("active_account", EXPENSE.getAccount());
                 break;
         }
 

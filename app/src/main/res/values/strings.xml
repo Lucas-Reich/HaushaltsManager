@@ -59,4 +59,6 @@
     <string name="month_report_bookings">Bookings</string>
 
     <string name="account">Accounts</string>
+    <string name="btn_new_acc">New Account</string>
+    <string name="no_name">(Unnamed)</string>
 </resources>

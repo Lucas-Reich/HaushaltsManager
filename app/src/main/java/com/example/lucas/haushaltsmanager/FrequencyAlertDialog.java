@@ -24,7 +24,7 @@ public class FrequencyAlertDialog extends DialogFragment {
         LayoutInflater inflater = activity.getLayoutInflater();
         final View frequencyInput = inflater.inflate(R.layout.frequency_input, null);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity.getBaseContext());
 
         builder.setTitle("Wie häufig soll das Ereigniss eintreten?");
 

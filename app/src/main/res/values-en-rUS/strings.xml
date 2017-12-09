@@ -49,4 +49,6 @@
     <string name="expense_screen_recurring_frequency">Choose frequency</string>
     <string name="choose_account">Choose Account</string>
     <string name="account">Accounts</string>
+    <string name="btn_new_acc">New Account</string>
+    <string name="no_name">(Unnamed)</string>
 </resources>

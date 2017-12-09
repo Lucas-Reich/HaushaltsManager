@@ -103,7 +103,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             //TODO wenn es eine Multiuser funktionalität muss hier der benutzer eingetragen werden, der das Geld ausgegeben hat
             txtPerson.setText("");
             txtPaidPrice.setText(String.format("%s", header.getUnsignedPrice()));
-            txtPaidCurrency.setText(header.getAccount().getCurrencySym());
+            txtPaidCurrency.setText(header.getAccount().getCurrency().getCurrencySymbol());
             //TODO wenn eine buchung in einer Ausländischen währung vorliegt, muss der Preis in der standartwährung ausgegeben werden und auch das standartwährungsreichen angezeigt werden
             txtCalcPrice.setText("");
             txtBaseCurrency.setText("");
@@ -152,7 +152,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         txtPerson.setText("");
         txtPaidPrice.setText(String.format("%s", child.getUnsignedPrice()));
         //TODO währung muss noch dynamisch gemacht werden, um mehrere Währungen zu unterstützen
-        txtPaidCurrency.setText(child.getAccount().getCurrencySym());
+        txtPaidCurrency.setText(child.getAccount().getCurrency().getCurrencySymbol());
         //TODO wenn eine buchung in einer Ausländischen währung vorliegt, muss der Preis in der standartwährung ausgegeben werden und auch das standartwährungsreichen angezeigt werden
         txtCalcPrice.setText("");
         txtBaseCurrency.setText("");

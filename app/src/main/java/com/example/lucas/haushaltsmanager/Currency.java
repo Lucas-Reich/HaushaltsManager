@@ -12,19 +12,9 @@ public class Currency implements Parcelable {
     private String currencySymbol;
     private double rateToBase;
 
-    private static String TAG = "Currency";
+    private static String TAG = Currency.class.getSimpleName();
 
-    /*
-        public Currency(long index, String currencyName, String currencyShortName, String currencySymbol, double rateToBase) {
-
-            this.index = index;
-            this.currencyName = currencyName;
-            this.currencyShortName = currencyShortName;
-            this.currencySymbol = currencySymbol;
-            this.rateToBase = rateToBase;
-        }
-    */
-    public Currency(Long index, String currencyName, String currencyShortName, String currencySymbol, Double rateToBase) {
+    Currency(Long index, String currencyName, String currencyShortName, String currencySymbol, Double rateToBase) {
 
         this.index = index != null ? index : -1;
         this.currencyName = currencyName;
@@ -33,22 +23,23 @@ public class Currency implements Parcelable {
         this.rateToBase = rateToBase != null ? rateToBase : 0;
     }
 
-    public Currency(String currencyName, String currencyShortName, String currencySymbol) {
+    Currency(long index, String currencyName, String currencyShortName, String currencySymbol) {
+
+        this(index, currencyName, currencyShortName, currencySymbol, null);
+    }
+
+    Currency(String currencyName, String currencyShortName, String currencySymbol) {
 
         this(null, currencyName, currencyShortName, currencySymbol, null);
     }
 
-    public Currency(Parcel source) {
+    Currency(Parcel source) {
 
+        this(source.readLong(), source.readString(), source.readString(), source.readString(), source.readDouble());
         Log.v(TAG, "ParcelData (Parcel source): time to put back parcel data");
-        index = source.readLong();
-        currencyName = source.readString();
-        currencyShortName = source.readString();
-        currencySymbol = source.readString();
-        rateToBase = source.readDouble();
     }
 
-    public void setIndex(long index) {
+    void setIndex(long index) {
 
         this.index = index;
     }
@@ -58,22 +49,22 @@ public class Currency implements Parcelable {
         return index;
     }
 
-    public String getCurrencyName() {
+    String getCurrencyName() {
 
         return currencyName;
     }
 
-    public String getCurrencyShortName() {
+    String getCurrencyShortName() {
 
         return currencyShortName;
     }
 
-    public String getCurrencySymbol() {
+    String getCurrencySymbol() {
 
         return currencySymbol;
     }
 
-    public double getRateToBase() {
+    double getRateToBase() {
 
         return rateToBase;
     }
@@ -92,12 +83,7 @@ public class Currency implements Parcelable {
         return 0;
     }
 
-    /**
-     * converting the custom object into an parcelable object
-     *
-     * @param dest  destination Parcel
-     * @param flags flags
-     */
+
     @Override
     public void writeToParcel(Parcel dest, int flags) {
 
@@ -109,9 +95,6 @@ public class Currency implements Parcelable {
         dest.writeDouble(rateToBase);
     }
 
-    /**
-     * regenerating the parcelable object back into our Category object
-     */
     public static final Parcelable.Creator<Currency> CREATOR = new Parcelable.Creator<Currency>() {
 
         @Override

@@ -71,7 +71,7 @@ class BookingAdapterVer2 extends ArrayAdapter<ExpenseObject> implements View.OnC
         //TODO wenn es eine Multiuser funktionalität muss hier der benutzer eingetragen werden, der das Geld ausgegeben hat
         viewHolder.txtPerson.setText("");
         viewHolder.txtPaidPrice.setText(String.format("%s", expenseObject.getUnsignedPrice()));
-        viewHolder.txtPaidCurrency.setText(expenseObject.getAccount().getCurrencySym());
+        viewHolder.txtPaidCurrency.setText(expenseObject.getAccount().getCurrency().getCurrencySymbol());
 
         //TODO wenn eine buchung in einer Ausländischen währung vorliegt, muss der Preis in der standartwährung ausgegeben werden und auch das standartwährungsreichen angezeigt werden
         viewHolder.txtCalcPrice.setText("");

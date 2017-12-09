@@ -48,8 +48,17 @@
             android:label="HaushaltsManager"
             android:parentActivityName=".MainActivityTab"/>
 
+        <activity
+            android:name=".CreateNewAccount"
+            android:label="HaushaltsManager"
+            android:parentActivityName=".MainActivityTab"/>
+
         <service
             android:name=".ExchangeRateService"
+            android:label="ExchangeRateService"/>
+
+        <service
+            android:name=".ExchangeService"
             android:label="ExchangeService"/>
     </application>
 

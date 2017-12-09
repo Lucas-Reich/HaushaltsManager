@@ -64,7 +64,7 @@ public class TabTwoMonthlyReports extends Fragment {
 
         if (!expense.hasChildren()) {
 
-            monthlyReports[expense.getDate().get(Calendar.MONTH)].addExpense(expense);
+            monthlyReports[expense.getDateTime().get(Calendar.MONTH)].addExpense(expense);
         } else {
 
             for (ExpenseObject child : expense.getChildren()) {
