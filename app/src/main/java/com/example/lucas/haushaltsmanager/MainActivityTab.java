@@ -19,7 +19,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
 import android.widget.Toast;
 
 public class MainActivityTab extends AppCompatActivity {
@@ -47,18 +46,17 @@ public class MainActivityTab extends AppCompatActivity {
         SharedPreferences.Editor editor = settings.edit();
         editor.putLong("activeAccount", 1);
         editor.putString("mainCurrency", "€");
-        editor.putLong("mainCurrencyIndex", 1);
+        editor.putLong("mainCurrencyIndex", 32);
 
         editor.commit();
 
 
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.activity_main_tab);
         setContentView(R.layout.tab_main_mit_nav_drawer);
 
 
-        FloatingActionButton testServcie = (FloatingActionButton) findViewById(R.id.service_fab);
-        testServcie.setOnClickListener(new View.OnClickListener() {
+        FloatingActionButton testService = (FloatingActionButton) findViewById(R.id.service_fab);
+        testService.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -66,7 +64,6 @@ public class MainActivityTab extends AppCompatActivity {
                 startService(serviceIntent);
             }
         });
-
 
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -191,8 +188,8 @@ public class MainActivityTab extends AppCompatActivity {
 
             case R.id.choose_account:
 
-                ChooseAccountsDialogFragment test = new ChooseAccountsDialogFragment();
-                test.show(getFragmentManager(), "test");
+                ChooseAccountsDialogFragment chooseAccountFragment = new ChooseAccountsDialogFragment();
+                chooseAccountFragment.show(getFragmentManager(), "test");
                 break;
 
             default:

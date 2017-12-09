@@ -3,6 +3,7 @@ package com.example.lucas.haushaltsmanager;
 import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
 import android.text.format.DateUtils;
 import android.util.Log;
 
@@ -20,14 +21,17 @@ class ExpenseObject implements Parcelable {
     private Calendar date;
     private String title = "";
     private double price = 0;
+    private Double calcPrice = null;
     private boolean expenditure;
     private Category category;
     private List<String> tag = new LinkedList<>();
     private String notice = "";
     private Account account;
+    private Currency currency;
     private List<ExpenseObject> children = new ArrayList<>();
+    private double exchangeRate = 0;
 
-    private String TAG = "ExpenseObject: ";
+    private String TAG = ExpenseObject.class.getSimpleName();
 
     public ExpenseObject(String title, double price, boolean expenditure, Category category, List<String> tags) {
 
@@ -57,6 +61,32 @@ class ExpenseObject implements Parcelable {
         this("", 0.0, true, new Category(), "");
     }
 
+    void setExchangeRate(double exchangeRate) {
+
+        this.exchangeRate = exchangeRate;
+    }
+
+    double getExchangeRate() {
+
+        return this.exchangeRate;
+    }
+
+    @Nullable
+    Double getCalcPrice() {
+
+        return calcPrice != null ? calcPrice * currency.getRateToBase() : null;
+    }
+
+    Currency getCurrency() {
+
+        return this.currency;
+    }
+
+    void setCurrency(Currency currency) {
+
+        this.currency = currency;
+    }
+
     @Override
     public String toString() {
 
@@ -68,44 +98,32 @@ class ExpenseObject implements Parcelable {
         return toDisplay + toDisplay2 + toDisplay3;
     }
 
-    Calendar getDate() {
+    Calendar getDateTime() {
 
         return this.date;
     }
 
-/*deprecated since 22.11.17 ersetzt mit getDBDate()
- *
-    String getDBDate() {
-
-        String dbDate = this.date.get(Calendar.YEAR) + "-";
-        if (this.date.get(Calendar.MONTH) <= 9) {
-
-            dbDate += "0";
-        }
-        dbDate += this.date.get(Calendar.MONTH);
-        dbDate += "-" + this.date.get(Calendar.DAY_OF_MONTH) + " " + this.date.get(Calendar.HOUR_OF_DAY) + ":" + this.date.get(Calendar.MINUTE) + ":" + this.date.get(Calendar.SECOND);
-
-        return dbDate;
-    }
- *
- */
-
-    String getDBDate() {
+    String getDBDateTime() {
 
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(this.date.getTime());
     }
 
-    String getDisplayableDate(Context context) {
+    String getDate() {
+
+        return new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(this.date.getTime());
+    }
+
+    String getDisplayableDateTime(Context context) {
 
         return DateUtils.formatDateTime(context, this.date.getTimeInMillis(), DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_NUMERIC_DATE | DateUtils.FORMAT_SHOW_YEAR);
     }
 
-    void setDate(Calendar date) {
+    void setDateTime(Calendar date) {
 
         this.date = date;
     }
 
-    void setDate(String date) {
+    void setDateTime(String date) {
 
         try {
 
@@ -137,22 +155,6 @@ class ExpenseObject implements Parcelable {
 
     void setPrice(double price) {
         this.price = price;
-    }
-
-    void addToPrice(double toAdd) {
-
-        double newPrice = toAdd + getSignedPrice();
-
-        // wenn der preis positiv ist und auch sein soll
-        if ((newPrice >= 0) && expenditure) {
-
-            this.price = newPrice;
-            this.expenditure = false;
-        } else if ((newPrice < 0) && !expenditure) {
-
-            this.price = 0 - (newPrice);
-            this.expenditure = true;
-        }
     }
 
     long getIndex() {
@@ -187,11 +189,6 @@ class ExpenseObject implements Parcelable {
         this.category = category;
     }
 
-    void setCategory(String categoryName, int color) {
-
-        this.category = new Category(categoryName, color);
-    }
-
     List<String> getTags() {
         return tag;
     }
@@ -215,7 +212,9 @@ class ExpenseObject implements Parcelable {
         this.notice = notice;
     }
 
+    @Nullable
     Account getAccount() {
+
         return account;
     }
 
@@ -261,7 +260,7 @@ class ExpenseObject implements Parcelable {
         Log.d("ExpenseObject expend: ", "" + expenditure);
         Log.d("ExpenseObject title: ", "" + title);
         Log.d("ExpenseObject tag: ", "" + tag);
-        Log.d("ExpenseObject date: ", "" + getDate());
+        Log.d("ExpenseObject date: ", "" + getDateTime());
         Log.d("ExpenseObject notice: ", "" + notice);
         Log.d("ExpenseObject account: ", "" + account.getAccountName());
 
@@ -296,6 +295,7 @@ class ExpenseObject implements Parcelable {
         notice = source.readString();
         account = source.readParcelable(Account.class.getClassLoader());
         children = source.createTypedArrayList(ExpenseObject.CREATOR);
+        currency = source.readParcelable(Currency.class.getClassLoader());
     }
 
     /**
@@ -329,6 +329,7 @@ class ExpenseObject implements Parcelable {
         dest.writeString(notice);
         dest.writeParcelable(account, flags);
         dest.writeList(children);
+        dest.writeParcelable(currency, flags);
     }
 
     /**
