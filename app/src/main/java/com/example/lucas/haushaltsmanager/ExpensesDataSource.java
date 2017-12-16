@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -44,97 +45,47 @@ class ExpensesDataSource {
         dbHelper.close();
         Log.d(TAG, "Closed Db with the help of dbHelper.");
     }
-/*veraltet seit 02.12.2017
-    private ExpenseObject cursorToExpense(Cursor cursor) {
 
-        ExpenseObject expense = new ExpenseObject();
-
-        int idIndex = cursor.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_ID);
-        expense.setIndex(cursor.getLong(idIndex));
-
-        int idAmount = cursor.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_PRICE);
-        expense.setPrice(cursor.getDouble(idAmount));
-
-        int idCategory = cursor.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID);
-        Category category1 = getCategoryById(cursor.getLong(idCategory));
-        expense.setCategory(category1);
-
-        int idExpenditure = cursor.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_EXPENDITURE);
-        expense.setExpenditure(cursor.getInt(idExpenditure));
-
-        int idTitle = cursor.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_TITLE);
-        expense.setTitle(cursor.getString(idTitle));
-
-        int idDate = cursor.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_DATE);
-        expense.setDateTime(cursor.getString(idDate));
-
-        int idNotice = cursor.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_NOTICE);
-        expense.setNotice(cursor.getString(idNotice));
-
-        int idAccount = cursor.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID);
-        //booking has children trigger
-        if (cursor.getLong(idAccount) == 9999) {
-
-            expense.addChildren(getChildrenToParent(expense.getIndex()));
-            expense.setAccount(new Account(9999, "", 0, new Currency("Euro", "EUR", "€")));
-        } else {
-
-            expense.setAccount(getAccountById(cursor.getLong(idAccount)));
-        }
-
-        return expense;
-    }
-*/
-
+    @NonNull
     private ExpenseObject cursorToChildBooking(Cursor c) {
 
         CAL = Calendar.getInstance();
 
-        ExpenseObject expense = new ExpenseObject();
-
-        int expenseId = c.getInt(0);
-        expense.setIndex(expenseId);
-
+        int expenseId = c.getInt(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_ID));
         String date = c.getString(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_DATE));
-        expense.setDateTime(date);
-
         String title = c.getString(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_TITLE));
-        expense.setTitle(title);
-
         double price = c.getDouble(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_PRICE));
-        expense.setPrice(price);
-
         boolean expenditure = c.getInt(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_EXPENDITURE)) == 1;
-        expense.setExpenditure(expenditure);
-
         String notice = c.getString(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_NOTICE));
-        expense.setNotice(notice);
+        int exchangeRate = c.getInt(c.getColumnIndex(ExpensesDbHelper.CHILD_BOOKINGS_COL_EXCHANGE_RATE));
 
-        double exchangeRate = c.getDouble(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_EXCHANGE_RATE));
-        expense.setExchangeRate(exchangeRate);
-
-        long categoryId = c.getLong(11);
+        long categoryId = c.getLong(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID));
         String categoryName = c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_NAME));
         int categoryColor = c.getInt(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_COLOR));
-        expense.setCategory(new Category(categoryId, categoryName, categoryColor));
+        Category category = new Category(categoryId, categoryName, categoryColor);
 
-        long curId = c.getLong(14);
+        long curId = c.getLong(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID));
         String curName = c.getString(c.getColumnIndex(ExpensesDbHelper.CURRENCIES_COL_NAME));
         String curShortName = c.getString(c.getColumnIndex(ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME));
         String curSymbol = c.getString(c.getColumnIndex(ExpensesDbHelper.CURRENCIES_COL_SYMBOL));
         Double rateToBase = getRateToBase(curId, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(CAL.getTime()));
         Currency currency = new Currency(curId, curName, curShortName, curSymbol, rateToBase);
 
-        long accountId = c.getLong(8);
+        long accountId = c.getLong(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID));
         String accountName = c.getString(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_NAME));
         int accountBalance = c.getInt(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_BALANCE));
-        expense.setAccount(new Account(accountId, accountName, accountBalance, currency));
+        Account account = new Account(accountId, accountName, accountBalance, currency);
+
+        long currencyId = c.getLong(c.getColumnIndex(ExpensesDbHelper.CHILD_BOOKINGS_COL_CURRENCY_ID));
+        Currency expenseCurrency = getCurrency(currencyId);
+        expenseCurrency.setRateToBase(exchangeRate);
+
 
 /*TODO das expenseobject sollte auch das tag object benutzen
         expense.setTags(getTagsToBooking(expenseId));
 */
 
-        return expense;
+        return new ExpenseObject(expenseId, title, price, expenditure, date, category, notice, account, expenseCurrency);
     }
 
     /**
@@ -147,55 +98,55 @@ class ExpensesDataSource {
 
         CAL = Calendar.getInstance();
 
-        ExpenseObject expense = new ExpenseObject();
+        int expenseId = c.getInt(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_ID));
 
-        int expenseId = c.getInt(0);
-        expense.setIndex(expenseId);
+        Log.d(TAG, "cursorToExpense: " + expenseId);
 
         String date = c.getString(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_DATE));
-        expense.setDateTime(date);
 
         String title = c.getString(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_TITLE));
-        expense.setTitle(title);
 
         double price = c.getDouble(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_PRICE));
-        expense.setPrice(price);
 
         boolean expenditure = c.getInt(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_EXPENDITURE)) == 1;
-        expense.setExpenditure(expenditure);
 
         String notice = c.getString(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_NOTICE));
-        expense.setNotice(notice);
 
-        double exchangeRate = c.getDouble(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_EXCHANGE_RATE));
-        expense.setExchangeRate(exchangeRate);
-
-        long categoryId = c.getLong(11);
+        long categoryId = c.getLong(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID));
         String categoryName = c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_NAME));
         int categoryColor = c.getInt(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_COLOR));
-        expense.setCategory(new Category(categoryId, categoryName, categoryColor));
+        Category category = new Category(categoryId, categoryName, categoryColor);
 
-        long curId = c.getLong(14);
+        long curId = c.getLong(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID));
         String curName = c.getString(c.getColumnIndex(ExpensesDbHelper.CURRENCIES_COL_NAME));
         String curShortName = c.getString(c.getColumnIndex(ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME));
         String curSymbol = c.getString(c.getColumnIndex(ExpensesDbHelper.CURRENCIES_COL_SYMBOL));
-        Double rateToBase = getRateToBase(curId, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(CAL.getTime()));
+        Double rateToBase = getRateToBase(curId, date.substring(0, 10));
         Currency currency = new Currency(curId, curName, curShortName, curSymbol, rateToBase);
 
-        long accountId = c.getLong(8);
+        long accountId = c.getLong(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID));
         String accountName = c.getString(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_NAME));
         int accountBalance = c.getInt(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_BALANCE));
-        expense.setAccount(new Account(accountId, accountName, accountBalance, currency));
+        Account account = new Account(accountId, accountName, accountBalance, currency);
 
-        boolean isParent = c.getInt(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_IS_PARENT)) == 1;
-        if (isParent) {
+        int exchangeRate = c.getInt(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_EXCHANGE_RATE));
 
-            expense.addChildren(getChildrenToParent(expenseId));
-        }
+        long currencyId = c.getLong(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_CURRENCY_ID));
+        Currency expenseCurrency = getCurrency(currencyId);
+        expenseCurrency.setRateToBase(exchangeRate);
 
 /*TODO das expenseobject sollte auch das tag object benutzen
         expense.setTags(getTagsToBooking(expenseId));
 */
+
+        ExpenseObject expense = new ExpenseObject(expenseId, title, price, expenditure, date, category, notice, account, expenseCurrency);
+
+        boolean isParent = c.getInt(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_IS_PARENT)) == 1;
+        if (isParent) {
+
+            Log.d(TAG, "cursorToExpense: " + expenseId);
+            expense.addChildren(getChildrenToParent(expenseId));
+        }
 
         return expense;
     }
@@ -206,6 +157,7 @@ class ExpensesDataSource {
      * @param c database cursor
      * @return Category object
      */
+    @NonNull
     private Category cursorToCategory(Cursor c) {
 
         long categoryIndex = c.getLong(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_ID));
@@ -221,6 +173,7 @@ class ExpensesDataSource {
      * @param c database cursor
      * @return Currency object
      */
+    @NonNull
     private Currency cursorToCurrency(Cursor c) {
 
         long currencyId = c.getLong(c.getColumnIndex(ExpensesDbHelper.CURRENCIES_COL_ID));
@@ -237,6 +190,7 @@ class ExpensesDataSource {
      * @param c database cursor
      * @return Account object
      */
+    @NonNull
     private Account cursorToAccount(Cursor c) {
 
         long accountIndex = c.getLong(0);
@@ -259,6 +213,7 @@ class ExpensesDataSource {
      * @param c database cursor
      * @return Tag object
      */
+    @NonNull
     private Tag cursorToTag(Cursor c) {
 
         long tagIndex = c.getLong(c.getColumnIndex(ExpensesDbHelper.TAGS_COL_ID));
@@ -270,12 +225,15 @@ class ExpensesDataSource {
 
     private long createDummyExpense() {
 
-        ExpenseObject dummyExpense = new ExpenseObject();
-        dummyExpense.setTitle("Dummy");
-        dummyExpense.setPrice(0);
-        dummyExpense.setExpenditure(true);
-        dummyExpense.setCategory(new Category());
-        dummyExpense.setAccount(new Account(9999, "", 0, null));
+        SharedPreferences preferences = mContext.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
+        Currency currency = getCurrency(preferences.getLong("mainCurrencyIndex", 1));
+
+        ExpenseObject dummyExpense;
+
+        Category category = new Category();
+        Account account = new Account(9999, "", 0, currency);
+
+        dummyExpense = new ExpenseObject("Dummy", 0, true, category, null, account);
         dummyExpense.setDateTime(Calendar.getInstance());
 
         return createBooking(dummyExpense);
@@ -341,7 +299,7 @@ class ExpensesDataSource {
         Log.d(TAG, "getAccountById: " + selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
-        Log.d(TAG, "getAccountById: " +  DatabaseUtils.dumpCursorToString(c));
+        Log.d(TAG, "getAccountById: " + DatabaseUtils.dumpCursorToString(c));
         c.moveToFirst();
 
         return c.isAfterLast() ? null : cursorToAccount(c);
@@ -462,7 +420,7 @@ class ExpensesDataSource {
         Log.d(TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
-        Log.d(TAG, "getTagById: "  + DatabaseUtils.dumpCursorToString(c));
+        Log.d(TAG, "getTagById: " + DatabaseUtils.dumpCursorToString(c));
         c.moveToFirst();
 
         return c.isAfterLast() ? null : cursorToTag(c);
@@ -629,13 +587,13 @@ class ExpensesDataSource {
         values.put(ExpensesDbHelper.BOOKINGS_COL_EXCHANGE_RATE, expense.getExchangeRate());
         if (expense.hasChildren() || expense.getAccount().getIndex() == 9999) {
 
+            Log.d(TAG, "createBooking: hallo");
             values.put(ExpensesDbHelper.BOOKINGS_COL_IS_PARENT, true);
         } else {
 
-
             values.put(ExpensesDbHelper.BOOKINGS_COL_IS_PARENT, false);
         }
-        //values.put(ExpensesDbHelper.BOOKINGS_COL_CURRENCY_ID, expense.getCurrency().getIndex());TODO überlegen wie ichd as mache
+        values.put(ExpensesDbHelper.BOOKINGS_COL_CURRENCY_ID, expense.getExpenseCurrency().getIndex());
 
         long bookingId = database.insert(ExpensesDbHelper.TABLE_BOOKINGS, null, values);
         Log.d(TAG, "created expense at index: " + bookingId);
@@ -669,27 +627,27 @@ class ExpensesDataSource {
                 + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_NOTICE + ", "
                 + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_EXCHANGE_RATE + ", "
                 + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_IS_PARENT + ", "
-                + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_ID + ", "
+                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID + ", "
                 + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_NAME + ", "
                 + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_BALANCE + ", "
-                + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_ID + ", "
-                + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_NAME + ", "
-                + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_COLOR + ", "
-                + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CURRENCIES_COL_ID + ", "
+                + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID + ", "
                 + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_NAME + ", "
                 + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME + ", "
-                + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SYMBOL
+                + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SYMBOL + ", "
+                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID + ", "
+                + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_NAME + ", "
+                + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_COLOR + ", "
+                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_CURRENCY_ID
                 + " FROM " + ExpensesDbHelper.TABLE_BOOKINGS
-                + " JOIN " + ExpensesDbHelper.TABLE_CATEGORIES + " ON " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID + " = " + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_ID
-                + " JOIN " + ExpensesDbHelper.TABLE_ACCOUNTS + " ON " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID + " = " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_ID
-                + " JOIN " + ExpensesDbHelper.TABLE_CURRENCIES + " ON " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID + " = " + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_ID
+                + " LEFT JOIN " + ExpensesDbHelper.TABLE_CATEGORIES + " ON " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID + " = " + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_ID
+                + " LEFT JOIN " + ExpensesDbHelper.TABLE_ACCOUNTS + " ON " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID + " = " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_ID
+                + " LEFT JOIN " + ExpensesDbHelper.TABLE_CURRENCIES + " ON " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID + " = " + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_ID
                 + " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_ID + " = " + bookingId
                 + " ORDER BY " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_DATE + " DESC;";
         Log.d(TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
         Log.d(TAG, "getBookingById: " + DatabaseUtils.dumpCursorToString(c));
-        Log.d(TAG, DatabaseUtils.dumpCursorToString(c));
 
         c.moveToFirst();
         return cursorToExpense(c);
@@ -724,16 +682,17 @@ class ExpensesDataSource {
                 + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_NOTICE + ", "
                 + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_EXCHANGE_RATE + ", "
                 + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_IS_PARENT + ", "
-                + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_ID + ", "
+                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID + ", "
                 + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_NAME + ", "
                 + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_BALANCE + ", "
-                + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_ID + ", "
-                + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_NAME + ", "
-                + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_COLOR + ", "
-                + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CURRENCIES_COL_ID + ", "
+                + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID + ", "
                 + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_NAME + ", "
                 + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME + ", "
-                + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SYMBOL
+                + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SYMBOL + ", "
+                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID + ", "
+                + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_NAME + ", "
+                + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_COLOR + ", "
+                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_CURRENCY_ID
                 + " FROM " + ExpensesDbHelper.TABLE_BOOKINGS
                 + " LEFT JOIN " + ExpensesDbHelper.TABLE_CATEGORIES + " ON " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID + " = " + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_ID
                 + " LEFT JOIN " + ExpensesDbHelper.TABLE_ACCOUNTS + " ON " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID + " = " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_ID
@@ -820,10 +779,10 @@ class ExpensesDataSource {
         values.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_NOTICE, child.getNotice());
         values.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_ACCOUNT_ID, child.getAccount().getIndex());
         values.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_EXCHANGE_RATE, child.getExchangeRate());
-        //values.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_CURRENCY_ID, child.getCurrency().getIndex());TODO
+        values.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_CURRENCY_ID, child.getExpenseCurrency().getIndex());
 
         long childId = database.insert(ExpensesDbHelper.TABLE_CHILD_BOOKINGS, null, values);
-        Log.d(TAG, "created expense at index: " + childId);
+        Log.d(TAG, "created child expense at index: " + childId);
 
 /*TODO siehe createBooking
         for (String tag : child.getTags()) {
@@ -894,20 +853,21 @@ class ExpensesDataSource {
                 + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_DATE + ", "
                 + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_NOTICE + ", "
                 + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_EXCHANGE_RATE + ", "
-                + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_ID + ", "
+                + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_CATEGORY_ID + ", "
                 + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_NAME + ", "
                 + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_COLOR + ", "
-                + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_ID + ", "
+                + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_ACCOUNT_ID + ", "
                 + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_NAME + ", "
                 + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_BALANCE + ", "
-                + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_ID + ", "
+                + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID + ", "
                 + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_NAME + ", "
                 + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME + ", "
-                + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SYMBOL
+                + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SYMBOL + ", "
+                + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_CURRENCY_ID
                 + " FROM " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS
-                + " JOIN " + ExpensesDbHelper.TABLE_CATEGORIES + " ON " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_CATEGORY_ID + " = " + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_ID
-                + " JOIN " + ExpensesDbHelper.TABLE_ACCOUNTS + " ON " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_ACCOUNT_ID + " = " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_ID
-                + " JOIN " + ExpensesDbHelper.TABLE_CURRENCIES + " ON " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID + " = " + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_ID
+                + " LEFT JOIN " + ExpensesDbHelper.TABLE_CATEGORIES + " ON " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_CATEGORY_ID + " = " + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_ID
+                + " LEFT JOIN " + ExpensesDbHelper.TABLE_ACCOUNTS + " ON " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_ACCOUNT_ID + " = " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_ID
+                + " LEFT JOIN " + ExpensesDbHelper.TABLE_CURRENCIES + " ON " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID + " = " + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_ID
                 + " WHERE " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_PARENT_BOOKING_ID + " = " + parentId
                 + " ORDER BY " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_DATE + " DESC;";
         Log.d(TAG, selectQuery);
@@ -947,11 +907,12 @@ class ExpensesDataSource {
                 + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_ID + ", "
                 + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_NAME + ", "
                 + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME + ", "
-                + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SYMBOL
-                + " FROM " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS
-                + " JOIN " + ExpensesDbHelper.TABLE_CATEGORIES + " ON " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_CATEGORY_ID + " = " + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_ID
-                + " JOIN " + ExpensesDbHelper.TABLE_ACCOUNTS + " ON " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_ACCOUNT_ID + " = " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_ID
-                + " JOIN " + ExpensesDbHelper.TABLE_CURRENCIES + " ON " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID + " = " + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_ID
+                + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SYMBOL + ", "
+                + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_CURRENCY_ID
+                + " LEFT FROM " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS
+                + " LEFT JOIN " + ExpensesDbHelper.TABLE_CATEGORIES + " ON " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_CATEGORY_ID + " = " + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_ID
+                + " LEFT JOIN " + ExpensesDbHelper.TABLE_ACCOUNTS + " ON " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_ACCOUNT_ID + " = " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_ID
+                + " LEFT JOIN " + ExpensesDbHelper.TABLE_CURRENCIES + " ON " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID + " = " + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_ID
                 + " WHERE " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_ID + " = " + childId
                 + " ORDER BY " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_DATE + " DESC;";
         Log.d(TAG, "getChildBookingById: " + selectQuery);
@@ -1293,7 +1254,7 @@ class ExpensesDataSource {
         return database.insert(ExpensesDbHelper.TABLE_CURRENCIES, null, values);
     }//DONE
 
-    @Nullable
+    @NonNull
     Currency getCurrency(long currencyId) {
 
         String selectQuery = "SELECT "
@@ -1306,10 +1267,10 @@ class ExpensesDataSource {
         Log.d(TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
-        Log.d(TAG, "getCurrency: " + DatabaseUtils.dumpCursorToString(c));
+        Log.d(TAG, "getExpenseCurrency: " + DatabaseUtils.dumpCursorToString(c));
         c.moveToFirst();
 
-        return c.isAfterLast() ? null : cursorToCurrency(c);
+        return cursorToCurrency(c);
     }//DONE2
 
     @Nullable
@@ -1325,7 +1286,7 @@ class ExpensesDataSource {
         Log.d(TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
-        Log.d(TAG, "getCurrency: " + DatabaseUtils.dumpCursorToString(c));
+        Log.d(TAG, "getExpenseCurrency: " + DatabaseUtils.dumpCursorToString(c));
         c.moveToFirst();
 
         return c.isAfterLast() ? null : cursorToCurrency(c);
@@ -1451,11 +1412,15 @@ class ExpensesDataSource {
                 + ExpensesDbHelper.CURRENCY_EXCHANGE_RATES_COL_EXCHANGE_RATE + ", "
                 + ExpensesDbHelper.CURRENCY_EXCHANGE_RATES_COL_SERVER_DATE
                 + " FROM " + ExpensesDbHelper.TABLE_CURRENCY_EXCHANGE_RATES
-                + " WHERE " + ExpensesDbHelper.CURRENCY_EXCHANGE_RATES_COL_FROM_CURRENCY_ID + " = " + fromCurIndex
-                + " AND " + ExpensesDbHelper.CURRENCY_EXCHANGE_RATES_COL_TO_CURRENCY_ID + " = " + toCurIndex;
+                + " WHERE "
+                + "(" + ExpensesDbHelper.CURRENCY_EXCHANGE_RATES_COL_FROM_CURRENCY_ID + " = " + fromCurIndex
+                + " OR " + ExpensesDbHelper.CURRENCY_EXCHANGE_RATES_COL_FROM_CURRENCY_ID + " = " + toCurIndex + ")"
+                + " AND "
+                + "(" + ExpensesDbHelper.CURRENCY_EXCHANGE_RATES_COL_TO_CURRENCY_ID + " = " + toCurIndex
+                + " OR " + ExpensesDbHelper.CURRENCY_EXCHANGE_RATES_COL_TO_CURRENCY_ID + " = " + fromCurIndex + ")";
 
         if (date != null)
-            selectQuery += " AND " + ExpensesDbHelper.CURRENCY_EXCHANGE_RATES_COL_TIMESTAMP + " = '" + date + "'";
+            selectQuery += " AND " + ExpensesDbHelper.CURRENCY_EXCHANGE_RATES_COL_SERVER_DATE + " = '" + date + "'";
 
         selectQuery += " ORDER BY " + ExpensesDbHelper.CURRENCY_EXCHANGE_RATES_COL_TIMESTAMP + " DESC;";
         Log.d(TAG, "getExchangeRate: " + selectQuery);
@@ -1506,17 +1471,17 @@ class ExpensesDataSource {
     /**
      * Method for getting an exchange rate from rate to base to toCurIndex
      *
-     * @param toCurIndex id of convert to currency
-     * @param date       date of the exchange rate
+     * @param fromCurIndex id of convert to currency
+     * @param date         date of the exchange rate
      * @return rate to base if available else null
      */
     @Nullable
-    Double getRateToBase(long toCurIndex, String date) {
+    Double getRateToBase(long fromCurIndex, String date) {
 
         SharedPreferences preferences = mContext.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
         long baseCurIndex = preferences.getLong("mainCurrencyIndex", 0);
 
-        HashMap<Double, String> extendedExchangeRate = getExtendedExchangeRate(baseCurIndex, toCurIndex, date);
+        HashMap<Double, String> extendedExchangeRate = getExtendedExchangeRate(fromCurIndex, baseCurIndex, date);
 
         if (extendedExchangeRate != null) {
 

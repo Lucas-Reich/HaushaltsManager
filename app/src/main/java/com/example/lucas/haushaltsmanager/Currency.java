@@ -2,6 +2,7 @@ package com.example.lucas.haushaltsmanager;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 public class Currency implements Parcelable {
@@ -14,23 +15,23 @@ public class Currency implements Parcelable {
 
     private static String TAG = Currency.class.getSimpleName();
 
-    Currency(Long index, String currencyName, String currencyShortName, String currencySymbol, Double rateToBase) {
+    Currency(long index,@NonNull String currencyName,@NonNull String currencyShortName,@NonNull String currencySymbol, Double rateToBase) {
 
-        this.index = index != null ? index : -1;
+        this.index = index;
         this.currencyName = currencyName;
         this.currencyShortName = currencyShortName;
         this.currencySymbol = currencySymbol;
         this.rateToBase = rateToBase != null ? rateToBase : 0;
     }
 
-    Currency(long index, String currencyName, String currencyShortName, String currencySymbol) {
+    Currency(long index,@NonNull String currencyName, @NonNull String currencyShortName,@NonNull String currencySymbol) {
 
         this(index, currencyName, currencyShortName, currencySymbol, null);
     }
 
-    Currency(String currencyName, String currencyShortName, String currencySymbol) {
+    Currency(@NonNull String currencyName,@NonNull String currencyShortName,@NonNull String currencySymbol) {
 
-        this(null, currencyName, currencyShortName, currencySymbol, null);
+        this(-1, currencyName, currencyShortName, currencySymbol, null);
     }
 
     Currency(Parcel source) {
@@ -69,7 +70,7 @@ public class Currency implements Parcelable {
         return rateToBase;
     }
 
-    public void setRateToBase(double rate) {
+    void setRateToBase(double rate) {
 
         this.rateToBase = rate;
     }

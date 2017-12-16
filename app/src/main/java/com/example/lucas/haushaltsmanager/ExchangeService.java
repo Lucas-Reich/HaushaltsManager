@@ -36,7 +36,7 @@ public class ExchangeService extends IntentService {
 
         for (ExpenseObject expense : expenses) {
 
-            long expenseCurIndex = expense.getCurrency().getIndex();
+            long expenseCurIndex = expense.getExpenseCurrency().getIndex();
 
             HashMap<Double, String> exchangeRate = database.getExtendedExchangeRate(expenseCurIndex, baseCurIndex, expense.getDBDateTime());
             Map.Entry<Double, String> entry = exchangeRate.entrySet().iterator().next();

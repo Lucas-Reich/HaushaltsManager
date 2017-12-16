@@ -18,6 +18,7 @@ import java.util.List;
 
 public class CreateNewAccount extends AppCompatActivity implements OnItemSelectedListener, BasicDialog.BasicDialogCommunicator {
 
+    SharedPreferences preferences;
     Button accountName;
     Button accountBalance;
     ExpensesDataSource database;
@@ -27,10 +28,14 @@ public class CreateNewAccount extends AppCompatActivity implements OnItemSelecte
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        preferences = getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
+
         database = new ExpensesDataSource(this);
         database.open();
 
-        account = new Account(null, null, null);
+
+        Currency defCurrency = database.getCurrency(preferences.getLong("mainCurrencyIndex", 1));
+        account = new Account(getResources().getString(R.string.no_name), null, defCurrency);
 
         setContentView(R.layout.activity_new_account);
 

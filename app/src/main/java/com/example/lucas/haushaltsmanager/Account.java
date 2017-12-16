@@ -2,6 +2,7 @@ package com.example.lucas.haushaltsmanager;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 class Account implements Parcelable {
@@ -13,17 +14,17 @@ class Account implements Parcelable {
 
     private String TAG = Account.class.getSimpleName();
 
-    public Account(long index, String accountName, int balance, Currency currency) {
+    Account(long index, @NonNull String accountName, Integer balance,@NonNull Currency currency) {
 
         this.index = index;
         this.accountName = accountName;
-        this.balance = balance;
+        this.balance = balance != null ? balance : 0;
         this.currency = currency;
     }
 
-    public Account(String accountName, Integer balance, Currency currency) {
+    Account(@NonNull String accountName, Integer balance,@NonNull Currency currency) {
 
-        this(0, accountName, balance != null ? balance : 0, currency);
+        this(-1, accountName, balance != null ? balance : 0, currency);
     }
 
     public long getIndex() {
@@ -34,32 +35,33 @@ class Account implements Parcelable {
         this.index = index;
     }
 
-    public String getAccountName() {
+    String getAccountName() {
         return accountName;
     }
 
-    public void setAccountName(String accountName) {
+    void setAccountName(String accountName) {
         this.accountName = accountName;
     }
 
-    public int getBalance() {
+    int getBalance() {
         return balance;
     }
 
-    public void setBalance(int balance) {
+    void setBalance(int balance) {
         this.balance = balance;
     }
 
-    public Currency getCurrency() {
+    Currency getCurrency() {
         return currency;
     }
 
-    public void setCurrency(Currency currency) {
+    void setCurrency(Currency currency) {
         this.currency = currency;
     }
 
 
     //make class Parcelable
+
     /**
      * This will be only used by ParcelableCategories
      * see: http://prasanta-paul.blogspot.de/2010/06/android-parcelable-example.html (Parcelable ArrayList)

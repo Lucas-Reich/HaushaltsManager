@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -25,7 +26,8 @@ public class AccountPickerDialogFragment extends DialogFragment {
         final ExpenseScreen expenseScreen = (ExpenseScreen) getActivity();
         final ArrayList<Account> accounts = expensesDataSource.getAllAccounts();
         final Account activeAccount = args.getParcelable("active_account");
-        final Button btn = (Button) expenseScreen.findViewById(R.id.expense_screen_account);
+        final Button accountBtn = (Button) expenseScreen.findViewById(R.id.expense_screen_account);
+        final TextView currencyBtn = (TextView) expenseScreen.findViewById(R.id.expense_screen_amount_currency);
 
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -38,7 +40,8 @@ public class AccountPickerDialogFragment extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int selectedAccount) {
 
-                btn.setText(accounts.get(selectedAccount).getAccountName());
+                accountBtn.setText(accounts.get(selectedAccount).getAccountName());
+                currencyBtn.setText(accounts.get(selectedAccount).getCurrency().getCurrencySymbol());
                 expenseScreen.EXPENSE.setAccount(accounts.get(selectedAccount));
                 Log.d(TAG, "set active account to: " + accounts.get(selectedAccount).getAccountName() + ", " + accounts.get(selectedAccount).getIndex());
 

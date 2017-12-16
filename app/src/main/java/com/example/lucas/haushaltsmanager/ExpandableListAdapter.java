@@ -1,7 +1,9 @@
 package com.example.lucas.haushaltsmanager;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +20,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     private Context mContext;
     private List<ExpenseObject> listDataHeader;
     private HashMap<ExpenseObject, List<ExpenseObject>> listDataChild;
-    private String TAG = "ExpandableListAdapter";
+    private String TAG = ExpandableListAdapter.class.getSimpleName();
     private ArrayList<Long> selectedGroups;
 
     public ExpandableListAdapter(Context context, List<ExpenseObject> listDataHeader, HashMap<ExpenseObject, List<ExpenseObject>> listChildData) {
@@ -80,6 +82,8 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
         if (getChildrenCount(groupPosition) == 0) {
 
+            SharedPreferences preferences = mContext.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
+
             convertView = inflater.inflate(R.layout.activity_test_exp_listview_list_group_child_n, null);
 
             TextView circleLetter = (TextView) convertView.findViewById(R.id.booking_item_circle);
@@ -103,10 +107,21 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             //TODO wenn es eine Multiuser funktionalität muss hier der benutzer eingetragen werden, der das Geld ausgegeben hat
             txtPerson.setText("");
             txtPaidPrice.setText(String.format("%s", header.getUnsignedPrice()));
-            txtPaidCurrency.setText(header.getAccount().getCurrency().getCurrencySymbol());
-            //TODO wenn eine buchung in einer Ausländischen währung vorliegt, muss der Preis in der standartwährung ausgegeben werden und auch das standartwährungsreichen angezeigt werden
-            txtCalcPrice.setText("");
-            txtBaseCurrency.setText("");
+            txtPaidCurrency.setText(header.getExpenseCurrency().getCurrencySymbol());
+
+            if (header.getExpenseCurrency().getIndex() == preferences.getLong("mainCurrencyIndex", 0)) {
+                //booking currency is the same as the base currency
+
+                txtCalcPrice.setText("");
+                txtBaseCurrency.setText("");
+            } else {
+                //booking currency is not the same currency as the base currency
+
+                txtPaidPrice.setText(String.format("%s", header.getUnsignedPrice()));
+                txtPaidCurrency.setText(header.getExpenseCurrency().getCurrencySymbol());
+                txtCalcPrice.setText(String.format("%s", header.getCalcPrice()));
+                txtBaseCurrency.setText(preferences.getString("mainCurrency", "€"));
+            }
 
         } else {
 
@@ -117,7 +132,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             TextView txtBaseCurrency = (TextView) convertView.findViewById(R.id.exp_listview_header_base_currency);
 
             txtTitle.setText(header.getTitle());
-            txtTotalAmount.setText(header.getUnsignedPrice() + "");
+            txtTotalAmount.setText(String.format("%s", header.getUnsignedPrice()));
             txtBaseCurrency.setText("€");
         }
 

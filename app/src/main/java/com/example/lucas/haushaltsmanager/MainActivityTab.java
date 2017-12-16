@@ -48,7 +48,7 @@ public class MainActivityTab extends AppCompatActivity {
         editor.putString("mainCurrency", "€");
         editor.putLong("mainCurrencyIndex", 32);
 
-        editor.commit();
+        editor.apply();
 
 
         super.onCreate(savedInstanceState);

@@ -11,19 +11,24 @@ import android.support.v7.widget.Toolbar;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
-public class ExpenseScreen extends AppCompatActivity {
+public class ExpenseScreen extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-    public ExpenseObject EXPENSE = new ExpenseObject();
+    public ExpenseObject EXPENSE;
     private Calendar CAL = Calendar.getInstance();
     private String TAG = "ExpenseScreen: ";
     private ExpensesDataSource expensesDataSource;
@@ -52,15 +57,14 @@ public class ExpenseScreen extends AppCompatActivity {
         } else {
 
             // dummy expense befülllen
-            EXPENSE.setCategory(new Category(getResources().getString(R.string.expense_screen_dsp_category), 0));// dummy Kategorie
-            EXPENSE.setTitle(getResources().getString(R.string.expense_screen_title));
-            EXPENSE.setTag("");
-            EXPENSE.setPrice(0);
-            EXPENSE.setNotice("");
-            EXPENSE.setDateTime(CAL);
-            EXPENSE.setAccount(expensesDataSource.getAccountById(preferences.getLong("activeAccount", 0)));
-            EXPENSE.setExpenditure(true);
+            Category category = new Category(getResources().getString(R.string.expense_screen_dsp_category), 0);// dummy Kategorie
+            String title = getResources().getString(R.string.expense_screen_title);
+            Account account = expensesDataSource.getAccountById(preferences.getLong("activeAccount", 0));
 
+            EXPENSE = new ExpenseObject(title, 0, true, category, null, account);
+            EXPENSE.setDateTime(CAL);
+            EXPENSE.setNotice("");
+            EXPENSE.setTag("");
         }
         expensesDataSource.close();
 
@@ -152,7 +156,7 @@ public class ExpenseScreen extends AppCompatActivity {
         //TODO change display tag behaviour from just taking the first tag to displaying all tags
         //set display tag
         TextView expenseTag = (TextView) findViewById(R.id.expense_screen_tag);
-        expenseTag.setText(EXPENSE.getTags().get(0));
+//        expenseTag.setText(EXPENSE.getTags().get(0));TODO enable
 
         //set display notice
         TextView expenseNotice = (TextView) findViewById(R.id.expense_screen_notice);
@@ -226,11 +230,17 @@ public class ExpenseScreen extends AppCompatActivity {
                     expensesDataSource.open();
                     if (bundle != null && bundle.get("parentIndex") != null) {
 
+                        //TODO kinder können aus irgendeinen grund der mit den umtauschkruden zusammenhängt noch nicht umgerechnet werden
+                        Double rateToBase = expensesDataSource.getRateToBase(EXPENSE.getExpenseCurrency().getIndex(), null);
+                        EXPENSE.getExpenseCurrency().setRateToBase(rateToBase != null ? rateToBase : 0);
+                        EXPENSE.setIndex(expensesDataSource.createBooking(EXPENSE));
                         EXPENSE.setIndex(expensesDataSource.createChildBooking(EXPENSE, bundle.getLong("parentIndex")));
 
                         Toast.makeText(ExpenseScreen.this, "Added Child " + EXPENSE.getTitle() + " to its Parent " + bundle.getLong("parentIndex"), Toast.LENGTH_SHORT).show();
                     } else {
 
+                        Double rateToBase = expensesDataSource.getRateToBase(EXPENSE.getExpenseCurrency().getIndex(), null);
+                        EXPENSE.getExpenseCurrency().setRateToBase(rateToBase != null ? rateToBase : 0);
                         EXPENSE.setIndex(expensesDataSource.createBooking(EXPENSE));
                         expensesDataSource.getBookingById(EXPENSE.getIndex()).toConsole();
 
@@ -286,6 +296,29 @@ public class ExpenseScreen extends AppCompatActivity {
                 startActivity(addChild);
             }
         });
+
+
+        Spinner currencySpinner = (Spinner) findViewById(R.id.expense_screen_select_currency);
+
+        currencySpinner.setOnItemSelectedListener(this);
+
+        expensesDataSource.open();
+        ArrayList<Currency> currencies = expensesDataSource.getAllCurrencies();
+        expensesDataSource.close();
+
+        List<String> currencyShortNames = new ArrayList<>();
+        for (Currency currency : currencies) {
+
+            currencyShortNames.add(currency.getCurrencyShortName());
+        }
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, currencyShortNames);
+
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        currencySpinner.setAdapter(adapter);
+
+        currencySpinner.setSelection(((int) preferences.getLong("mainCurrencyIndex", 32)) - 1);
     }
 
 
@@ -411,5 +444,26 @@ public class ExpenseScreen extends AppCompatActivity {
                 category.setText(result.getCategoryName());
             }
         }
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+        String curName = parent.getItemAtPosition(position).toString();
+
+        expensesDataSource.open();
+        Currency currency = expensesDataSource.getCurrency(curName);
+        expensesDataSource.close();
+
+        TextView expenseCurrency = (TextView) findViewById(R.id.expense_screen_amount_currency);
+        expenseCurrency.setText(currency.getCurrencySymbol());
+
+        EXPENSE.setExpenseCurrency(currency);
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> arg0) {
+
+
     }
 }

@@ -3,10 +3,12 @@ package com.example.lucas.haushaltsmanager;
 import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.format.DateUtils;
 import android.util.Log;
 
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -17,74 +19,126 @@ import java.util.Locale;
 
 class ExpenseObject implements Parcelable {
 
+    /**
+     * Database index of expense
+     */
     private long index;
+
+    /**
+     * Title of expense
+     */
+    private String title;
+
+    /**
+     * Price by user
+     */
+    private double price;
+
+    /**
+     * Date of expense
+     */
     private Calendar date;
-    private String title = "";
-    private double price = 0;
-    private Double calcPrice = null;
+
+    /**
+     * Type of expense
+     * (true = expense, false = income)
+     */
     private boolean expenditure;
+
+    /**
+     * Category of expense
+     */
     private Category category;
+
+    /**
+     * Tags assigned to expense
+     */
     private List<String> tag = new LinkedList<>();
-    private String notice = "";
+
+    /**
+     * Notice from user
+     */
+    private String notice;
+
+    /**
+     * Account where booking happened
+     */
     private Account account;
-    private Currency currency;
+
+    /**
+     * Currency of expense
+     */
+    private Currency expenseCurrency;
+
+    /**
+     * Children of expense
+     */
     private List<ExpenseObject> children = new ArrayList<>();
-    private double exchangeRate = 0;
 
     private String TAG = ExpenseObject.class.getSimpleName();
 
-    public ExpenseObject(String title, double price, boolean expenditure, Category category, List<String> tags) {
+    public ExpenseObject(long index,@NonNull String title, double price, Calendar date, boolean expenditure,@NonNull Category category, String notice,@NonNull Account account, Currency expenseCurrency) {
 
+        this.index = index;
         this.title = title;
         this.price = price;
+        this.date = date != null ? date : Calendar.getInstance();
         this.expenditure = expenditure;
         this.category = category;
-        this.tag.addAll(tags);
+        this.notice = notice != null ? notice : "";
+        this.account = account;
+        this.expenseCurrency = expenseCurrency != null ? expenseCurrency : account.getCurrency();
     }
 
-    public ExpenseObject(String title, double price, boolean expenditure, Category category, String tag) {
+    public ExpenseObject(long index,@NonNull String title, double price, boolean expenditure,@NonNull String date,@NonNull Category category, String notice,@NonNull Account account, Currency expenseCurrency) {
 
+        this.index = index;
         this.title = title;
         this.price = price;
+        this.date = Calendar.getInstance();
+        setDateTime(date);
         this.expenditure = expenditure;
         this.category = category;
-        this.tag.add(tag);
+        this.notice = notice != null ? notice : "";
+        this.account = account;
+        this.expenseCurrency = expenseCurrency != null ? expenseCurrency : account.getCurrency();
     }
 
-    public ExpenseObject(String title, double price, boolean expenditure, Category category) {
+    public ExpenseObject(@NonNull String title, double price, boolean expenditure,@NonNull Category category, Currency expenseCurrency,@NonNull Account account) {
 
-        this(title, price, expenditure, category, "");
-    }
-
-    ExpenseObject() {
-
-        this("", 0.0, true, new Category(), "");
-    }
-
-    void setExchangeRate(double exchangeRate) {
-
-        this.exchangeRate = exchangeRate;
+        this(-1, title, price, null, expenditure, category, null, account, expenseCurrency);
     }
 
     double getExchangeRate() {
 
-        return this.exchangeRate;
+        return this.expenseCurrency.getRateToBase();
     }
 
     @Nullable
     Double getCalcPrice() {
 
-        return calcPrice != null ? calcPrice * currency.getRateToBase() : null;
+        DecimalFormat df = new DecimalFormat("#.##");
+        double rate;
+
+        if (this.expenseCurrency.getRateToBase() != 0) {
+
+            rate = this.expenseCurrency.getRateToBase() * this.price;
+            return Double.parseDouble(df.format(rate));
+        } else {
+
+            rate = this.account.getCurrency().getRateToBase() * this.price;
+            return Double.parseDouble(df.format(rate));
+        }
     }
 
-    Currency getCurrency() {
+    Currency getExpenseCurrency() {
 
-        return this.currency;
+        return this.expenseCurrency;
     }
 
-    void setCurrency(Currency currency) {
+    void setExpenseCurrency(Currency expenseCurrency) {
 
-        this.currency = currency;
+        this.expenseCurrency = expenseCurrency;
     }
 
     @Override
@@ -127,11 +181,9 @@ class ExpenseObject implements Parcelable {
 
         try {
 
-            this.date = Calendar.getInstance();
             this.date.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).parse(date));
         } catch (ParseException e) {
 
-            this.date = Calendar.getInstance();
             e.printStackTrace();
         }
     }
@@ -176,11 +228,6 @@ class ExpenseObject implements Parcelable {
         this.expenditure = expenditure;
     }
 
-    void setExpenditure(int expenditure) {
-
-        this.expenditure = expenditure != 0;
-    }
-
     Category getCategory() {
         return category;
     }
@@ -212,7 +259,6 @@ class ExpenseObject implements Parcelable {
         this.notice = notice;
     }
 
-    @Nullable
     Account getAccount() {
 
         return account;
@@ -244,7 +290,7 @@ class ExpenseObject implements Parcelable {
 
     boolean hasChildren() {
 
-        return !this.children.isEmpty();
+        return !this.children.isEmpty() || this.account.getIndex() == 9999;
     }
 
     boolean isSet() {
@@ -295,7 +341,7 @@ class ExpenseObject implements Parcelable {
         notice = source.readString();
         account = source.readParcelable(Account.class.getClassLoader());
         children = source.createTypedArrayList(ExpenseObject.CREATOR);
-        currency = source.readParcelable(Currency.class.getClassLoader());
+        expenseCurrency = source.readParcelable(Currency.class.getClassLoader());
     }
 
     /**
@@ -329,7 +375,7 @@ class ExpenseObject implements Parcelable {
         dest.writeString(notice);
         dest.writeParcelable(account, flags);
         dest.writeList(children);
-        dest.writeParcelable(currency, flags);
+        dest.writeParcelable(expenseCurrency, flags);
     }
 
     /**

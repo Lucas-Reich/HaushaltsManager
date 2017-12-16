@@ -75,7 +75,7 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
             + BOOKINGS_COL_ACCOUNT_ID + " INTEGER NOT NULL, "
             + BOOKINGS_COL_EXCHANGE_RATE + " TEXT, "
             + BOOKINGS_COL_IS_PARENT + " INTEGER NOT NULL, "
-            + BOOKINGS_COL_CURRENCY_ID + "INTEGER "
+            + BOOKINGS_COL_CURRENCY_ID + " INTEGER "
             + ");";
 
 
