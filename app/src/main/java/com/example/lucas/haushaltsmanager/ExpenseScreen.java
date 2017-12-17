@@ -57,7 +57,7 @@ public class ExpenseScreen extends AppCompatActivity implements AdapterView.OnIt
         } else {
 
             // dummy expense befülllen
-            Category category = new Category(getResources().getString(R.string.expense_screen_dsp_category), 0);// dummy Kategorie
+            Category category = new Category(getResources().getString(R.string.expense_screen_dsp_category), "");// dummy Kategorie
             String title = getResources().getString(R.string.expense_screen_title);
             Account account = expensesDataSource.getAccountById(preferences.getLong("activeAccount", 0));
 

@@ -61,7 +61,7 @@ class ExpensesDataSource {
 
         long categoryId = c.getLong(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID));
         String categoryName = c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_NAME));
-        int categoryColor = c.getInt(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_COLOR));
+        String categoryColor = c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_COLOR));
         Category category = new Category(categoryId, categoryName, categoryColor);
 
         long curId = c.getLong(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID));
@@ -114,7 +114,7 @@ class ExpensesDataSource {
 
         long categoryId = c.getLong(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID));
         String categoryName = c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_NAME));
-        int categoryColor = c.getInt(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_COLOR));
+        String categoryColor = c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_COLOR));
         Category category = new Category(categoryId, categoryName, categoryColor);
 
         long curId = c.getLong(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID));
@@ -162,7 +162,7 @@ class ExpensesDataSource {
 
         long categoryIndex = c.getLong(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_ID));
         String categoryName = c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_NAME));
-        int categoryColor = c.getInt(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_COLOR));
+        String categoryColor = c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_COLOR));
 
         return new Category(categoryIndex, categoryName, categoryColor);
     }//DONE
@@ -222,7 +222,11 @@ class ExpensesDataSource {
         return new Tag(tagIndex, tagName);
     }//DONE
 
-
+    /**
+     * creates an dummy expense for combining expenses
+     *
+     * @return id of expense
+     */
     private long createDummyExpense() {
 
         SharedPreferences preferences = mContext.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
@@ -587,7 +591,6 @@ class ExpensesDataSource {
         values.put(ExpensesDbHelper.BOOKINGS_COL_EXCHANGE_RATE, expense.getExchangeRate());
         if (expense.hasChildren() || expense.getAccount().getIndex() == 9999) {
 
-            Log.d(TAG, "createBooking: hallo");
             values.put(ExpensesDbHelper.BOOKINGS_COL_IS_PARENT, true);
         } else {
 
@@ -836,6 +839,7 @@ class ExpensesDataSource {
         for (ExpenseObject child : children) {
 
             createChildBooking(child, parentId);
+            deleteBooking(child.getIndex());
         }
 
         return parentId;
@@ -961,7 +965,7 @@ class ExpensesDataSource {
     }
 
 
-    long createCategory(String categoryName, int color) {
+    long createCategory(String categoryName, String color) {
 
         //TODO erstelle neue Kategorie wenn sie nicht bereits existiert
         ContentValues values = new ContentValues();

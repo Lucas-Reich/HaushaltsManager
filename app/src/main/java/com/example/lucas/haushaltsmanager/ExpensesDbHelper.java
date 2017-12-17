@@ -153,7 +153,7 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
             + "("
             + CATEGORIES_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + CATEGORIES_COL_NAME + " TEXT NOT NULL, "
-            + CATEGORIES_COL_COLOR + " INTEGER NOT NULL"
+            + CATEGORIES_COL_COLOR + " TEXT NOT NULL"
             + ");";
 
 

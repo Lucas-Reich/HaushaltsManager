@@ -3,7 +3,6 @@ package com.example.lucas.haushaltsmanager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -86,7 +85,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
             convertView = inflater.inflate(R.layout.activity_test_exp_listview_list_group_child_n, null);
 
-            TextView circleLetter = (TextView) convertView.findViewById(R.id.booking_item_circle);
+            CircularTextView circleLetter = (CircularTextView) convertView.findViewById(R.id.booking_item_circle);
             TextView txtTitle = (TextView) convertView.findViewById(R.id.booking_item_title);
             TextView txtPerson = (TextView) convertView.findViewById(R.id.booking_item_person);
             TextView txtPaidPrice = (TextView) convertView.findViewById(R.id.booking_item_paid_price);
@@ -95,6 +94,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             TextView txtBaseCurrency = (TextView) convertView.findViewById(R.id.booking_item_currency_base);
 
 
+            //if group is selected by the user the entry has to be highligted on redrawing
             if (selectedGroups.contains(getGroupId(groupPosition))) {
 
                 convertView.setBackgroundColor(Color.GREEN);
@@ -103,6 +103,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
             String category = header.getCategory().getCategoryName();
             circleLetter.setText(category.substring(0, 1).toUpperCase());
+            circleLetter.setSolidColor(header.getCategory().getColor());
             txtTitle.setText(header.getTitle());
             //TODO wenn es eine Multiuser funktionalität muss hier der benutzer eingetragen werden, der das Geld ausgegeben hat
             txtPerson.setText("");
@@ -150,7 +151,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             convertView = inflater.inflate(R.layout.activity_test_exp_listview_list_item, null);
         }
 
-        TextView circleLetter = (TextView) convertView.findViewById(R.id.exp_listview_item_circle);
+        CircularTextView circleLetter = (CircularTextView) convertView.findViewById(R.id.exp_listview_item_circle);
         TextView txtTitle = (TextView) convertView.findViewById(R.id.exp_listview_item_title);
         TextView txtPerson = (TextView) convertView.findViewById(R.id.exp_listview_item_person);
         TextView txtPaidPrice = (TextView) convertView.findViewById(R.id.exp_listview_item_paid_price);
@@ -162,13 +163,12 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         String category = child.getCategory().getCategoryName();
 
         circleLetter.setText(category.substring(0, 1).toUpperCase());
+        circleLetter.setSolidColor(child.getCategory().getColor());
         txtTitle.setText(child.getTitle());
         //TODO wenn es eine Multiuser funktionalität muss hier der benutzer eingetragen werden, der das Geld ausgegeben hat
         txtPerson.setText("");
         txtPaidPrice.setText(String.format("%s", child.getUnsignedPrice()));
-        //TODO währung muss noch dynamisch gemacht werden, um mehrere Währungen zu unterstützen
         txtPaidCurrency.setText(child.getAccount().getCurrency().getCurrencySymbol());
-        //TODO wenn eine buchung in einer Ausländischen währung vorliegt, muss der Preis in der standartwährung ausgegeben werden und auch das standartwährungsreichen angezeigt werden
         txtCalcPrice.setText("");
         txtBaseCurrency.setText("");
 

@@ -2,32 +2,33 @@ package com.example.lucas.haushaltsmanager;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 class Category implements Parcelable {
 
     private long index;
     private String categoryName;
-    private int color;
+    private String color;
 
-    private String TAG = "Category: ";
+    private String TAG = Category.class.getSimpleName();
 
 
-    Category(long index, String categoryName, int color) {
+    Category(Long index, @NonNull String categoryName, @NonNull String color) {
 
-        this.index = index;
+        this.index = index != null ? index : -1;
         this.categoryName = categoryName;
         this.color = color;
     }
 
-    Category(String categoryName, int color) {
+    Category(@NonNull String categoryName, @NonNull String color) {
 
-        this(0, categoryName, color);
+        this(null, categoryName, color);
     }
 
     Category() {
 
-        this(0, "", 0);
+        this(null, "", "#000000");
     }
 
     long getIndex() {
@@ -46,16 +47,17 @@ class Category implements Parcelable {
         this.categoryName = categoryName;
     }
 
-    int getColor() {
-        return color;
+    String getColor() {
+        return this.color;
     }
 
-    void setColor(int color) {
+    void setColor(String color) {
         this.color = color;
     }
 
 
     //make class Parcelable
+
     /**
      * This will be only used by ParcelableCategories
      * see: http://prasanta-paul.blogspot.de/2010/06/android-parcelable-example.html (Parcelable ArrayList)
@@ -70,7 +72,7 @@ class Category implements Parcelable {
         Log.v(TAG, "ParcelData (Parcel source): time to put back parcel data");
         index = source.readLong();
         categoryName = source.readString();
-        color = source.readInt();
+        color = source.readString();
     }
 
     /**
@@ -96,7 +98,7 @@ class Category implements Parcelable {
         Log.v(TAG, "write to parcel..." + flags);
         dest.writeLong(index);
         dest.writeString(categoryName);
-        dest.writeInt(color);
+        dest.writeString(color);
     }
 
     /**

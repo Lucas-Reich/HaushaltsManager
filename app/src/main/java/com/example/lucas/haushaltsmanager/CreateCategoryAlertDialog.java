@@ -31,7 +31,7 @@ public class CreateCategoryAlertDialog extends DialogFragment {
                 String newCategory = input.getText().toString();
 
                 expensesDataSource.open();
-                expensesDataSource.createCategory(newCategory, 1);
+                expensesDataSource.createCategory(newCategory, "#000000");//TODO let user decide for color
                 expensesDataSource.close();
                 dismiss();
             }
