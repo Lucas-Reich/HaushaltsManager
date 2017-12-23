@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -19,6 +20,7 @@ public class Categories extends AppCompatActivity {
     ListView listView;
     ArrayList<Category> categories;
     CategoryAdapter adapter;
+    FloatingActionButton addCatFab;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -41,21 +43,22 @@ public class Categories extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                //Toast.makeText(Categories.this, categories.get(position).getCategoryName(), Toast.LENGTH_SHORT).show();
-/*
-                ArrayList<Category> test = new ArrayList<>();
-                test.add(categories.get(position));
-                Intent returnIntent = new Intent();
-                returnIntent.putParcelableArrayListExtra("categoryObj", test);
-                returnIntent.putExtra("category", categories.get(position).getCategoryName());
-                setResult(Activity.RESULT_OK, returnIntent);
-                finish();
-                */
-
+                //TODO wenn der nutzer durch das menü in die activity gekommen ist den intent verbieten/ ausschalten
                 Intent returnIntent = new Intent();
                 returnIntent.putExtra("categoryObj", categories.get(position));
                 setResult(Activity.RESULT_OK, returnIntent);
                 finish();
+            }
+        });
+
+        addCatFab = (FloatingActionButton) findViewById(R.id.categories_add_category);
+        addCatFab.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                Intent createCategoryIntent = new Intent(Categories.this, CreateNewCategory.class);
+                Categories.this.startActivity(createCategoryIntent);
             }
         });
 

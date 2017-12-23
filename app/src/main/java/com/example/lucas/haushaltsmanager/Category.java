@@ -10,25 +10,27 @@ class Category implements Parcelable {
     private long index;
     private String categoryName;
     private String color;
+    private boolean defaultExpenseType;
 
     private String TAG = Category.class.getSimpleName();
 
 
-    Category(Long index, @NonNull String categoryName, @NonNull String color) {
+    Category(Long index, @NonNull String categoryName, @NonNull String color, boolean defaultExpenseType) {
 
         this.index = index != null ? index : -1;
         this.categoryName = categoryName;
         this.color = color;
+        this.defaultExpenseType = defaultExpenseType;
     }
 
-    Category(@NonNull String categoryName, @NonNull String color) {
+    Category(@NonNull String categoryName, @NonNull String color, Boolean defaultExpenseType) {
 
-        this(null, categoryName, color);
+        this(null, categoryName, color, defaultExpenseType != null ? defaultExpenseType : false);
     }
 
     Category() {
 
-        this(null, "", "#000000");
+        this(null, "", "#000000", false);
     }
 
     long getIndex() {
@@ -52,7 +54,23 @@ class Category implements Parcelable {
     }
 
     void setColor(String color) {
+
         this.color = color;
+    }
+
+    void setColor(int color) {
+
+        this.color = "#" + Integer.toHexString(color);
+    }
+
+    boolean getDefaultExpenseType() {
+
+        return this.defaultExpenseType;
+    }
+
+    void setDefaultExpenseType(boolean expenseType) {
+
+        this.defaultExpenseType = expenseType;
     }
 
 
@@ -73,6 +91,7 @@ class Category implements Parcelable {
         index = source.readLong();
         categoryName = source.readString();
         color = source.readString();
+        defaultExpenseType = source.readInt() == 1;
     }
 
     /**
@@ -99,6 +118,7 @@ class Category implements Parcelable {
         dest.writeLong(index);
         dest.writeString(categoryName);
         dest.writeString(color);
+        dest.writeInt(defaultExpenseType ? 1 : 0);
     }
 
     /**

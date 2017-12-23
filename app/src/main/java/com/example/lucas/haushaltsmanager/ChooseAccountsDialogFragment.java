@@ -39,7 +39,7 @@ public class ChooseAccountsDialogFragment extends DialogFragment {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-        builder.setTitle(R.string.account);
+        builder.setTitle(R.string.choose_account);
 
         builder.setMultiChoiceItems(accountNames(accounts), checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
 

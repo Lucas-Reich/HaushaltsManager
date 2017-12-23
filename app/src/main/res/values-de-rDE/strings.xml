@@ -52,7 +52,10 @@
     <string name="expense_screen_amount_currency">€</string>
     <string name="expense_screen_recurring_end">Enddatum auswählen</string>
     <string name="expense_screen_recurring_frequency">Häufigkeit auswählen</string>
-    <string name="choose_account">Konto auswählen</string>
+    <string name="choose_account">Deine Konten</string>
     <string name="account">Konten</string>
     <string name="btn_new_acc">Neues Konto</string>
+    <string name="no_name">(Unnamed)</string>
+    <string name="category_name">Geben Sie einen Namen ein</string>
+    <string name="choose_category_color">Wählen Sie eine Farbe aus</string>
 </resources>

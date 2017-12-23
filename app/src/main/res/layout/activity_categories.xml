@@ -9,6 +9,16 @@
     <ListView
         android:id="@+id/categories_listview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content">
+
+    </ListView>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/categories_add_category"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right|end"
+        android:clickable="true"
+        app:srcCompat="@drawable/ic_add_black_24dp"/>
 
 </android.support.design.widget.CoordinatorLayout>

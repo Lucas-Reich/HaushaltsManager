@@ -28,12 +28,19 @@ public class TabOneBookingsVer2 extends Fragment {
     ExpandableListView expListView;
     List<ExpenseObject> listDataHeader;
     HashMap<ExpenseObject, List<ExpenseObject>> listDataChild;
+    String TAG = TabOneBookingsVer2.class.getSimpleName();
 
     ExpensesDataSource database;
 
     FloatingActionButton fab, fabDelete, fabCombine;
     Animation test, fabClose, rotateForward, rotateBackward;
     boolean combOpen = false, delOpen = false, fabOpen = false;
+
+
+    /**
+     * https://www.captechconsulting.com/blogs/android-expandablelistview-magic
+     * Anleitung um eine ExpandableListView ohne indicators zu machen
+     */
 
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstances) {
@@ -126,17 +133,22 @@ public class TabOneBookingsVer2 extends Fragment {
             public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
 
                 //get expense
-                Object o = expListView.getItemAtPosition(groupPosition);
-                ExpenseObject expense = (ExpenseObject) o;
+                ExpenseObject expense = (ExpenseObject) expListView.getItemAtPosition(groupPosition);
+                switch (expense.getAccount().getIndex() + "") {
 
-                //start ExpenseScreen with selected Expense only when the expense has no children
-                if (!expense.hasChildren()) {
+                    case "9999"://do nothing but expand group
 
-                    Intent openExpense = new Intent(getContext(), ExpenseScreen.class);
-                    openExpense.putExtra("parentExpense", expense.getIndex());
-                    startActivity(openExpense);
+                        return false;
+                    case "8888"://do nothing and do not expand group
+
+                        return true;
+                    default://open expenseScreen with expense to edit this
+
+                        Intent openExpense = new Intent(getContext(), ExpenseScreen.class);
+                        openExpense.putExtra("parentExpense", expense.getIndex());
+                        startActivity(openExpense);
+                        return true;
                 }
-                return false;
             }
         });
 
@@ -164,6 +176,8 @@ public class TabOneBookingsVer2 extends Fragment {
 
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+                //TODO datum und group mit kinder dürfen nicht auswählbar sein
 
                 int groupPosition = ExpandableListView.getPackedPositionGroup(id);
                 int childPosition = ExpandableListView.getPackedPositionChild(id);
@@ -210,12 +224,36 @@ public class TabOneBookingsVer2 extends Fragment {
         database.open();
         Calendar cal = Calendar.getInstance();
         expenses = database.getAllBookings(cal.get(Calendar.YEAR) + "-01-01 00:00:00", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(cal.getTime()));
-
+/*
         //assigning child/s to expenses
         for (ExpenseObject expense : expenses) {
 
             listDataHeader.add(expense);
             listDataChild.put(expense, expense.getChildren());
+        }
+*/
+
+        String separatorDate = "";
+
+        for (int i = 0; i < expenses.size(); ) {
+
+            if (!expenses.get(i).getDate().equals(separatorDate)) {
+
+                separatorDate = expenses.get(i).getDate();
+
+                Category category = new Category(null, "test", "#000000", false);
+                Account account = new Account(8888, "", 0, new Currency("", "", ""));
+
+                ExpenseObject dateSeparator = new ExpenseObject(-1, "", 0, expenses.get(i).getDateTime(), true, category, null, account, null);
+
+                listDataHeader.add(dateSeparator);
+                listDataChild.put(dateSeparator, new ArrayList<ExpenseObject>());
+            } else {
+
+                listDataHeader.add(expenses.get(i));
+                listDataChild.put(expenses.get(i), expenses.get(i).getChildren());
+                i++;
+            }
         }
 
         database.close();

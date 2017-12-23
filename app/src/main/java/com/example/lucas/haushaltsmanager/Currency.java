@@ -62,7 +62,7 @@ public class Currency implements Parcelable {
 
     String getCurrencySymbol() {
 
-        return currencySymbol;
+        return currencySymbol != null ? currencySymbol : currencyShortName;
     }
 
     double getRateToBase() {

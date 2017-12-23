@@ -30,12 +30,13 @@ public class ExpenseScreen extends AppCompatActivity implements AdapterView.OnIt
 
     public ExpenseObject EXPENSE;
     private Calendar CAL = Calendar.getInstance();
-    private String TAG = "ExpenseScreen: ";
     private ExpensesDataSource expensesDataSource;
     private boolean template = false, recurring = false;
     private Calendar recurringEndDate = Calendar.getInstance();
     public int frequency = 0;
+    private String TAG = ExpenseScreen.class.getSimpleName();
 
+    //TODO klasse sollte auch den BasicDialog erweitern
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         SharedPreferences preferences = getSharedPreferences("UserSettings", 0);
@@ -57,11 +58,11 @@ public class ExpenseScreen extends AppCompatActivity implements AdapterView.OnIt
         } else {
 
             // dummy expense befülllen
-            Category category = new Category(getResources().getString(R.string.expense_screen_dsp_category), "");// dummy Kategorie
+            Category category = new Category(getResources().getString(R.string.expense_screen_dsp_category), "#00000000", false);// dummy Kategorie
             String title = getResources().getString(R.string.expense_screen_title);
             Account account = expensesDataSource.getAccountById(preferences.getLong("activeAccount", 0));
 
-            EXPENSE = new ExpenseObject(title, 0, true, category, null, account);
+            EXPENSE = new ExpenseObject(title, 0, category.getDefaultExpenseType(), category, null, account);
             EXPENSE.setDateTime(CAL);
             EXPENSE.setNotice("");
             EXPENSE.setTag("");
@@ -120,7 +121,7 @@ public class ExpenseScreen extends AppCompatActivity implements AdapterView.OnIt
 
         //TODO implement AlertDialog which enables the user to input a number for the expense amount
         TextView amount = (TextView) findViewById(R.id.expense_screen_amount);
-        amount.setText(EXPENSE.getUnsignedPrice() + "");
+        amount.setText(String.format("%s", EXPENSE.getUnsignedPrice()));
         amount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -145,9 +146,10 @@ public class ExpenseScreen extends AppCompatActivity implements AdapterView.OnIt
             expenseCurrency.setText(preferences.getString("mainCurrency", "€"));
         }
 
-        //set display category
+        //set display CATEGORY
         TextView category = (TextView) findViewById(R.id.expense_screen_category);
         category.setText(EXPENSE.getCategory().getCategoryName());
+        //TODO wenn eine neue kategorie ausgewählt wird sollte sich auch der expenseType zu dem kategorie default wert ändern
 
         //set display expense title
         TextView expenseTitle = (TextView) findViewById(R.id.expense_screen_title);
@@ -273,18 +275,6 @@ public class ExpenseScreen extends AppCompatActivity implements AdapterView.OnIt
             }
 
         });
-
-
-        Button createCat = (Button) findViewById(R.id.create_category);
-        createCat.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                CreateCategoryAlertDialog categoryDialog = new CreateCategoryAlertDialog();
-                categoryDialog.show(getFragmentManager(), "create_new_category");
-            }
-        });
-
 
         Button createChild = (Button) findViewById(R.id.create_child);
         createChild.setOnClickListener(new View.OnClickListener() {
@@ -456,7 +446,7 @@ public class ExpenseScreen extends AppCompatActivity implements AdapterView.OnIt
         expensesDataSource.close();
 
         TextView expenseCurrency = (TextView) findViewById(R.id.expense_screen_amount_currency);
-        expenseCurrency.setText(currency.getCurrencySymbol());
+        expenseCurrency.setText(String.format("%s", currency.getCurrencySymbol()));
 
         EXPENSE.setExpenseCurrency(currency);
     }

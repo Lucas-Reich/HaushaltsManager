@@ -9,7 +9,7 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
-    <string name="choose_account">Choose Account</string>
+    <string name="choose_account">Your Accounts</string>
 
     <string name="left_slider_desktop">Desktop</string>
     <string name="left_slider_categories">Categories</string>
@@ -58,7 +58,10 @@
     <string name="month_report_booking">Booking</string>
     <string name="month_report_bookings">Bookings</string>
 
-    <string name="account">Accounts</string>
     <string name="btn_new_acc">New Account</string>
     <string name="no_name">(Unnamed)</string>
+
+    <string name="category_name">Enter a category name</string>
+    <string name="choose_category_color">Choose a color</string>
+    <string name="account">Accounts</string>
 </resources>

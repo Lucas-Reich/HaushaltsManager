@@ -53,6 +53,11 @@
             android:label="HaushaltsManager"
             android:parentActivityName=".MainActivityTab"/>
 
+        <activity
+            android:name=".CreateNewCategory"
+            android:label="HaushaltsManager"
+            android:parentActivityName=".MainActivityTab"/>
+
         <service
             android:name=".ExchangeRateService"
             android:label="ExchangeRateService"/>

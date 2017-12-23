@@ -47,7 +47,6 @@ public class CreateNewAccount extends AppCompatActivity implements OnItemSelecte
                 Bundle args = new Bundle();
                 args.putString("title", "Set Account name");
 
-
                 DialogFragment basicDialog = new BasicDialog();
                 basicDialog.setArguments(args);
                 basicDialog.show(getFragmentManager(), "accountName");
@@ -61,7 +60,6 @@ public class CreateNewAccount extends AppCompatActivity implements OnItemSelecte
 
                 Bundle args = new Bundle();
                 args.putString("title", "Set Account Balance");
-
 
                 DialogFragment basicDialog = new BasicDialog();
                 basicDialog.setArguments(args);

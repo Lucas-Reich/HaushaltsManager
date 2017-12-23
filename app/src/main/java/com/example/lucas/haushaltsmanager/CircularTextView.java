@@ -43,8 +43,6 @@ public class CircularTextView extends android.support.v7.widget.AppCompatTextVie
         this.setHeight(diameter);
         this.setWidth(diameter);
 
-        //canvas.drawCircle(diameter / 2, diameter / 2, radius, strokePaint);
-
         canvas.drawCircle(diameter / 2, diameter / 2, radius - strokeWidth, circlePaint);
 
         super.draw(canvas);

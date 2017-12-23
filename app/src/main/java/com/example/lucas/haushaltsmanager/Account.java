@@ -7,6 +7,10 @@ import android.util.Log;
 
 class Account implements Parcelable {
 
+    /**
+     * is set to 9999 if the expense with this account has children
+     * is set to 8888 if the expense with this account is an date separator
+     */
     private long index;
     private String accountName;
     private int balance;

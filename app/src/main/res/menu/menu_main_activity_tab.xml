@@ -9,7 +9,7 @@
         app:showAsAction="never" />
     <item
         android:id="@+id/choose_account"
-        android:icon="@android:drawable/ic_menu_add"
+        android:icon="@drawable/ic_account_balance_wallet_black_24dp"
         android:title="@string/choose_account"
         app:showAsAction="ifRoom"/>
 </menu>
