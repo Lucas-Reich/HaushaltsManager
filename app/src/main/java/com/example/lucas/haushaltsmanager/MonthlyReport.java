@@ -95,7 +95,7 @@ class MonthlyReport {
 
                 MonthlyExpenses monthly = monthlyExpenses.get(index);
 
-                if (expense.getExpenditure()){
+                if (expense.getExpenditure()) {
 
                     monthly.spendMoney += expense.getUnsignedPrice();
                 } else {
@@ -120,8 +120,7 @@ class MonthlyReport {
 
     /**
      * @param monthlyExpenses ArrayList of monthly expenses
-     * @param category Category name which has to be found
-     *
+     * @param category        Category name which has to be found
      * @return index of the CATEGORY name if found or -1 if not in List
      */
     private int containsHelper(ArrayList<MonthlyExpenses> monthlyExpenses, String category) {

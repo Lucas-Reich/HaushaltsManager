@@ -95,9 +95,7 @@ public class MainActivityTab extends AppCompatActivity {
                 switch (item.getItemId()) {
 
                     case R.id.desktop:
-
-                        Intent testIntent = new Intent(MainActivityTab.this, PieChartTest.class);
-                        MainActivityTab.this.startActivity(testIntent);
+                        //do smth
                         break;
                     case R.id.categories:
 
@@ -211,7 +209,7 @@ public class MainActivityTab extends AppCompatActivity {
 
                 case 0:
 
-                    return new TabOneBookingsVer2();
+                    return new TabOneBookings();
                 case 1:
 
                     return new TabTwoMonthlyReports();

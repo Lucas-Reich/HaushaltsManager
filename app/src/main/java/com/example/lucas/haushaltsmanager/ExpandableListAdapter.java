@@ -156,7 +156,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
             case "9999"://bookings that have children
 
-                convertView = inflater.inflate(R.layout.activity_test_exp_listview_list_group_child_y_ver2, null);
+                convertView = inflater.inflate(R.layout.activity_test_exp_listview_list_group_child_y, null);
 
                 ImageView image = (ImageView) convertView.findViewById(R.id.expandable_icon);
                 int imageResourceId = isExpanded ? R.drawable.ic_expand_less_black_24dp : R.drawable.ic_expand_more_black_24dp;

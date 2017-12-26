@@ -179,6 +179,8 @@ public class ExpenseScreen extends AppCompatActivity implements AdapterView.OnIt
             @Override
             public void onClick(View v) {
 
+                //TODO ist kaputt
+
                 ImageView imgFrequency = (ImageView) findViewById(R.id.img_frequency);
                 Button recurringFrequency = (Button) findViewById(R.id.expense_screen_recurring_frequency);
                 recurringFrequency.setOnClickListener(new View.OnClickListener() {
@@ -453,7 +455,5 @@ public class ExpenseScreen extends AppCompatActivity implements AdapterView.OnIt
 
     @Override
     public void onNothingSelected(AdapterView<?> arg0) {
-
-
     }
 }

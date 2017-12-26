@@ -83,7 +83,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:background="@drawable/test"
                     android:drawableRight="@mipmap/quickcontact_badge_overlay_normal_dark_am"
                     android:fontFamily="sans-serif"
                     android:gravity="end|center_vertical"
@@ -91,7 +90,7 @@
                     android:text="@string/expense_screen_category"
                     android:textAllCaps="false"
                     android:textColor="@android:color/darker_gray"
-                    android:textSize="15sp" />
+                    android:textSize="15sp"/>
             </LinearLayout>
 
             <LinearLayout

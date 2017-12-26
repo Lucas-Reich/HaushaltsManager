@@ -14,7 +14,7 @@ public class RecurringBookings extends AppCompatActivity {
     private static final String TAG = "RecurringBookings: ";
     ArrayList<ExpenseObject> expenseObjects;
     ListView listView;
-    static BookingAdapterVer2 bookingAdapter;
+    static BookingAdapter bookingAdapter;
     Calendar startDate = Calendar.getInstance();
     Calendar endDate = Calendar.getInstance();
 
@@ -41,7 +41,7 @@ public class RecurringBookings extends AppCompatActivity {
 
         expenseObjects = expensesDataSource.getRecurringBookings(startDate, endDate);
 
-        bookingAdapter = new BookingAdapterVer2(expenseObjects, this);
+        bookingAdapter = new BookingAdapter(expenseObjects, this);
 
         expensesDataSource.close();
 
