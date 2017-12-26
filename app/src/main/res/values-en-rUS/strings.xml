@@ -53,4 +53,5 @@
     <string name="no_name">(Unnamed)</string>
     <string name="category_name">Enter a category name</string>
     <string name="choose_category_color">Choose a color</string>
+    <string name="create_booking">Create Booking</string>
 </resources>

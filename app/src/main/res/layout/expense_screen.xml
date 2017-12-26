@@ -45,7 +45,7 @@
 
                 <TextView
                     android:id="@+id/expense_screen_amount"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
                     android:layout_weight="1"
@@ -60,6 +60,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/expense_screen_amount_currency"
                     android:textAlignment="viewStart"
+                    android:layout_gravity="start"
                     android:textColor="@android:color/black"
                     android:textSize="40sp"/>
             </LinearLayout>
@@ -74,7 +75,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_weight="0"
-                    app:srcCompat="?android:attr/actionModeCopyDrawable" />
+                    app:srcCompat="@drawable/ic_folder_open_black_24dp"/>
 
                 <Button
                     android:id="@+id/expense_screen_category"
@@ -171,7 +172,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_weight="0"
-                    app:srcCompat="@mipmap/ic_launcher_round" />
+                    app:srcCompat="@drawable/ic_tag"/>
 
                 <Button
                     android:id="@+id/expense_screen_tag"
@@ -199,7 +200,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_weight="0"
-                    app:srcCompat="@mipmap/ic_launcher_round" />
+                    app:srcCompat="@drawable/ic_date"/>
 
                 <Button
                     android:id="@+id/expense_screen_date"
@@ -208,6 +209,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:drawableRight="@mipmap/quickcontact_badge_overlay_normal_dark_am"
+                    android:drawableEnd="@mipmap/quickcontact_badge_overlay_normal_dark_am"
                     android:fontFamily="sans-serif"
                     android:gravity="end|center_vertical"
                     android:onClick="expensePopUp"
@@ -227,7 +229,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_weight="0"
-                    app:srcCompat="@mipmap/ic_launcher_round" />
+                    app:srcCompat="@drawable/ic_notice"/>
 
                 <Button
                     android:id="@+id/expense_screen_notice"
@@ -236,6 +238,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:drawableRight="@mipmap/quickcontact_badge_overlay_normal_dark_am"
+                    android:drawableEnd="@mipmap/quickcontact_badge_overlay_normal_dark_am"
                     android:fontFamily="sans-serif"
                     android:gravity="end|center_vertical"
                     android:onClick="expensePopUp"
@@ -255,7 +258,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_weight="0"
-                    app:srcCompat="@mipmap/ic_launcher_round" />
+                    app:srcCompat="@drawable/ic_account_balance_wallet_black_24dp"/>
 
                 <Button
                     android:id="@+id/expense_screen_account"
@@ -263,9 +266,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
+                    android:drawableEnd="@mipmap/quickcontact_badge_overlay_normal_dark_am"
                     android:drawableRight="@mipmap/quickcontact_badge_overlay_normal_dark_am"
                     android:fontFamily="sans-serif"
-                    android:gravity="right|center_vertical"
+                    android:gravity="end|center_vertical"
                     android:onClick="expensePopUp"
                     android:text="@string/expense_screen_account"
                     android:textAllCaps="false"
@@ -297,16 +301,17 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:visibility="gone"
-                    app:srcCompat="@mipmap/ic_launcher_round"/>
+                    app:srcCompat="@drawable/ic_repeat"/>
 
                 <Button
                     android:id="@+id/expense_screen_recurring_frequency"
                     style="@style/Widget.AppCompat.Button.Borderless"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/expense_screen_recurring_frequency"
                     android:textAlignment="viewEnd"
+                    android:layout_gravity="end"
                     android:textAllCaps="false"
                     android:textSize="15sp"
                     android:visibility="gone"/>
@@ -322,16 +327,17 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:visibility="gone"
-                    app:srcCompat="@mipmap/ic_launcher_round"/>
+                    app:srcCompat="@drawable/ic_end_daterange"/>
 
                 <Button
                     android:id="@+id/expense_screen_recurring_end"
                     style="@style/Widget.AppCompat.Button.Borderless"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/expense_screen_recurring_end"
                     android:textAlignment="viewEnd"
+                    android:layout_gravity="end"
                     android:textAllCaps="false"
                     android:textSize="15sp"
                     android:visibility="gone"/>
@@ -355,11 +361,9 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
                     android:layout_weight="1"
-                    android:text="erstelle Buchung" />
+                    android:text="@string/create_booking"/>
 
             </LinearLayout>
-
         </LinearLayout>
     </ScrollView>
-
 </LinearLayout>

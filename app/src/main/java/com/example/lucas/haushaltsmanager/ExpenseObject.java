@@ -199,10 +199,35 @@ class ExpenseObject implements Parcelable {
     double getUnsignedPrice() {
         return price;
     }
-
+/*
     double getSignedPrice() {
 
         return this.expenditure ? 0 - this.price : price;
+    }
+*/
+
+    /**
+     * Method um den tatsächlichen wert einer Buchung zu bekommen.
+     * Falls die Buchung ein Parent ist wird die Summer der Kinder zurückgegeben
+     *
+     * @return tatsächlicher Wert der Buchung
+     */
+    double getSignedPrice() {
+
+        if (hasChildren()) {
+
+            double calcPrice = 0;
+
+            for(ExpenseObject child : this.children) {
+
+                calcPrice += child.getSignedPrice();
+            }
+
+            return calcPrice;
+        } else {
+
+            return this.expenditure ? 0 - this.price : price;
+        }
     }
 
     void setPrice(double price) {

@@ -9,7 +9,7 @@ class Account implements Parcelable {
 
     /**
      * is set to 9999 if the expense with this account has children
-     * is set to 8888 if the expense with this account is an date separator
+     * is set to 8888 if the expense with this account is an date exp_listview_separator
      */
     private long index;
     private String accountName;

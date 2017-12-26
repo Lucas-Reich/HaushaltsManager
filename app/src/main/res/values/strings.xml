@@ -52,8 +52,6 @@
     <string name="expense_screen_dsp_account">Choose Account</string>
 
     <string name="expense_screen_error_create">Error while creating the expense. Create at least a Title, Amount and a Category!</string>
-    <string name="title_activity_main_tab">MainActivityTab</string>
-    <string name="section_format">Hello World from section: %1$d</string>
 
     <string name="month_report_booking">Booking</string>
     <string name="month_report_bookings">Bookings</string>
@@ -64,4 +62,5 @@
     <string name="category_name">Enter a category name</string>
     <string name="choose_category_color">Choose a color</string>
     <string name="account">Accounts</string>
+    <string name="create_booking">Create Booking</string>
 </resources>

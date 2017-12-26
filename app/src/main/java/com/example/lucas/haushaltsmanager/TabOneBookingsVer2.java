@@ -42,7 +42,6 @@ public class TabOneBookingsVer2 extends Fragment {
      * Anleitung um eine ExpandableListView ohne indicators zu machen
      */
 
-
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstances) {
 
         //View rootView = inflater.inflate(R.layout.activity_test_exp_listview, container, false);

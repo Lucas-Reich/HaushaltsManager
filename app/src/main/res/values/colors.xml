@@ -5,4 +5,6 @@
     <color name="colorAccent">#ef7196</color> // angepasst (Highlights wie FAB button farbe, aktuelle tabauswahl farbe, ...)
     <color name="accentColor">#009688</color>
     <color name="mainColor">#ffffff</color>
+    <color name="booking_expense">#bc0000</color>
+    <color name="booking_income">#04925d</color>
 </resources>

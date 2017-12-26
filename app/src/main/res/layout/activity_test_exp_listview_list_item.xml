@@ -104,8 +104,22 @@
                         android:textSize="10sp"/>
                 </TableRow>
 
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <include
+                        layout="@layout/exp_listview_separator"
+                        layout_width="match_parent"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
+                </TableRow>
+
             </TableLayout>
+
         </LinearLayout>
 
     </LinearLayout>
+
 </LinearLayout>

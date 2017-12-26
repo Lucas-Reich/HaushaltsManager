@@ -2,7 +2,6 @@ package com.example.lucas.haushaltsmanager;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -113,7 +112,7 @@ public class MainActivityTab extends AppCompatActivity {
                     case R.id.no_category:
                         //do smth
                         break;
-                    case R.id.course:
+                    case R.id.course://Verlauf
                         //do smth
                         break;
                     case R.id.standing_orders:
@@ -135,14 +134,6 @@ public class MainActivityTab extends AppCompatActivity {
                         break;
                     case R.id.preferences:
                         //do smth
-                        break;
-                    case R.id.follow_us:
-                        //do smth
-                        break;
-                    case R.id.rate_the_app:
-
-                        Intent testListViewIntent = new Intent(MainActivityTab.this, ExpandableListViewTest.class);
-                        MainActivityTab.this.startActivity(testListViewIntent);
                         break;
                     case R.id.about:
                         //do smth

@@ -240,7 +240,7 @@ class ExpensesDataSource {
         Category category = new Category();
         Account account = new Account(9999, "", 0, currency);
 
-        dummyExpense = new ExpenseObject("Dummy", 0, true, category, null, account);
+        dummyExpense = new ExpenseObject(mContext.getResources().getString(R.string.no_name), 0, true, category, null, account);
         dummyExpense.setDateTime(Calendar.getInstance());
 
         return createBooking(dummyExpense);
