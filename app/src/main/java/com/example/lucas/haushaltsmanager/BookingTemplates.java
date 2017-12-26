@@ -11,7 +11,7 @@ public class BookingTemplates extends AppCompatActivity {
 
     ArrayList<ExpenseObject> expenseObjects;
     ListView listView;
-    static BookingAdapterVer2 bookingAdapter;
+    static BookingAdapter bookingAdapter;
 
     private static String TAG = "BookingTemplates";
 
@@ -31,7 +31,7 @@ public class BookingTemplates extends AppCompatActivity {
 
         expenseObjects = expensesDataSource.getTemplates();
 
-        bookingAdapter = new BookingAdapterVer2(expenseObjects, this);
+        bookingAdapter = new BookingAdapter(expenseObjects, this);
 
         expensesDataSource.close();
 

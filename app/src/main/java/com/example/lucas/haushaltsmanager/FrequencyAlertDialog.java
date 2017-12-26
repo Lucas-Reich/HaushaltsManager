@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 public class FrequencyAlertDialog extends DialogFragment {
 
@@ -34,11 +33,11 @@ public class FrequencyAlertDialog extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                EditText numberInput = (EditText)frequencyInput.findViewById(R.id.input_number);
+                EditText numberInput = (EditText) frequencyInput.findViewById(R.id.input_number);
                 String frequency = numberInput.getText().toString();
 
                 expenseScreen.frequency = convToHours(frequency);
-                Button freButton = (Button)activity.findViewById(R.id.expense_screen_recurring_frequency);
+                Button freButton = (Button) activity.findViewById(R.id.expense_screen_recurring_frequency);
                 freButton.setText(frequency + " Tage");
                 dismiss();
             }

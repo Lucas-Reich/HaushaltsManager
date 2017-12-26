@@ -13,6 +13,9 @@ import android.widget.EditText;
 
 public class ExpenseInputDialogFragment extends DialogFragment {
 
+
+    //TODO diese klasse sollte durch den Basic Dialog ersetzt werden
+    //dieses Dialog fragment ermöglicht die eingabe einer Notiz, eines Titels, der Tags
     public Dialog onCreateDialog(final Bundle savedInstances) {
 
         final Bundle args = getArguments();

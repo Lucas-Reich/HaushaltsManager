@@ -28,15 +28,6 @@
             android:name=".Categories"
             android:label="HaushaltsManager"
             android:parentActivityName=".MainActivityTab"/>
-        <activity
-            android:name=".PieChartTest"
-            android:label="HaushaltsManager"
-            android:parentActivityName=".MainActivityTab"/>
-
-        <activity
-            android:name=".ExpandableListViewTest"
-            android:label="HaushaltsManager"
-            android:parentActivityName=".MainActivityTab"/>
 
         <activity
             android:name=".BookingTemplates"

@@ -5,7 +5,7 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-public class Currency implements Parcelable {
+class Currency implements Parcelable {
 
     private long index;
     private String currencyName;
@@ -15,7 +15,7 @@ public class Currency implements Parcelable {
 
     private static String TAG = Currency.class.getSimpleName();
 
-    Currency(long index,@NonNull String currencyName,@NonNull String currencyShortName,@NonNull String currencySymbol, Double rateToBase) {
+    Currency(long index, @NonNull String currencyName, @NonNull String currencyShortName, @NonNull String currencySymbol, Double rateToBase) {
 
         this.index = index;
         this.currencyName = currencyName;
@@ -24,12 +24,12 @@ public class Currency implements Parcelable {
         this.rateToBase = rateToBase != null ? rateToBase : 0;
     }
 
-    Currency(long index,@NonNull String currencyName, @NonNull String currencyShortName,@NonNull String currencySymbol) {
+    Currency(long index, @NonNull String currencyName, @NonNull String currencyShortName, @NonNull String currencySymbol) {
 
         this(index, currencyName, currencyShortName, currencySymbol, null);
     }
 
-    Currency(@NonNull String currencyName,@NonNull String currencyShortName,@NonNull String currencySymbol) {
+    Currency(@NonNull String currencyName, @NonNull String currencyShortName, @NonNull String currencySymbol) {
 
         this(-1, currencyName, currencyShortName, currencySymbol, null);
     }
