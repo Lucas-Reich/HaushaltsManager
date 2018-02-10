@@ -1,0 +1,22 @@
+[
+    {
+        "merged": "C:\\Users\\LabberToasT\\StudioProjects\\HaushaltsManager\\androidColorPickermaster\\build\\intermediates\\res\\merged\\release\\layout_act_demo.xml.flat",
+        "source": "C:\\Users\\LabberToasT\\StudioProjects\\HaushaltsManager\\androidColorPickermaster\\src\\main\\res\\layout\\act_demo.xml"
+    },
+    {
+        "merged": "C:\\Users\\LabberToasT\\StudioProjects\\HaushaltsManager\\androidColorPickermaster\\build\\intermediates\\res\\merged\\release\\drawable-nodpi_ic_launcher.png.flat",
+        "source": "C:\\Users\\LabberToasT\\StudioProjects\\HaushaltsManager\\androidColorPickermaster\\src\\main\\res\\drawable-nodpi\\ic_launcher.png"
+    },
+    {
+        "merged": "C:\\Users\\LabberToasT\\StudioProjects\\HaushaltsManager\\androidColorPickermaster\\build\\intermediates\\res\\merged\\release\\layout_act_multi_picker.xml.flat",
+        "source": "C:\\Users\\LabberToasT\\StudioProjects\\HaushaltsManager\\androidColorPickermaster\\src\\main\\res\\layout\\act_multi_picker.xml"
+    },
+    {
+        "merged": "C:\\Users\\LabberToasT\\StudioProjects\\HaushaltsManager\\androidColorPickermaster\\build\\intermediates\\res\\merged\\release\\layout_act_picker.xml.flat",
+        "source": "C:\\Users\\LabberToasT\\StudioProjects\\HaushaltsManager\\androidColorPickermaster\\src\\main\\res\\layout\\act_picker.xml"
+    },
+    {
+        "merged": "C:\\Users\\LabberToasT\\StudioProjects\\HaushaltsManager\\androidColorPickermaster\\build\\intermediates\\res\\merged\\release\\layout_act_pref.xml.flat",
+        "source": "C:\\Users\\LabberToasT\\StudioProjects\\HaushaltsManager\\androidColorPickermaster\\src\\main\\res\\layout\\act_pref.xml"
+    }
+]

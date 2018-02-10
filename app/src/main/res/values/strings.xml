@@ -63,4 +63,7 @@
     <string name="choose_category_color">Choose a color</string>
     <string name="account">Accounts</string>
     <string name="create_booking">Create Booking</string>
+    <string name="no_data">No Data Available</string>
+
+    <string name="others">Other</string>
 </resources>

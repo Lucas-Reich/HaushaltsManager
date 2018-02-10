@@ -1096,7 +1096,7 @@ class ExpensesDataSource {
     ArrayList<ExpenseObject> getTemplates() {
 
         String selectQuery = "SELECT "
-                + ExpensesDbHelper.TEMPLATE_COL_ID
+                + ExpensesDbHelper.TEMPLATE_COL_BOOKING_ID
                 + " FROM " + ExpensesDbHelper.TABLE_TEMPLATE_BOOKINGS + ";";
         Log.d(TAG, "getTemplates: " + selectQuery);
 

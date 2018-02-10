@@ -49,6 +49,11 @@
             android:label="HaushaltsManager"
             android:parentActivityName=".MainActivityTab"/>
 
+        <activity
+            android:name=".TestPieChart"
+            android:label="HaushaltsManager"
+            android:parentActivityName=".MainActivityTab"/>
+
         <service
             android:name=".ExchangeRateService"
             android:label="ExchangeRateService"/>

@@ -223,14 +223,6 @@ public class TabOneBookings extends Fragment {
         database.open();
         Calendar cal = Calendar.getInstance();
         expenses = database.getAllBookings(cal.get(Calendar.YEAR) + "-01-01 00:00:00", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(cal.getTime()));
-/*
-        //assigning child/s to expenses
-        for (ExpenseObject expense : expenses) {
-
-            listDataHeader.add(expense);
-            listDataChild.put(expense, expense.getChildren());
-        }
-*/
 
         String separatorDate = "";
 

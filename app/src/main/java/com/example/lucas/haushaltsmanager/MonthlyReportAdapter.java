@@ -24,6 +24,7 @@ class MonthlyReportAdapter extends ArrayAdapter<MonthlyReport> implements View.O
 
     private MonthlyReport[] dataSet;
     private Context mContext;
+    private String TAG = MonthlyReportAdapter.class.getSimpleName();
 
     private static class ViewHolder {
         TextView txtMonth;
@@ -34,12 +35,12 @@ class MonthlyReportAdapter extends ArrayAdapter<MonthlyReport> implements View.O
         TextView txtTotalBookings;
         TextView colorCategory;
         TextView txtCategory;
-        PieChart pieChart;
+        PieChartView pieChart;
     }
 
     MonthlyReportAdapter(MonthlyReport[] data, Context context) {
 
-        super(context, R.layout.monthly_overview_item_v1, data);
+        super(context, R.layout.monthly_overview_item_v2, data);
         this.dataSet = data;
         this.mContext = context;
     }
@@ -50,6 +51,7 @@ class MonthlyReportAdapter extends ArrayAdapter<MonthlyReport> implements View.O
         Toast.makeText(mContext, "du hast gecklickt", Toast.LENGTH_SHORT).show();
     }
 
+    @NonNull
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
 
         MonthlyReport monthlyReport = getItem(position);
@@ -59,7 +61,7 @@ class MonthlyReportAdapter extends ArrayAdapter<MonthlyReport> implements View.O
 
             viewHolder = new ViewHolder();
             LayoutInflater inflater = LayoutInflater.from(getContext());
-            convertView = inflater.inflate(R.layout.monthly_overview_item_v1, parent, false);
+            convertView = inflater.inflate(R.layout.monthly_overview_item_v2, parent, false);
 
             viewHolder.txtMonth = (TextView) convertView.findViewById(R.id.monthly_item_month);
             viewHolder.txtInbound = (TextView) convertView.findViewById(R.id.monthly_item_inbound);
@@ -69,34 +71,36 @@ class MonthlyReportAdapter extends ArrayAdapter<MonthlyReport> implements View.O
             viewHolder.txtAccountCurrency = (TextView) convertView.findViewById(R.id.monthly_item_account_currency);
             viewHolder.colorCategory = (TextView) convertView.findViewById(R.id.monthly_item_category_color);
             viewHolder.txtCategory = (TextView) convertView.findViewById(R.id.monthly_item_category);
-            viewHolder.pieChart = (PieChart) convertView.findViewById(R.id.monthly_item_pie_chart);
+            viewHolder.pieChart = (PieChartView) convertView.findViewById(R.id.monthly_item_pie_chart);
 
             convertView.setTag(viewHolder);
         } else {
 
             viewHolder = (ViewHolder) convertView.getTag();
+            viewHolder.pieChart = (PieChartView) convertView.findViewById(R.id.monthly_item_pie_chart);
         }
 
-        //TODO setText mit platzhaltern füllen, sodass sich die ide nicht mehr beschwehrt
         viewHolder.txtMonth.setText(getMonth(Integer.parseInt(monthlyReport.getMonth())));
-        viewHolder.txtInbound.setText(monthlyReport.countIncomingMoney() + "");
-        viewHolder.txtOutbound.setText(monthlyReport.countOutgoingMoney() + "");
-        viewHolder.txtTotal.setText(monthlyReport.calcMonthlyTotal() + "");
+        viewHolder.txtInbound.setText(String.format("%s", monthlyReport.countIncomingMoney()));
+        viewHolder.txtOutbound.setText(String.format("%s", monthlyReport.countOutgoingMoney()));
+        viewHolder.txtTotal.setText(String.format("%s", monthlyReport.calcMonthlyTotal()));
 
         if (monthlyReport.countBookings() <= 1) {
 
-            viewHolder.txtTotalBookings.setText(monthlyReport.countBookings() + " " + mContext.getResources().getString(R.string.month_report_booking));
+            viewHolder.txtTotalBookings.setText(String.format("%s  %s", monthlyReport.countBookings(), mContext.getResources().getString(R.string.month_report_booking)));
         } else {
 
-            viewHolder.txtTotalBookings.setText(monthlyReport.countBookings() + " " + mContext.getResources().getString(R.string.month_report_bookings));
+            viewHolder.txtTotalBookings.setText(String.format("%s  %ss", monthlyReport.countBookings(), mContext.getResources().getString(R.string.month_report_booking)));
         }
         viewHolder.txtAccountCurrency.setText(monthlyReport.getCurrency());
 
         viewHolder.colorCategory.setText("red");
         viewHolder.txtCategory.setText(monthlyReport.getMostStressedCategory());
-
+/*
         viewHolder.pieChart.setUsePercentValues(true);
         addDataSet(viewHolder.pieChart, monthlyReport.countIncomingMoney(), monthlyReport.countOutgoingMoney());
+*/
+        viewHolder.pieChart.setPieData(new float[]{30, 20, 19, 15, 7, 4, 4, 1});
 
         return convertView;
     }

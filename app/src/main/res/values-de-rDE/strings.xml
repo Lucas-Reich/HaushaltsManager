@@ -59,4 +59,6 @@
     <string name="category_name">Geben Sie einen Namen ein</string>
     <string name="choose_category_color">Wählen Sie eine Farbe aus</string>
     <string name="create_booking">Erstelle Buchung</string>
+    <string name="no_data">Keine Daten verfügbar</string>
+    <string name="others">Andere</string>
 </resources>

@@ -1,5 +1,7 @@
 package com.example.lucas.haushaltsmanager;
 
+import android.support.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,7 +11,7 @@ class MonthlyReport {
     private List<ExpenseObject> expenses;
     private String currency;
 
-    MonthlyReport(String month, ArrayList<ExpenseObject> expenses, String currency) {
+    MonthlyReport(@NonNull String month, ArrayList<ExpenseObject> expenses, String currency) {
 
         this.month = month;
         this.expenses = expenses;
@@ -21,7 +23,9 @@ class MonthlyReport {
         this.expenses.add(expense);
     }
 
-    String getMonth() {
+    @NonNull
+    public String getMonth() {
+
         return month;
     }
 

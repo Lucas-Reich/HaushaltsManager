@@ -1,6 +1,7 @@
 package com.example.lucas.haushaltsmanager;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,8 +14,8 @@ import java.util.ArrayList;
 
 class BookingAdapter extends ArrayAdapter<ExpenseObject> implements View.OnClickListener {
 
-    private ArrayList<ExpenseObject> dataSet;
     private Context mContext;
+    private SharedPreferences preferences;
 
     private static class ViewHolder {
         TextView circleLetter;
@@ -28,8 +29,9 @@ class BookingAdapter extends ArrayAdapter<ExpenseObject> implements View.OnClick
 
     BookingAdapter(ArrayList<ExpenseObject> data, Context context) {
         super(context, R.layout.booking_item, data);
-        this.dataSet = data;
+
         this.mContext = context;
+        this.preferences = context.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
     }
 
     @Override
@@ -38,6 +40,7 @@ class BookingAdapter extends ArrayAdapter<ExpenseObject> implements View.OnClick
         Toast.makeText(mContext, "du hast gecklickt", Toast.LENGTH_SHORT).show();
     }
 
+    @NonNull
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
 
         ExpenseObject expenseObject = getItem(position);
@@ -73,9 +76,15 @@ class BookingAdapter extends ArrayAdapter<ExpenseObject> implements View.OnClick
         viewHolder.txtPaidPrice.setText(String.format("%s", expenseObject.getUnsignedPrice()));
         viewHolder.txtPaidCurrency.setText(expenseObject.getAccount().getCurrency().getCurrencySymbol());
 
-        //TODO wenn eine buchung in einer Ausländischen währung vorliegt, muss der Preis in der standartwährung ausgegeben werden und auch das standartwährungsreichen angezeigt werden
-        viewHolder.txtCalcPrice.setText("");
-        viewHolder.txtBaseCurrency.setText("");
+        if (expenseObject.getExpenseCurrency().getIndex() == preferences.getLong("mainCurrencyIndex", 0)) {
+
+            viewHolder.txtCalcPrice.setText("");
+            viewHolder.txtBaseCurrency.setText("");
+        } else {
+
+            viewHolder.txtCalcPrice.setText(String.format("%s", expenseObject.getCalcPrice()));
+            viewHolder.txtBaseCurrency.setText(String.format("%s", expenseObject.getExpenseCurrency().getCurrencySymbol()));
+        }
 
         return convertView;
     }

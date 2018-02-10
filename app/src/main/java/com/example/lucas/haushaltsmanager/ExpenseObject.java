@@ -253,7 +253,9 @@ class ExpenseObject implements Parcelable {
         this.expenditure = expenditure;
     }
 
+    @NonNull
     Category getCategory() {
+
         return category;
     }
 

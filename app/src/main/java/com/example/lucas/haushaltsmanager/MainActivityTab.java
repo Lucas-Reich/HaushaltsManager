@@ -134,7 +134,9 @@ public class MainActivityTab extends AppCompatActivity {
                         //do smth
                         break;
                     case R.id.about:
-                        //do smth
+
+                        Intent testPieIntent = new Intent(MainActivityTab.this, TestPieChart.class);
+                        MainActivityTab.this.startActivity(testPieIntent);
                         break;
                 }
 
