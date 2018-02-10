@@ -2,7 +2,6 @@ package com.example.lucas.haushaltsmanager;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,45 +17,45 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
 
     private Context mContext;
-    private List<ExpenseObject> listDataHeader;
-    private HashMap<ExpenseObject, List<ExpenseObject>> listDataChild;
+    private List<ExpenseObject> mGroupData;
+    private HashMap<ExpenseObject, List<ExpenseObject>> mChildData;
     private String TAG = ExpandableListAdapter.class.getSimpleName();
-    private ArrayList<Long> selectedGroups;
-    private int colorRed, colorGreen;
+    private ArrayList<Integer> mSelectedGroups;
+    private int mRed, mGreen;
 
-    ExpandableListAdapter(Context context, List<ExpenseObject> listDataHeader, HashMap<ExpenseObject, List<ExpenseObject>> listChildData) {
+    ExpandableListAdapter(Context context, List<ExpenseObject> mGroupData, HashMap<ExpenseObject, List<ExpenseObject>> mChildData) {
 
         this.mContext = context;
-        this.listDataHeader = listDataHeader;
-        this.listDataChild = listChildData;
-        this.selectedGroups = new ArrayList<>();
+        this.mGroupData = mGroupData;
+        this.mChildData = mChildData;
+        this.mSelectedGroups = new ArrayList<>();
 
-        this.colorRed = context.getResources().getColor(R.color.booking_expense);
-        this.colorGreen = context.getResources().getColor(R.color.booking_income);
+        this.mRed = context.getResources().getColor(R.color.booking_expense);
+        this.mGreen = context.getResources().getColor(R.color.booking_income);
     }
 
     @Override
     public int getGroupCount() {
 
-        return this.listDataHeader.size();
+        return this.mGroupData.size();
     }
 
     @Override
     public int getChildrenCount(int groupPosition) {
 
-        return this.listDataChild.get(this.listDataHeader.get(groupPosition)).size();
+        return this.mChildData.get(this.mGroupData.get(groupPosition)).size();
     }
 
     @Override
     public Object getGroup(int groupPosition) {
 
-        return this.listDataHeader.get(groupPosition);
+        return this.mGroupData.get(groupPosition);
     }
 
     @Override
     public Object getChild(int groupPosition, int childPosition) {
 
-        return this.listDataChild.get(this.listDataHeader.get(groupPosition)).get(childPosition);
+        return this.mChildData.get(this.mGroupData.get(groupPosition)).get(childPosition);
     }
 
     @Override
@@ -80,10 +79,10 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
 
-        final ExpenseObject header = (ExpenseObject) getGroup(groupPosition);
+        final ExpenseObject groupExpense = (ExpenseObject) getGroup(groupPosition);
         LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        switch (header.getAccount().getIndex() + "") {
+        switch (groupExpense.getAccount().getIndex() + "") {
 
             case "9999"://bookings that have children
 
@@ -99,19 +98,19 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 TextView txtTotalAmount = (TextView) convertView.findViewById(R.id.exp_listview_header_total_amount);
                 TextView txtBaseCurrency = (TextView) convertView.findViewById(R.id.exp_listview_header_base_currency);
 
-                txtTitle.setText(header.getTitle());
-                txtTotalAmount.setText(String.format("%s", header.getSignedPrice()));
-                txtTotalAmount.setTextColor(header.getExpenditure() ? colorRed : colorGreen);
+                txtTitle.setText(groupExpense.getTitle());
+                txtTotalAmount.setText(String.format("%s", groupExpense.getSignedPrice()));
+                txtTotalAmount.setTextColor(groupExpense.getSignedPrice() < 0 ? mRed : mGreen);
                 txtBaseCurrency.setText("€");
-                txtBaseCurrency.setTextColor(header.getExpenditure() ? colorRed : colorGreen);
+                txtBaseCurrency.setTextColor(groupExpense.getSignedPrice() < 0 ? mRed : mGreen);
                 break;
-            case "8888"://bookings that are date header placeholders
+            case "8888"://bookings that are date groupExpense placeholders
 
                 convertView = inflater.inflate(R.layout.activity_test_exp_listview_list_group_sep_date, null);
 
                 TextView date = (TextView) convertView.findViewById(R.id.exp_listview_sep_header_date);
 
-                date.setText(header.getDate());
+                date.setText(groupExpense.getDate());
                 break;
             default://normal bookings
 
@@ -129,24 +128,24 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
 
                 //if group is selected by the user the entry has to be highligted on redrawing
-                if (selectedGroups.contains(getGroupId(groupPosition))) {
+                if (mSelectedGroups.contains(getGroupId(groupPosition))) {
 
-                    convertView.setBackgroundColor(Color.GREEN);
+                    convertView.setBackgroundColor(mContext.getResources().getColor(R.color.highlighted_item_color));
                 }
 
 
-                String category = header.getCategory().getCategoryName();
+                String category = groupExpense.getCategory().getCategoryName();
                 circleLetter.setText(category.substring(0, 1).toUpperCase());
-                circleLetter.setSolidColor(header.getCategory().getColor());
-                txtTitle2.setText(header.getTitle());
+                circleLetter.setSolidColor(groupExpense.getCategory().getColor());
+                txtTitle2.setText(groupExpense.getTitle());
                 //TODO wenn es eine Multiuser funktionalität muss hier der benutzer eingetragen werden, der das Geld ausgegeben hat
                 txtPerson.setText("");
-                txtPaidPrice.setText(String.format("%s", header.getUnsignedPrice()));
-                txtPaidPrice.setTextColor(header.getExpenditure() ? colorRed : colorGreen);
-                txtPaidCurrency.setText(header.getExpenseCurrency().getCurrencySymbol());
-                txtPaidCurrency.setTextColor(header.getExpenditure() ? colorRed : colorGreen);
+                txtPaidPrice.setText(String.format("%s", groupExpense.getUnsignedPrice()));
+                txtPaidPrice.setTextColor(groupExpense.getExpenditure() ? mRed : mGreen);
+                txtPaidCurrency.setText(groupExpense.getExpenseCurrency().getCurrencySymbol());
+                txtPaidCurrency.setTextColor(groupExpense.getExpenditure() ? mRed : mGreen);
 
-                if (header.getExpenseCurrency().getIndex() == preferences.getLong("mainCurrencyIndex", 0)) {
+                if (groupExpense.getExpenseCurrency().getIndex() == preferences.getLong("mainCurrencyIndex", 0)) {
                     //booking currency is the same as the base currency
 
                     txtCalcPrice.setText("");
@@ -154,9 +153,9 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 } else {
                     //booking currency is not the same currency as the base currency
 
-                    txtPaidPrice.setText(String.format("%s", header.getUnsignedPrice()));
-                    txtPaidCurrency.setText(header.getExpenseCurrency().getCurrencySymbol());
-                    txtCalcPrice.setText(String.format("%s", header.getCalcPrice()));
+                    txtPaidPrice.setText(String.format("%s", groupExpense.getUnsignedPrice()));
+                    txtPaidCurrency.setText(groupExpense.getExpenseCurrency().getCurrencySymbol());
+                    txtCalcPrice.setText(String.format("%s", groupExpense.getCalcPrice()));
                     txtBaseCurrency2.setText(preferences.getString("mainCurrency", "€"));
                 }
                 break;
@@ -193,9 +192,9 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         //TODO wenn es eine Multiuser funktionalität muss hier der benutzer eingetragen werden, der das Geld ausgegeben hat
         txtPerson.setText("");
         txtPaidPrice.setText(String.format("%s", child.getUnsignedPrice()));
-        txtPaidPrice.setTextColor(child.getExpenditure() ? colorRed : colorGreen);
+        txtPaidPrice.setTextColor(child.getExpenditure() ? mRed : mGreen);
         txtPaidCurrency.setText(child.getAccount().getCurrency().getCurrencySymbol());
-        txtPaidCurrency.setTextColor(child.getExpenditure() ? colorRed : colorGreen);
+        txtPaidCurrency.setTextColor(child.getExpenditure() ? mRed : mGreen);
         txtCalcPrice.setText("");
         txtBaseCurrency.setText("");
 
@@ -208,38 +207,48 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         return true;
     }
 
-    boolean selectGroup(Long groupId) {
+    boolean selectGroup(int groupId) {
 
-        return this.selectedGroups.add(groupId);
+        return this.mSelectedGroups.add(groupId);
     }
 
-    boolean isSelected(Long groupId) {
+    ExpenseObject getExpense(int expenseId) {
 
-        return this.selectedGroups.contains(groupId);
+        return this.mGroupData.get(expenseId);
     }
 
-    boolean removeGroup(Long groupId) {
+    boolean isSelected(int groupId) {
 
-        return this.selectedGroups.remove(groupId);
+        return this.mSelectedGroups.contains(groupId);
+    }
+
+    boolean removeGroup(int groupId) {
+
+        return this.mSelectedGroups.remove((Object) groupId);
     }
 
     void deselectAll() {
 
-        this.selectedGroups.clear();
+        this.mSelectedGroups.clear();
     }
 
     int getSelectedCount() {
 
-        return this.selectedGroups.size();
+        return this.mSelectedGroups.size();
+    }
+
+    void clearSelected() {
+
+        this.mSelectedGroups.clear();
     }
 
     ArrayList<ExpenseObject> getSelectedGroupData() {
 
         ArrayList<ExpenseObject> groupData = new ArrayList<>();
 
-        for (long groupId : this.selectedGroups) {
+        for (int groupId : this.mSelectedGroups) {
 
-            groupData.add(listDataHeader.get((int) groupId));
+            groupData.add(mGroupData.get(groupId));
         }
 
         return groupData;
@@ -247,12 +256,12 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
     long[] getSelectedBookingIds() {
 
-        long bookingIds[] = new long[this.selectedGroups.size()];
+        long bookingIds[] = new long[this.mSelectedGroups.size()];
         int counter = 0;
 
-        for (long groupId : this.selectedGroups) {
+        for (long groupId : this.mSelectedGroups) {
 
-            bookingIds[counter] = this.listDataHeader.get((int) groupId).getIndex();
+            bookingIds[counter] = this.mGroupData.get((int) groupId).getIndex();
             counter++;
         }
 

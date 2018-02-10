@@ -29,7 +29,7 @@ import java.util.List;
 public class ExpenseScreen extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     public ExpenseObject EXPENSE;
-    private Calendar CAL = Calendar.getInstance();
+    private Calendar mCAL = Calendar.getInstance();
     private ExpensesDataSource expensesDataSource;
     private boolean template = false, recurring = false;
     private Calendar recurringEndDate = Calendar.getInstance();
@@ -41,9 +41,8 @@ public class ExpenseScreen extends AppCompatActivity implements AdapterView.OnIt
     protected void onCreate(Bundle savedInstanceState) {
         SharedPreferences preferences = getSharedPreferences("UserSettings", 0);
 
-        /**
-         * wenn ExpenseScreen von einer bereits bestehenden Buchung aufgerufen wird, dann soll diese buchung aus der datenbank geholt werden
-         */
+
+        //wenn ExpenseScreen von einer bereits bestehenden Buchung aufgerufen wird, dann soll diese buchung aus der datenbank geholt werden
         expensesDataSource = new ExpensesDataSource(this);
         expensesDataSource.open();
 
@@ -63,7 +62,7 @@ public class ExpenseScreen extends AppCompatActivity implements AdapterView.OnIt
             Account account = expensesDataSource.getAccountById(preferences.getLong("activeAccount", 0));
 
             EXPENSE = new ExpenseObject(title, 0, category.getDefaultExpenseType(), category, null, account);
-            EXPENSE.setDateTime(CAL);
+            EXPENSE.setDateTime(mCAL);
             EXPENSE.setNotice("");
             EXPENSE.setTag("");
         }
@@ -255,7 +254,7 @@ public class ExpenseScreen extends AppCompatActivity implements AdapterView.OnIt
                     if (recurring) {
 
                         // frequency is saved as duration in hours, endDate is saved as Calendar object
-                        long index = expensesDataSource.createRecurringBooking(EXPENSE.getIndex(), CAL, frequency, recurringEndDate);
+                        long index = expensesDataSource.createRecurringBooking(EXPENSE.getIndex(), mCAL, frequency, recurringEndDate);
                         Log.d(TAG, "created recurring booking event at index: " + index);
                     }
 
@@ -322,7 +321,7 @@ public class ExpenseScreen extends AppCompatActivity implements AdapterView.OnIt
             new DatePickerDialog(ExpenseScreen.this, d, EXPENSE.getDateTime().get(Calendar.YEAR), EXPENSE.getDateTime().get(Calendar.MONTH), EXPENSE.getDateTime().get(Calendar.DAY_OF_MONTH)).show();
         } else {
 
-            new DatePickerDialog(ExpenseScreen.this, d2, CAL.get(Calendar.YEAR), CAL.get(Calendar.MONTH), CAL.get(Calendar.DAY_OF_MONTH)).show();
+            new DatePickerDialog(ExpenseScreen.this, d2, mCAL.get(Calendar.YEAR), mCAL.get(Calendar.MONTH), mCAL.get(Calendar.DAY_OF_MONTH)).show();
         }
     }
 

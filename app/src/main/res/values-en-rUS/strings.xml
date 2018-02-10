@@ -56,4 +56,6 @@
     <string name="create_booking">Create Booking</string>
     <string name="no_data">No Data Available</string>
     <string name="others">Other</string>
+    <string name="incoming">Incoming</string>
+    <string name="outgoing">Outgoing</string>
 </resources>

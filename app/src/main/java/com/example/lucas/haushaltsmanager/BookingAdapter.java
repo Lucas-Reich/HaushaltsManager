@@ -14,7 +14,6 @@ import java.util.ArrayList;
 
 class BookingAdapter extends ArrayAdapter<ExpenseObject> implements View.OnClickListener {
 
-    private Context mContext;
     private SharedPreferences preferences;
 
     private static class ViewHolder {
@@ -30,14 +29,13 @@ class BookingAdapter extends ArrayAdapter<ExpenseObject> implements View.OnClick
     BookingAdapter(ArrayList<ExpenseObject> data, Context context) {
         super(context, R.layout.booking_item, data);
 
-        this.mContext = context;
         this.preferences = context.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
     }
 
     @Override
     public void onClick(View v) {
 
-        Toast.makeText(mContext, "du hast gecklickt", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "du hast gecklickt", Toast.LENGTH_SHORT).show();
     }
 
     @NonNull

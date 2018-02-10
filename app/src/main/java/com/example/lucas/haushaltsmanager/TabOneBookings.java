@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,10 +25,10 @@ import java.util.Locale;
 
 public class TabOneBookings extends Fragment {
 
-    ExpandableListAdapter listAdapter;
-    ExpandableListView expListView;
-    List<ExpenseObject> listDataHeader;
-    HashMap<ExpenseObject, List<ExpenseObject>> listDataChild;
+    ExpandableListAdapter mListAdapter;
+    ExpandableListView mExpListView;
+    List<ExpenseObject> mListDataHeader;
+    HashMap<ExpenseObject, List<ExpenseObject>> mListDataChild;
     String TAG = TabOneBookings.class.getSimpleName();
 
     ExpensesDataSource database;
@@ -35,6 +36,7 @@ public class TabOneBookings extends Fragment {
     FloatingActionButton fab, fabDelete, fabCombine;
     Animation test, fabClose, rotateForward, rotateBackward;
     boolean combOpen = false, delOpen = false, fabOpen = false;
+    boolean mSelectionMode = false;
 
 
     /**
@@ -44,18 +46,18 @@ public class TabOneBookings extends Fragment {
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstances) {
 
-        //View rootView = inflater.inflate(R.layout.activity_test_exp_listview, container, false);
         View rootView = inflater.inflate(R.layout.tab_one_bookings, container, false);
 
         //get ListView
-        expListView = (ExpandableListView) rootView.findViewById(R.id.lvExp);
+        mExpListView = (ExpandableListView) rootView.findViewById(R.id.lvExp);
+        mExpListView.setBackgroundColor(Color.WHITE);
 
         prepareListData();
 
-        listAdapter = new ExpandableListAdapter(getContext(), listDataHeader, listDataChild);
+        mListAdapter = new ExpandableListAdapter(getContext(), mListDataHeader, mListDataChild);
 
         //setting list adapter
-        expListView.setAdapter(listAdapter);
+        mExpListView.setAdapter(mListAdapter);
 
 
         final Activity mainTab = getActivity();
@@ -68,15 +70,16 @@ public class TabOneBookings extends Fragment {
             @Override
             public void onClick(View v) {
 
-                if (delOpen || combOpen) {
+                if (delOpen || combOpen) {//Cose button is clicked
 
-                    listAdapter.deselectAll();
+                    mListAdapter.deselectAll();
+                    mSelectionMode = false;
                     closeDelete();
                     closeCombine();
                     closeFab();
 
-                    listAdapter.notifyDataSetChanged();
-                } else {
+                    updateExpListView();
+                } else {//Create new Booking button is clicked
 
                     Intent intent = new Intent(mainTab, ExpenseScreen.class);
                     mainTab.startActivity(intent);
@@ -91,12 +94,12 @@ public class TabOneBookings extends Fragment {
             public void onClick(View v) {
 
                 database.open();
-                database.createChildBooking(listAdapter.getSelectedGroupData());
+                database.createChildBooking(mListAdapter.getSelectedGroupData());
                 database.close();
-                listAdapter.deselectAll();
+                mListAdapter.deselectAll();
                 Toast.makeText(mainTab, "Done!", Toast.LENGTH_SHORT).show();
                 closeCombine();
-                listAdapter.notifyDataSetChanged();
+                updateExpListView();
             }
         });
 
@@ -107,12 +110,12 @@ public class TabOneBookings extends Fragment {
             public void onClick(View v) {
 
                 database.open();
-                database.deleteBookings(listAdapter.getSelectedBookingIds());
+                database.deleteBookings(mListAdapter.getSelectedBookingIds());
                 database.close();
-                listAdapter.deselectAll();
+                mListAdapter.deselectAll();
                 Toast.makeText(mainTab, "Deleted all Bookings", Toast.LENGTH_SHORT).show();
                 closeDelete();
-                listAdapter.notifyDataSetChanged();
+                updateExpListView();
             }
         });
 
@@ -127,39 +130,58 @@ public class TabOneBookings extends Fragment {
         //OnClickMethods for ExpandableListView
 
         //ExpandableListView Group click listener
-        expListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+        mExpListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
             @Override
-            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+            public boolean onGroupClick(ExpandableListView parent, View view, int groupPosition, long id) {
 
                 //get expense
-                ExpenseObject expense = (ExpenseObject) expListView.getItemAtPosition(groupPosition);
-                switch (expense.getAccount().getIndex() + "") {
+                ExpenseObject expense = (ExpenseObject) mExpListView.getItemAtPosition(groupPosition);
 
-                    case "9999"://do nothing but expand group
+                //When the user clicks on an Parent or on an Date divider the default behaviour should happen
+                if (expense.getAccount().getIndex() == 8888)
+                    return true;
 
-                        return false;
-                    case "8888"://do nothing and do not expand group
+                if (expense.getAccount().getIndex() == 9999)
+                    return false;
 
-                        return true;
-                    default://open expenseScreen with expense to edit this
+                if (!mSelectionMode) {
 
-                        Intent openExpense = new Intent(getContext(), ExpenseScreen.class);
-                        openExpense.putExtra("parentExpense", expense.getIndex());
-                        startActivity(openExpense);
-                        return true;
+                    Intent openExpense = new Intent(getContext(), ExpenseScreen.class);
+                    openExpense.putExtra("parentExpense", expense.getIndex());
+                    startActivity(openExpense);
+                } else {
+
+                    if (mListAdapter.isSelected(groupPosition)) {
+
+                        mListAdapter.removeGroup(groupPosition);
+                        view.setBackgroundColor(Color.WHITE);
+
+                        if (mListAdapter.getSelectedCount() == 0)
+                            mSelectionMode = false;
+                    } else {
+
+                        mListAdapter.selectGroup(groupPosition);
+                        view.setBackgroundColor(getResources().getColor(R.color.highlighted_item_color));
+                    }
+
+                    animateFabs(mListAdapter.getSelectedCount());
                 }
+
+                return true;
             }
         });
 
 
         //ExpandableListView Child click listener
-        expListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+        mExpListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
 
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
 
+                mListAdapter.clearSelected();
+
                 //get expense
-                Object o = expListView.getItemAtPosition(groupPosition);
+                Object o = mExpListView.getItemAtPosition(groupPosition);
                 ExpenseObject expense = (ExpenseObject) o;
 
                 //start expenseScreen with selected expense
@@ -170,34 +192,41 @@ public class TabOneBookings extends Fragment {
             }
         });
 
+
         //ExpandableListView Long click listener for selecting multiple groups
-        expListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+        mExpListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
-                //TODO datum und group mit kinder dürfen nicht auswählbar sein
+                //if selection mode is enabled the user can't long click elements anymore
+                //instead he has to normal click them
+                if (mSelectionMode)
+                    return true;
 
                 int groupPosition = ExpandableListView.getPackedPositionGroup(id);
                 int childPosition = ExpandableListView.getPackedPositionChild(id);
 
                 if (ExpandableListView.getPackedPositionType(id) == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
 
-                    if (listAdapter.isSelected(listAdapter.getGroupId(groupPosition))) {
+                    ExpenseObject expense = mListAdapter.getExpense(groupPosition);
 
-                        listAdapter.removeGroup(listAdapter.getGroupId(groupPosition));
-                        view.setBackgroundColor(Color.WHITE);
-                    } else {
+                    Log.d(TAG, "onItemLongClick: " + groupPosition);
 
-                        listAdapter.selectGroup(listAdapter.getGroupId(groupPosition));
-                        view.setBackgroundColor(Color.GREEN);
+                    if (expense.getAccount().getIndex() < 8888) {
+
+                        mListAdapter.selectGroup(groupPosition);
+                        view.setBackgroundColor(getResources().getColor(R.color.highlighted_item_color));
+
+                        mSelectionMode = true;
+                        animateFabs(mListAdapter.getSelectedCount());
+                        return true;
                     }
 
-                    animateFabs(listAdapter.getSelectedCount());
-                    return true;
+                    return false;
                 } else if (ExpandableListView.getPackedPositionType(id) == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
 
-
+                    //if long click is on child element
                     Toast.makeText(getContext(), "CHILD", Toast.LENGTH_SHORT).show();
                     return true;
                 }
@@ -214,8 +243,8 @@ public class TabOneBookings extends Fragment {
      */
     private void prepareListData() {
 
-        listDataHeader = new ArrayList<>();
-        listDataChild = new HashMap<>();
+        mListDataHeader = new ArrayList<>();
+        mListDataChild = new HashMap<>();
         ArrayList<ExpenseObject> expenses;
         database = new ExpensesDataSource(getContext());
 
@@ -237,12 +266,12 @@ public class TabOneBookings extends Fragment {
 
                 ExpenseObject dateSeparator = new ExpenseObject(-1, "", 0, expenses.get(i).getDateTime(), true, category, null, account, null);
 
-                listDataHeader.add(dateSeparator);
-                listDataChild.put(dateSeparator, new ArrayList<ExpenseObject>());
+                mListDataHeader.add(dateSeparator);
+                mListDataChild.put(dateSeparator, new ArrayList<ExpenseObject>());
             } else {
 
-                listDataHeader.add(expenses.get(i));
-                listDataChild.put(expenses.get(i), expenses.get(i).getChildren());
+                mListDataHeader.add(expenses.get(i));
+                mListDataChild.put(expenses.get(i), expenses.get(i).getChildren());
                 i++;
             }
         }
@@ -343,6 +372,6 @@ public class TabOneBookings extends Fragment {
 
     public void updateExpListView() {
 
-        listAdapter.notifyDataSetChanged();
+        mListAdapter.notifyDataSetChanged();
     }
 }

@@ -3,6 +3,7 @@ package com.example.lucas.haushaltsmanager;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,20 +11,12 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.PieData;
-import com.github.mikephil.charting.data.PieDataSet;
-import com.github.mikephil.charting.formatter.PercentFormatter;
-
 import java.text.DateFormatSymbols;
 import java.util.ArrayList;
+import java.util.List;
 
 class MonthlyReportAdapter extends ArrayAdapter<MonthlyReport> implements View.OnClickListener {
 
-    private MonthlyReport[] dataSet;
-    private Context mContext;
     private String TAG = MonthlyReportAdapter.class.getSimpleName();
 
     private static class ViewHolder {
@@ -38,17 +31,15 @@ class MonthlyReportAdapter extends ArrayAdapter<MonthlyReport> implements View.O
         PieChartView pieChart;
     }
 
-    MonthlyReportAdapter(MonthlyReport[] data, Context context) {
+    MonthlyReportAdapter(List<MonthlyReport> data, Context context) {
 
         super(context, R.layout.monthly_overview_item_v2, data);
-        this.dataSet = data;
-        this.mContext = context;
     }
 
     @Override
     public void onClick(View v) {
 
-        Toast.makeText(mContext, "du hast gecklickt", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "onClick: du hast geklickt");
     }
 
     @NonNull
@@ -87,67 +78,28 @@ class MonthlyReportAdapter extends ArrayAdapter<MonthlyReport> implements View.O
 
         if (monthlyReport.countBookings() <= 1) {
 
-            viewHolder.txtTotalBookings.setText(String.format("%s  %s", monthlyReport.countBookings(), mContext.getResources().getString(R.string.month_report_booking)));
+            viewHolder.txtTotalBookings.setText(String.format("%s  %s", monthlyReport.countBookings(), getContext().getResources().getString(R.string.month_report_booking)));
         } else {
 
-            viewHolder.txtTotalBookings.setText(String.format("%s  %ss", monthlyReport.countBookings(), mContext.getResources().getString(R.string.month_report_booking)));
+            viewHolder.txtTotalBookings.setText(String.format("%s  %ss", monthlyReport.countBookings(), getContext().getResources().getString(R.string.month_report_booking)));
         }
         viewHolder.txtAccountCurrency.setText(monthlyReport.getCurrency());
 
         viewHolder.colorCategory.setText("red");
         viewHolder.txtCategory.setText(monthlyReport.getMostStressedCategory());
-/*
-        viewHolder.pieChart.setUsePercentValues(true);
-        addDataSet(viewHolder.pieChart, monthlyReport.countIncomingMoney(), monthlyReport.countOutgoingMoney());
-*/
-        viewHolder.pieChart.setPieData(new float[]{30, 20, 19, 15, 7, 4, 4, 1});
+
+        preparePieData(viewHolder, monthlyReport);
 
         return convertView;
     }
 
+    private void preparePieData(ViewHolder viewHolder, MonthlyReport monthlyReport) {
 
-    private void addDataSet(PieChart chart, double incoming, double outgoing) {
+        String[] sliceLabels = new String[]{getContext().getResources().getString(R.string.incoming), getContext().getResources().getString(R.string.outgoing)};
+        int[] sliceColors = new int[] {getContext().getResources().getColor(R.color.booking_expense), getContext().getResources().getColor(R.color.booking_income)};
+        float[] pieData = new float[] {(float) monthlyReport.countIncomingMoney(),(float) monthlyReport.countOutgoingMoney()};
 
-        ArrayList<Entry> yValues = new ArrayList<>();
-
-        double totalMoney = incoming + outgoing;
-
-        yValues.add(new Entry((float) (totalMoney / incoming), 0));
-        yValues.add(new Entry((float) (totalMoney / outgoing), 1));
-
-        ArrayList<String> xValues = new ArrayList<>();
-
-        xValues.add("Outbound");
-        xValues.add("Inbound");
-
-        PieDataSet pieDataSet = new PieDataSet(yValues, "Expenses");
-        pieDataSet.setValueTextSize(12);
-
-        pieDataSet.setColors(new int[]{Color.rgb(235, 49, 50), Color.rgb(117, 165, 73)});
-
-        Legend legend = chart.getLegend();
-        legend.setForm(Legend.LegendForm.CIRCLE);
-        legend.setPosition(Legend.LegendPosition.BELOW_CHART_RIGHT);
-
-        chart.setDrawHoleEnabled(false);
-
-        PieData pieData = new PieData(xValues, pieDataSet);
-
-        pieData.setValueFormatter(new PercentFormatter());
-        pieData.setValueTextColor(Color.WHITE);
-        pieData.setValueTextSize(11f);
-
-        chart.setDescription("");
-        chart.setRotationEnabled(false);
-
-        chart.setNoDataText("No Available Data");
-        chart.setDrawSliceText(false);
-
-        chart.setTouchEnabled(false);
-
-
-        chart.setData(pieData);
-        chart.invalidate();
+        viewHolder.pieChart.setPieData(pieData, sliceColors, sliceLabels);
     }
 
     private String getMonth(int month) {

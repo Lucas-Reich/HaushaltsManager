@@ -799,6 +799,11 @@ public class PieChartView extends View {
         mAnimator.start();
     }
 
+    private void crossLegendElem(final PieSlice slice) {
+
+
+    }
+
     /**
      * Klasse um die Datensets des Kreisdiagramms zu sortieren
      */

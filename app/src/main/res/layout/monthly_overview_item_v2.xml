@@ -118,7 +118,6 @@
             android:id="@+id/monthly_item_pie_chart"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/booking_income"
             app:use_legend="false"/>
     </LinearLayout>
 </LinearLayout>

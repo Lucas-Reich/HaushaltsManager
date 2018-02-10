@@ -7,4 +7,5 @@
     <color name="mainColor">#ffffff</color>
     <color name="booking_expense">#bc0000</color>
     <color name="booking_income">#04925d</color>
+    <color name="highlighted_item_color">#5CE675</color>
 </resources>

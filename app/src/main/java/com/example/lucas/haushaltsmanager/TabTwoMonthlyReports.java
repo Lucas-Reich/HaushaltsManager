@@ -11,16 +11,16 @@ import android.widget.ListView;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 public class TabTwoMonthlyReports extends Fragment {
 
-
     Calendar cal = Calendar.getInstance();
-    MonthlyReport[] monthlyReports = new MonthlyReport[12];
+    List<MonthlyReport> monthlyReports = new ArrayList<>();
     ListView listView;
-    static MonthlyReportAdapter reportAdapter;
-    String TAG = "TabTwoMonthlyReports";
+    MonthlyReportAdapter reportAdapter;
+    String TAG = TabTwoMonthlyReports.class.getSimpleName();
 
     ExpensesDataSource expensesDataSource;
 
@@ -42,10 +42,10 @@ public class TabTwoMonthlyReports extends Fragment {
         ArrayList<ExpenseObject> expenses = expensesDataSource.getAllBookings(startDate, endDate);
 
         expensesDataSource.close();
-        //das array mit leeren MonthlyReports befüllen TODO nur mit so vielen wie es aktuell monate gibt
-        for (int i = 0; i < monthlyReports.length; i++) {
 
-            monthlyReports[i] = new MonthlyReport((i + 1) + "", new ArrayList<ExpenseObject>(), preferences.getString("mainCurrency", "€"));
+        for (int i = 0; i <= cal.get(Calendar.MONTH); i++) {
+
+            monthlyReports.add(new MonthlyReport((i + 1) + "", new ArrayList<ExpenseObject>(), preferences.getString("mainCurrency", "€")));
         }
 
         for (ExpenseObject expense : expenses) {
@@ -60,11 +60,17 @@ public class TabTwoMonthlyReports extends Fragment {
         return rootView;
     }
 
+    /**
+     * Methode um die Buchung dem richtigen MonthlyReport zuzuweisen.
+     * Ist die Buchung eine ParentBuchung, werden statdessen alle Kinden in den MonthlyReport gepackt.
+     *
+     * @param expense Buchung die einen MonthlyReport zugeordnet werden soll
+     */
     private void getReports(ExpenseObject expense) {
 
         if (!expense.hasChildren()) {
 
-            monthlyReports[expense.getDateTime().get(Calendar.MONTH)].addExpense(expense);
+            monthlyReports.get(expense.getDateTime().get(Calendar.MONTH)).addExpense(expense);
         } else {
 
             for (ExpenseObject child : expense.getChildren()) {

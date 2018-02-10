@@ -11,42 +11,79 @@ class MonthlyReport {
     private List<ExpenseObject> expenses;
     private String currency;
 
-    MonthlyReport(@NonNull String month, ArrayList<ExpenseObject> expenses, String currency) {
+    MonthlyReport(@NonNull String month,@NonNull ArrayList<ExpenseObject> expenses,@NonNull String currency) {
 
         this.month = month;
         this.expenses = expenses;
         this.currency = currency;
     }
 
+    /**
+     * Methode um Buchungen hinzuzufügen
+     *
+     * @param expense Neue Buchungen
+     */
     public void addExpense(ExpenseObject expense) {
 
         this.expenses.add(expense);
     }
 
+    /**
+     * Methode um den Monat zu erhalten
+     *
+     * @return Monat
+     */
     @NonNull
     public String getMonth() {
 
         return month;
     }
 
+    /**
+     * Methode um den Monat zu setzen
+     *
+     * @param month Monat
+     */
     public void setMonth(String month) {
         this.month = month;
     }
 
+    /**
+     * Methode um alle Buchungen des Monats zu erhalten
+     *
+     * @return Liste mit allen Buchungen
+     */
+    @NonNull
     public List<ExpenseObject> getExpenses() {
         return expenses;
     }
 
+    /**
+     * Methode um die Hauptwährung zu erhalten
+     *
+     * @return Währung als String
+     */
+    @NonNull
     String getCurrency() {
 
         return currency;
     }
 
+    /**
+     * Methode um die Anzahl der Buchungen in diesem Monat zu bekommen.
+     *
+     * @return Anzahl an Buchungen
+     */
     int countBookings() {
 
         return expenses.size();
     }
 
+    /**
+     * Methode um die gesamten Einnahmen des Monats zu errechnen.
+     *
+     * @return Einnahmen des Monats
+     */
     double countIncomingMoney() {
 
         double incomingMoney = 0;
@@ -62,6 +99,11 @@ class MonthlyReport {
         return incomingMoney;
     }
 
+    /**
+     * Methode um die Gesamten Ausgaben des Monats zu errechnen.
+     *
+     * @return Ausgaben des Monats
+     */
     double countOutgoingMoney() {
 
         double outgoingMoney = 0;
@@ -77,11 +119,21 @@ class MonthlyReport {
         return outgoingMoney;
     }
 
+    /**
+     * Methode die die Ausgaben und Einnahmen verrechnet und das Total zurückgibt
+     *
+     * @return Ausgaben total
+     */
     double calcMonthlyTotal() {
 
         return (countIncomingMoney() - countOutgoingMoney());
     }
 
+    /**
+     * Methode um herauszufinden, in welches Kategorie die meisten Ausgaben gemacht wurden.
+     *
+     * @return Kategorie mit den meisten Ausgaben
+     */
     String getMostStressedCategory() {
 
         MonthlyExpenses mostStressedCategory = new MonthlyExpenses("Keine Ausgaben", 0);
@@ -109,7 +161,6 @@ class MonthlyReport {
                 monthlyExpenses.set(index, monthly);
             }
         }
-
 
         for (MonthlyExpenses monthlyExpense : monthlyExpenses) {
 

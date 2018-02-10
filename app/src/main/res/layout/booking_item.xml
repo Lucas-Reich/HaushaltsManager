@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-    >
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -21,9 +22,10 @@
             android:textSize="22sp"/>
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginEnd="12dp"
+            android:layout_marginRight="12dp"
             android:layout_weight="1"
             android:orientation="horizontal">
 
@@ -41,6 +43,7 @@
                         android:id="@+id/booking_item_title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="start"
                         android:layout_weight="1"
                         android:text="Kategorie"
                         android:textAlignment="viewStart"
@@ -51,6 +54,7 @@
                         android:id="@+id/booking_item_paid_price"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="end"
                         android:text="17"
                         android:textAlignment="textEnd"
                         android:textSize="16sp"/>
@@ -59,6 +63,7 @@
                         android:id="@+id/booking_item_currency_paid"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="start"
                         android:text="$"
                         android:textAlignment="viewStart"
                         android:textSize="16sp"/>
@@ -72,6 +77,7 @@
                         android:id="@+id/booking_item_person"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="start"
                         android:layout_weight="1"
                         android:text="Lucas"
                         android:textAlignment="viewStart"
@@ -82,17 +88,19 @@
                         android:id="@+id/booking_item_booking_price"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="end"
                         android:text="15"
                         android:textAlignment="textEnd"
-                        android:textSize="10sp"/>
+                        android:textSize="12sp"/>
 
                     <TextView
                         android:id="@+id/booking_item_currency_base"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="start"
                         android:text="€"
                         android:textAlignment="viewStart"
-                        android:textSize="10sp"/>
+                        android:textSize="12sp"/>
                 </TableRow>
 
             </TableLayout>
