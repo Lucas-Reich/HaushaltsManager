@@ -131,16 +131,18 @@ public class TabOneBookings extends Fragment {
 
         //ExpandableListView Group click listener
         mExpListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+
             @Override
             public boolean onGroupClick(ExpandableListView parent, View view, int groupPosition, long id) {
 
                 //get expense
-                ExpenseObject expense = (ExpenseObject) mExpListView.getItemAtPosition(groupPosition);
+                ExpenseObject expense = (ExpenseObject) mListAdapter.getGroup(groupPosition);
 
-                //When the user clicks on an Parent or on an Date divider the default behaviour should happen
+                //if the user clicks on date divider nothing should happen
                 if (expense.getAccount().getIndex() == 8888)
                     return true;
 
+                //if user clicks on parent the defualt behaviour should happen
                 if (expense.getAccount().getIndex() == 9999)
                     return false;
 
@@ -178,17 +180,21 @@ public class TabOneBookings extends Fragment {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
 
+                if (mSelectionMode)
+                    return true;
+
                 mListAdapter.clearSelected();
 
                 //get expense
-                Object o = mExpListView.getItemAtPosition(groupPosition);
-                ExpenseObject expense = (ExpenseObject) o;
+                ExpenseObject expense = (ExpenseObject) mListAdapter.getChild(groupPosition, childPosition);
+
+                Log.d(TAG, "onChildClick: " + expense.getTitle() + " " + expense.getIndex());
 
                 //start expenseScreen with selected expense
                 Intent openExpense = new Intent(getContext(), ExpenseScreen.class);
                 openExpense.putExtra("childExpense", expense.getIndex());
                 startActivity(openExpense);
-                return false;
+                return true;
             }
         });
 
@@ -199,8 +205,7 @@ public class TabOneBookings extends Fragment {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
-                //if selection mode is enabled the user can't long click elements anymore
-                //instead he has to normal click them
+                //if selection mode is enabled do not make long clicks anymore
                 if (mSelectionMode)
                     return true;
 
@@ -210,8 +215,6 @@ public class TabOneBookings extends Fragment {
                 if (ExpandableListView.getPackedPositionType(id) == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
 
                     ExpenseObject expense = mListAdapter.getExpense(groupPosition);
-
-                    Log.d(TAG, "onItemLongClick: " + groupPosition);
 
                     if (expense.getAccount().getIndex() < 8888) {
 

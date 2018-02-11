@@ -8,13 +8,21 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 
 public class ExpenseInputDialogFragment extends DialogFragment {
 
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+    }
 
     //TODO diese klasse sollte durch den Basic Dialog ersetzt werden
+    //todo wenn der user nicht das popup anklickt und es sich dmit schließt bleibt das keyboard noch geöffnet
     //dieses Dialog fragment ermöglicht die eingabe einer Notiz, eines Titels, der Tags
     public Dialog onCreateDialog(final Bundle savedInstances) {
 
