@@ -1,7 +1,9 @@
 package com.example.lucas.haushaltsmanager;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -16,6 +18,7 @@ import android.widget.AdapterView;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
 
+import java.net.ConnectException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -23,7 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-public class TabOneBookings extends Fragment {
+public class TabOneBookings extends Fragment implements ChooseAccountsDialogFragment.OnSelectedAccount {
 
     ExpandableListAdapter mListAdapter;
     ExpandableListView mExpListView;
@@ -43,7 +46,6 @@ public class TabOneBookings extends Fragment {
      * https://www.captechconsulting.com/blogs/android-expandablelistview-magic
      * Anleitung um eine ExpandableListView ohne indicators zu machen
      */
-
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstances) {
 
         View rootView = inflater.inflate(R.layout.tab_one_bookings, container, false);
@@ -51,6 +53,8 @@ public class TabOneBookings extends Fragment {
         //get ListView
         mExpListView = (ExpandableListView) rootView.findViewById(R.id.lvExp);
         mExpListView.setBackgroundColor(Color.WHITE);
+
+        database = new ExpensesDataSource(getContext());
 
         prepareListData();
 
@@ -61,7 +65,6 @@ public class TabOneBookings extends Fragment {
 
 
         final Activity mainTab = getActivity();
-        database = new ExpensesDataSource(getContext());
 
         // Animated Floating Action Buttons
         fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
@@ -98,8 +101,9 @@ public class TabOneBookings extends Fragment {
                 database.close();
                 mListAdapter.deselectAll();
                 Toast.makeText(mainTab, "Done!", Toast.LENGTH_SHORT).show();
-                closeCombine();
+
                 updateExpListView();
+                animateFabs(mListAdapter.getSelectedCount());
             }
         });
 
@@ -114,8 +118,9 @@ public class TabOneBookings extends Fragment {
                 database.close();
                 mListAdapter.deselectAll();
                 Toast.makeText(mainTab, "Deleted all Bookings", Toast.LENGTH_SHORT).show();
-                closeDelete();
+
                 updateExpListView();
+                animateFabs(mListAdapter.getSelectedCount());
             }
         });
 
@@ -155,7 +160,7 @@ public class TabOneBookings extends Fragment {
 
                     if (mListAdapter.isSelected(groupPosition)) {
 
-                        mListAdapter.removeGroup(groupPosition);
+                        mListAdapter.removeGroupFromList(groupPosition);
                         view.setBackgroundColor(Color.WHITE);
 
                         if (mListAdapter.getSelectedCount() == 0)
@@ -241,20 +246,27 @@ public class TabOneBookings extends Fragment {
         return rootView;
     }
 
+    public void onAccountSelected(long accountId, boolean isChecked) {
+
+        Toast.makeText(getContext(), "sdlfguhstuistujikghnsitug", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "onAccountSelected: dujikfhgnikrghiksudbghksbghkiujsfdhgbsdkgjiljhdgbkisdfgujahsbritlkujsdnhtflisuhtrnösaoghiuaerguia");
+    }
+
     /**
-     * Preparing the list Data
+     * Methode um die Ausgaben für die ExpandableListView vorzubereiten
      */
     private void prepareListData() {
 
         mListDataHeader = new ArrayList<>();
         mListDataChild = new HashMap<>();
         ArrayList<ExpenseObject> expenses;
+
         database = new ExpensesDataSource(getContext());
 
-        //TODO nur die Buchungen für den aktuellen monat aus der datenbank holen
         database.open();
         Calendar cal = Calendar.getInstance();
-        expenses = database.getAllBookings(cal.get(Calendar.YEAR) + "-01-01 00:00:00", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(cal.getTime()));
+        //todo wechsle zu getBookingsForActiveAccounts wenn die funktion richtig funktioniert
+        expenses = database.getBookings(cal.get(Calendar.YEAR) + "-01-01 00:00:00", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(cal.getTime()));
 
         String separatorDate = "";
 
@@ -264,7 +276,7 @@ public class TabOneBookings extends Fragment {
 
                 separatorDate = expenses.get(i).getDate();
 
-                Category category = new Category(null, "test", "#000000", false);
+                Category category = new Category(null, "alterVisibleAccounts", "#000000", false);
                 Account account = new Account(8888, "", 0, new Currency("", "", ""));
 
                 ExpenseObject dateSeparator = new ExpenseObject(-1, "", 0, expenses.get(i).getDateTime(), true, category, null, account, null);
@@ -311,6 +323,10 @@ public class TabOneBookings extends Fragment {
         }
     }
 
+    /**
+     * Methode die das plus auf dem Button animiert.
+     * Wird diese Animation getriggert dreht sich das Pluszeichen um 45°.
+     */
     public void openFab() {
 
         if (!fabOpen) {
@@ -320,6 +336,10 @@ public class TabOneBookings extends Fragment {
         }
     }
 
+    /**
+     * Methode die das plus auf dem Button animiert.
+     * Wird diese Animation getriggert dreht sich das Pluszeichen um -45°.
+     */
     public void closeFab() {
 
         if (fabOpen) {
@@ -329,6 +349,9 @@ public class TabOneBookings extends Fragment {
         }
     }
 
+    /**
+     * Methode die den LöschFab sichtbar und anklickbar macht.
+     */
     public void openDelete() {
 
         if (!delOpen) {
@@ -340,6 +363,9 @@ public class TabOneBookings extends Fragment {
         }
     }
 
+    /**
+     * Methode die den LöschFab unsichtbar und nicht mehr anklickbar macht.
+     */
     public void closeDelete() {
 
         if (delOpen) {
@@ -351,6 +377,9 @@ public class TabOneBookings extends Fragment {
         }
     }
 
+    /**
+     * Methode die den KombinierFab sichtbar und anklickbar macht.
+     */
     public void openCombine() {
 
         if (!combOpen) {
@@ -362,6 +391,9 @@ public class TabOneBookings extends Fragment {
         }
     }
 
+    /**
+     * Methode die den KombinierFab sichtbar und anklickbar macht.
+     */
     public void closeCombine() {
 
         if (combOpen) {
@@ -373,8 +405,23 @@ public class TabOneBookings extends Fragment {
         }
     }
 
+    /**
+     * Methode um die ExpandableListView nach einer Änderung neu anzuzeigen.
+     * <p>
+     * todo bei vielen Buchungen kann diese Operation eventuell sehr resourcen intensiv sein
+     */
     public void updateExpListView() {
 
+        //änderungen aus der Datenbank holen
+        prepareListData();
+
+        //den adapter mit den neuen Daten versorgen
+        mListAdapter = new ExpandableListAdapter(getContext(), mListDataHeader, mListDataChild);
+
+        //den Adapter mit den neuen Daten der ExpandableListView zuordnen
+        mExpListView.setAdapter(mListAdapter);
+
+        //dem Adapter bescheid geben dass neue Daten zur verfügung stehen
         mListAdapter.notifyDataSetChanged();
     }
 }

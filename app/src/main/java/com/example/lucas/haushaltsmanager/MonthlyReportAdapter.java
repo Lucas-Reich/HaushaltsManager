@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.DateFormatSymbols;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,9 +73,11 @@ class MonthlyReportAdapter extends ArrayAdapter<MonthlyReport> implements View.O
         }
 
         viewHolder.txtMonth.setText(getMonth(Integer.parseInt(monthlyReport.getMonth())));
-        viewHolder.txtInbound.setText(String.format("%s", monthlyReport.countIncomingMoney()));
-        viewHolder.txtOutbound.setText(String.format("%s", monthlyReport.countOutgoingMoney()));
-        viewHolder.txtTotal.setText(String.format("%s", monthlyReport.calcMonthlyTotal()));
+
+        //formatiert die Ausgabe so, dass nur noch zwei nachkommastellen angezeigt werden
+        viewHolder.txtInbound.setText(String.format(getContext().getResources().getConfiguration().locale, "%.2f", monthlyReport.countIncomingMoney()));
+        viewHolder.txtOutbound.setText(String.format(getContext().getResources().getConfiguration().locale, "%.2f", monthlyReport.countOutgoingMoney()));
+        viewHolder.txtTotal.setText(String.format(getContext().getResources().getConfiguration().locale, "%.2f", monthlyReport.calcMonthlyTotal()));
 
         if (monthlyReport.countBookings() <= 1) {
 

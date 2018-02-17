@@ -13,7 +13,7 @@ public class BookingTemplates extends AppCompatActivity {
     ListView listView;
     static BookingAdapter bookingAdapter;
 
-    private static String TAG = "BookingTemplates";
+    private static String TAG = BookingTemplates.class.getSimpleName();
 
     ExpensesDataSource expensesDataSource;
 

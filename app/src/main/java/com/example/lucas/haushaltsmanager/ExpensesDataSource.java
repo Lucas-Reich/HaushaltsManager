@@ -665,9 +665,9 @@ class ExpensesDataSource {
      *
      * @return ExpenseObject ArrayList
      */
-    ArrayList<ExpenseObject> getAllBookings() {
+    ArrayList<ExpenseObject> getBookings() {
 
-        return getAllBookings(null, null);
+        return getBookings(null, null);
     }//DONE2
 
     /**
@@ -677,7 +677,7 @@ class ExpensesDataSource {
      * @param endDate   ending date
      * @return list of Expenses which are between the starting and end date
      */
-    ArrayList<ExpenseObject> getAllBookings(String startDate, String endDate) {
+    ArrayList<ExpenseObject> getBookings(String startDate, String endDate) {
 
         String selectQuery;
         selectQuery = "SELECT "
@@ -713,7 +713,7 @@ class ExpensesDataSource {
         Log.d(TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
-        Log.d(TAG, "getAllBookings: " + DatabaseUtils.dumpCursorToString(c));
+        Log.d(TAG, "getBookings: " + DatabaseUtils.dumpCursorToString(c));
         c.moveToFirst();
 
         ArrayList<ExpenseObject> bookings = new ArrayList<>();
@@ -724,7 +724,92 @@ class ExpensesDataSource {
         }
 
         return bookings;
-    }//DONE2
+    }
+
+    /**
+     * Methode um alle Buchungen in einem bestimmten Zeitraum, für alle aktiven Konten zu bekommen.
+     *
+     * @param startDate startind date
+     * @param endDate   ending date
+     * @return Liste mit ExpenseObjects
+     */
+    ArrayList<ExpenseObject> getBookingsForActiveAccounts(String startDate, String endDate) {
+
+        SharedPreferences preferences = mContext.getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
+
+        List<Long> activeAccounts = new ArrayList<>();
+        for (Account test : getAllAccounts()) {
+
+            //wenn das Konto Aktiv ist dann adde es zu mActiveAccounts
+            if (preferences.getBoolean(test.getAccountName().toLowerCase(), false))
+                activeAccounts.add(test.getIndex());
+        }
+
+        String selectQuery;
+        selectQuery = "SELECT "
+                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_ID + ", "
+                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_PRICE + ", "
+                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_EXPENDITURE + ", "
+                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_TITLE + ", "
+                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_DATE + ", "
+                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_NOTICE + ", "
+                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_EXCHANGE_RATE + ", "
+                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_IS_PARENT + ", "
+                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID + ", "
+                + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_NAME + ", "
+                + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_BALANCE + ", "
+                + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID + ", "
+                + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_NAME + ", "
+                + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME + ", "
+                + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SYMBOL + ", "
+                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID + ", "
+                + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_NAME + ", "
+                + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_COLOR + ", "
+                + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_EXPENSE_TYPE + ", "
+                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_CURRENCY_ID
+                + " FROM " + ExpensesDbHelper.TABLE_BOOKINGS
+                + " LEFT JOIN " + ExpensesDbHelper.TABLE_CATEGORIES + " ON " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID + " = " + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_ID
+                + " LEFT JOIN " + ExpensesDbHelper.TABLE_ACCOUNTS + " ON " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID + " = " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_ID
+                + " LEFT JOIN " + ExpensesDbHelper.TABLE_CURRENCIES + " ON " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID + " = " + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_ID;
+        if (startDate != null && endDate != null) {
+
+            selectQuery += " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_DATE + " BETWEEN '" + startDate + "' AND '" + endDate + "'";
+
+            if (activeAccounts.size() != 0)
+                selectQuery += " AND (";
+        } else {
+
+            if (activeAccounts.size() != 0)
+                selectQuery += " WHERE (";
+        }
+
+        for (long accountId : activeAccounts) {
+
+            if (activeAccounts.indexOf(accountId) != 0)
+                selectQuery += " OR ";
+
+            selectQuery += " " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_ID + " = " + accountId;
+
+            if (activeAccounts.indexOf(accountId) == activeAccounts.size() - 1)
+                selectQuery += ")";
+        }
+
+        selectQuery += " ORDER BY " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_DATE + " DESC;";
+        Log.d(TAG, selectQuery);
+
+        Cursor c = database.rawQuery(selectQuery, null);
+        Log.d(TAG, "getBookings: " + DatabaseUtils.dumpCursorToString(c));
+        c.moveToFirst();
+
+        ArrayList<ExpenseObject> bookings = new ArrayList<>();
+        while (!c.isAfterLast()) {
+
+            bookings.add(cursorToExpense(c));
+            c.moveToNext();
+        }
+
+        return bookings;
+    }
 
     int updateBooking(long bookingId) {
 

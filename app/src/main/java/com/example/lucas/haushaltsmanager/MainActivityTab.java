@@ -21,7 +21,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-public class MainActivityTab extends AppCompatActivity {
+public class MainActivityTab extends AppCompatActivity implements ChooseAccountsDialogFragment.OnSelectedAccount {
+
+    private String TAG = MainActivityTab.class.getSimpleName();
+    TabLayout mTabLayout;
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -76,8 +79,8 @@ public class MainActivityTab extends AppCompatActivity {
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(mViewPager);
+        mTabLayout = (TabLayout) findViewById(R.id.tabs);
+        mTabLayout.setupWithViewPager(mViewPager);
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_2);
@@ -181,7 +184,7 @@ public class MainActivityTab extends AppCompatActivity {
             case R.id.choose_account:
 
                 ChooseAccountsDialogFragment chooseAccountFragment = new ChooseAccountsDialogFragment();
-                chooseAccountFragment.show(getFragmentManager(), "test");
+                chooseAccountFragment.show(getFragmentManager(), "alterVisibleAccounts");
                 break;
 
             default:
@@ -218,10 +221,8 @@ public class MainActivityTab extends AppCompatActivity {
                 case 2:
 
                     return new TabThree();
-                default:
-
-                    return null;
             }
+            return null;
         }
 
         @Override
@@ -247,6 +248,32 @@ public class MainActivityTab extends AppCompatActivity {
                     return getString(R.string.tab_three_title);
             }
             return null;
+        }
+    }
+
+    /**
+     * Der User hat in dem ChooseAccountDialogFragment ein Konto angewählt.
+     * @param accountId Id des angewählten Kontos.
+     */
+    public void onAccountSelected(long accountId, boolean isChecked) {
+
+        //todo die funktionalität wieder aktivieren
+        //bis jetzt ist sie aus, da die aufgerufende funktion nicht mit getContext() umgehen kann und immer null zurück gibt
+
+        int position = mTabLayout.getSelectedTabPosition();
+        Fragment fragment = mSectionsPagerAdapter.getItem(position);
+
+        if (fragment != null) {
+
+            switch (position) {
+
+                case 0:
+                    //((TabOneBookings) fragment).updateExpListView();
+                    break;
+                case 1:
+                    //((TabTwoMonthlyReports) fragment).updateView();
+                    break;
+            }
         }
     }
 }

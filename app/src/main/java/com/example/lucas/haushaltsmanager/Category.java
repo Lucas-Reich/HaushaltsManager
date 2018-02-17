@@ -41,6 +41,7 @@ class Category implements Parcelable {
         this.index = index;
     }
 
+    @NonNull
     String getCategoryName() {
         return categoryName;
     }

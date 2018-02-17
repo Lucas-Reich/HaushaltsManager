@@ -27,6 +27,8 @@ public class TabTwoMonthlyReports extends Fragment {
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstances) {
 
+        //todo funktion udateView() implementieren welche die MonthlyReports updated
+
         SharedPreferences preferences = this.getActivity().getSharedPreferences("UserSettings", 0);
 
         View rootView = inflater.inflate(R.layout.tab_two_monthly_reports, container, false);
@@ -39,7 +41,7 @@ public class TabTwoMonthlyReports extends Fragment {
         String startDate = cal.get(Calendar.YEAR) + "-01-01 00:00:00";
         String endDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(cal.getTime());
 
-        ArrayList<ExpenseObject> expenses = expensesDataSource.getAllBookings(startDate, endDate);
+        ArrayList<ExpenseObject> expenses = expensesDataSource.getBookings(startDate, endDate);
 
         expensesDataSource.close();
 

@@ -17,6 +17,24 @@ public class ChooseAccountsDialogFragment extends DialogFragment {
     ExpensesDataSource expensesDataSource;
     boolean checkedItems[];
     SharedPreferences settings;
+    OnSelectedAccount mCallback;
+
+    /**
+     * Standart Fragment Methode die genutzt wird, um zu checken ob die aufrufende Activity auch das interface inplementiert.
+     * @param context Kontext
+     */
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        try {
+
+            mCallback = (OnSelectedAccount) context;
+        } catch (ClassCastException e) {
+
+            throw new ClassCastException(context.toString() + " must implement OnSelectedAccountListener");
+        }
+    }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -48,6 +66,8 @@ public class ChooseAccountsDialogFragment extends DialogFragment {
 
                 editor.putBoolean(accounts.get(which).getAccountName(), isChecked);
                 //TODO die buchungen der MainActivityTab live neuladen beim click auf ein Konto
+                //informaiert die activity darüber, dass ein Konto ausgewählt wurde
+                mCallback.onAccountSelected(accounts.get(which).getIndex(), isChecked);
             }
         });
 
@@ -90,5 +110,9 @@ public class ChooseAccountsDialogFragment extends DialogFragment {
         }
 
         return accountNames;
+    }
+
+    public interface OnSelectedAccount {
+        void onAccountSelected(long accountId, boolean isChecked);
     }
 }
