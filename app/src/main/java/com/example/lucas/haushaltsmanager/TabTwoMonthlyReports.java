@@ -27,8 +27,6 @@ public class TabTwoMonthlyReports extends Fragment {
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstances) {
 
-        //todo funktion udateView() implementieren welche die MonthlyReports updated
-
         SharedPreferences preferences = this.getActivity().getSharedPreferences("UserSettings", 0);
 
         View rootView = inflater.inflate(R.layout.tab_two_monthly_reports, container, false);
@@ -80,5 +78,14 @@ public class TabTwoMonthlyReports extends Fragment {
                 getReports(child);
             }
         }
+    }
+
+    /**
+     * Methode um die Ansicht des Tabs beim hinzufügen oder abwählen eines Kontos in ChooseAccountDialogFragment mit neuen Daten zu erneuern
+     */
+    public void updateView() {
+
+        //todo implement refresh functionality
+        throw new UnsupportedOperationException("Die Funktion updateView() in TabTwoMonthlyReports ist noch nicht implementiert!");
     }
 }

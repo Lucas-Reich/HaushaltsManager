@@ -16,15 +16,18 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.BaseExpandableListAdapter;
 import android.widget.Toast;
 
 public class MainActivityTab extends AppCompatActivity implements ChooseAccountsDialogFragment.OnSelectedAccount {
 
     private String TAG = MainActivityTab.class.getSimpleName();
     TabLayout mTabLayout;
+    int mTest;
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -214,7 +217,9 @@ public class MainActivityTab extends AppCompatActivity implements ChooseAccounts
 
                 case 0:
 
-                    return new TabOneBookings();
+                    TabOneBookings tabOneBookings = new TabOneBookings();
+                    mTest = tabOneBookings.getId();
+                    return tabOneBookings;
                 case 1:
 
                     return new TabTwoMonthlyReports();
@@ -252,26 +257,27 @@ public class MainActivityTab extends AppCompatActivity implements ChooseAccounts
     }
 
     /**
+     * Hilfe von: https://stackoverflow.com/questions/27204409/android-calling-a-function-inside-a-fragment-from-a-custom-action-bar
+     *
      * Der User hat in dem ChooseAccountDialogFragment ein Konto angewählt.
      * @param accountId Id des angewählten Kontos.
      */
     public void onAccountSelected(long accountId, boolean isChecked) {
 
-        //todo die funktionalität wieder aktivieren
-        //bis jetzt ist sie aus, da die aufgerufende funktion nicht mit getContext() umgehen kann und immer null zurück gibt
+        int visibleTabPosition = mTabLayout.getSelectedTabPosition();
 
-        int position = mTabLayout.getSelectedTabPosition();
-        Fragment fragment = mSectionsPagerAdapter.getItem(position);
+        //wenn man sich den mFragmentManager im Debug modus anguckt sieht man dass der TabTag so aufgebaut ist wie er hier erstellt wird
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag("android:switcher:" + mViewPager.getId() + ":" + visibleTabPosition);
 
         if (fragment != null) {
 
-            switch (position) {
+            switch (visibleTabPosition) {
 
                 case 0:
-                    //((TabOneBookings) fragment).updateExpListView();
+                    ((TabOneBookings) fragment).updateExpListView();
                     break;
                 case 1:
-                    //((TabTwoMonthlyReports) fragment).updateView();
+                    ((TabTwoMonthlyReports) fragment).updateView();
                     break;
             }
         }

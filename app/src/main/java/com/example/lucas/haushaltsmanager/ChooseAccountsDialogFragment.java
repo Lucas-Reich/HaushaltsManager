@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
-import android.widget.ArrayAdapter;
 
 import java.util.ArrayList;
 
@@ -21,6 +20,7 @@ public class ChooseAccountsDialogFragment extends DialogFragment {
 
     /**
      * Standart Fragment Methode die genutzt wird, um zu checken ob die aufrufende Activity auch das interface inplementiert.
+     *
      * @param context Kontext
      */
     @Override
@@ -65,8 +65,8 @@ public class ChooseAccountsDialogFragment extends DialogFragment {
             public void onClick(DialogInterface dialog, int which, boolean isChecked) {
 
                 editor.putBoolean(accounts.get(which).getAccountName(), isChecked);
-                //TODO die buchungen der MainActivityTab live neuladen beim click auf ein Konto
-                //informaiert die activity darüber, dass ein Konto ausgewählt wurde
+
+                //informiert die activity darüber, dass ein Konto angewählt wurde
                 mCallback.onAccountSelected(accounts.get(which).getIndex(), isChecked);
             }
         });

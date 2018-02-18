@@ -3,7 +3,6 @@ package com.example.lucas.haushaltsmanager;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -18,7 +17,6 @@ import android.widget.AdapterView;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
 
-import java.net.ConnectException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -26,7 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-public class TabOneBookings extends Fragment implements ChooseAccountsDialogFragment.OnSelectedAccount {
+public class TabOneBookings extends Fragment {
 
     ExpandableListAdapter mListAdapter;
     ExpandableListView mExpListView;
@@ -246,12 +244,6 @@ public class TabOneBookings extends Fragment implements ChooseAccountsDialogFrag
         return rootView;
     }
 
-    public void onAccountSelected(long accountId, boolean isChecked) {
-
-        Toast.makeText(getContext(), "sdlfguhstuistujikghnsitug", Toast.LENGTH_SHORT).show();
-        Log.d(TAG, "onAccountSelected: dujikfhgnikrghiksudbghksbghkiujsfdhgbsdkgjiljhdgbkisdfgujahsbritlkujsdnhtflisuhtrnösaoghiuaerguia");
-    }
-
     /**
      * Methode um die Ausgaben für die ExpandableListView vorzubereiten
      */
@@ -412,16 +404,72 @@ public class TabOneBookings extends Fragment implements ChooseAccountsDialogFrag
      */
     public void updateExpListView() {
 
+        Log.d(TAG, "updateExpListView: " + isAdded());
+
         //änderungen aus der Datenbank holen
         prepareListData();
 
         //den adapter mit den neuen Daten versorgen
-        mListAdapter = new ExpandableListAdapter(getContext(), mListDataHeader, mListDataChild);
+        mListAdapter = new ExpandableListAdapter(getActivity(), mListDataHeader, mListDataChild);
 
         //den Adapter mit den neuen Daten der ExpandableListView zuordnen
         mExpListView.setAdapter(mListAdapter);
 
         //dem Adapter bescheid geben dass neue Daten zur verfügung stehen
         mListAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onPause() {
+        Log.d(TAG, "onPause: ich bin gerade in die pause gegangen und deshalb kann man mich momentan nicht ansprechen");
+        super.onPause();
+    }
+
+    @Override
+    public void onDetach() {
+        Log.d(TAG, "onDetach: ich wurde gerade von meinem parent abgekoppelt und deshalb bekommt man bei getContext() jetzt auch null");
+        super.onDetach();
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.d(TAG, "onDestroy: fikluhgwiklhlsuitbgnhluiwtrhglhstronjslrothnoistrhnlostrhnstrujhsntruiogl");
+        super.onDestroy();
+    }
+
+    @Override
+    public void onAttachFragment(Fragment childFragment) {
+        Log.d(TAG, "onAttachFragment: ikujhrgbhkwuriehgwueirghlwerguhlwteioguhbnluowtrghleuotrhbgiuewtbhgluoteghqoeurhbg");
+        super.onAttachFragment(childFragment);
+    }
+
+    @Override
+    public void onStop() {
+        Log.d(TAG, "onStop: reajikhbglrehkiuqehrgiuaehrbguiahlrioehgsoirenhotirsnvghwlszhnvuiohwzuiwhtoiu");
+        super.onStop();
+    }
+
+    @Override
+    public void onStart() {
+        Log.d(TAG, "onStart: rlieukgnhweuirghwerhgoiwet5zhglöiotrzjhoitnbvgziolsthsköt6orjnhiostrdnh");
+        super.onStart();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        Log.d(TAG, "onAttach: ljikwrgqhbuirebgiuiwreugjhnleroghbuireahngvfhejrailtcghaoirezvnhtoui5ezhtiouw5eauio");
+        super.onAttach(context);
+    }
+
+    @Override
+    public void onDestroyView() {
+        Log.d(TAG, "onDestroyView: elrgikhgziuenhrgihnfurthawlsecuihr,oiuthauieo5htrzouirhblgaurjgihblgi");
+        super.onDestroyView();
+    }
+
+    @Override
+    public void onResume() {
+        Log.d(TAG, "onResume: rqlkghtbireuhkgquiehncvfuiahtlgzsvhlzoiusahöiuzhgöoisrehoöiuvrnhtzuilesrzhiulhauilhzoh5reöpazhuj5tp0azhö");
+        super.onResume();
     }
 }
