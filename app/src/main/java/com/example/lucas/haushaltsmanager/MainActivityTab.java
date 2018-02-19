@@ -206,7 +206,6 @@ public class MainActivityTab extends AppCompatActivity implements ChooseAccounts
     private class SectionsPagerAdapter extends FragmentPagerAdapter {
 
         SectionsPagerAdapter(FragmentManager fm) {
-
             super(fm);
         }
 
@@ -214,7 +213,6 @@ public class MainActivityTab extends AppCompatActivity implements ChooseAccounts
         public Fragment getItem(int position) {
 
             switch (position) {
-
                 case 0:
 
                     TabOneBookings tabOneBookings = new TabOneBookings();
@@ -233,8 +231,7 @@ public class MainActivityTab extends AppCompatActivity implements ChooseAccounts
         @Override
         public int getCount() {
 
-            // Show 3 total pages.
-            return 3;
+            return 3;//show 3 pages
         }
 
         @Override
@@ -257,7 +254,7 @@ public class MainActivityTab extends AppCompatActivity implements ChooseAccounts
     }
 
     /**
-     * Hilfe von: https://stackoverflow.com/questions/27204409/android-calling-a-function-inside-a-fragment-from-a-custom-action-bar
+     * Anleitung von: https://stackoverflow.com/questions/27204409/android-calling-a-function-inside-a-fragment-from-a-custom-action-bar
      *
      * Der User hat in dem ChooseAccountDialogFragment ein Konto angewählt.
      * @param accountId Id des angewählten Kontos.
@@ -266,7 +263,6 @@ public class MainActivityTab extends AppCompatActivity implements ChooseAccounts
 
         int visibleTabPosition = mTabLayout.getSelectedTabPosition();
 
-        //wenn man sich den mFragmentManager im Debug modus anguckt sieht man dass der TabTag so aufgebaut ist wie er hier erstellt wird
         Fragment fragment = getSupportFragmentManager().findFragmentByTag("android:switcher:" + mViewPager.getId() + ":" + visibleTabPosition);
 
         if (fragment != null) {
@@ -274,7 +270,7 @@ public class MainActivityTab extends AppCompatActivity implements ChooseAccounts
             switch (visibleTabPosition) {
 
                 case 0:
-                    ((TabOneBookings) fragment).updateExpListView();
+                    ((TabOneBookings) fragment).changeVisibleAccounts(accountId, isChecked);
                     break;
                 case 1:
                     ((TabTwoMonthlyReports) fragment).updateView();

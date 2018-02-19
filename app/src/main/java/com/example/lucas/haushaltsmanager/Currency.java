@@ -34,15 +34,25 @@ class Currency implements Parcelable {
         this(-1, currencyName, currencyShortName, currencySymbol, null);
     }
 
+    /**
+     * Parcelable Constructor
+     *
+     * @param source Parceldata
+     */
     Currency(Parcel source) {
 
         this(source.readLong(), source.readString(), source.readString(), source.readString(), source.readDouble());
         Log.v(TAG, "ParcelData (Parcel source): time to put back parcel data");
     }
 
-    void setIndex(long index) {
+    /**
+     * Methode um eine DummyCategory zu erstellen die keine Werte entält
+     *
+     * @return dummy Category
+     */
+    static Currency createDummyCurrency() {
 
-        this.index = index;
+        return new Currency("", "", "");
     }
 
     public long getIndex() {

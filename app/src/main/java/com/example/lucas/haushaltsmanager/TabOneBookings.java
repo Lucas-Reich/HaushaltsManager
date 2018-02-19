@@ -3,8 +3,10 @@ package com.example.lucas.haushaltsmanager;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -33,12 +35,35 @@ public class TabOneBookings extends Fragment {
     String TAG = TabOneBookings.class.getSimpleName();
 
     ExpensesDataSource database;
+    ArrayList<ExpenseObject> mExpenses;
+    List<Long> mActiveAccounts;
 
     FloatingActionButton fab, fabDelete, fabCombine;
     Animation test, fabClose, rotateForward, rotateBackward;
     boolean combOpen = false, delOpen = false, fabOpen = false;
     boolean mSelectionMode = false;
 
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        mListDataHeader = new ArrayList<>();
+        mActiveAccounts = new ArrayList<>();
+        mListDataChild = new HashMap<>();
+        mExpenses = new ArrayList<>();
+
+        database = new ExpensesDataSource(getContext());
+        setActiveAccounts(database);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        if (database.isOpen())
+            database.close();
+    }
 
     /**
      * https://www.captechconsulting.com/blogs/android-expandablelistview-magic
@@ -94,9 +119,7 @@ public class TabOneBookings extends Fragment {
             @Override
             public void onClick(View v) {
 
-                database.open();
                 database.createChildBooking(mListAdapter.getSelectedGroupData());
-                database.close();
                 mListAdapter.deselectAll();
                 Toast.makeText(mainTab, "Done!", Toast.LENGTH_SHORT).show();
 
@@ -111,9 +134,7 @@ public class TabOneBookings extends Fragment {
             @Override
             public void onClick(View v) {
 
-                database.open();
                 database.deleteBookings(mListAdapter.getSelectedBookingIds());
-                database.close();
                 mListAdapter.deselectAll();
                 Toast.makeText(mainTab, "Deleted all Bookings", Toast.LENGTH_SHORT).show();
 
@@ -245,51 +266,129 @@ public class TabOneBookings extends Fragment {
     }
 
     /**
-     * Methode um die Ausgaben für die ExpandableListView vorzubereiten
+     * Methode um die mActiveAccounts liste zu initialisieren
+     *
+     * @param database Datenbankverbindung
+     */
+    private void setActiveAccounts(ExpensesDataSource database) {
+
+        if (!database.isOpen())
+            database.open();
+
+        SharedPreferences preferences = getContext().getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
+
+        ArrayList<Account> accounts = database.getAllAccounts();
+
+        for (Account account : accounts) {
+
+            if (preferences.getBoolean(account.getAccountName().toLowerCase(), false))
+                mActiveAccounts.add(account.getIndex());
+        }
+    }
+
+    /**
+     * Methode um die ExpandableListView datenitem vorzubereiten.
+     * Beim vorbereiten wird die mActiveAccounts liste mit einbezogen,
+     * ist das Konto einer Buchung nicht in der aktiven Kontoliste wird die Buchung auch nicht angezeigt.
+     * <p>
+     * <p>
+     * todo funktion so umschreiben dass sie die Liste mit Buchungen speichert anstatt sie jeder mal erneut aus der Datenbank abzufragen
+     * todo mExpenses liste soll bei änderungen (Buchugen werden zusammengefügt; Buchungen werden gelöscht) entsprechend angepasst werden
+     * todo wenn es unter einem datum keine Buchungen mehr geben sollte muss der DatumsPlatzhalter ebenfalls entfernt werden
+     * todo wenn ein Konto abgewählt wird und bei einer parentBuchung ein oder mehrere (aber nicht alle) Buchungen nicht mehr angezeigt werden,
+     *      muss auch der angezeigte Preis der parentBuchung angepasst werden
      */
     private void prepareListData() {
 
-        mListDataHeader = new ArrayList<>();
-        mListDataChild = new HashMap<>();
-        ArrayList<ExpenseObject> expenses;
+        if (mListDataHeader.size() > 0)
+            mListDataHeader.clear();
 
-        database = new ExpensesDataSource(getContext());
+        if (!mListDataChild.isEmpty())
+            mListDataChild.clear();
 
-        database.open();
-        Calendar cal = Calendar.getInstance();
-        //todo wechsle zu getBookingsForActiveAccounts wenn die funktion richtig funktioniert
-        expenses = database.getBookings(cal.get(Calendar.YEAR) + "-01-01 00:00:00", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(cal.getTime()));
+        if (mExpenses.size() == 0) {//wenn die Liste noch nicht erstellt wurde
+
+            if (!database.isOpen())
+                database.open();
+
+            Calendar cal = Calendar.getInstance();
+            mExpenses = database.getBookings(cal.get(Calendar.YEAR) + "-01-01 00:00:00", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(cal.getTime()));
+        }
+
 
         String separatorDate = "";
 
-        for (int i = 0; i < expenses.size(); ) {
+        for (int i = 0; i < mExpenses.size(); ) {
 
-            if (!expenses.get(i).getDate().equals(separatorDate)) {
+            //wenn das Datum der neuen Buchung ungleich das der alten Buchung ist muss ein DatumsSeperator eingefügt werden
+            //wird ein DatumsSeperator eingefügt wird der counter nicht um eins erhöht
+            if (!mExpenses.get(i).getDate().equals(separatorDate)) {
 
-                separatorDate = expenses.get(i).getDate();
+                separatorDate = mExpenses.get(i).getDate();
 
-                Category category = new Category(null, "alterVisibleAccounts", "#000000", false);
-                Account account = new Account(8888, "", 0, new Currency("", "", ""));
+                Account account = new Account(8888, "", 0, Currency.createDummyCurrency());
 
-                ExpenseObject dateSeparator = new ExpenseObject(-1, "", 0, expenses.get(i).getDateTime(), true, category, null, account, null);
+                ExpenseObject dateSeparator = new ExpenseObject(-1, "", 0, mExpenses.get(i).getDateTime(), true, Category.createDummyCategory(), null, account, null);
 
                 mListDataHeader.add(dateSeparator);
                 mListDataChild.put(dateSeparator, new ArrayList<ExpenseObject>());
             } else {
 
-                mListDataHeader.add(expenses.get(i));
-                mListDataChild.put(expenses.get(i), expenses.get(i).getChildren());
+                ExpenseObject expense = mExpenses.get(i);
+
+                if (expense.getAccount().getIndex() == 9999) {
+
+                    ArrayList<ExpenseObject> allowedBookings = new ArrayList<>();
+
+                    for (ExpenseObject childExpense : expense.getChildren()) {
+
+                        if (mActiveAccounts.contains(childExpense.getAccount().getIndex()))
+                            allowedBookings.add(childExpense);
+                    }
+
+                    //wenn kein Kind erlaubt ist muss der Parent nicht angezeigt werden
+                    if (allowedBookings.size() > 0) {
+
+                        mListDataHeader.add(expense);
+                        mListDataChild.put(expense, allowedBookings);
+                    }
+                }
+
+                //wenn expense keine kinder hat
+                if (expense.getAccount().getIndex() == 8888 || mActiveAccounts.contains(expense.getAccount().getIndex())) {
+
+                    mListDataHeader.add(expense);
+                    mListDataChild.put(expense, expense.getChildren());//sollte leer sein
+                }
                 i++;
             }
         }
+    }
 
-        database.close();
+    /**
+     * Methode um die ein Konto in der aktiven Kontoliste zu aktivieren oder deaktivieren
+     * !Nachdem Änderungen an der aktiven Kontoliste gemacht wurden wird die ExpandableListView neu instanziiert
+     *
+     * @param accountId AccountId des zu ändernden Kontos
+     * @param isChecked status des Kontos
+     */
+    public void changeVisibleAccounts(long accountId, boolean isChecked) {
+
+        //wenn das Konto bereits dem gewünschten stand entspricht
+        if (mActiveAccounts.contains(accountId) == isChecked)
+            return;
+
+        if (mActiveAccounts.contains(accountId) && !isChecked)
+            mActiveAccounts.remove(accountId);
+        else
+            mActiveAccounts.add(accountId);
+
+        updateExpListView();
     }
 
     /**
      * animating the FloatingActionButtons
-     * <p>
-     * TODO die ganzen animations methoden noch einmal neu schreiben da ich mit den aktuellen nicht zufrieden bin
+     * todo die ganzen animations methoden noch einmal neu schreiben da ich mit den aktuellen nicht zufrieden bin
      *
      * @param selectedCount number of selected entries
      */
@@ -404,9 +503,6 @@ public class TabOneBookings extends Fragment {
      */
     public void updateExpListView() {
 
-        Log.d(TAG, "updateExpListView: " + isAdded());
-
-        //änderungen aus der Datenbank holen
         prepareListData();
 
         //den adapter mit den neuen Daten versorgen
@@ -417,59 +513,5 @@ public class TabOneBookings extends Fragment {
 
         //dem Adapter bescheid geben dass neue Daten zur verfügung stehen
         mListAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void onPause() {
-        Log.d(TAG, "onPause: ich bin gerade in die pause gegangen und deshalb kann man mich momentan nicht ansprechen");
-        super.onPause();
-    }
-
-    @Override
-    public void onDetach() {
-        Log.d(TAG, "onDetach: ich wurde gerade von meinem parent abgekoppelt und deshalb bekommt man bei getContext() jetzt auch null");
-        super.onDetach();
-    }
-
-    @Override
-    public void onDestroy() {
-        Log.d(TAG, "onDestroy: fikluhgwiklhlsuitbgnhluiwtrhglhstronjslrothnoistrhnlostrhnstrujhsntruiogl");
-        super.onDestroy();
-    }
-
-    @Override
-    public void onAttachFragment(Fragment childFragment) {
-        Log.d(TAG, "onAttachFragment: ikujhrgbhkwuriehgwueirghlwerguhlwteioguhbnluowtrghleuotrhbgiuewtbhgluoteghqoeurhbg");
-        super.onAttachFragment(childFragment);
-    }
-
-    @Override
-    public void onStop() {
-        Log.d(TAG, "onStop: reajikhbglrehkiuqehrgiuaehrbguiahlrioehgsoirenhotirsnvghwlszhnvuiohwzuiwhtoiu");
-        super.onStop();
-    }
-
-    @Override
-    public void onStart() {
-        Log.d(TAG, "onStart: rlieukgnhweuirghwerhgoiwet5zhglöiotrzjhoitnbvgziolsthsköt6orjnhiostrdnh");
-        super.onStart();
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        Log.d(TAG, "onAttach: ljikwrgqhbuirebgiuiwreugjhnleroghbuireahngvfhejrailtcghaoirezvnhtoui5ezhtiouw5eauio");
-        super.onAttach(context);
-    }
-
-    @Override
-    public void onDestroyView() {
-        Log.d(TAG, "onDestroyView: elrgikhgziuenhrgihnfurthawlsecuihr,oiuthauieo5htrzouirhblgaurjgihblgi");
-        super.onDestroyView();
-    }
-
-    @Override
-    public void onResume() {
-        Log.d(TAG, "onResume: rqlkghtbireuhkgquiehncvfuiahtlgzsvhlzoiusahöiuzhgöoisrehoöiuvrnhtzuilesrzhiulhauilhzoh5reöpazhuj5tp0azhö");
-        super.onResume();
     }
 }

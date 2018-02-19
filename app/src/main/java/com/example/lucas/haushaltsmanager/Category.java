@@ -2,6 +2,7 @@ package com.example.lucas.haushaltsmanager;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -33,12 +34,18 @@ class Category implements Parcelable {
         this(null, "", "#000000", false);
     }
 
-    long getIndex() {
-        return index;
+    /**
+     * Methode um eine Dummy Category zu erstellen
+     *
+     * @return Category dummy object
+     */
+    static Category createDummyCategory() {
+
+        return new Category(null, "dummy", "#000000", false);
     }
 
-    void setIndex(long index) {
-        this.index = index;
+    long getIndex() {
+        return index;
     }
 
     @NonNull
@@ -46,7 +53,7 @@ class Category implements Parcelable {
         return categoryName;
     }
 
-    void setCategoryName(String categoryName) {
+    void setCategoryName(@NonNull String categoryName) {
         this.categoryName = categoryName;
     }
 
@@ -54,12 +61,12 @@ class Category implements Parcelable {
         return this.color;
     }
 
-    void setColor(String color) {
+    void setColor(@NonNull String color) {
 
         this.color = color;
     }
 
-    void setColor(int color) {
+    void setColor(@ColorInt int color) {
 
         this.color = "#" + Integer.toHexString(color);
     }
