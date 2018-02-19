@@ -1,0 +1,19 @@
+<scheme name="_@user_Darcula" version="142" parent_scheme="Darcula">
+  <option name="FONT_SCALE" value="1.0" />
+  <metaInfo>
+    <property name="created">2018-02-19T19:46:38</property>
+    <property name="ide">AndroidStudio</property>
+    <property name="ideVersion">3.0.1.0</property>
+    <property name="modified">2018-02-19T20:05:13</property>
+    <property name="originalScheme">Darcula</property>
+  </metaInfo>
+  <option name="EDITOR_FONT_SIZE" value="12" />
+  <option name="EDITOR_FONT_NAME" value="Monospaced" />
+  <attributes>
+    <option name="JAVA_LINE_COMMENT">
+      <value>
+        <option name="FOREGROUND" value="fc37e9" />
+      </value>
+    </option>
+  </attributes>
+</scheme>
