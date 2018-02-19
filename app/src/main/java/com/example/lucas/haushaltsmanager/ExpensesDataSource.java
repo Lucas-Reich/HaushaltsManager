@@ -46,6 +46,11 @@ class ExpensesDataSource {
         Log.d(TAG, "Closed Db with the help of dbHelper.");
     }
 
+    boolean isOpen() {
+
+        return database != null && database.isOpen();
+    }
+
     @NonNull
     private ExpenseObject cursorToChildBooking(Cursor c) {
 
