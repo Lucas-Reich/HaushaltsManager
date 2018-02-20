@@ -1,5 +1,6 @@
 package com.example.lucas.haushaltsmanager;
 
+import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -26,63 +27,78 @@ class Account implements Parcelable {
         this.currency = currency;
     }
 
-    Account(@NonNull String accountName, Integer balance,@NonNull Currency currency) {
+    Account(@NonNull String accountName, Integer balance, @NonNull Currency currency) {
 
         this(-1, accountName, balance != null ? balance : 0, currency);
     }
 
-    public long getIndex() {
-        return index;
-    }
-
-    public void setIndex(long index) {
-        this.index = index;
-    }
-
-    String getAccountName() {
-        return accountName;
-    }
-
-    void setAccountName(String accountName) {
-        this.accountName = accountName;
-    }
-
-    int getBalance() {
-        return balance;
-    }
-
-    void setBalance(int balance) {
-        this.balance = balance;
-    }
-
-    Currency getCurrency() {
-        return currency;
-    }
-
-    void setCurrency(Currency currency) {
-        this.currency = currency;
-    }
-
-
-    //make class Parcelable
-
     /**
-     * This will be only used by ParcelableCategories
+     * this constructor converts our parcelable object back into an Category object
+     *
      * see: http://prasanta-paul.blogspot.de/2010/06/android-parcelable-example.html (Parcelable ArrayList)
      * and: https://stackoverflow.com/questions/2139134/how-to-send-an-object-from-one-android-activity-to-another-using-intents for further explanations (Parcelable Object)
-     * <p>
-     * this constructor converts our parcelable object back into an Category object
      *
      * @param source .
      */
     public Account(Parcel source) {
 
-        Log.v(TAG, "ParcelData (Parcel source): time to put back parcel data");
+        Log.v(TAG, "Recreating Account from parcel data");
         index = source.readLong();
         accountName = source.readString();
         balance = source.readInt();
         currency = source.readParcelable(Account.class.getClassLoader());
     }
+
+    /**
+     * Methode um ein dummy Konto zu erzeugen
+     *
+     * @param context System context
+     * @return dummy Konto
+     */
+    public static Account createDummyAccount(Context context) {
+
+        return new Account(-1, context.getResources().getString(R.string.no_name), 0, Currency.createDummyCurrency());
+    }
+
+    public long getIndex() {
+
+        return index;
+    }
+
+    @NonNull
+    String getAccountName() {
+
+        return accountName;
+    }
+
+    void setAccountName(@NonNull String accountName) {
+
+        this.accountName = accountName;
+    }
+
+    int getBalance() {
+
+        return balance;
+    }
+
+    void setBalance(int balance) {
+
+        this.balance = balance;
+    }
+
+    @NonNull
+    Currency getCurrency() {
+
+        return currency;
+    }
+
+    void setCurrency(@NonNull Currency currency) {
+
+        this.currency = currency;
+    }
+
+
+    //make class Parcelable
 
     /**
      * can be ignored mostly

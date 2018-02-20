@@ -63,10 +63,10 @@ public class TabTwoMonthlyReports extends Fragment {
         createMonthlyReports();
 
 /* Deprecated since 20.02.18 -- use createMonthlyeports instead
-        String startDate = mCal.get(Calendar.YEAR) + "-01-01 00:00:00";
-        String endDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(mCal.getTime());
+        String mStartDate = mCal.get(Calendar.YEAR) + "-01-01 00:00:00";
+        String mEndDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(mCal.getTime());
 
-        ArrayList<ExpenseObject> expenses = mDatabase.getBookings(startDate, endDate);
+        ArrayList<ExpenseObject> expenses = mDatabase.getBookings(mStartDate, mEndDate);
 
         for (int i = 0; i <= mCal.get(Calendar.MONTH); i++) {
 

@@ -41,8 +41,12 @@ class Currency implements Parcelable {
      */
     Currency(Parcel source) {
 
-        this(source.readLong(), source.readString(), source.readString(), source.readString(), source.readDouble());
-        Log.v(TAG, "ParcelData (Parcel source): time to put back parcel data");
+        Log.v(TAG, "Recreating Currency from parcel data");
+        index = source.readLong();
+        currencyName = source.readString();
+        currencyShortName = source.readString();
+        currencySymbol = source.readString();
+        rateToBase = source.readDouble();
     }
 
     /**
@@ -60,16 +64,19 @@ class Currency implements Parcelable {
         return index;
     }
 
+    @NonNull
     String getCurrencyName() {
 
         return currencyName;
     }
 
+    @NonNull
     String getCurrencyShortName() {
 
         return currencyShortName;
     }
 
+    @NonNull
     String getCurrencySymbol() {
 
         return currencySymbol != null ? currencySymbol : currencyShortName;
@@ -93,7 +100,6 @@ class Currency implements Parcelable {
 
         return 0;
     }
-
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {

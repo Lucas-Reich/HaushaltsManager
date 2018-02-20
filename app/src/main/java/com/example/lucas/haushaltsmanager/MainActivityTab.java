@@ -45,7 +45,7 @@ public class MainActivityTab extends AppCompatActivity implements ChooseAccounts
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        //TODO die shared preferences in den dafür vorgehenen bereich bringen
+        //todo die shared preferences in den dafür vorgehenen bereich bringen
         SharedPreferences settings = getSharedPreferences("UserSettings", 0);
         SharedPreferences.Editor editor = settings.edit();
         editor.putLong("activeAccount", 1);

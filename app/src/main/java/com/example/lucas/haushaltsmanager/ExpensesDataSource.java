@@ -260,32 +260,17 @@ class ExpensesDataSource {
      */
     long createAccount(Account account) {
 
-
-        //TODO erstelle einen Account nur wenn es ihn noch nicht gibt
-        //wenn es ihn gibt frage nach und überschreibe dann
+        if (account.getCurrency().getIndex() == -1)
+            throw new RuntimeException("Cannot create account with dummy Currency object!");
 
         ContentValues values = new ContentValues();
-        //get unnamed string resource if no name if set
-        String accountName = account.getAccountName() == null ? mContext.getResources().getString(R.string.no_name) : account.getAccountName();
-        values.put(ExpensesDbHelper.ACCOUNTS_COL_NAME, accountName);
-
+        values.put(ExpensesDbHelper.ACCOUNTS_COL_NAME, account.getAccountName());
         values.put(ExpensesDbHelper.ACCOUNTS_COL_BALANCE, account.getBalance());
+        values.put(ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID, account.getCurrency().getIndex());
 
-        // get Currency main currency id from preferences if no currency is set
-        if (account.getCurrency() != null) {
-
-            values.put(ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID, account.getCurrency().getIndex());
-        } else {
-
-            SharedPreferences preferences = mContext.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
-            long baseCurIndex = preferences.getLong("mainCurrencyIndex", 0);
-
-            values.put(ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID, baseCurIndex);
-        }
-
-        Log.d(TAG, "created account " + account.getAccountName());
+        Log.d(TAG, "Creating account: " + account.getAccountName());
         return database.insert(ExpensesDbHelper.TABLE_ACCOUNTS, null, values);
-    }//DONE
+    }
 
     /**
      * Convenience Method for getting an specific Account
@@ -345,7 +330,7 @@ class ExpensesDataSource {
         c.moveToFirst();
 
         return c.isAfterLast() ? null : cursorToAccount(c);
-    }//DONE2
+    }
 
     ArrayList<Account> getAllAccounts() {
 
@@ -375,7 +360,7 @@ class ExpensesDataSource {
         }
 
         return accounts;
-    }//DONE2
+    }
 
     int updateAccount(long accountId) {
 
@@ -391,9 +376,57 @@ class ExpensesDataSource {
      */
     int deleteAccount(long accountId) {
 
-        //TODO ein konto kann nicht gelöscht werden wenn noch eine buchung für das konto existiert
-        Log.d(TAG, "deleting account at index: " + accountId);
+        if (hasAccountBookings(accountId))
+            throw new RuntimeException("Account with existing bookings cannot be deleted!");
+
+        Log.d(TAG, "Deleting account at index: " + accountId);
         return database.delete(ExpensesDbHelper.TABLE_ACCOUNTS, ExpensesDbHelper.ACCOUNTS_COL_ID + " = ?", new String[]{"" + accountId});
+    }
+
+    /**
+     * Methode um zu checken ob noch mindestends eine Buchung mit diesem Konto existiert
+     *
+     * @param accountId Id des Kontos
+     * @return Boolean
+     */
+    boolean hasAccountBookings(long accountId) {
+
+        String selectQuery;
+
+        //check bookings table
+        selectQuery = "SELECT"
+                + " COUNT(1) 'exists'"
+                + " FROM " + ExpensesDbHelper.TABLE_BOOKINGS
+                + " WHERE " + ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID + " = " + accountId + ";";
+        Log.d(TAG, "isChild: " + selectQuery);
+
+        Cursor c = database.rawQuery(selectQuery, null);
+        c.moveToFirst();
+
+        if (c.getInt(c.getColumnIndex("exists")) != 0) {
+
+            return true;
+        }
+
+        //check childBookings table
+        selectQuery = "SELECT"
+                + " COUNT(1) 'exists'"
+                + " FROM " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS
+                + " WHERE " + ExpensesDbHelper.CHILD_BOOKINGS_COL_ACCOUNT_ID + " = " + accountId + ";";
+        Log.d(TAG, "isChild: " + selectQuery);
+
+        c = database.rawQuery(selectQuery, null);
+        c.moveToFirst();
+
+        if (c.getInt(c.getColumnIndex("exists")) != 0) {
+
+            c.close();
+            return true;
+        } else {
+
+            c.close();
+            return false;
+        }
     }
 
 
@@ -714,91 +747,6 @@ class ExpensesDataSource {
 
             selectQuery += " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_DATE + " BETWEEN '" + startDate + "' AND '" + endDate + "'";
         }
-        selectQuery += " ORDER BY " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_DATE + " DESC;";
-        Log.d(TAG, selectQuery);
-
-        Cursor c = database.rawQuery(selectQuery, null);
-        Log.d(TAG, "getBookings: " + DatabaseUtils.dumpCursorToString(c));
-        c.moveToFirst();
-
-        ArrayList<ExpenseObject> bookings = new ArrayList<>();
-        while (!c.isAfterLast()) {
-
-            bookings.add(cursorToExpense(c));
-            c.moveToNext();
-        }
-
-        return bookings;
-    }
-
-    /**
-     * Methode um alle Buchungen in einem bestimmten Zeitraum, für alle aktiven Konten zu bekommen.
-     *
-     * @param startDate startind date
-     * @param endDate   ending date
-     * @return Liste mit ExpenseObjects
-     */
-    ArrayList<ExpenseObject> getBookingsForActiveAccounts(String startDate, String endDate) {
-
-        SharedPreferences preferences = mContext.getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
-
-        List<Long> activeAccounts = new ArrayList<>();
-        for (Account test : getAllAccounts()) {
-
-            //wenn das Konto Aktiv ist dann adde es zu mActiveAccounts
-            if (preferences.getBoolean(test.getAccountName().toLowerCase(), false))
-                activeAccounts.add(test.getIndex());
-        }
-
-        String selectQuery;
-        selectQuery = "SELECT "
-                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_ID + ", "
-                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_PRICE + ", "
-                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_EXPENDITURE + ", "
-                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_TITLE + ", "
-                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_DATE + ", "
-                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_NOTICE + ", "
-                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_EXCHANGE_RATE + ", "
-                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_IS_PARENT + ", "
-                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID + ", "
-                + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_NAME + ", "
-                + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_BALANCE + ", "
-                + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID + ", "
-                + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_NAME + ", "
-                + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME + ", "
-                + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SYMBOL + ", "
-                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID + ", "
-                + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_NAME + ", "
-                + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_COLOR + ", "
-                + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_EXPENSE_TYPE + ", "
-                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_CURRENCY_ID
-                + " FROM " + ExpensesDbHelper.TABLE_BOOKINGS
-                + " LEFT JOIN " + ExpensesDbHelper.TABLE_CATEGORIES + " ON " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID + " = " + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_ID
-                + " LEFT JOIN " + ExpensesDbHelper.TABLE_ACCOUNTS + " ON " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID + " = " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_ID
-                + " LEFT JOIN " + ExpensesDbHelper.TABLE_CURRENCIES + " ON " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID + " = " + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_ID;
-        if (startDate != null && endDate != null) {
-
-            selectQuery += " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_DATE + " BETWEEN '" + startDate + "' AND '" + endDate + "'";
-
-            if (activeAccounts.size() != 0)
-                selectQuery += " AND (";
-        } else {
-
-            if (activeAccounts.size() != 0)
-                selectQuery += " WHERE (";
-        }
-
-        for (long accountId : activeAccounts) {
-
-            if (activeAccounts.indexOf(accountId) != 0)
-                selectQuery += " OR ";
-
-            selectQuery += " " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_ID + " = " + accountId;
-
-            if (activeAccounts.indexOf(accountId) == activeAccounts.size() - 1)
-                selectQuery += ")";
-        }
-
         selectQuery += " ORDER BY " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_DATE + " DESC;";
         Log.d(TAG, selectQuery);
 

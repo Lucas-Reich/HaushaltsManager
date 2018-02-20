@@ -253,7 +253,7 @@ public class ExpenseScreen extends AppCompatActivity implements AdapterView.OnIt
 
                     if (recurring) {
 
-                        // frequency is saved as duration in hours, endDate is saved as Calendar object
+                        // frequency is saved as duration in hours, mEndDate is saved as Calendar object
                         long index = expensesDataSource.createRecurringBooking(EXPENSE.getIndex(), mCAL, frequency, recurringEndDate);
                         Log.d(TAG, "created recurring booking event at index: " + index);
                     }

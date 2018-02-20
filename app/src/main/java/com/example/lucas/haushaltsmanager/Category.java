@@ -35,6 +35,22 @@ class Category implements Parcelable {
     }
 
     /**
+     * this constructor converts our parcelable object back into an Category object
+     * see: http://prasanta-paul.blogspot.de/2010/06/android-parcelable-example.html (Parcelable ArrayList)
+     * and: https://stackoverflow.com/questions/2139134/how-to-send-an-object-from-one-android-activity-to-another-using-intents for further explanations (Parcelable Object)
+     *
+     * @param source .
+     */
+    public Category(Parcel source) {
+
+        Log.v(TAG, "Recreating Category from parcel data");
+        index = source.readLong();
+        categoryName = source.readString();
+        color = source.readString();
+        defaultExpenseType = source.readInt() == 1;
+    }
+
+    /**
      * Methode um eine Dummy Category zu erstellen
      *
      * @return Category dummy object
@@ -45,19 +61,23 @@ class Category implements Parcelable {
     }
 
     long getIndex() {
+
         return index;
     }
 
     @NonNull
     String getCategoryName() {
+
         return categoryName;
     }
 
     void setCategoryName(@NonNull String categoryName) {
+
         this.categoryName = categoryName;
     }
 
     String getColor() {
+
         return this.color;
     }
 
@@ -83,24 +103,6 @@ class Category implements Parcelable {
 
 
     //make class Parcelable
-
-    /**
-     * This will be only used by ParcelableCategories
-     * see: http://prasanta-paul.blogspot.de/2010/06/android-parcelable-example.html (Parcelable ArrayList)
-     * and: https://stackoverflow.com/questions/2139134/how-to-send-an-object-from-one-android-activity-to-another-using-intents for further explanations (Parcelable Object)
-     * <p>
-     * this constructor converts our parcelable object back into an Category object
-     *
-     * @param source .
-     */
-    public Category(Parcel source) {
-
-        Log.v(TAG, "ParcelData (Parcel source): time to put back parcel data");
-        index = source.readLong();
-        categoryName = source.readString();
-        color = source.readString();
-        defaultExpenseType = source.readInt() == 1;
-    }
 
     /**
      * can be ignored mostly

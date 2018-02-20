@@ -300,7 +300,6 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * TODO move string array to string resources
      * initialization of currency table
      *
      * @param db reference to editable database
