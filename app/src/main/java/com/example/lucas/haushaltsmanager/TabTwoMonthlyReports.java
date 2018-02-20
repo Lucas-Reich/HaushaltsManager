@@ -162,7 +162,7 @@ public class TabTwoMonthlyReports extends Fragment {
     /**
      * Methode um die Ansicht des Tabs beim hinzufügen oder abwählen eines Kontos in ChooseAccountDialogFragment mit neuen Daten zu erneuern
      */
-    public void changeVisibleAccounts(long accountId, boolean isChecked) {
+    public void refreshListOnAccountSelected(long accountId, boolean isChecked) {
 
         //wenn das Konto bereits dem gewünschten stand entspricht
         if (mActiveAccounts.contains(accountId) == isChecked)

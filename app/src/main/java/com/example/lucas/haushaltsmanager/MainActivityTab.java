@@ -16,11 +16,9 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.BaseExpandableListAdapter;
 import android.widget.Toast;
 
 public class MainActivityTab extends AppCompatActivity implements ChooseAccountsDialogFragment.OnSelectedAccount {
@@ -270,13 +268,13 @@ public class MainActivityTab extends AppCompatActivity implements ChooseAccounts
             switch (visibleTabPosition) {
 
                 case 0:
-                    ((TabOneBookings) fragment).changeVisibleAccounts(accountId, isChecked);
+                    ((TabOneBookings) fragment).refreshListOnAccountSelected(accountId, isChecked);
                     break;
                 case 1:
-                    ((TabTwoMonthlyReports) fragment).changeVisibleAccounts(accountId, isChecked);
+                    ((TabTwoMonthlyReports) fragment).refreshListOnAccountSelected(accountId, isChecked);
                     break;
                 case 3:
-                    //todo ((TabThree) fragment).changeVisibleAccounts(accountId, isChecked);
+                    //todo ((TabThree) fragment).refreshListOnAccountSelected(accountId, isChecked);
                     break;
             }
         }

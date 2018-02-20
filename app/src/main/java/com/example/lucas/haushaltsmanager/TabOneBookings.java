@@ -372,7 +372,7 @@ public class TabOneBookings extends Fragment {
      * @param accountId AccountId des zu ändernden Kontos
      * @param isChecked status des Kontos
      */
-    public void changeVisibleAccounts(long accountId, boolean isChecked) {
+    public void refreshListOnAccountSelected(long accountId, boolean isChecked) {
 
         //wenn das Konto bereits dem gewünschten stand entspricht
         if (mActiveAccounts.contains(accountId) == isChecked)
