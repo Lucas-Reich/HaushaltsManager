@@ -1,7 +1,9 @@
 package com.example.lucas.haushaltsmanager;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,76 +18,161 @@ import java.util.Locale;
 
 public class TabTwoMonthlyReports extends Fragment {
 
-    Calendar cal = Calendar.getInstance();
-    List<MonthlyReport> monthlyReports = new ArrayList<>();
-    ListView listView;
-    MonthlyReportAdapter reportAdapter;
+    List<MonthlyReport> mMonthlyReports;
+    MonthlyReportAdapter mReportAdapter;
+    ArrayList<ExpenseObject> mExpenses;
+    ArrayList<Long> mActiveAccounts;
+    ExpensesDataSource mDatabase;
+    ListView mListView;
+    Calendar mCal;
+
     String TAG = TabTwoMonthlyReports.class.getSimpleName();
 
-    ExpensesDataSource expensesDataSource;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        mActiveAccounts = new ArrayList<>();
+        mMonthlyReports = new ArrayList<>();
+        mExpenses = new ArrayList<>();
+
+        mDatabase = new ExpensesDataSource(getContext());
+        mDatabase.open();
+
+        mCal = Calendar.getInstance();
+
+        setActiveAccounts();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        mDatabase.close();
+    }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstances) {
 
-        SharedPreferences preferences = this.getActivity().getSharedPreferences("UserSettings", 0);
+        SharedPreferences preferences = getContext().getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
 
         View rootView = inflater.inflate(R.layout.tab_two_monthly_reports, container, false);
-        expensesDataSource = new ExpensesDataSource(getContext());
 
-        listView = (ListView) rootView.findViewById(R.id.booking_listview);
+        mListView = (ListView) rootView.findViewById(R.id.booking_listview);
 
-        expensesDataSource.open();
+        createMonthlyReports();
 
-        String startDate = cal.get(Calendar.YEAR) + "-01-01 00:00:00";
-        String endDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(cal.getTime());
+/* Deprecated since 20.02.18 -- use createMonthlyeports instead
+        String startDate = mCal.get(Calendar.YEAR) + "-01-01 00:00:00";
+        String endDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(mCal.getTime());
 
-        ArrayList<ExpenseObject> expenses = expensesDataSource.getBookings(startDate, endDate);
+        ArrayList<ExpenseObject> expenses = mDatabase.getBookings(startDate, endDate);
 
-        expensesDataSource.close();
+        for (int i = 0; i <= mCal.get(Calendar.MONTH); i++) {
 
-        for (int i = 0; i <= cal.get(Calendar.MONTH); i++) {
-
-            monthlyReports.add(new MonthlyReport((i + 1) + "", new ArrayList<ExpenseObject>(), preferences.getString("mainCurrency", "€")));
+            mMonthlyReports.add(new MonthlyReport((i + 1) + "", new ArrayList<ExpenseObject>(), preferences.getString("mainCurrency", "€")));
         }
 
         for (ExpenseObject expense : expenses) {
 
-            getReports(expense);
+            assignBookingToReport(expense);
         }
+*/
+        mReportAdapter = new MonthlyReportAdapter(mMonthlyReports, getContext());
 
-        reportAdapter = new MonthlyReportAdapter(monthlyReports, getContext());
-
-        listView.setAdapter(reportAdapter);
+        mListView.setAdapter(mReportAdapter);
 
         return rootView;
     }
 
     /**
+     * Methode um die MonthlyReports zu erstellen.
+     */
+    private void createMonthlyReports() {
+
+        SharedPreferences preferences = getContext().getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
+
+        if (!mMonthlyReports.isEmpty())
+            mMonthlyReports.clear();
+
+        if (mExpenses.isEmpty()) {
+
+            if (!mDatabase.isOpen())
+                mDatabase.open();
+
+            String startDate = mCal.get(Calendar.YEAR) + "-01-01 00:00:00";
+            String endDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(mCal.getTime());
+
+            mExpenses = mDatabase.getBookings(startDate, endDate);
+        }
+
+        for (ExpenseObject expense : mExpenses) {
+
+            int currentMonth = expense.getDateTime().get(Calendar.MONTH);
+
+            if (currentMonth != mMonthlyReports.size())
+                mMonthlyReports.add(new MonthlyReport((currentMonth + 1) + "", new ArrayList<ExpenseObject>(), preferences.getString("mainCurrency", "€")));
+
+            assignBookingToReport(expense);
+        }
+    }
+
+    /**
      * Methode um die Buchung dem richtigen MonthlyReport zuzuweisen.
      * Ist die Buchung eine ParentBuchung, werden statdessen alle Kinden in den MonthlyReport gepackt.
+     * Ist das Konto der Buchung nicht in der aktiven Konotliste aufgeführt wird die Buchung nicht mit im MonthlyReport einbezogen.
      *
      * @param expense Buchung die einen MonthlyReport zugeordnet werden soll
      */
-    private void getReports(ExpenseObject expense) {
+    private void assignBookingToReport(ExpenseObject expense) {
 
         if (!expense.hasChildren()) {
 
-            monthlyReports.get(expense.getDateTime().get(Calendar.MONTH)).addExpense(expense);
+            if (mActiveAccounts.contains(expense.getAccount().getIndex()))
+                return;
+
+            mMonthlyReports.get(expense.getDateTime().get(Calendar.MONTH)).addExpense(expense);
         } else {
 
             for (ExpenseObject child : expense.getChildren()) {
 
-                getReports(child);
+                assignBookingToReport(child);
             }
+        }
+    }
+
+
+    /**
+     * Methode um die mActiveAccounts liste zu initialisieren
+     */
+    private void setActiveAccounts() {
+
+        if (!mDatabase.isOpen())
+            mDatabase.open();
+
+        SharedPreferences preferences = getContext().getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
+
+        for (Account account : mDatabase.getAllAccounts()) {
+
+            if (preferences.getBoolean(account.getAccountName().toLowerCase(), false))
+                mActiveAccounts.add(account.getIndex());
         }
     }
 
     /**
      * Methode um die Ansicht des Tabs beim hinzufügen oder abwählen eines Kontos in ChooseAccountDialogFragment mit neuen Daten zu erneuern
      */
-    public void updateView() {
+    public void changeVisibleAccounts(long accountId, boolean isChecked) {
 
-        //todo implement refresh functionality
-        throw new UnsupportedOperationException("Die Funktion updateView() in TabTwoMonthlyReports ist noch nicht implementiert!");
+        //wenn das Konto bereits dem gewünschten stand entspricht
+        if (mActiveAccounts.contains(accountId) == isChecked)
+            return;
+
+        if (mActiveAccounts.contains(accountId) && !isChecked)
+            mActiveAccounts.remove(accountId);
+        else
+            mActiveAccounts.add(accountId);
+
+        createMonthlyReports();
     }
 }

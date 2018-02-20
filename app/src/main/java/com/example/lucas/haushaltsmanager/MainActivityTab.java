@@ -74,11 +74,11 @@ public class MainActivityTab extends AppCompatActivity implements ChooseAccounts
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        // Create the reportAdapter that will return a fragment for each of the three
+        // Create the mReportAdapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
-        // Set up the ViewPager with the sections reportAdapter.
+        // Set up the ViewPager with the sections mReportAdapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
@@ -215,9 +215,7 @@ public class MainActivityTab extends AppCompatActivity implements ChooseAccounts
             switch (position) {
                 case 0:
 
-                    TabOneBookings tabOneBookings = new TabOneBookings();
-                    mTest = tabOneBookings.getId();
-                    return tabOneBookings;
+                    return new TabOneBookings();
                 case 1:
 
                     return new TabTwoMonthlyReports();
@@ -255,9 +253,11 @@ public class MainActivityTab extends AppCompatActivity implements ChooseAccounts
 
     /**
      * Anleitung von: https://stackoverflow.com/questions/27204409/android-calling-a-function-inside-a-fragment-from-a-custom-action-bar
+     * <p>
+     * Der User hat im ChooseAccountDialogFragment ein Konto angewählt.
      *
-     * Der User hat in dem ChooseAccountDialogFragment ein Konto angewählt.
      * @param accountId Id des angewählten Kontos.
+     * @param isChecked Status des Kontos (aktiv - true oder inaktiv - false)
      */
     public void onAccountSelected(long accountId, boolean isChecked) {
 
@@ -273,7 +273,10 @@ public class MainActivityTab extends AppCompatActivity implements ChooseAccounts
                     ((TabOneBookings) fragment).changeVisibleAccounts(accountId, isChecked);
                     break;
                 case 1:
-                    ((TabTwoMonthlyReports) fragment).updateView();
+                    ((TabTwoMonthlyReports) fragment).changeVisibleAccounts(accountId, isChecked);
+                    break;
+                case 3:
+                    //todo ((TabThree) fragment).changeVisibleAccounts(accountId, isChecked);
                     break;
             }
         }
