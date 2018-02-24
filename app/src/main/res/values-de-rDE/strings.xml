@@ -61,4 +61,8 @@
     <string name="create_booking">Erstelle Buchung</string>
     <string name="no_data">Keine Daten verfügbar</string>
     <string name="others">Andere</string>
+    <string name="incoming">Eingehend</string>
+    <string name="outgoing">Ausgehend</string>
+    <string name="update_booking">Update</string>
+    <string name="add_child_to_booking">Erstelle Kind Buchung</string>
 </resources>

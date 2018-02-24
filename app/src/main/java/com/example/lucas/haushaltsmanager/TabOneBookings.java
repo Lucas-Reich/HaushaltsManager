@@ -34,12 +34,12 @@ public class TabOneBookings extends Fragment {
     HashMap<ExpenseObject, List<ExpenseObject>> mListDataChild;
     String TAG = TabOneBookings.class.getSimpleName();
 
-    ExpensesDataSource database;
+    ExpensesDataSource mDatabase;
     ArrayList<ExpenseObject> mExpenses;
     List<Long> mActiveAccounts;
 
-    FloatingActionButton fab, fabDelete, fabCombine;
-    Animation test, fabClose, rotateForward, rotateBackward;
+    FloatingActionButton fabMainAction, fabDelete, fabCombine;
+    Animation openFabAnim, closeFabAnim, rotateForwardAnim, rotateBackwardAnim;
     boolean combOpen = false, delOpen = false, fabOpen = false;
     boolean mSelectionMode = false;
 
@@ -53,16 +53,16 @@ public class TabOneBookings extends Fragment {
         mListDataChild = new HashMap<>();
         mExpenses = new ArrayList<>();
 
-        database = new ExpensesDataSource(getContext());
-        setActiveAccounts(database);
+        mDatabase = new ExpensesDataSource(getContext());
+        setActiveAccounts();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
 
-        if (database.isOpen())
-            database.close();
+        if (mDatabase.isOpen())
+            mDatabase.close();
     }
 
     /**
@@ -77,38 +77,31 @@ public class TabOneBookings extends Fragment {
         mExpListView = (ExpandableListView) rootView.findViewById(R.id.lvExp);
         mExpListView.setBackgroundColor(Color.WHITE);
 
-        database = new ExpensesDataSource(getContext());
-
-        prepareListData();
-
-        mListAdapter = new ExpandableListAdapter(getContext(), mListDataHeader, mListDataChild);
-
-        //setting list adapter
-        mExpListView.setAdapter(mListAdapter);
-
+        updateExpListView();
+        //prepareListDataOld();
 
         final Activity mainTab = getActivity();
 
         // Animated Floating Action Buttons
-        fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        fabMainAction = (FloatingActionButton) rootView.findViewById(R.id.fab);
+        fabMainAction.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
 
-                if (delOpen || combOpen) {//Cose button is clicked
+                if (delOpen || combOpen) {
 
                     mListAdapter.deselectAll();
                     mSelectionMode = false;
                     closeDelete();
                     closeCombine();
-                    closeFab();
+                    animateIconClose();
 
                     updateExpListView();
-                } else {//Create new Booking button is clicked
+                } else {
 
-                    Intent intent = new Intent(mainTab, ExpenseScreen.class);
-                    mainTab.startActivity(intent);
+                    Intent createNewBookingIntent = new Intent(mainTab, ExpenseScreen.class);
+                    mainTab.startActivity(createNewBookingIntent);
                 }
             }
         });
@@ -119,12 +112,27 @@ public class TabOneBookings extends Fragment {
             @Override
             public void onClick(View v) {
 
-                database.createChildBooking(mListAdapter.getSelectedGroupData());
-                mListAdapter.deselectAll();
-                Toast.makeText(mainTab, "Done!", Toast.LENGTH_SHORT).show();
+                if (mListAdapter.getSelectedCount() > 1){
 
-                updateExpListView();
-                animateFabs(mListAdapter.getSelectedCount());
+
+                    //todo bevor die Buchungen zusammengefügt werden sollte ein alert dialog den user nach einem namen für die KombiBuchung fragen
+                    ExpenseObject parentBooking = mDatabase.createChildBooking(mListAdapter.getSelectedGroupData());
+                    mExpenses.removeAll(mListAdapter.getSelectedGroupData());
+                    mExpenses.add(0, parentBooking);
+                    mListAdapter.deselectAll();
+                    updateExpListView();
+                    animateFabs(mListAdapter.getSelectedCount());
+                } else {
+
+                    long parentExpenseId = mListAdapter.getSelectedBookingIds()[0];
+                    Intent createChildToBookingIntent = new Intent(mainTab, ExpenseScreen.class);
+                    createChildToBookingIntent.putExtra("parentIndex", parentExpenseId);
+
+                    mListAdapter.deselectAll();
+                    mainTab.startActivity(createChildToBookingIntent);
+                }
+
+                //todo snackbar einfügen, die es ermöglicht die aktion wieder rückgängig zu machen
             }
         });
 
@@ -134,25 +142,26 @@ public class TabOneBookings extends Fragment {
             @Override
             public void onClick(View v) {
 
-                database.deleteBookings(mListAdapter.getSelectedBookingIds());
+                mDatabase.deleteBookings(mListAdapter.getSelectedBookingIds());
+                mExpenses.removeAll(mListAdapter.getSelectedGroupData());
                 mListAdapter.deselectAll();
-                Toast.makeText(mainTab, "Deleted all Bookings", Toast.LENGTH_SHORT).show();
 
                 updateExpListView();
                 animateFabs(mListAdapter.getSelectedCount());
+
+                //todo snackbar einfügen die es ermöglicht die aktion wieder rückgängig zu machen
             }
         });
 
 
-        test = AnimationUtils.loadAnimation(mainTab, R.anim.fab_open);
-        fabClose = AnimationUtils.loadAnimation(mainTab, R.anim.fab_close);
+        openFabAnim = AnimationUtils.loadAnimation(mainTab, R.anim.fab_open);
+        closeFabAnim = AnimationUtils.loadAnimation(mainTab, R.anim.fab_close);
 
-        rotateForward = AnimationUtils.loadAnimation(mainTab, R.anim.rotate_forward);
-        rotateBackward = AnimationUtils.loadAnimation(mainTab, R.anim.rotate_backward);
+        rotateForwardAnim = AnimationUtils.loadAnimation(mainTab, R.anim.rotate_forward);
+        rotateBackwardAnim = AnimationUtils.loadAnimation(mainTab, R.anim.rotate_backward);
 
 
         //OnClickMethods for ExpandableListView
-
         //ExpandableListView Group click listener
         mExpListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
 
@@ -172,9 +181,9 @@ public class TabOneBookings extends Fragment {
 
                 if (!mSelectionMode) {
 
-                    Intent openExpense = new Intent(getContext(), ExpenseScreen.class);
-                    openExpense.putExtra("parentExpense", expense.getIndex());
-                    startActivity(openExpense);
+                    Intent updateParentExpenseIntent = new Intent(getContext(), ExpenseScreen.class);
+                    updateParentExpenseIntent.putExtra("parentExpense", expense.getIndex());
+                    startActivity(updateParentExpenseIntent);
                 } else {
 
                     if (mListAdapter.isSelected(groupPosition)) {
@@ -215,9 +224,9 @@ public class TabOneBookings extends Fragment {
                 Log.d(TAG, "onChildClick: " + expense.getTitle() + " " + expense.getIndex());
 
                 //start expenseScreen with selected expense
-                Intent openExpense = new Intent(getContext(), ExpenseScreen.class);
-                openExpense.putExtra("childExpense", expense.getIndex());
-                startActivity(openExpense);
+                Intent updateChildExpenseIntent = new Intent(getContext(), ExpenseScreen.class);
+                updateChildExpenseIntent.putExtra("childExpense", expense.getIndex());
+                startActivity(updateChildExpenseIntent);
                 return true;
             }
         });
@@ -261,25 +270,25 @@ public class TabOneBookings extends Fragment {
                 return false;
             }
         });
-
         return rootView;
     }
 
     /**
      * Methode um die mActiveAccounts liste zu initialisieren
-     *
-     * @param database Datenbankverbindung
      */
-    private void setActiveAccounts(ExpensesDataSource database) {
+    private void setActiveAccounts() {
 
-        if (!database.isOpen())
-            database.open();
+        Log.d(TAG, "setActiveAccounts: erneuere aktiven KontenListe");
+
+        if (!mDatabase.isOpen())
+            mDatabase.open();
+
+        if (!mActiveAccounts.isEmpty())
+            mActiveAccounts.clear();
 
         SharedPreferences preferences = getContext().getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
 
-        ArrayList<Account> accounts = database.getAllAccounts();
-
-        for (Account account : accounts) {
+        for (Account account : mDatabase.getAllAccounts()) {
 
             if (preferences.getBoolean(account.getAccountName().toLowerCase(), false))
                 mActiveAccounts.add(account.getIndex());
@@ -287,18 +296,17 @@ public class TabOneBookings extends Fragment {
     }
 
     /**
-     * Methode um die ExpandableListView datenitem vorzubereiten.
+     * Methode um die ExpandableListView items vorzubereiten.
      * Beim vorbereiten wird die mActiveAccounts liste mit einbezogen,
      * ist das Konto einer Buchung nicht in der aktiven Kontoliste wird die Buchung auch nicht angezeigt.
      * <p>
-     * <p>
-     * todo funktion so umschreiben dass sie die Liste mit Buchungen speichert anstatt sie jeder mal erneut aus der Datenbank abzufragen
-     * todo mExpenses liste soll bei änderungen (Buchugen werden zusammengefügt; Buchungen werden gelöscht) entsprechend angepasst werden
-     * todo wenn es unter einem datum keine Buchungen mehr geben sollte muss der DatumsPlatzhalter ebenfalls entfernt werden
      * todo wenn ein Konto abgewählt wird und bei einer parentBuchung ein oder mehrere (aber nicht alle) Buchungen nicht mehr angezeigt werden,
-     *      muss auch der angezeigte Preis der parentBuchung angepasst werden
+     * muss auch der angezeigte Preis der parentBuchung angepasst werden
      */
+    //jedes mal wenn ich von tab 3 auf den ersten tab wechsle wird die funktion prepareListData ausgeführt
     private void prepareListData() {
+
+        Log.d(TAG, "prepareListData: erstelle neue Listen daten");
 
         if (mListDataHeader.size() > 0)
             mListDataHeader.clear();
@@ -306,13 +314,13 @@ public class TabOneBookings extends Fragment {
         if (!mListDataChild.isEmpty())
             mListDataChild.clear();
 
-        if (mExpenses.size() == 0) {//wenn die Liste noch nicht erstellt wurde
+        if (mExpenses.isEmpty()) {//wenn die Liste noch nicht erstellt wurde
 
-            if (!database.isOpen())
-                database.open();
+            if (!mDatabase.isOpen())
+                mDatabase.open();
 
             Calendar cal = Calendar.getInstance();
-            mExpenses = database.getBookings(cal.get(Calendar.YEAR) + "-01-01 00:00:00", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(cal.getTime()));
+            mExpenses = mDatabase.getBookings(cal.get(Calendar.YEAR) + "-01-01 00:00:00", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(cal.getTime()));
         }
 
 
@@ -326,9 +334,9 @@ public class TabOneBookings extends Fragment {
 
                 separatorDate = mExpenses.get(i).getDate();
 
-                Account account = new Account(8888, "", 0, Currency.createDummyCurrency());
+                Account account = new Account(8888, "", 0, Currency.createDummyCurrency(getContext()));
 
-                ExpenseObject dateSeparator = new ExpenseObject(-1, "", 0, mExpenses.get(i).getDateTime(), true, Category.createDummyCategory(), null, account, null);
+                ExpenseObject dateSeparator = new ExpenseObject(-1, "", 0, mExpenses.get(i).getDateTime(), true, Category.createDummyCategory(getContext()), null, account, null);
 
                 mListDataHeader.add(dateSeparator);
                 mListDataChild.put(dateSeparator, new ArrayList<ExpenseObject>());
@@ -374,7 +382,6 @@ public class TabOneBookings extends Fragment {
      */
     public void refreshListOnAccountSelected(long accountId, boolean isChecked) {
 
-        //wenn das Konto bereits dem gewünschten stand entspricht
         if (mActiveAccounts.contains(accountId) == isChecked)
             return;
 
@@ -387,6 +394,20 @@ public class TabOneBookings extends Fragment {
     }
 
     /**
+     * Methode um die ExpandableListView nach einer Änderung neu anzuzeigen.
+     */
+    public void updateExpListView() {
+
+        prepareListData();
+
+        mListAdapter = new ExpandableListAdapter(getActivity(), mListDataHeader, mListDataChild);
+
+        mExpListView.setAdapter(mListAdapter);
+
+        mListAdapter.notifyDataSetChanged();
+    }
+
+    /**
      * animating the FloatingActionButtons
      * todo die ganzen animations methoden noch einmal neu schreiben da ich mit den aktuellen nicht zufrieden bin
      *
@@ -396,20 +417,22 @@ public class TabOneBookings extends Fragment {
 
         switch (selectedCount) {
 
-            case 0:
+            case 0:// beide buttons müssen nicht funktional und nicht sichtbar sein
                 closeCombine();
                 closeDelete();
-                closeFab();
+                animateIconClose();
                 break;
-            case 1:
+            case 1:// beide buttons müssen sichtbar sein und auf dem combineButton muss das addChild icon zu sehen sein
+                fabCombine.setImageResource(R.drawable.ic_add_child_white);
                 openDelete();
-                closeCombine();
-                openFab();
+                openCombine();
+                animateIconOpen();
                 break;
-            default:
+            default:// beide buttons müssen sichtbar und funktional sein und auf dem combineButton muss das combineBookings icon sichtbar sein
+                fabCombine.setImageResource(R.drawable.ic_combine_white);
                 openCombine();
                 openDelete();
-                openFab();
+                animateIconOpen();
                 break;
         }
     }
@@ -418,11 +441,11 @@ public class TabOneBookings extends Fragment {
      * Methode die das plus auf dem Button animiert.
      * Wird diese Animation getriggert dreht sich das Pluszeichen um 45°.
      */
-    public void openFab() {
+    public void animateIconOpen() {
 
         if (!fabOpen) {
 
-            fab.startAnimation(rotateForward);
+            fabMainAction.startAnimation(rotateForwardAnim);
             fabOpen = true;
         }
     }
@@ -431,11 +454,11 @@ public class TabOneBookings extends Fragment {
      * Methode die das plus auf dem Button animiert.
      * Wird diese Animation getriggert dreht sich das Pluszeichen um -45°.
      */
-    public void closeFab() {
+    public void animateIconClose() {
 
         if (fabOpen) {
 
-            fab.startAnimation(rotateBackward);
+            fabMainAction.startAnimation(rotateBackwardAnim);
             fabOpen = false;
         }
     }
@@ -447,7 +470,7 @@ public class TabOneBookings extends Fragment {
 
         if (!delOpen) {
 
-            fabDelete.startAnimation(test);
+            fabDelete.startAnimation(openFabAnim);
             fabDelete.setClickable(true);
 
             delOpen = true;
@@ -461,7 +484,7 @@ public class TabOneBookings extends Fragment {
 
         if (delOpen) {
 
-            fabDelete.startAnimation(fabClose);
+            fabDelete.startAnimation(closeFabAnim);
             fabDelete.setClickable(false);
 
             delOpen = false;
@@ -475,7 +498,7 @@ public class TabOneBookings extends Fragment {
 
         if (!combOpen) {
 
-            fabCombine.startAnimation(test);
+            fabCombine.startAnimation(openFabAnim);
             fabCombine.setClickable(true);
 
             combOpen = true;
@@ -489,29 +512,10 @@ public class TabOneBookings extends Fragment {
 
         if (combOpen) {
 
-            fabCombine.startAnimation(fabClose);
+            fabCombine.startAnimation(closeFabAnim);
             fabCombine.setClickable(false);
 
             combOpen = false;
         }
-    }
-
-    /**
-     * Methode um die ExpandableListView nach einer Änderung neu anzuzeigen.
-     * <p>
-     * todo bei vielen Buchungen kann diese Operation eventuell sehr resourcen intensiv sein
-     */
-    public void updateExpListView() {
-
-        prepareListData();
-
-        //den adapter mit den neuen Daten versorgen
-        mListAdapter = new ExpandableListAdapter(getActivity(), mListDataHeader, mListDataChild);
-
-        //den Adapter mit den neuen Daten der ExpandableListView zuordnen
-        mExpListView.setAdapter(mListAdapter);
-
-        //dem Adapter bescheid geben dass neue Daten zur verfügung stehen
-        mListAdapter.notifyDataSetChanged();
     }
 }

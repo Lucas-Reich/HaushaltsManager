@@ -68,4 +68,6 @@
     <string name="others">Other</string>
     <string name="incoming">Incoming</string>
     <string name="outgoing">Outgoing</string>
+    <string name="update_booking">Update</string>
+    <string name="add_child_to_booking">Create Child Booking</string>
 </resources>

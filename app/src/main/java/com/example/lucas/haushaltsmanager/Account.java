@@ -27,16 +27,17 @@ class Account implements Parcelable {
         this.currency = currency;
     }
 
-    Account(@NonNull String accountName, Integer balance, @NonNull Currency currency) {
+    Account(@NonNull String accountName, Integer balance,@NonNull Currency currency) {
 
         this(-1, accountName, balance != null ? balance : 0, currency);
     }
 
     /**
-     * this constructor converts our parcelable object back into an Category object
-     *
+     * This will be only used by ParcelableCategories
      * see: http://prasanta-paul.blogspot.de/2010/06/android-parcelable-example.html (Parcelable ArrayList)
      * and: https://stackoverflow.com/questions/2139134/how-to-send-an-object-from-one-android-activity-to-another-using-intents for further explanations (Parcelable Object)
+     * <p>
+     * this constructor converts our parcelable object back into an Category object
      *
      * @param source .
      */
@@ -50,50 +51,41 @@ class Account implements Parcelable {
     }
 
     /**
-     * Methode um ein dummy Konto zu erzeugen
+     * Methode um ein dummy Konto zu erstellen
      *
-     * @param context System context
+     * @param context Context
      * @return dummy Konto
      */
-    public static Account createDummyAccount(Context context) {
+    static Account createDummyAccount(Context context) {
 
-        return new Account(-1, context.getResources().getString(R.string.no_name), 0, Currency.createDummyCurrency());
+        return new Account(-1, context.getResources().getString(R.string.no_name), 0, Currency.createDummyCurrency(context));
     }
 
     public long getIndex() {
-
         return index;
     }
 
-    @NonNull
     String getAccountName() {
-
         return accountName;
     }
 
-    void setAccountName(@NonNull String accountName) {
-
+    void setAccountName(String accountName) {
         this.accountName = accountName;
     }
 
     int getBalance() {
-
         return balance;
     }
 
     void setBalance(int balance) {
-
         this.balance = balance;
     }
 
-    @NonNull
     Currency getCurrency() {
-
         return currency;
     }
 
-    void setCurrency(@NonNull Currency currency) {
-
+    void setCurrency(Currency currency) {
         this.currency = currency;
     }
 

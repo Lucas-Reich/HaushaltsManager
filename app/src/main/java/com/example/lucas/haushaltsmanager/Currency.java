@@ -1,5 +1,6 @@
 package com.example.lucas.haushaltsmanager;
 
+import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -54,9 +55,9 @@ class Currency implements Parcelable {
      *
      * @return dummy Category
      */
-    static Currency createDummyCurrency() {
+    static Currency createDummyCurrency(Context context) {
 
-        return new Currency("", "", "");
+        return new Currency(-1, context.getResources().getString(R.string.no_name), "NON", "");
     }
 
     public long getIndex() {

@@ -47,14 +47,14 @@ public class PriceInputDialogFragment extends DialogFragment {
 
                 if (input.getText().toString().length() != 0) {
 
-                    expenseScreen.EXPENSE.setPrice(Double.parseDouble(input.getText().toString()));
-                    Log.d("PriceInput", "set price to " + expenseScreen.EXPENSE.getUnsignedPrice());
-                    txtView.setText(String.format("%s", expenseScreen.EXPENSE.getUnsignedPrice()));
+                    expenseScreen.mExpense.setPrice(Double.parseDouble(input.getText().toString()));
+                    Log.d("PriceInput", "set price to " + expenseScreen.mExpense.getUnsignedPrice());
+                    txtView.setText(String.format("%s", expenseScreen.mExpense.getUnsignedPrice()));
                     txtView.setTextColor(Color.BLACK);
                 } else {
 
-                    expenseScreen.EXPENSE.setPrice(0.0);
-                    Log.d("PriceInput", "set price to " + expenseScreen.EXPENSE.getUnsignedPrice());
+                    expenseScreen.mExpense.setPrice(0.0);
+                    Log.d("PriceInput", "set price to " + expenseScreen.mExpense.getUnsignedPrice());
                     txtView.setText(String.format("%s", args.getDouble("original_title")));
                     txtView.setTextColor(Color.DKGRAY);
                 }
@@ -80,14 +80,14 @@ public class PriceInputDialogFragment extends DialogFragment {
 
                     if (input.getText().toString().length() != 0) {
 
-                        expenseScreen.EXPENSE.setPrice(Double.parseDouble(input.getText().toString()));
-                        Log.d("PriceInput", "set price to " + expenseScreen.EXPENSE.getUnsignedPrice());
-                        txtView.setText(String.format("%s", expenseScreen.EXPENSE.getUnsignedPrice()));
+                        expenseScreen.mExpense.setPrice(Double.parseDouble(input.getText().toString()));
+                        Log.d("PriceInput", "set price to " + expenseScreen.mExpense.getUnsignedPrice());
+                        txtView.setText(String.format("%s", expenseScreen.mExpense.getUnsignedPrice()));
                         txtView.setTextColor(Color.BLACK);
                     } else {
 
-                        expenseScreen.EXPENSE.setPrice(0.0);
-                        Log.d("PriceInput", "set price to " + expenseScreen.EXPENSE.getUnsignedPrice());
+                        expenseScreen.mExpense.setPrice(0.0);
+                        Log.d("PriceInput", "set price to " + expenseScreen.mExpense.getUnsignedPrice());
                         txtView.setText(String.format("%s", args.getDouble("original_title")));
                         txtView.setTextColor(Color.DKGRAY);
                     }

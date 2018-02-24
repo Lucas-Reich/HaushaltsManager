@@ -109,6 +109,17 @@ class ExpenseObject implements Parcelable {
         this(-1, title, price, null, expenditure, category, null, account, expenseCurrency);
     }
 
+    /**
+     * Methode um eine dummy Expense zu erstellen
+     *
+     * @param context Context
+     * @return dummy Expense
+     */
+    static ExpenseObject createDummyExpense(Context context) {
+
+        return new ExpenseObject(-1, context.getResources().getString(R.string.no_name), 0, null, false, Category.createDummyCategory(context), null, Account.createDummyAccount(context), Currency.createDummyCurrency(context));
+    }
+
     double getExchangeRate() {
 
         return this.expenseCurrency.getRateToBase();

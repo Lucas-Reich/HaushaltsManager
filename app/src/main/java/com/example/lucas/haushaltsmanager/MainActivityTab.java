@@ -25,7 +25,6 @@ public class MainActivityTab extends AppCompatActivity implements ChooseAccounts
 
     private String TAG = MainActivityTab.class.getSimpleName();
     TabLayout mTabLayout;
-    int mTest;
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -204,6 +203,7 @@ public class MainActivityTab extends AppCompatActivity implements ChooseAccounts
     private class SectionsPagerAdapter extends FragmentPagerAdapter {
 
         SectionsPagerAdapter(FragmentManager fm) {
+
             super(fm);
         }
 

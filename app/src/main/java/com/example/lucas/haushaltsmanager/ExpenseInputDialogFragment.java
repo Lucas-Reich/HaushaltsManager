@@ -47,12 +47,12 @@ public class ExpenseInputDialogFragment extends DialogFragment {
 
                 if (input.getText().toString().length() != 0) {
 
-                    setExpense(args.getInt("button_id"), expenseScreen.EXPENSE, input.getText().toString());
+                    setExpense(args.getInt("button_id"), expenseScreen.mExpense, input.getText().toString());
                     btn.setText(input.getText().toString());
                     btn.setTextColor(Color.BLACK);
                 } else {
 
-                    setExpense(args.getInt("button_id"), expenseScreen.EXPENSE, "");
+                    setExpense(args.getInt("button_id"), expenseScreen.mExpense, "");
                     btn.setText(args.getString("original_title"));
                     btn.setTextColor(Color.DKGRAY);
                 }

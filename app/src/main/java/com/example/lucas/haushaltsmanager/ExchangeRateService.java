@@ -29,6 +29,9 @@ public class ExchangeRateService extends IntentService {
     private static String TAG = "ExchangeRateService";
 
 
+    /**
+     * Service um Umrechnungskurse aus dem Internet abzurufen und diese in die Datenbank zu schreiben
+     */
     public ExchangeRateService() {
 
         super("ExchangeRateService");

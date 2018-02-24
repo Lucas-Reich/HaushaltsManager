@@ -2,6 +2,7 @@ package com.example.lucas.haushaltsmanager;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -79,6 +80,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
 
+        //todo ich MUSS die convertView wiederbenutzen und sie nicht jedes mal wieder neu initialisieren
         final ExpenseObject groupExpense = (ExpenseObject) getGroup(groupPosition);
         LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 

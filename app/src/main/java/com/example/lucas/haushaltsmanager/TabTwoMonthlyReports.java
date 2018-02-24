@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,11 @@ import java.util.List;
 import java.util.Locale;
 
 public class TabTwoMonthlyReports extends Fragment {
+
+    //todo eineige der methoden (setActiveAccounts, refreshListOnAccountSelected, updateExpandableListView) können in eine abstrakte klasse gepackt werden, welche von jedem tab implementiert wird
+
+    //todo immer wenn ich von tab 3 auf tab 2 wechlse dann werden ~0.3 MB Arbeitsspeicher mehr in anspruch genommen als vorher
+    //irgendwo muss es eine memory leak geben
 
     List<MonthlyReport> mMonthlyReports;
     MonthlyReportAdapter mReportAdapter;
@@ -32,6 +38,8 @@ public class TabTwoMonthlyReports extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Log.d(TAG, "onCreate: fetching data form mDatabase");
 
         mActiveAccounts = new ArrayList<>();
         mMonthlyReports = new ArrayList<>();
@@ -54,33 +62,11 @@ public class TabTwoMonthlyReports extends Fragment {
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstances) {
 
-        SharedPreferences preferences = getContext().getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
-
         View rootView = inflater.inflate(R.layout.tab_two_monthly_reports, container, false);
 
         mListView = (ListView) rootView.findViewById(R.id.booking_listview);
 
-        createMonthlyReports();
-
-/* Deprecated since 20.02.18 -- use createMonthlyeports instead
-        String mStartDate = mCal.get(Calendar.YEAR) + "-01-01 00:00:00";
-        String mEndDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(mCal.getTime());
-
-        ArrayList<ExpenseObject> expenses = mDatabase.getBookings(mStartDate, mEndDate);
-
-        for (int i = 0; i <= mCal.get(Calendar.MONTH); i++) {
-
-            mMonthlyReports.add(new MonthlyReport((i + 1) + "", new ArrayList<ExpenseObject>(), preferences.getString("mainCurrency", "€")));
-        }
-
-        for (ExpenseObject expense : expenses) {
-
-            assignBookingToReport(expense);
-        }
-*/
-        mReportAdapter = new MonthlyReportAdapter(mMonthlyReports, getContext());
-
-        mListView.setAdapter(mReportAdapter);
+        //updateExpandableListView(); todo enable
 
         return rootView;
     }
@@ -106,12 +92,12 @@ public class TabTwoMonthlyReports extends Fragment {
             mExpenses = mDatabase.getBookings(startDate, endDate);
         }
 
+        for (int i = 0; i <= mCal.get(Calendar.MONTH); i++) {
+
+            mMonthlyReports.add(new MonthlyReport((i + 1) + "", new ArrayList<ExpenseObject>(), preferences.getString("mainCurrency", "€")));
+        }
+
         for (ExpenseObject expense : mExpenses) {
-
-            int currentMonth = expense.getDateTime().get(Calendar.MONTH);
-
-            if (currentMonth != mMonthlyReports.size())
-                mMonthlyReports.add(new MonthlyReport((currentMonth + 1) + "", new ArrayList<ExpenseObject>(), preferences.getString("mainCurrency", "€")));
 
             assignBookingToReport(expense);
         }
@@ -127,10 +113,10 @@ public class TabTwoMonthlyReports extends Fragment {
     private void assignBookingToReport(ExpenseObject expense) {
 
         if (!expense.hasChildren()) {
-
-            if (mActiveAccounts.contains(expense.getAccount().getIndex()))
+/*todo enable
+            if (!mActiveAccounts.contains(expense.getAccount().getIndex()))
                 return;
-
+*/
             mMonthlyReports.get(expense.getDateTime().get(Calendar.MONTH)).addExpense(expense);
         } else {
 
@@ -146,6 +132,8 @@ public class TabTwoMonthlyReports extends Fragment {
      * Methode um die mActiveAccounts liste zu initialisieren
      */
     private void setActiveAccounts() {
+
+        Log.d(TAG, "setActiveAccounts: Erneuere aktive Kontenliste");
 
         if (!mDatabase.isOpen())
             mDatabase.open();
@@ -164,7 +152,6 @@ public class TabTwoMonthlyReports extends Fragment {
      */
     public void refreshListOnAccountSelected(long accountId, boolean isChecked) {
 
-        //wenn das Konto bereits dem gewünschten stand entspricht
         if (mActiveAccounts.contains(accountId) == isChecked)
             return;
 
@@ -173,6 +160,21 @@ public class TabTwoMonthlyReports extends Fragment {
         else
             mActiveAccounts.add(accountId);
 
+        updateExpandableListView();
+    }
+
+    /**
+     * Methode um die ExpandableListView nach eine Änderung neu anzuzeigen
+     */
+    //hat performance probleme
+    public void updateExpandableListView() {
+
         createMonthlyReports();
+
+        mReportAdapter = new MonthlyReportAdapter(mMonthlyReports, getContext());
+
+        //mListView.setAdapter(mReportAdapter); macht probleme
+
+        mReportAdapter.notifyDataSetChanged();
     }
 }

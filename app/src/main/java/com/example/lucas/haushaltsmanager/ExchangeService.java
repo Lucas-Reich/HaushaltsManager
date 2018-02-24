@@ -16,7 +16,9 @@ public class ExchangeService extends IntentService {
     SharedPreferences preferences;
 
 
-
+    /**
+     * Service um Buchungen, die noch nicht von einer Fremdwährung in die eigene umgerechnet wurden umzurechnen.
+     */
     public ExchangeService() {
 
         super("ExchangeService");

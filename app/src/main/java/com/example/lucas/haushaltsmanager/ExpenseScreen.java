@@ -28,78 +28,105 @@ import java.util.List;
 
 public class ExpenseScreen extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-    public ExpenseObject EXPENSE;
-    private Calendar mCAL = Calendar.getInstance();
-    private ExpensesDataSource expensesDataSource;
-    private boolean template = false, recurring = false;
-    private Calendar recurringEndDate = Calendar.getInstance();
-    public int frequency = 0;
+    private creationModes CREATION_MODE;
+
+    private enum creationModes {
+        CREATE_EXPENSE_MODE,
+        CREATE_CHILD_MODE,
+        UPDATE_EXPENSE_MODE,
+        UPDATE_CHILD_MODE
+    }
+
     private String TAG = ExpenseScreen.class.getSimpleName();
+
+    public ExpenseObject mExpense;
+    private Calendar mCalendar = Calendar.getInstance();
+    private Calendar recurringEndDate = Calendar.getInstance();
+    private boolean mTemplate = false, mRecurring = false;
+    public int frequency = 0;
+    Button setDateBtn, accountBtn, saveBtn, categoryTxt, titleTxt, tagTxt, noticeTxt;
+    TextView amountTxt, currencyTxt;
+    RadioGroup expenseType;
+    private ExpenseObject mParentBooking;
+
+
+    private ExpensesDataSource mDatabase;
 
     //TODO klasse sollte auch den BasicDialog erweitern
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        SharedPreferences preferences = getSharedPreferences("UserSettings", 0);
-
-
-        //wenn ExpenseScreen von einer bereits bestehenden Buchung aufgerufen wird, dann soll diese buchung aus der datenbank geholt werden
-        expensesDataSource = new ExpensesDataSource(this);
-        expensesDataSource.open();
-
-        final Bundle bundle = getIntent().getExtras();
-
-        if (bundle != null && bundle.get("parentExpense") != null) {
-
-            EXPENSE = expensesDataSource.getBookingById(bundle.getLong("parentExpense"));
-        } else if (bundle != null && bundle.get("childExpense") != null) {
-
-            EXPENSE = expensesDataSource.getChildBookingById(bundle.getLong("childExpense"));
-        } else {
-
-            // dummy expense befülllen
-            Category category = new Category(getResources().getString(R.string.expense_screen_dsp_category), "#00000000", false);// dummy Kategorie
-            String title = getResources().getString(R.string.expense_screen_title);
-            Account account = expensesDataSource.getAccountById(preferences.getLong("activeAccount", 0));
-
-            EXPENSE = new ExpenseObject(title, 0, category.getDefaultExpenseType(), category, null, account);
-            EXPENSE.setDateTime(mCAL);
-            EXPENSE.setNotice("");
-            EXPENSE.setTag("");
-        }
-        expensesDataSource.close();
-
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.expense_screen);
 
-        //TODO implement the correct Toolbar functionality (back arrow, overflow menu which holds the load template button)
+        SharedPreferences preferences = getSharedPreferences("UserSettings", 0);
+
+        mDatabase = new ExpensesDataSource(this);
+        mDatabase.open();
+
+        final Bundle bundle = getIntent().getExtras();
+
+        saveBtn = (Button) findViewById(R.id.expense_screen_create_booking);
+        saveBtn.setOnClickListener(createBookingClickListener);
+
+        if (bundle != null && bundle.get("parentIndex") != null) {
+
+            saveBtn.setText(getString(R.string.add_child_to_booking));
+
+            CREATION_MODE = creationModes.CREATE_CHILD_MODE;
+            mParentBooking = mDatabase.getBookingById(bundle.getLong("parentIndex"));
+
+            String title = getResources().getString(R.string.expense_screen_title);
+            Account account = mDatabase.getAccountById(preferences.getLong("activeAccount", 0));
+
+            mExpense = new ExpenseObject(title, 0, false, Category.createDummyCategory(this), null, account);
+            mExpense.setDateTime(mCalendar);
+            mExpense.setNotice("");
+            mExpense.setTag("");
+        } else if (bundle != null && bundle.get("childExpense") != null) {
+
+            saveBtn.setText(getString(R.string.update_booking));
+
+            CREATION_MODE = creationModes.UPDATE_CHILD_MODE;
+            mExpense = mDatabase.getChildBookingById(bundle.getLong("childExpense"));
+        } else if (bundle != null && bundle.get("parentExpense") != null) {
+
+            saveBtn.setText(getString(R.string.update_booking));
+
+            CREATION_MODE = creationModes.UPDATE_EXPENSE_MODE;
+            mExpense = mDatabase.getBookingById(bundle.getLong("parentExpense"));
+        } else {
+
+            saveBtn.setText(getString(R.string.create_booking));
+
+            CREATION_MODE = creationModes.CREATE_EXPENSE_MODE;
+            String title = getResources().getString(R.string.expense_screen_title);
+            Account account = mDatabase.getAccountById(preferences.getLong("activeAccount", 0));
+
+            mExpense = new ExpenseObject(title, 0, false, Category.createDummyCategory(this), null, account);
+            mExpense.setDateTime(mCalendar);
+            mExpense.setNotice("");
+            mExpense.setTag("");
+        }
+
+        //TODO implement the correct Toolbar functionality (back arrow, overflow menu which holds the load mTemplate button)
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         // set the displayed date to the current one
-        Button setDate = (Button) findViewById(R.id.expense_screen_date);
-        setDate.setText(EXPENSE.getDisplayableDateTime(ExpenseScreen.this));
-        Log.d(TAG, "set date to " + setDate.getText());
+        setDateBtn = (Button) findViewById(R.id.expense_screen_date);
+        setDateBtn.setText(mExpense.getDisplayableDateTime(ExpenseScreen.this));
 
 
         // set the account to the current main account
-        Button accountBtn = (Button) findViewById(R.id.expense_screen_account);
-        if (EXPENSE.getAccount() != null) {
+        accountBtn = (Button) findViewById(R.id.expense_screen_account);
+        accountBtn.setText(mExpense.getAccount().getAccountName());
 
-            accountBtn.setText(EXPENSE.getAccount().getAccountName());
-            Log.d(TAG, "set active account to: " + EXPENSE.getAccount().getAccountName());
-        }
-
-        // set the EXPENSE type
-        RadioGroup expenseType = (RadioGroup) findViewById(R.id.expense_screen_expense_type);
-        if (EXPENSE.getExpenditure()) {
-
+        // set the mExpense type
+        expenseType = (RadioGroup) findViewById(R.id.expense_screen_expense_type);
+        if (mExpense.getExpenditure())
             expenseType.check(R.id.expense_screen_radio_expense);
-        } else {
-
+        else
             expenseType.check(R.id.expense_screen_radio_income);
-        }
-        Log.d(TAG, "set expense type to " + EXPENSE.getExpenditure());
 
         expenseType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -107,26 +134,26 @@ public class ExpenseScreen extends AppCompatActivity implements AdapterView.OnIt
 
                 if (checkedId == R.id.expense_screen_radio_expense) {
 
-                    EXPENSE.setExpenditure(true);
-                    Log.d(TAG, "set expense type to " + EXPENSE.getExpenditure());
+                    mExpense.setExpenditure(true);
+                    Log.d(TAG, "set expense type to " + mExpense.getExpenditure());
                 } else {
 
-                    EXPENSE.setExpenditure(false);
-                    Log.d(TAG, "set expense type to " + EXPENSE.getExpenditure());
+                    mExpense.setExpenditure(false);
+                    Log.d(TAG, "set expense type to " + mExpense.getExpenditure());
                 }
             }
         });
 
 
-        //TODO implement AlertDialog which enables the user to input a number for the expense amount
-        TextView amount = (TextView) findViewById(R.id.expense_screen_amount);
-        amount.setText(String.format("%s", EXPENSE.getUnsignedPrice()));
-        amount.setOnClickListener(new View.OnClickListener() {
+        amountTxt = (TextView) findViewById(R.id.expense_screen_amount);
+        amountTxt.setText(String.format("%s", mExpense.getUnsignedPrice()));
+        amountTxt.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
 
                 Bundle bundle = new Bundle();
-                bundle.putDouble("original_title", EXPENSE.getUnsignedPrice());
+                bundle.putDouble("original_title", mExpense.getUnsignedPrice());
                 bundle.putInt("button_id", v.getId());
 
                 PriceInputDialogFragment priceDialog = new PriceInputDialogFragment();
@@ -136,39 +163,32 @@ public class ExpenseScreen extends AppCompatActivity implements AdapterView.OnIt
         });
 
         //set account currency symbol
-        TextView expenseCurrency = (TextView) findViewById(R.id.expense_screen_amount_currency);
-        if (EXPENSE.getAccount() != null) {
-
-            expenseCurrency.setText(EXPENSE.getAccount().getCurrency().getCurrencySymbol());
-        } else {
-
-            expenseCurrency.setText(preferences.getString("mainCurrency", "€"));
-        }
+        currencyTxt = (TextView) findViewById(R.id.expense_screen_amount_currency);
+        currencyTxt.setText(mExpense.getAccount().getCurrency().getCurrencySymbol());
 
         //set display CATEGORY
-        TextView category = (TextView) findViewById(R.id.expense_screen_category);
-        category.setText(EXPENSE.getCategory().getCategoryName());
-        //TODO wenn eine neue kategorie ausgewählt wird sollte sich auch der expenseType zu dem kategorie default wert ändern
+        categoryTxt = (Button) findViewById(R.id.expense_screen_category);
+        categoryTxt.setText(mExpense.getCategory().getCategoryName());
 
         //set display expense title
-        TextView expenseTitle = (TextView) findViewById(R.id.expense_screen_title);
-        expenseTitle.setText(EXPENSE.getTitle());
+        titleTxt = (Button) findViewById(R.id.expense_screen_title);
+        titleTxt.setText(mExpense.getTitle());
 
         //TODO change display tag behaviour from just taking the first tag to displaying all tags
         //set display tag
-        TextView expenseTag = (TextView) findViewById(R.id.expense_screen_tag);
-//        expenseTag.setText(EXPENSE.getTags().get(0));TODO enable
+        tagTxt = (Button) findViewById(R.id.expense_screen_tag);
+//        tagTxt.setText(mExpense.getTags().get(0));TODO enable
 
         //set display notice
-        TextView expenseNotice = (TextView) findViewById(R.id.expense_screen_notice);
-        expenseNotice.setText(EXPENSE.getNotice());
+        noticeTxt = (Button) findViewById(R.id.expense_screen_notice);
+        noticeTxt.setText(mExpense.getNotice());
 
         final CheckBox templateChk = (CheckBox) findViewById(R.id.expense_screen_template);
         templateChk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                template = true;
+                mTemplate = true;
                 Toast.makeText(ExpenseScreen.this, "Du möchtest die Ausgabe als Vorlage speichern", Toast.LENGTH_SHORT).show();
             }
         });
@@ -207,7 +227,7 @@ public class ExpenseScreen extends AppCompatActivity implements AdapterView.OnIt
 
                     imgEnd.setVisibility(ImageView.VISIBLE);
                     recurringEnd.setVisibility(Button.VISIBLE);
-                    recurring = true;
+                    mRecurring = true;
                 } else {
 
                     imgFrequency.setVisibility(ImageView.GONE);
@@ -215,87 +235,18 @@ public class ExpenseScreen extends AppCompatActivity implements AdapterView.OnIt
 
                     imgEnd.setVisibility(ImageView.GONE);
                     recurringEnd.setVisibility(Button.GONE);
-                    recurring = false;
+                    mRecurring = false;
                 }
             }
         });
 
-        Button saveExpense = (Button) findViewById(R.id.expense_screen_create_booking);
-        saveExpense.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        //ab hier wird der CurrencySelector erstellt
 
+        Spinner currencySelector = (Spinner) findViewById(R.id.expense_screen_select_currency);
 
-                //TODO buchungen die in der zukunft sind (nach dem aktuellen datum) sollten als einmalige wiederauftretende buchung in die liste eingefügt werden
-                //wenn der nutzer versucht eine buchung in der zukunft einzugeben wird nachgefragt (mit alertdialog) ob er sie als wie oben speichern möchte oder nicht
-                if (EXPENSE.isSet()) {
+        currencySelector.setOnItemSelectedListener(this);
 
-                    expensesDataSource.open();
-                    if (bundle != null && bundle.get("parentIndex") != null) {
-
-                        //TODO kinder können aus irgendeinen grund der mit den umtauschkruden zusammenhängt noch nicht umgerechnet werden
-                        Double rateToBase = expensesDataSource.getRateToBase(EXPENSE.getExpenseCurrency().getIndex(), null);
-                        EXPENSE.getExpenseCurrency().setRateToBase(rateToBase != null ? rateToBase : 0);
-                        EXPENSE.setIndex(expensesDataSource.createBooking(EXPENSE));
-                        EXPENSE.setIndex(expensesDataSource.createChildBooking(EXPENSE, bundle.getLong("parentIndex")));
-
-                        Toast.makeText(ExpenseScreen.this, "Added Child " + EXPENSE.getTitle() + " to its Parent " + bundle.getLong("parentIndex"), Toast.LENGTH_SHORT).show();
-                    } else {
-
-                        Double rateToBase = expensesDataSource.getRateToBase(EXPENSE.getExpenseCurrency().getIndex(), null);
-                        EXPENSE.getExpenseCurrency().setRateToBase(rateToBase != null ? rateToBase : 0);
-                        EXPENSE.setIndex(expensesDataSource.createBooking(EXPENSE));
-                        expensesDataSource.getBookingById(EXPENSE.getIndex()).toConsole();
-
-
-                        Toast.makeText(ExpenseScreen.this, "Created booking \"" + EXPENSE.getTitle() + "\"", Toast.LENGTH_SHORT).show();
-                    }
-
-                    if (recurring) {
-
-                        // frequency is saved as duration in hours, mEndDate is saved as Calendar object
-                        long index = expensesDataSource.createRecurringBooking(EXPENSE.getIndex(), mCAL, frequency, recurringEndDate);
-                        Log.d(TAG, "created recurring booking event at index: " + index);
-                    }
-
-                    if (template) {
-
-                        long index = expensesDataSource.createTemplateBooking(EXPENSE.getIndex());
-                        Log.d(TAG, "created template for bookings at index: " + index);
-                    }
-                    expensesDataSource.close();
-                    Intent intent = new Intent(ExpenseScreen.this, MainActivityTab.class);
-                    intent.putExtra("key", 10); //Optional parameters
-                    ExpenseScreen.this.startActivity(intent);
-
-                } else {
-
-                    Toast.makeText(ExpenseScreen.this, getResources().getString(R.string.expense_screen_error_create), Toast.LENGTH_LONG).show();
-                    EXPENSE.toConsole();
-                }
-            }
-
-        });
-
-        Button createChild = (Button) findViewById(R.id.create_child);
-        createChild.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Intent addChild = new Intent(ExpenseScreen.this, ExpenseScreen.class);
-                addChild.putExtra("parentIndex", EXPENSE.getIndex());
-                startActivity(addChild);
-            }
-        });
-
-
-        Spinner currencySpinner = (Spinner) findViewById(R.id.expense_screen_select_currency);
-
-        currencySpinner.setOnItemSelectedListener(this);
-
-        expensesDataSource.open();
-        ArrayList<Currency> currencies = expensesDataSource.getAllCurrencies();
-        expensesDataSource.close();
+        ArrayList<Currency> currencies = mDatabase.getAllCurrencies();
 
         List<String> currencyShortNames = new ArrayList<>();
         for (Currency currency : currencies) {
@@ -307,21 +258,85 @@ public class ExpenseScreen extends AppCompatActivity implements AdapterView.OnIt
 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-        currencySpinner.setAdapter(adapter);
+        currencySelector.setAdapter(adapter);
 
-        currencySpinner.setSelection(((int) preferences.getLong("mainCurrencyIndex", 32)) - 1);
+        currencySelector.setSelection(((int) preferences.getLong("mainCurrencyIndex", 32)) - 1);
     }
 
+    /**
+     * OnClickListener um eine Buchung zu erstellen oder um sie zu updaten.
+     */
+    private View.OnClickListener createBookingClickListener = new View.OnClickListener() {
 
-    //TODO extract the input date logic to the DatePickerDialogFragment
+        @Override
+        public void onClick(View v) {
+
+            //todo buchungen in der Zukunft sollen als geplante buchung eingefügt werden
+            if (!mExpense.isSet())
+                return;
+
+            switch (CREATION_MODE) {
+
+                case UPDATE_EXPENSE_MODE:
+
+                    mDatabase.updateBooking(mExpense);
+                    Toast.makeText(ExpenseScreen.this, "Updated Booking " + mExpense.getTitle(), Toast.LENGTH_SHORT).show();
+                    break;
+                case UPDATE_CHILD_MODE:
+
+                    mDatabase.updateChildBooking(mExpense);
+                    Toast.makeText(ExpenseScreen.this, "Updated Booking " + mExpense.getTitle(), Toast.LENGTH_SHORT).show();
+                    break;
+                case CREATE_CHILD_MODE:
+
+                    mDatabase.addChildToBooking(mExpense, mParentBooking.getIndex());
+                    mDatabase.insertConvertExpense(mExpense);
+                    Toast.makeText(ExpenseScreen.this, "Added Booking \"" + mExpense.getTitle() + "\" to parent Booking " + mParentBooking.getTitle(), Toast.LENGTH_SHORT).show();
+                    break;
+                case CREATE_EXPENSE_MODE:
+
+                    mDatabase.createBooking(mExpense);
+                    mDatabase.insertConvertExpense(mExpense);
+                    Toast.makeText(ExpenseScreen.this, "Created Booking \"" + mExpense.getTitle() + "\"", Toast.LENGTH_SHORT).show();
+                    break;
+                default:
+                    throw new UnsupportedOperationException("ExpenseScreen unterstützt keine anderen Methoden als createExpense, createChildToExpense und updateExpense");
+            }
+
+            if (mRecurring) {//todo noch einmal überarbeiten
+
+                // frequency is saved as duration in hours, mEndDate is saved as Calendar object
+                long index = mDatabase.createRecurringBooking(mExpense.getIndex(), mCalendar, frequency, recurringEndDate);
+                Log.d(TAG, "created mRecurring booking event at index: " + index);
+            }
+
+            if (mTemplate) {//todo noch einmal überarbeiten
+
+                long index = mDatabase.createTemplateBooking(mExpense.getIndex());
+                Log.d(TAG, "created mTemplate for bookings at index: " + index);
+            }
+
+            Intent intent = new Intent(ExpenseScreen.this, MainActivityTab.class);
+            ExpenseScreen.this.startActivity(intent);
+        }
+    };
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        mDatabase.close();
+    }
+
+    //TODO das aussuchen eine Datums sollte genauso wie der ColorPicker funktionieren
     private void updateDate(String caller) {
 
         if (caller.equals("expenseDate")) {
 
-            new DatePickerDialog(ExpenseScreen.this, d, EXPENSE.getDateTime().get(Calendar.YEAR), EXPENSE.getDateTime().get(Calendar.MONTH), EXPENSE.getDateTime().get(Calendar.DAY_OF_MONTH)).show();
+            new DatePickerDialog(ExpenseScreen.this, d, mExpense.getDateTime().get(Calendar.YEAR), mExpense.getDateTime().get(Calendar.MONTH), mExpense.getDateTime().get(Calendar.DAY_OF_MONTH)).show();
         } else {
 
-            new DatePickerDialog(ExpenseScreen.this, d2, mCAL.get(Calendar.YEAR), mCAL.get(Calendar.MONTH), mCAL.get(Calendar.DAY_OF_MONTH)).show();
+            new DatePickerDialog(ExpenseScreen.this, d2, mCalendar.get(Calendar.YEAR), mCalendar.get(Calendar.MONTH), mCalendar.get(Calendar.DAY_OF_MONTH)).show();
         }
     }
 
@@ -333,11 +348,11 @@ public class ExpenseScreen extends AppCompatActivity implements AdapterView.OnIt
             Calendar expenditureDate = Calendar.getInstance();
             expenditureDate.set(year, month, dayOfMonth, 0, 0, 0);
 
-            EXPENSE.setDateTime(expenditureDate);
-            Log.d(TAG, "updated date to " + EXPENSE.getDisplayableDateTime(ExpenseScreen.this));
+            mExpense.setDateTime(expenditureDate);
+            Log.d(TAG, "updated date to " + mExpense.getDisplayableDateTime(ExpenseScreen.this));
 
             Button btn_date = (Button) findViewById(R.id.expense_screen_date);
-            btn_date.setText(EXPENSE.getDisplayableDateTime(ExpenseScreen.this));
+            btn_date.setText(mExpense.getDisplayableDateTime(ExpenseScreen.this));
         }
     };
 
@@ -397,7 +412,7 @@ public class ExpenseScreen extends AppCompatActivity implements AdapterView.OnIt
             case R.id.expense_screen_account:
 
                 bundle.putString("original_title", getResources().getString(R.string.expense_screen_dsp_account));
-                bundle.putParcelable("active_account", EXPENSE.getAccount());
+                bundle.putParcelable("active_account", mExpense.getAccount());
                 break;
         }
 
@@ -428,11 +443,15 @@ public class ExpenseScreen extends AppCompatActivity implements AdapterView.OnIt
 
             if (resultCode == Activity.RESULT_OK) {
 
-                Category result = data.getParcelableExtra("categoryObj");
-                EXPENSE.setCategory(result);
+                Category category = data.getParcelableExtra("categoryObj");
+                mExpense.setCategory(category);
 
-                Button category = (Button) findViewById(R.id.expense_screen_category);
-                category.setText(result.getCategoryName());
+                categoryTxt.setText(category.getCategoryName());
+
+                if (category.getDefaultExpenseType())
+                    expenseType.check(R.id.expense_screen_radio_expense);
+                else
+                    expenseType.check(R.id.expense_screen_radio_income);
             }
         }
     }
@@ -440,16 +459,17 @@ public class ExpenseScreen extends AppCompatActivity implements AdapterView.OnIt
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
+        if (!mDatabase.isOpen())
+            mDatabase.open();
+
         String curName = parent.getItemAtPosition(position).toString();
 
-        expensesDataSource.open();
-        Currency currency = expensesDataSource.getCurrency(curName);
-        expensesDataSource.close();
+        Currency currency = mDatabase.getCurrency(curName);
 
         TextView expenseCurrency = (TextView) findViewById(R.id.expense_screen_amount_currency);
         expenseCurrency.setText(String.format("%s", currency.getCurrencySymbol()));
 
-        EXPENSE.setExpenseCurrency(currency);
+        mExpense.setExpenseCurrency(currency);
     }
 
     @Override

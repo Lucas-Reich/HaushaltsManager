@@ -161,7 +161,7 @@ class ExpensesDataSource {
     /**
      * Method for mapping an Cursor to a Category object
      *
-     * @param c database cursor
+     * @param c mDatabase cursor
      * @return Category object
      */
     @NonNull
@@ -178,7 +178,7 @@ class ExpensesDataSource {
     /**
      * Method for mapping an Cursor to a Currency object
      *
-     * @param c database cursor
+     * @param c mDatabase cursor
      * @return Currency object
      */
     @NonNull
@@ -195,7 +195,7 @@ class ExpensesDataSource {
     /**
      * Method for mapping an Cursor to a Account object
      *
-     * @param c database cursor
+     * @param c mDatabase cursor
      * @return Account object
      */
     @NonNull
@@ -218,7 +218,7 @@ class ExpensesDataSource {
     /**
      * Method for mapping an Cursor to a Tag object
      *
-     * @param c database cursor
+     * @param c mDatabase cursor
      * @return Tag object
      */
     @NonNull
@@ -242,10 +242,9 @@ class ExpensesDataSource {
 
         ExpenseObject dummyExpense;
 
-        Category category = new Category();
         Account account = new Account(9999, "", 0, currency);
 
-        dummyExpense = new ExpenseObject(mContext.getResources().getString(R.string.no_name), 0, true, category, null, account);
+        dummyExpense = new ExpenseObject(mContext.getResources().getString(R.string.no_name), 0, true, Category.createDummyCategory(mContext), null, account);
         dummyExpense.setDateTime(Calendar.getInstance());
 
         return createBooking(dummyExpense);
@@ -362,10 +361,9 @@ class ExpensesDataSource {
         return accounts;
     }
 
-    int updateAccount(long accountId) {
+    long updateAccount(Account account) {
 
-        //TODO siehe updateBooking
-        return -1;
+        throw new UnsupportedOperationException("Updating Accounts is not Supported");//todo
     }
 
     /**
@@ -498,10 +496,9 @@ class ExpensesDataSource {
         return tags;
     }//DONE2
 
-    int updateTag(long tagId) {
+    long updateTag(Tag tag) {
 
-        //TODO siehe updateBooking
-        return -1;
+        throw new UnsupportedOperationException("Updating Tags is not Supported");//todo
     }
 
     /**
@@ -764,10 +761,9 @@ class ExpensesDataSource {
         return bookings;
     }
 
-    int updateBooking(long bookingId) {
+    int updateBooking(ExpenseObject expense) {
 
-        //TODO implementieren
-        return -1;
+        throw new UnsupportedOperationException("Updating bookings is not supported");//todo
     }
 
     /**
@@ -848,7 +844,7 @@ class ExpensesDataSource {
      * @param parentId     ID of parent expense
      * @return ID of parent
      */
-    long createChildBooking(ExpenseObject childExpense, long parentId) {
+    long addChildToBooking(ExpenseObject childExpense, long parentId) {
 
         if (!isChild(parentId)) {
 
@@ -871,22 +867,23 @@ class ExpensesDataSource {
         } else {
 
             Log.w(TAG, "createChildBooking: Error while adding child to Parent! Parent is Child");
-            return -1;
+            throw new UnsupportedOperationException("Cannot add Booking to an child Booking");
+            //return -1;
         }
-    }//DONE
+    }
 
-    long createChildBooking(List<ExpenseObject> children) {
+    ExpenseObject createChildBooking(List<ExpenseObject> children) {
 
         long parentId = createDummyExpense();
 
         for (ExpenseObject child : children) {
 
-            createChildBooking(child, parentId);
+            addChildToBooking(child, parentId);
             deleteBooking(child.getIndex());
         }
 
-        return parentId;
-    }//DONE
+        return getBookingById(parentId);
+    }
 
     ArrayList<ExpenseObject> getChildrenToParent(long parentId) {
 
@@ -990,10 +987,9 @@ class ExpensesDataSource {
         return c.getInt(c.getColumnIndex("exists")) != 0;
     }//DONE
 
-    int updateChildBooking(long childId) {
+    int updateChildBooking(ExpenseObject expense) {
 
-        //TODO see updateBooking
-        return -1;
+        throw new UnsupportedOperationException("Updating children is not Supported");//todo
     }
 
     int deleteChildBooking(long childId) {
@@ -1098,14 +1094,13 @@ class ExpensesDataSource {
     /**
      * Convenience Method for updating a Categories color
      *
-     * @param categoryName new name of the CATEGORY
      * @param categoryId   Id of the Category which should be changed
+     * @param categoryName new name of the CATEGORY
      * @return The id of the affected row
      */
-    int updateCategoryName(String categoryName, long categoryId) {
+    int updateCategoryName(long categoryId, String categoryName) {
 
-        //TODO siehe updateBooking
-        return -1;
+        throw new UnsupportedOperationException("Updating Categories us not Supported");//todo
     }
 
     /**
@@ -1387,10 +1382,9 @@ class ExpensesDataSource {
         return currencyId;
     }//DONE2
 
-    UnsupportedOperationException updateCurrency(long index) {
+    long updateCurrency(long index) {
 
-        //TODO siehe updateBooking
-        return new UnsupportedOperationException();
+        throw  new UnsupportedOperationException("Updating Currencies is not Supported");//todo
     }
 
     int deleteCurrency(long index) {
@@ -1492,7 +1486,7 @@ class ExpensesDataSource {
             return extendedExchangeRateInfo;
         } else {
 
-            Log.w(TAG, "getRateToBase: No available ExchangeRate from " + fromCurIndex + " to " + toCurIndex + " in database!");
+            Log.w(TAG, "getRateToBase: No available ExchangeRate from " + fromCurIndex + " to " + toCurIndex + " in mDatabase!");
             c.close();
             return null;
         }

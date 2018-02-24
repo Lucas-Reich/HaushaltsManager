@@ -8,11 +8,6 @@
     android:fitsSystemWindows="true"
     tools:openDrawer="start">
 
-    <!-- The main content view-->
-
-
-    <!-- The navigation drawer-->
-
     <include
         layout="@layout/activity_main_tab"
         android:layout_width="wrap_content"

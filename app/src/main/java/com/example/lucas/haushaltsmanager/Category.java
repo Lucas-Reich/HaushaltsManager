@@ -1,5 +1,6 @@
 package com.example.lucas.haushaltsmanager;
 
+import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.ColorInt;
@@ -29,11 +30,6 @@ class Category implements Parcelable {
         this(null, categoryName, color, defaultExpenseType != null ? defaultExpenseType : false);
     }
 
-    Category() {
-
-        this(null, "", "#000000", false);
-    }
-
     /**
      * this constructor converts our parcelable object back into an Category object
      * see: http://prasanta-paul.blogspot.de/2010/06/android-parcelable-example.html (Parcelable ArrayList)
@@ -55,9 +51,9 @@ class Category implements Parcelable {
      *
      * @return Category dummy object
      */
-    static Category createDummyCategory() {
+    static Category createDummyCategory(Context context) {
 
-        return new Category(null, "dummy", "#000000", false);
+        return new Category(-1L, context.getResources().getString(R.string.no_name), "#000000", false);
     }
 
     long getIndex() {

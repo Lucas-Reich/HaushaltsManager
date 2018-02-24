@@ -42,7 +42,7 @@ public class AccountPickerDialogFragment extends DialogFragment {
 
                 accountBtn.setText(accounts.get(selectedAccount).getAccountName());
                 currencyBtn.setText(accounts.get(selectedAccount).getCurrency().getCurrencySymbol());
-                expenseScreen.EXPENSE.setAccount(accounts.get(selectedAccount));
+                expenseScreen.mExpense.setAccount(accounts.get(selectedAccount));
                 Log.d(TAG, "set active account to: " + accounts.get(selectedAccount).getAccountName() + ", " + accounts.get(selectedAccount).getIndex());
 
                 expensesDataSource.close();

@@ -302,7 +302,7 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
     /**
      * initialization of currency table
      *
-     * @param db reference to editable database
+     * @param db reference to editable mDatabase
      */
     private void insertCurrencies(SQLiteDatabase db) {
 
