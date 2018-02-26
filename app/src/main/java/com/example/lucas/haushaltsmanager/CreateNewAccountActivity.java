@@ -16,7 +16,7 @@ import android.widget.Spinner;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CreateNewAccount extends AppCompatActivity implements OnItemSelectedListener, BasicDialog.BasicDialogCommunicator {
+public class CreateNewAccountActivity extends AppCompatActivity implements OnItemSelectedListener, BasicDialog.BasicDialogCommunicator {
 
     SharedPreferences preferences;
     Button accountName;
@@ -79,8 +79,8 @@ public class CreateNewAccount extends AppCompatActivity implements OnItemSelecte
                 editor.apply();
 
                 database.createAccount(account);
-                Intent startMainTab = new Intent(CreateNewAccount.this, MainActivityTab.class);
-                CreateNewAccount.this.startActivity(startMainTab);
+                Intent startMainTab = new Intent(CreateNewAccountActivity.this, MainActivityTab.class);
+                CreateNewAccountActivity.this.startActivity(startMainTab);
             }
         });
 
@@ -106,9 +106,9 @@ public class CreateNewAccount extends AppCompatActivity implements OnItemSelecte
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-        String curName = parent.getItemAtPosition(position).toString();
+        String currencyName = parent.getItemAtPosition(position).toString();
 
-        this.account.setCurrency(database.getCurrency(curName));
+        this.account.setCurrency(database.getCurrency(currencyName));
     }
 
     @Override

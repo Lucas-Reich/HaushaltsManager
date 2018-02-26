@@ -22,7 +22,6 @@ public class ExpenseInputDialogFragment extends DialogFragment {
     }
 
     //TODO diese klasse sollte durch den Basic Dialog ersetzt werden
-    //todo wenn der user nicht das popup anklickt und es sich dmit schließt bleibt das keyboard noch geöffnet
     //dieses Dialog fragment ermöglicht die eingabe einer Notiz, eines Titels, der Tags
     public Dialog onCreateDialog(final Bundle savedInstances) {
 
@@ -89,18 +88,6 @@ public class ExpenseInputDialogFragment extends DialogFragment {
             case R.id.expense_screen_notice:
 
                 expense.setNotice(btnText);
-                break;
-
-            //TODO remove CATEGORY from ExpenseInputDialogFragment
-            case R.id.expense_screen_category:
-
-
-                ExpensesDataSource expenseDataSource = new ExpensesDataSource(getContext());
-                expenseDataSource.open();
-
-                expense.setCategory(expenseDataSource.getCategoryByName(btnText));
-
-                expenseDataSource.close();
                 break;
 
             default:

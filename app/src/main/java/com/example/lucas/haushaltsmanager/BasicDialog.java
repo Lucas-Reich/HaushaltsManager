@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.InputType;
+import android.view.WindowManager;
 import android.widget.EditText;
 
 public class BasicDialog extends DialogFragment {
@@ -15,6 +16,12 @@ public class BasicDialog extends DialogFragment {
     private EditText text;
     BasicDialogCommunicator mCallback;
 
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+    }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -71,7 +78,7 @@ public class BasicDialog extends DialogFragment {
             mCallback = (BasicDialogCommunicator) context;
         } catch (ClassCastException e) {
 
-            throw new ClassCastException(context.toString() + " must implement OnHeadLineSelectedListener");
+            throw new ClassCastException(context.toString() + " must implement BasicDialogCommunicator");
         }
     }
 }

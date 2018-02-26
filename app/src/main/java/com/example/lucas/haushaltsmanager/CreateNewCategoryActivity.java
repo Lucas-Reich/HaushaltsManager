@@ -10,9 +10,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RadioGroup;
 
-public class CreateNewCategory extends AppCompatActivity implements BasicDialog.BasicDialogCommunicator {
+public class CreateNewCategoryActivity extends AppCompatActivity implements BasicDialog.BasicDialogCommunicator {
 
-    private String TAG = CreateNewCategory.class.getSimpleName();
+    private String TAG = CreateNewCategoryActivity.class.getSimpleName();
     private Category CATEGORY;
     Button categoryNameBtn, categoryColorBtn, createCategoryBtn;
     RadioGroup expenseType;
@@ -48,7 +48,7 @@ public class CreateNewCategory extends AppCompatActivity implements BasicDialog.
             @Override
             public void onClick(View v) {
 
-                ColorPickerDialog dialog = new ColorPickerDialog(CreateNewCategory.this, Color.WHITE, new ColorPickerDialog.OnColorSelectedListener() {
+                ColorPickerDialog dialog = new ColorPickerDialog(CreateNewCategoryActivity.this, Color.WHITE, new ColorPickerDialog.OnColorSelectedListener() {
 
                     @Override
                     public void onColorSelected(int color) {
@@ -90,8 +90,8 @@ public class CreateNewCategory extends AppCompatActivity implements BasicDialog.
                 database.createCategory(CATEGORY);
                 database.close();
 
-                Intent startCategories = new Intent(CreateNewCategory.this, Categories.class);
-                CreateNewCategory.this.startActivity(startCategories);
+                Intent startCategories = new Intent(CreateNewCategoryActivity.this, Categories.class);
+                CreateNewCategoryActivity.this.startActivity(startCategories);
             }
         });
     }

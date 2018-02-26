@@ -34,7 +34,9 @@ class ColorPickerDialog extends AlertDialog {
     }
 
     private OnClickListener onClickListener = new DialogInterface.OnClickListener() {
+
         public void onClick(DialogInterface dialog, int which) {
+
             switch (which) {
                 case BUTTON_POSITIVE:
                     int selectedColor = colorPickerView.getColor();

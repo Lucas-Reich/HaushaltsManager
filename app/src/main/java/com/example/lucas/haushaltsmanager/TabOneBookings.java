@@ -55,6 +55,8 @@ public class TabOneBookings extends Fragment {
 
         mDatabase = new ExpensesDataSource(getContext());
         setActiveAccounts();
+
+        Log.d(TAG, "onCreate: ");
     }
 
     @Override
@@ -112,7 +114,7 @@ public class TabOneBookings extends Fragment {
             @Override
             public void onClick(View v) {
 
-                if (mListAdapter.getSelectedCount() > 1){
+                if (mListAdapter.getSelectedCount() > 1) {
 
 
                     //todo bevor die Buchungen zusammengefügt werden sollte ein alert dialog den user nach einem namen für die KombiBuchung fragen
@@ -290,7 +292,7 @@ public class TabOneBookings extends Fragment {
 
         for (Account account : mDatabase.getAllAccounts()) {
 
-            if (preferences.getBoolean(account.getAccountName().toLowerCase(), false))
+            if (preferences.getBoolean(account.getAccountName(), false))
                 mActiveAccounts.add(account.getIndex());
         }
     }
@@ -369,6 +371,80 @@ public class TabOneBookings extends Fragment {
                     mListDataChild.put(expense, expense.getChildren());//sollte leer sein
                 }
                 i++;
+            }
+        }
+    }
+
+    /**
+     * Ersatz für die prepareListData methode, da diese nicht in der lage ist die Datumstrenner aus der liste zu nehmen.
+     * Da diese Funktion aber noch Probleme mit der HasMap klasse hat wird sie noch nicht eingesetzt
+     */
+    private void prepareListData2() {//todo unerwartetes verhalten der HasMap
+
+        Log.d(TAG, "prepareListData: erstelle neue Listen daten");
+
+        if (mListDataHeader.size() > 0)
+            mListDataHeader.clear();
+
+        if (!mListDataChild.isEmpty())
+            mListDataChild.clear();
+
+        if (mExpenses.isEmpty()) {//wenn die Liste noch nicht erstellt wurde
+
+            Log.d(TAG, "prepareListData2: Hole die Buchungen aus der Datenbank");
+            if (!mDatabase.isOpen())
+                mDatabase.open();
+
+            Calendar cal = Calendar.getInstance();
+            mExpenses = mDatabase.getBookings(cal.get(Calendar.YEAR) + "-01-01 00:00:00", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(cal.getTime()));
+        }
+
+        String separatorDate = "";
+        ArrayList<ExpenseObject> tempGroupData = new ArrayList<>();
+        HashMap<ExpenseObject, List<ExpenseObject>> tempChildData = new HashMap<>();
+        ArrayList<ExpenseObject> childrenToDisplay = new ArrayList<>();
+
+        for (int i = 0; i < mExpenses.size(); ) {
+
+            if (mExpenses.get(i).getDate().equals(separatorDate) && i + 1 != mExpenses.size()) {
+
+                ExpenseObject expense = mExpenses.get(i);
+                childrenToDisplay.clear();
+
+                for (ExpenseObject childExpense : expense.getChildren()) {
+
+                    if (mActiveAccounts.contains(childExpense.getAccount().getIndex()))
+                        childrenToDisplay.add(childExpense);
+                }
+
+                //wenn es kein/-e Kind/-er zum anzeigen gibt
+                if (childrenToDisplay.size() > 0 || expense.getAccount().getIndex() != 9999) {
+
+                    tempGroupData.add(expense);
+                    tempChildData.put(expense, childrenToDisplay);//bei jeder iteration werden die kinder der buchungen alle  auf den gleichn wert gesetzt und die Group buhungen in der HasMAp sind auch nicht geordnet
+                }
+                i++;
+            } else {
+
+                if (tempGroupData.size() > 0) {
+
+                    ExpenseObject dateSeparator = ExpenseObject.createDummyExpense(getContext());
+                    dateSeparator.getAccount().setIndex(8888);
+                    dateSeparator.setDateTime(tempGroupData.get(0).getDateTime());
+
+                    mListDataHeader.add(dateSeparator);
+                    mListDataChild.put(dateSeparator, new ArrayList<ExpenseObject>());
+
+                    mListDataHeader.addAll(tempGroupData);
+                    mListDataChild.putAll(tempChildData);
+                }
+
+                tempGroupData.clear();
+                tempChildData.clear();
+                separatorDate = mExpenses.get(i).getDate();
+
+                if (i == mExpenses.size() - 1)
+                    break;
             }
         }
     }

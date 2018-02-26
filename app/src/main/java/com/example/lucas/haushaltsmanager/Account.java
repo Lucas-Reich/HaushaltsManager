@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 class Account implements Parcelable {
@@ -33,7 +34,6 @@ class Account implements Parcelable {
     }
 
     /**
-     * This will be only used by ParcelableCategories
      * see: http://prasanta-paul.blogspot.de/2010/06/android-parcelable-example.html (Parcelable ArrayList)
      * and: https://stackoverflow.com/questions/2139134/how-to-send-an-object-from-one-android-activity-to-another-using-intents for further explanations (Parcelable Object)
      * <p>
@@ -53,16 +53,26 @@ class Account implements Parcelable {
     /**
      * Methode um ein dummy Konto zu erstellen
      *
+     * @param accountIndex Index des Kontos
      * @param context Context
      * @return dummy Konto
      */
-    static Account createDummyAccount(Context context) {
+    static Account createDummyAccount(Context context,@Nullable Long accountIndex) {
 
-        return new Account(-1, context.getResources().getString(R.string.no_name), 0, Currency.createDummyCurrency(context));
+        return new Account(accountIndex != null ? accountIndex : -1, context.getResources().getString(R.string.no_name), 0, Currency.createDummyCurrency(context));
     }
 
     public long getIndex() {
         return index;
+    }
+
+    /**
+     * Damit man eine DummyExpense erstellen kann und im nachinein den Platzhalter setzen kann
+     * @param index Database index
+     */
+    public void setIndex(long index) {
+
+        this.index = index;
     }
 
     String getAccountName() {
@@ -89,6 +99,11 @@ class Account implements Parcelable {
         this.currency = currency;
     }
 
+    @Override
+    public String toString() {
+
+        return this.index + " " + this.accountName;
+    }
 
     //make class Parcelable
 

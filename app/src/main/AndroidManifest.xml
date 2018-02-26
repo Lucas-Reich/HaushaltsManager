@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.example.lucas.haushaltsmanager">
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.lucas.haushaltsmanager">
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
         android:allowBackup="true"
@@ -17,6 +19,7 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
+
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
@@ -26,41 +29,42 @@
             android:parentActivityName=".MainActivityTab"/>
         <activity
             android:name=".Categories"
-            android:label="HaushaltsManager"
+            android:label="Categories"
             android:parentActivityName=".MainActivityTab"/>
-
         <activity
             android:name=".BookingTemplates"
-            android:label="HaushaltsManager"
+            android:label="BookingTemplate"
             android:parentActivityName=".MainActivityTab"/>
-
         <activity
             android:name=".RecurringBookings"
-            android:label="HaushaltsManager"
+            android:label="RecurringBookings"
             android:parentActivityName=".MainActivityTab"/>
-
         <activity
-            android:name=".CreateNewAccount"
-            android:label="HaushaltsManager"
+            android:name=".CreateNewAccountActivity"
+            android:label="CreateNewAccount"
             android:parentActivityName=".MainActivityTab"/>
-
         <activity
-            android:name=".CreateNewCategory"
-            android:label="HaushaltsManager"
+            android:name=".CreateNewCategoryActivity"
+            android:label="CreateNewCategory"
             android:parentActivityName=".MainActivityTab"/>
-
         <activity
             android:name=".TestPieChart"
-            android:label="HaushaltsManager"
+            android:label="TestPieChart"
+            android:parentActivityName=".MainActivityTab"/>
+        <activity
+            android:name=".ImportExportActivity"
+            android:label="ExportImportActivity"
             android:parentActivityName=".MainActivityTab"/>
 
         <service
             android:name=".ExchangeRateService"
             android:label="ExchangeRateService"/>
-
         <service
             android:name=".ExchangeService"
             android:label="ExchangeService"/>
+        <service
+            android:name=".BackupService"
+            android:label="BackupService"/>
     </application>
 
 </manifest>

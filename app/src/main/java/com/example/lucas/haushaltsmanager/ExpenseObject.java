@@ -117,7 +117,7 @@ class ExpenseObject implements Parcelable {
      */
     static ExpenseObject createDummyExpense(Context context) {
 
-        return new ExpenseObject(-1, context.getResources().getString(R.string.no_name), 0, null, false, Category.createDummyCategory(context), null, Account.createDummyAccount(context), Currency.createDummyCurrency(context));
+        return new ExpenseObject(-1, context.getResources().getString(R.string.no_name), 0, null, false, Category.createDummyCategory(context), null, Account.createDummyAccount(context, null), Currency.createDummyCurrency(context));
     }
 
     double getExchangeRate() {
@@ -155,12 +155,7 @@ class ExpenseObject implements Parcelable {
     @Override
     public String toString() {
 
-        String toDisplay = "Book " + this.title + " " + this.price + " times as an " + this.expenditure;
-        String toDisplay2 = "The booking belongs to " + this.category + ", happened at the " + date.get(Calendar.DAY_OF_MONTH) + "-" + (date.get(Calendar.MONTH) + 1) + "-" + date.get(Calendar.YEAR);
-        String toDisplay3 = " and has to be inserted to " + this.account;
-
-
-        return toDisplay + toDisplay2 + toDisplay3;
+        return "" + this.index + " " + this.title;
     }
 
     Calendar getDateTime() {
@@ -334,20 +329,6 @@ class ExpenseObject implements Parcelable {
     boolean isSet() {
 
         return !this.title.isEmpty() && this.price != 0.0 && !this.category.getCategoryName().isEmpty();
-    }
-
-    void toConsole() {
-
-        Log.d("ExpenseObject index: ", "" + index);
-        Log.d("ExpenseObject cat: ", "" + category.getCategoryName());
-        Log.d("ExpenseObject price: ", "" + price);
-        Log.d("ExpenseObject expend: ", "" + expenditure);
-        Log.d("ExpenseObject title: ", "" + title);
-        Log.d("ExpenseObject tag: ", "" + tag);
-        Log.d("ExpenseObject date: ", "" + getDateTime());
-        Log.d("ExpenseObject notice: ", "" + notice);
-        Log.d("ExpenseObject account: ", "" + account.getAccountName());
-
     }
 
 

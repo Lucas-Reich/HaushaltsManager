@@ -382,8 +382,8 @@ public class ExpenseScreen extends AppCompatActivity implements AdapterView.OnIt
 
             case R.id.expense_screen_category:
 
-                Intent bla = new Intent(ExpenseScreen.this, Categories.class);
-                ExpenseScreen.this.startActivityForResult(bla, 1);
+                Intent chooseCategoryIntent = new Intent(ExpenseScreen.this, Categories.class);
+                ExpenseScreen.this.startActivityForResult(chooseCategoryIntent, 1);
                 break;
 
             case R.id.expense_screen_title:

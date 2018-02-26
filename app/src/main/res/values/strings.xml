@@ -70,4 +70,22 @@
     <string name="outgoing">Outgoing</string>
     <string name="update_booking">Update</string>
     <string name="add_child_to_booking">Create Child Booking</string>
+    <string name="choose_currency">Select the accounts currency</string>
+    <string name="create_new_account_name">Accountname</string>
+    <string name="create_new_account_starting_balance">Start balance</string>
+    <string name="create_new_account_create">Create Account</string>
+    <string name="title_activity_export_import2">ExportImportActivity2</string>
+    <string name="tab_text_1">Tab 1</string>
+    <string name="tab_text_2">Tab 2</string>
+    <string name="tab_text_3">Tab 3</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="import_title">Import</string>
+    <string name="export_title">Export</string>
+    <string name="error">Error</string>
+    <string name="file_already_existing_err_msg">Filename is already existing!</string>
+    <string name="overwrite_existing_file">Create File anyway</string>
+    <string name="abort_file_writing">Do Not Create File</string>
+    <string name="choose_new_file_name">Choose new File name</string>
+    <string name="input_file_name">Input file name</string>
+    <string name="btn_create">Create</string>
 </resources>

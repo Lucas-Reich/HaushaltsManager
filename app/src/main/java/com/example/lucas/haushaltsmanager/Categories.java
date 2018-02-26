@@ -54,7 +54,7 @@ public class Categories extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                Intent createCategoryIntent = new Intent(Categories.this, CreateNewCategory.class);
+                Intent createCategoryIntent = new Intent(Categories.this, CreateNewCategoryActivity.class);
                 Categories.this.startActivity(createCategoryIntent);
             }
         });

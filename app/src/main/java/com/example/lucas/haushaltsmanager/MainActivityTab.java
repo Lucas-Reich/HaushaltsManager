@@ -128,7 +128,9 @@ public class MainActivityTab extends AppCompatActivity implements ChooseAccounts
                         //do smth
                         break;
                     case R.id.import_export:
-                        //do smth
+
+                        Intent importExportIntent = new Intent(MainActivityTab.this, ImportExportActivity.class);
+                        MainActivityTab.this.startActivity(importExportIntent);
                         break;
                     case R.id.store:
                         //do smth

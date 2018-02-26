@@ -92,7 +92,7 @@ public class ChooseAccountsDialogFragment extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                Intent newAccountIntent = new Intent(getActivity(), CreateNewAccount.class);
+                Intent newAccountIntent = new Intent(getActivity(), CreateNewAccountActivity.class);
                 getActivity().startActivity(newAccountIntent);
             }
         });

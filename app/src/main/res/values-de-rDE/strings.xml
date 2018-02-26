@@ -46,7 +46,7 @@
     <string name="expense_screen_error_create">Fehler beim erstellen der Buchung. Gib mindestens einen Betrag, einen Titel und eine Kategorie an!</string>
     <string name="tab_one_title">Ausgaben</string>
     <string name="tab_three_title">Berichte</string>
-    <string name="tab_two_title">Übersicht Monat</string>
+    <string name="tab_two_title">Monatsübersicht</string>
     <string name="month_report_booking">Buchung</string>
     <string name="month_report_bookings">Buchungen</string>
     <string name="expense_screen_amount_currency">€</string>
