@@ -117,7 +117,7 @@ public class CreateNewAccountActivity extends AppCompatActivity implements OnIte
     }
 
     @Override
-    public void sendData(String data, String tag) {
+    public void onTextInput(String data, String tag) {
 
         if (tag.equals("accountName")) {
 

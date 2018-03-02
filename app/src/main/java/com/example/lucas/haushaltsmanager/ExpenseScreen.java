@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class ExpenseScreen extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class ExpenseScreen extends AppCompatActivity implements AdapterView.OnItemSelectedListener, AccountPickerDialogFragment.OnAccountSelected {
 
     private creationModes CREATION_MODE;
 
@@ -411,7 +411,7 @@ public class ExpenseScreen extends AppCompatActivity implements AdapterView.OnIt
 
             case R.id.expense_screen_account:
 
-                bundle.putString("original_title", getResources().getString(R.string.expense_screen_dsp_account));
+                bundle.putString("title", getResources().getString(R.string.expense_screen_dsp_account));
                 bundle.putParcelable("active_account", mExpense.getAccount());
                 break;
         }
@@ -474,5 +474,24 @@ public class ExpenseScreen extends AppCompatActivity implements AdapterView.OnIt
 
     @Override
     public void onNothingSelected(AdapterView<?> arg0) {
+    }
+
+    /**
+     * Methode die den Callback des AccountPickerDialogFragments implementiert
+     *
+     * @param account Konto das ausgewählt wurde
+     * @param tag     Tag mit dem das DialogFragment aufgerufen wurde
+     */
+    @Override
+    public void onAccountSelected(Account account, String tag) {
+
+        if (tag.equals("account_picker")) {
+
+            accountBtn.setText(account.getAccountName());
+            currencyTxt.setText(account.getCurrency().getCurrencySymbol());
+            mExpense.setAccount(account);
+
+            Log.d(TAG, "set active account to: " + account.getAccountName());
+        }
     }
 }

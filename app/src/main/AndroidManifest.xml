@@ -53,7 +53,7 @@
             android:parentActivityName=".MainActivityTab"/>
         <activity
             android:name=".ImportExportActivity"
-            android:label="ExportImportActivity"
+            android:label="ExportImportActivity2"
             android:parentActivityName=".MainActivityTab"/>
 
         <service

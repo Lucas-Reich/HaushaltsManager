@@ -88,4 +88,5 @@
     <string name="choose_new_file_name">Choose new File name</string>
     <string name="input_file_name">Input file name</string>
     <string name="btn_create">Create</string>
+    <string name="choose_directory">Choose Directory</string>
 </resources>

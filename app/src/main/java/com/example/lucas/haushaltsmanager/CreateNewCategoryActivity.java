@@ -97,7 +97,7 @@ public class CreateNewCategoryActivity extends AppCompatActivity implements Basi
     }
 
     @Override
-    public void sendData(String data, String tag) {
+    public void onTextInput(String data, String tag) {
 
         CATEGORY.setCategoryName(data);
         categoryNameBtn.setText(data);

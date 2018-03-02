@@ -2,6 +2,7 @@ package com.example.lucas.haushaltsmanager;
 
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -15,6 +16,20 @@ public class AccountPickerDialogFragment extends DialogFragment {
 
     private ExpensesDataSource expensesDataSource;
     private String TAG = AccountPickerDialogFragment.class.getSimpleName();
+    private OnAccountSelected mCallback;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        try {
+
+            mCallback = (OnAccountSelected) context;
+        } catch (ClassCastException e) {
+
+            throw new ClassCastException(context.toString() + " must implement BasicDialogCommunicator");
+        }
+    }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -23,11 +38,8 @@ public class AccountPickerDialogFragment extends DialogFragment {
         expensesDataSource.open();
 
         final Bundle args = getArguments();
-        final ExpenseScreen expenseScreen = (ExpenseScreen) getActivity();
         final ArrayList<Account> accounts = expensesDataSource.getAllAccounts();
         final Account activeAccount = args.getParcelable("active_account");
-        final Button accountBtn = (Button) expenseScreen.findViewById(R.id.expense_screen_account);
-        final TextView currencyBtn = (TextView) expenseScreen.findViewById(R.id.expense_screen_amount_currency);
 
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -40,11 +52,7 @@ public class AccountPickerDialogFragment extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int selectedAccount) {
 
-                accountBtn.setText(accounts.get(selectedAccount).getAccountName());
-                currencyBtn.setText(accounts.get(selectedAccount).getCurrency().getCurrencySymbol());
-                expenseScreen.mExpense.setAccount(accounts.get(selectedAccount));
-                Log.d(TAG, "set active account to: " + accounts.get(selectedAccount).getAccountName() + ", " + accounts.get(selectedAccount).getIndex());
-
+                mCallback.onAccountSelected(accounts.get(selectedAccount), getTag());
                 expensesDataSource.close();
                 dismiss();
             }
@@ -78,5 +86,10 @@ public class AccountPickerDialogFragment extends DialogFragment {
         super.onStop();
 
         expensesDataSource.close();
+    }
+
+    public interface OnAccountSelected {
+
+        void onAccountSelected(Account account, String tag);
     }
 }

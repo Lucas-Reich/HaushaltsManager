@@ -148,7 +148,7 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
     static final String CATEGORIES_COL_ID = "_id";
     static final String CATEGORIES_COL_NAME = "cat_name";
     static final String CATEGORIES_COL_COLOR = "color";
-    static final String CATEGORIES_COL_EXPENSE_TYPE = "expense_type";
+    static final String CATEGORIES_COL_EXPENSE_TYPE = "expense_type";//todo rename to default_expense_type
 
     private final static String CREATE_CATEGORIES = "CREATE TABLE " + TABLE_CATEGORIES
             + "("
