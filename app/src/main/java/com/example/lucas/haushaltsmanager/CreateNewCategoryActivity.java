@@ -10,7 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RadioGroup;
 
-public class CreateNewCategoryActivity extends AppCompatActivity implements BasicDialog.BasicDialogCommunicator {
+public class CreateNewCategoryActivity extends AppCompatActivity implements BasicTextInputDialog.BasicDialogCommunicator {
 
     private String TAG = CreateNewCategoryActivity.class.getSimpleName();
     private Category CATEGORY;
@@ -36,7 +36,7 @@ public class CreateNewCategoryActivity extends AppCompatActivity implements Basi
                 Bundle args = new Bundle();
                 args.putString("title", getResources().getString(R.string.category_name));
 
-                DialogFragment basicDialog = new BasicDialog();
+                DialogFragment basicDialog = new BasicTextInputDialog();
                 basicDialog.setArguments(args);
                 basicDialog.show(getFragmentManager(), "categoryName");
             }

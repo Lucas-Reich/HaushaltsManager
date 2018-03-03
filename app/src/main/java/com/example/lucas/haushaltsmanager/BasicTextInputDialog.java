@@ -10,7 +10,7 @@ import android.text.InputType;
 import android.view.WindowManager;
 import android.widget.EditText;
 
-public class BasicDialog extends DialogFragment {
+public class BasicTextInputDialog extends DialogFragment {
 
     BasicDialogCommunicator mCallback;
     private EditText mTextInput;

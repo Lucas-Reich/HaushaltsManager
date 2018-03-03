@@ -1,5 +1,8 @@
 package com.example.lucas.haushaltsmanager;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -57,6 +60,9 @@ public class MainActivityTab extends AppCompatActivity implements ChooseAccounts
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tab_main_mit_nav_drawer);
 
+        //Methode die jeden Tag einmal den BackupService laufen lässt
+        scheduleBackupServiceAlarm();
+
 
         FloatingActionButton testService = (FloatingActionButton) findViewById(R.id.service_fab);
         testService.setOnClickListener(new View.OnClickListener() {
@@ -98,6 +104,7 @@ public class MainActivityTab extends AppCompatActivity implements ChooseAccounts
                 switch (item.getItemId()) {
 
                     case R.id.desktop:
+
                         //do smth
                         break;
                     case R.id.categories:
@@ -118,11 +125,13 @@ public class MainActivityTab extends AppCompatActivity implements ChooseAccounts
                         break;
                     case R.id.standing_orders:
 
-                        Intent recurringIntent = new Intent(MainActivityTab.this, RecurringBookings.class);
-                        MainActivityTab.this.startActivity(recurringIntent);
+                        Intent recurringBookingIntent = new Intent(MainActivityTab.this, RecurringBookings.class);
+                        MainActivityTab.this.startActivity(recurringBookingIntent);
                         break;
                     case R.id.transfers:
-                        //do smth
+
+                        Intent createBackupIntent = new Intent(MainActivityTab.this, CreateBackupActivity.class);//todo replace
+                        MainActivityTab.this.startActivity(createBackupIntent);
                         break;
                     case R.id.backup:
                         //do smth
@@ -140,7 +149,7 @@ public class MainActivityTab extends AppCompatActivity implements ChooseAccounts
                         break;
                     case R.id.about:
 
-                        Intent testPieIntent = new Intent(MainActivityTab.this, TestPieChart.class);
+                        Intent testPieIntent = new Intent(MainActivityTab.this, TestPieChart.class);//todo replace
                         MainActivityTab.this.startActivity(testPieIntent);
                         break;
                 }
@@ -280,5 +289,23 @@ public class MainActivityTab extends AppCompatActivity implements ChooseAccounts
                     break;
             }
         }
+    }
+
+    /**
+     * Methode um meinen BackupService periodische jeden Tag einmal laufen zu lassen.
+     *
+     * Anleitung siehe: https://guides.codepath.com/android/Starting-Background-Services#using-with-alarmmanager-for-periodic-tasks
+     *///todo es sollte nicht jedes mal ein backup erstellt werden wenn die app aufgerufen wird
+    private void scheduleBackupServiceAlarm() {
+
+        Intent backupServiceIntent = new Intent(getApplicationContext(), MyAlarmReceiver.class);
+
+        final PendingIntent pendingIntent = PendingIntent.getBroadcast(this, MyAlarmReceiver.REQUEST_CODE, backupServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+        long startInMillis = System.currentTimeMillis();
+
+        AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+
+        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, startInMillis, AlarmManager.INTERVAL_DAY, pendingIntent);
     }
 }

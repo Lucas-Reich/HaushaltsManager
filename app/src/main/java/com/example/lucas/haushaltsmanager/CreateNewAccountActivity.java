@@ -16,7 +16,7 @@ import android.widget.Spinner;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CreateNewAccountActivity extends AppCompatActivity implements OnItemSelectedListener, BasicDialog.BasicDialogCommunicator {
+public class CreateNewAccountActivity extends AppCompatActivity implements OnItemSelectedListener, BasicTextInputDialog.BasicDialogCommunicator {
 
     SharedPreferences preferences;
     Button accountName;
@@ -47,7 +47,7 @@ public class CreateNewAccountActivity extends AppCompatActivity implements OnIte
                 Bundle args = new Bundle();
                 args.putString("title", "Set Account name");
 
-                DialogFragment basicDialog = new BasicDialog();
+                DialogFragment basicDialog = new BasicTextInputDialog();
                 basicDialog.setArguments(args);
                 basicDialog.show(getFragmentManager(), "accountName");
             }
@@ -61,7 +61,7 @@ public class CreateNewAccountActivity extends AppCompatActivity implements OnIte
                 Bundle args = new Bundle();
                 args.putString("title", "Set Account Balance");
 
-                DialogFragment basicDialog = new BasicDialog();
+                DialogFragment basicDialog = new BasicTextInputDialog();
                 basicDialog.setArguments(args);
                 basicDialog.show(getFragmentManager(), "accountBalance");
             }

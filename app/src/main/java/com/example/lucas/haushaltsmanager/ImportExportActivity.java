@@ -17,7 +17,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class ImportExportActivity extends AppCompatActivity implements AccountPickerDialogFragment.OnAccountSelected, BasicDialog.BasicDialogCommunicator, DirectoryPickerDialogFragment.OnDirectorySelected {
+public class ImportExportActivity extends AppCompatActivity implements AccountPickerDialogFragment.OnAccountSelected, BasicTextInputDialog.BasicDialogCommunicator, DirectoryPickerDialogFragment.OnDirectorySelected {
 
     String TAG = ImportExportActivity.class.getSimpleName();
 
@@ -54,7 +54,7 @@ public class ImportExportActivity extends AppCompatActivity implements AccountPi
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_import_export_2);
+        setContentView(R.layout.activity_import_export);
 
         mAccountBtn = (Button) findViewById(R.id.import_export_account_btn);
         mFileNameBtn = (Button) findViewById(R.id.import_export_file_name_btn);
@@ -91,7 +91,7 @@ public class ImportExportActivity extends AppCompatActivity implements AccountPi
                 mBundle.clear();
                 mBundle.putString("title", getResources().getString(R.string.choose_new_file_name));
 
-                BasicDialog dialog = new BasicDialog();
+                BasicTextInputDialog dialog = new BasicTextInputDialog();
                 dialog.setArguments(mBundle);
                 dialog.show(getFragmentManager(), "choose_file_name");
 
@@ -206,7 +206,7 @@ public class ImportExportActivity extends AppCompatActivity implements AccountPi
                 mBundle.clear();
                 mBundle.putString("title", getResources().getString(R.string.input_file_name));
 
-                BasicDialog dialog1 = new BasicDialog();
+                BasicTextInputDialog dialog1 = new BasicTextInputDialog();
                 dialog1.setArguments(mBundle);
                 dialog1.show(getFragmentManager(), "choose_file_name");
             }

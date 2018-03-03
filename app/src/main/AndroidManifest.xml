@@ -53,18 +53,30 @@
             android:parentActivityName=".MainActivityTab"/>
         <activity
             android:name=".ImportExportActivity"
-            android:label="ExportImportActivity2"
+            android:label="ExportImportActivity"
             android:parentActivityName=".MainActivityTab"/>
+        <activity
+            android:name=".CreateBackupActivity"
+            android:label="CreateBackupActivity"
+            android:parentActivityName=".MainActivityTab"/>
+
+        <receiver
+            android:name=".MyAlarmReceiver"
+            android:process=":remote"/>
 
         <service
             android:name=".ExchangeRateService"
+            android:exported="false"
             android:label="ExchangeRateService"/>
         <service
             android:name=".ExchangeService"
+            android:exported="false"
             android:label="ExchangeService"/>
         <service
             android:name=".BackupService"
-            android:label="BackupService"/>
+            android:exported="false"
+            android:label="BackupService"
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
     </application>
 
 </manifest>

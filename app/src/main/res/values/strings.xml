@@ -89,4 +89,9 @@
     <string name="input_file_name">Input file name</string>
     <string name="btn_create">Create</string>
     <string name="choose_directory">Choose Directory</string>
+    <string name="restoreBackup">Restore Backup</string>
+    <string name="restore_backup_confirmation">Are you sure you want to restore the old Backup? All Changes since then will be lost!</string>
+    <string name="choose_new_backup_name">Backup name</string>
+    <string name="creating_backup">Creating Backup</string>
+    <string name="created_backup">Successfully created Backup</string>
 </resources>
