@@ -57,6 +57,7 @@ public class CreateBackupActivity extends AppCompatActivity implements Directory
     protected void onStart() {
         super.onStart();
 
+        mChooseDirectoryBtn.setText(mBackupDirectory.getName());
         mChooseDirectoryBtn.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -93,6 +94,8 @@ public class CreateBackupActivity extends AppCompatActivity implements Directory
                 basicDialog.show(getFragmentManager(), "create_backup_name");
             }
         });
+
+        //ab einer bestimmten anzahl an Backups ist der FAB nicht mehr zu sehen
     }
 
     /**
@@ -115,6 +118,7 @@ public class CreateBackupActivity extends AppCompatActivity implements Directory
     private void createBackup(@Nullable String backupName) {
 
         Intent backupServiceIntent = new Intent(this, BackupService.class);
+        backupServiceIntent.putExtra("user_triggered", true);
         backupServiceIntent.putExtra("backup_directory", mBackupDirectory.toString());
         if (backupName != null)
             backupServiceIntent.putExtra("backup_name", backupName);
@@ -223,8 +227,13 @@ public class CreateBackupActivity extends AppCompatActivity implements Directory
 
         if (tag.equals("choose_directory")) {
 
-            if (validateDirectory(file))
+            if (validateDirectory(file)) {
+
                 mBackupDirectory = file;
+                mChooseDirectoryBtn.setText(mBackupDirectory.getName());
+
+                refreshListView();
+            }
         }
     }
 

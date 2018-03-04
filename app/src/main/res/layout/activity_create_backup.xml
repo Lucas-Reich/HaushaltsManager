@@ -23,15 +23,16 @@
     <ListView
         android:id="@+id/create_backup_list_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content">
+
+    </ListView>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/create_backup_create_backup_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|right|end"
         android:clickable="true"
-        android:focusable="true"
         app:backgroundTint="@color/colorPrimary"
         app:srcCompat="@drawable/ic_add_white"/>
+
 </LinearLayout>

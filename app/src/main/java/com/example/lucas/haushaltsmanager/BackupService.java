@@ -1,7 +1,6 @@
 package com.example.lucas.haushaltsmanager;
 
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -26,6 +25,11 @@ public class BackupService extends Service {
     File mBackupDirectory;
     String mFileName = "Backup_";
 
+    /**
+     * Variable die true ist, wenn der BackupService durch den User ausgelöst wurde
+     */
+    boolean mUserTriggered;
+
     //.SavedDataFile
     final String mFileExtension = ".sdf";
 
@@ -43,6 +47,9 @@ public class BackupService extends Service {
         mBackupDirectory = new File(getApplicationContext().getFilesDir().toString() + "/Backups");
 
         mFileName = new SimpleDateFormat("YYYY_dd_mm_HH_mm_ss_SS", Locale.US).format(Calendar.getInstance().getTime());
+
+        //todo ein property ("max_backup_count") in den SharedPreferences("UserSettings") setzen in dem die maximale anzahl an backups steht die abgespeichert werden
+        // sind mehr Backups erstellt als in "max_backup_count" angegeben sind soll das älteste Backup gelöscht werden
     }
 
     @Override
@@ -55,6 +62,9 @@ public class BackupService extends Service {
 
             if (intent.hasExtra("backup_name"))
                 mFileName = intent.getStringExtra("backup_name");
+
+            if (intent.hasExtra("user_triggered"))
+                mUserTriggered = intent.getBooleanExtra("user_triggered", false);
         }
 
         try {
@@ -72,13 +82,12 @@ public class BackupService extends Service {
     }
 
     /**
+     * Antwort von: https://stackoverflow.com/a/9293885
      * Methode um eine Datei zu kopieren
      *
      * @param src Datei die kopiert werden soll
      * @param dst Ort zu dem die Date kopiert werden soll
      * @throws IOException Exception wenn beim kopieren etwas schiefgeht
-     *                     <p>
-     *                     Antwort von: https://stackoverflow.com/a/9293885
      */
     public static void copy(File src, File dst) throws IOException {
 
@@ -109,7 +118,8 @@ public class BackupService extends Service {
     public void onDestroy() {
         super.onDestroy();
 
-        Toast.makeText(this, R.string.created_backup, Toast.LENGTH_SHORT).show();
+        if (mUserTriggered)
+            Toast.makeText(this, R.string.created_backup, Toast.LENGTH_SHORT).show();
     }
 
     @Nullable
