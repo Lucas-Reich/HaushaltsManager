@@ -2,7 +2,6 @@ package com.example.lucas.haushaltsmanager;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,21 +9,23 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
+    private String TAG = ExpandableListAdapter.class.getSimpleName();
 
     private Context mContext;
     private List<ExpenseObject> mGroupData;
     private HashMap<ExpenseObject, List<ExpenseObject>> mChildData;
-    private String TAG = ExpandableListAdapter.class.getSimpleName();
     private ArrayList<Integer> mSelectedGroups;
     private int mRed, mGreen;
 
-    ExpandableListAdapter(Context context, List<ExpenseObject> mGroupData, HashMap<ExpenseObject, List<ExpenseObject>> mChildData) {
+    public ExpandableListAdapter(Context context, List<ExpenseObject> mGroupData, HashMap<ExpenseObject, List<ExpenseObject>> mChildData) {
 
         this.mContext = context;
         this.mGroupData = mGroupData;
@@ -209,42 +210,42 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         return true;
     }
 
-    boolean selectGroup(int groupId) {
+    public boolean selectGroup(int groupId) {
 
         return this.mSelectedGroups.add(groupId);
     }
 
-    ExpenseObject getExpense(int expenseId) {
+    public ExpenseObject getExpense(int expenseId) {
 
         return this.mGroupData.get(expenseId);
     }
 
-    boolean isSelected(int groupId) {
+    public boolean isSelected(int groupId) {
 
         return this.mSelectedGroups.contains(groupId);
     }
 
-    boolean removeGroupFromList(int groupId) {
+    public boolean removeGroupFromList(int groupId) {
 
         return this.mSelectedGroups.remove((Object) groupId);
     }
 
-    void deselectAll() {
+    public void deselectAll() {
 
         this.mSelectedGroups.clear();
     }
 
-    int getSelectedCount() {
+    public int getSelectedCount() {
 
         return this.mSelectedGroups.size();
     }
 
-    void clearSelected() {
+    public void clearSelected() {
 
         this.mSelectedGroups.clear();
     }
 
-    ArrayList<ExpenseObject> getSelectedGroupData() {
+    public ArrayList<ExpenseObject> getSelectedGroupData() {
 
         ArrayList<ExpenseObject> groupData = new ArrayList<>();
 
@@ -256,7 +257,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         return groupData;
     }
 
-    long[] getSelectedBookingIds() {
+    public long[] getSelectedBookingIds() {
 
         long bookingIds[] = new long[this.mSelectedGroups.size()];
         int counter = 0;

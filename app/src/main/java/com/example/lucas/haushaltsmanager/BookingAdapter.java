@@ -10,9 +10,11 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+
 import java.util.ArrayList;
 
-class BookingAdapter extends ArrayAdapter<ExpenseObject> implements View.OnClickListener {
+public class BookingAdapter extends ArrayAdapter<ExpenseObject> implements View.OnClickListener {
 
     private SharedPreferences preferences;
 
@@ -26,7 +28,7 @@ class BookingAdapter extends ArrayAdapter<ExpenseObject> implements View.OnClick
         TextView txtPaidCurrency;
     }
 
-    BookingAdapter(ArrayList<ExpenseObject> data, Context context) {
+    public BookingAdapter(ArrayList<ExpenseObject> data, Context context) {
         super(context, R.layout.booking_item, data);
 
         this.preferences = context.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);

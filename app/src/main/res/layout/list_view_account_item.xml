@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:paddingEnd="35dp"
+              android:paddingLeft="20dp"
+              android:paddingRight="35dp"
+              android:paddingStart="20dp"
+              android:paddingTop="20dp">
+
+    <CheckedTextView
+        android:id="@+id/list_view_account_item_account_chk"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:drawableLeft="?android:attr/listChoiceIndicatorMultiple"
+        android:drawableStart="?android:attr/listChoiceIndicatorMultiple"
+        android:gravity="center"
+        android:textSize="17sp"/>
+
+    <ImageView
+        android:id="@+id/list_view_account_item_overflow"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        app:srcCompat="@drawable/ic_three_dots_vertical_black"/>
+</LinearLayout>

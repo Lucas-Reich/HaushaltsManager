@@ -8,12 +8,12 @@ import android.content.DialogInterface;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 
-class ColorPickerDialog extends AlertDialog {
+public class ColorPickerDialog extends AlertDialog {
 
     private ColorPicker colorPickerView;
     private final OnColorSelectedListener onColorSelectedListener;
 
-    ColorPickerDialog(Context context, int initialColor, OnColorSelectedListener onColorSelectedListener) {
+    public ColorPickerDialog(Context context, int initialColor, OnColorSelectedListener onColorSelectedListener) {
         super(context);
 
         this.onColorSelectedListener = onColorSelectedListener;

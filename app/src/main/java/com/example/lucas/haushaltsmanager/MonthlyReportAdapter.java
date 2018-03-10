@@ -1,7 +1,6 @@
 package com.example.lucas.haushaltsmanager;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,14 +8,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.text.DateFormatSymbols;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.List;
 
-class MonthlyReportAdapter extends ArrayAdapter<MonthlyReport> implements View.OnClickListener {
+public class MonthlyReportAdapter extends ArrayAdapter<MonthlyReport> implements View.OnClickListener {
 
     private String TAG = MonthlyReportAdapter.class.getSimpleName();
 
@@ -32,7 +28,7 @@ class MonthlyReportAdapter extends ArrayAdapter<MonthlyReport> implements View.O
         PieChartView pieChart;
     }
 
-    MonthlyReportAdapter(List<MonthlyReport> data, Context context) {
+    public MonthlyReportAdapter(List<MonthlyReport> data, Context context) {
 
         super(context, R.layout.monthly_overview_item_v2, data);
     }

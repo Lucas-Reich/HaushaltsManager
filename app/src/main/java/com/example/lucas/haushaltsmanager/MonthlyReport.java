@@ -2,16 +2,18 @@ package com.example.lucas.haushaltsmanager;
 
 import android.support.annotation.NonNull;
 
+import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
-class MonthlyReport {
+public class MonthlyReport {
 
     private String month;
     private List<ExpenseObject> expenses;
     private String currency;
 
-    MonthlyReport(@NonNull String month,@NonNull ArrayList<ExpenseObject> expenses,@NonNull String currency) {
+    public MonthlyReport(@NonNull String month,@NonNull ArrayList<ExpenseObject> expenses,@NonNull String currency) {
 
         this.month = month;
         this.expenses = expenses;
@@ -74,7 +76,7 @@ class MonthlyReport {
      *
      * @return Anzahl an Buchungen
      */
-    int countBookings() {
+    public int countBookings() {
 
         return expenses.size();
     }
@@ -84,7 +86,7 @@ class MonthlyReport {
      *
      * @return Einnahmen des Monats
      */
-    double countIncomingMoney() {
+    public double countIncomingMoney() {
 
         double incomingMoney = 0;
 
@@ -104,7 +106,7 @@ class MonthlyReport {
      *
      * @return Ausgaben des Monats
      */
-    double countOutgoingMoney() {
+    public double countOutgoingMoney() {
 
         double outgoingMoney = 0;
 
@@ -124,7 +126,7 @@ class MonthlyReport {
      *
      * @return Ausgaben total
      */
-    double calcMonthlyTotal() {
+    public double calcMonthlyTotal() {
 
         return (countIncomingMoney() - countOutgoingMoney());
     }
@@ -134,7 +136,7 @@ class MonthlyReport {
      *
      * @return Kategorie mit den meisten Ausgaben
      */
-    String getMostStressedCategory() {
+    public String getMostStressedCategory() {
 
         MonthlyExpenses mostStressedCategory = new MonthlyExpenses("Keine Ausgaben", 0);
 

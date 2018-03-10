@@ -14,7 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivityTab"
+            android:name=".Activities.MainTab.TabParentActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -24,56 +24,56 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ExpenseScreen"
+            android:name=".Activities.ExpenseScreenActivity"
             android:label="HaushaltsManager"
-            android:parentActivityName=".MainActivityTab"/>
+            android:parentActivityName=".Activities.MainTab.TabParentActivity"/>
         <activity
-            android:name=".Categories"
+            android:name=".Activities.ShowCategoriesActivity"
             android:label="Categories"
-            android:parentActivityName=".MainActivityTab"/>
+            android:parentActivityName=".Activities.MainTab.TabParentActivity"/>
         <activity
             android:name=".BookingTemplates"
             android:label="BookingTemplate"
-            android:parentActivityName=".MainActivityTab"/>
+            android:parentActivityName=".Activities.MainTab.TabParentActivity"/>
         <activity
-            android:name=".RecurringBookings"
+            android:name=".Activities.RecurringBookingsActivity"
             android:label="RecurringBookings"
-            android:parentActivityName=".MainActivityTab"/>
+            android:parentActivityName=".Activities.MainTab.TabParentActivity"/>
         <activity
-            android:name=".CreateNewAccountActivity"
+            android:name=".Activities.CreateNewAccountActivity"
             android:label="CreateNewAccount"
-            android:parentActivityName=".MainActivityTab"/>
+            android:parentActivityName=".Activities.MainTab.TabParentActivity"/>
         <activity
-            android:name=".CreateNewCategoryActivity"
+            android:name=".Activities.CreateNewCategoryActivity"
             android:label="CreateNewCategory"
-            android:parentActivityName=".MainActivityTab"/>
+            android:parentActivityName=".Activities.MainTab.TabParentActivity"/>
         <activity
             android:name=".TestPieChart"
             android:label="TestPieChart"
-            android:parentActivityName=".MainActivityTab"/>
+            android:parentActivityName=".Activities.MainTab.TabParentActivity"/>
         <activity
-            android:name=".ImportExportActivity"
+            android:name=".Activities.ImportExportActivity"
             android:label="ExportImportActivity"
-            android:parentActivityName=".MainActivityTab"/>
+            android:parentActivityName=".Activities.MainTab.TabParentActivity"/>
         <activity
-            android:name=".CreateBackupActivity"
+            android:name=".Activities.CreateBackupActivity"
             android:label="CreateBackupActivity"
-            android:parentActivityName=".MainActivityTab"/>
+            android:parentActivityName=".Activities.MainTab.TabParentActivity"/>
 
         <receiver
             android:name=".MyAlarmReceiver"
             android:process=":remote"/>
 
         <service
-            android:name=".ExchangeRateService"
+            android:name=".Services.ExchangeRateService"
             android:exported="false"
             android:label="ExchangeRateService"/>
         <service
-            android:name=".ExchangeService"
+            android:name=".Services.ExchangeService"
             android:exported="false"
             android:label="ExchangeService"/>
         <service
-            android:name=".BackupService"
+            android:name=".Services.BackupService"
             android:exported="false"
             android:label="BackupService"
             android:permission="android.permission.BIND_JOB_SERVICE"/>

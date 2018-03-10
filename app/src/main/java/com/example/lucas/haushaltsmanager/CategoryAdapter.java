@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.example.lucas.haushaltsmanager.Entities.Category;
+
 import java.util.ArrayList;
 
 public class CategoryAdapter extends ArrayAdapter<Category> implements View.OnClickListener {
@@ -18,7 +20,7 @@ public class CategoryAdapter extends ArrayAdapter<Category> implements View.OnCl
         TextView txtCategoryName;
     }
 
-    CategoryAdapter(ArrayList<Category> data, Context context) {
+    public CategoryAdapter(ArrayList<Category> data, Context context) {
         super(context, R.layout.category_item, data);
     }
 
@@ -54,6 +56,4 @@ public class CategoryAdapter extends ArrayAdapter<Category> implements View.OnCl
 
         return convertView;
     }
-
-
 }
