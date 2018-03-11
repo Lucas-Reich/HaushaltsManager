@@ -49,7 +49,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
                     android:layout_weight="1"
-                    android:text="@string/expense_screen_amount"
+                    android:hint="@string/placeholder_amount"
                     android:textAlignment="textEnd"
                     android:textColor="@android:color/black"
                     android:textSize="40sp"/>

@@ -28,12 +28,13 @@ import com.example.lucas.haushaltsmanager.Activities.CreateBackupActivity;
 import com.example.lucas.haushaltsmanager.Activities.ImportExportActivity;
 import com.example.lucas.haushaltsmanager.Activities.RecurringBookingsActivity;
 import com.example.lucas.haushaltsmanager.Activities.ShowCategoriesActivity;
+import com.example.lucas.haushaltsmanager.Activities.TransferActivity;
 import com.example.lucas.haushaltsmanager.BookingTemplates;
 import com.example.lucas.haushaltsmanager.Dialogs.ChangeAccounts.ChooseAccountsDialogFragment;
 import com.example.lucas.haushaltsmanager.MyAlarmReceiver;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Services.ExchangeRateService;
-import com.example.lucas.haushaltsmanager.TestPieChart;
+import com.example.lucas.haushaltsmanager.Activities.TestPieChart;
 
 public class TabParentActivity extends AppCompatActivity implements ChooseAccountsDialogFragment.OnSelectedAccount {
 
@@ -128,6 +129,9 @@ public class TabParentActivity extends AppCompatActivity implements ChooseAccoun
                         TabParentActivity.this.startActivity(recurringBookingIntent);
                         break;
                     case R.id.transfers:
+
+                        Intent transferIntent = new Intent(TabParentActivity.this, TransferActivity.class);
+                        TabParentActivity.this.startActivity(transferIntent);
                         break;
                     case R.id.backup:
 

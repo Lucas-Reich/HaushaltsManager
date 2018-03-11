@@ -15,8 +15,8 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.example.lucas.haushaltsmanager.BasicTextInputDialog;
-import com.example.lucas.haushaltsmanager.Dialogs.DirectoryPickerDialogFragment;
+import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
+import com.example.lucas.haushaltsmanager.Dialogs.DirectoryPickerDialog;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Services.BackupService;
 
@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CreateBackupActivity extends AppCompatActivity implements DirectoryPickerDialogFragment.OnDirectorySelected, BasicTextInputDialog.BasicDialogCommunicator {
+public class CreateBackupActivity extends AppCompatActivity implements DirectoryPickerDialog.OnDirectorySelected, BasicTextInputDialog.BasicDialogCommunicator {
 
     String TAG = CreateBackupActivity.class.getSimpleName();
 
@@ -71,7 +71,7 @@ public class CreateBackupActivity extends AppCompatActivity implements Directory
                 Bundle bundle = new Bundle();
                 bundle.putString("title", getResources().getString(R.string.choose_directory));
 
-                DirectoryPickerDialogFragment directoryPicker = new DirectoryPickerDialogFragment();
+                DirectoryPickerDialog directoryPicker = new DirectoryPickerDialog();
                 directoryPicker.setArguments(bundle);
                 directoryPicker.show(getFragmentManager(), "choose_directory");
             }
@@ -243,11 +243,11 @@ public class CreateBackupActivity extends AppCompatActivity implements Directory
     }
 
     @Override
-    public void onTextInput(String data, String tag) {
+    public void onTextInput(String textInput, String tag) {
 
         if (tag.equals("create_backup_name")) {
 
-            createBackup(data);
+            createBackup(textInput);
         }
     }
 }

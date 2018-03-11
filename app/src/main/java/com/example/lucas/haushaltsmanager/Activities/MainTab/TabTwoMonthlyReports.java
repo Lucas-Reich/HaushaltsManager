@@ -149,7 +149,7 @@ public class TabTwoMonthlyReports extends Fragment {
 
         for (Account account : mDatabase.getAllAccounts()) {
 
-            if (preferences.getBoolean(account.getAccountName().toLowerCase(), false))
+            if (preferences.getBoolean(account.getName().toLowerCase(), false))
                 mActiveAccounts.add(account.getIndex());
         }
     }

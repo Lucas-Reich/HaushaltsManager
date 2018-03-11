@@ -34,7 +34,7 @@
     <string name="expense_screen_account">account_placeholder</string>
     <string name="expense_screen_template">Buchung als Schablone speichern</string>
     <string name="expense_screen_recurring">Dauerauftrag</string>
-    <string name="expense_screen_amount">0,00</string>
+    <string name="placeholder_amount">0,00</string>
     <string name="btn_cancel">Abbrechen</string>
     <string name="btn_ok">OK</string>
     <string name="expense_pop_up_title">title_placeholder</string>
@@ -42,7 +42,7 @@
     <string name="expense_screen_dsp_notice">Notiz eingeben</string>
     <string name="expense_screen_dsp_tag">Merkmal hinzufügen</string>
     <string name="expense_screen_dsp_title">Titel eingeben</string>
-    <string name="expense_screen_dsp_account">Konto Auswählen</string>
+    <string name="input_account">Wählen Sie ein Konto aus</string>
     <string name="expense_screen_error_create">Fehler beim erstellen der Buchung. Gib mindestens einen Betrag, einen Titel und eine Kategorie an!</string>
     <string name="tab_one_title">Ausgaben</string>
     <string name="tab_three_title">Berichte</string>
@@ -55,7 +55,7 @@
     <string name="choose_account">Deine Konten</string>
     <string name="account">Konten</string>
     <string name="btn_new_acc">Neues Konto</string>
-    <string name="no_name">(Unnamed)</string>
+    <string name="no_name">(Unbenannt)</string>
     <string name="category_name">Geben Sie einen Namen ein</string>
     <string name="choose_category_color">Wählen Sie eine Farbe aus</string>
     <string name="create_booking">Erstelle Buchung</string>
@@ -65,4 +65,26 @@
     <string name="outgoing">Ausgehend</string>
     <string name="update_booking">Update</string>
     <string name="add_child_to_booking">Erstelle Kind Buchung</string>
+    <string name="choose_currency">Wähle die Währung des Kontos</string>
+    <string name="create_new_account_name">Kontoname</string>
+    <string name="create_new_account_starting_balance">Eröffnungsbetrag</string>
+    <string name="create_new_account_create">Erstelle Konto</string>
+    <string name="import_title">Import</string>
+    <string name="export_title">Export</string>
+    <string name="error">Fehler</string>
+    <string name="file_already_existing_err_msg">Dateiname bereits vorhanden!</string>
+    <string name="overwrite_existing_file">Erstelle Datei trotzdem</string>
+    <string name="abort_file_writing">Datei nicht erstellen</string>
+    <string name="choose_new_file_name">Gebe einen Dateinamen ein</string>
+    <string name="input_file_name">Gebe einen Dateinamen ein</string>
+    <string name="btn_create">Erstelle</string>
+    <string name="choose_directory">Wähle Pfad aus</string>
+    <string name="restoreBackup">Stelle Backup wieder her</string>
+    <string name="restore_backup_confirmation">Bist du dir sicher, dass du dieses Backup wiederherstellen möchtest? Alle Änderungen seit dem gehen verloren</string>
+    <string name="select_end_date">Bis</string>
+    <string name="btn_set">Erstelle</string>
+    <string name="created_backup">Backup erfolgreich erstellt</string>
+    <string name="creating_backup">Erstelle Backup</string>
+    <string name="choose_new_backup_name">Backup name</string>
+    <string name="input_date">Geben Sie eine Datum ein</string>
 </resources>

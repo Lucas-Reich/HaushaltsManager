@@ -14,7 +14,7 @@ import android.widget.Button;
 import android.widget.Spinner;
 
 import com.example.lucas.haushaltsmanager.Activities.MainTab.TabParentActivity;
-import com.example.lucas.haushaltsmanager.BasicTextInputDialog;
+import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
@@ -52,7 +52,7 @@ public class CreateNewAccountActivity extends AppCompatActivity implements OnIte
             public void onClick(View v) {
 
                 Bundle args = new Bundle();
-                args.putString("title", "Set Account name");
+                args.putString("title", "Set Account getName");
 
                 DialogFragment basicDialog = new BasicTextInputDialog();
                 basicDialog.setArguments(args);
@@ -82,7 +82,7 @@ public class CreateNewAccountActivity extends AppCompatActivity implements OnIte
                 SharedPreferences settings = getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = settings.edit();
 
-                editor.putBoolean(account.getAccountName(), true);
+                editor.putBoolean(account.getName(), true);
                 editor.apply();
 
                 database.createAccount(account);
@@ -124,20 +124,20 @@ public class CreateNewAccountActivity extends AppCompatActivity implements OnIte
     }
 
     @Override
-    public void onTextInput(String data, String tag) {
+    public void onTextInput(String textInput, String tag) {
 
         if (tag.equals("accountName")) {
 
-            account.setAccountName(data);
+            account.setAccountName(textInput);
 
             accountName = (Button) findViewById(R.id.new_account_name);
-            accountName.setText(data);
+            accountName.setText(textInput);
         } else {
 
-            account.setBalance(Integer.parseInt(data));
+            account.setBalance(Integer.parseInt(textInput));
 
             accountBalance = (Button) findViewById(R.id.new_account_balance);
-            accountBalance.setText(data);
+            accountBalance.setText(textInput);
         }
     }
 }

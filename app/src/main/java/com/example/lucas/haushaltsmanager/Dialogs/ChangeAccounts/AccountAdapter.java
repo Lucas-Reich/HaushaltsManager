@@ -53,7 +53,7 @@ public class AccountAdapter extends ArrayAdapter<Account> {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        viewHolder.account_chk.setText(String.format("   %s", account.getAccountName()));
+        viewHolder.account_chk.setText(String.format("   %s", account.getName()));
         viewHolder.account_chk.setChecked(mCheckedItems.get(position));
         viewHolder.overflow_menu.setOnClickListener(new OnAccountOverflowSelectedListener(getContext(), account));
 

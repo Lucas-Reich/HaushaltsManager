@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager;
+package com.example.lucas.haushaltsmanager.CustomViews;
 
 import android.content.Context;
 import android.graphics.Canvas;

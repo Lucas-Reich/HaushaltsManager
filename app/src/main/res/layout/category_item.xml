@@ -5,7 +5,7 @@
               android:layout_height="wrap_content"
     >
 
-    <com.example.lucas.haushaltsmanager.CircularTextView
+    <com.example.lucas.haushaltsmanager.CustomViews.CircularTextView
         android:id="@+id/category_item_circ_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

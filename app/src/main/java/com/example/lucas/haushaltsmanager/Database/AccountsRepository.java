@@ -82,11 +82,11 @@ public class AccountsRepository {
             throw new RuntimeException("Cannot create account with dummy Currency object!");
 
         ContentValues values = new ContentValues();
-        values.put(ExpensesDbHelper.ACCOUNTS_COL_NAME, account.getAccountName());
+        values.put(ExpensesDbHelper.ACCOUNTS_COL_NAME, account.getName());
         values.put(ExpensesDbHelper.ACCOUNTS_COL_BALANCE, account.getBalance());
         values.put(ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID, account.getCurrency().getIndex());
 
-        Log.d(TAG, "Creating account: " + account.getAccountName());
+        Log.d(TAG, "Creating account: " + account.getName());
         return database.insert(ExpensesDbHelper.TABLE_ACCOUNTS, null, values);
     }
 
@@ -121,9 +121,9 @@ public class AccountsRepository {
     }
 
     /**
-     * Method for getting an account by its name
+     * Method for getting an account by its getName
      *
-     * @param accountName name of account
+     * @param accountName getName of account
      * @return account object if available else null
      */
     @Nullable

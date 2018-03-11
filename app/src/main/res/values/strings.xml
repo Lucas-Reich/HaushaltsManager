@@ -34,7 +34,7 @@
     <string name="expense_screen_notice">Input notice</string>
     <string name="expense_screen_date">date_placeholder</string>
     <string name="expense_screen_account">account_placeholder</string>
-    <string name="expense_screen_amount">0.00</string>
+    <string name="placeholder_amount">0.00</string>
     <string name="expense_screen_amount_currency">$</string>
     <string name="expense_screen_template">Create a new template</string>
     <string name="expense_screen_recurring">Recurring</string>
@@ -49,7 +49,7 @@
     <string name="expense_screen_dsp_category">Choose Category</string>
     <string name="expense_screen_dsp_title">Input Title</string>
     <string name="expense_screen_dsp_notice">Input Notice</string>
-    <string name="expense_screen_dsp_account">Choose Account</string>
+    <string name="input_account">Choose Account</string>
 
     <string name="expense_screen_error_create">Error while creating the expense. Create at least a Title, Amount and a Category!</string>
 
@@ -74,11 +74,6 @@
     <string name="create_new_account_name">Accountname</string>
     <string name="create_new_account_starting_balance">Start balance</string>
     <string name="create_new_account_create">Create Account</string>
-    <string name="title_activity_export_import2">ExportImportActivity2</string>
-    <string name="tab_text_1">Tab 1</string>
-    <string name="tab_text_2">Tab 2</string>
-    <string name="tab_text_3">Tab 3</string>
-    <string name="section_format">Hello World from section: %1$d</string>
     <string name="import_title">Import</string>
     <string name="export_title">Export</string>
     <string name="error">Error</string>
@@ -94,4 +89,7 @@
     <string name="choose_new_backup_name">Backup name</string>
     <string name="creating_backup">Creating Backup</string>
     <string name="created_backup">Successfully created Backup</string>
+    <string name="btn_set">set</string>
+    <string name="select_end_date">Until</string>
+    <string name="input_date">Input Date</string>
 </resources>

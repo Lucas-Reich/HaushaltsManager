@@ -19,15 +19,23 @@ import android.widget.TextView;
 import com.example.lucas.haushaltsmanager.Activities.ExpenseScreenActivity;
 import com.example.lucas.haushaltsmanager.R;
 
-public class PriceInputDialogFragment extends DialogFragment {
+public class PriceInputDialog extends DialogFragment {
 
     private Context mContext;
+    private OnPriceSelected mCallback;
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        mContext = context;
+        try {
+
+            mCallback = (OnPriceSelected) context;
+            mContext = context;
+        } catch (ClassCastException e) {
+
+            throw new ClassCastException(context.toString() + " must implement OnPriceSelected!");
+        }
     }
 
     @Override
@@ -42,39 +50,27 @@ public class PriceInputDialogFragment extends DialogFragment {
 
         final Bundle args = getArguments();
         final Activity activity = getActivity();
-        final ExpenseScreenActivity expenseScreen = (ExpenseScreenActivity) getActivity();
         final EditText input = new EditText(mContext);
         input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 
-        builder.setTitle(args.getDouble("original_title") + "");
+        builder.setTitle(args.getString("title"));
 
         builder.setView(input);
 
         builder.setPositiveButton(R.string.btn_ok, new DialogInterface.OnClickListener() {
+
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                TextView txtView = (TextView) activity.findViewById(args.getInt("button_id"));
+                mCallback.onPriceSelected(Double.parseDouble(input.getText().toString()), getTag());
 
-                if (input.getText().toString().length() != 0) {
-
-                    expenseScreen.mExpense.setPrice(Double.parseDouble(input.getText().toString()));
-                    Log.d("PriceInput", "set price to " + expenseScreen.mExpense.getUnsignedPrice());
-                    txtView.setText(String.format("%s", expenseScreen.mExpense.getUnsignedPrice()));
-                    txtView.setTextColor(Color.BLACK);
-                } else {
-
-                    expenseScreen.mExpense.setPrice(0.0);
-                    Log.d("PriceInput", "set price to " + expenseScreen.mExpense.getUnsignedPrice());
-                    txtView.setText(String.format("%s", args.getDouble("original_title")));
-                    txtView.setTextColor(Color.DKGRAY);
-                }
             }
         });
 
         builder.setNegativeButton(R.string.btn_cancel, new DialogInterface.OnClickListener() {
+
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
@@ -84,26 +80,13 @@ public class PriceInputDialogFragment extends DialogFragment {
 
         //when user clicks ok on keyboard input gets send to activity
         input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 
                 if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || actionId == EditorInfo.IME_ACTION_DONE) {
 
-                    TextView txtView = (TextView) activity.findViewById(args.getInt("button_id"));
-
-                    if (input.getText().toString().length() != 0) {
-
-                        expenseScreen.mExpense.setPrice(Double.parseDouble(input.getText().toString()));
-                        Log.d("PriceInput", "set price to " + expenseScreen.mExpense.getUnsignedPrice());
-                        txtView.setText(String.format("%s", expenseScreen.mExpense.getUnsignedPrice()));
-                        txtView.setTextColor(Color.BLACK);
-                    } else {
-
-                        expenseScreen.mExpense.setPrice(0.0);
-                        Log.d("PriceInput", "set price to " + expenseScreen.mExpense.getUnsignedPrice());
-                        txtView.setText(String.format("%s", args.getDouble("original_title")));
-                        txtView.setTextColor(Color.DKGRAY);
-                    }
+                    mCallback.onPriceSelected(Double.parseDouble(input.getText().toString()), getTag());
                     dismiss();
                     return false;
                 }
@@ -114,5 +97,9 @@ public class PriceInputDialogFragment extends DialogFragment {
 
 
         return builder.create();
+    }
+
+    public interface OnPriceSelected {
+        void onPriceSelected(double price, String tag);
     }
 }

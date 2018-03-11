@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager;
+package com.example.lucas.haushaltsmanager.CustomViews;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
@@ -18,6 +18,8 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
+
+import com.example.lucas.haushaltsmanager.R;
 
 import java.util.ArrayList;
 import java.util.Arrays;

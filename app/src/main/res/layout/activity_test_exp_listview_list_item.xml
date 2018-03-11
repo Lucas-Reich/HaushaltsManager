@@ -11,7 +11,7 @@
         android:paddingLeft="?android:attr/expandableListPreferredChildPaddingLeft"
         android:paddingStart="?android:attr/expandableListPreferredChildPaddingLeft">
 
-        <com.example.lucas.haushaltsmanager.CircularTextView
+        <com.example.lucas.haushaltsmanager.CustomViews.CircularTextView
             android:id="@+id/exp_listview_item_circle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

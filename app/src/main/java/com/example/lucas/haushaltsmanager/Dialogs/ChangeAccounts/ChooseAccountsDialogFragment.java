@@ -68,7 +68,7 @@ public class ChooseAccountsDialogFragment extends DialogFragment {
         mAccounts = mDatabase.getAllAccounts();
         for (Account account : mAccounts) {
 
-            mCheckedAccounts.add(mSettings.getBoolean(account.getAccountName(), false));
+            mCheckedAccounts.add(mSettings.getBoolean(account.getName(), false));
         }
     }
 
@@ -150,7 +150,7 @@ public class ChooseAccountsDialogFragment extends DialogFragment {
                 accountChk.setChecked(true);
             }
 
-            mSettingsEditor.putBoolean(mAccounts.get(position).getAccountName(), mCheckedAccounts.get(position));
+            mSettingsEditor.putBoolean(mAccounts.get(position).getName(), mCheckedAccounts.get(position));
             mCallback.onAccountSelected(mAccounts.get(position).getIndex(), mCheckedAccounts.get(position));
         }
     };

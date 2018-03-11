@@ -9,6 +9,7 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.lucas.haushaltsmanager.CustomViews.CircularTextView;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 
 import java.util.ArrayList;

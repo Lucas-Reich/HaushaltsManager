@@ -48,7 +48,7 @@
             android:label="CreateNewCategory"
             android:parentActivityName=".Activities.MainTab.TabParentActivity"/>
         <activity
-            android:name=".TestPieChart"
+            android:name=".Activities.TestPieChart"
             android:label="TestPieChart"
             android:parentActivityName=".Activities.MainTab.TabParentActivity"/>
         <activity
@@ -59,6 +59,9 @@
             android:name=".Activities.CreateBackupActivity"
             android:label="CreateBackupActivity"
             android:parentActivityName=".Activities.MainTab.TabParentActivity"/>
+        <activity
+            android:name=".Activities.TransferActivity"
+            android:label="TransfersActivity"/>
 
         <receiver
             android:name=".MyAlarmReceiver"

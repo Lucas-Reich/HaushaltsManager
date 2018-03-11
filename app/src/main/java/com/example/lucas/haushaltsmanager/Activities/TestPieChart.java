@@ -1,8 +1,11 @@
-package com.example.lucas.haushaltsmanager;
+package com.example.lucas.haushaltsmanager.Activities;
 
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+
+import com.example.lucas.haushaltsmanager.CustomViews.PieChartView;
+import com.example.lucas.haushaltsmanager.R;
 
 public class TestPieChart extends AppCompatActivity {
 

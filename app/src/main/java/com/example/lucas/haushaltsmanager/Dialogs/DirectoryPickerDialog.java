@@ -17,9 +17,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DirectoryPickerDialogFragment extends DialogFragment {
+public class DirectoryPickerDialog extends DialogFragment {
 
-    private String TAG = DirectoryPickerDialogFragment.class.getSimpleName();
+    private String TAG = DirectoryPickerDialog.class.getSimpleName();
 
     OnDirectorySelected mCallback;
     String mDialogTitle;

@@ -1,12 +1,14 @@
 // color picker from: https://github.com/chiralcode/Android-Color-Picker
 
-package com.example.lucas.haushaltsmanager;
+package com.example.lucas.haushaltsmanager.Dialogs;
 
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
+
+import com.example.lucas.haushaltsmanager.CustomViews.ColorPicker;
 
 public class ColorPickerDialog extends AlertDialog {
 

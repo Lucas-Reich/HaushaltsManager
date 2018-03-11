@@ -98,7 +98,7 @@ public class ExpensesDataSource {
         expense.setTags(getTagsToBooking(expenseId));
 */
 
-        return new ExpenseObject(expenseId, title, price, expenditure, date, category, notice, account, expenseCurrency);
+        return new ExpenseObject(expenseId, title, price, date, expenditure, category, notice, account, expenseCurrency, ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE);
     }
 
     /**
@@ -153,7 +153,7 @@ public class ExpensesDataSource {
         expense.setTags(getTagsToBooking(expenseId));
 */
 
-        ExpenseObject expense = new ExpenseObject(expenseId, title, price, expenditure, date, category, notice, account, expenseCurrency);
+        ExpenseObject expense = new ExpenseObject(expenseId, title, price, date, expenditure, category, notice, account, expenseCurrency, ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE);
 
         boolean isParent = c.getInt(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_IS_PARENT)) == 1;
         if (isParent) {
@@ -270,11 +270,11 @@ public class ExpensesDataSource {
             throw new RuntimeException("Cannot create account with dummy Currency object!");
 
         ContentValues values = new ContentValues();
-        values.put(ExpensesDbHelper.ACCOUNTS_COL_NAME, account.getAccountName());
+        values.put(ExpensesDbHelper.ACCOUNTS_COL_NAME, account.getName());
         values.put(ExpensesDbHelper.ACCOUNTS_COL_BALANCE, account.getBalance());
         values.put(ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID, account.getCurrency().getIndex());
 
-        Log.d(TAG, "Creating account: " + account.getAccountName());
+        Log.d(TAG, "Creating account: " + account.getName());
         return database.insert(ExpensesDbHelper.TABLE_ACCOUNTS, null, values);
     }
 
@@ -309,9 +309,9 @@ public class ExpensesDataSource {
     }
 
     /**
-     * Method for getting an account by its name
+     * Method for getting an account by its getName
      *
-     * @param accountName name of account
+     * @param accountName getName of account
      * @return account object if available else null
      */
     @Nullable
@@ -438,7 +438,7 @@ public class ExpensesDataSource {
     /**
      * Convenience Method for creating a new Tag
      *
-     * @param tagName name of the tag which should be created
+     * @param tagName getName of the tag which should be created
      * @return the id of the created tag. -1 if the insertion failed
      */
     public long createTag(String tagName) {
@@ -1050,7 +1050,7 @@ public class ExpensesDataSource {
     }
 
     /**
-     * Convenience Method for getting a Category by its name
+     * Convenience Method for getting a Category by its getName
      *
      * @param category Name of the CATEGORY
      * @return Returns an Category object
@@ -1102,7 +1102,7 @@ public class ExpensesDataSource {
      * Convenience Method for updating a Categories color
      *
      * @param categoryId   Id of the Category which should be changed
-     * @param categoryName new name of the CATEGORY
+     * @param categoryName new getName of the CATEGORY
      * @return The id of the affected row
      */
     public int updateCategoryName(long categoryId, String categoryName) {
@@ -1404,8 +1404,8 @@ public class ExpensesDataSource {
     /**
      * Method for creating a new exchange rate based on currency objects
      *
-     * @param fromCur    name of first currency
-     * @param toCur      name of second currency
+     * @param fromCur    getName of first currency
+     * @param toCur      getName of second currency
      * @param rate       exchange rate from currency one to currency two
      * @param serverDate fetching date
      * @return state of operation

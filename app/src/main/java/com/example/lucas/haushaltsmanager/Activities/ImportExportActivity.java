@@ -11,10 +11,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 
-import com.example.lucas.haushaltsmanager.BasicTextInputDialog;
+import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
-import com.example.lucas.haushaltsmanager.Dialogs.AccountPickerDialogFragment;
-import com.example.lucas.haushaltsmanager.Dialogs.DirectoryPickerDialogFragment;
+import com.example.lucas.haushaltsmanager.Dialogs.AccountPickerDialog;
+import com.example.lucas.haushaltsmanager.Dialogs.DirectoryPickerDialog;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.R;
@@ -25,7 +25,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class ImportExportActivity extends AppCompatActivity implements AccountPickerDialogFragment.OnAccountSelected, BasicTextInputDialog.BasicDialogCommunicator, DirectoryPickerDialogFragment.OnDirectorySelected {
+public class ImportExportActivity extends AppCompatActivity implements AccountPickerDialog.OnAccountSelected, BasicTextInputDialog.BasicDialogCommunicator, DirectoryPickerDialog.OnDirectorySelected {
 
     String TAG = ImportExportActivity.class.getSimpleName();
 
@@ -85,7 +85,7 @@ public class ImportExportActivity extends AppCompatActivity implements AccountPi
                 mBundle.clear();
                 mBundle.putString("title", getResources().getString(R.string.choose_account));
 
-                AccountPickerDialogFragment accountPicker = new AccountPickerDialogFragment();
+                AccountPickerDialog accountPicker = new AccountPickerDialog();
                 accountPicker.setArguments(mBundle);
                 accountPicker.show(getFragmentManager(), "choose_account");
             }
@@ -114,7 +114,7 @@ public class ImportExportActivity extends AppCompatActivity implements AccountPi
                 mBundle.clear();
                 mBundle.putString("title", getResources().getString(R.string.choose_directory));
 
-                DirectoryPickerDialogFragment directoryPicker = new DirectoryPickerDialogFragment();
+                DirectoryPickerDialog directoryPicker = new DirectoryPickerDialog();
                 directoryPicker.setArguments(mBundle);
                 directoryPicker.show(getFragmentManager(), "choose_export_directory");
             }
@@ -137,7 +137,7 @@ public class ImportExportActivity extends AppCompatActivity implements AccountPi
                 mBundle.clear();
                 mBundle.putString("title", getResources().getString(R.string.choose_directory));
 
-                DirectoryPickerDialogFragment importFilePicker = new DirectoryPickerDialogFragment();
+                DirectoryPickerDialog importFilePicker = new DirectoryPickerDialog();
                 importFilePicker.setArguments(mBundle);
                 importFilePicker.show(getFragmentManager(), "choose_import_directory");
             }
@@ -357,7 +357,7 @@ public class ImportExportActivity extends AppCompatActivity implements AccountPi
         expenseString.append(expense.getCategory().getColor()).append(",");
         expenseString.append(expense.getCategory().getDefaultExpenseType()).append(",");
         expenseString.append(expense.getAccount().getIndex()).append(",");
-        expenseString.append(expense.getAccount().getAccountName()).append(",");
+        expenseString.append(expense.getAccount().getName()).append(",");
         expenseString.append(expense.getAccount().getBalance()).append(",");
         expenseString.append(expense.getExpenseCurrency().getIndex()).append(",");
         expenseString.append(expense.getExpenseCurrency().getCurrencyName()).append(",");
@@ -387,18 +387,18 @@ public class ImportExportActivity extends AppCompatActivity implements AccountPi
         if (tag.equals("choose_account")) {
 
             mChosenAccount = account;
-            mAccountBtn.setText(mChosenAccount.getAccountName());
+            mAccountBtn.setText(mChosenAccount.getName());
         }
     }
 
     @Override
-    public void onTextInput(String fileName, String tag) {
+    public void onTextInput(String textInput, String tag) {
 
         if (tag.equals("choose_file_name")) {
 
-            if (isFileNameValid(fileName)) {
+            if (isFileNameValid(textInput)) {
 
-                mFileName = fileName;
+                mFileName = textInput;
                 mFileNameBtn.setText(mFileName);
             } else {
 

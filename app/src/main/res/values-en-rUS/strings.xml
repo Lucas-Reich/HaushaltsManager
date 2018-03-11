@@ -29,7 +29,7 @@
     <string name="expense_screen_account">account_placeholder</string>
     <string name="expense_screen_template">Save booking as template</string>
     <string name="expense_screen_recurring">Recurring</string>
-    <string name="expense_screen_amount">0.00</string>
+    <string name="placeholder_amount">0.00</string>
     <string name="btn_cancel">Cancel</string>
     <string name="btn_ok">OK</string>
     <string name="expense_pop_up_title">title_placeholder</string>
@@ -37,7 +37,7 @@
     <string name="expense_screen_dsp_notice">Input Notice</string>
     <string name="expense_screen_dsp_tag">Add Tag</string>
     <string name="expense_screen_dsp_title">Add Title</string>
-    <string name="expense_screen_dsp_account">Choose Account</string>
+    <string name="input_account">Choose Account</string>
     <string name="expense_screen_error_create">Error while creating the expense. Create at least a Title, Amount and a Category!</string>
     <string name="tab_one_title">Bookings</string>
     <string name="tab_three_title">Report</string>
@@ -79,4 +79,7 @@
     <string name="choose_new_backup_name">Backup name</string>
     <string name="creating_backup">Creating Backup</string>
     <string name="created_backup">Successfully created Backup</string>
+    <string name="btn_set">set</string>
+    <string name="select_end_date">Until</string>
+    <string name="input_date">Input Date</string>
 </resources>

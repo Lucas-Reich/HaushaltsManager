@@ -79,7 +79,7 @@ public class Account implements Parcelable {
     }
 
     @NonNull
-    public String getAccountName() {
+    public String getName() {
 
         return accountName;
     }

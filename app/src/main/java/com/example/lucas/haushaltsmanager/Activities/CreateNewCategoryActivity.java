@@ -10,8 +10,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RadioGroup;
 
-import com.example.lucas.haushaltsmanager.BasicTextInputDialog;
-import com.example.lucas.haushaltsmanager.ColorPickerDialog;
+import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
+import com.example.lucas.haushaltsmanager.Dialogs.ColorPickerDialog;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.R;
@@ -103,11 +103,11 @@ public class CreateNewCategoryActivity extends AppCompatActivity implements Basi
     }
 
     @Override
-    public void onTextInput(String data, String tag) {
+    public void onTextInput(String textInput, String tag) {
 
-        CATEGORY.setCategoryName(data);
-        categoryNameBtn.setText(data);
+        CATEGORY.setCategoryName(textInput);
+        categoryNameBtn.setText(textInput);
 
-        Log.d(TAG, "set CATEGORY name to: " + data);
+        Log.d(TAG, "set CATEGORY getName to: " + textInput);
     }
 }

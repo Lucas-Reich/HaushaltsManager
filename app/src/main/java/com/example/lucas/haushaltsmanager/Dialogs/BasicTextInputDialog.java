@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager;
+package com.example.lucas.haushaltsmanager.Dialogs;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.view.WindowManager;
 import android.widget.EditText;
+
+import com.example.lucas.haushaltsmanager.R;
 
 public class BasicTextInputDialog extends DialogFragment {
 
@@ -76,6 +78,6 @@ public class BasicTextInputDialog extends DialogFragment {
 
     public interface BasicDialogCommunicator {
 
-        void onTextInput(String data, String tag);
+        void onTextInput(String textInput, String tag);
     }
 }

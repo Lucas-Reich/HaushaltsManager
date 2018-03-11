@@ -301,7 +301,7 @@ public class TabOneBookings extends Fragment {
 
         for (Account account : mDatabase.getAllAccounts()) {
 
-            if (preferences.getBoolean(account.getAccountName(), false))
+            if (preferences.getBoolean(account.getName(), false))
                 mActiveAccounts.add(account.getIndex());
         }
     }
@@ -347,7 +347,7 @@ public class TabOneBookings extends Fragment {
 
                 Account account = new Account(8888, "", 0, Currency.createDummyCurrency(getContext()));
 
-                ExpenseObject dateSeparator = new ExpenseObject(-1, "", 0, mExpenses.get(i).getDateTime(), true, Category.createDummyCategory(getContext()), null, account, null);
+                ExpenseObject dateSeparator = new ExpenseObject(-1, "", 0, mExpenses.get(i).getDateTime(), true, Category.createDummyCategory(getContext()), null, account, null, ExpenseObject.EXPENSE_TYPES.DATE_PLACEHOLDER);
 
                 mListDataHeader.add(dateSeparator);
                 mListDataChild.put(dateSeparator, new ArrayList<ExpenseObject>());

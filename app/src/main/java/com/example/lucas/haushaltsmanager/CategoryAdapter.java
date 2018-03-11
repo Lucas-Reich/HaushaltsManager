@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.example.lucas.haushaltsmanager.CustomViews.CircularTextView;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 
 import java.util.ArrayList;

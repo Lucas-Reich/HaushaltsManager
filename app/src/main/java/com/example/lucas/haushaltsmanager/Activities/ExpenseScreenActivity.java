@@ -24,10 +24,10 @@ import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Activities.MainTab.TabParentActivity;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
-import com.example.lucas.haushaltsmanager.Dialogs.AccountPickerDialogFragment;
-import com.example.lucas.haushaltsmanager.Dialogs.ExpenseInputDialogFragment;
+import com.example.lucas.haushaltsmanager.Dialogs.AccountPickerDialog;
+import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.FrequencyAlertDialog;
-import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialogFragment;
+import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
@@ -38,7 +38,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class ExpenseScreenActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, AccountPickerDialogFragment.OnAccountSelected {
+public class ExpenseScreenActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, AccountPickerDialog.OnAccountSelected, BasicTextInputDialog.BasicDialogCommunicator, PriceInputDialog.OnPriceSelected {
 
     private creationModes CREATION_MODE;
 
@@ -53,12 +53,12 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
 
     public ExpenseObject mExpense;
     private Calendar mCalendar = Calendar.getInstance();
-    private Calendar recurringEndDate = Calendar.getInstance();
+    private Calendar mRecurringEndDate = Calendar.getInstance();
     private boolean mTemplate = false, mRecurring = false;
     public int frequency = 0;
-    Button setDateBtn, accountBtn, saveBtn, categoryTxt, titleTxt, tagTxt, noticeTxt;
-    TextView amountTxt, currencyTxt;
-    RadioGroup expenseType;
+    private Button mDateBtn, mAccountBtn, mSaveBtn, mCategoryBtn, mTitleBtn, mTagBtn, mNoticeBtn;
+    private TextView mAmountTxt, mCurrencyTxt;
+    private RadioGroup mExpenseTypeRadio;
     private ExpenseObject mParentBooking;
 
 
@@ -77,12 +77,12 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
 
         final Bundle bundle = getIntent().getExtras();
 
-        saveBtn = (Button) findViewById(R.id.expense_screen_create_booking);
-        saveBtn.setOnClickListener(createBookingClickListener);
+        mSaveBtn = (Button) findViewById(R.id.expense_screen_create_booking);
+        mSaveBtn.setOnClickListener(createBookingClickListener);
 
         if (bundle != null && bundle.get("parentIndex") != null) {
 
-            saveBtn.setText(getString(R.string.add_child_to_booking));
+            mSaveBtn.setText(getString(R.string.add_child_to_booking));
 
             CREATION_MODE = creationModes.CREATE_CHILD_MODE;
             mParentBooking = mDatabase.getBookingById(bundle.getLong("parentIndex"));
@@ -96,19 +96,19 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
             mExpense.setTag("");
         } else if (bundle != null && bundle.get("childExpense") != null) {
 
-            saveBtn.setText(getString(R.string.update_booking));
+            mSaveBtn.setText(getString(R.string.update_booking));
 
             CREATION_MODE = creationModes.UPDATE_CHILD_MODE;
             mExpense = mDatabase.getChildBookingById(bundle.getLong("childExpense"));
         } else if (bundle != null && bundle.get("parentExpense") != null) {
 
-            saveBtn.setText(getString(R.string.update_booking));
+            mSaveBtn.setText(getString(R.string.update_booking));
 
             CREATION_MODE = creationModes.UPDATE_EXPENSE_MODE;
             mExpense = mDatabase.getBookingById(bundle.getLong("parentExpense"));
         } else {
 
-            saveBtn.setText(getString(R.string.create_booking));
+            mSaveBtn.setText(getString(R.string.create_booking));
 
             CREATION_MODE = creationModes.CREATE_EXPENSE_MODE;
             String title = getResources().getString(R.string.expense_screen_title);
@@ -125,22 +125,22 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
         setSupportActionBar(toolbar);
 
         // set the displayed date to the current one
-        setDateBtn = (Button) findViewById(R.id.expense_screen_date);
-        setDateBtn.setText(mExpense.getDisplayableDateTime(ExpenseScreenActivity.this));
+        mDateBtn = (Button) findViewById(R.id.expense_screen_date);
+        mDateBtn.setText(mExpense.getDisplayableDateTime());
 
 
         // set the account to the current main account
-        accountBtn = (Button) findViewById(R.id.expense_screen_account);
-        accountBtn.setText(mExpense.getAccount().getAccountName());
+        mAccountBtn = (Button) findViewById(R.id.expense_screen_account);
+        mAccountBtn.setText(mExpense.getAccount().getName());
 
         // set the mExpense type
-        expenseType = (RadioGroup) findViewById(R.id.expense_screen_expense_type);
+        mExpenseTypeRadio = (RadioGroup) findViewById(R.id.expense_screen_expense_type);
         if (mExpense.getExpenditure())
-            expenseType.check(R.id.expense_screen_radio_expense);
+            mExpenseTypeRadio.check(R.id.expense_screen_radio_expense);
         else
-            expenseType.check(R.id.expense_screen_radio_income);
+            mExpenseTypeRadio.check(R.id.expense_screen_radio_income);
 
-        expenseType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+        mExpenseTypeRadio.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
 
@@ -157,43 +157,42 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
         });
 
 
-        amountTxt = (TextView) findViewById(R.id.expense_screen_amount);
-        amountTxt.setText(String.format("%s", mExpense.getUnsignedPrice()));
-        amountTxt.setOnClickListener(new View.OnClickListener() {
+        mAmountTxt = (TextView) findViewById(R.id.expense_screen_amount);
+        mAmountTxt.setText(String.format("%s", mExpense.getUnsignedPrice()));
+        mAmountTxt.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
 
                 Bundle bundle = new Bundle();
-                bundle.putDouble("original_title", mExpense.getUnsignedPrice());
-                bundle.putInt("button_id", v.getId());
+                bundle.putString("title", "Input Price");//todo make variable, use mExpense.getPrice()??
 
-                PriceInputDialogFragment priceDialog = new PriceInputDialogFragment();
+                PriceInputDialog priceDialog = new PriceInputDialog();
                 priceDialog.setArguments(bundle);
                 priceDialog.show(getFragmentManager(), "expense_screen_price");
             }
         });
 
         //set account currency symbol
-        currencyTxt = (TextView) findViewById(R.id.expense_screen_amount_currency);
-        currencyTxt.setText(mExpense.getAccount().getCurrency().getCurrencySymbol());
+        mCurrencyTxt = (TextView) findViewById(R.id.expense_screen_amount_currency);
+        mCurrencyTxt.setText(mExpense.getAccount().getCurrency().getCurrencySymbol());
 
         //set display CATEGORY
-        categoryTxt = (Button) findViewById(R.id.expense_screen_category);
-        categoryTxt.setText(mExpense.getCategory().getCategoryName());
+        mCategoryBtn = (Button) findViewById(R.id.expense_screen_category);
+        mCategoryBtn.setText(mExpense.getCategory().getCategoryName());
 
         //set display expense title
-        titleTxt = (Button) findViewById(R.id.expense_screen_title);
-        titleTxt.setText(mExpense.getTitle());
+        mTitleBtn = (Button) findViewById(R.id.expense_screen_title);
+        mTitleBtn.setText(mExpense.getTitle());
 
         //TODO change display tag behaviour from just taking the first tag to displaying all tags
         //set display tag
-        tagTxt = (Button) findViewById(R.id.expense_screen_tag);
-//        tagTxt.setText(mExpense.getTags().get(0));TODO enable
+        mTagBtn = (Button) findViewById(R.id.expense_screen_tag);
+//        mTagBtn.setText(mExpense.getTags().get(0));TODO enable
 
         //set display notice
-        noticeTxt = (Button) findViewById(R.id.expense_screen_notice);
-        noticeTxt.setText(mExpense.getNotice());
+        mNoticeBtn = (Button) findViewById(R.id.expense_screen_notice);
+        mNoticeBtn.setText(mExpense.getNotice());
 
         final CheckBox templateChk = (CheckBox) findViewById(R.id.expense_screen_template);
         templateChk.setOnClickListener(new View.OnClickListener() {
@@ -318,7 +317,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
             if (mRecurring) {//todo noch einmal überarbeiten
 
                 // frequency is saved as duration in hours, mEndDate is saved as Calendar object
-                long index = mDatabase.createRecurringBooking(mExpense.getIndex(), mCalendar, frequency, recurringEndDate);
+                long index = mDatabase.createRecurringBooking(mExpense.getIndex(), mCalendar, frequency, mRecurringEndDate);
                 Log.d(TAG, "created mRecurring booking event at index: " + index);
             }
 
@@ -361,10 +360,10 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
             expenditureDate.set(year, month, dayOfMonth, 0, 0, 0);
 
             mExpense.setDateTime(expenditureDate);
-            Log.d(TAG, "updated date to " + mExpense.getDisplayableDateTime(ExpenseScreenActivity.this));
+            Log.d(TAG, "updated date to " + mExpense.getDisplayableDateTime());
 
             Button btn_date = (Button) findViewById(R.id.expense_screen_date);
-            btn_date.setText(mExpense.getDisplayableDateTime(ExpenseScreenActivity.this));
+            btn_date.setText(mExpense.getDisplayableDateTime());
         }
     };
 
@@ -373,10 +372,10 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
         @Override
         public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
 
-            recurringEndDate.set(year, month, dayOfMonth, 0, 0, 0);
+            mRecurringEndDate.set(year, month, dayOfMonth, 0, 0, 0);
 
             Button recurringEnd = (Button) findViewById(R.id.expense_screen_recurring_end);
-            recurringEnd.setText(DateUtils.formatDateTime(getBaseContext(), recurringEndDate.getTimeInMillis(), DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_NUMERIC_DATE | DateUtils.FORMAT_SHOW_YEAR));
+            recurringEnd.setText(DateUtils.formatDateTime(getBaseContext(), mRecurringEndDate.getTimeInMillis(), DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_NUMERIC_DATE | DateUtils.FORMAT_SHOW_YEAR));
         }
     };
 
@@ -385,6 +384,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
 
         Bundle bundle = new Bundle();
         Button btn = (Button) findViewById(view.getId());
+        BasicTextInputDialog basicDialog = new BasicTextInputDialog();
 
         switch (btn.getId()) {
 
@@ -400,14 +400,18 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
 
             case R.id.expense_screen_title:
 
-                bundle.putString("original_title", getResources().getString(R.string.expense_screen_dsp_title));
-                bundle.putInt("button_id", R.id.expense_screen_title);
+                bundle.putString("title", "Input Title");//todo make variable, use mExpense.getTitle()
+
+                basicDialog.setArguments(bundle);
+                basicDialog.show(getFragmentManager(), "expense_screen_title");
                 break;
 
             case R.id.expense_screen_tag:
 
-                bundle.putString("original_title", getResources().getString(R.string.expense_screen_dsp_tag));
-                bundle.putInt("button_id", view.getId());
+                bundle.putString("title", "Input Tag");//todo make variable, use mExpense.getTags()
+
+                basicDialog.setArguments(bundle);
+                basicDialog.show(getFragmentManager(), "expense_screen_tag");
                 break;
 
             case R.id.expense_screen_date:
@@ -417,27 +421,21 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
 
             case R.id.expense_screen_notice:
 
-                bundle.putString("original_title", getResources().getString(R.string.expense_screen_dsp_notice));
-                bundle.putInt("button_id", view.getId());
+                bundle.putString("title", "Input Notice");//todo make veriable, use mExpense.getNotice()
+
+                basicDialog.setArguments(bundle);
+                basicDialog.show(getFragmentManager(), "expense_screen_notice");
                 break;
 
             case R.id.expense_screen_account:
 
-                bundle.putString("title", getResources().getString(R.string.expense_screen_dsp_account));
+                bundle.putString("title", getResources().getString(R.string.input_account));
                 bundle.putParcelable("active_account", mExpense.getAccount());
+
+                AccountPickerDialog accountPicker = new AccountPickerDialog();
+                accountPicker.setArguments(bundle);
+                accountPicker.show(getFragmentManager(), "expense_screen_account");
                 break;
-        }
-
-        if (btn.getId() == R.id.expense_screen_account) {
-
-            AccountPickerDialogFragment accountPicker = new AccountPickerDialogFragment();
-            accountPicker.setArguments(bundle);
-            accountPicker.show(getFragmentManager(), "account_picker");
-        } else if (btn.getId() != R.id.expense_screen_date && btn.getId() != R.id.expense_screen_category) {
-
-            ExpenseInputDialogFragment expenseDialog = new ExpenseInputDialogFragment();
-            expenseDialog.setArguments(bundle);
-            expenseDialog.show(getFragmentManager(), "expenseDialog");
         }
     }
 
@@ -458,12 +456,12 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
                 Category category = data.getParcelableExtra("categoryObj");
                 mExpense.setCategory(category);
 
-                categoryTxt.setText(category.getCategoryName());
+                mCategoryBtn.setText(category.getCategoryName());
 
                 if (category.getDefaultExpenseType())
-                    expenseType.check(R.id.expense_screen_radio_expense);
+                    mExpenseTypeRadio.check(R.id.expense_screen_radio_expense);
                 else
-                    expenseType.check(R.id.expense_screen_radio_income);
+                    mExpenseTypeRadio.check(R.id.expense_screen_radio_income);
             }
         }
     }
@@ -497,13 +495,68 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
     @Override
     public void onAccountSelected(Account account, String tag) {
 
-        if (tag.equals("account_picker")) {
+        if (tag.equals("expense_screen_account")) {
 
-            accountBtn.setText(account.getAccountName());
-            currencyTxt.setText(account.getCurrency().getCurrencySymbol());
             mExpense.setAccount(account);
+            mAccountBtn.setText(mExpense.getAccount().getName());
+            mCurrencyTxt.setText(mExpense.getAccount().getCurrency().getCurrencySymbol());
 
-            Log.d(TAG, "set active account to: " + account.getAccountName());
+            Log.d(TAG, "set expense account to: " + mExpense.getAccount().getName());
+        }
+    }
+
+    /**
+     * Methode die den Callback des BasicTextInputDialogs implementiert
+     *
+     * @param textInput Daten die vom user eigegeben wurden
+     * @param tag       Dialog tag
+     */
+    @Override
+    public void onTextInput(String textInput, String tag) {
+
+        if (!textInput.isEmpty()) {
+
+            switch (tag) {
+
+                case "expense_screen_title":
+
+                    mExpense.setTitle(textInput);
+                    mTitleBtn.setText(mExpense.getTitle());
+                    Log.d(TAG, "set expense title to " + mExpense.getTitle());
+                    break;
+
+                case "expense_screen_tag":
+
+                    mExpense.setTag(textInput);
+                    mTagBtn.setText(mExpense.getTags().get(0));//todo take all
+                    Log.d(TAG, "set expense tag to " + mExpense.getTags().get(0));
+                    break;
+
+                case "expense_screen_notice":
+
+                    mExpense.setNotice(textInput);
+                    mNoticeBtn.setText(mExpense.getNotice());
+                    Log.d(TAG, "set expense notice to " + mExpense.getNotice());
+                    break;
+            }
+        }
+    }
+
+    /**
+     * Methode die den Callback des PriceInputDialogs implementiert
+     *
+     * @param price Preis den der User einegeben hat
+     * @param tag   Dialog tag
+     */
+    @Override
+    public void onPriceSelected(double price, String tag) {
+
+        if (tag.equals("expense_screen_price")) {
+
+            mExpense.setPrice(price);
+            mAmountTxt.setText(String.format("%s", mExpense.getUnsignedPrice()));
+
+            Log.d(TAG, "set expense amount to " + mExpense.getUnsignedPrice());
         }
     }
 }

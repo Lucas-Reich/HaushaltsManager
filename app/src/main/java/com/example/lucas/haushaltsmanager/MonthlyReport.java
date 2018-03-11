@@ -177,8 +177,8 @@ public class MonthlyReport {
 
     /**
      * @param monthlyExpenses ArrayList of monthly expenses
-     * @param category        Category name which has to be found
-     * @return index of the CATEGORY name if found or -1 if not in List
+     * @param category        Category getName which has to be found
+     * @return index of the CATEGORY getName if found or -1 if not in List
      */
     private int containsHelper(ArrayList<MonthlyExpenses> monthlyExpenses, String category) {
 
