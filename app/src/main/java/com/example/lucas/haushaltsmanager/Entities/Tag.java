@@ -1,51 +1,106 @@
 package com.example.lucas.haushaltsmanager.Entities;
 
+import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.util.Log;
+
+import com.example.lucas.haushaltsmanager.R;
 
 public class Tag implements Parcelable {
 
-    private Long index;
+    private String TAG = Tag.class.getSimpleName();
+
+    private long index;
     private String name;
-    private String TAG = "TAG";
 
-    public Tag(Long index, String name) {
+    public Tag(long index, @NonNull String name) {
 
-        this.index = index;
-        this.name = name;
+        setIndex(index);
+        setName(name);
     }
 
     public Tag(Parcel source) {
 
         Log.v(TAG, "ParcelData (Parcel Source): time to put back parcel data");
-        this.index = source.readLong();
-        this.name = source.readString();
+        setIndex(source.readLong());
+        setName(source.readString());
     }
 
-    public Tag(String name) {
+    /**
+     * Methode um einen dummy Tag zu erstellen
+     *
+     * @param context context
+     * @return dummy tag
+     */
+    public static Tag createDummyTag(Context context) {
 
-        this(null, name);
+        return new Tag(-1, context.getResources().getString(R.string.no_name));
     }
 
-    public void setIndex(long index) {
+    /**
+     * Methode um den index des Tags zu manipulieren
+     *
+     * @param index neuer index
+     */
+    private void setIndex(long index) {
 
         this.index = index;
     }
 
-    public Long getIndex() {
+    public long getIndex() {
 
         return this.index;
     }
 
-    public void setName(String name) {
+    public void setName(@NonNull String name) {
 
         this.name = name;
     }
 
+    @NonNull
     public String getName() {
 
         return this.name;
+    }
+
+    /**
+     * Methode die die Felder des Tags checkt ob diese gesetzt sind oder nicht.
+     * Sind alle Felder gesetzt, dann kann das Tag ohne Probleme in die Datenbank geschrieben werden.
+     *
+     * @return Ob das Tag in die Datenbank geschrieben werden kann
+     */
+    public boolean isSet() {
+
+        return !this.name.isEmpty();
+    }
+
+    /**
+     * Wenn der index des Tags größer als null ist, dann gibt es das Tag bereits in der Datenbank
+     * und man kann sie sicher verwenden.
+     *
+     * @return boolean
+     */
+    public boolean isValid() {
+
+        return getIndex() > -1;
+    }
+
+    /**
+     * Methode um zu überprüfen, ob das angegebene Tag das gleiche ist wie dieses.
+     *
+     * @param otherTag Anderes Tag
+     * @return boolean
+     */
+    public boolean equals(Tag otherTag) {
+
+        return getName().equals(otherTag.getName());
+    }
+
+    public String toString() {
+
+        return getIndex() + " " + getName();
     }
 
 

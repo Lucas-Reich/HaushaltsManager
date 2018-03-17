@@ -68,7 +68,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.expense_screen);
+        setContentView(R.layout.activity_expense_screen);
 
         SharedPreferences preferences = getSharedPreferences("UserSettings", 0);
 
@@ -93,7 +93,6 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
             mExpense = new ExpenseObject(title, 0, false, Category.createDummyCategory(this), null, account);
             mExpense.setDateTime(mCalendar);
             mExpense.setNotice("");
-            mExpense.setTag("");
         } else if (bundle != null && bundle.get("childExpense") != null) {
 
             mSaveBtn.setText(getString(R.string.update_booking));
@@ -117,7 +116,6 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
             mExpense = new ExpenseObject(title, 0, false, Category.createDummyCategory(this), null, account);
             mExpense.setDateTime(mCalendar);
             mExpense.setNotice("");
-            mExpense.setTag("");
         }
 
         //TODO implement the correct Toolbar functionality (back arrow, overflow menu which holds the load mTemplate button)
@@ -135,7 +133,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
 
         // set the mExpense type
         mExpenseTypeRadio = (RadioGroup) findViewById(R.id.expense_screen_expense_type);
-        if (mExpense.getExpenditure())
+        if (mExpense.isExpenditure())
             mExpenseTypeRadio.check(R.id.expense_screen_radio_expense);
         else
             mExpenseTypeRadio.check(R.id.expense_screen_radio_income);
@@ -147,11 +145,11 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
                 if (checkedId == R.id.expense_screen_radio_expense) {
 
                     mExpense.setExpenditure(true);
-                    Log.d(TAG, "set expense type to " + mExpense.getExpenditure());
+                    Log.d(TAG, "set expense type to " + mExpense.isExpenditure());
                 } else {
 
                     mExpense.setExpenditure(false);
-                    Log.d(TAG, "set expense type to " + mExpense.getExpenditure());
+                    Log.d(TAG, "set expense type to " + mExpense.isExpenditure());
                 }
             }
         });
@@ -175,15 +173,15 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
 
         //set account currency symbol
         mCurrencyTxt = (TextView) findViewById(R.id.expense_screen_amount_currency);
-        mCurrencyTxt.setText(mExpense.getAccount().getCurrency().getCurrencySymbol());
+        mCurrencyTxt.setText(mExpense.getAccount().getCurrency().getSymbol());
 
         //set display CATEGORY
         mCategoryBtn = (Button) findViewById(R.id.expense_screen_category);
-        mCategoryBtn.setText(mExpense.getCategory().getCategoryName());
+        mCategoryBtn.setText(mExpense.getCategory().getName());
 
         //set display expense title
         mTitleBtn = (Button) findViewById(R.id.expense_screen_title);
-        mTitleBtn.setText(mExpense.getTitle());
+        mTitleBtn.setText(mExpense.getName());
 
         //TODO change display tag behaviour from just taking the first tag to displaying all tags
         //set display tag
@@ -262,7 +260,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
         List<String> currencyShortNames = new ArrayList<>();
         for (Currency currency : currencies) {
 
-            currencyShortNames.add(currency.getCurrencyShortName());
+            currencyShortNames.add(currency.getShortName());
         }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, currencyShortNames);
@@ -291,24 +289,24 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
                 case UPDATE_EXPENSE_MODE:
 
                     mDatabase.updateBooking(mExpense);
-                    Toast.makeText(ExpenseScreenActivity.this, "Updated Booking " + mExpense.getTitle(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ExpenseScreenActivity.this, "Updated Booking " + mExpense.getName(), Toast.LENGTH_SHORT).show();
                     break;
                 case UPDATE_CHILD_MODE:
 
                     mDatabase.updateChildBooking(mExpense);
-                    Toast.makeText(ExpenseScreenActivity.this, "Updated Booking " + mExpense.getTitle(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ExpenseScreenActivity.this, "Updated Booking " + mExpense.getName(), Toast.LENGTH_SHORT).show();
                     break;
                 case CREATE_CHILD_MODE:
 
                     mDatabase.addChildToBooking(mExpense, mParentBooking.getIndex());
                     mDatabase.insertConvertExpense(mExpense);
-                    Toast.makeText(ExpenseScreenActivity.this, "Added Booking \"" + mExpense.getTitle() + "\" to parent Booking " + mParentBooking.getTitle(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ExpenseScreenActivity.this, "Added Booking \"" + mExpense.getName() + "\" to parent Booking " + mParentBooking.getName(), Toast.LENGTH_SHORT).show();
                     break;
                 case CREATE_EXPENSE_MODE:
 
                     mDatabase.createBooking(mExpense);
                     mDatabase.insertConvertExpense(mExpense);
-                    Toast.makeText(ExpenseScreenActivity.this, "Created Booking \"" + mExpense.getTitle() + "\"", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ExpenseScreenActivity.this, "Created Booking \"" + mExpense.getName() + "\"", Toast.LENGTH_SHORT).show();
                     break;
                 default:
                     throw new UnsupportedOperationException("ExpenseScreen unterstützt keine anderen Methoden als createExpense, createChildToExpense und updateExpense");
@@ -400,7 +398,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
 
             case R.id.expense_screen_title:
 
-                bundle.putString("title", "Input Title");//todo make variable, use mExpense.getTitle()
+                bundle.putString("title", "Input Title");//todo make variable, use mExpense.getName()
 
                 basicDialog.setArguments(bundle);
                 basicDialog.show(getFragmentManager(), "expense_screen_title");
@@ -456,7 +454,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
                 Category category = data.getParcelableExtra("categoryObj");
                 mExpense.setCategory(category);
 
-                mCategoryBtn.setText(category.getCategoryName());
+                mCategoryBtn.setText(category.getName());
 
                 if (category.getDefaultExpenseType())
                     mExpenseTypeRadio.check(R.id.expense_screen_radio_expense);
@@ -477,7 +475,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
         Currency currency = mDatabase.getCurrency(curName);
 
         TextView expenseCurrency = (TextView) findViewById(R.id.expense_screen_amount_currency);
-        expenseCurrency.setText(String.format("%s", currency.getCurrencySymbol()));
+        expenseCurrency.setText(String.format("%s", currency.getSymbol()));
 
         mExpense.setExpenseCurrency(currency);
     }
@@ -499,7 +497,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
 
             mExpense.setAccount(account);
             mAccountBtn.setText(mExpense.getAccount().getName());
-            mCurrencyTxt.setText(mExpense.getAccount().getCurrency().getCurrencySymbol());
+            mCurrencyTxt.setText(mExpense.getAccount().getCurrency().getSymbol());
 
             Log.d(TAG, "set expense account to: " + mExpense.getAccount().getName());
         }
@@ -520,16 +518,14 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
 
                 case "expense_screen_title":
 
-                    mExpense.setTitle(textInput);
-                    mTitleBtn.setText(mExpense.getTitle());
-                    Log.d(TAG, "set expense title to " + mExpense.getTitle());
+                    mExpense.setName(textInput);
+                    mTitleBtn.setText(mExpense.getName());
+                    Log.d(TAG, "set expense title to " + mExpense.getName());
                     break;
 
                 case "expense_screen_tag":
 
-                    mExpense.setTag(textInput);
-                    mTagBtn.setText(mExpense.getTags().get(0));//todo take all
-                    Log.d(TAG, "set expense tag to " + mExpense.getTags().get(0));
+                    //todo implement tag functionality
                     break;
 
                 case "expense_screen_notice":

@@ -119,7 +119,7 @@ public class TabTwoMonthlyReports extends Fragment {
      */
     private void assignBookingToReport(ExpenseObject expense) {
 
-        if (!expense.hasChildren()) {
+        if (!expense.isParent()) {
 /*todo enable
             if (!mActiveAccounts.contains(expense.getAccount().getIndex()))
                 return;

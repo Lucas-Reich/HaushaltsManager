@@ -82,4 +82,6 @@
     <string name="btn_set">set</string>
     <string name="select_end_date">Until</string>
     <string name="input_date">Input Date</string>
+    <string name="error_same_accounts">You cannot transfer money from and to the same account!</string>
+    <string name="error_missing_content">You have to set all values</string>
 </resources>

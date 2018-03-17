@@ -67,14 +67,14 @@ public class BookingAdapter extends ArrayAdapter<ExpenseObject> implements View.
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        String category = expenseObject.getCategory().getCategoryName();
+        String category = expenseObject.getCategory().getName();
 
         viewHolder.circleLetter.setText(category.substring(0, 1).toUpperCase());
-        viewHolder.txtTitle.setText(expenseObject.getTitle());
+        viewHolder.txtTitle.setText(expenseObject.getName());
         //TODO wenn es eine Multiuser funktionalität muss hier der benutzer eingetragen werden, der das Geld ausgegeben hat
         viewHolder.txtPerson.setText("");
         viewHolder.txtPaidPrice.setText(String.format("%s", expenseObject.getUnsignedPrice()));
-        viewHolder.txtPaidCurrency.setText(expenseObject.getAccount().getCurrency().getCurrencySymbol());
+        viewHolder.txtPaidCurrency.setText(expenseObject.getAccount().getCurrency().getSymbol());
 
         if (expenseObject.getExpenseCurrency().getIndex() == preferences.getLong("mainCurrencyIndex", 0)) {
 
@@ -83,7 +83,7 @@ public class BookingAdapter extends ArrayAdapter<ExpenseObject> implements View.
         } else {
 
             viewHolder.txtCalcPrice.setText(String.format("%s", expenseObject.getCalcPrice()));
-            viewHolder.txtBaseCurrency.setText(String.format("%s", expenseObject.getExpenseCurrency().getCurrencySymbol()));
+            viewHolder.txtBaseCurrency.setText(String.format("%s", expenseObject.getExpenseCurrency().getSymbol()));
         }
 
         return convertView;

@@ -11,26 +11,22 @@ import com.example.lucas.haushaltsmanager.R;
 
 public class Account implements Parcelable {
 
-    /**
-     * is set to 9999 if the expense with this account has children
-     * is set to 8888 if the expense with this account is an date exp_listview_separator
-     */
+    private String TAG = Account.class.getSimpleName();
+
     private long index;
-    private String accountName;
+    private String name;
     private int balance;
     private Currency currency;
 
-    private String TAG = Account.class.getSimpleName();
+    public Account(long index, @NonNull String accountName,int balance, @NonNull Currency currency) {
 
-    public Account(long index, @NonNull String accountName, Integer balance,@NonNull Currency currency) {
-
-        this.index = index;
-        this.accountName = accountName;
-        this.balance = balance != null ? balance : 0;
-        this.currency = currency;
+        setIndex(index);
+        setName(accountName);
+        setBalance(balance);
+        setCurrency(currency);
     }
 
-    public Account(@NonNull String accountName, Integer balance,@NonNull Currency currency) {
+    public Account(@NonNull String accountName, Integer balance, @NonNull Currency currency) {
 
         this(-1, accountName, balance != null ? balance : 0, currency);
     }
@@ -46,22 +42,21 @@ public class Account implements Parcelable {
     public Account(Parcel source) {
 
         Log.v(TAG, "Recreating Account from parcel data");
-        index = source.readLong();
-        accountName = source.readString();
-        balance = source.readInt();
-        currency = source.readParcelable(Account.class.getClassLoader());
+        setIndex(source.readLong());
+        setName(source.readString());
+        setBalance(source.readInt());
+        setCurrency((Currency) source.readParcelable(Currency.class.getClassLoader()));
     }
 
     /**
      * Methode um ein dummy Konto zu erstellen
      *
-     * @param accountIndex Index des Kontos
-     * @param context Context
+     * @param context      Context
      * @return dummy Konto
      */
-    public static Account createDummyAccount(Context context,@Nullable Long accountIndex) {
+    public static Account createDummyAccount(Context context) {
 
-        return new Account(accountIndex != null ? accountIndex : -1, context.getResources().getString(R.string.no_name), 0, Currency.createDummyCurrency(context));
+        return new Account(-1, context.getResources().getString(R.string.no_name), 0, Currency.createDummyCurrency(context));
     }
 
     public long getIndex() {
@@ -69,11 +64,7 @@ public class Account implements Parcelable {
         return index;
     }
 
-    /**
-     * Damit man eine DummyExpense erstellen kann und im nachinein den Platzhalter setzen kann
-     * @param index Database index
-     */
-    public void setIndex(long index) {
+    private void setIndex(long index) {
 
         this.index = index;
     }
@@ -81,12 +72,12 @@ public class Account implements Parcelable {
     @NonNull
     public String getName() {
 
-        return accountName;
+        return name;
     }
 
-    public void setAccountName(@NonNull String accountName) {
+    public void setName(@NonNull String accountName) {
 
-        this.accountName = accountName;
+        this.name = accountName;
     }
 
     public int getBalance() {
@@ -110,10 +101,48 @@ public class Account implements Parcelable {
         this.currency = currency;
     }
 
+    /**
+     * Methode die die Felder des Kontos checkt ob diese gesetzt sind oder nicht.
+     * Sind alle Felder gesetzt, dann kann das Konto ohne Probleme in die Datenbank geschrieben werden.
+     *
+     * @return Ob das Konto in die Datenbank geschrieben werden kann
+     */
+    public boolean isSet() {
+
+        return !this.name.isEmpty() && this.currency.isSet();
+    }
+
+    /**
+     * Wenn der index des Kontos größer als null ist, dann gibt es die Buchung bereits in der Datenbank
+     * und man kann es sicher verwenden.
+     *
+     * @return boolean
+     */
+    public boolean isValid() {
+
+        return getIndex() > -1 && getCurrency().isValid();
+    }
+
+    /**
+     * Methode die überprüft ob das angegebe Konto das gleiche ist wie dieses
+     *
+     * @param otherAccount Anderes Konot
+     * @return sind die Konten gleich
+     */
+    public boolean equals(Account otherAccount) {
+
+        boolean result;
+
+        result = this.name.equals(otherAccount.getName());
+        result = result && (this.index == otherAccount.getIndex());
+
+        return result;
+    }
+
     @Override
     public String toString() {
 
-        return this.index + " " + this.accountName;
+        return getIndex() + " " + getName() + " " + getBalance();
     }
 
 
@@ -134,7 +163,7 @@ public class Account implements Parcelable {
 
         Log.v(TAG, "write to parcel..." + flags);
         dest.writeLong(index);
-        dest.writeString(accountName);
+        dest.writeString(name);
         dest.writeInt(balance);
         dest.writeParcelable(currency, flags);
     }

@@ -1,8 +1,11 @@
 package com.example.lucas.haushaltsmanager.Activities;
 
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -130,10 +133,50 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
             public void onClick(View v) {
 
                 //checke ob alles gesetzt ist
-                //checke ob alles valid ist (preis größer null, konten sind nicht die gleichen)
-                //füge die Ausgaben mFromExpense und mToExpense in die Datenbank ein
+                if (mFromExpense.isSet() && mToExpense.isSet()) {
+
+                    if (!mFromExpense.getAccount().equals(mToExpense.getAccount())) {
+
+                        //todo erst wieder enablen wenn die Datenbank nicht mehr zerstört wird
+                        //mDatabase.createBooking(mFromExpense);
+                        //mDatabase.createBooking(mToExpense);
+                    } else {
+
+                        showErrorDialog(R.string.error_same_accounts);
+                    }
+                } else {
+
+                    showErrorDialog(R.string.error_missing_content);
+                }
             }
         });
+    }
+
+    /**
+     * Methode um einen Fehlerdialog anzeigen zu lassen, der den User informiert, dass noch eine Eingabe fehlt, oder die Konten gleich sind.
+     *
+     * @param message Message id
+     */
+    private void showErrorDialog(@StringRes int message) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle(R.string.error);
+
+        builder.setMessage(message);
+
+        builder.setPositiveButton(R.string.btn_ok, new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                //do nothing
+            }
+        });
+
+        builder.create();
+
+        builder.show();
     }
 
     /**

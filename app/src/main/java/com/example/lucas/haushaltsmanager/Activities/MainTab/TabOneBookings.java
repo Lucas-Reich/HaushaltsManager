@@ -183,11 +183,11 @@ public class TabOneBookings extends Fragment {
                 ExpenseObject expense = (ExpenseObject) mListAdapter.getGroup(groupPosition);
 
                 //if the user clicks on date divider nothing should happen
-                if (expense.getAccount().getIndex() == 8888)
+                if (expense.getExpenseType() == ExpenseObject.EXPENSE_TYPES.DATE_PLACEHOLDER)
                     return true;
 
-                //if user clicks on parent the defualt behaviour should happen
-                if (expense.getAccount().getIndex() == 9999)
+                //if user clicks on parent the default behaviour should happen
+                if (expense.isParent())
                     return false;
 
                 if (!mSelectionMode) {
@@ -232,7 +232,7 @@ public class TabOneBookings extends Fragment {
                 //get expense
                 ExpenseObject expense = (ExpenseObject) mListAdapter.getChild(groupPosition, childPosition);
 
-                Log.d(TAG, "onChildClick: " + expense.getTitle() + " " + expense.getIndex());
+                Log.d(TAG, "onChildClick: " + expense.getName() + " " + expense.getIndex());
 
                 //start expenseScreen with selected expense
                 Intent updateChildExpenseIntent = new Intent(getContext(), ExpenseScreenActivity.class);
@@ -260,7 +260,7 @@ public class TabOneBookings extends Fragment {
 
                     ExpenseObject expense = mListAdapter.getExpense(groupPosition);
 
-                    if (expense.getAccount().getIndex() < 8888) {
+                    if (expense.isValidExpense()) {
 
                         mListAdapter.selectGroup(groupPosition);
                         view.setBackgroundColor(getResources().getColor(R.color.highlighted_item_color));
@@ -289,7 +289,7 @@ public class TabOneBookings extends Fragment {
      */
     private void setActiveAccounts() {
 
-        Log.d(TAG, "setActiveAccounts: erneuere aktiven KontenListe");
+        Log.d(TAG, "setActiveAccounts: erneuere aktiven Kontenliste");
 
         if (!mDatabase.isOpen())
             mDatabase.open();
@@ -331,6 +331,7 @@ public class TabOneBookings extends Fragment {
                 mDatabase.open();
 
             Calendar cal = Calendar.getInstance();
+            //todo immer nur die buchungen des aktuellen monats anzeigen!!
             mExpenses = mDatabase.getBookings(cal.get(Calendar.YEAR) + "-01-01 00:00:00", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(cal.getTime()));
         }
 
@@ -355,7 +356,7 @@ public class TabOneBookings extends Fragment {
 
                 ExpenseObject expense = mExpenses.get(i);
 
-                if (expense.getAccount().getIndex() == 9999) {
+                if (expense.isParent()) {
 
                     ArrayList<ExpenseObject> allowedBookings = new ArrayList<>();
 
@@ -374,7 +375,7 @@ public class TabOneBookings extends Fragment {
                 }
 
                 //wenn expense keine kinder hat
-                if (expense.getAccount().getIndex() == 8888 || mActiveAccounts.contains(expense.getAccount().getIndex())) {
+                if (expense.getExpenseType() == ExpenseObject.EXPENSE_TYPES.DATE_PLACEHOLDER || mActiveAccounts.contains(expense.getAccount().getIndex())) {
 
                     mListDataHeader.add(expense);
                     mListDataChild.put(expense, expense.getChildren());//sollte leer sein
@@ -426,8 +427,9 @@ public class TabOneBookings extends Fragment {
                         childrenToDisplay.add(childExpense);
                 }
 
+                //muss childrenToDisplay.size() nicht == 0 sein???
                 //wenn es kein/-e Kind/-er zum anzeigen gibt
-                if (childrenToDisplay.size() > 0 || expense.getAccount().getIndex() != 9999) {
+                if (childrenToDisplay.size() > 0 || !expense.isParent()) {
 
                     tempGroupData.add(expense);
                     tempChildData.put(expense, childrenToDisplay);//bei jeder iteration werden die kinder der buchungen alle  auf den gleichn wert gesetzt und die Group buhungen in der HasMAp sind auch nicht geordnet
@@ -438,7 +440,7 @@ public class TabOneBookings extends Fragment {
                 if (tempGroupData.size() > 0) {
 
                     ExpenseObject dateSeparator = ExpenseObject.createDummyExpense(getContext());
-                    dateSeparator.getAccount().setIndex(8888);
+                    dateSeparator.setExpenseType(ExpenseObject.EXPENSE_TYPES.DATE_PLACEHOLDER);
                     dateSeparator.setDateTime(tempGroupData.get(0).getDateTime());
 
                     mListDataHeader.add(dateSeparator);

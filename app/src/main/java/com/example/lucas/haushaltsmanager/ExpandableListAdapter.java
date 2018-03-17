@@ -86,9 +86,9 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         final ExpenseObject groupExpense = (ExpenseObject) getGroup(groupPosition);
         LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        switch (groupExpense.getAccount().getIndex() + "") {
+        switch (groupExpense.getExpenseType()) {
 
-            case "9999"://bookings that have children
+            case PARENT_EXPENSE:
 
                 convertView = inflater.inflate(R.layout.activity_test_exp_listview_list_group_child_y, null);
 
@@ -102,13 +102,13 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 TextView txtTotalAmount = (TextView) convertView.findViewById(R.id.exp_listview_header_total_amount);
                 TextView txtBaseCurrency = (TextView) convertView.findViewById(R.id.exp_listview_header_base_currency);
 
-                txtTitle.setText(groupExpense.getTitle());
+                txtTitle.setText(groupExpense.getName());
                 txtTotalAmount.setText(String.format(String.format(mContext.getResources().getConfiguration().locale, "%.2f", groupExpense.getSignedPrice())));
                 txtTotalAmount.setTextColor(groupExpense.getSignedPrice() < 0 ? mRed : mGreen);
                 txtBaseCurrency.setText("€");
                 txtBaseCurrency.setTextColor(groupExpense.getSignedPrice() < 0 ? mRed : mGreen);
                 break;
-            case "8888"://bookings that are date groupExpense placeholders
+            case DATE_PLACEHOLDER:
 
                 convertView = inflater.inflate(R.layout.activity_test_exp_listview_list_group_sep_date, null);
 
@@ -116,7 +116,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
                 date.setText(groupExpense.getDate());
                 break;
-            default://normal bookings
+            case NORMAL_EXPENSE:
 
                 SharedPreferences preferences = mContext.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
 
@@ -138,16 +138,16 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 }
 
 
-                String category = groupExpense.getCategory().getCategoryName();
+                String category = groupExpense.getCategory().getName();
                 circleLetter.setText(category.substring(0, 1).toUpperCase());
                 circleLetter.setSolidColor(groupExpense.getCategory().getColor());
-                txtTitle2.setText(groupExpense.getTitle());
+                txtTitle2.setText(groupExpense.getName());
                 //TODO wenn es eine Multiuser funktionalität muss hier der benutzer eingetragen werden, der das Geld ausgegeben hat
                 txtPerson.setText("");
                 txtPaidPrice.setText(String.format(mContext.getResources().getConfiguration().locale, "%.2f", groupExpense.getUnsignedPrice()));
-                txtPaidPrice.setTextColor(groupExpense.getExpenditure() ? mRed : mGreen);
-                txtPaidCurrency.setText(groupExpense.getExpenseCurrency().getCurrencySymbol());
-                txtPaidCurrency.setTextColor(groupExpense.getExpenditure() ? mRed : mGreen);
+                txtPaidPrice.setTextColor(groupExpense.isExpenditure() ? mRed : mGreen);
+                txtPaidCurrency.setText(groupExpense.getExpenseCurrency().getSymbol());
+                txtPaidCurrency.setTextColor(groupExpense.isExpenditure() ? mRed : mGreen);
 
                 if (groupExpense.getExpenseCurrency().getIndex() == preferences.getLong("mainCurrencyIndex", 0)) {
                     //booking currency is the same as the base currency
@@ -158,7 +158,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                     //booking currency is not the same currency as the base currency
 
                     txtPaidPrice.setText(String.format(mContext.getResources().getConfiguration().locale, "%.2f", groupExpense.getUnsignedPrice()));
-                    txtPaidCurrency.setText(groupExpense.getExpenseCurrency().getCurrencySymbol());
+                    txtPaidCurrency.setText(groupExpense.getExpenseCurrency().getSymbol());
                     txtCalcPrice.setText(String.format(mContext.getResources().getConfiguration().locale, "%.2f", groupExpense.getCalcPrice()));
                     txtBaseCurrency2.setText(preferences.getString("mainCurrency", "€"));
                 }
@@ -188,17 +188,17 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         TextView txtPaidCurrency = (TextView) convertView.findViewById(R.id.exp_listview_item_currency_paid);
 
 
-        String category = childExpense.getCategory().getCategoryName();
+        String category = childExpense.getCategory().getName();
 
         circleLetter.setText(category.substring(0, 1).toUpperCase());
         circleLetter.setSolidColor(childExpense.getCategory().getColor());
-        txtTitle.setText(childExpense.getTitle());
+        txtTitle.setText(childExpense.getName());
         //TODO wenn es eine Multiuser funktionalität muss hier der benutzer eingetragen werden, der das Geld ausgegeben hat
         txtPerson.setText("");
         txtPaidPrice.setText(String.format("%s", childExpense.getUnsignedPrice()));
-        txtPaidPrice.setTextColor(childExpense.getExpenditure() ? mRed : mGreen);
-        txtPaidCurrency.setText(childExpense.getAccount().getCurrency().getCurrencySymbol());
-        txtPaidCurrency.setTextColor(childExpense.getExpenditure() ? mRed : mGreen);
+        txtPaidPrice.setTextColor(childExpense.isExpenditure() ? mRed : mGreen);
+        txtPaidCurrency.setText(childExpense.getAccount().getCurrency().getSymbol());
+        txtPaidCurrency.setTextColor(childExpense.isExpenditure() ? mRed : mGreen);
         txtCalcPrice.setText("");
         txtBaseCurrency.setText("");
 

@@ -5,7 +5,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.format.DateUtils;
 import android.util.Log;
 
 import com.example.lucas.haushaltsmanager.R;
@@ -17,7 +16,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
@@ -67,7 +65,7 @@ public class ExpenseObject implements Parcelable {
     /**
      * Tags assigned to expense
      */
-    private List<String> tag = new LinkedList<>();
+    private List<Tag> tags = new ArrayList<>();
 
     /**
      * Notice from user
@@ -91,35 +89,19 @@ public class ExpenseObject implements Parcelable {
 
     private String TAG = ExpenseObject.class.getSimpleName();
 
-    public ExpenseObject(long index, @NonNull String title, double price, Calendar date, boolean expenditure, @NonNull Category category, String notice, @NonNull Account account, Currency expenseCurrency, EXPENSE_TYPES expenseType) {
+    public ExpenseObject(long index, @NonNull String expenseName, double price, Calendar date, boolean expenditure, @NonNull Category category, String notice, @NonNull Account account, Currency expenseCurrency, @NonNull EXPENSE_TYPES expenseType) {
 
-        //todo remove den einen konstruktor
         //todo benutze ExpenseTypes um ausgaben zu markieren
-        this.index = index;
-        this.title = title;
-        this.price = price;
-        this.date = date != null ? date : Calendar.getInstance();
-        this.expenditure = expenditure;
-        this.category = category;
-        this.notice = notice != null ? notice : "";
-        this.account = account;
-        this.expenseCurrency = expenseCurrency != null ? expenseCurrency : account.getCurrency();
-        this.expenseType = expenseType;
-    }
-
-    public ExpenseObject(long index, @NonNull String title, double price, @NonNull String date, boolean expenditure, @NonNull Category category, String notice, @NonNull Account account, Currency expenseCurrency, EXPENSE_TYPES expenseType) {
-
-        this.index = index;
-        this.title = title;
-        this.price = price;
-        this.date = Calendar.getInstance();
-        setDateTime(date);
-        this.expenditure = expenditure;
-        this.category = category;
-        this.notice = notice != null ? notice : "";
-        this.account = account;
-        this.expenseCurrency = expenseCurrency != null ? expenseCurrency : account.getCurrency();
-        this.expenseType = expenseType;
+        setIndex(index);
+        setName(expenseName);
+        setPrice(price);
+        setDateTime(date != null ? date : Calendar.getInstance());
+        setExpenditure(expenditure);
+        setCategory(category);
+        setNotice(notice != null ? notice : "");
+        setAccount(account);
+        setExpenseCurrency(expenseCurrency != null ? expenseCurrency : account.getCurrency());
+        setExpenseType(expenseType);
     }
 
     public ExpenseObject(@NonNull String title, double price, boolean expenditure, @NonNull Category category, Currency expenseCurrency, @NonNull Account account) {
@@ -128,14 +110,43 @@ public class ExpenseObject implements Parcelable {
     }
 
     /**
+     * This will be only used by ParcelableCategories
+     * see: http://prasanta-paul.blogspot.de/2010/06/android-parcelable-example.html (Parcelable ArrayList)
+     * and: https://stackoverflow.com/questions/2139134/how-to-send-an-object-from-one-android-activity-to-another-using-intents for further explanations (Parcelable Object)
+     * <p>
+     * this constructor converts our parcelable object back into an Category object
+     *
+     * @param source .
+     */
+    public ExpenseObject(Parcel source) {
+
+        Calendar cal = Calendar.getInstance();
+
+        Log.v(TAG, "ParcelData (Parcel source): time to put back parcel data");
+        cal.setTimeInMillis(source.readLong());
+        setDateTime(cal);
+        setName(source.readString());
+        setPrice(source.readDouble());
+        setIndex(source.readLong());
+        setExpenditure(source.readByte() != 0);
+        setCategory((Category) source.readParcelable(Category.class.getClassLoader()));
+        source.readList(this.tags, Tag.class.getClassLoader());
+        setNotice(source.readString());
+        setAccount((Account) source.readParcelable(Account.class.getClassLoader()));
+        //children = source.createTypedArrayList(ExpenseObject.CREATOR); deprecated since 11.03.18
+        source.readList(this.children, ExpenseObject.class.getClassLoader());
+        setExpenseCurrency((Currency)source.readParcelable(Currency.class.getClassLoader()));
+    }
+
+    /**
      * Methode um eine dummy Expense zu erstellen
      *
      * @param context Context
      * @return dummy Expense
      */
-    public static ExpenseObject createDummyExpense(Context context) {
+    public static ExpenseObject createDummyExpense(@NonNull Context context) {
 
-        return new ExpenseObject(-1, context.getResources().getString(R.string.no_name), 0, Calendar.getInstance(), false, Category.createDummyCategory(context), null, Account.createDummyAccount(context, null), Currency.createDummyCurrency(context), EXPENSE_TYPES.DUMMY_EXPENSE);
+        return new ExpenseObject(-1, context.getResources().getString(R.string.no_name), 0, Calendar.getInstance(), false, Category.createDummyCategory(context), null, Account.createDummyAccount(context), Currency.createDummyCurrency(context), EXPENSE_TYPES.DUMMY_EXPENSE);
     }
 
     public double getExchangeRate() {
@@ -160,48 +171,47 @@ public class ExpenseObject implements Parcelable {
         }
     }
 
+    @NonNull
     public Currency getExpenseCurrency() {
 
         return this.expenseCurrency;
     }
 
-    public void setExpenseCurrency(Currency expenseCurrency) {
+    public void setExpenseCurrency(@NonNull Currency expenseCurrency) {
 
         this.expenseCurrency = expenseCurrency;
     }
 
-    @Override
-    public String toString() {
-
-        return "" + this.index + " " + this.title;
-    }
-
+    @NonNull
     public Calendar getDateTime() {
 
         return this.date;
     }
 
+    @NonNull
     public String getDBDateTime() {
 
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(getDateTime().getTime());
     }
 
+    @NonNull
     public String getDate() {
 
         return new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(getDateTime().getTime());
     }
 
+    @NonNull
     public String getDisplayableDateTime() {
 
         return DateFormat.getDateInstance(DateFormat.SHORT).format(new Date(getDateTime().getTimeInMillis()));
     }
 
-    public void setDateTime(Calendar date) {
+    public void setDateTime(@NonNull Calendar date) {
 
         this.date = date;
     }
 
-    public void setDateTime(String date) {
+    public void setDateTime(@NonNull String date) {
 
         try {
 
@@ -212,15 +222,22 @@ public class ExpenseObject implements Parcelable {
         }
     }
 
-    public String getTitle() {
+    @NonNull
+    public String getName() {
+
         return title;
     }
 
-    public void setTitle(String title) {
+    public void setName(@NonNull String title) {
+
         this.title = title;
+
+        if (isSet() && !isParent())
+            this.expenseType = EXPENSE_TYPES.NORMAL_EXPENSE;
     }
 
     public double getUnsignedPrice() {
+
         return price;
     }
 
@@ -232,7 +249,7 @@ public class ExpenseObject implements Parcelable {
      */
     public double getSignedPrice() {
 
-        if (hasChildren()) {
+        if (isParent()) {
 
             double calcPrice = 0;
 
@@ -250,7 +267,7 @@ public class ExpenseObject implements Parcelable {
 
     public void setPrice(double price) {
 
-        if (price < 0 ) {
+        if (price < 0) {
 
             this.price = Math.abs(price);
             this.expenditure = true;
@@ -259,17 +276,23 @@ public class ExpenseObject implements Parcelable {
             this.price = price;
             this.expenditure = false;
         }
+
+        if (isSet() && !isParent())
+            this.expenseType = EXPENSE_TYPES.NORMAL_EXPENSE;
     }
 
     public long getIndex() {
+
         return index;
     }
 
-    public void setIndex(long index) {
+    private void setIndex(long index) {
+
         this.index = index;
     }
 
-    public boolean getExpenditure() {
+    public boolean isExpenditure() {
+
         return expenditure;
     }
 
@@ -277,6 +300,7 @@ public class ExpenseObject implements Parcelable {
      * @param expenditure true (for outgoing money) or false (for incoming money)
      */
     public void setExpenditure(boolean expenditure) {
+
         this.expenditure = expenditure;
     }
 
@@ -286,25 +310,36 @@ public class ExpenseObject implements Parcelable {
         return category;
     }
 
-    public void setCategory(Category category) {
+    public void setCategory(@NonNull Category category) {
+
         this.category = category;
+
+        if (isSet() && !isParent())
+            this.expenseType = EXPENSE_TYPES.NORMAL_EXPENSE;
     }
 
-    public List<String> getTags() {
-        return tag;
+    @NonNull
+    public List<Tag> getTags() {
+
+        return tags;
     }
 
-    public void setTag(String tag) {
+    public void setTag(@NonNull Tag tag) {
 
-        this.tag.add(tag);
+        //todo implement tags functionality
     }
 
-    public void setTags(List<String> tags) {
+    public void setTags(@NonNull List<Tag> tags) {
 
-        this.tag = tags;
+        for (Tag tag : tags) {
+
+            setTag(tag);
+        }
     }
 
+    @NonNull
     public String getNotice() {
+
         return notice;
     }
 
@@ -313,30 +348,35 @@ public class ExpenseObject implements Parcelable {
         this.notice = notice;
     }
 
+    @NonNull
     public Account getAccount() {
 
         return account;
     }
 
-    public void setAccount(Account account) {
+    public void setAccount(@NonNull Account account) {
+
         this.account = account;
+
+        if (isSet() && !isParent())
+            this.expenseType = EXPENSE_TYPES.NORMAL_EXPENSE;
     }
 
-    public void addChild(ExpenseObject child) {
+    public void addChild(@NonNull ExpenseObject child) {
 
         children.add(child);
         setExpenseType(EXPENSE_TYPES.PARENT_EXPENSE);
     }
 
-    public void addChildren(List<ExpenseObject> children) {
+    public void addChildren(@NonNull List<ExpenseObject> children) {
 
-        if (!children.isEmpty()) {
+        for (ExpenseObject childExpense : children) {
 
-            this.children.addAll(children);
-            setExpenseType(EXPENSE_TYPES.PARENT_EXPENSE);
+            addChild(childExpense);
         }
     }
 
+    @NonNull
     public List<ExpenseObject> getChildren() {
 
         return this.children;
@@ -347,58 +387,100 @@ public class ExpenseObject implements Parcelable {
         return this.children.size();
     }
 
-    public boolean hasChildren() {
+    public boolean isParent() {
 
         return expenseType == EXPENSE_TYPES.PARENT_EXPENSE;
     }
 
+    /**
+     * Methode die die Felder der Buchung checkt ob diese gesetzt sind oder nicht.
+     * Sind alle Felder gesetzt, dann kann die Buchung ohne Probleme in die Datenbank geschrieben werden.
+     *
+     * @return Ob die Buchung in die Datenbank geschrieben werden kann
+     */
     public boolean isSet() {
 
-        //todo change to return this.expenseType == EXPENSE_TYPES.NORMAL_EXPENSE || this.expenseType == EXPENSE_TYPES.PARENT_EXPENSE
-        return !this.title.isEmpty() && this.price != 0.0 && !this.category.getCategoryName().isEmpty();
+        return !this.title.isEmpty() && this.price != 0 && this.category.isSet() && this.account.isSet();
     }
 
-    public void setExpenseType(EXPENSE_TYPES expenseType) {
+    /**
+     * Wenn der index der Buchung größer als null ist, dann gibt es die Buchung bereits in der Datenbank
+     * und man kann sie sicher verwenden.
+     *
+     * @return boolean
+     */
+    public boolean isValid() {
+
+        return getIndex() > -1 && account.isValid() && category.isValid() && getExpenseCurrency().isValid() && areTagsValid();
+    }
+
+    public boolean areTagsValid() {
+
+        boolean result = true;
+        for (Tag tag : getTags()) {
+            result = result && tag.isValid();
+        }
+
+        return result;
+    }
+
+    @Override
+    public String toString() {
+
+        return getIndex() + " " + getName() + " " + getUnsignedPrice();
+    }
+
+    public boolean equals(ExpenseObject otherExpense) {
+
+        boolean result = getName().equals(otherExpense.getName());
+        result = result && (getUnsignedPrice() == otherExpense.getUnsignedPrice());
+        result = result && getExpenseCurrency().equals(otherExpense.getExpenseCurrency());
+        result = result && getAccount().equals(otherExpense.getAccount());
+        result = result && getExpenseType().equals(otherExpense.getExpenseType());
+        result = result && getDateTime().equals(otherExpense.getDateTime());
+        result = result && getNotice().equals(otherExpense.getNotice());
+        result = result && getCategory().equals(otherExpense.getCategory());
+        result = result && (getExchangeRate() == otherExpense.getExchangeRate());
+
+        for (Tag tag : getTags()) {
+            for (Tag otherTag : otherExpense.getTags()) {
+                result = result && tag.equals(otherTag);
+            }
+        }
+
+        for (ExpenseObject child : getChildren()) {
+            for (ExpenseObject otherChildren : otherExpense.getChildren()) {
+                result = result && child.equals(otherChildren);
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Wenn die Buchung den Buchungstyp Normal oder Parent hat, dann ist die Buchung Valid.
+     *
+     * @return Ist die Buchung vom typ Normal oder Parent
+     */
+    public boolean isValidExpense() {
+
+        return this.expenseType == EXPENSE_TYPES.NORMAL_EXPENSE || this.expenseType == EXPENSE_TYPES.PARENT_EXPENSE;
+    }
+
+    public void setExpenseType(@NonNull EXPENSE_TYPES expenseType) {
 
         this.expenseType = expenseType;
     }
 
+    @NonNull
     public EXPENSE_TYPES getExpenseType() {
 
         return this.expenseType;
     }
 
 
-    //make class Parcelable || Parcelable is super slow DO NOT USE IN PRODUCTION
+    //Parcelable is super slow DO NOT USE IN PRODUCTION
     //TODO make faster!!
-
-    /**
-     * This will be only used by ParcelableCategories
-     * see: http://prasanta-paul.blogspot.de/2010/06/android-parcelable-example.html (Parcelable ArrayList)
-     * and: https://stackoverflow.com/questions/2139134/how-to-send-an-object-from-one-android-activity-to-another-using-intents for further explanations (Parcelable Object)
-     * <p>
-     * this constructor converts our parcelable object back into an Category object
-     *
-     * @param source .
-     */
-    public ExpenseObject(Parcel source) {
-
-        Calendar cal = Calendar.getInstance();
-
-        Log.v(TAG, "ParcelData (Parcel source): time to put back parcel data");
-        cal.setTimeInMillis(source.readLong());
-        date = cal;
-        title = source.readString();
-        price = source.readDouble();
-        index = source.readLong();
-        expenditure = source.readByte() != 0;
-        category = source.readParcelable(Category.class.getClassLoader());
-        tag = source.createStringArrayList();
-        notice = source.readString();
-        account = source.readParcelable(Account.class.getClassLoader());
-        children = source.createTypedArrayList(ExpenseObject.CREATOR);
-        expenseCurrency = source.readParcelable(Currency.class.getClassLoader());
-    }
 
     /**
      * can be ignored mostly
@@ -427,7 +509,7 @@ public class ExpenseObject implements Parcelable {
         dest.writeLong(index);
         dest.writeByte((byte) (expenditure ? 1 : 0));
         dest.writeParcelable(category, flags);
-        dest.writeList(tag);
+        dest.writeList(tags);
         dest.writeString(notice);
         dest.writeParcelable(account, flags);
         dest.writeList(children);

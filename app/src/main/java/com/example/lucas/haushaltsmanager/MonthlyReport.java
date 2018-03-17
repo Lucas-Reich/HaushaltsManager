@@ -92,7 +92,7 @@ public class MonthlyReport {
 
         for (ExpenseObject expense : expenses) {
 
-            if (!expense.getExpenditure()) {
+            if (!expense.isExpenditure()) {
 
                 incomingMoney += expense.getUnsignedPrice();
             }
@@ -112,7 +112,7 @@ public class MonthlyReport {
 
         for (ExpenseObject expense : expenses) {
 
-            if (expense.getExpenditure()) {
+            if (expense.isExpenditure()) {
 
                 outgoingMoney += expense.getUnsignedPrice();
             }
@@ -144,16 +144,16 @@ public class MonthlyReport {
 
         for (ExpenseObject expense : expenses) {
 
-            int index = containsHelper(monthlyExpenses, expense.getCategory().getCategoryName());
+            int index = containsHelper(monthlyExpenses, expense.getCategory().getName());
 
             if (index == -1) {
 
-                monthlyExpenses.add(new MonthlyExpenses(expense.getCategory().getCategoryName(), expense.getUnsignedPrice()));
+                monthlyExpenses.add(new MonthlyExpenses(expense.getCategory().getName(), expense.getUnsignedPrice()));
             } else {
 
                 MonthlyExpenses monthly = monthlyExpenses.get(index);
 
-                if (expense.getExpenditure()) {
+                if (expense.isExpenditure()) {
 
                     monthly.spendMoney += expense.getUnsignedPrice();
                 } else {

@@ -6,7 +6,6 @@ import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.DatePicker;
 
 import com.example.lucas.haushaltsmanager.R;
@@ -54,7 +53,7 @@ public class DatePickerDialog extends DialogFragment implements DatePicker.OnDat
 
         builder.setView(datePicker);
 
-        builder.setPositiveButton(R.string.btn_set, new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.btn_ok, new DialogInterface.OnClickListener() {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {

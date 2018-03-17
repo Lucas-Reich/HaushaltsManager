@@ -347,22 +347,22 @@ public class ImportExportActivity extends AppCompatActivity implements AccountPi
 
         expenseString.append(expense.getIndex()).append(",");
         expenseString.append(expense.getUnsignedPrice()).append(",");
-        expenseString.append(expense.getExpenditure()).append(",");
-        expenseString.append(expense.getTitle()).append(",");
+        expenseString.append(expense.isExpenditure()).append(",");
+        expenseString.append(expense.getName()).append(",");
         expenseString.append(expense.getDate()).append(",");
         expenseString.append(expense.getNotice()).append(",");
         expenseString.append(expense.getExchangeRate()).append(",");
         expenseString.append(expense.getCategory().getIndex()).append(",");
-        expenseString.append(expense.getCategory().getCategoryName()).append(",");
+        expenseString.append(expense.getCategory().getName()).append(",");
         expenseString.append(expense.getCategory().getColor()).append(",");
         expenseString.append(expense.getCategory().getDefaultExpenseType()).append(",");
         expenseString.append(expense.getAccount().getIndex()).append(",");
         expenseString.append(expense.getAccount().getName()).append(",");
         expenseString.append(expense.getAccount().getBalance()).append(",");
         expenseString.append(expense.getExpenseCurrency().getIndex()).append(",");
-        expenseString.append(expense.getExpenseCurrency().getCurrencyName()).append(",");
-        expenseString.append(expense.getExpenseCurrency().getCurrencyShortName()).append(",");
-        expenseString.append(expense.getExpenseCurrency().getCurrencySymbol()).append(",");
+        expenseString.append(expense.getExpenseCurrency().getName()).append(",");
+        expenseString.append(expense.getExpenseCurrency().getShortName()).append(",");
+        expenseString.append(expense.getExpenseCurrency().getSymbol()).append(",");
         expenseString.append(expense.getExchangeRate()).append("\n");
 
         for (ExpenseObject expenseChild : expense.getChildren()) {

@@ -100,7 +100,7 @@ public class CreateNewAccountActivity extends AppCompatActivity implements OnIte
         List<String> currencyShortNames = new ArrayList<>();
         for (Currency currency : currencies) {
 
-            currencyShortNames.add(currency.getCurrencyShortName());
+            currencyShortNames.add(currency.getShortName());
         }
 
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, currencyShortNames);
@@ -128,7 +128,7 @@ public class CreateNewAccountActivity extends AppCompatActivity implements OnIte
 
         if (tag.equals("accountName")) {
 
-            account.setAccountName(textInput);
+            account.setName(textInput);
 
             accountName = (Button) findViewById(R.id.new_account_name);
             accountName.setText(textInput);

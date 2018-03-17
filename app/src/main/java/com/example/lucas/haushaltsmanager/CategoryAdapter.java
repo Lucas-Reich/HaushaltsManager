@@ -51,8 +51,8 @@ public class CategoryAdapter extends ArrayAdapter<Category> implements View.OnCl
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        viewHolder.txtCategoryName.setText(String.format("%s", categoryObject.getCategoryName()));
-        viewHolder.circTextView.setText(String.format("%s", categoryObject.getCategoryName().substring(0,1).toUpperCase()));
+        viewHolder.txtCategoryName.setText(String.format("%s", categoryObject.getName()));
+        viewHolder.circTextView.setText(String.format("%s", categoryObject.getName().substring(0,1).toUpperCase()));
         viewHolder.circTextView.setBackgroundColor(Color.parseColor(categoryObject.getColor()));
 
         return convertView;

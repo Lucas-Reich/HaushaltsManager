@@ -11,25 +11,24 @@ import com.example.lucas.haushaltsmanager.R;
 
 public class Category implements Parcelable {
 
+    private String TAG = Category.class.getSimpleName();
+
     private long index;
-    private String categoryName;
+    private String name;
     private String color;
     private boolean defaultExpenseType;
 
-    private String TAG = Category.class.getSimpleName();
+    public Category(long index, @NonNull String categoryName, @NonNull String color, boolean defaultExpenseType) {
 
-
-    public Category(Long index, @NonNull String categoryName, @NonNull String color, boolean defaultExpenseType) {
-
-        this.index = index != null ? index : -1;
-        this.categoryName = categoryName;
-        this.color = color;
-        this.defaultExpenseType = defaultExpenseType;
+        setIndex(index);
+        setName(categoryName);
+        setColor(color);
+        setDefaultExpenseType(defaultExpenseType);
     }
 
     public Category(@NonNull String categoryName, @NonNull String color, Boolean defaultExpenseType) {
 
-        this(null, categoryName, color, defaultExpenseType != null ? defaultExpenseType : false);
+        this(-1L, categoryName, color, defaultExpenseType != null ? defaultExpenseType : false);
     }
 
     /**
@@ -42,10 +41,11 @@ public class Category implements Parcelable {
     public Category(Parcel source) {
 
         Log.v(TAG, "Recreating Category from parcel data");
-        index = source.readLong();
-        categoryName = source.readString();
-        color = source.readString();
-        defaultExpenseType = source.readInt() == 1;
+        setIndex(source.readLong());
+        setName(source.readString());
+        ;
+        setColor(source.readString());
+        setDefaultExpenseType(source.readInt() == 1);
     }
 
     /**
@@ -63,15 +63,20 @@ public class Category implements Parcelable {
         return index;
     }
 
-    @NonNull
-    public String getCategoryName() {
+    private void setIndex(long index) {
 
-        return categoryName;
+        this.index = index;
     }
 
-    public void setCategoryName(@NonNull String categoryName) {
+    @NonNull
+    public String getName() {
 
-        this.categoryName = categoryName;
+        return name;
+    }
+
+    public void setName(@NonNull String name) {
+
+        this.name = name;
     }
 
     public String getColor() {
@@ -99,8 +104,47 @@ public class Category implements Parcelable {
         this.defaultExpenseType = expenseType;
     }
 
+    /**
+     * Methode die die Felder der Kategorie checkt ob diese gesetzt sind oder nicht.
+     * Sind alle Felder gesetzt, dann kann die Kategorie ohne Probleme in die Datenbank geschrieben werden.
+     *
+     * @return Ob die Kategorie in die Datenbank geschrieben werden kann
+     */
+    public boolean isSet() {
 
-    //make class Parcelable
+        return !this.name.isEmpty() && !this.color.isEmpty();
+    }
+
+    /**
+     * Wenn der index der Kategorie größer als null ist, dann gibt es die Kategorie bereits in der Datenbank
+     * und man kann sie sicher verwenden.
+     *
+     * @return boolean
+     */
+    public boolean isValid() {
+
+        return getIndex() > -1;
+    }
+
+    /**
+     * Methode die überprüft, ob die angegebene Kategorie die gleiche ist, wie diese.
+     *
+     * @param otherCategory Andere Kategorie
+     * @return boolean
+     */
+    public boolean equals(Category otherCategory) {
+
+        boolean result = getName().equals(otherCategory.getName());
+        result = result && getColor().equals(otherCategory.getColor());
+        result = result && (getDefaultExpenseType() == otherCategory.getDefaultExpenseType());
+
+        return result;
+    }
+
+    public String toString() {
+
+        return getIndex() + " " + getName() + " " + getColor();
+    }
 
     /**
      * can be ignored mostly
@@ -124,7 +168,7 @@ public class Category implements Parcelable {
 
         Log.v(TAG, "write to parcel..." + flags);
         dest.writeLong(index);
-        dest.writeString(categoryName);
+        dest.writeString(name);
         dest.writeString(color);
         dest.writeInt(defaultExpenseType ? 1 : 0);
     }

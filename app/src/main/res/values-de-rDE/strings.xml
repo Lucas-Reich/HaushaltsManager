@@ -87,4 +87,6 @@
     <string name="creating_backup">Erstelle Backup</string>
     <string name="choose_new_backup_name">Backup name</string>
     <string name="input_date">Geben Sie eine Datum ein</string>
+    <string name="error_same_accounts">Du kannst kein Geld auf dasselbe Konto überweisen</string>
+    <string name="error_missing_content">Du musst alle Spalten ausfüllen</string>
 </resources>

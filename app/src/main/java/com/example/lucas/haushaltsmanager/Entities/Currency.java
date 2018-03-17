@@ -10,31 +10,26 @@ import com.example.lucas.haushaltsmanager.R;
 
 public class Currency implements Parcelable {
 
-    private long index;
-    private String currencyName;
-    private String currencyShortName;
-    private String currencySymbol;
-    private double rateToBase;
-
     private static String TAG = Currency.class.getSimpleName();
+
+    private long index;
+    private String name;
+    private String shortName;
+    private String symbol;
+    private double rateToBase;
 
     public Currency(long index, @NonNull String currencyName, @NonNull String currencyShortName, @NonNull String currencySymbol, Double rateToBase) {
 
-        this.index = index;
-        this.currencyName = currencyName;
-        this.currencyShortName = currencyShortName;
-        this.currencySymbol = currencySymbol;
-        this.rateToBase = rateToBase != null ? rateToBase : 0;
+        setIndex(index);
+        setName(currencyName);
+        setShortName(currencyShortName);
+        setSymbol(currencySymbol);
+        setRateToBase(rateToBase != null ? rateToBase : 0);
     }
 
     public Currency(long index, @NonNull String currencyName, @NonNull String currencyShortName, @NonNull String currencySymbol) {
 
         this(index, currencyName, currencyShortName, currencySymbol, null);
-    }
-
-    public Currency(@NonNull String currencyName, @NonNull String currencyShortName, @NonNull String currencySymbol) {
-
-        this(-1, currencyName, currencyShortName, currencySymbol, null);
     }
 
     /**
@@ -45,11 +40,11 @@ public class Currency implements Parcelable {
     public Currency(Parcel source) {
 
         Log.v(TAG, "Recreating Currency from parcel data");
-        index = source.readLong();
-        currencyName = source.readString();
-        currencyShortName = source.readString();
-        currencySymbol = source.readString();
-        rateToBase = source.readDouble();
+        setIndex(source.readLong());
+        setName(source.readString());
+        setShortName(source.readString());
+        setSymbol(source.readString());
+        setRateToBase(source.readDouble());
     }
 
     /**
@@ -59,7 +54,7 @@ public class Currency implements Parcelable {
      */
     public static Currency createDummyCurrency(Context context) {
 
-        return new Currency(-1, context.getResources().getString(R.string.no_name), "NON", "");
+        return new Currency(-1, context.getResources().getString(R.string.no_name), "NON", "", null);
     }
 
     public long getIndex() {
@@ -67,22 +62,42 @@ public class Currency implements Parcelable {
         return index;
     }
 
-    @NonNull
-    public String getCurrencyName() {
+    private void setIndex(long index) {
 
-        return currencyName;
+        this.index = index;
     }
 
     @NonNull
-    public String getCurrencyShortName() {
+    public String getName() {
 
-        return currencyShortName;
+        return name;
+    }
+
+    private void setName(@NonNull String name) {
+
+        this.name = name;
     }
 
     @NonNull
-    public String getCurrencySymbol() {
+    public String getShortName() {
 
-        return currencySymbol != null ? currencySymbol : currencyShortName;
+        return shortName;
+    }
+
+    private void setShortName(@NonNull String shortName) {
+
+        this.shortName = shortName;
+    }
+
+    @NonNull
+    public String getSymbol() {
+
+        return symbol != null ? symbol : shortName;
+    }
+
+    private void setSymbol(@NonNull String symbol) {
+
+        this.symbol = symbol;
     }
 
     public double getRateToBase() {
@@ -93,6 +108,48 @@ public class Currency implements Parcelable {
     public void setRateToBase(double rate) {
 
         this.rateToBase = rate;
+    }
+
+    /**
+     * Methode die die Felder der Währung checkt ob diese gesetzt sind oder nicht.
+     * Sind alle Felder gesetzt, dann kann die Währung ohne Probleme in die Datenbank geschrieben werden.
+     *
+     * @return Ob die Währung in die Datenbank geschrieben werden kann
+     */
+    public boolean isSet() {
+
+        return !this.name.isEmpty() && !this.shortName.isEmpty() && !this.symbol.isEmpty();
+    }
+
+    /**
+     * Wenn der index der Währung größer als null ist, dann gibt es die Währung bereits in der Datenbank
+     * und man kann sie sicher verwenden.
+     *
+     * @return boolean
+     */
+    public boolean isValid() {
+
+        return getIndex() > -1;
+    }
+    public String toString() {
+
+        return getIndex() + " " + getName() + " " + getRateToBase();
+    }
+
+    /**
+     * Methode um zu überprüfen, ob die angegebene Währung die gleiche ist wie diese.
+     *
+     * @param otherCurrency Andere Währung
+     * @return boolean
+     */
+    public boolean equals(Currency otherCurrency) {
+
+        boolean result = getName().equals(otherCurrency.getName());
+        result = result && getShortName().equals(otherCurrency.getShortName());
+        result = result && getSymbol().equals(otherCurrency.getShortName());
+        result = result && (getRateToBase() == otherCurrency.getRateToBase());
+
+        return result;
     }
 
 
@@ -109,9 +166,9 @@ public class Currency implements Parcelable {
 
         Log.v(TAG, "write to parcel..." + flags);
         dest.writeLong(index);
-        dest.writeString(currencyName);
-        dest.writeString(currencyShortName);
-        dest.writeString(currencySymbol);
+        dest.writeString(name);
+        dest.writeString(shortName);
+        dest.writeString(symbol);
         dest.writeDouble(rateToBase);
     }
 

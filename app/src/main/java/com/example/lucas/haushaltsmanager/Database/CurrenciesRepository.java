@@ -66,9 +66,9 @@ public class CurrenciesRepository {
     public long createCurrency(Currency currency) {
 
         ContentValues values = new ContentValues();
-        values.put(ExpensesDbHelper.CURRENCIES_COL_NAME, currency.getCurrencyName());
-        values.put(ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME, currency.getCurrencyShortName());
-        values.put(ExpensesDbHelper.CURRENCIES_COL_SYMBOL, currency.getCurrencySymbol());
+        values.put(ExpensesDbHelper.CURRENCIES_COL_NAME, currency.getName());
+        values.put(ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME, currency.getShortName());
+        values.put(ExpensesDbHelper.CURRENCIES_COL_SYMBOL, currency.getSymbol());
 
         return database.insert(ExpensesDbHelper.TABLE_CURRENCIES, null, values);
     }

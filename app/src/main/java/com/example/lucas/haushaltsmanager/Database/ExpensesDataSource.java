@@ -32,7 +32,6 @@ public class ExpensesDataSource {
     private SQLiteDatabase database;
     private ExpensesDbHelper dbHelper;
     private Context mContext;
-    private Calendar CAL;
 
     public ExpensesDataSource(Context context) {
 
@@ -61,10 +60,12 @@ public class ExpensesDataSource {
     @NonNull
     private ExpenseObject cursorToChildBooking(Cursor c) {
 
-        CAL = Calendar.getInstance();
-
         int expenseId = c.getInt(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_ID));
-        String date = c.getString(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_DATE));
+
+        Calendar date = Calendar.getInstance();
+        String dateString = c.getString(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_DATE));
+        date.setTimeInMillis(Long.parseLong(dateString));
+
         String title = c.getString(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_TITLE));
         double price = c.getDouble(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_PRICE));
         boolean expenditure = c.getInt(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_EXPENDITURE)) == 1;
@@ -81,7 +82,7 @@ public class ExpensesDataSource {
         String curName = c.getString(c.getColumnIndex(ExpensesDbHelper.CURRENCIES_COL_NAME));
         String curShortName = c.getString(c.getColumnIndex(ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME));
         String curSymbol = c.getString(c.getColumnIndex(ExpensesDbHelper.CURRENCIES_COL_SYMBOL));
-        Double rateToBase = getRateToBase(curId, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(CAL.getTime()));
+        Double rateToBase = getRateToBase(curId, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(date.getTime()));
         Currency currency = new Currency(curId, curName, curShortName, curSymbol, rateToBase);
 
         long accountId = c.getLong(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID));
@@ -109,13 +110,11 @@ public class ExpensesDataSource {
      */
     private ExpenseObject cursorToExpense(Cursor c) {
 
-        CAL = Calendar.getInstance();
-
         int expenseId = c.getInt(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_ID));
 
-        Log.d(TAG, "cursorToExpense: " + expenseId);
-
-        String date = c.getString(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_DATE));
+        Calendar date = Calendar.getInstance();
+        String dateString = c.getString(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_DATE));
+        date.setTimeInMillis(Long.parseLong(dateString));
 
         String title = c.getString(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_TITLE));
 
@@ -135,7 +134,7 @@ public class ExpensesDataSource {
         String curName = c.getString(c.getColumnIndex(ExpensesDbHelper.CURRENCIES_COL_NAME));
         String curShortName = c.getString(c.getColumnIndex(ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME));
         String curSymbol = c.getString(c.getColumnIndex(ExpensesDbHelper.CURRENCIES_COL_SYMBOL));
-        Double rateToBase = getRateToBase(curId, date.substring(0, 10));
+        Double rateToBase = getRateToBase(curId, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(date.getTime()));
         Currency currency = new Currency(curId, curName, curShortName, curSymbol, rateToBase);
 
         long accountId = c.getLong(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID));
@@ -628,19 +627,13 @@ public class ExpensesDataSource {
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.BOOKINGS_COL_PRICE, expense.getUnsignedPrice());
         values.put(ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID, expense.getCategory().getIndex());
-        values.put(ExpensesDbHelper.BOOKINGS_COL_EXPENDITURE, expense.getExpenditure());
-        values.put(ExpensesDbHelper.BOOKINGS_COL_TITLE, expense.getTitle());
-        values.put(ExpensesDbHelper.BOOKINGS_COL_DATE, expense.getDBDateTime());
+        values.put(ExpensesDbHelper.BOOKINGS_COL_EXPENDITURE, expense.isExpenditure());
+        values.put(ExpensesDbHelper.BOOKINGS_COL_TITLE, expense.getName());
+        values.put(ExpensesDbHelper.BOOKINGS_COL_DATE, expense.getDateTime().getTimeInMillis());
         values.put(ExpensesDbHelper.BOOKINGS_COL_NOTICE, expense.getNotice());
         values.put(ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID, expense.getAccount().getIndex());
         values.put(ExpensesDbHelper.BOOKINGS_COL_EXCHANGE_RATE, expense.getExchangeRate());
-        if (expense.hasChildren() || expense.getAccount().getIndex() == 9999) {
-
-            values.put(ExpensesDbHelper.BOOKINGS_COL_IS_PARENT, true);
-        } else {
-
-            values.put(ExpensesDbHelper.BOOKINGS_COL_IS_PARENT, false);
-        }
+        values.put(ExpensesDbHelper.BOOKINGS_COL_IS_PARENT, expense.isParent());
         values.put(ExpensesDbHelper.BOOKINGS_COL_CURRENCY_ID, expense.getExpenseCurrency().getIndex());
 
         long bookingId = database.insert(ExpensesDbHelper.TABLE_BOOKINGS, null, values);
@@ -719,7 +712,7 @@ public class ExpensesDataSource {
      * @param endDate   ending date
      * @return list of Expenses which are between the starting and end date
      */
-    public ArrayList<ExpenseObject> getBookings(String startDate, String endDate) {
+    public ArrayList<ExpenseObject> getBookings(String startDate, String endDate) {//todo
 
         String selectQuery;
         selectQuery = "SELECT "
@@ -822,9 +815,9 @@ public class ExpensesDataSource {
         values.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_PRICE, child.getUnsignedPrice());
         values.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_PARENT_BOOKING_ID, parentId);
         values.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_CATEGORY_ID, child.getCategory().getIndex());
-        values.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_EXPENDITURE, child.getExpenditure());
-        values.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_TITLE, child.getTitle());
-        values.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_DATE, child.getDBDateTime());
+        values.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_EXPENDITURE, child.isExpenditure());
+        values.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_TITLE, child.getName());
+        values.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_DATE, child.getDateTime().getTimeInMillis());
         values.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_NOTICE, child.getNotice());
         values.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_ACCOUNT_ID, child.getAccount().getIndex());
         values.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_EXCHANGE_RATE, child.getExchangeRate());
@@ -857,7 +850,7 @@ public class ExpensesDataSource {
 
             ExpenseObject parent = getBookingById(parentId);
 
-            if (parent.hasChildren()) {
+            if (parent.isParent()) {
 
                 addChild(childExpense, parentId);
 
@@ -1017,7 +1010,7 @@ public class ExpensesDataSource {
 
         //TODO erstelle neue Kategorie wenn sie nicht bereits existiert
         ContentValues values = new ContentValues();
-        values.put(ExpensesDbHelper.CATEGORIES_COL_NAME, category.getCategoryName());
+        values.put(ExpensesDbHelper.CATEGORIES_COL_NAME, category.getName());
         values.put(ExpensesDbHelper.CATEGORIES_COL_COLOR, category.getColor());
         values.put(ExpensesDbHelper.CATEGORIES_COL_EXPENSE_TYPE, category.getDefaultExpenseType() ? 1 : 0);
         Log.d(TAG, "created new CATEGORY");
@@ -1188,7 +1181,7 @@ public class ExpensesDataSource {
     }
 
 
-    public long createRecurringBooking(long recurringBookingId, Calendar start, int frequency, Calendar end) {
+    public long createRecurringBooking(long recurringBookingId, Calendar start, int frequency, Calendar end) {//todo
 
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID, recurringBookingId);
@@ -1200,6 +1193,7 @@ public class ExpensesDataSource {
         return database.insert(ExpensesDbHelper.TABLE_RECURRING_BOOKINGS, null, values);
     }
 
+    //todo
     public ArrayList<ExpenseObject> getRecurringBookings(Calendar dateRngStart, Calendar endDate) {//TODO nicht ganz zufrieden mit der funktion, bitte überdenken
 
         //exclude all events which end before the given date range
@@ -1280,6 +1274,7 @@ public class ExpensesDataSource {
         return getBookingById(bookingId);
     }
 
+    //todo
     public int updateRecurringBooking(ExpenseObject newRecurringBooking, String startDate, int frequency, String endDate, long recurringId) {
 
         ContentValues values = new ContentValues();
@@ -1302,9 +1297,9 @@ public class ExpensesDataSource {
     public long createCurrency(Currency currency) {
 
         ContentValues values = new ContentValues();
-        values.put(ExpensesDbHelper.CURRENCIES_COL_NAME, currency.getCurrencyName());
-        values.put(ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME, currency.getCurrencyShortName());
-        values.put(ExpensesDbHelper.CURRENCIES_COL_SYMBOL, currency.getCurrencySymbol());
+        values.put(ExpensesDbHelper.CURRENCIES_COL_NAME, currency.getName());
+        values.put(ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME, currency.getShortName());
+        values.put(ExpensesDbHelper.CURRENCIES_COL_SYMBOL, currency.getSymbol());
 
         return database.insert(ExpensesDbHelper.TABLE_CURRENCIES, null, values);
     }
@@ -1424,7 +1419,7 @@ public class ExpensesDataSource {
      * @param serverDate fetching date
      * @return state of operation
      */
-    public long createExchangeRate(String fromCur, String toCur, double rate, String serverDate) {
+    public long createExchangeRate(String fromCur, String toCur, double rate, String serverDate) {//todo
 
         return createExchangeRate(getCurrencyId(fromCur), getCurrencyId(toCur), rate, serverDate);
     }
@@ -1438,7 +1433,7 @@ public class ExpensesDataSource {
      * @param serverDate   fetching date
      * @return state of operation
      */
-    public long createExchangeRate(long fromCurIndex, long toCurIndex, double rate, String serverDate) {
+    public long createExchangeRate(long fromCurIndex, long toCurIndex, double rate, String serverDate) {//todo
 
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.CURRENCY_EXCHANGE_RATES_COL_FROM_CURRENCY_ID, fromCurIndex);
@@ -1458,7 +1453,7 @@ public class ExpensesDataSource {
      * @return HashMap(ExchangeRate, Download date of fetched exchange rate)
      */
     @Nullable
-    public HashMap<Double, String> getExtendedExchangeRate(long fromCurIndex, long toCurIndex, String date) {
+    public HashMap<Double, String> getExtendedExchangeRate(long fromCurIndex, long toCurIndex, String date) {//todo
 
         HashMap<Double, String> extendedExchangeRateInfo = new HashMap<>();
 
@@ -1508,7 +1503,7 @@ public class ExpensesDataSource {
      * @return The ExchangeRate if available null if not
      */
     @Nullable
-    public Double getExchangeRate(long fromCurIndex, long toCurIndex, String date) {
+    public Double getExchangeRate(long fromCurIndex, long toCurIndex, String date) {//todo
 
         HashMap<Double, String> extendedExchangeRate = getExtendedExchangeRate(fromCurIndex, toCurIndex, date);
 
@@ -1526,16 +1521,16 @@ public class ExpensesDataSource {
      * Method for getting an exchange rate from rate to base to toCurIndex
      *
      * @param fromCurIndex id of convert to currency
-     * @param date         date of the exchange rate
+     * @param timeInMills         date of the exchange rate
      * @return rate to base if available else null
      */
     @Nullable
-    public Double getRateToBase(long fromCurIndex, String date) {
+    public Double getRateToBase(long fromCurIndex, long timeInMills) {
 
         SharedPreferences preferences = mContext.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
         long baseCurIndex = preferences.getLong("mainCurrencyIndex", 0);
 
-        HashMap<Double, String> extendedExchangeRate = getExtendedExchangeRate(fromCurIndex, baseCurIndex, date);
+        HashMap<Double, String> extendedExchangeRate = getExtendedExchangeRate(fromCurIndex, baseCurIndex, timeInMills);
 
         if (extendedExchangeRate != null) {
 
@@ -1569,7 +1564,7 @@ public class ExpensesDataSource {
 
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.CONVERT_EXPENSES_STACK_COL_BOOKING, expense.getIndex());
-        values.put(ExpensesDbHelper.CONVERT_EXPENSES_STACK_COL_LATEST_TRY, expense.getDBDateTime());
+        values.put(ExpensesDbHelper.CONVERT_EXPENSES_STACK_COL_LATEST_TRY, expense.getDateTime().getTimeInMillis());
 
         database.insert(ExpensesDbHelper.TABLE_CONVERT_EXPENSES_STACK, null, values);
     }
