@@ -68,7 +68,7 @@
     <string name="others">Other</string>
     <string name="incoming">Incoming</string>
     <string name="outgoing">Outgoing</string>
-    <string name="update_booking">Update</string>
+    <string name="update">Update</string>
     <string name="add_child_to_booking">Create Child Booking</string>
     <string name="choose_currency">Select the accounts currency</string>
     <string name="create_new_account_name">Accountname</string>
@@ -94,4 +94,5 @@
     <string name="input_date">Input Date</string>
     <string name="error_same_accounts">You cannot transfer from and to the same account!</string>
     <string name="error_missing_content">You have to set all values</string>
+    <string name="btn_save">Save</string>
 </resources>

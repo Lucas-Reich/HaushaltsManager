@@ -58,6 +58,13 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
         mToAccountBtn = (Button) findViewById(R.id.transfer_to_account_btn);
         mCreateTransferBtn = (Button) findViewById(R.id.transfer_create_btn);
         mAmountBtn = (Button) findViewById(R.id.transfer_amount_btn);
+
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+
+            long fromAccountId = bundle.getLong("from_account_id");
+            setFromAccount(mDatabase.getAccountById(fromAccountId));
+        }
     }
 
     @Override
@@ -208,15 +215,39 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
 
         if (tag.equals("transfers_from_account")) {
 
-            mFromAccount = account;
-            mFromExpense.setAccount(account);
-            mFromAccountBtn.setText(mFromAccount.getName());
+            setFromAccount(account);
         } else if (tag.equals("transfers_to_account")) {
 
-            mToAccount = account;
-            mToExpense.setAccount(account);
-            mToAccountBtn.setText(mToAccount.getName());
+            setToAccount(account);
         }
+    }
+
+    /**
+     * Methode um das Ausgehende Konto zu setzen
+     *
+     * @param newAccount Das neue ausgehende Konto
+     */
+    private void setFromAccount(Account newAccount) {
+
+        mFromAccount = newAccount;
+        mFromExpense.setAccount(mFromAccount);
+        mFromAccountBtn.setText(mFromAccount.getName());
+
+        Log.d(TAG, "selected " + mFromAccount.getName() + " as from account");
+    }
+
+    /**
+     * Methode um das Eingehende Konto zu setzen
+     *
+     * @param newAccount Das neue eingehende Konto
+     */
+    private void setToAccount(Account newAccount) {
+
+        mToAccount = newAccount;
+        mToExpense.setAccount(mToAccount);
+        mToAccountBtn.setText(mToAccount.getName());
+
+        Log.d(TAG, "selected " + mToAccount.getName() + " as to account");
     }
 
     @Override
@@ -242,8 +273,7 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
             mToExpense.setPrice(price);
             mToExpense.setExpenditure(false);
 
-            mAmountBtn.setText(String.format("%s", price));
-            //todo formatiere den preis entsprechend der user locale
+            mAmountBtn.setText(String.format(this.getResources().getConfiguration().locale,"%.2f", mFromExpense.getUnsignedPrice()));
             //todo füge die Basis währung mit in den Text ein
         }
     }

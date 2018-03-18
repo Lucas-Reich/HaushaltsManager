@@ -1,12 +1,14 @@
 package com.example.lucas.haushaltsmanager.Dialogs.ChangeAccounts;
 
 import android.content.Context;
-import android.support.v7.view.menu.MenuBuilder;
+import android.content.Intent;
+import android.support.v7.widget.PopupMenu;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.support.v7.widget.PopupMenu;
 
+import com.example.lucas.haushaltsmanager.Activities.CreateNewAccountActivity;
+import com.example.lucas.haushaltsmanager.Activities.TransferActivity;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.R;
 
@@ -37,15 +39,24 @@ public class OnAccountOverflowSelectedListener implements View.OnClickListener {
                 switch (item.getItemId()) {
 
                     case R.id.edit_account_delete:
+                        //TODO lösche das Konto
                         //wenn diser menüpunkt ausgewählt wurde soll noch einmal nachgefragt werden ob der user sich sicher ist und wenn ja soll das konto direkt gelöscht werden
-                        Log.d(TAG, "onMenuItemSelected: delete selected");
                         return true;
                     case R.id.edit_account_edit:
-                        //wenn dieser menüpunkt ausgewählt wurde dann soll die CreateNewAccountActivity aufgehen, die werte sollen bereits eingefügt sein und der button heißt "Update"
+
+                        Intent updateAccountIntent = new Intent(mContext, CreateNewAccountActivity.class);
+                        updateAccountIntent.putExtra("mode", "update");
+                        updateAccountIntent.putExtra("account_id", mAccount.getIndex());
+                        mContext.startActivity(updateAccountIntent);
+
                         Log.d(TAG, "onMenuItemSelected: edit selected");
                         return true;
                     case R.id.edit_account_transfer:
-                        //wenn dieser menüpunkt ausgewählt wurde, dann sich ein fenster öffnen in dem es möglich ist überweisungen von einem Konto zu einerm anderen zu machen
+
+                        Intent transferMoneyBetweenAccountsIntent = new Intent(mContext, TransferActivity.class);
+                        transferMoneyBetweenAccountsIntent.putExtra("from_account_id", mAccount.getIndex());
+                        mContext.startActivity(transferMoneyBetweenAccountsIntent);
+
                         Log.d(TAG, "onMenuItemSelected: empty selected");
                         return true;
                     default:

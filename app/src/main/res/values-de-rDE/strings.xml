@@ -63,7 +63,7 @@
     <string name="others">Andere</string>
     <string name="incoming">Eingehend</string>
     <string name="outgoing">Ausgehend</string>
-    <string name="update_booking">Update</string>
+    <string name="update">Update</string>
     <string name="add_child_to_booking">Erstelle Kind Buchung</string>
     <string name="choose_currency">Wähle die Währung des Kontos</string>
     <string name="create_new_account_name">Kontoname</string>
@@ -89,4 +89,5 @@
     <string name="input_date">Geben Sie eine Datum ein</string>
     <string name="error_same_accounts">Du kannst kein Geld auf dasselbe Konto überweisen</string>
     <string name="error_missing_content">Du musst alle Spalten ausfüllen</string>
+    <string name="btn_save">Speichern</string>
 </resources>

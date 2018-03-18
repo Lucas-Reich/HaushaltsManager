@@ -15,10 +15,10 @@ public class Account implements Parcelable {
 
     private long index;
     private String name;
-    private int balance;
+    private double balance;
     private Currency currency;
 
-    public Account(long index, @NonNull String accountName,int balance, @NonNull Currency currency) {
+    public Account(long index, @NonNull String accountName,double balance, @NonNull Currency currency) {
 
         setIndex(index);
         setName(accountName);
@@ -26,9 +26,9 @@ public class Account implements Parcelable {
         setCurrency(currency);
     }
 
-    public Account(@NonNull String accountName, Integer balance, @NonNull Currency currency) {
+    public Account(@NonNull String accountName, double balance, @NonNull Currency currency) {
 
-        this(-1, accountName, balance != null ? balance : 0, currency);
+        this(-1, accountName, balance, currency);
     }
 
     /**
@@ -44,7 +44,7 @@ public class Account implements Parcelable {
         Log.v(TAG, "Recreating Account from parcel data");
         setIndex(source.readLong());
         setName(source.readString());
-        setBalance(source.readInt());
+        setBalance(source.readDouble());
         setCurrency((Currency) source.readParcelable(Currency.class.getClassLoader()));
     }
 
@@ -80,12 +80,12 @@ public class Account implements Parcelable {
         this.name = accountName;
     }
 
-    public int getBalance() {
+    public double getBalance() {
 
         return balance;
     }
 
-    public void setBalance(int balance) {
+    public void setBalance(double balance) {
 
         this.balance = balance;
     }
@@ -113,7 +113,7 @@ public class Account implements Parcelable {
     }
 
     /**
-     * Wenn der index des Kontos größer als null ist, dann gibt es die Buchung bereits in der Datenbank
+     * Wenn der index des Kontos größer als null ist, dann gibt es das Konto bereits in der Datenbank
      * und man kann es sicher verwenden.
      *
      * @return boolean
@@ -164,7 +164,7 @@ public class Account implements Parcelable {
         Log.v(TAG, "write to parcel..." + flags);
         dest.writeLong(index);
         dest.writeString(name);
-        dest.writeInt(balance);
+        dest.writeDouble(balance);
         dest.writeParcelable(currency, flags);
     }
 

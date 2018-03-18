@@ -95,13 +95,13 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
             mExpense.setNotice("");
         } else if (bundle != null && bundle.get("childExpense") != null) {
 
-            mSaveBtn.setText(getString(R.string.update_booking));
+            mSaveBtn.setText(getString(R.string.update));
 
             CREATION_MODE = creationModes.UPDATE_CHILD_MODE;
             mExpense = mDatabase.getChildBookingById(bundle.getLong("childExpense"));
         } else if (bundle != null && bundle.get("parentExpense") != null) {
 
-            mSaveBtn.setText(getString(R.string.update_booking));
+            mSaveBtn.setText(getString(R.string.update));
 
             CREATION_MODE = creationModes.UPDATE_EXPENSE_MODE;
             mExpense = mDatabase.getBookingById(bundle.getLong("parentExpense"));
@@ -127,7 +127,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
         mDateBtn.setText(mExpense.getDisplayableDateTime());
 
 
-        // set the account to the current main account
+        // set the mAccount to the current main mAccount
         mAccountBtn = (Button) findViewById(R.id.expense_screen_account);
         mAccountBtn.setText(mExpense.getAccount().getName());
 
@@ -171,7 +171,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
             }
         });
 
-        //set account currency symbol
+        //set mAccount currency symbol
         mCurrencyTxt = (TextView) findViewById(R.id.expense_screen_amount_currency);
         mCurrencyTxt.setText(mExpense.getAccount().getCurrency().getSymbol());
 
@@ -499,7 +499,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
             mAccountBtn.setText(mExpense.getAccount().getName());
             mCurrencyTxt.setText(mExpense.getAccount().getCurrency().getSymbol());
 
-            Log.d(TAG, "set expense account to: " + mExpense.getAccount().getName());
+            Log.d(TAG, "set expense mAccount to: " + mExpense.getAccount().getName());
         }
     }
 

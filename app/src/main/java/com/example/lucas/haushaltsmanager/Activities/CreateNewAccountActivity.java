@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -14,8 +15,9 @@ import android.widget.Button;
 import android.widget.Spinner;
 
 import com.example.lucas.haushaltsmanager.Activities.MainTab.TabParentActivity;
-import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
+import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
+import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.R;
@@ -23,79 +25,144 @@ import com.example.lucas.haushaltsmanager.R;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CreateNewAccountActivity extends AppCompatActivity implements OnItemSelectedListener, BasicTextInputDialog.BasicDialogCommunicator {
+public class CreateNewAccountActivity extends AppCompatActivity implements OnItemSelectedListener, BasicTextInputDialog.BasicDialogCommunicator, PriceInputDialog.OnPriceSelected {
 
-    SharedPreferences preferences;
-    Button accountName;
-    Button accountBalance;
-    ExpensesDataSource database;
-    Account account;
+    private String TAG = CreateNewAccountActivity.class.getSimpleName();
+
+    Button mAccountNameBtn;
+    Button mAccountBalanceBtn, mCreateAccountBtn;
+    Spinner mAccountCurrencySpin;
+    ExpensesDataSource mDatabase;
+    Account mAccount;
+
+    private enum CREATION_MODES {
+        CREATE_ACCOUNT,
+        UPDATE_ACCOUNT
+    }
+
+    private CREATION_MODES mCreationMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        preferences = getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
-
-        database = new ExpensesDataSource(this);
-        database.open();
-
-
-        Currency defCurrency = database.getCurrency(preferences.getLong("mainCurrencyIndex", 1));
-        account = new Account(getResources().getString(R.string.no_name), null, defCurrency);
-
         setContentView(R.layout.activity_new_account);
 
-        accountName = (Button) findViewById(R.id.new_account_name);
-        accountName.setOnClickListener(new View.OnClickListener() {
+        mDatabase = new ExpensesDataSource(this);
+        mDatabase.open();
+
+        final Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+
+            switch (bundle.getString("mode")) {
+
+                case "update":
+                    mCreationMode = CREATION_MODES.UPDATE_ACCOUNT;
+
+                    long accountId = bundle.getLong("account_id");
+                    mAccount = mDatabase.getAccountById(accountId);
+                    break;
+                case "create":
+                    mCreationMode = CREATION_MODES.CREATE_ACCOUNT;
+
+                    mAccount = Account.createDummyAccount(this);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        mAccountNameBtn = (Button) findViewById(R.id.new_account_name);
+        mAccountBalanceBtn = (Button) findViewById(R.id.new_account_balance);
+        mCreateAccountBtn = (Button) findViewById(R.id.new_account_create);
+
+        mAccountCurrencySpin = (Spinner) findViewById(R.id.new_account_currency);
+        mAccountCurrencySpin.setOnItemSelectedListener(this);
+        refreshSpinnerContents();
+        setVisibleSpinnerItem(mAccount.getCurrency().getShortName());
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        mAccountNameBtn.setHint(mAccount.getName());
+        mAccountNameBtn.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
 
                 Bundle args = new Bundle();
                 args.putString("title", "Set Account getName");
 
-                DialogFragment basicDialog = new BasicTextInputDialog();
+                BasicTextInputDialog basicDialog = new BasicTextInputDialog();
                 basicDialog.setArguments(args);
-                basicDialog.show(getFragmentManager(), "accountName");
+                basicDialog.show(getFragmentManager(), "create_account_name");
             }
         });
 
-        accountBalance = (Button) findViewById(R.id.new_account_balance);
-        accountBalance.setOnClickListener(new View.OnClickListener() {
+        mAccountBalanceBtn.setHint(mAccount.getBalance() + "");
+        mAccountBalanceBtn.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
 
                 Bundle args = new Bundle();
                 args.putString("title", "Set Account Balance");
 
-                DialogFragment basicDialog = new BasicTextInputDialog();
-                basicDialog.setArguments(args);
-                basicDialog.show(getFragmentManager(), "accountBalance");
+                PriceInputDialog priceInputDialog = new PriceInputDialog();
+                priceInputDialog.setArguments(args);
+                priceInputDialog.show(getFragmentManager(), "create_account_price");
             }
         });
 
-        Button createAccount = (Button) findViewById(R.id.new_account_create);
-        createAccount.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        if (mCreationMode == CREATION_MODES.UPDATE_ACCOUNT)
+            mCreateAccountBtn.setText(R.string.update);
+        else
+            mCreateAccountBtn.setText(R.string.btn_save);
+        mCreateAccountBtn.setOnClickListener(createAccountClickListener);
+    }
 
-                SharedPreferences settings = getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = settings.edit();
+    /**
+     * OnClickListener der unterscheidet ob ein Konto neu erstellt oder nur geupdated werden soll
+     * und die dementsprechende Aktion ausfüht.
+     */
+    private View.OnClickListener createAccountClickListener = new View.OnClickListener() {
 
-                editor.putBoolean(account.getName(), true);
-                editor.apply();
+        @Override
+        public void onClick(View v) {
 
-                database.createAccount(account);
-                Intent startMainTab = new Intent(CreateNewAccountActivity.this, TabParentActivity.class);
-                CreateNewAccountActivity.this.startActivity(startMainTab);
+            if (!mAccount.isSet())
+                return;
+
+            switch (mCreationMode) {
+
+                case CREATE_ACCOUNT:
+
+                    SharedPreferences settings = getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = settings.edit();
+
+                    editor.putBoolean(mAccount.getName(), true);
+                    editor.apply();
+
+                    mDatabase.createAccount(mAccount);
+                    break;
+                case UPDATE_ACCOUNT:
+
+                    mDatabase.updateAccount(mAccount);
+                    break;
             }
-        });
 
-        Spinner accountCurrency = (Spinner) findViewById(R.id.new_account_currency);
+            Intent startMainTab = new Intent(CreateNewAccountActivity.this, TabParentActivity.class);
+            CreateNewAccountActivity.this.startActivity(startMainTab);
+        }
+    };
 
-        accountCurrency.setOnItemSelectedListener(this);
+    /**
+     * Methode um die in dem Spinner angezeigten Währungen neu zu laden
+     */
+    private void refreshSpinnerContents() {
 
-        ArrayList<Currency> currencies = database.getAllCurrencies();
+        ArrayList<Currency> currencies = mDatabase.getAllCurrencies();
 
         List<String> currencyShortNames = new ArrayList<>();
         for (Currency currency : currencies) {
@@ -107,7 +174,23 @@ public class CreateNewAccountActivity extends AppCompatActivity implements OnIte
 
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-        accountCurrency.setAdapter(dataAdapter);
+        mAccountCurrencySpin.setAdapter(dataAdapter);
+    }
+
+    /**
+     * Methode um das sichtbare Element des Spinners auf das visibleItem zu setzen
+     *
+     * @param visibleItem Anzuzeigendes Element
+     */
+    private void setVisibleSpinnerItem(String visibleItem) {
+
+        int index = 0;
+        for (int i = 0; i < mAccountCurrencySpin.getCount(); i++) {
+            if (mAccountCurrencySpin.getItemAtPosition(i).equals(visibleItem))
+                index = i;
+        }
+
+        mAccountCurrencySpin.setSelection(index);
     }
 
     @Override
@@ -115,7 +198,7 @@ public class CreateNewAccountActivity extends AppCompatActivity implements OnIte
 
         String currencyName = parent.getItemAtPosition(position).toString();
 
-        this.account.setCurrency(database.getCurrency(currencyName));
+        this.mAccount.setCurrency(mDatabase.getCurrency(currencyName));
     }
 
     @Override
@@ -126,18 +209,24 @@ public class CreateNewAccountActivity extends AppCompatActivity implements OnIte
     @Override
     public void onTextInput(String textInput, String tag) {
 
-        if (tag.equals("accountName")) {
+        if (tag.equals("create_account_name")) {
 
-            account.setName(textInput);
+            mAccount.setName(textInput);
+            mAccountNameBtn.setText(mAccount.getName());
 
-            accountName = (Button) findViewById(R.id.new_account_name);
-            accountName.setText(textInput);
-        } else {
+            Log.d(TAG, "set Account name to" + mAccount.getName());
+        }
+    }
 
-            account.setBalance(Integer.parseInt(textInput));
+    @Override
+    public void onPriceSelected(double price, String tag) {
 
-            accountBalance = (Button) findViewById(R.id.new_account_balance);
-            accountBalance.setText(textInput);
+        if (tag.equals("create_account_price")) {
+
+            mAccount.setBalance(price);
+            mAccountBalanceBtn.setText(String.format(this.getResources().getConfiguration().locale, "%.2f", mAccount.getBalance()));
+
+            Log.d(TAG, "set account balance to " + mAccount.getBalance());
         }
     }
 }

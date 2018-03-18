@@ -5,18 +5,15 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.example.lucas.haushaltsmanager.Activities.ExpenseScreenActivity;
 import com.example.lucas.haushaltsmanager.R;
 
 public class PriceInputDialog extends DialogFragment {
@@ -64,7 +61,11 @@ public class PriceInputDialog extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                mCallback.onPriceSelected(Double.parseDouble(input.getText().toString()), getTag());
+                String price = input.getText().toString();
+                if (price.isEmpty())
+                    mCallback.onPriceSelected(0, getTag());
+                else
+                    mCallback.onPriceSelected(Double.parseDouble(price), getTag());
 
             }
         });

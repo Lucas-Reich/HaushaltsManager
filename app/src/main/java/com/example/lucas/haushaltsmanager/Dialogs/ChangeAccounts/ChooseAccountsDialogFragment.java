@@ -105,6 +105,7 @@ public class ChooseAccountsDialogFragment extends DialogFragment {
             public void onClick(DialogInterface dialog, int which) {
 
                 Intent newAccountIntent = new Intent(getActivity(), CreateNewAccountActivity.class);
+                newAccountIntent.putExtra("mode", "create");
                 getActivity().startActivity(newAccountIntent);
             }
         });
