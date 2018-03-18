@@ -15,7 +15,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Iterator;
+import java.util.Locale;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -79,7 +83,9 @@ public class ExchangeRateService extends IntentService {
                     JSONObject json = new JSONObject(buffer.toString());
 
                     long baseCurId = database.getCurrencyId(json.getString("base"));
-                    String downloadDate = json.getString("date");
+
+                    Calendar downloadDate = Calendar.getInstance();
+                    downloadDate.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).parse(json.getString("date")));
 
                     JSONObject exchangeRates = json.getJSONObject("rates");
 
@@ -88,9 +94,12 @@ public class ExchangeRateService extends IntentService {
 
                         String currency = (String) currencies.next();
                         long toCurId = database.getCurrencyId(currency);
-                        database.createExchangeRate(baseCurId, toCurId, exchangeRates.getDouble(currency), downloadDate);
+                        database.createExchangeRate(baseCurId, toCurId, exchangeRates.getDouble(currency), downloadDate.getTimeInMillis());
                     }
                 } catch (JSONException e) {
+
+                    e.printStackTrace();
+                } catch (ParseException e) {
 
                     e.printStackTrace();
                 }

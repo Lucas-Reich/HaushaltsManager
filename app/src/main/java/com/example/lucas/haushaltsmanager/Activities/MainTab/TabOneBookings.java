@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.provider.CalendarContract;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -330,9 +331,15 @@ public class TabOneBookings extends Fragment {
             if (!mDatabase.isOpen())
                 mDatabase.open();
 
-            Calendar cal = Calendar.getInstance();
-            //todo immer nur die buchungen des aktuellen monats anzeigen!!
-            mExpenses = mDatabase.getBookings(cal.get(Calendar.YEAR) + "-01-01 00:00:00", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(cal.getTime()));
+            //erzeuge den ersten Tag der Monats (um nur die Buchugen des aktuellen Monats anzuzeigen)
+            Calendar firstOfMonth = Calendar.getInstance();
+            firstOfMonth.set(Calendar.DAY_OF_MONTH, 1);
+
+            //erzeuge den letzten Tag des Monats (um nur die Buchungen des aktuellen Monats anzuzeigen)
+            int lastDayMonth = Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH);
+            Calendar lastOfMonth = Calendar.getInstance();
+            lastOfMonth.set(Calendar.DAY_OF_MONTH, lastDayMonth);
+            mExpenses = mDatabase.getBookings(firstOfMonth.getTimeInMillis(), lastOfMonth.getTimeInMillis());
         }
 
 
@@ -405,8 +412,15 @@ public class TabOneBookings extends Fragment {
             if (!mDatabase.isOpen())
                 mDatabase.open();
 
-            Calendar cal = Calendar.getInstance();
-            mExpenses = mDatabase.getBookings(cal.get(Calendar.YEAR) + "-01-01 00:00:00", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(cal.getTime()));
+            //erzeuge den ersten Tag der Monats (um nur die Buchugen des aktuellen Monats anzuzeigen)
+            Calendar firstOfMonth = Calendar.getInstance();
+            firstOfMonth.set(Calendar.DAY_OF_MONTH, 1);
+
+            //erzeuge den letzten Tag des Monats (um nur die Buchungen des aktuellen Monats anzuzeigen)
+            int lastDayMonth = Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH);
+            Calendar lastOfMonth = Calendar.getInstance();
+            lastOfMonth.set(Calendar.DAY_OF_MONTH, lastDayMonth);
+            mExpenses = mDatabase.getBookings(firstOfMonth.getTimeInMillis(), lastOfMonth.getTimeInMillis());
         }
 
         String separatorDate = "";

@@ -231,9 +231,6 @@ public class ExpenseObject implements Parcelable {
     public void setName(@NonNull String title) {
 
         this.title = title;
-
-        if (isSet() && !isParent())
-            this.expenseType = EXPENSE_TYPES.NORMAL_EXPENSE;
     }
 
     public double getUnsignedPrice() {
@@ -276,9 +273,6 @@ public class ExpenseObject implements Parcelable {
             this.price = price;
             this.expenditure = false;
         }
-
-        if (isSet() && !isParent())
-            this.expenseType = EXPENSE_TYPES.NORMAL_EXPENSE;
     }
 
     public long getIndex() {
@@ -313,9 +307,6 @@ public class ExpenseObject implements Parcelable {
     public void setCategory(@NonNull Category category) {
 
         this.category = category;
-
-        if (isSet() && !isParent())
-            this.expenseType = EXPENSE_TYPES.NORMAL_EXPENSE;
     }
 
     @NonNull
@@ -357,9 +348,6 @@ public class ExpenseObject implements Parcelable {
     public void setAccount(@NonNull Account account) {
 
         this.account = account;
-
-        if (isSet() && !isParent())
-            this.expenseType = EXPENSE_TYPES.NORMAL_EXPENSE;
     }
 
     public void addChild(@NonNull ExpenseObject child) {

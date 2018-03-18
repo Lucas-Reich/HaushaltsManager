@@ -3,6 +3,7 @@ package com.example.lucas.haushaltsmanager.Activities.MainTab;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.provider.CalendarContract;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -93,10 +94,12 @@ public class TabTwoMonthlyReports extends Fragment {
             if (!mDatabase.isOpen())
                 mDatabase.open();
 
-            String startDate = mCal.get(Calendar.YEAR) + "-01-01 00:00:00";
-            String endDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(mCal.getTime());
+            Calendar startDate = Calendar.getInstance();
+            startDate.set(startDate.get(Calendar.YEAR), 0, 0, 1, 0, 1);
 
-            mExpenses = mDatabase.getBookings(startDate, endDate);
+            Calendar endDate = Calendar.getInstance();
+
+            mExpenses = mDatabase.getBookings(startDate.getTimeInMillis(), endDate.getTimeInMillis());
         }
 
         for (int i = 0; i <= mCal.get(Calendar.MONTH); i++) {

@@ -15,6 +15,7 @@ import java.util.Calendar;
 public class RecurringBookingsActivity extends AppCompatActivity {
 
     private static final String TAG = RecurringBookingsActivity.class.getSimpleName();
+
     ArrayList<ExpenseObject> mExpenses;
     ListView mListView;
     BookingAdapter mBookingAdapter;

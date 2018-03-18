@@ -315,7 +315,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
             if (mRecurring) {//todo noch einmal überarbeiten
 
                 // frequency is saved as duration in hours, mEndDate is saved as Calendar object
-                long index = mDatabase.createRecurringBooking(mExpense.getIndex(), mCalendar, frequency, mRecurringEndDate);
+                long index = mDatabase.createRecurringBooking(mExpense.getIndex(), mCalendar.getTimeInMillis(), frequency, mRecurringEndDate.getTimeInMillis());
                 Log.d(TAG, "created mRecurring booking event at index: " + index);
             }
 

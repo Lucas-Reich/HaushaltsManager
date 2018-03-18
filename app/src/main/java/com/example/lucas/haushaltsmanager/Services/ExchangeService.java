@@ -21,6 +21,8 @@ public class ExchangeService extends IntentService {
 
     /**
      * Service um Buchungen, die noch nicht von einer Fremdwährung in die eigene umgerechnet wurden umzurechnen.
+     * todo was passiert wenn eine user nie seine internetverbindung anschaltet (bzw ich kein recht darauf habe) aber trotzdem buchungen in eine anderen währung macht
+     *  -> dann wird der store immer voller kann aber nie abgearbeitet werden
      */
     public ExchangeService() {
 
@@ -43,10 +45,10 @@ public class ExchangeService extends IntentService {
 
             long expenseCurIndex = expense.getExpenseCurrency().getIndex();
 
-            HashMap<Double, String> exchangeRate = database.getExtendedExchangeRate(expenseCurIndex, baseCurIndex, expense.getDBDateTime());
-            Map.Entry<Double, String> entry = exchangeRate.entrySet().iterator().next();
+            HashMap<Double, Long> exchangeRate = database.getExtendedExchangeRate(expenseCurIndex, baseCurIndex, expense.getDateTime().getTimeInMillis());
+            Map.Entry<Double, Long> entry = exchangeRate.entrySet().iterator().next();
 
-            //if the exchange rate fetch date matches the expense date then calc the price
+            //todo aus der Datenbank kommen nun long werte anstatt von String datumsangaben
             if (entry.getValue().equals(expense.getDate())) {
 
                 database.updateExpenseExchangeRate(expense.getIndex(), entry.getKey());
