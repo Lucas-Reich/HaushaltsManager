@@ -62,10 +62,8 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
     private RadioGroup mExpenseTypeRadio;
     private ExpenseObject mParentBooking;
 
-
     private ExpensesDataSource mDatabase;
 
-    //TODO klasse sollte auch den BasicDialog erweitern
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

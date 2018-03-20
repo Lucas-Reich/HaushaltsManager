@@ -12,8 +12,10 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CheckedTextView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Activities.CreateNewAccountActivity;
+import com.example.lucas.haushaltsmanager.Database.CannotDeleteAccountException;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.R;
@@ -21,7 +23,7 @@ import com.example.lucas.haushaltsmanager.R;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChooseAccountsDialogFragment extends DialogFragment {
+public class ChooseAccountsDialogFragment extends DialogFragment implements AdapterView.OnItemClickListener, AccountAdapter.OnDeleteAccountSelected {
 
     String TAG = ChooseAccountsDialogFragment.class.getSimpleName();
 
@@ -33,6 +35,7 @@ public class ChooseAccountsDialogFragment extends DialogFragment {
     List<Boolean> mCheckedAccounts;
     SharedPreferences.Editor mSettingsEditor;
     ArrayList<Account> mAccounts;
+    AlertDialog.Builder builder;
 
     /**
      * Standart Fragment Methode die genutzt wird, um zu checken ob die aufrufende Activity auch das interface inplementiert.
@@ -77,7 +80,7 @@ public class ChooseAccountsDialogFragment extends DialogFragment {
 
         setUpListView();
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder = new AlertDialog.Builder(getActivity());
 
         builder.setTitle(R.string.choose_account);
 
@@ -101,6 +104,7 @@ public class ChooseAccountsDialogFragment extends DialogFragment {
         });
 
         builder.setNeutralButton(R.string.btn_new_acc, new DialogInterface.OnClickListener() {
+
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
@@ -120,6 +124,7 @@ public class ChooseAccountsDialogFragment extends DialogFragment {
 
         AccountAdapter adapter = new AccountAdapter(mAccounts, mContext);
         adapter.setCheckedItems(mCheckedAccounts);
+        adapter.setOnDeleteAccountListener(this);
 
         mListView = new ListView(mContext);
         mListView.setAdapter(adapter);
@@ -127,34 +132,54 @@ public class ChooseAccountsDialogFragment extends DialogFragment {
         mListView.setDividerHeight(0);
         mListView.setItemsCanFocus(false);
         mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-        mListView.setOnItemClickListener(onItemClickListener);
+        mListView.setOnItemClickListener(this);
     }
 
     /**
-     * OnItemClickListener für die CheckedTextView, welcher die CheckBox manipuliert, und die callbacks auslöst
-     * <p>
-     * Anleitung: http://kb4dev.com/tutorial/android-listview/android-listview-with-checkbox
+     * Wenn in der ListView ein Konto ausgewählt wurde wird hier die Checkbox manipuliert und der callback ausgelöst
+     *
+     * @param parent   parent
+     * @param view     view
+     * @param position position
+     * @param id       id
      */
-    AdapterView.OnItemClickListener onItemClickListener = new AdapterView.OnItemClickListener() {
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        CheckedTextView accountChk = (CheckedTextView) view.findViewById(R.id.list_view_account_item_account_chk);
+        if (accountChk.isChecked()) {
 
-            CheckedTextView accountChk = (CheckedTextView) view.findViewById(R.id.list_view_account_item_account_chk);
-            if (accountChk.isChecked()) {
+            mCheckedAccounts.set(position, false);
+            accountChk.setChecked(false);
+        } else {
 
-                mCheckedAccounts.set(position, false);
-                accountChk.setChecked(false);
-            } else {
-
-                mCheckedAccounts.set(position, true);
-                accountChk.setChecked(true);
-            }
-
-            mSettingsEditor.putBoolean(mAccounts.get(position).getName(), mCheckedAccounts.get(position));
-            mCallback.onAccountSelected(mAccounts.get(position).getIndex(), mCheckedAccounts.get(position));
+            mCheckedAccounts.set(position, true);
+            accountChk.setChecked(true);
         }
-    };
+
+        mSettingsEditor.putBoolean(mAccounts.get(position).getName(), mCheckedAccounts.get(position));
+        mCallback.onAccountSelected(mAccounts.get(position).getIndex(), mCheckedAccounts.get(position));
+    }
+
+    /**
+     * Methode die den Callback des AccountAdapters implementiert, wenn ein Konto gelöscht werden soll
+     *
+     * @param accountId Id des zu löschendem Kontos
+     */
+    @Override
+    public void onDeleteAccountSelected(long accountId) {
+
+        try {
+
+            mDatabase.deleteAccount(accountId);
+            Toast.makeText(mContext, "Deleted account", Toast.LENGTH_SHORT).show();
+        } catch (CannotDeleteAccountException e) {
+
+            Toast.makeText(mContext, "Failed to delete account there are still Bookings with this account", Toast.LENGTH_SHORT).show();
+        }
+
+        dismiss();
+    }
 
     public interface OnSelectedAccount {
         void onAccountSelected(long accountId, boolean isChecked);

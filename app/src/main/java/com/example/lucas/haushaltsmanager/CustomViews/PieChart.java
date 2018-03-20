@@ -26,9 +26,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-public class PieChartView extends View {
+public class PieChart extends View {
 
-    private String TAG = PieChartView.class.getSimpleName();
+    private String TAG = PieChart.class.getSimpleName();
 
     private RectF mBackgroundBounds;
 
@@ -83,17 +83,17 @@ public class PieChartView extends View {
 
     private ValueAnimator mAnimator;
 
-    public PieChartView(Context context) {
+    public PieChart(Context context) {
         super(context);
         init(context, null, 0);
     }
 
-    public PieChartView(Context context, @Nullable AttributeSet attrs) {
+    public PieChart(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         init(context, attrs, 0);
     }
 
-    public PieChartView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public PieChart(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context, attrs, defStyleAttr);
     }
@@ -111,7 +111,7 @@ public class PieChartView extends View {
 
         TypedArray a = context.getTheme().obtainStyledAttributes(
                 attrs,
-                R.styleable.PieChartView,
+                R.styleable.PieChart,
                 defStyleAttr,
                 0);
 
@@ -119,19 +119,19 @@ public class PieChartView extends View {
         int numeratorColor;
         try {
 
-            mDrawHole = a.getBoolean(R.styleable.PieChartView_draw_hole, false);
-            mHoleSize = a.getInteger(R.styleable.PieChartView_hole_size, 50);
-            holeColor = a.getColor(R.styleable.PieChartView_hole_color, Color.WHITE);
-            mNoData = a.getString(R.styleable.PieChartView_no_data_text);
+            mDrawHole = a.getBoolean(R.styleable.PieChart_draw_hole, false);
+            mHoleSize = a.getInteger(R.styleable.PieChart_hole_size, 50);
+            holeColor = a.getColor(R.styleable.PieChart_hole_color, Color.WHITE);
+            mNoData = a.getString(R.styleable.PieChart_no_data_text);
             mLegendPosition = LegendPositions.TOP_LEFT;
-            mDrawLegend = a.getBoolean(R.styleable.PieChartView_use_legend, false);
+            mDrawLegend = a.getBoolean(R.styleable.PieChart_use_legend, false);
             mNumeratorStyle = NumeratorStyles.SQUARE;
-            mTransparentCircle = a.getBoolean(R.styleable.PieChartView_use_transparent_circle, false);
-            mCompressed = a.getBoolean(R.styleable.PieChartView_use_compressed, false);
-            mLayer = a.getInt(R.styleable.PieChartView_layer_depth, 3);
-            mSliceMargin = a.getBoolean(R.styleable.PieChartView_draw_slice_margin, false);
-            mCenterText = a.getString(R.styleable.PieChartView_center_text);
-            numeratorColor = a.getColor(R.styleable.PieChartView_numerator_color, Color.BLACK);
+            mTransparentCircle = a.getBoolean(R.styleable.PieChart_use_transparent_circle, false);
+            mCompressed = a.getBoolean(R.styleable.PieChart_use_compressed, false);
+            mLayer = a.getInt(R.styleable.PieChart_layer_depth, 3);
+            mSliceMargin = a.getBoolean(R.styleable.PieChart_draw_slice_margin, false);
+            mCenterText = a.getString(R.styleable.PieChart_center_text);
+            numeratorColor = a.getColor(R.styleable.PieChart_numerator_color, Color.BLACK);
             mLegendDirection = LegendDirections.LEFT_TO_RIGHT;
         } finally {
 

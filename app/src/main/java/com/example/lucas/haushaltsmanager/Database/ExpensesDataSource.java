@@ -372,11 +372,12 @@ public class ExpensesDataSource {
      *
      * @param accountId Account object which should be deleted
      * @return the number of affected rows
+     * @throws CannotDeleteAccountException Wenn ein Konto immer noch zu Buchungen zugewiesen ist kann es nicht gelöscht werden
      */
-    public int deleteAccount(long accountId) {
+    public int deleteAccount(long accountId) throws CannotDeleteAccountException {
 
         if (hasAccountBookings(accountId))
-            throw new RuntimeException("Account with existing bookings cannot be deleted!");
+            throw new CannotDeleteAccountException("Account with existing bookings cannot be deleted!");
 
         Log.d(TAG, "Deleting account at index: " + accountId);
         return database.delete(ExpensesDbHelper.TABLE_ACCOUNTS, ExpensesDbHelper.ACCOUNTS_COL_ID + " = ?", new String[]{"" + accountId});
@@ -633,7 +634,7 @@ public class ExpensesDataSource {
 
         long bookingId = database.insert(ExpensesDbHelper.TABLE_BOOKINGS, null, values);
         Log.d(TAG, "created expense at index: " + bookingId);
-        
+
         for (Tag tag : expense.getTags()) {
 
             assignTagToBooking(bookingId, tag.getIndex());
@@ -1095,14 +1096,23 @@ public class ExpensesDataSource {
     /**
      * Convenience Method for deleting a Category by id
      *
-     * @param categoryId Id of the Category which should be deleted
-     * @return The result of the deleting operation
+     * @param categoryId Id der Kategorie die gelöscht werden soll
+     * @return Das Ergebnis der Operation
+     * @throws CannotDeleteCategoryException Wenn es noch Buchungen mit dieser Kategorie gibt, dann kann die Kategorie nicht gelöscht werden
      */
-    public int deleteCategory(long categoryId) {
+    public int deleteCategory(long categoryId) throws CannotDeleteCategoryException {
 
-        //TODO kategorien können nicht gelöscht werden, wenn es noch buchungen gibt, die in dieser Kategorie gemacht wurden
+        if (hasCategoryBookings(categoryId))
+            throw new CannotDeleteCategoryException("Category with existing Bookings cannot be deleted");
+
         Log.d(TAG, "delete Category + " + categoryId);
         return database.delete(ExpensesDbHelper.TABLE_CATEGORIES, ExpensesDbHelper.CATEGORIES_COL_ID + " = ?", new String[]{"" + categoryId});
+    }
+
+    private boolean hasCategoryBookings(long categoryId) {
+
+
+        return false;
     }
 
 

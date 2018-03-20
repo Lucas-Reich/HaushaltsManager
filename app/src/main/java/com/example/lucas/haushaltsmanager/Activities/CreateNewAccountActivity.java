@@ -1,6 +1,5 @@
 package com.example.lucas.haushaltsmanager.Activities;
 
-import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -45,7 +44,7 @@ public class CreateNewAccountActivity extends AppCompatActivity implements OnIte
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_account);
+        setContentView(R.layout.activity_new_account_ver2);
 
         mDatabase = new ExpensesDataSource(this);
         mDatabase.open();
