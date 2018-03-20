@@ -86,13 +86,14 @@ public class AccountAdapter extends ArrayAdapter<Account> {
      *
      * @param listener Callback listener
      */
-    public void setOnDeleteAccountListener(OnDeleteAccountSelected listener) {
+    void setOnDeleteAccountListener(OnDeleteAccountSelected listener) {
 
         mCallback = listener;
     }
 
     public interface OnDeleteAccountSelected {
         void onDeleteAccountSelected(long accountId);
+        void onAccountSetMain(long accountId);
     }
 
     /**
@@ -132,8 +133,10 @@ public class AccountAdapter extends ArrayAdapter<Account> {
 
                         case R.id.edit_account_delete:
 
-                            //user wird nicht noch einmal um betsätigung gefrahgt!
+                            //user wird nicht noch einmal um betstätigung gefragt!
                             mCallback.onDeleteAccountSelected(mAccount.getIndex());
+
+                            Log.d(TAG, "onMenuItemClick: delete selected");
                             return true;
                         case R.id.edit_account_edit:
 
@@ -151,6 +154,12 @@ public class AccountAdapter extends ArrayAdapter<Account> {
                             mContext.startActivity(transferMoneyBetweenAccountsIntent);
 
                             Log.d(TAG, "onMenuItemSelected: empty selected");
+                            return true;
+                        case R.id.edit_account_set_main:
+
+                            mCallback.onAccountSetMain(mAccount.getIndex());
+
+                            Log.d(TAG, "onMenuItemClick: make main selected");
                             return true;
                         default:
                             return false;

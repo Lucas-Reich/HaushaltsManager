@@ -90,4 +90,10 @@
     <string name="error_same_accounts">Du kannst kein Geld auf dasselbe Konto überweisen</string>
     <string name="error_missing_content">Du musst alle Spalten ausfüllen</string>
     <string name="btn_save">Speichern</string>
+    <string name="input_title">Titel eingeben</string>
+    <string name="input_tag">Tag eingeben</string>
+    <string name="input_notice">Notiz eingeben</string>
+    <string name="transfer">Überweisung</string>
+    <string name="edit">Bearbeiten</string>
+    <string name="delete">Löschen</string>
 </resources>

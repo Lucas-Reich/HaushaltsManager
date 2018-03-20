@@ -98,4 +98,8 @@
     <string name="input_title">Input Title</string>
     <string name="input_tag">Input Tag</string>
     <string name="input_notice">Input Notice</string>
+    <string name="transfer">Transfer</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="make_main">Make main account</string>
 </resources>

@@ -391,42 +391,7 @@ public class ExpensesDataSource {
      */
     public boolean hasAccountBookings(long accountId) {
 
-        String selectQuery;
-
-        //check bookings table
-        selectQuery = "SELECT"
-                + " COUNT(1) 'exists'"
-                + " FROM " + ExpensesDbHelper.TABLE_BOOKINGS
-                + " WHERE " + ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID + " = " + accountId + ";";
-        Log.d(TAG, "isChild: " + selectQuery);
-
-        Cursor c = database.rawQuery(selectQuery, null);
-        c.moveToFirst();
-
-        if (c.getInt(c.getColumnIndex("exists")) != 0) {
-
-            return true;
-        }
-
-        //check childBookings table
-        selectQuery = "SELECT"
-                + " COUNT(1) 'exists'"
-                + " FROM " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS
-                + " WHERE " + ExpensesDbHelper.CHILD_BOOKINGS_COL_ACCOUNT_ID + " = " + accountId + ";";
-        Log.d(TAG, "isChild: " + selectQuery);
-
-        c = database.rawQuery(selectQuery, null);
-        c.moveToFirst();
-
-        if (c.getInt(c.getColumnIndex("exists")) != 0) {
-
-            c.close();
-            return true;
-        } else {
-
-            c.close();
-            return false;
-        }
+        return isEntityAssignedToBooking(accountId, ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID);
     }
 
 
@@ -504,16 +469,31 @@ public class ExpensesDataSource {
     }
 
     /**
-     * Convenience Method for deleting a Tag
+     * Methode um ein Tag zu löschen
      *
-     * @param tagId the id of the entry which should be deleted
-     * @return the number of affected rows
+     * @param tagId Id des zu löschenden Tags
+     * @return Status der Operation
+     * @throws CannotDeleteTagException Ein Tag kann nicht gelöscht werden, wenn es noch Buchungen mit diesem Tag gibt
      */
-    public int deleteTag(long tagId) {
+    public int deleteTag(long tagId) throws CannotDeleteTagException {
 
-        //TODO ein tag kann nicht gelöscht werden, wenn es noch einer buchung zugeordnet ist
+        if (hasTagBookings(tagId))
+            throw new CannotDeleteTagException("Cannot delete tag while there are still Bookings with this tag");
+
         Log.d(TAG, "deleted tag at index " + tagId);
         return database.delete(ExpensesDbHelper.TABLE_TAGS, ExpensesDbHelper.TAGS_COL_ID + " = ?", new String[]{"" + tagId});
+    }
+
+    /**
+     * Methode um herauszufinden ob es Buchungen mit diesem Tag gibt
+     *
+     * @param tagId Id des zu überprüfenden Tags
+     * @return boolean
+     */
+    private boolean hasTagBookings(long tagId) {
+
+        //TODO erstelle funktionalität
+        return false;
     }
 
 
@@ -1109,10 +1089,15 @@ public class ExpensesDataSource {
         return database.delete(ExpensesDbHelper.TABLE_CATEGORIES, ExpensesDbHelper.CATEGORIES_COL_ID + " = ?", new String[]{"" + categoryId});
     }
 
+    /**
+     * Methode um herauszufinde ob es Buchungen mit dieser Kategorie gibt
+     *
+     * @param categoryId Id der zu checkenden Kategorie
+     * @return boolean
+     */
     private boolean hasCategoryBookings(long categoryId) {
 
-
-        return false;
+        return isEntityAssignedToBooking(categoryId, ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID);
     }
 
 
@@ -1200,7 +1185,7 @@ public class ExpensesDataSource {
                 + ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID + ", "
                 + ExpensesDbHelper.RECURRING_BOOKINGS_COL_FREQUENCY
                 + " FROM " + ExpensesDbHelper.TABLE_RECURRING_BOOKINGS
-                + " WHERE " + ExpensesDbHelper.RECURRING_BOOKINGS_COL_END + " > '" + endDate.getTimeInMillis() + ";";
+                + " WHERE " + ExpensesDbHelper.RECURRING_BOOKINGS_COL_END + " > " + endDate.getTimeInMillis() + ";";
         Log.d(TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
@@ -1384,13 +1369,46 @@ public class ExpensesDataSource {
 
     public long updateCurrency(long index) {
 
-        throw new UnsupportedOperationException("Updating Currencies is not Supported");//todo
+        throw new UnsupportedOperationException("Updating Currencies is not Supported");//todo create UpdateCurrency
     }
 
-    public int deleteCurrency(long index) {
+    /**
+     * Methode um eine Währung zu löschen
+     *
+     * @param currencyId Id der zu löschenden Währung
+     * @return Status der operation
+     * @throws CannotDeleteCurrencyException Eine Währung kann nicht gelöscht werden, wenn es noch Konten oder Buchungen mit dieser Währung gibt
+     */
+    public int deleteCurrency(long currencyId) throws CannotDeleteCurrencyException {
 
-        Log.d(TAG, "deleteCurrency at index: " + index);
-        return database.delete(ExpensesDbHelper.TABLE_CURRENCIES, ExpensesDbHelper.CURRENCIES_COL_ID + " = ?", new String[]{"" + index});
+        if (hasCurrencyAccounts(currencyId) || hasCurrencyBookings(currencyId))
+            throw new CannotDeleteCurrencyException("Cannot delete Currency while there are still bookings or accounts with this currency");
+
+        Log.d(TAG, "deleteCurrency at index: " + currencyId);
+        return database.delete(ExpensesDbHelper.TABLE_CURRENCIES, ExpensesDbHelper.CURRENCIES_COL_ID + " = ?", new String[]{"" + currencyId});
+    }
+
+    /**
+     * Methode um zu überprüfen ob es eine Buchung gibt, die dieser Währung zugeordnet ist
+     *
+     * @param currencyId Id der zu überprüfenden Währung
+     * @return boolean
+     */
+    private boolean hasCurrencyBookings(long currencyId) {
+
+        return isEntityAssignedToBooking(currencyId, ExpensesDbHelper.BOOKINGS_COL_CURRENCY_ID);
+    }
+
+    /**
+     * Methode um zu überprüfen ob es ein Konto gibt, zu dem diese Währung zugeordnet ist
+     *
+     * @param currencyId Id der zu überprüfenden Währung
+     * @return booelean
+     */
+    private boolean hasCurrencyAccounts(long currencyId) {
+
+        //TODO funktionalität implementieren
+        return false;
     }
 
 
@@ -1622,5 +1640,53 @@ public class ExpensesDataSource {
     public void deleteConvertExpense(long index) {
 
         database.delete(ExpensesDbHelper.TABLE_CONVERT_EXPENSES_STACK, ExpensesDbHelper.CONVERT_EXPENSES_STACK_COL_BOOKING + " = ?", new String[]{"" + index});
+    }
+
+    /**
+     * Methode um zu überprüfen ob zu einer bestimmten Entity noch mindestends eine Buchunge zugeordnet ist
+     *
+     * @param propertyId     Id der Entity
+     * @param propertyColumn Spaltenname der Entity in der Bookings tabelle
+     * @return boolean
+     */
+    private boolean isEntityAssignedToBooking(long propertyId, String propertyColumn) {
+
+        String selectQuery;
+
+        //prüfe die Bookings tabelle
+        selectQuery = "SELECT"
+                + " COUNT(1) 'exists'"
+                + " FROM " + ExpensesDbHelper.TABLE_BOOKINGS
+                + " WHERE " + propertyColumn + " = " + propertyId + ";";
+        Log.d(TAG, "isChild: " + selectQuery);
+
+        Cursor c = database.rawQuery(selectQuery, null);
+        c.moveToFirst();
+
+        if (c.getInt(c.getColumnIndex("exists")) != 0) {
+
+            c.close();
+            return true;
+        }
+
+        //prüfe die ChilBookings tabelle
+        selectQuery = "SELECT"
+                + " COUNT(1) 'exists'"
+                + " FROM " + ExpensesDbHelper.TABLE_BOOKINGS
+                + " WHERE " + propertyColumn + " = " + propertyId + ";";
+        Log.d(TAG, "isChild: " + selectQuery);
+
+        c = database.rawQuery(selectQuery, null);
+        c.moveToFirst();
+
+        if (c.getInt(c.getColumnIndex("exists")) != 0) {
+
+            c.close();
+            return true;
+        } else {
+
+            c.close();
+            return false;
+        }
     }
 }

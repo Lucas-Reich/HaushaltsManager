@@ -105,7 +105,6 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
             CREATION_MODE = creationModes.UPDATE_EXPENSE_MODE;
             mExpense = mDatabase.getBookingById(bundle.getLong("parentExpense"));
         } else {
-
             mSaveBtn.setText(getString(R.string.create_booking));
 
             CREATION_MODE = creationModes.CREATE_EXPENSE_MODE;

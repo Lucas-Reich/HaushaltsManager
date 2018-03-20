@@ -181,6 +181,17 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Adap
         dismiss();
     }
 
+    /**
+     * Methode die den Callback des AccountsAdapters implementiert, wenn ein Konto als Hauptkonto ausgewählt wurde
+     *
+     * @param accountId Id des neuen Hauptkontos
+     */
+    @Override
+    public void onAccountSetMain(long accountId) {
+
+
+    }
+
     public interface OnSelectedAccount {
         void onAccountSelected(long accountId, boolean isChecked);
     }
