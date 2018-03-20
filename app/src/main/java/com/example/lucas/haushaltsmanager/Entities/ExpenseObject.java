@@ -91,7 +91,6 @@ public class ExpenseObject implements Parcelable {
 
     public ExpenseObject(long index, @NonNull String expenseName, double price, Calendar date, boolean expenditure, @NonNull Category category, String notice, @NonNull Account account, Currency expenseCurrency, @NonNull EXPENSE_TYPES expenseType) {
 
-        //todo benutze ExpenseTypes um ausgaben zu markieren
         setIndex(index);
         setName(expenseName);
         setPrice(price);
@@ -315,16 +314,16 @@ public class ExpenseObject implements Parcelable {
         return tags;
     }
 
-    public void setTag(@NonNull Tag tag) {
+    public void addTag(@NonNull Tag tag) {
 
-        //todo implement tags functionality
+        tags.add(tag);
     }
 
     public void setTags(@NonNull List<Tag> tags) {
 
         for (Tag tag : tags) {
 
-            setTag(tag);
+            addTag(tag);
         }
     }
 

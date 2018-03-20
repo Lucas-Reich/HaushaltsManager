@@ -440,7 +440,6 @@ public class PieChartView extends View {
 
         int chartDesiredWidth = 250, chartDesiredHeight = 250;
         if (mDrawLegend)
-            //measureLegend(widthSize / 2 - chartDesiredWidth, heightSize / 2 - chartDesiredHeight, chartDesiredWidth); todo deprecated
             measureLegend(widthSize - chartDesiredWidth, heightSize - chartDesiredHeight, chartDesiredWidth);
 
         int pieRadius = heightSize > widthSize ? widthSize / 2 : heightSize / 2;

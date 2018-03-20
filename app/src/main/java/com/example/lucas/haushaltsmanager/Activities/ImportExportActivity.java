@@ -272,7 +272,7 @@ public class ImportExportActivity extends AppCompatActivity implements AccountPi
 
         return expense;
 */
-    }//todo
+    }//todo string to expense funktionalität implementieren
 
     /**
      * Methode um die Buchungen in eine Datei zu schreiben und diese Datei dann zu speichern

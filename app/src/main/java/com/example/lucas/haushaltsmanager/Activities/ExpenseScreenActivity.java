@@ -1,21 +1,18 @@
 package com.example.lucas.haushaltsmanager.Activities;
 
 import android.app.Activity;
-import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
@@ -26,6 +23,7 @@ import com.example.lucas.haushaltsmanager.Activities.MainTab.TabParentActivity;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
 import com.example.lucas.haushaltsmanager.Dialogs.AccountPickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
+import com.example.lucas.haushaltsmanager.Dialogs.DatePickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.FrequencyAlertDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
 import com.example.lucas.haushaltsmanager.Entities.Account;
@@ -34,11 +32,15 @@ import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.R;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
-public class ExpenseScreenActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, AccountPickerDialog.OnAccountSelected, BasicTextInputDialog.BasicDialogCommunicator, PriceInputDialog.OnPriceSelected {
+public class ExpenseScreenActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, AccountPickerDialog.OnAccountSelected, BasicTextInputDialog.BasicDialogCommunicator, PriceInputDialog.OnPriceSelected, com.example.lucas.haushaltsmanager.Dialogs.DatePickerDialog.OnDateSelected {
+
+    private String TAG = ExpenseScreenActivity.class.getSimpleName();
 
     private creationModes CREATION_MODE;
 
@@ -49,14 +51,13 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
         UPDATE_CHILD_MODE
     }
 
-    private String TAG = ExpenseScreenActivity.class.getSimpleName();
-
     public ExpenseObject mExpense;
     private Calendar mCalendar = Calendar.getInstance();
     private Calendar mRecurringEndDate = Calendar.getInstance();
     private boolean mTemplate = false, mRecurring = false;
     public int frequency = 0;
-    private Button mDateBtn, mAccountBtn, mSaveBtn, mCategoryBtn, mTitleBtn, mTagBtn, mNoticeBtn;
+    private Button mDateBtn, mAccountBtn, mSaveBtn, mCategoryBtn, mTitleBtn, mTagBtn, mNoticeBtn, mRecurringEndBtn;
+    private CheckBox mTemplateChk, mRecurringChk;
     private TextView mAmountTxt, mCurrencyTxt;
     private RadioGroup mExpenseTypeRadio;
     private ExpenseObject mParentBooking;
@@ -122,132 +123,18 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // set the displayed date to the current one
-        mDateBtn = (Button) findViewById(R.id.expense_screen_date);
-        mDateBtn.setText(mExpense.getDisplayableDateTime());
-
-
-        // set the mAccount to the current main mAccount
-        mAccountBtn = (Button) findViewById(R.id.expense_screen_account);
-        mAccountBtn.setText(mExpense.getAccount().getName());
-
-        // set the mExpense type
-        mExpenseTypeRadio = (RadioGroup) findViewById(R.id.expense_screen_expense_type);
-        if (mExpense.isExpenditure())
-            mExpenseTypeRadio.check(R.id.expense_screen_radio_expense);
-        else
-            mExpenseTypeRadio.check(R.id.expense_screen_radio_income);
-
-        mExpenseTypeRadio.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
-
-                if (checkedId == R.id.expense_screen_radio_expense) {
-
-                    mExpense.setExpenditure(true);
-                    Log.d(TAG, "set expense type to " + mExpense.isExpenditure());
-                } else {
-
-                    mExpense.setExpenditure(false);
-                    Log.d(TAG, "set expense type to " + mExpense.isExpenditure());
-                }
-            }
-        });
-
-
         mAmountTxt = (TextView) findViewById(R.id.expense_screen_amount);
-        mAmountTxt.setText(String.format("%s", mExpense.getUnsignedPrice()));
-        mAmountTxt.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-
-                Bundle bundle = new Bundle();
-                bundle.putString("title", "Input Price");//todo make variable, use mExpense.getPrice()??
-
-                PriceInputDialog priceDialog = new PriceInputDialog();
-                priceDialog.setArguments(bundle);
-                priceDialog.show(getFragmentManager(), "expense_screen_price");
-            }
-        });
-
-        //set mAccount currency symbol
         mCurrencyTxt = (TextView) findViewById(R.id.expense_screen_amount_currency);
-        mCurrencyTxt.setText(mExpense.getAccount().getCurrency().getSymbol());
-
-        //set display CATEGORY
         mCategoryBtn = (Button) findViewById(R.id.expense_screen_category);
-        mCategoryBtn.setText(mExpense.getCategory().getName());
-
-        //set display expense title
+        mExpenseTypeRadio = (RadioGroup) findViewById(R.id.expense_screen_expense_type);
         mTitleBtn = (Button) findViewById(R.id.expense_screen_title);
-        mTitleBtn.setText(mExpense.getName());
-
-        //TODO change display tag behaviour from just taking the first tag to displaying all tags
-        //set display tag
         mTagBtn = (Button) findViewById(R.id.expense_screen_tag);
-//        mTagBtn.setText(mExpense.getTags().get(0));TODO enable
-
-        //set display notice
+        mDateBtn = (Button) findViewById(R.id.expense_screen_date);
         mNoticeBtn = (Button) findViewById(R.id.expense_screen_notice);
-        mNoticeBtn.setText(mExpense.getNotice());
+        mAccountBtn = (Button) findViewById(R.id.expense_screen_account);
 
-        final CheckBox templateChk = (CheckBox) findViewById(R.id.expense_screen_template);
-        templateChk.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                mTemplate = true;
-                Toast.makeText(ExpenseScreenActivity.this, "Du möchtest die Ausgabe als Vorlage speichern", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        final CheckBox recurringChk = (CheckBox) findViewById(R.id.expense_screen_recurring);
-        recurringChk.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                //TODO ist kaputt
-
-                ImageView imgFrequency = (ImageView) findViewById(R.id.img_frequency);
-                Button recurringFrequency = (Button) findViewById(R.id.expense_screen_recurring_frequency);
-                recurringFrequency.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                        FrequencyAlertDialog freqDia = new FrequencyAlertDialog();
-                        freqDia.show(getFragmentManager(), "expense_screen_frequency_dialog");
-                    }
-                });
-
-                ImageView imgEnd = (ImageView) findViewById(R.id.img_end);
-                Button recurringEnd = (Button) findViewById(R.id.expense_screen_recurring_end);
-                recurringEnd.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                        updateDate("frequencyDate");
-                    }
-                });
-                if (recurringChk.isChecked()) {
-
-                    imgFrequency.setVisibility(ImageView.VISIBLE);
-                    recurringFrequency.setVisibility(Button.VISIBLE);
-
-                    imgEnd.setVisibility(ImageView.VISIBLE);
-                    recurringEnd.setVisibility(Button.VISIBLE);
-                    mRecurring = true;
-                } else {
-
-                    imgFrequency.setVisibility(ImageView.GONE);
-                    recurringFrequency.setVisibility(Button.GONE);
-
-                    imgEnd.setVisibility(ImageView.GONE);
-                    recurringEnd.setVisibility(Button.GONE);
-                    mRecurring = false;
-                }
-            }
-        });
+        mTemplateChk = (CheckBox) findViewById(R.id.expense_screen_template);
+        mRecurringChk = (CheckBox) findViewById(R.id.expense_screen_recurring);
 
         //ab hier wird der CurrencySelector erstellt
 
@@ -270,6 +157,123 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
         currencySelector.setAdapter(adapter);
 
         currencySelector.setSelection(((int) preferences.getLong("mainCurrencyIndex", 32)) - 1);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if (mExpense.isExpenditure())
+            mExpenseTypeRadio.check(R.id.expense_screen_radio_expense);
+        else
+            mExpenseTypeRadio.check(R.id.expense_screen_radio_income);
+
+        mExpenseTypeRadio.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
+
+                if (checkedId == R.id.expense_screen_radio_expense) {
+
+                    mExpense.setExpenditure(true);
+                    Log.d(TAG, "set expense type to " + mExpense.isExpenditure());
+                } else {
+
+                    mExpense.setExpenditure(false);
+                    Log.d(TAG, "set expense type to " + mExpense.isExpenditure());
+                }
+            }
+        });
+
+        mCurrencyTxt.setText(mExpense.getAccount().getCurrency().getSymbol());
+
+        mAccountBtn.setText(mExpense.getAccount().getName());
+
+        mCategoryBtn.setText(mExpense.getCategory().getName());
+
+        mDateBtn.setText(mExpense.getDisplayableDateTime());
+
+        mTitleBtn.setText(mExpense.getName());
+
+//        mTagBtn.setText(mExpense.getTags().get(0));TODO enable
+
+        mNoticeBtn.setText(mExpense.getNotice());
+
+        mAmountTxt.setText(String.format("%s", mExpense.getUnsignedPrice()));
+        mAmountTxt.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                Bundle bundle = new Bundle();
+                bundle.putString("title", "Input Price");
+
+                PriceInputDialog priceDialog = new PriceInputDialog();
+                priceDialog.setArguments(bundle);
+                priceDialog.show(getFragmentManager(), "expense_screen_price");
+            }
+        });
+
+        mTemplateChk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                mTemplate = true;
+                Toast.makeText(ExpenseScreenActivity.this, "Du möchtest die Ausgabe als Vorlage speichern", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        mRecurringChk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                //TODO ist kaputt
+
+                ImageView imgFrequency = (ImageView) findViewById(R.id.img_frequency);
+                Button recurringFrequency = (Button) findViewById(R.id.expense_screen_recurring_frequency);
+                recurringFrequency.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        FrequencyAlertDialog freqDia = new FrequencyAlertDialog();
+                        freqDia.show(getFragmentManager(), "expense_screen_frequency_dialog");
+                    }
+                });
+
+                ImageView imgEnd = (ImageView) findViewById(R.id.img_end);
+                mRecurringEndBtn = (Button) findViewById(R.id.expense_screen_recurring_end);
+                mRecurringEndBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        Bundle dateBundle = new Bundle();
+                        dateBundle.putString("title", "");
+
+                        DatePickerDialog datePicker = new DatePickerDialog();
+                        datePicker.setArguments(dateBundle);
+                        datePicker.show(getFragmentManager(), "expense_screen_recurring");
+                    }
+                });
+
+                //setVisibility of icon and input field to visible
+                if (mTemplate) {
+
+                    imgFrequency.setVisibility(ImageView.VISIBLE);
+                    recurringFrequency.setVisibility(Button.VISIBLE);
+
+                    imgEnd.setVisibility(ImageView.VISIBLE);
+                    mRecurringEndBtn.setVisibility(Button.VISIBLE);
+                    mRecurring = true;
+                } else {
+
+                    imgFrequency.setVisibility(ImageView.GONE);
+                    recurringFrequency.setVisibility(Button.GONE);
+
+                    imgEnd.setVisibility(ImageView.GONE);
+                    mRecurringEndBtn.setVisibility(Button.GONE);
+                    mRecurring = false;
+                }
+            }
+        });
     }
 
     /**
@@ -337,46 +341,6 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
         mDatabase.close();
     }
 
-    //TODO das aussuchen eine Datums sollte genauso wie der ColorPicker funktionieren
-    private void updateDate(String caller) {
-
-        if (caller.equals("expenseDate")) {
-
-            new DatePickerDialog(ExpenseScreenActivity.this, d, mExpense.getDateTime().get(Calendar.YEAR), mExpense.getDateTime().get(Calendar.MONTH), mExpense.getDateTime().get(Calendar.DAY_OF_MONTH)).show();
-        } else {
-
-            new DatePickerDialog(ExpenseScreenActivity.this, d2, mCalendar.get(Calendar.YEAR), mCalendar.get(Calendar.MONTH), mCalendar.get(Calendar.DAY_OF_MONTH)).show();
-        }
-    }
-
-    DatePickerDialog.OnDateSetListener d = new DatePickerDialog.OnDateSetListener() {
-
-        @Override
-        public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-
-            Calendar expenditureDate = Calendar.getInstance();
-            expenditureDate.set(year, month, dayOfMonth, 0, 0, 0);
-
-            mExpense.setDateTime(expenditureDate);
-            Log.d(TAG, "updated date to " + mExpense.getDisplayableDateTime());
-
-            Button btn_date = (Button) findViewById(R.id.expense_screen_date);
-            btn_date.setText(mExpense.getDisplayableDateTime());
-        }
-    };
-
-    DatePickerDialog.OnDateSetListener d2 = new DatePickerDialog.OnDateSetListener() {
-
-        @Override
-        public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-
-            mRecurringEndDate.set(year, month, dayOfMonth, 0, 0, 0);
-
-            Button recurringEnd = (Button) findViewById(R.id.expense_screen_recurring_end);
-            recurringEnd.setText(DateUtils.formatDateTime(getBaseContext(), mRecurringEndDate.getTimeInMillis(), DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_NUMERIC_DATE | DateUtils.FORMAT_SHOW_YEAR));
-        }
-    };
-
 
     public void expensePopUp(View view) {
 
@@ -398,7 +362,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
 
             case R.id.expense_screen_title:
 
-                bundle.putString("title", "Input Title");//todo make variable, use mExpense.getName()
+                bundle.putString("title", getResources().getString(R.string.input_title));
 
                 basicDialog.setArguments(bundle);
                 basicDialog.show(getFragmentManager(), "expense_screen_title");
@@ -406,7 +370,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
 
             case R.id.expense_screen_tag:
 
-                bundle.putString("title", "Input Tag");//todo make variable, use mExpense.getTags()
+                bundle.putString("title", getResources().getString(R.string.input_tag));
 
                 basicDialog.setArguments(bundle);
                 basicDialog.show(getFragmentManager(), "expense_screen_tag");
@@ -414,12 +378,16 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
 
             case R.id.expense_screen_date:
 
-                updateDate("expenseDate");
+                bundle.putString("title", "");
+
+                DatePickerDialog datePicker = new DatePickerDialog();
+                datePicker.setArguments(bundle);
+                datePicker.show(getFragmentManager(), "expense_screen_date");
                 break;
 
             case R.id.expense_screen_notice:
 
-                bundle.putString("title", "Input Notice");//todo make veriable, use mExpense.getNotice()
+                bundle.putString("title", getResources().getString(R.string.input_notice));
 
                 basicDialog.setArguments(bundle);
                 basicDialog.show(getFragmentManager(), "expense_screen_notice");
@@ -553,6 +521,28 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
             mAmountTxt.setText(String.format("%s", mExpense.getUnsignedPrice()));
 
             Log.d(TAG, "set expense amount to " + mExpense.getUnsignedPrice());
+        }
+    }
+
+    /**
+     * Methode die den Callback des DatePickerDialogs implementiert
+     *
+     * @param date Dateum das der User ausgewählt hat
+     * @param tag  Dialog tag
+     */
+    @Override
+    public void onDateSelected(Calendar date, String tag) {
+
+        if (tag.equals("expense_screen_recurring")) {
+
+            mRecurringEndDate = date;
+            mRecurringEndBtn.setText(DateFormat.getDateInstance(DateFormat.SHORT).format(new Date(mRecurringEndDate.getTimeInMillis())));
+            Log.d(TAG, "updated recurring end date to " + DateFormat.getDateInstance(DateFormat.SHORT).format(new Date(mRecurringEndDate.getTimeInMillis())));
+        } else if (tag.equals("expense_screen_date")) {
+
+            mExpense.setDateTime(date);
+            mDateBtn.setText(mExpense.getDisplayableDateTime());
+            Log.d(TAG, "updated expense date to " + mExpense.getDisplayableDateTime());
         }
     }
 }

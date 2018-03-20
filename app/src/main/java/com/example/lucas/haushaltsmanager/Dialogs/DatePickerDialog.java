@@ -41,7 +41,7 @@ public class DatePickerDialog extends DialogFragment implements DatePicker.OnDat
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
         Bundle args = getArguments();
-        if (args.getLong("current_day") != 0L)
+        if (args != null && args.getLong("current_day") != 0L)
             mCalendar.setTimeInMillis(args.getLong("current_day"));
 
         DatePicker datePicker = new DatePicker(mContext);

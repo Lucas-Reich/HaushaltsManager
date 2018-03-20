@@ -17,12 +17,10 @@ import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Tag;
 import com.example.lucas.haushaltsmanager.R;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 public class ExpensesDataSource {
@@ -95,11 +93,10 @@ public class ExpensesDataSource {
         expenseCurrency.setRateToBase(exchangeRate);
 
 
-/*TODO das expenseobject sollte auch das tag object benutzen
-        expense.setTags(getTagsToBooking(expenseId));
-*/
+        ExpenseObject expense = new ExpenseObject(expenseId, title, price, date, expenditure, category, notice, account, expenseCurrency, ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE);
+        expense.setTags(getTagsToBooking(expense.getIndex()));
 
-        return new ExpenseObject(expenseId, title, price, date, expenditure, category, notice, account, expenseCurrency, ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE);
+        return expense;
     }
 
     /**
@@ -148,10 +145,6 @@ public class ExpensesDataSource {
         Currency expenseCurrency = getCurrency(currencyId);
         expenseCurrency.setRateToBase(exchangeRate);
 
-/*TODO das expenseobject sollte auch das tag object benutzen
-        expense.setTags(getTagsToBooking(expenseId));
-*/
-
         ExpenseObject expense = new ExpenseObject(expenseId, title, price, date, expenditure, category, notice, account, expenseCurrency, ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE);
 
         boolean isParent = c.getInt(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_IS_PARENT)) == 1;
@@ -160,6 +153,8 @@ public class ExpensesDataSource {
             Log.d(TAG, "cursorToExpense: " + expenseId);
             expense.addChildren(getChildrenToParent(expenseId));
         }
+
+        expense.setTags(getTagsToBooking(expense.getIndex()));
 
         return expense;
     }
@@ -549,7 +544,7 @@ public class ExpensesDataSource {
         String selectQuery;
         selectQuery = "SELECT "
                 + ExpensesDbHelper.TABLE_TAGS + "." + ExpensesDbHelper.TAGS_COL_ID + ", "
-                + ExpensesDbHelper.TABLE_TAGS + "." + ExpensesDbHelper.TAGS_COL_NAME + ", "
+                + ExpensesDbHelper.TABLE_TAGS + "." + ExpensesDbHelper.TAGS_COL_NAME
                 + " FROM " + ExpensesDbHelper.TABLE_BOOKINGS_TAGS
                 + " JOIN " + ExpensesDbHelper.TABLE_TAGS + " ON " + ExpensesDbHelper.TABLE_BOOKINGS_TAGS + "." + ExpensesDbHelper.BOOKINGS_TAGS_COL_TAG_ID + " = " + ExpensesDbHelper.TABLE_TAGS + "." + ExpensesDbHelper.TAGS_COL_ID
                 + " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS_TAGS + "." + ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_ID + " = " + bookingId;
@@ -638,14 +633,11 @@ public class ExpensesDataSource {
 
         long bookingId = database.insert(ExpensesDbHelper.TABLE_BOOKINGS, null, values);
         Log.d(TAG, "created expense at index: " + bookingId);
+        
+        for (Tag tag : expense.getTags()) {
 
-        /*TODO die tag funktinalität noch einmal überdenken.. am besten sollte ich eine tag klasse erstellen und dann die tags per id zu den bookings hinzufügen
-        //assign all chosen tags to the booking
-        for (String tag : expense.getTags()) {
-
-            assignTagToBooking(bookingId, tag);
+            assignTagToBooking(bookingId, tag.getIndex());
         }
-        */
 
         return bookingId;
     }

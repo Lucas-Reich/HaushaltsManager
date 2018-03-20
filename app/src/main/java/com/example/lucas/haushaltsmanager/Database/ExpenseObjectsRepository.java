@@ -89,10 +89,6 @@ public class ExpenseObjectsRepository {
         Currency expenseCurrency = currenciesRepository.getCurrency(currencyId);
         expenseCurrency.setRateToBase(exchangeRate);
 
-/*TODO das expenseobject sollte auch das tag object benutzen
-        expense.setTags(getTagsToBooking(expenseId));
-
-
         ExpenseObject expense = new ExpenseObject(expenseId, title, price, expenditure, date, category, notice, account, expenseCurrency);
 
         boolean isParent = c.getInt(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_IS_PARENT)) == 1;
@@ -101,6 +97,8 @@ public class ExpenseObjectsRepository {
             Log.d(TAG, "cursorToExpense: " + expenseId);
             expense.addChildren(getChildrenToParent(expenseId));
         }
+
+        expense.setTags(getTagsToBooking(expense.getIndex()));
 
         return expense;
     }*/
