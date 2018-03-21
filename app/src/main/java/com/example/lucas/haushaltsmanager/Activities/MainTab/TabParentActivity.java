@@ -33,7 +33,7 @@ import com.example.lucas.haushaltsmanager.BookingTemplates;
 import com.example.lucas.haushaltsmanager.Dialogs.ChangeAccounts.ChooseAccountsDialogFragment;
 import com.example.lucas.haushaltsmanager.MyAlarmReceiver;
 import com.example.lucas.haushaltsmanager.R;
-import com.example.lucas.haushaltsmanager.Services.ExchangeRateService;
+import com.example.lucas.haushaltsmanager.Services.GetExchangeRatesService;
 import com.example.lucas.haushaltsmanager.Activities.TestPieChart;
 
 public class TabParentActivity extends AppCompatActivity implements ChooseAccountsDialogFragment.OnSelectedAccount {
@@ -64,12 +64,13 @@ public class TabParentActivity extends AppCompatActivity implements ChooseAccoun
         scheduleBackupServiceAlarm();
 
 
+        //Hier wird der GetEchangeRatesService auf einen Fab click listener gesetzt TODO remove
         FloatingActionButton testService = (FloatingActionButton) findViewById(R.id.service_fab);
         testService.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                Intent serviceIntent = new Intent(getBaseContext(), ExchangeRateService.class);
+                Intent serviceIntent = new Intent(getBaseContext(), GetExchangeRatesService.class);
                 startService(serviceIntent);
             }
         });

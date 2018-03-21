@@ -65,8 +65,6 @@ public class TabOneBookings extends Fragment {
 
         mDatabase = new ExpensesDataSource(getContext());
         setActiveAccounts();
-
-        Log.d(TAG, "onCreate: ");
     }
 
     @Override

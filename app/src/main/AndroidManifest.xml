@@ -68,7 +68,7 @@
             android:process=":remote"/>
 
         <service
-            android:name=".Services.ExchangeRateService"
+            android:name=".Services.GetExchangeRatesService"
             android:exported="false"
             android:label="ExchangeRateService"/>
         <service

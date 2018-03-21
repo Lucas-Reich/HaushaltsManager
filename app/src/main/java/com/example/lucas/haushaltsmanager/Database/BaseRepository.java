@@ -14,7 +14,7 @@ public interface BaseRepository {
 
     boolean has();
 
-    Object getEntityById(long entityId);
+    Object getEntityById(long entityId) throws EntityNotExistingException;
 
     ArrayList<Object> getAll();
 

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -1349,7 +1350,7 @@ public class ExpensesDataSource {
         return currencies;
     }
 
-    public Long getCurrencyId(String curShortName) {
+    private Long getCurrencyId(String curShortName) throws EntityNotExistingException {
 
         String selectQuery = "SELECT "
                 + ExpensesDbHelper.CURRENCIES_COL_ID
@@ -1361,10 +1362,24 @@ public class ExpensesDataSource {
         Log.d(TAG, "getCurrencyId: " + DatabaseUtils.dumpCursorToString(c));
         c.moveToFirst();
 
+        assertNotEmpty(c);
         long currencyId = c.getLong(c.getColumnIndex(ExpensesDbHelper.CURRENCIES_COL_ID));
         c.close();
 
         return currencyId;
+    }
+
+    /**
+     * Methode um zu überprüfen, dass etwas mit einer Query gefunden wurde
+     *
+     * @param cursor Cursor
+     * @throws EntityNotExistingException Wenn in dem Cursor keine Daten enthalten sind wird ein Fehler ausgelöst
+     */
+    private void assertNotEmpty(Cursor cursor) throws EntityNotExistingException {
+
+        //TODO wann immer etwas aus der datenbank abgefragt wird soll der cursor vor der weiterverarbeitung mit dieser funktion gepüft werden
+        if (cursor == null)
+            throw new EntityNotExistingException("No entity in database");
     }
 
     public long updateCurrency(long index) {
@@ -1421,7 +1436,7 @@ public class ExpensesDataSource {
      * @param dateInMills fetching date in milliseconds
      * @return state of operation
      */
-    public long createExchangeRate(Currency fromCur, Currency toCur, double rate, long dateInMills) {//changed date string to mills
+    public long createExchangeRate(Currency fromCur, Currency toCur, double rate, long dateInMills) throws EntityNotExistingException {//changed date string to mills
 
         return createExchangeRate(fromCur.getIndex(), toCur.getIndex(), rate, dateInMills);
     }
@@ -1435,7 +1450,7 @@ public class ExpensesDataSource {
      * @param dateInMills fetching date in milliseconds
      * @return state of operation
      */
-    public long createExchangeRate(String fromCur, String toCur, double rate, long dateInMills) {//changed date string to mills
+    public long createExchangeRate(String fromCur, String toCur, double rate, long dateInMills) throws EntityNotExistingException {//changed date string to mills
 
         return createExchangeRate(getCurrencyId(fromCur), getCurrencyId(toCur), rate, dateInMills);
     }
@@ -1449,7 +1464,7 @@ public class ExpensesDataSource {
      * @param dateInMills  fetching date in milliseconds
      * @return state of operation
      */
-    public long createExchangeRate(long fromCurIndex, long toCurIndex, double rate, long dateInMills) {//changed date string to mills
+    public long createExchangeRate(long fromCurIndex, long toCurIndex, double rate, long dateInMills) throws EntityNotExistingException {//changed date string to mills
 
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.CURRENCY_EXCHANGE_RATES_COL_FROM_CURRENCY_ID, fromCurIndex);
@@ -1457,7 +1472,12 @@ public class ExpensesDataSource {
         values.put(ExpensesDbHelper.CURRENCY_EXCHANGE_RATES_COL_EXCHANGE_RATE, rate);
         values.put(ExpensesDbHelper.CURRENCY_EXCHANGE_RATES_COL_SERVER_DATE, dateInMills);
 
-        return database.insert(ExpensesDbHelper.TABLE_CURRENCY_EXCHANGE_RATES, null, values);
+        try {
+            return database.insertOrThrow(ExpensesDbHelper.TABLE_CURRENCY_EXCHANGE_RATES, null, values);
+        } catch (SQLException e) {
+
+            throw new EntityNotExistingException(e.getMessage());
+        }
     }
 
     /**
