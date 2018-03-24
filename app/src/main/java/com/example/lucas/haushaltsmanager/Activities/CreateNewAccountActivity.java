@@ -1,6 +1,7 @@
 package com.example.lucas.haushaltsmanager.Activities;
 
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -137,13 +138,17 @@ public class CreateNewAccountActivity extends AppCompatActivity implements OnIte
 
                 case CREATE_ACCOUNT:
 
-                    SharedPreferences settings = getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = settings.edit();
+                    SharedPreferences activeAccounts = getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor activeAccountsEditor = activeAccounts.edit();
+                    activeAccountsEditor.putBoolean(mAccount.getName(), true);
+                    activeAccountsEditor.apply();
 
-                    editor.putBoolean(mAccount.getName(), true);
-                    editor.apply();
+                    Account account = mDatabase.createAccount(mAccount);
 
-                    mDatabase.createAccount(mAccount);
+                    SharedPreferences userSettings = getSharedPreferences("UserSettings", ContextWrapper.MODE_PRIVATE);
+                    SharedPreferences.Editor userSettingsEditor = userSettings.edit();
+                    userSettingsEditor.putLong("activeAccount", account.getIndex());
+                    userSettingsEditor.apply();
                     break;
                 case UPDATE_ACCOUNT:
 

@@ -20,7 +20,7 @@ public interface BaseRepository {
 
     ArrayList<Object> getAll(Calendar from, Calendar till);
 
-    void insert(Object entity);//sollte eine exception auslösen, wenn die entity bereits vorhanden ist
+    Object insert(Object entity);//sollte eine exception auslösen, wenn die entity bereits vorhanden ist
 
     void delete(long entityId);//sollte eine exception auslösen, wenn nicht gelöscht werden kann
 

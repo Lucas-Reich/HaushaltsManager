@@ -31,6 +31,7 @@ import com.example.lucas.haushaltsmanager.Activities.ShowCategoriesActivity;
 import com.example.lucas.haushaltsmanager.Activities.TransferActivity;
 import com.example.lucas.haushaltsmanager.BookingTemplates;
 import com.example.lucas.haushaltsmanager.Dialogs.ChangeAccounts.ChooseAccountsDialogFragment;
+import com.example.lucas.haushaltsmanager.MockDataCreator;
 import com.example.lucas.haushaltsmanager.MyAlarmReceiver;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Services.GetExchangeRatesService;
@@ -50,7 +51,6 @@ public class TabParentActivity extends AppCompatActivity implements ChooseAccoun
         //todo die shared preferences in den dafür vorgehenen bereich bringen
         SharedPreferences settings = getSharedPreferences("UserSettings", 0);
         SharedPreferences.Editor editor = settings.edit();
-        editor.putLong("activeAccount", 1);
         editor.putString("mainCurrency", "€");
         editor.putLong("mainCurrencyIndex", 32);
 
@@ -64,14 +64,16 @@ public class TabParentActivity extends AppCompatActivity implements ChooseAccoun
         scheduleBackupServiceAlarm();
 
 
-        //Hier wird der GetEchangeRatesService auf einen Fab click listener gesetzt TODO remove
+        //TODO remove den GetExchangeRateService test button
         FloatingActionButton testService = (FloatingActionButton) findViewById(R.id.service_fab);
         testService.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                Intent serviceIntent = new Intent(getBaseContext(), GetExchangeRatesService.class);
-                startService(serviceIntent);
+                //Intent serviceIntent = new Intent(getBaseContext(), GetExchangeRatesService.class);
+                //startService(serviceIntent);
+
+                MockDataCreator test = new MockDataCreator(TabParentActivity.this);
             }
         });
 

@@ -30,7 +30,7 @@ public class PieChart extends View {
 
     private String TAG = PieChart.class.getSimpleName();
 
-    private RectF mBackgroundBounds;
+    private RectF mViewBounds;
 
     private boolean mDrawLegend;
     private TextPaint mNumeratorFontPaint;
@@ -179,7 +179,7 @@ public class PieChart extends View {
         mSlicePaint.setDither(true);
         mSlicePaint.setStyle(Paint.Style.FILL);
 
-        mBackgroundBounds = new RectF();
+        mViewBounds = new RectF();
         mChartBounds = new RectF();
         mLegendBounds = new Rect();
     }
@@ -435,7 +435,7 @@ public class PieChart extends View {
         int heightSize = MeasureSpec.getSize(heightMeasureSpec);
 
         mLegendBounds.set(0, 0, 0, 0);
-        mBackgroundBounds.set(0, 0, widthSize, heightSize);
+        mViewBounds.set(0, 0, widthSize, heightSize);
 
 
         int chartDesiredWidth = 250, chartDesiredHeight = 250;
@@ -448,17 +448,17 @@ public class PieChart extends View {
 
         //Measure width
         if (widthMode == MeasureSpec.AT_MOST)
-            mBackgroundBounds.right = Math.min((int) mChartBounds.width() + mLegendBounds.width(), widthSize);
+            mViewBounds.right = Math.min((int) mChartBounds.width() + mLegendBounds.width(), widthSize);
         else if (widthMode == MeasureSpec.UNSPECIFIED)
-            mBackgroundBounds.right = (int) mChartBounds.width() + mLegendBounds.width();
+            mViewBounds.right = (int) mChartBounds.width() + mLegendBounds.width();
 
         //Measure height
         if (heightMode == MeasureSpec.AT_MOST)
-            mBackgroundBounds.bottom = Math.min(mChartBounds.height() + mLegendBounds.height(), heightSize);
+            mViewBounds.bottom = Math.min(mChartBounds.height() + mLegendBounds.height(), heightSize);
         else if (heightMode == MeasureSpec.UNSPECIFIED)
-            mBackgroundBounds.bottom = mChartBounds.height() + mLegendBounds.height();
+            mViewBounds.bottom = mChartBounds.height() + mLegendBounds.height();
 
-        setMeasuredDimension((int) mBackgroundBounds.width(), (int) mBackgroundBounds.height());
+        setMeasuredDimension((int) mViewBounds.width(), (int) mViewBounds.height());
     }
 
     /**

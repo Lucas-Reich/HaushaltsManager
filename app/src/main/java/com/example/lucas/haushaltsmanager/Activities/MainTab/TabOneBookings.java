@@ -338,6 +338,7 @@ public class TabOneBookings extends Fragment {
             Calendar lastOfMonth = Calendar.getInstance();
             lastOfMonth.set(Calendar.DAY_OF_MONTH, lastDayMonth);
             mExpenses = mDatabase.getBookings(firstOfMonth.getTimeInMillis(), lastOfMonth.getTimeInMillis());
+            Log.d(TAG, "prepareListData: hole mir neue daten aus der datenbank");
         }
 
 

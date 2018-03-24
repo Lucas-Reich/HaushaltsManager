@@ -191,7 +191,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
 
         mTitleBtn.setText(mExpense.getName());
 
-//        mTagBtn.setText(mExpense.getTags().get(0));TODO enable
+//        mTagBtn.setCenterText(mExpense.getTags().get(0));TODO enable
 
         mNoticeBtn.setText(mExpense.getNotice());
 

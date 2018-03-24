@@ -11,8 +11,8 @@ public class TestPieChart extends AppCompatActivity {
 
     protected void onCreate(Bundle savedInstances) {
         super.onCreate(savedInstances);
-
         setContentView(R.layout.test_pie_chart);
+
 
         PieChart test = (PieChart) findViewById(R.id.test_chart);
 

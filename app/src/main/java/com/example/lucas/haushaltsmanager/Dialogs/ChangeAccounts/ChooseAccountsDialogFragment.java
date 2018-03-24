@@ -11,6 +11,7 @@ import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CheckedTextView;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -164,18 +165,23 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Adap
     /**
      * Methode die den Callback des AccountAdapters implementiert, wenn ein Konto gelöscht werden soll
      *
-     * @param accountId Id des zu löschendem Kontos
+     * @param account Zu löschendes Konto
      */
     @Override
-    public void onDeleteAccountSelected(long accountId) {
+    public void onDeleteAccountSelected(Account account) {
 
         try {
+            mDatabase.deleteAccount(account.getIndex());
 
-            mDatabase.deleteAccount(accountId);
-            Toast.makeText(mContext, "Deleted account", Toast.LENGTH_SHORT).show();
+            SharedPreferences preferences = mContext.getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.remove(account.getName());
+            editor.apply();
+            //was passiert wenn ich das aktuelle acktive konto lösche
+            Toast.makeText(mContext, mContext.getResources().getString(R.string.deleted_account), Toast.LENGTH_SHORT).show();
         } catch (CannotDeleteAccountException e) {
 
-            Toast.makeText(mContext, "Failed to delete account there are still Bookings with this account", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, mContext.getResources().getString(R.string.failed_to_delete_account), Toast.LENGTH_SHORT).show();
         }
 
         dismiss();
@@ -184,12 +190,17 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Adap
     /**
      * Methode die den Callback des AccountsAdapters implementiert, wenn ein Konto als Hauptkonto ausgewählt wurde
      *
-     * @param accountId Id des neuen Hauptkontos
+     * @param account Konto das nun das Hautpkonto sein soll
      */
     @Override
-    public void onAccountSetMain(long accountId) {
+    public void onAccountSetMain(Account account) {
 
+        SharedPreferences preferences = mContext.getSharedPreferences("UserSettings",  Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putLong("activeAccount", account.getIndex());
+        editor.apply();
 
+        Toast.makeText(mContext, account.getName() + mContext.getResources().getString(R.string.changed_main_account), Toast.LENGTH_SHORT).show();
     }
 
     public interface OnSelectedAccount {

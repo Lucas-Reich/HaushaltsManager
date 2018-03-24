@@ -21,6 +21,11 @@ public class Tag implements Parcelable {
         setName(name);
     }
 
+    public Tag(@NonNull String name) {
+
+        this(-1, name);
+    }
+
     public Tag(Parcel source) {
 
         Log.v(TAG, "ParcelData (Parcel Source): time to put back parcel data");

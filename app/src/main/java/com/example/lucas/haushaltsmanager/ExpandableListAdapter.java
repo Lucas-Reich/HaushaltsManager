@@ -2,6 +2,7 @@ package com.example.lucas.haushaltsmanager;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.lucas.haushaltsmanager.CustomViews.CircularTextView;
+import com.example.lucas.haushaltsmanager.CustomViews.RoundedTextView;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 
 import java.util.ArrayList;
@@ -122,7 +124,8 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
                 convertView = inflater.inflate(R.layout.activity_test_exp_listview_list_group_child_n, null);
 
-                CircularTextView circleLetter = (CircularTextView) convertView.findViewById(R.id.booking_item_circle);
+                //CircularTextView circleLetter = (CircularTextView) convertView.findViewById(R.id.booking_item_circle);
+                RoundedTextView circleLetter = (RoundedTextView) convertView.findViewById(R.id.booking_item_circle);
                 TextView txtTitle2 = (TextView) convertView.findViewById(R.id.booking_item_title);
                 TextView txtPerson = (TextView) convertView.findViewById(R.id.booking_item_person);
                 TextView txtPaidPrice = (TextView) convertView.findViewById(R.id.booking_item_paid_price);
@@ -139,8 +142,9 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
 
                 String category = groupExpense.getCategory().getName();
-                circleLetter.setText(category.substring(0, 1).toUpperCase());
-                circleLetter.setSolidColor(groupExpense.getCategory().getColor());
+                circleLetter.setTextColor(Color.WHITE);
+                circleLetter.setCenterText(category.substring(0, 1).toUpperCase());
+                circleLetter.setCircleColor(groupExpense.getCategory().getColor());
                 txtTitle2.setText(groupExpense.getName());
                 //TODO wenn es eine Multiuser funktionalität muss hier der benutzer eingetragen werden, der das Geld ausgegeben hat
                 txtPerson.setText("");
@@ -179,7 +183,8 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             convertView = inflater.inflate(R.layout.activity_test_exp_listview_list_item, null);
         }
 
-        CircularTextView circleLetter = (CircularTextView) convertView.findViewById(R.id.exp_listview_item_circle);
+        //CircularTextView circleLetter = (CircularTextView) convertView.findViewById(R.id.exp_listview_item_circle);
+        RoundedTextView circleLetter = (RoundedTextView) convertView.findViewById(R.id.exp_listview_item_circle);
         TextView txtTitle = (TextView) convertView.findViewById(R.id.exp_listview_item_title);
         TextView txtPerson = (TextView) convertView.findViewById(R.id.exp_listview_item_person);
         TextView txtPaidPrice = (TextView) convertView.findViewById(R.id.exp_listview_item_paid_price);
@@ -190,8 +195,8 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
         String category = childExpense.getCategory().getName();
 
-        circleLetter.setText(category.substring(0, 1).toUpperCase());
-        circleLetter.setSolidColor(childExpense.getCategory().getColor());
+        circleLetter.setCenterText(category.substring(0, 1).toUpperCase());
+        circleLetter.setCircleColor(childExpense.getCategory().getColor());
         txtTitle.setText(childExpense.getName());
         //TODO wenn es eine Multiuser funktionalität muss hier der benutzer eingetragen werden, der das Geld ausgegeben hat
         txtPerson.setText("");

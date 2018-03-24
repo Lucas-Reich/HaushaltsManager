@@ -105,7 +105,7 @@ public class GetExchangeRatesService extends IntentService {
             urlConnection.setRequestMethod("GET");
             urlConnection.connect();
 
-            assertHttpStatusOk(urlConnection.getResponseCode());
+            assertHttpStatusOk(urlConnection.getResponseCode());//todo Code wird hier fehlerhaft ausgeführt
 
             InputStream inputStream = urlConnection.getInputStream();
             closeUrlConnection(urlConnection);
@@ -292,7 +292,7 @@ public class GetExchangeRatesService extends IntentService {
             mDatabase.createExchangeRate(fromCurId, toCurId, exchangeRate, downloadTimeInMills);
         } catch (EntityNotExistingException e) {
 
-            Log.d(TAG, "createNewExchangeRate: " + e.getMessage());
+            Log.e(TAG, "createNewExchangeRate: Error while creating a new ExchangeRate", e);
         }
     }
 

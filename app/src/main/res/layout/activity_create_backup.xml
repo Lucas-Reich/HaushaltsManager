@@ -1,38 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/create_backup_directory_btn"
-        style="@style/Widget.AppCompat.Button.Borderless"
+    <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="current Directory"
-        android:textAlignment="center"
-        android:textAllCaps="false"/>
+        android:orientation="vertical">
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/booking_income"/>
+        <Button
+            android:id="@+id/create_backup_directory_btn"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="current Directory"
+            android:textAlignment="center"
+            android:textAllCaps="false"/>
 
-    <ListView
-        android:id="@+id/create_backup_list_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorPrimary"/>
 
-    </ListView>
+        <ListView
+            android:id="@+id/create_backup_list_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/create_backup_create_backup_btn"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="18dp"
+        android:layout_marginEnd="18dp"
+        android:layout_marginRight="18dp"
         android:clickable="true"
-        app:backgroundTint="@color/colorPrimary"
         app:srcCompat="@drawable/ic_add_white"/>
-
-</LinearLayout>
+</RelativeLayout>

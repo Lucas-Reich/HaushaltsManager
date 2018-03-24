@@ -249,7 +249,7 @@ public class ExpensesDataSource {
         dummyExpense = new ExpenseObject(mContext.getResources().getString(R.string.no_name), 0, true, Category.createDummyCategory(mContext), null, account);
         dummyExpense.setDateTime(Calendar.getInstance());
 
-        return createBooking(dummyExpense);
+        return createBooking(dummyExpense).getIndex();
     }
 
 
@@ -259,7 +259,7 @@ public class ExpensesDataSource {
      * @param account Account object  which should be created
      * @return the id of the created tag. -1 if the insertion failed
      */
-    public long createAccount(Account account) {
+    public Account createAccount(Account account) {
 
         if (account.getCurrency().getIndex() == -1)
             throw new RuntimeException("Cannot create account with dummy Currency object!");
@@ -270,7 +270,9 @@ public class ExpensesDataSource {
         values.put(ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID, account.getCurrency().getIndex());
 
         Log.d(TAG, "Creating account: " + account.getName());
-        return database.insert(ExpensesDbHelper.TABLE_ACCOUNTS, null, values);
+        long index = database.insert(ExpensesDbHelper.TABLE_ACCOUNTS, null, values);
+
+        return new Account(index, account.getName(), account.getBalance(), account.getCurrency());
     }
 
     /**
@@ -402,15 +404,16 @@ public class ExpensesDataSource {
      * @param tag Das Tag welches erstellt werden soll
      * @return the id of the created tag. -1 if the insertion failed
      */
-    public long createTag(Tag tag) {
+    public Tag createTag(Tag tag) {
 
 
         //TODO create tag wenn es noch nicht existiert
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.TAGS_COL_NAME, tag.getName());
-
         Log.d(TAG, "created tag: " + tag.getName());
-        return database.insert(ExpensesDbHelper.TABLE_TAGS, null, values);
+
+        long index = database.insert(ExpensesDbHelper.TABLE_TAGS, null, values);
+        return new Tag(index, tag.getName());
     }
 
     /**
@@ -599,7 +602,7 @@ public class ExpensesDataSource {
      * @param expense The expense which has to be stored in the DB
      * @return Id of the created Booking
      */
-    public long createBooking(ExpenseObject expense) {//changed date string to mills
+    public ExpenseObject createBooking(ExpenseObject expense) {
 
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.BOOKINGS_COL_PRICE, expense.getUnsignedPrice());
@@ -613,15 +616,20 @@ public class ExpensesDataSource {
         values.put(ExpensesDbHelper.BOOKINGS_COL_IS_PARENT, expense.isParent());
         values.put(ExpensesDbHelper.BOOKINGS_COL_CURRENCY_ID, expense.getExpenseCurrency().getIndex());
 
-        long bookingId = database.insert(ExpensesDbHelper.TABLE_BOOKINGS, null, values);
-        Log.d(TAG, "created expense at index: " + bookingId);
+        long index = database.insert(ExpensesDbHelper.TABLE_BOOKINGS, null, values);
+        Log.d(TAG, "created expense at index: " + index);
 
         for (Tag tag : expense.getTags()) {
 
-            assignTagToBooking(bookingId, tag.getIndex());
+            assignTagToBooking(index, tag.getIndex());
         }
 
-        return bookingId;
+        for (ExpenseObject child : expense.getChildren()) {
+
+            addChild(child, index);
+        }
+
+        return new ExpenseObject(index, expense.getName(), expense.getUnsignedPrice(), expense.getDateTime(), expense.isExpenditure(), expense.getCategory(), expense.getNotice(), expense.getAccount(), expense.getExpenseCurrency(), expense.getExpenseType());
     }
 
     /**
@@ -977,7 +985,7 @@ public class ExpensesDataSource {
     }
 
 
-    public long createCategory(Category category) {
+    public Category createCategory(Category category) {
 
         //TODO erstelle neue Kategorie wenn sie nicht bereits existiert
         ContentValues values = new ContentValues();
@@ -986,7 +994,9 @@ public class ExpensesDataSource {
         values.put(ExpensesDbHelper.CATEGORIES_COL_EXPENSE_TYPE, category.getDefaultExpenseType() ? 1 : 0);
         Log.d(TAG, "created new CATEGORY");
 
-        return database.insert(ExpensesDbHelper.TABLE_CATEGORIES, null, values);
+
+        long index = database.insert(ExpensesDbHelper.TABLE_CATEGORIES, null, values);
+        return new Category(index, category.getName(), category.getColor(), category.getDefaultExpenseType());
     }
 
     public ArrayList<Category> getAllCategories() {
@@ -1278,14 +1288,16 @@ public class ExpensesDataSource {
     }
 
 
-    public long createCurrency(Currency currency) {
+    public Currency createCurrency(Currency currency) {
 
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.CURRENCIES_COL_NAME, currency.getName());
         values.put(ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME, currency.getShortName());
         values.put(ExpensesDbHelper.CURRENCIES_COL_SYMBOL, currency.getSymbol());
 
-        return database.insert(ExpensesDbHelper.TABLE_CURRENCIES, null, values);
+        long index = database.insert(ExpensesDbHelper.TABLE_CURRENCIES, null, values);
+
+        return new Currency(index, currency.getName(), currency.getShortName(), currency.getSymbol(), currency.getRateToBase());
     }
 
     @NonNull
