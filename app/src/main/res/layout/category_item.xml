@@ -7,7 +7,8 @@
     <com.example.lucas.haushaltsmanager.CustomViews.RoundedTextView
         android:id="@+id/category_item_circ_textview"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"/>
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"/>
 
     <TextView
         android:id="@+id/category_item_name"

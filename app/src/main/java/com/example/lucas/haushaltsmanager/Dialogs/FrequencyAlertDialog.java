@@ -1,34 +1,47 @@
 package com.example.lucas.haushaltsmanager.Dialogs;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 
-import com.example.lucas.haushaltsmanager.Activities.ExpenseScreenActivity;
 import com.example.lucas.haushaltsmanager.R;
 
 public class FrequencyAlertDialog extends DialogFragment {
 
+    private OnFrequencySet mCallback;
+    private Context mContext;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        try {
+
+            mCallback = (OnFrequencySet) context;
+            mContext = context;
+        } catch (ClassCastException e) {
+
+            throw new ClassCastException(context.toString() + " must implement OnFrequencySelected!");
+        }
+    }
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-        final Activity activity = getActivity();
-        final ExpenseScreenActivity expenseScreen = (ExpenseScreenActivity) getActivity();
+        Bundle args = getArguments();
 
-
-        LayoutInflater inflater = activity.getLayoutInflater();
+        LayoutInflater inflater = getActivity().getLayoutInflater();
         final View frequencyInput = inflater.inflate(R.layout.frequency_input, null);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity.getBaseContext());
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 
-        builder.setTitle("Wie häufig soll das Ereigniss eintreten?");
+        builder.setTitle(args.getString("title"));
 
         builder.setView(frequencyInput);
 
@@ -36,12 +49,7 @@ public class FrequencyAlertDialog extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                EditText numberInput = (EditText) frequencyInput.findViewById(R.id.input_number);
-                String frequency = numberInput.getText().toString();
-
-                expenseScreen.frequency = convertToHours(frequency);
-                Button freButton = (Button) activity.findViewById(R.id.expense_screen_recurring_frequency);
-                freButton.setText(String.format("%s Tage", frequency));
+                mCallback.onFrequencySet(getFrequencyFromInput(frequencyInput), getTag());
                 dismiss();
             }
         });
@@ -57,8 +65,21 @@ public class FrequencyAlertDialog extends DialogFragment {
         return builder.create();
     }
 
-    private int convertToHours(String timeString) {
+    /**
+     * Methode um die vom user eingegebene Häufigkeit aus dem Inputfeld auszulesen
+     *
+     * @param view View, in dem sich das Inputfeld befindet
+     * @return Häufigkeit in Stunden
+     */
+    private int getFrequencyFromInput(View view) {
 
-        return Integer.parseInt(timeString) * 24;
+        EditText numberInput = (EditText) view.findViewById(R.id.input_number);
+        String frequency = numberInput.getText().toString();
+
+        return Integer.parseInt(frequency) * 24;
+    }
+
+    public interface OnFrequencySet {
+        void onFrequencySet(int frequencyInHours, String tag);
     }
 }

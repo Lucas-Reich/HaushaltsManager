@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.example.lucas.haushaltsmanager.CustomViews.CircularTextView;
 import com.example.lucas.haushaltsmanager.CustomViews.RoundedTextView;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 
@@ -55,6 +54,7 @@ public class CategoryAdapter extends ArrayAdapter<Category> implements View.OnCl
         viewHolder.txtCategoryName.setText(String.format("%s", categoryObject.getName()));
         viewHolder.circTextView.setCenterText(String.format("%s", categoryObject.getName().substring(0,1).toUpperCase()));
         viewHolder.circTextView.setCircleColor(categoryObject.getColor());
+        viewHolder.circTextView.setTextColor(Color.WHITE);
 
         return convertView;
     }

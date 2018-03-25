@@ -111,6 +111,7 @@ public class TabOneBookings extends Fragment {
                 } else {
 
                     Intent createNewBookingIntent = new Intent(mainTab, ExpenseScreenActivity.class);
+                    createNewBookingIntent.putExtra("mode", "createBooking");
                     mainTab.startActivity(createNewBookingIntent);
                 }
             }
@@ -124,7 +125,6 @@ public class TabOneBookings extends Fragment {
 
                 if (mListAdapter.getSelectedCount() > 1) {
 
-
                     //todo bevor die Buchungen zusammengefügt werden sollte ein alert dialog den user nach einem namen für die KombiBuchung fragen
                     ExpenseObject parentBooking = mDatabase.createChildBooking(mListAdapter.getSelectedGroupData());
                     mExpenses.removeAll(mListAdapter.getSelectedGroupData());
@@ -134,9 +134,11 @@ public class TabOneBookings extends Fragment {
                     animateFabs(mListAdapter.getSelectedCount());
                 } else {
 
+                    //wenn zu einer buchung eine Kindbuchung hinzugefügt werden soll, dann muss die id des Parents mit übergeben werden
                     long parentExpenseId = mListAdapter.getSelectedBookingIds()[0];
                     Intent createChildToBookingIntent = new Intent(mainTab, ExpenseScreenActivity.class);
-                    createChildToBookingIntent.putExtra("parentIndex", parentExpenseId);
+                    createChildToBookingIntent.putExtra("mode", "addChild");
+                    createChildToBookingIntent.putExtra("parentBooking", parentExpenseId);
 
                     mListAdapter.deselectAll();
                     mainTab.startActivity(createChildToBookingIntent);
@@ -192,7 +194,9 @@ public class TabOneBookings extends Fragment {
                 if (!mSelectionMode) {
 
                     Intent updateParentExpenseIntent = new Intent(getContext(), ExpenseScreenActivity.class);
-                    updateParentExpenseIntent.putExtra("parentExpense", expense.getIndex());
+                    updateParentExpenseIntent.putExtra("mode", "updateParent");
+                    updateParentExpenseIntent.putExtra("updateParentExpense", expense);
+                    //updateParentExpenseIntent.putExtra("parentExpense", expense.getIndex());
                     startActivity(updateParentExpenseIntent);
                 } else {
 
@@ -235,7 +239,9 @@ public class TabOneBookings extends Fragment {
 
                 //start expenseScreen with selected expense
                 Intent updateChildExpenseIntent = new Intent(getContext(), ExpenseScreenActivity.class);
-                updateChildExpenseIntent.putExtra("childExpense", expense.getIndex());
+                updateChildExpenseIntent.putExtra("mode", "updateChild");
+                updateChildExpenseIntent.putExtra("updateChildExpense", expense);
+                //updateChildExpenseIntent.putExtra("childExpense", expense.getIndex());
                 startActivity(updateChildExpenseIntent);
                 return true;
             }

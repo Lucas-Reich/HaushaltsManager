@@ -6,10 +6,6 @@
         android:icon="@drawable/ic_menu_camera"
         android:title="@string/left_slider_import_export"/>
     <item
-        android:id="@+id/no_category"
-        android:icon="@drawable/ic_menu_camera"
-        android:title="@string/left_slider_no_category"/>
-    <item
         android:id="@+id/course"
         android:icon="@drawable/ic_menu_camera"
         android:title="@string/left_slider_course"/>
@@ -45,10 +41,6 @@
 
     <group>
         <item
-            android:id="@+id/store"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="@string/left_slider_store"/>
-        <item
             android:id="@+id/preferences"
             android:icon="@drawable/ic_menu_camera"
             android:title="@string/left_slider_preferences"/>
@@ -56,10 +48,6 @@
             android:id="@+id/follow_us"
             android:icon="@drawable/ic_menu_camera"
             android:title="@string/left_slider_follow_us"/>
-        <item
-            android:id="@+id/rate_the_app"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="@string/left_slider_rate_the_app"/>
         <item
             android:id="@+id/about"
             android:icon="@drawable/ic_menu_camera"

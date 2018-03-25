@@ -24,6 +24,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.lucas.haushaltsmanager.Activities.CourseActivity;
 import com.example.lucas.haushaltsmanager.Activities.CreateBackupActivity;
 import com.example.lucas.haushaltsmanager.Activities.ImportExportActivity;
 import com.example.lucas.haushaltsmanager.Activities.RecurringBookingsActivity;
@@ -120,11 +121,10 @@ public class TabParentActivity extends AppCompatActivity implements ChooseAccoun
                         Intent templateIntent = new Intent(TabParentActivity.this, BookingTemplates.class);
                         TabParentActivity.this.startActivity(templateIntent);
                         break;
-                    case R.id.no_category:
-                        //do smth
-                        break;
-                    case R.id.course://Verlauf
-                        //do smth
+                    case R.id.course:
+
+                        Intent courseIntent = new Intent(TabParentActivity.this, CourseActivity.class);
+                        TabParentActivity.this.startActivity(courseIntent);
                         break;
                     case R.id.standing_orders:
 
@@ -146,10 +146,8 @@ public class TabParentActivity extends AppCompatActivity implements ChooseAccoun
                         Intent importExportIntent = new Intent(TabParentActivity.this, ImportExportActivity.class);
                         TabParentActivity.this.startActivity(importExportIntent);
                         break;
-                    case R.id.store:
-                        //do smth
-                        break;
                     case R.id.preferences:
+
                         //do smth
                         break;
                     case R.id.about:

@@ -87,9 +87,7 @@
                     android:fontFamily="sans-serif"
                     android:gravity="end|center_vertical"
                     android:onClick="expensePopUp"
-                    android:text="@string/expense_screen_category"
                     android:textAllCaps="false"
-                    android:textColor="@android:color/darker_gray"
                     android:textSize="15sp"/>
             </LinearLayout>
 
@@ -155,9 +153,7 @@
                     android:fontFamily="sans-serif"
                     android:gravity="end|center_vertical"
                     android:onClick="expensePopUp"
-                    android:text="@string/expense_screen_title"
                     android:textAllCaps="false"
-                    android:textColor="@android:color/darker_gray"
                     android:textSize="15sp"/>
             </LinearLayout>
 
@@ -183,10 +179,8 @@
                     android:fontFamily="sans-serif"
                     android:gravity="end|center_vertical"
                     android:onClick="expensePopUp"
-                    android:text="@string/expense_screen_tag"
                     android:textAllCaps="false"
-                    android:textColor="@android:color/darker_gray"
-                    android:textSize="15sp" />
+                    android:textSize="15sp"/>
             </LinearLayout>
 
             <LinearLayout
@@ -236,15 +230,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:drawableRight="@mipmap/quickcontact_badge_overlay_normal_dark_am"
                     android:drawableEnd="@mipmap/quickcontact_badge_overlay_normal_dark_am"
+                    android:drawableRight="@mipmap/quickcontact_badge_overlay_normal_dark_am"
                     android:fontFamily="sans-serif"
                     android:gravity="end|center_vertical"
                     android:onClick="expensePopUp"
-                    android:text="@string/expense_screen_notice"
                     android:textAllCaps="false"
-                    android:textColor="@android:color/darker_gray"
-                    android:textSize="15sp" />
+                    android:textSize="15sp"/>
             </LinearLayout>
 
             <LinearLayout

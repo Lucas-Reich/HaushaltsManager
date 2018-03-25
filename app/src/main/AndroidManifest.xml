@@ -62,6 +62,9 @@
         <activity
             android:name=".Activities.TransferActivity"
             android:label="TransfersActivity"/>
+        <activity
+            android:name=".Activities.CourseActivity"
+            android:label="CourseActivity"/>
 
         <receiver
             android:name=".MyAlarmReceiver"

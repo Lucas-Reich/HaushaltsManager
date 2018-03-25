@@ -95,5 +95,8 @@
     <string name="failed_to_delete_account">Failed to delete account, there are still Bookings with this account!</string>
     <string name="deleted_account">Deleted account</string>
     <string name="changed_main_account">is now the main account.</string>
+    <string name="choose_category">Choose category</string>
+    <string name="input_price">Input price</string>
+    <string name="input_frequency">Input frequency</string>
     <item name="deleted_account" type="id">Deleted account</item>
 </resources>
