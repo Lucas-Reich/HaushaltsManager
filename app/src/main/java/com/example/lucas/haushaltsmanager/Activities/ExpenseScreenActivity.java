@@ -14,7 +14,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
@@ -134,6 +133,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
 
             CREATION_MODE = creationModes.UPDATE_CHILD_MODE;
             mExpense = getIntent().getParcelableExtra("updateChildExpense");
+            Log.d(TAG, "resolveIntent: Updating Child Expense " + mExpense.toString());
             return;
         }
 
@@ -143,6 +143,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
 
             CREATION_MODE = creationModes.UPDATE_EXPENSE_MODE;
             mExpense = getIntent().getParcelableExtra("updateParentExpense");
+            Log.d(TAG, "resolveIntent: Updating Parent Expense " + mExpense.toString());
             return;
         }
 
@@ -154,7 +155,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
             mParentBooking = getIntent().getParcelableExtra("parentBooking");
         }
 
-        if (bundle.getString("mode").equals("createBooking")){
+        if (bundle.getString("mode").equals("createBooking")) {
 
             mSaveBtn.setText(getString(R.string.create_booking));
             CREATION_MODE = creationModes.CREATE_EXPENSE_MODE;
@@ -163,6 +164,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
         Account account = mDatabase.getAccountById(preferences.getLong("activeAccount", 0));
         mExpense = ExpenseObject.createDummyExpense(this);
         mExpense.setAccount(account);
+        Log.d(TAG, "resolveIntent: Creating Expense " + mExpense.toString());
     }
 
     @Override

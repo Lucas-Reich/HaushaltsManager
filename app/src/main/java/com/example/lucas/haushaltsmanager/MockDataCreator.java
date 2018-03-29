@@ -19,7 +19,7 @@ public class MockDataCreator {
     private String TAG = MockDataCreator.class.getSimpleName();
 
     private ExpensesDataSource mDatabase;
-    private int accountCount, bookingCount, categoryCount, tagCount, childBookingCount;
+    private int accountCount, bookingCount, categoryCount, tagCount;
     private List<Account> mAccounts;
     private List<Category> mCategories;
     private Currency mMainCurrency;
@@ -30,10 +30,10 @@ public class MockDataCreator {
         mDatabase.open();
 
         mMainCurrency = createCurrency();
-        mAccounts = createAccounts(10);
-        mCategories = createCategories(10);
-        createTags(10);
-        createBookings(500);
+        mAccounts = createAccounts(3);
+        mCategories = createCategories(3);
+        createTags(3);
+        createBookings(50);
     }
 
     private List<Account> createAccounts(int count) {

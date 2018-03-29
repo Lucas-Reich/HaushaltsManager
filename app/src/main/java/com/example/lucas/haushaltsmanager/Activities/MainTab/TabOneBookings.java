@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.provider.CalendarContract;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -21,6 +21,7 @@ import android.widget.ExpandableListView;
 import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Activities.ExpenseScreenActivity;
+import com.example.lucas.haushaltsmanager.ExpandableListAdapterCreator;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
@@ -29,12 +30,10 @@ import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.ExpandableListAdapter;
 import com.example.lucas.haushaltsmanager.R;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
 public class TabOneBookings extends Fragment {
 
@@ -64,6 +63,7 @@ public class TabOneBookings extends Fragment {
         mExpenses = new ArrayList<>();
 
         mDatabase = new ExpensesDataSource(getContext());
+        mDatabase.open();
         setActiveAccounts();
     }
 
@@ -290,17 +290,12 @@ public class TabOneBookings extends Fragment {
     }
 
     /**
-     * Methode um die mActiveAccounts liste zu initialisieren
+     * Methode um die mActiveAccounts liste zu initialisieren.
+     * Dabei werden die Indizes der akitven Konten in der mActiveAccounts liste gespeichert
      */
     private void setActiveAccounts() {
-
         Log.d(TAG, "setActiveAccounts: erneuere aktiven Kontenliste");
-
-        if (!mDatabase.isOpen())
-            mDatabase.open();
-
-        if (!mActiveAccounts.isEmpty())
-            mActiveAccounts.clear();
+        mActiveAccounts.clear();
 
         SharedPreferences preferences = getContext().getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
 
@@ -308,174 +303,6 @@ public class TabOneBookings extends Fragment {
 
             if (preferences.getBoolean(account.getName(), false))
                 mActiveAccounts.add(account.getIndex());
-        }
-    }
-
-    /**
-     * Methode um die ExpandableListView items vorzubereiten.
-     * Beim vorbereiten wird die mActiveAccounts liste mit einbezogen,
-     * ist das Konto einer Buchung nicht in der aktiven Kontoliste wird die Buchung auch nicht angezeigt.
-     * <p>
-     * todo wenn ein Konto abgewählt wird und bei einer parentBuchung ein oder mehrere (aber nicht alle) Buchungen nicht mehr angezeigt werden,
-     * muss auch der angezeigte Preis der parentBuchung angepasst werden
-     */
-    //jedes mal wenn ich von tab 3 auf den ersten tab wechsle wird die funktion prepareListData ausgeführt
-    private void prepareListData() {
-
-        Log.d(TAG, "prepareListData: erstelle neue Listen daten");
-
-        if (mListDataHeader.size() > 0)
-            mListDataHeader.clear();
-
-        if (!mListDataChild.isEmpty())
-            mListDataChild.clear();
-
-        if (mExpenses.isEmpty()) {//wenn die Liste noch nicht erstellt wurde
-
-            if (!mDatabase.isOpen())
-                mDatabase.open();
-
-            //erzeuge den ersten Tag der Monats (um nur die Buchugen des aktuellen Monats anzuzeigen)
-            Calendar firstOfMonth = Calendar.getInstance();
-            firstOfMonth.set(Calendar.DAY_OF_MONTH, 1);
-
-            //erzeuge den letzten Tag des Monats (um nur die Buchungen des aktuellen Monats anzuzeigen)
-            int lastDayMonth = Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH);
-            Calendar lastOfMonth = Calendar.getInstance();
-            lastOfMonth.set(Calendar.DAY_OF_MONTH, lastDayMonth);
-            mExpenses = mDatabase.getBookings(firstOfMonth.getTimeInMillis(), lastOfMonth.getTimeInMillis());
-            Log.d(TAG, "prepareListData: hole mir neue daten aus der datenbank");
-        }
-
-
-        String separatorDate = "";
-
-        for (int i = 0; i < mExpenses.size(); ) {
-
-            //wenn das Datum der neuen Buchung ungleich das der alten Buchung ist muss ein DatumsSeperator eingefügt werden
-            //wird ein DatumsSeperator eingefügt wird der counter nicht um eins erhöht
-            if (!mExpenses.get(i).getDate().equals(separatorDate)) {
-
-                separatorDate = mExpenses.get(i).getDate();
-
-                Account account = new Account(8888, "", 0, Currency.createDummyCurrency(getContext()));
-
-                ExpenseObject dateSeparator = new ExpenseObject(-1, "", 0, mExpenses.get(i).getDateTime(), true, Category.createDummyCategory(getContext()), null, account, null, ExpenseObject.EXPENSE_TYPES.DATE_PLACEHOLDER);
-
-                mListDataHeader.add(dateSeparator);
-                mListDataChild.put(dateSeparator, new ArrayList<ExpenseObject>());
-            } else {
-
-                ExpenseObject expense = mExpenses.get(i);
-
-                if (expense.isParent()) {
-
-                    ArrayList<ExpenseObject> allowedBookings = new ArrayList<>();
-
-                    for (ExpenseObject childExpense : expense.getChildren()) {
-
-                        if (mActiveAccounts.contains(childExpense.getAccount().getIndex()))
-                            allowedBookings.add(childExpense);
-                    }
-
-                    //wenn kein Kind erlaubt ist muss der Parent nicht angezeigt werden
-                    if (allowedBookings.size() > 0) {
-
-                        mListDataHeader.add(expense);
-                        mListDataChild.put(expense, allowedBookings);
-                    }
-                }
-
-                //wenn expense keine kinder hat
-                if (expense.getExpenseType() == ExpenseObject.EXPENSE_TYPES.DATE_PLACEHOLDER || mActiveAccounts.contains(expense.getAccount().getIndex())) {
-
-                    mListDataHeader.add(expense);
-                    mListDataChild.put(expense, expense.getChildren());//sollte leer sein
-                }
-                i++;
-            }
-        }
-    }
-
-    /**
-     * Ersatz für die prepareListData methode, da diese nicht in der lage ist die Datumstrenner aus der liste zu nehmen.
-     * Da diese Funktion aber noch Probleme mit der HasMap klasse hat wird sie noch nicht eingesetzt
-     */
-    private void prepareListData2() {//todo unerwartetes verhalten der HasMap
-
-        Log.d(TAG, "prepareListData: erstelle neue Listen daten");
-
-        if (mListDataHeader.size() > 0)
-            mListDataHeader.clear();
-
-        if (!mListDataChild.isEmpty())
-            mListDataChild.clear();
-
-        if (mExpenses.isEmpty()) {//wenn die Liste noch nicht erstellt wurde
-
-            Log.d(TAG, "prepareListData2: Hole die Buchungen aus der Datenbank");
-            if (!mDatabase.isOpen())
-                mDatabase.open();
-
-            //erzeuge den ersten Tag der Monats (um nur die Buchugen des aktuellen Monats anzuzeigen)
-            Calendar firstOfMonth = Calendar.getInstance();
-            firstOfMonth.set(Calendar.DAY_OF_MONTH, 1);
-
-            //erzeuge den letzten Tag des Monats (um nur die Buchungen des aktuellen Monats anzuzeigen)
-            int lastDayMonth = Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH);
-            Calendar lastOfMonth = Calendar.getInstance();
-            lastOfMonth.set(Calendar.DAY_OF_MONTH, lastDayMonth);
-            mExpenses = mDatabase.getBookings(firstOfMonth.getTimeInMillis(), lastOfMonth.getTimeInMillis());
-        }
-
-        String separatorDate = "";
-        ArrayList<ExpenseObject> tempGroupData = new ArrayList<>();
-        HashMap<ExpenseObject, List<ExpenseObject>> tempChildData = new HashMap<>();
-        ArrayList<ExpenseObject> childrenToDisplay = new ArrayList<>();
-
-        for (int i = 0; i < mExpenses.size(); ) {
-
-            if (mExpenses.get(i).getDate().equals(separatorDate) && i + 1 != mExpenses.size()) {
-
-                ExpenseObject expense = mExpenses.get(i);
-                childrenToDisplay.clear();
-
-                for (ExpenseObject childExpense : expense.getChildren()) {
-
-                    if (mActiveAccounts.contains(childExpense.getAccount().getIndex()))
-                        childrenToDisplay.add(childExpense);
-                }
-
-                //muss childrenToDisplay.size() nicht == 0 sein???
-                //wenn es kein/-e Kind/-er zum anzeigen gibt
-                if (childrenToDisplay.size() > 0 || !expense.isParent()) {
-
-                    tempGroupData.add(expense);
-                    tempChildData.put(expense, childrenToDisplay);//bei jeder iteration werden die kinder der buchungen alle  auf den gleichn wert gesetzt und die Group buhungen in der HasMAp sind auch nicht geordnet
-                }
-                i++;
-            } else {
-
-                if (tempGroupData.size() > 0) {
-
-                    ExpenseObject dateSeparator = ExpenseObject.createDummyExpense(getContext());
-                    dateSeparator.setExpenseType(ExpenseObject.EXPENSE_TYPES.DATE_PLACEHOLDER);
-                    dateSeparator.setDateTime(tempGroupData.get(0).getDateTime());
-
-                    mListDataHeader.add(dateSeparator);
-                    mListDataChild.put(dateSeparator, new ArrayList<ExpenseObject>());
-
-                    mListDataHeader.addAll(tempGroupData);
-                    mListDataChild.putAll(tempChildData);
-                }
-
-                tempGroupData.clear();
-                tempChildData.clear();
-                separatorDate = mExpenses.get(i).getDate();
-
-                if (i == mExpenses.size() - 1)
-                    break;
-            }
         }
     }
 
@@ -504,9 +331,9 @@ public class TabOneBookings extends Fragment {
      */
     public void updateExpListView() {
 
-        prepareListData();
-
-        mListAdapter = new ExpandableListAdapter(getActivity(), mListDataHeader, mListDataChild);
+        //initialisierung von mExpenses soll im TabOne geschehen und nicht im AdapterCreator
+        //es kann sein dass ich andere kriterien habe, welche Ausgaben genommen werden sollen und welche nicht
+        mListAdapter = new ExpandableListAdapterCreator(mExpenses, mActiveAccounts, getContext()).getExpandableListAdapter();
 
         mExpListView.setAdapter(mListAdapter);
 
