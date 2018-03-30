@@ -53,27 +53,48 @@ public class ExpandableListAdapterCreator {
      * Da diese Funktion aber noch Probleme mit der HasMap klasse hat wird sie noch nicht eingesetzt
      */
     private void prepareAdapter() {
-        Log.d(TAG, "prepareAdapter: Bereite neue Adapter daten vor!");
-        prepareDataSources();
+        Log.d(TAG, "prepareAdapter: Preparing new Adapter data!");
+        clearExistingViewDataSource();
 
+        int counter = 0;
         String separatorDate = "";
         for (int i = 0; i < mExpenses.size() - 1; ) {
 
+            ExpenseObject expense = mExpenses.get(i);
             if (mExpenses.get(i).getDate().equals(separatorDate) && i + 1 != mExpenses.size()) {
 
-                ExpenseObject expense = mExpenses.get(i);
+                if (isExpenseVisible(expense)) {
 
-                if (isExpenseVisible(expense))
                     addDataToListViewDataSource(expense, getChildrenToDisplay(expense));
+                    counter++;
+                }
                 i++;
             } else {
 
-                //wenn zwischen den letzten und dem aktuellen separator keine Buchungen liegen lösche den letzten separator
+                if (counter == 0 && mListDataHeader.size() != 0)
+                    removeItemAtIndex(i - 1);
+
                 ExpenseObject dateSeparator = createDateSeparator(mExpenses.get(i).getDateTime());
                 addDataToListViewDataSource(dateSeparator, null);
-                separatorDate = mExpenses.get(i).getDate();
+                separatorDate = expense.getDate();
+
+                counter = 0;
             }
         }
+
+        if (counter == 0 && mListDataHeader.size() != 0)
+            removeItemAtIndex(mListDataHeader.size() - 1);
+    }
+
+    /**
+     * Methode um eine Buchung aus dem Datensatz des ExpandableListAdapters basierend auf dem Index zu löschen
+     *
+     * @param index 0 basierter Index der zu löschenden Buchung
+     */
+    private void removeItemAtIndex(int index) {
+
+        ExpenseObject itemToRemove = mListDataHeader.get(index);
+        removeItem(itemToRemove);
     }
 
     /**
@@ -85,49 +106,6 @@ public class ExpandableListAdapterCreator {
 
         mListDataChild.remove(expense);
         mListDataHeader.remove(expense);
-    }
-
-    /**
-     * Methode um die Datengrundlagen des ExpandableListAdapters vorzubereiten.
-     * - Lösche alte Daten
-     * - Initialisiere Buchungsliste, wenn noch nicht vorhanden
-     */
-    private void prepareDataSources() {
-
-        clearExistingViewDataSource();
-
-        if (mExpenses.isEmpty()) {
-
-            Log.d(TAG, "prepareDataSources: Initialisiere Buchungsliste.");
-            mExpenses = mDatabase.getBookings(getFirstOfMonth().getTimeInMillis(), getLastOfMonth().getTimeInMillis());
-        }
-    }
-
-    /**
-     * Methode um eine Kalendar Objekt zu erstellen, welches dem ersten Tag des Monats entspricht.
-     *
-     * @return Erster Tag des Monats
-     */
-    private Calendar getFirstOfMonth() {
-
-        Calendar firstOfMonth = Calendar.getInstance();
-        firstOfMonth.set(Calendar.DAY_OF_MONTH, 1);
-
-        return firstOfMonth;
-    }
-
-    /**
-     * Methode um ein Kalendar objekt zu erstellen, welches dem letzten Tag des Monats entspricht.
-     *
-     * @return Letzter Tag des Monats
-     */
-    private Calendar getLastOfMonth() {
-
-        int lastDayMonth = Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH);
-        Calendar lastOfMonth = Calendar.getInstance();
-        lastOfMonth.set(Calendar.DAY_OF_MONTH, lastDayMonth);
-
-        return lastOfMonth;
     }
 
     /**
