@@ -331,13 +331,52 @@ public class TabOneBookings extends Fragment {
      */
     public void updateExpListView() {
 
-        //initialisierung von mExpenses soll im TabOne geschehen und nicht im AdapterCreator
-        //es kann sein dass ich andere kriterien habe, welche Ausgaben genommen werden sollen und welche nicht
+        prepareDataSources();
+
         mListAdapter = new ExpandableListAdapterCreator(mExpenses, mActiveAccounts, getContext()).getExpandableListAdapter();
 
         mExpListView.setAdapter(mListAdapter);
 
         mListAdapter.notifyDataSetChanged();
+    }
+
+    /**
+     * Methode um die Ausgabenliste zu initialiesieren, wenn dies noch nicht geschehen ist
+     */
+    private void prepareDataSources() {
+
+        if (mExpenses.isEmpty()) {
+
+            Log.d(TAG, "prepareDataSources: Initialisiere Buchungsliste.");
+            mExpenses = mDatabase.getBookings(getFirstOfMonth().getTimeInMillis(), getLastOfMonth().getTimeInMillis());
+        }
+    }
+
+    /**
+     * Methode um eine Kalendar Objekt zu erstellen, welches dem ersten Tag des Monats entspricht.
+     *
+     * @return Erster Tag des Monats
+     */
+    private Calendar getFirstOfMonth() {
+
+        Calendar firstOfMonth = Calendar.getInstance();
+        firstOfMonth.set(Calendar.DAY_OF_MONTH, 1);
+
+        return firstOfMonth;
+    }
+
+    /**
+     * Methode um ein Kalendar objekt zu erstellen, welches dem letzten Tag des Monats entspricht.
+     *
+     * @return Letzter Tag des Monats
+     */
+    private Calendar getLastOfMonth() {
+
+        int lastDayMonth = Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH);
+        Calendar lastOfMonth = Calendar.getInstance();
+        lastOfMonth.set(Calendar.DAY_OF_MONTH, lastDayMonth);
+
+        return lastOfMonth;
     }
 
     /**

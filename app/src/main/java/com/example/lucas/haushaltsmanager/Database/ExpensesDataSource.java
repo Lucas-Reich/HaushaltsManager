@@ -1704,7 +1704,7 @@ public class ExpensesDataSource {
         //prüfe die ChilBookings tabelle
         selectQuery = "SELECT"
                 + " COUNT(1) 'exists'"
-                + " FROM " + ExpensesDbHelper.TABLE_BOOKINGS
+                + " FROM " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS
                 + " WHERE " + propertyColumn + " = " + propertyId + ";";
         Log.d(TAG, "isChild: " + selectQuery);
 
