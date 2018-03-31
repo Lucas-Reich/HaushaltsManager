@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.CursorIndexOutOfBoundsException;
 import android.database.DatabaseUtils;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
@@ -16,7 +17,6 @@ import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Tag;
-import com.example.lucas.haushaltsmanager.R;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -57,7 +57,7 @@ public class ExpensesDataSource {
     }
 
     @NonNull
-    private ExpenseObject cursorToChildBooking(Cursor c) {//changed date string to mills
+    private ExpenseObject cursorToChildBooking(Cursor c) {
 
         int expenseId = c.getInt(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_ID));
 
@@ -106,7 +106,7 @@ public class ExpensesDataSource {
      * @param c Cursor object obtained by a SQLITE search query
      * @return An remapped ExpenseObject
      */
-    private ExpenseObject cursorToExpense(Cursor c) {//changed date string to mills
+    private ExpenseObject cursorToExpense(Cursor c) {
 
         int expenseId = c.getInt(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_ID));
 
@@ -233,30 +233,26 @@ public class ExpensesDataSource {
     }
 
     /**
-     * creates an dummy expense for combining expenses
+     * Methode um eine Dummy Ausgabe zu erstellen.
      *
-     * @return id of expense
+     * @return Dummy Ausgabe
      */
-    private long createDummyExpense() {
+    private ExpenseObject createDummyExpense() {
 
         SharedPreferences preferences = mContext.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
         Currency currency = getCurrency(preferences.getLong("mainCurrencyIndex", 1));
 
-        ExpenseObject dummyExpense;
+        ExpenseObject dummyExpense = ExpenseObject.createDummyExpense(mContext);
+        dummyExpense.setExpenseCurrency(currency);
 
-        Account account = new Account(9999, "", 0, currency);
-
-        dummyExpense = new ExpenseObject(mContext.getResources().getString(R.string.no_name), 0, true, Category.createDummyCategory(mContext), null, account);
-        dummyExpense.setDateTime(Calendar.getInstance());
-
-        return createBooking(dummyExpense).getIndex();
+        return createBooking(dummyExpense);
     }
 
 
     /**
      * Convenience Method for creating a new Account
      *
-     * @param account Account object  which should be created
+     * @param account Account object which should be created
      * @return the id of the created tag. -1 if the insertion failed
      */
     public Account createAccount(Account account) {
@@ -450,7 +446,7 @@ public class ExpensesDataSource {
         String selectQuery = "SELECT "
                 + ExpensesDbHelper.TAGS_COL_ID + ", "
                 + ExpensesDbHelper.TAGS_COL_NAME + ", "
-                + " FROM " + ExpensesDbHelper.TABLE_TAGS;
+                + " FROM " + ExpensesDbHelper.TABLE_TAGS + ";";
         Log.d(TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
@@ -694,7 +690,7 @@ public class ExpensesDataSource {
      * @param endDateInMills   ending date
      * @return list of Expenses which are between the starting and end date
      */
-    public ArrayList<ExpenseObject> getBookings(long startDateInMills, long endDateInMills) {//changed date string to mills
+    public ArrayList<ExpenseObject> getBookings(long startDateInMills, long endDateInMills) {
 
         String selectQuery;
         selectQuery = "SELECT "
@@ -788,7 +784,7 @@ public class ExpensesDataSource {
      * @param parentId Id of parent booking
      * @return index of inserted child
      */
-    private long addChild(ExpenseObject child, long parentId) {//changed date string to mills
+    private long addChild(ExpenseObject child, long parentId) {
 
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_PRICE, child.getUnsignedPrice());
@@ -819,49 +815,54 @@ public class ExpensesDataSource {
      * It also checks whether the parent expense has children attached to it or not.
      * If the parent expense has no children then a dummy expense is created and the parent and the child are attached to it.
      *
-     * @param childExpense expense to add to the parent
-     * @param parentId     ID of parent expense
-     * @return ID of parent
+     * @param childExpense  expense to add to the parent
+     * @param parentBooking Übergeordnete Buchung
+     * @return Übergeordnete Buchung
      */
-    public long addChildToBooking(ExpenseObject childExpense, long parentId) {
+    public ExpenseObject addChildToBooking(ExpenseObject childExpense, ExpenseObject parentBooking) {
 
-        if (!isChild(parentId)) {
+        if (isChild(parentBooking.getIndex()))
+            throw new UnsupportedOperationException("Cannot add Booking to an child Booking");
 
-            ExpenseObject parent = getBookingById(parentId);
+        if (parentBooking.isParent()) {
 
-            if (parent.isParent()) {
-
-                addChild(childExpense, parentId);
-
-                return parentId;
-            } else {
-
-                parentId = createDummyExpense();
-                addChild(parent, parentId);
-                deleteBooking(parent.getIndex());
-                addChild(childExpense, parentId);
-
-                return parentId;
-            }
+            addChild(childExpense, parentBooking.getIndex());
+            parentBooking.addChild(childExpense);
+            return parentBooking;
         } else {
 
-            Log.w(TAG, "createChildBooking: Error while adding child to Parent! Parent is Child");
-            throw new UnsupportedOperationException("Cannot add Booking to an child Booking");
-            //return -1;
+            ExpenseObject dummyParentBooking = createDummyExpense();
+            addChild(parentBooking, dummyParentBooking.getIndex());
+            dummyParentBooking.addChild(parentBooking);
+
+            addChild(childExpense, dummyParentBooking.getIndex());
+            dummyParentBooking.addChild(childExpense);
+
+            deleteBooking(parentBooking.getIndex());
+
+            return dummyParentBooking;
         }
     }
 
+    /**
+     * Methode um eine Liste von Buchungen zusammenzufügen.
+     * Dabei wird zuesrt eine DummyParent erstellt, unter welchem dann die Ausgaben platziert werden
+     *
+     * @param children Buchungen die zusammengefügt werden sollen
+     * @return Übergeordnete Buchung
+     */
     public ExpenseObject createChildBooking(List<ExpenseObject> children) {
 
-        long parentId = createDummyExpense();
+        ExpenseObject parentBooking = createDummyExpense();
+        parentBooking.addChildren(children);
 
         for (ExpenseObject child : children) {
 
-            addChildToBooking(child, parentId);
+            addChildToBooking(child, parentBooking);
             deleteBooking(child.getIndex());
         }
 
-        return getBookingById(parentId);
+        return parentBooking;
     }
 
     public ArrayList<ExpenseObject> getChildrenToParent(long parentId) {
@@ -1176,7 +1177,7 @@ public class ExpensesDataSource {
     }
 
 
-    public long createRecurringBooking(long recurringBookingId, long startTimeInMills, int frequency, long endTimeInMills) {//changed date string to mills
+    public long createRecurringBooking(long recurringBookingId, long startTimeInMills, int frequency, long endTimeInMills) {
 
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID, recurringBookingId);
@@ -1189,7 +1190,6 @@ public class ExpensesDataSource {
     }
 
     public ArrayList<ExpenseObject> getRecurringBookings(Calendar dateRngStart, Calendar endDate) {//TODO nicht ganz zufrieden mit der funktion, bitte überdenken
-        //changed date string to mills
 
         //exclude all events which end before the given date range
         String selectQuery = "SELECT "
@@ -1269,7 +1269,7 @@ public class ExpensesDataSource {
     }
 
 
-    public int updateRecurringBooking(ExpenseObject newRecurringBooking, long startDateInMills, int frequency, long endDateInMills, long recurringId) {//changed date string to mills
+    public int updateRecurringBooking(ExpenseObject newRecurringBooking, long startDateInMills, int frequency, long endDateInMills, long recurringId) {
 
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID, newRecurringBooking.getIndex());
@@ -1448,7 +1448,7 @@ public class ExpensesDataSource {
      * @param dateInMills fetching date in milliseconds
      * @return state of operation
      */
-    public long createExchangeRate(Currency fromCur, Currency toCur, double rate, long dateInMills) throws EntityNotExistingException {//changed date string to mills
+    public long createExchangeRate(Currency fromCur, Currency toCur, double rate, long dateInMills) throws EntityNotExistingException {
 
         return createExchangeRate(fromCur.getIndex(), toCur.getIndex(), rate, dateInMills);
     }
@@ -1462,7 +1462,7 @@ public class ExpensesDataSource {
      * @param dateInMills fetching date in milliseconds
      * @return state of operation
      */
-    public long createExchangeRate(String fromCur, String toCur, double rate, long dateInMills) throws EntityNotExistingException {//changed date string to mills
+    public long createExchangeRate(String fromCur, String toCur, double rate, long dateInMills) throws EntityNotExistingException {
 
         return createExchangeRate(getCurrencyId(fromCur), getCurrencyId(toCur), rate, dateInMills);
     }
@@ -1476,7 +1476,7 @@ public class ExpensesDataSource {
      * @param dateInMills  fetching date in milliseconds
      * @return state of operation
      */
-    public long createExchangeRate(long fromCurIndex, long toCurIndex, double rate, long dateInMills) throws EntityNotExistingException {//changed date string to mills
+    public long createExchangeRate(long fromCurIndex, long toCurIndex, double rate, long dateInMills) throws EntityNotExistingException {
 
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.CURRENCY_EXCHANGE_RATES_COL_FROM_CURRENCY_ID, fromCurIndex);
@@ -1501,7 +1501,7 @@ public class ExpensesDataSource {
      * @return HashMap(ExchangeRate, Download date of fetched exchange rate)
      */
     @Nullable
-    public HashMap<Double, Long> getExtendedExchangeRate(long fromCurIndex, long toCurIndex, long timeInMills) {//changed date string to mills
+    public HashMap<Double, Long> getExtendedExchangeRate(long fromCurIndex, long toCurIndex, long timeInMills) {
 
         HashMap<Double, Long> extendedExchangeRateInfo = new HashMap<>();
         Calendar currentDay = Calendar.getInstance();
@@ -1559,7 +1559,7 @@ public class ExpensesDataSource {
      * @return The ExchangeRate if available null if not
      */
     @Nullable
-    public Double getExchangeRate(long fromCurIndex, long toCurIndex, long timeInMills) {//changed date string to mills
+    public Double getExchangeRate(long fromCurIndex, long toCurIndex, long timeInMills) {
 
         HashMap<Double, Long> extendedExchangeRate = getExtendedExchangeRate(fromCurIndex, toCurIndex, timeInMills);
 
@@ -1581,7 +1581,7 @@ public class ExpensesDataSource {
      * @return rate to base if available else null
      */
     @Nullable
-    public Double getRateToBase(long fromCurIndex, long timeInMills) {//changed date string to mills
+    public Double getRateToBase(long fromCurIndex, long timeInMills) {
 
         SharedPreferences preferences = mContext.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
         long baseCurIndex = preferences.getLong("mainCurrencyIndex", 0);

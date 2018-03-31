@@ -33,7 +33,7 @@ public class MockDataCreator {
         mAccounts = createAccounts(3);
         mCategories = createCategories(3);
         createTags(3);
-        createBookings(50);
+        createBookings(100);
     }
 
     private List<Account> createAccounts(int count) {

@@ -31,6 +31,7 @@ import com.example.lucas.haushaltsmanager.Activities.RecurringBookingsActivity;
 import com.example.lucas.haushaltsmanager.Activities.ShowCategoriesActivity;
 import com.example.lucas.haushaltsmanager.Activities.TransferActivity;
 import com.example.lucas.haushaltsmanager.BookingTemplates;
+import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ChangeAccounts.ChooseAccountsDialogFragment;
 import com.example.lucas.haushaltsmanager.MockDataCreator;
 import com.example.lucas.haushaltsmanager.MyAlarmReceiver;
@@ -38,7 +39,7 @@ import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Services.GetExchangeRatesService;
 import com.example.lucas.haushaltsmanager.Activities.TestPieChart;
 
-public class TabParentActivity extends AppCompatActivity implements ChooseAccountsDialogFragment.OnSelectedAccount {
+public class TabParentActivity extends AppCompatActivity implements ChooseAccountsDialogFragment.OnSelectedAccount, BasicTextInputDialog.BasicDialogCommunicator {
 
     private String TAG = TabParentActivity.class.getSimpleName();
 
@@ -274,7 +275,6 @@ public class TabParentActivity extends AppCompatActivity implements ChooseAccoun
     public void onAccountSelected(long accountId, boolean isChecked) {
 
         int visibleTabPosition = mTabLayout.getSelectedTabPosition();
-
         Fragment fragment = getSupportFragmentManager().findFragmentByTag("android:switcher:" + mViewPager.getId() + ":" + visibleTabPosition);
 
         if (fragment != null) {
@@ -291,6 +291,18 @@ public class TabParentActivity extends AppCompatActivity implements ChooseAccoun
                     //todo ((TabThree) fragment).refreshListOnAccountSelected(accountId, isChecked);
                     break;
             }
+        }
+    }
+
+    @Override
+    public void onTextInput(String textInput, String tag) {
+
+        int visibleTabPosition = mTabLayout.getSelectedTabPosition();
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag("android:switcher:" + mViewPager.getId() + ":" + visibleTabPosition);
+
+        if (tag.equals("tab_one_combine_bookings")) {
+
+            ((TabOneBookings) fragment).onCombinedTitleSelected(textInput);
         }
     }
 

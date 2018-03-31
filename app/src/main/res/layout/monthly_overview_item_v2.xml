@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:baselineAligned="false"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:paddingEnd="0dp"
     android:paddingLeft="12dp"
-    android:paddingStart="12dp"
     android:paddingRight="0dp"
-    android:paddingEnd="0dp">
+    android:paddingStart="12dp">
 
     <LinearLayout
         android:id="@+id/monthly_text_wrapper"
@@ -90,17 +90,16 @@
             android:layout_height="match_parent"
             android:orientation="horizontal">
 
-            <TextView
+            <com.example.lucas.haushaltsmanager.CustomViews.RoundedTextView
                 android:id="@+id/monthly_item_category_color"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/circle_small"
-                android:text="TextView"/>
+                />
 
             <TextView
                 android:id="@+id/monthly_item_category"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="Kategorie"/>
         </LinearLayout>

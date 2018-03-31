@@ -211,12 +211,8 @@ public class MonthlyReport {
             this.category = category;
         }
 
-        public double getSpendMoney() {
+        double getSpendMoney() {
             return spendMoney;
-        }
-
-        public void setSpendMoney(double spendMoney) {
-            this.spendMoney = spendMoney;
         }
     }
 }

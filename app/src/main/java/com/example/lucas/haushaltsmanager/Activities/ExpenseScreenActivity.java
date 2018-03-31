@@ -327,7 +327,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
                     break;
                 case CREATE_CHILD_MODE:
 
-                    mDatabase.addChildToBooking(mExpense, mParentBooking.getIndex());
+                    mDatabase.addChildToBooking(mExpense, mParentBooking);
                     mDatabase.insertConvertExpense(mExpense);
                     Toast.makeText(ExpenseScreenActivity.this, "Added Booking \"" + mExpense.getName() + "\" to parent Booking " + mParentBooking.getName(), Toast.LENGTH_SHORT).show();
                     break;

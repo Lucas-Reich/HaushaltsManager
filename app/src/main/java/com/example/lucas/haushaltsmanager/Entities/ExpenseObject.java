@@ -295,7 +295,7 @@ public class ExpenseObject implements Parcelable {
         return tags;
     }
 
-    public void addTag(@NonNull Tag tag) {
+    private void addTag(@NonNull Tag tag) {
 
         tags.add(tag);
     }
@@ -350,11 +350,6 @@ public class ExpenseObject implements Parcelable {
         return this.children;
     }
 
-    public int countChildren() {
-
-        return this.children.size();
-    }
-
     public boolean isParent() {
 
         return expenseType == EXPENSE_TYPES.PARENT_EXPENSE;
@@ -382,7 +377,7 @@ public class ExpenseObject implements Parcelable {
         return getIndex() > -1 && account.isValid() && category.isValid() && getExpenseCurrency().isValid() && areTagsValid();
     }
 
-    public boolean areTagsValid() {
+    private boolean areTagsValid() {
 
         boolean result = true;
         for (Tag tag : getTags()) {
@@ -445,10 +440,6 @@ public class ExpenseObject implements Parcelable {
 
         return this.expenseType;
     }
-
-
-    //Parcelable is super slow DO NOT USE IN PRODUCTION
-    //TODO make faster!!
 
     /**
      * can be ignored mostly

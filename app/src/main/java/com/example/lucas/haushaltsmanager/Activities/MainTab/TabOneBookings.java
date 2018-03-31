@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -21,13 +20,12 @@ import android.widget.ExpandableListView;
 import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Activities.ExpenseScreenActivity;
-import com.example.lucas.haushaltsmanager.ExpandableListAdapterCreator;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
+import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Entities.Account;
-import com.example.lucas.haushaltsmanager.Entities.Category;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.ExpandableListAdapter;
+import com.example.lucas.haushaltsmanager.ExpandableListAdapterCreator;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.util.ArrayList;
@@ -126,12 +124,13 @@ public class TabOneBookings extends Fragment {
                 if (mListAdapter.getSelectedCount() > 1) {
 
                     //todo bevor die Buchungen zusammengefügt werden sollte ein alert dialog den user nach einem namen für die KombiBuchung fragen
-                    ExpenseObject parentBooking = mDatabase.createChildBooking(mListAdapter.getSelectedGroupData());
-                    mExpenses.removeAll(mListAdapter.getSelectedGroupData());
-                    mExpenses.add(0, parentBooking);
-                    mListAdapter.deselectAll();
-                    updateExpListView();
-                    animateFabs(mListAdapter.getSelectedCount());
+                    Bundle bundle = new Bundle();
+                    bundle.putString("title", getResources().getString(R.string.input_title));
+
+                    BasicTextInputDialog textInputDialog = new BasicTextInputDialog();
+                    textInputDialog.setArguments(bundle);
+                    textInputDialog.show(getActivity().getFragmentManager(), "tab_one_combine_bookings");
+
                 } else {
 
                     //wenn zu einer buchung eine Kindbuchung hinzugefügt werden soll, dann muss die id des Parents mit übergeben werden
@@ -490,4 +489,18 @@ public class TabOneBookings extends Fragment {
             combOpen = false;
         }
     }
+
+    public void onCombinedTitleSelected(String title) {
+
+        ExpenseObject parentBooking = mDatabase.createChildBooking(mListAdapter.getSelectedGroupData());
+        parentBooking.setName(title);
+        //mDatabase.updateBooking(parentBooking); todo wenn die update booking funktionalität besteht wieder aktivieren
+
+        mExpenses.removeAll(mListAdapter.getSelectedGroupData());
+        mExpenses.add(0, parentBooking);
+        mListAdapter.deselectAll();
+        updateExpListView();
+        animateFabs(mListAdapter.getSelectedCount());
+    }
+
 }

@@ -2,6 +2,7 @@ package com.example.lucas.haushaltsmanager.CustomViews;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -9,6 +10,7 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -19,6 +21,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
+import com.example.lucas.haushaltsmanager.DataSet;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.util.ArrayList;
@@ -38,7 +41,8 @@ public class PieChart extends View {
     private Paint mNumeratorPaint;
     private RectF mNumeratorRect;
     private float mNumeratorSize;
-    private Rect mLegendBounds;
+    private float mLegendFontSize = 15;//todo anpassen
+    private Rect legendBounds;
 
     private NumeratorStyles mNumeratorStyle;
 
@@ -62,7 +66,7 @@ public class PieChart extends View {
     private List<List<PieSlice>> mPieData = new ArrayList<>();
     private float[] mAbsoluteValues;
     private Paint mSlicePaint;
-    private RectF mChartBounds;
+    private RectF mPieChartBounds;
     private Random mRnd = new Random();
     private String mNoData = getResources().getString(R.string.no_data);
     private boolean mPercentageValues = false;
@@ -180,8 +184,10 @@ public class PieChart extends View {
         mSlicePaint.setStyle(Paint.Style.FILL);
 
         mViewBounds = new RectF();
-        mChartBounds = new RectF();
-        mLegendBounds = new Rect();
+        mPieChartBounds = new RectF();
+        legendBounds = new Rect();
+
+        mPieData.add(new ArrayList<PieSlice>());
     }
 
     public void setHoleColor(@ColorInt int color) {
@@ -286,6 +292,19 @@ public class PieChart extends View {
             invalidate();
             requestLayout();
         }
+    }
+
+    public void setPieData(List<DataSet> pieData) {
+        if (pieData.size() == 0)
+            return;
+
+        mPieData.clear();
+        //todo methode schreiben die eine liste von datensets entgegennimmt und daraus slices macht
+        sortDataSetAsc(pieData);
+    }
+
+    private void sortDataSetAsc(List<DataSet> dataSet) {
+
     }
 
     /**
@@ -421,85 +440,345 @@ public class PieChart extends View {
         return total;
     }
 
+    //ab hier wird die Größe des PieCharts bestimmt
+
+    private Rect getChartDesiredSize() {
+
+        return new Rect(0, 0, 500, 500);
+    }
+
+    private Rect getLegendDesiredSize() {
+
+        //wenn man im collapsed mode ist wird das letzte label nicht mit einbezogen ("Andere") todo
+        //        //wenn die legende vertikal angeordnet sein soll dann soll sie so aussehen
+        //        // * Label
+        //        // * Label
+        //        // ...
+        //
+        //        // und nicht so
+        //        // *
+        //        // Label
+        //        // *
+        //        // Label
+        //todo offset zwischen den labels einfügen
+        int width = 0, height = 0;
+        for (PieSlice slice : mPieData.get(mVisibleLayer - 1)) {
+
+            Rect textSize = getTextBounds(slice.getSliceLabel(), mLegendFontSize);
+            if (mLegendDirection.equals(LegendDirections.LEFT_TO_RIGHT)) {
+
+                width += mNumeratorSize + textSize.width();
+                height = Math.max(textSize.height(), (int) mNumeratorSize);
+            } else {
+
+                width = Math.max(textSize.width(), (int) mNumeratorSize);
+                height += mNumeratorSize + textSize.height();
+            }
+        }
+
+        return new Rect(0, 0, width, height);
+    }
+
     /**
-     * Methode welche die Dimensionen der View berechnet
+     * Methode um die maximale Größe der View zu ermitteln
      *
-     * @param widthMeasureSpec  Maximale Breite der View
-     * @param heightMeasureSpec Maximale Höhe der View
+     * @param widthMeasureSpec  Breiteninformationen
+     * @param heightMeasureSpec Höheninformationen
      */
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {//todo padding considern
-        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
-        int widthSize = MeasureSpec.getSize(widthMeasureSpec);
-        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
-        int heightSize = MeasureSpec.getSize(heightMeasureSpec);
+    private void setViewBounds(int widthMeasureSpec, int heightMeasureSpec) {
 
-        mLegendBounds.set(0, 0, 0, 0);
-        mViewBounds.set(0, 0, widthSize, heightSize);
+        mViewBounds.set(0, 0, 0, 0);
+        if (isLegendBottom() || isLegendTop()) {
+
+            mViewBounds.right = reconcileSize(Math.max(getChartDesiredSize().width(), getLegendDesiredSize().width()), widthMeasureSpec);
+            mViewBounds.bottom = reconcileSize(getChartDesiredSize().height() + getLegendDesiredSize().height(), heightMeasureSpec);
+        } else {
+
+            mViewBounds.right = reconcileSize(getChartDesiredSize().width() + getLegendDesiredSize().width(), widthMeasureSpec);
+            mViewBounds.bottom = reconcileSize(Math.max(getChartDesiredSize().height(), getLegendDesiredSize().height()), heightMeasureSpec);
+        }
+    }
+
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        setViewBounds(widthMeasureSpec, heightMeasureSpec);
+
+        //padding von der maximalen größe abziehen
+        int widthPadding = getPaddingRight() + getPaddingLeft();
+        int heightPadding = getPaddingTop() + getPaddingBottom();
+        Rect sizeWithPadding = new Rect(0, 0, (int) mViewBounds.width() - widthPadding, (int) mViewBounds.height() - heightPadding);
 
 
-        int chartDesiredWidth = 250, chartDesiredHeight = 250;
-        if (mDrawLegend)
-            measureLegend(widthSize - chartDesiredWidth, heightSize - chartDesiredHeight, chartDesiredWidth);
+        //herausfinden wie groß die legende sein kann
+        int minChartSize = 500;//todo map to dp
+        legendBounds = resolveLegendSize(sizeWithPadding, minChartSize);
+        mPieChartBounds = resolveChartSize(legendBounds, sizeWithPadding);
 
-        int pieRadius = heightSize > widthSize ? widthSize / 2 : heightSize / 2;
-
-        mChartBounds.set(0, mLegendBounds.height(), pieRadius, pieRadius + mLegendBounds.height());
-
-        //Measure width
-        if (widthMode == MeasureSpec.AT_MOST)
-            mViewBounds.right = Math.min((int) mChartBounds.width() + mLegendBounds.width(), widthSize);
-        else if (widthMode == MeasureSpec.UNSPECIFIED)
-            mViewBounds.right = (int) mChartBounds.width() + mLegendBounds.width();
-
-        //Measure height
-        if (heightMode == MeasureSpec.AT_MOST)
-            mViewBounds.bottom = Math.min(mChartBounds.height() + mLegendBounds.height(), heightSize);
-        else if (heightMode == MeasureSpec.UNSPECIFIED)
-            mViewBounds.bottom = mChartBounds.height() + mLegendBounds.height();
-
+        applyPaddingToChartAndLegend(legendBounds, mPieChartBounds);
         setMeasuredDimension((int) mViewBounds.width(), (int) mViewBounds.height());
     }
 
     /**
-     * Methode um die größe der Legende zu bestimmen.
-     * Ist zu wenig platz werden zuerst die Label entfernt, ist immer noch zu wenig platz werden auch die Numeratoren nicht mehr angezeigt
+     * Methode um die Größe des PieCharts zu bestimmen.
      *
-     * @param maxWidth     Maximale Breite die der Legende (in px) zur verfügung steht
-     * @param maxHeight    Maximale Höhe die der Legende (in px) zur verfügung steht
-     * @param minChartSize Größe die der Chart mindestens einnehmen wird
+     * @param legendBounds   Größe der Legende
+     * @param availableSpace Verfügbarer platz
+     * @return PieChart bounds mit angepasster Größe
      */
-    private void measureLegend(int maxWidth, int maxHeight, int minChartSize) {
+    private RectF resolveChartSize(Rect legendBounds, Rect availableSpace) {
 
-        int counter = 1, width = 0, height = (int) mNumeratorSize;
+        mPieChartBounds.left = 0;
+        mPieChartBounds.top = 0;
+        if (isLegendBottom() || isLegendTop()) {
 
-        while (counter < 3) {
+            //ist die breite größer als die höhe
+            mPieChartBounds.right = availableSpace.width();
+            mPieChartBounds.bottom = availableSpace.height() - legendBounds.height();
+        } else {
 
-            for (PieSlice slice : mPieData.get(mVisibleLayer - 1)) {
-
-                mNumeratorFontPaint.getTextBounds(slice.getSliceLabel(), 0, slice.getSliceLabel().length(), mNumeratorFontBounds);
-                width += counter > 1 ? mNumeratorSize + 5 : mNumeratorFontBounds.width() + mNumeratorSize + 5;
-
-                if (mNumeratorFontBounds.height() > mNumeratorSize)
-                    height = mNumeratorFontBounds.height();
-            }
-
-            if (width <= maxWidth && height <= maxHeight)
-                break;
-            else if (counter == 2)
-                height = 0;
-
-            counter++;
-            width = 0;
+            mPieChartBounds.right = availableSpace.width() - legendBounds.width();
+            mPieChartBounds.bottom = availableSpace.height();
         }
 
-        Point startCoord = getLegendStart(maxWidth + minChartSize, maxHeight + minChartSize);
+        //den chart wieder quadratisch machen
+        if (mPieChartBounds.width() != mPieChartBounds.height()) {
 
-        if (mLegendDirection == LegendDirections.LEFT_TO_RIGHT)
-            mLegendBounds.set(startCoord.x, startCoord.y, startCoord.x + width, startCoord.y + height);
-        else
-            mLegendBounds.set(startCoord.x, startCoord.y, startCoord.x + height, startCoord.y + width);
+            float smallerSide = Math.min(mPieChartBounds.width(), mPieChartBounds.height());
+            mPieChartBounds.right = smallerSide;
+            mPieChartBounds.bottom = smallerSide;
+        }
+
+        return mPieChartBounds;
     }
+
+    /**
+     * Methode um die Legende und den PieChart in den ViewBounds zu platzieren.
+     *
+     * @param legendBounds   Den von der Legende eingenommenen Platz
+     * @param pieChartBounds Den von dem PieChart eingenommenen Platz
+     */
+    private void applyPaddingToChartAndLegend(Rect legendBounds, RectF pieChartBounds) {
+
+        if (!legendBounds.isEmpty()) {
+            //offset ist nicht mit eingerechnet wodurch teile der views abgeschnitten sein könnten
+            int offset = 0;//todo map to dp
+            if (isLegendLeft()) {
+
+                legendBounds.left = getPaddingLeft();
+                legendBounds.top = getPaddingTop();
+                legendBounds.right += legendBounds.left;
+                legendBounds.bottom += legendBounds.top;
+
+                pieChartBounds.left = legendBounds.right + offset;
+                pieChartBounds.top += getPaddingTop();
+                pieChartBounds.right += legendBounds.width();
+            } else if (isLegendTop()) {
+
+                legendBounds.left = getPaddingLeft();
+                legendBounds.top = getPaddingTop();
+                legendBounds.right += legendBounds.left;
+                legendBounds.bottom += legendBounds.top;
+
+                pieChartBounds.left = getPaddingLeft();
+                pieChartBounds.top = legendBounds.bottom + offset;
+                pieChartBounds.bottom += legendBounds.height();
+            } else if (isLegendRight()) {
+
+                pieChartBounds.left = getPaddingLeft();
+                pieChartBounds.top = getPaddingTop();
+
+                legendBounds.left = (int) pieChartBounds.right + offset;
+                legendBounds.top = getPaddingTop();
+                legendBounds.right += legendBounds.left;
+                legendBounds.bottom += legendBounds.top;
+            } else if (isLegendBottom()) {
+
+                pieChartBounds.left = getPaddingLeft();
+                pieChartBounds.top = getPaddingTop();
+
+                legendBounds.left = getPaddingLeft();
+                legendBounds.top = (int) pieChartBounds.bottom + offset;
+                legendBounds.right += legendBounds.left;
+                legendBounds.bottom += legendBounds.top;
+            }
+        }
+    }
+
+
+    /**
+     * Methode um die größe der Legende zu bestimmen.
+     * Ist zu wenig platz werden zuerst die Label entfernt,
+     * ist immer noch zu wenig platz werden auch die Numeratoren nicht mehr angezeigt.
+     * Wenn dann immer noch zu wenig platz sein sollte wird ein leeres Quadrat zurückgegeben.
+     *
+     * @param availableSpace Maximal verfügbarer Platz
+     * @param minChartSize   Größe die der Chart mindestens einnehmen wird
+     * @return Platz, welchen die Legende einnimmt
+     */
+    private Rect resolveLegendSize(Rect availableSpace, int minChartSize) {
+
+        Rect availableLegendSpace = getAvailableLegendSpace(availableSpace, minChartSize);
+
+        for (int i = 0; i < 2; i++) {
+
+            int computedWidth = 0;
+            int computedHeight = 0;
+            for (PieSlice slice : mPieData.get(mVisibleLayer - 1)) {
+
+                Rect textBounds = getTextBounds(slice.getSliceLabel(), mLegendFontSize);
+
+                if (mLegendDirection.equals(LegendDirections.TOP_TO_BOTTOM)) {
+
+                    computedWidth = Math.max(textBounds.width(), (int) mNumeratorSize);
+                    computedHeight += i == 0 ? textBounds.height() + mNumeratorSize : mNumeratorSize;
+                } else {
+
+                    computedWidth += i == 0 ? textBounds.width() + mNumeratorSize : mNumeratorSize;
+                    computedHeight = Math.max(textBounds.height(), (int) mNumeratorSize);
+                }
+            }
+
+            if (isElementInBounds(availableLegendSpace, computedWidth, computedHeight)) {
+
+                return new Rect(0, 0, computedWidth, computedHeight);
+            }
+        }
+
+        return new Rect();
+    }
+
+    /**
+     * Methode um den Platz zu ermitteln, welcher der Legende zur verfügung steht,
+     * basierend auf dem Maximalen Platz und einem weitern Objekt, welches bereits in den Bounds ist
+     *
+     * @param bounds       Maximaler zur verfügung stehender Platz
+     * @param minChartSize Weiteres Objekt, welches in den bounds platziert werden soll
+     * @return Verfügbarer Legendenplatz
+     */
+    private Rect getAvailableLegendSpace(Rect bounds, int minChartSize) {
+
+        Rect availableSpace = new Rect(bounds);
+        if (mLegendDirection.equals(LegendDirections.LEFT_TO_RIGHT)) {
+            //finde heraus wie viel platz über bzw. unter dem piechart noch zur verfügung steht
+            if (isLegendTop()) {
+                //finde heraus wie viel platz über dem piechart noch zur verfügung steht
+                availableSpace.bottom = bounds.height() - minChartSize;
+            } else if (isLegendBottom()) {
+                //finde heraus wie viel plart unter dem piechart noch zur verfügung steht
+                availableSpace.top = bounds.top + minChartSize;
+            }
+        } else if (mLegendDirection.equals(LegendDirections.TOP_TO_BOTTOM)) {
+            //finde heraus auf welcher seite die legende sein soll
+            if (isLegendLeft()) {
+                //finde heraus wie viel platz links neben dem piechart noch zur verfügung steht
+                availableSpace.right = bounds.width() - minChartSize;
+            } else if (isLegendRight()) {
+                //finde heraus wie viel platz rechts neben dem piechart noch zur verfügung steht
+                availableSpace.left = bounds.left + minChartSize;
+            }
+        }
+
+        return availableSpace;
+    }
+
+    private boolean isLegendTop() {
+
+        return (mLegendPosition.equals(LegendPositions.TOP_LEFT) || mLegendPosition.equals(LegendPositions.TOP_CENTER) || mLegendPosition.equals(LegendPositions.TOP_RIGHT)) && mLegendDirection.equals(LegendDirections.LEFT_TO_RIGHT);
+    }
+
+    private boolean isLegendBottom() {
+
+        return (mLegendPosition.equals(LegendPositions.BOTTOM_LEFT) || mLegendPosition.equals(LegendPositions.BOTTOM_CENTER) || mLegendPosition.equals(LegendPositions.BOTTOM_RIGHT)) && mLegendDirection.equals(LegendDirections.LEFT_TO_RIGHT);
+    }
+
+    private boolean isLegendLeft() {
+
+        return (mLegendPosition.equals(LegendPositions.TOP_LEFT) || mLegendPosition.equals(LegendPositions.BOTTOM_LEFT)) && mLegendDirection.equals(LegendDirections.TOP_TO_BOTTOM);
+    }
+
+    private boolean isLegendRight() {
+
+        return (mLegendPosition.equals(LegendPositions.TOP_RIGHT) || mLegendPosition.equals(LegendPositions.BOTTOM_RIGHT)) && mLegendDirection.equals(LegendDirections.TOP_TO_BOTTOM);
+    }
+
+    /**
+     * Methode um zu überprüfen, ob ein Element in einem Container platz findet.
+     *
+     * @param bounds        Container
+     * @param elementWidth  Breite des Elements
+     * @param elementHeight Höhe des Elements
+     * @return Passt das Element in den Container
+     */
+    private boolean isElementInBounds(Rect bounds, int elementWidth, int elementHeight) {
+
+        return elementWidth <= bounds.width() && elementHeight <= bounds.height();
+    }
+
+    /**
+     * Methode den von einem String eingenommenen Platz zu ermitteln
+     * source: https://stackoverflow.com/a/4795393
+     *
+     * @param text Text dessen Größe bestimmt werden soll
+     * @return Textgröße in einem Rect gespeichert
+     */
+    private Rect getTextBounds(String text, float textSize) {
+
+        Rect textBounds = new Rect();
+
+        Paint paint = new Paint();
+        paint.setTypeface(Typeface.DEFAULT);
+        paint.setTextSize(textSize);
+        paint.getTextBounds(text, 0, text.length(), textBounds);
+
+        return textBounds;
+    }
+
+    /**
+     * Methode um herauszufinden wie viel Platz maximal zur verfügung steht
+     *
+     * @param desiredSize Optimale Größe
+     * @param measureSpec Kombinierter Wert aus Platz und Layout verhalten
+     * @return Int
+     */
+    private int reconcileSize(int desiredSize, int measureSpec) {
+
+        int mode = MeasureSpec.getMode(measureSpec);
+        int sizeInDp = MeasureSpec.getSize(measureSpec);//todo map to dp
+
+        if (mode == MeasureSpec.EXACTLY)
+            return sizeInDp;
+
+        if (mode == MeasureSpec.AT_MOST)
+            return Math.min(sizeInDp, desiredSize);
+
+        if (mode == MeasureSpec.UNSPECIFIED)
+            return desiredSize;
+
+        return -1;
+    }
+
+    /**
+     * Methode um Pixel in DensityPixel umzuwandeln.
+     * source: https://stackoverflow.com/a/19953871/9376633
+     *
+     * @param px Zu konvertierende pixel
+     * @return In Dp konvertierte pixel
+     */
+    private int pxToDp(int px) {
+        return (int) (px / Resources.getSystem().getDisplayMetrics().density);
+    }
+
+    /**
+     * Methode um DensityPixel in Pixel umzuwandeln.
+     * source: https://stackoverflow.com/a/19953871/9376633
+     *
+     * @param dp Zu konvertierende dp
+     * @return In px konvertierte dp
+     */
+    public static int dpToPx(int dp) {
+        return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
+    }
+
+    //ab hier werden visuelle sachen behandelt
 
     /**
      * Methode um das Kreisdiagramm zu zeichnen
@@ -516,9 +795,9 @@ public class PieChart extends View {
 
             mSlicePaint.setColor(slice.getSliceColor());
             if (mSliceMargin)
-                canvas.drawArc(mChartBounds, slice.getStartAngle(), slice.getPercentValue() - 2f, true, mSlicePaint);
+                canvas.drawArc(mPieChartBounds, slice.getStartAngle(), slice.getPercentValue() - 2f, true, mSlicePaint);
             else
-                canvas.drawArc(mChartBounds, slice.getStartAngle(), slice.getPercentValue(), true, mSlicePaint);
+                canvas.drawArc(mPieChartBounds, slice.getStartAngle(), slice.getPercentValue(), true, mSlicePaint);
         }
 
         if (mDrawHole)
@@ -534,26 +813,27 @@ public class PieChart extends View {
      * @param canvas Das Object auf dem gezeichnet wurde
      */
     private void drawHole(Canvas canvas) {
-        mHoleRadius = (float) (mChartBounds.width() / 2 * (mHoleSize / 100));
+        mHoleRadius = (float) (mPieChartBounds.width() / 2 * (mHoleSize / 100));
 
-        canvas.drawCircle(mChartBounds.centerX(), mChartBounds.centerY(), mHoleRadius, mHolePaint);
+        canvas.drawCircle(mPieChartBounds.centerX(), mPieChartBounds.centerY(), mHoleRadius, mHolePaint);
 
         if (mTransparentCircle)
-            canvas.drawCircle(mChartBounds.centerX(), mChartBounds.centerY(), mHoleRadius + (mHoleRadius * 0.25f), mTransparentPaint);
+            canvas.drawCircle(mPieChartBounds.centerX(), mPieChartBounds.centerY(), mHoleRadius + (mHoleRadius * 0.25f), mTransparentPaint);
     }
 
     /**
      * Methode um die Legende zu zeichnen
      *
      * @param canvas Canvas Objekt auf dem die Legende gezeichnet werden soll
+     *               todo legende in die richtige richtung (mLegendDirection) zeichnen
      */
     private void drawLegend(Canvas canvas) {
 
-        if (mLegendBounds.isEmpty())
+        if (legendBounds.isEmpty())
             return;
 
         boolean drawLabels = true;
-        if (mPieData.get(mVisibleLayer - 1).size() * (mNumeratorSize + 5) == mLegendBounds.width())
+        if (mPieData.get(mVisibleLayer - 1).size() * (mNumeratorSize + 5) == legendBounds.width())
             drawLabels = false;
 
         for (PieSlice slice : mPieData.get(mVisibleLayer - 1)) {
@@ -586,37 +866,7 @@ public class PieChart extends View {
         mNumeratorRect.set(0, 0, mNumeratorSize, mNumeratorSize);
     }
 
-    /**
-     * Methode um die Anfangskoordinate der Legende zu bestimmen
-     *
-     * @return Punkt der die Startkoordinate enthält
-     */
-    private Point getLegendStart(int width, int height) {
-
-        switch (mLegendPosition) {
-
-            case TOP_LEFT:
-                return new Point(0, 0);
-
-            case TOP_CENTER:
-                return new Point(width / 2, 0);
-
-            case TOP_RIGHT:
-                return new Point();
-
-            case BOTTOM_LEFT:
-                return new Point(0, height);
-
-            case BOTTOM_CENTER:
-                return new Point(width / 2, height);
-
-            case BOTTOM_RIGHT:
-                return new Point();
-
-            default:
-                return new Point();
-        }
-    }
+    //ab hier werden klick ereignisse behandelt
 
     /**
      * Methode um Touch aktionen des Users abzufangen
@@ -690,17 +940,17 @@ public class PieChart extends View {
      * Methode gibt einen code für den angeklickten Punkt zurück
      *
      * @param click Punkt auf den gecklickt wurde
-     * @return 0 wenn auf den PieChart geklickt wurde, 1 wenn auf die Legende geklickt wurde, 0 wenn "nichts" angeklickt wurde
+     * @return 0 wenn auf den PieChart geklickt wurde, 1 wenn auf die Legende geklickt wurde, -1 wenn "nichts" angeklickt wurde
      */
     private int clickableArea(Point click) {
 
-        if (mDrawHole && Math.sqrt(Math.pow((mChartBounds.centerX() - click.x), 2) + Math.pow((mChartBounds.centerY() - click.y), 2)) <= mHoleRadius)
+        if (mDrawHole && Math.sqrt(Math.pow((mPieChartBounds.centerX() - click.x), 2) + Math.pow((mPieChartBounds.centerY() - click.y), 2)) <= mHoleRadius)
             return -1;//hole click
 
-        if (mLegendBounds.contains(click.x, click.y))
+        if (legendBounds.contains(click.x, click.y))
             return 1;//legend click
 
-        if (Math.sqrt(Math.pow((mChartBounds.centerX() - click.x), 2) + Math.pow((mChartBounds.centerY() - click.y), 2)) <= mChartBounds.width() / 2)
+        if (Math.sqrt(Math.pow((mPieChartBounds.centerX() - click.x), 2) + Math.pow((mPieChartBounds.centerY() - click.y), 2)) <= mPieChartBounds.width() / 2)
             return 0;//chart click
 
         return -1;//nothing click
@@ -714,13 +964,13 @@ public class PieChart extends View {
      */
     private float getAngleForPoint(Point point) {
 
-        double tx = point.x - mChartBounds.centerX(), ty = point.y - mChartBounds.centerY();
+        double tx = point.x - mPieChartBounds.centerX(), ty = point.y - mPieChartBounds.centerY();
         double length = Math.sqrt(tx * tx + ty * ty);
         double r = Math.acos(ty / length);
 
         float angle = (float) Math.toDegrees(r);
 
-        if (point.x > mChartBounds.centerX())
+        if (point.x > mPieChartBounds.centerX())
             angle = 360f - angle;
 
         angle += 90f;
@@ -774,6 +1024,7 @@ public class PieChart extends View {
      */
     private void fadeSliceInOut(final PieSlice slice) {
 
+        //todo wenn nur noch ein slice zu sehen ist, kann dieser nicht mehr versteck werden!
         if (mAnimator != null)
             mAnimator.end();
 
@@ -802,7 +1053,7 @@ public class PieChart extends View {
 
     private void crossLegendElem(final PieSlice slice) {
 
-
+        //TODO
     }
 
     /**

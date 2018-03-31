@@ -10,9 +10,12 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.example.lucas.haushaltsmanager.CustomViews.PieChart;
+import com.example.lucas.haushaltsmanager.CustomViews.RoundedTextView;
 
 import java.text.DateFormatSymbols;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class MonthlyReportAdapter extends ArrayAdapter<MonthlyReport> implements View.OnClickListener {
 
@@ -25,7 +28,7 @@ public class MonthlyReportAdapter extends ArrayAdapter<MonthlyReport> implements
         TextView txtOutbound;
         TextView txtTotal;
         TextView txtTotalBookings;
-        TextView colorCategory;
+        RoundedTextView colorCategory;
         TextView txtCategory;
         PieChart pieChart;
     }
@@ -59,7 +62,7 @@ public class MonthlyReportAdapter extends ArrayAdapter<MonthlyReport> implements
             viewHolder.txtTotal = (TextView) convertView.findViewById(R.id.monthly_item_total);
             viewHolder.txtTotalBookings = (TextView) convertView.findViewById(R.id.monthly_item_total_bookings);
             viewHolder.txtAccountCurrency = (TextView) convertView.findViewById(R.id.monthly_item_account_currency);
-            viewHolder.colorCategory = (TextView) convertView.findViewById(R.id.monthly_item_category_color);
+            viewHolder.colorCategory = (RoundedTextView) convertView.findViewById(R.id.monthly_item_category_color);
             viewHolder.txtCategory = (TextView) convertView.findViewById(R.id.monthly_item_category);
             viewHolder.pieChart = (PieChart) convertView.findViewById(R.id.monthly_item_pie_chart);
 
@@ -71,11 +74,9 @@ public class MonthlyReportAdapter extends ArrayAdapter<MonthlyReport> implements
         }
 
         viewHolder.txtMonth.setText(getMonth(Integer.parseInt(monthlyReport.getMonth())));
-
-        //formatiert die Ausgabe so, dass nur noch zwei nachkommastellen angezeigt werden
-        viewHolder.txtInbound.setText(String.format(getContext().getResources().getConfiguration().locale, "%.2f", monthlyReport.countIncomingMoney()));
-        viewHolder.txtOutbound.setText(String.format(getContext().getResources().getConfiguration().locale, "%.2f", monthlyReport.countOutgoingMoney()));
-        viewHolder.txtTotal.setText(String.format(getContext().getResources().getConfiguration().locale, "%.2f", monthlyReport.calcMonthlyTotal()));
+        viewHolder.txtInbound.setText(formatMoney(monthlyReport.countIncomingMoney()));
+        viewHolder.txtOutbound.setText(formatMoney(monthlyReport.countOutgoingMoney()));
+        viewHolder.txtTotal.setText(formatMoney(monthlyReport.calcMonthlyTotal()));
 
         if (monthlyReport.countBookings() <= 1) {
 
@@ -86,23 +87,47 @@ public class MonthlyReportAdapter extends ArrayAdapter<MonthlyReport> implements
         }
         viewHolder.txtAccountCurrency.setText(monthlyReport.getCurrency());
 
-        viewHolder.colorCategory.setText("red");
+        viewHolder.colorCategory.setCenterText("");
+        viewHolder.colorCategory.setCircleColor("#EF1616");// dynamisch machen
         viewHolder.txtCategory.setText(monthlyReport.getMostStressedCategory());
-
-        preparePieData(viewHolder, monthlyReport);
+        //viewHolder.pieChart.setPieData(preparePieData(monthlyReport)); todo einschalten, wenn setPieData(List<DataSet>) funktioniert
 
         return convertView;
     }
 
-    private void preparePieData(ViewHolder viewHolder, MonthlyReport monthlyReport) {
+    /**
+     * Methode um ein Geldbetrag des userlocale entsprechend zu formatieren.
+     *
+     * @param money Zu formatierender Geldbetrag
+     * @return Formatierter Geldbetrag
+     */
+    private String formatMoney(double money) {
 
-        String[] sliceLabels = new String[]{getContext().getResources().getString(R.string.incoming), getContext().getResources().getString(R.string.outgoing)};
-        int[] sliceColors = new int[] {getContext().getResources().getColor(R.color.booking_expense), getContext().getResources().getColor(R.color.booking_income)};
-        float[] pieData = new float[] {(float) monthlyReport.countIncomingMoney(),(float) monthlyReport.countOutgoingMoney()};
-
-        viewHolder.pieChart.setPieData(pieData, sliceColors, sliceLabels);
+        Locale locale = getContext().getResources().getConfiguration().locale;
+        return String.format(locale, "%.2f", money);
     }
 
+    /**
+     * Methode um die Daten für den PieChart vorzubereiten
+     *
+     * @param monthlyReport Report, welcher als PieChart dargestellt werden soll
+     * @return DataSet's
+     */
+    private List<DataSet> preparePieData(MonthlyReport monthlyReport) {
+
+        List<DataSet> pieData = new ArrayList<>();
+        pieData.add(new DataSet((float) monthlyReport.countIncomingMoney(), getContext().getResources().getColor(R.color.booking_income), getContext().getResources().getString(R.string.incoming)));
+        pieData.add(new DataSet((float) monthlyReport.countOutgoingMoney(), getContext().getResources().getColor(R.color.booking_expense), getContext().getResources().getString(R.string.outgoing)));
+
+        return pieData;
+    }
+
+    /**
+     * Methode um den Name eines Monats zu bekommen
+     *
+     * @param month Monatzahl
+     * @return Monatname
+     */
     private String getMonth(int month) {
 
         return new DateFormatSymbols().getMonths()[month - 1];
