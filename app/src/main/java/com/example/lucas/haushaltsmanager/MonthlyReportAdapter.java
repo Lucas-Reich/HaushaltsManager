@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.example.lucas.haushaltsmanager.CustomViews.PieChartView;
+import com.example.lucas.haushaltsmanager.CustomViews.PieChart;
 
 import java.text.DateFormatSymbols;
 import java.util.List;
@@ -27,7 +27,7 @@ public class MonthlyReportAdapter extends ArrayAdapter<MonthlyReport> implements
         TextView txtTotalBookings;
         TextView colorCategory;
         TextView txtCategory;
-        PieChartView pieChart;
+        PieChart pieChart;
     }
 
     public MonthlyReportAdapter(List<MonthlyReport> data, Context context) {
@@ -61,13 +61,13 @@ public class MonthlyReportAdapter extends ArrayAdapter<MonthlyReport> implements
             viewHolder.txtAccountCurrency = (TextView) convertView.findViewById(R.id.monthly_item_account_currency);
             viewHolder.colorCategory = (TextView) convertView.findViewById(R.id.monthly_item_category_color);
             viewHolder.txtCategory = (TextView) convertView.findViewById(R.id.monthly_item_category);
-            viewHolder.pieChart = (PieChartView) convertView.findViewById(R.id.monthly_item_pie_chart);
+            viewHolder.pieChart = (PieChart) convertView.findViewById(R.id.monthly_item_pie_chart);
 
             convertView.setTag(viewHolder);
         } else {
 
             viewHolder = (ViewHolder) convertView.getTag();
-            viewHolder.pieChart = (PieChartView) convertView.findViewById(R.id.monthly_item_pie_chart);
+            viewHolder.pieChart = (PieChart) convertView.findViewById(R.id.monthly_item_pie_chart);
         }
 
         viewHolder.txtMonth.setText(getMonth(Integer.parseInt(monthlyReport.getMonth())));

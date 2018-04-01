@@ -5,8 +5,7 @@
               android:layout_height="match_parent">
 
     <include
-        layout="@layout/listview_test"
-        layout_width="match_parent"
+        layout="@layout/activity_test_exp_listview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 </LinearLayout>

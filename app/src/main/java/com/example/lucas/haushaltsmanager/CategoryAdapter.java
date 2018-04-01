@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.example.lucas.haushaltsmanager.CustomViews.CircularTextView;
+import com.example.lucas.haushaltsmanager.CustomViews.RoundedTextView;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ import java.util.ArrayList;
 public class CategoryAdapter extends ArrayAdapter<Category> implements View.OnClickListener {
 
     private static class ViewHolder {
-        CircularTextView circTextView;
+        RoundedTextView circTextView;
         TextView txtCategoryName;
     }
 
@@ -43,7 +43,7 @@ public class CategoryAdapter extends ArrayAdapter<Category> implements View.OnCl
             convertView = inflater.inflate(R.layout.category_item, parent, false);
 
             viewHolder.txtCategoryName = (TextView) convertView.findViewById(R.id.category_item_name);
-            viewHolder.circTextView = (CircularTextView) convertView.findViewById(R.id.category_item_circ_textview);
+            viewHolder.circTextView = (RoundedTextView) convertView.findViewById(R.id.category_item_circ_textview);
 
             convertView.setTag(viewHolder);
         } else {
@@ -52,8 +52,9 @@ public class CategoryAdapter extends ArrayAdapter<Category> implements View.OnCl
         }
 
         viewHolder.txtCategoryName.setText(String.format("%s", categoryObject.getName()));
-        viewHolder.circTextView.setText(String.format("%s", categoryObject.getName().substring(0,1).toUpperCase()));
-        viewHolder.circTextView.setBackgroundColor(Color.parseColor(categoryObject.getColor()));
+        viewHolder.circTextView.setCenterText(String.format("%s", categoryObject.getName().substring(0,1).toUpperCase()));
+        viewHolder.circTextView.setCircleColor(categoryObject.getColor());
+        viewHolder.circTextView.setTextColor(Color.WHITE);
 
         return convertView;
     }

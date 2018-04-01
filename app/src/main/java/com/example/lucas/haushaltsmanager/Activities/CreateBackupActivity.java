@@ -52,6 +52,7 @@ public class CreateBackupActivity extends AppCompatActivity implements Directory
         mChooseDirectoryBtn = (Button) findViewById(R.id.create_backup_directory_btn);
         mListView = (ListView) findViewById(R.id.create_backup_list_view);
         //mListView.setEmptyView(); todo wenn keine alten Backups vorhanden sind soll "Keine Existierenden Backups vorhanden" angezeigt werden
+        //todo die backups sollen so sortiert sein, dass der aktuellste eintrag an erster stelle steht
 
         refreshListView();
 
@@ -158,14 +159,14 @@ public class CreateBackupActivity extends AppCompatActivity implements Directory
      *
      * @param fileName Backup das wiederhergestellt werden soll
      */
-    private void restoreAppState(File fileName) {
+    private void restoreDatabaseState(File fileName) {
 
         try {
 
             BackupService.copy(fileName, getDatabasePath("expenses.db"));
         } catch (IOException e) {
 
-            Log.e(TAG, "restoreAppState: ", e);
+            Log.e(TAG, "restoreDatabaseState: Fehler beim kopieren der Backupdatei", e);
         }
     }
 
@@ -187,7 +188,7 @@ public class CreateBackupActivity extends AppCompatActivity implements Directory
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                restoreAppState(file);
+                restoreDatabaseState(file);
             }
         });
 

@@ -62,13 +62,16 @@
         <activity
             android:name=".Activities.TransferActivity"
             android:label="TransfersActivity"/>
+        <activity
+            android:name=".Activities.CourseActivity"
+            android:label="CourseActivity"/>
 
         <receiver
             android:name=".MyAlarmReceiver"
             android:process=":remote"/>
 
         <service
-            android:name=".Services.ExchangeRateService"
+            android:name=".Services.GetExchangeRatesService"
             android:exported="false"
             android:label="ExchangeRateService"/>
         <service

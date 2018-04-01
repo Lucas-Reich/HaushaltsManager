@@ -1,6 +1,7 @@
 package com.example.lucas.haushaltsmanager.Activities;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -38,7 +39,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-public class ExpenseScreenActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, AccountPickerDialog.OnAccountSelected, BasicTextInputDialog.BasicDialogCommunicator, PriceInputDialog.OnPriceSelected, com.example.lucas.haushaltsmanager.Dialogs.DatePickerDialog.OnDateSelected {
+public class ExpenseScreenActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, AccountPickerDialog.OnAccountSelected, BasicTextInputDialog.BasicDialogCommunicator, PriceInputDialog.OnPriceSelected, com.example.lucas.haushaltsmanager.Dialogs.DatePickerDialog.OnDateSelected, FrequencyAlertDialog.OnFrequencySet {
 
     private String TAG = ExpenseScreenActivity.class.getSimpleName();
 
@@ -51,73 +52,26 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
         UPDATE_CHILD_MODE
     }
 
-    public ExpenseObject mExpense;
+    private ExpenseObject mExpense;
     private Calendar mCalendar = Calendar.getInstance();
     private Calendar mRecurringEndDate = Calendar.getInstance();
     private boolean mTemplate = false, mRecurring = false;
     public int frequency = 0;
-    private Button mDateBtn, mAccountBtn, mSaveBtn, mCategoryBtn, mTitleBtn, mTagBtn, mNoticeBtn, mRecurringEndBtn;
+    private Button mDateBtn, mAccountBtn, mSaveBtn, mCategoryBtn, mTitleBtn, mTagBtn, mNoticeBtn, mRecurringEndBtn, mRecurringFrequency;
     private CheckBox mTemplateChk, mRecurringChk;
     private TextView mAmountTxt, mCurrencyTxt;
     private RadioGroup mExpenseTypeRadio;
     private ExpenseObject mParentBooking;
 
-
     private ExpensesDataSource mDatabase;
 
-    //TODO klasse sollte auch den BasicDialog erweitern
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_expense_screen);
 
-        SharedPreferences preferences = getSharedPreferences("UserSettings", 0);
-
         mDatabase = new ExpensesDataSource(this);
         mDatabase.open();
-
-        final Bundle bundle = getIntent().getExtras();
-
-        mSaveBtn = (Button) findViewById(R.id.expense_screen_create_booking);
-        mSaveBtn.setOnClickListener(createBookingClickListener);
-
-        if (bundle != null && bundle.get("parentIndex") != null) {
-
-            mSaveBtn.setText(getString(R.string.add_child_to_booking));
-
-            CREATION_MODE = creationModes.CREATE_CHILD_MODE;
-            mParentBooking = mDatabase.getBookingById(bundle.getLong("parentIndex"));
-
-            String title = getResources().getString(R.string.expense_screen_title);
-            Account account = mDatabase.getAccountById(preferences.getLong("activeAccount", 0));
-
-            mExpense = new ExpenseObject(title, 0, false, Category.createDummyCategory(this), null, account);
-            mExpense.setDateTime(mCalendar);
-            mExpense.setNotice("");
-        } else if (bundle != null && bundle.get("childExpense") != null) {
-
-            mSaveBtn.setText(getString(R.string.update));
-
-            CREATION_MODE = creationModes.UPDATE_CHILD_MODE;
-            mExpense = mDatabase.getChildBookingById(bundle.getLong("childExpense"));
-        } else if (bundle != null && bundle.get("parentExpense") != null) {
-
-            mSaveBtn.setText(getString(R.string.update));
-
-            CREATION_MODE = creationModes.UPDATE_EXPENSE_MODE;
-            mExpense = mDatabase.getBookingById(bundle.getLong("parentExpense"));
-        } else {
-
-            mSaveBtn.setText(getString(R.string.create_booking));
-
-            CREATION_MODE = creationModes.CREATE_EXPENSE_MODE;
-            String title = getResources().getString(R.string.expense_screen_title);
-            Account account = mDatabase.getAccountById(preferences.getLong("activeAccount", 0));
-
-            mExpense = new ExpenseObject(title, 0, false, Category.createDummyCategory(this), null, account);
-            mExpense.setDateTime(mCalendar);
-            mExpense.setNotice("");
-        }
 
         //TODO implement the correct Toolbar functionality (back arrow, overflow menu which holds the load mTemplate button)
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -132,9 +86,12 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
         mDateBtn = (Button) findViewById(R.id.expense_screen_date);
         mNoticeBtn = (Button) findViewById(R.id.expense_screen_notice);
         mAccountBtn = (Button) findViewById(R.id.expense_screen_account);
+        mSaveBtn = (Button) findViewById(R.id.expense_screen_create_booking);
 
         mTemplateChk = (CheckBox) findViewById(R.id.expense_screen_template);
         mRecurringChk = (CheckBox) findViewById(R.id.expense_screen_recurring);
+
+        resolveIntent(getIntent().getExtras());
 
         //ab hier wird der CurrencySelector erstellt
 
@@ -156,7 +113,58 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
 
         currencySelector.setAdapter(adapter);
 
+        SharedPreferences preferences = getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
         currencySelector.setSelection(((int) preferences.getLong("mainCurrencyIndex", 32)) - 1);
+    }
+
+    /**
+     * Methode um herauszufinden mit welcher Intention (createChild, createBooking, updateChild, updateBooking)
+     * der ExpenseScreen aufgerufen wurde
+     */
+    public void resolveIntent(Bundle bundle) {
+        if (bundle == null)
+            return;
+
+        SharedPreferences preferences = getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
+
+        if (bundle.getString("mode").equals("updateChild")) {
+
+            mSaveBtn.setText(getString(R.string.update));
+
+            CREATION_MODE = creationModes.UPDATE_CHILD_MODE;
+            mExpense = getIntent().getParcelableExtra("updateChildExpense");
+            Log.d(TAG, "resolveIntent: Updating Child Expense " + mExpense.toString());
+            return;
+        }
+
+        if (bundle.getString("mode").equals("updateParent")) {
+
+            mSaveBtn.setText(getString(R.string.update));
+
+            CREATION_MODE = creationModes.UPDATE_EXPENSE_MODE;
+            mExpense = getIntent().getParcelableExtra("updateParentExpense");
+            Log.d(TAG, "resolveIntent: Updating Parent Expense " + mExpense.toString());
+            return;
+        }
+
+        if (bundle.getString("mode").equals("addChild")) {
+
+            mSaveBtn.setText(getString(R.string.add_child_to_booking));
+
+            CREATION_MODE = creationModes.CREATE_CHILD_MODE;
+            mParentBooking = getIntent().getParcelableExtra("parentBooking");
+        }
+
+        if (bundle.getString("mode").equals("createBooking")) {
+
+            mSaveBtn.setText(getString(R.string.create_booking));
+            CREATION_MODE = creationModes.CREATE_EXPENSE_MODE;
+        }
+
+        Account account = mDatabase.getAccountById(preferences.getLong("activeAccount", 0));
+        mExpense = ExpenseObject.createDummyExpense(this);
+        mExpense.setAccount(account);
+        Log.d(TAG, "resolveIntent: Creating Expense " + mExpense.toString());
     }
 
     @Override
@@ -188,14 +196,18 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
 
         mAccountBtn.setText(mExpense.getAccount().getName());
 
+        mCategoryBtn.setHint(R.string.choose_category);
         mCategoryBtn.setText(mExpense.getCategory().getName());
 
         mDateBtn.setText(mExpense.getDisplayableDateTime());
 
+        mTitleBtn.setHint(R.string.input_title);
         mTitleBtn.setText(mExpense.getName());
 
+        mTagBtn.setHint(R.string.input_tag);
 //        mTagBtn.setText(mExpense.getTags().get(0));TODO enable
 
+        mNoticeBtn.setHint(R.string.input_notice);
         mNoticeBtn.setText(mExpense.getNotice());
 
         mAmountTxt.setText(String.format("%s", mExpense.getUnsignedPrice()));
@@ -205,7 +217,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
             public void onClick(View v) {
 
                 Bundle bundle = new Bundle();
-                bundle.putString("title", "Input Price");
+                bundle.putString("title", getString(R.string.input_price));
 
                 PriceInputDialog priceDialog = new PriceInputDialog();
                 priceDialog.setArguments(bundle);
@@ -214,6 +226,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
         });
 
         mTemplateChk.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
 
@@ -223,25 +236,32 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
         });
 
         mRecurringChk.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
 
                 //TODO ist kaputt
 
                 ImageView imgFrequency = (ImageView) findViewById(R.id.img_frequency);
-                Button recurringFrequency = (Button) findViewById(R.id.expense_screen_recurring_frequency);
-                recurringFrequency.setOnClickListener(new View.OnClickListener() {
+                mRecurringFrequency = (Button) findViewById(R.id.expense_screen_recurring_frequency);
+                mRecurringFrequency.setOnClickListener(new View.OnClickListener() {
+
                     @Override
                     public void onClick(View v) {
 
-                        FrequencyAlertDialog freqDia = new FrequencyAlertDialog();
-                        freqDia.show(getFragmentManager(), "expense_screen_frequency_dialog");
+                        Bundle bundle = new Bundle();
+                        bundle.putString("title", getString(R.string.input_frequency));
+
+                        FrequencyAlertDialog frequencyDialog = new FrequencyAlertDialog();
+                        frequencyDialog.setArguments(bundle);
+                        frequencyDialog.show(getFragmentManager(), "expense_screen_frequency");
                     }
                 });
 
                 ImageView imgEnd = (ImageView) findViewById(R.id.img_end);
                 mRecurringEndBtn = (Button) findViewById(R.id.expense_screen_recurring_end);
                 mRecurringEndBtn.setOnClickListener(new View.OnClickListener() {
+
                     @Override
                     public void onClick(View v) {
 
@@ -258,7 +278,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
                 if (mTemplate) {
 
                     imgFrequency.setVisibility(ImageView.VISIBLE);
-                    recurringFrequency.setVisibility(Button.VISIBLE);
+                    mRecurringFrequency.setVisibility(Button.VISIBLE);
 
                     imgEnd.setVisibility(ImageView.VISIBLE);
                     mRecurringEndBtn.setVisibility(Button.VISIBLE);
@@ -266,7 +286,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
                 } else {
 
                     imgFrequency.setVisibility(ImageView.GONE);
-                    recurringFrequency.setVisibility(Button.GONE);
+                    mRecurringFrequency.setVisibility(Button.GONE);
 
                     imgEnd.setVisibility(ImageView.GONE);
                     mRecurringEndBtn.setVisibility(Button.GONE);
@@ -274,6 +294,8 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
                 }
             }
         });
+
+        mSaveBtn.setOnClickListener(createBookingClickListener);
     }
 
     /**
@@ -285,6 +307,9 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
         public void onClick(View v) {
 
             //todo buchungen in der Zukunft sollen als geplante buchung eingefügt werden
+            //wenn eine Buchung in der Zukunft erstellt wurde soll ein alert dialog den user darauf hinweisen,
+            //dass die Buchung als zukünftige Buchung erstellt wurde
+            //AlertDialog text: "Du hast eine Buchung in der Zukunft erstellt. Diese wird dann zum entsprechenden Tag in deine Historie eingefügt"
             if (!mExpense.isSet())
                 return;
 
@@ -313,7 +338,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
                     Toast.makeText(ExpenseScreenActivity.this, "Created Booking \"" + mExpense.getName() + "\"", Toast.LENGTH_SHORT).show();
                     break;
                 default:
-                    throw new UnsupportedOperationException("ExpenseScreen unterstützt keine anderen Methoden als createExpense, createChildToExpense und updateExpense");
+                    throw new UnsupportedOperationException("ExpenseScreen unterstützt keine anderen Methoden als createExpense, createChildToExpense, updateExpense und updateChildExpense");
             }
 
             if (mRecurring) {//todo noch einmal überarbeiten
@@ -336,9 +361,9 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
-
         mDatabase.close();
+
+        super.onDestroy();
     }
 
 
@@ -349,10 +374,6 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
         BasicTextInputDialog basicDialog = new BasicTextInputDialog();
 
         switch (btn.getId()) {
-
-            case R.id.expense_screen_amount:
-
-                break;
 
             case R.id.expense_screen_category:
 
@@ -432,20 +453,22 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
         }
     }
 
+    /**
+     * Callback Methode des Currency selectors
+     *
+     * @param parent   parent
+     * @param view     view
+     * @param position Die vom Nutzer ausgewählte position
+     * @param id       id
+     */
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-        if (!mDatabase.isOpen())
-            mDatabase.open();
-
         String curName = parent.getItemAtPosition(position).toString();
-
         Currency currency = mDatabase.getCurrency(curName);
 
-        TextView expenseCurrency = (TextView) findViewById(R.id.expense_screen_amount_currency);
-        expenseCurrency.setText(String.format("%s", currency.getSymbol()));
-
         mExpense.setExpenseCurrency(currency);
+        mCurrencyTxt.setText(String.format("%s", mExpense.getExpenseCurrency().getSymbol()));
     }
 
     @Override
@@ -543,6 +566,15 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
             mExpense.setDateTime(date);
             mDateBtn.setText(mExpense.getDisplayableDateTime());
             Log.d(TAG, "updated expense date to " + mExpense.getDisplayableDateTime());
+        }
+    }
+
+    @Override
+    public void onFrequencySet(int frequencyInHours, String tag) {
+
+        if (tag.equals("expense_screen_frequency")) {
+
+            mRecurringFrequency.setText(String.format("%s Tage", frequencyInHours));
         }
     }
 }

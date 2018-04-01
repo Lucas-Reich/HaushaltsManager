@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="PieChartView">
+    <declare-styleable name="PieChart">
         <attr name="draw_hole" format="boolean"/>
         <attr name="hole_size" format="integer"/>
         <attr name="hole_color" format="color"/>

@@ -98,4 +98,14 @@
     <string name="input_title">Input Title</string>
     <string name="input_tag">Input Tag</string>
     <string name="input_notice">Input Notice</string>
+    <string name="transfer">Transfer</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="make_main">Make main account</string>
+    <string name="failed_to_delete_account">Failed to delete account, there are still Bookings with this account!</string>
+    <string name="deleted_account">Deleted account</string>
+    <string name="changed_main_account">is now the main account.</string>
+    <string name="choose_category">Choose category</string>
+    <string name="input_price">Input price</string>
+    <string name="input_frequency">Input frequency</string>
 </resources>

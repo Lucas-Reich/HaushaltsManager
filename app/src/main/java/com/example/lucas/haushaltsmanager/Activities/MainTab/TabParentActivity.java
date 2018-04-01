@@ -24,6 +24,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.lucas.haushaltsmanager.Activities.CourseActivity;
 import com.example.lucas.haushaltsmanager.Activities.CreateBackupActivity;
 import com.example.lucas.haushaltsmanager.Activities.ImportExportActivity;
 import com.example.lucas.haushaltsmanager.Activities.RecurringBookingsActivity;
@@ -31,9 +32,10 @@ import com.example.lucas.haushaltsmanager.Activities.ShowCategoriesActivity;
 import com.example.lucas.haushaltsmanager.Activities.TransferActivity;
 import com.example.lucas.haushaltsmanager.BookingTemplates;
 import com.example.lucas.haushaltsmanager.Dialogs.ChangeAccounts.ChooseAccountsDialogFragment;
+import com.example.lucas.haushaltsmanager.MockDataCreator;
 import com.example.lucas.haushaltsmanager.MyAlarmReceiver;
 import com.example.lucas.haushaltsmanager.R;
-import com.example.lucas.haushaltsmanager.Services.ExchangeRateService;
+import com.example.lucas.haushaltsmanager.Services.GetExchangeRatesService;
 import com.example.lucas.haushaltsmanager.Activities.TestPieChart;
 
 public class TabParentActivity extends AppCompatActivity implements ChooseAccountsDialogFragment.OnSelectedAccount {
@@ -50,7 +52,6 @@ public class TabParentActivity extends AppCompatActivity implements ChooseAccoun
         //todo die shared preferences in den dafür vorgehenen bereich bringen
         SharedPreferences settings = getSharedPreferences("UserSettings", 0);
         SharedPreferences.Editor editor = settings.edit();
-        editor.putLong("activeAccount", 1);
         editor.putString("mainCurrency", "€");
         editor.putLong("mainCurrencyIndex", 32);
 
@@ -64,13 +65,16 @@ public class TabParentActivity extends AppCompatActivity implements ChooseAccoun
         scheduleBackupServiceAlarm();
 
 
+        //TODO remove den GetExchangeRateService test button
         FloatingActionButton testService = (FloatingActionButton) findViewById(R.id.service_fab);
         testService.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                Intent serviceIntent = new Intent(getBaseContext(), ExchangeRateService.class);
-                startService(serviceIntent);
+                //Intent serviceIntent = new Intent(getBaseContext(), GetExchangeRatesService.class);
+                //startService(serviceIntent);
+
+                MockDataCreator test = new MockDataCreator(TabParentActivity.this);
             }
         });
 
@@ -117,11 +121,10 @@ public class TabParentActivity extends AppCompatActivity implements ChooseAccoun
                         Intent templateIntent = new Intent(TabParentActivity.this, BookingTemplates.class);
                         TabParentActivity.this.startActivity(templateIntent);
                         break;
-                    case R.id.no_category:
-                        //do smth
-                        break;
-                    case R.id.course://Verlauf
-                        //do smth
+                    case R.id.course:
+
+                        Intent courseIntent = new Intent(TabParentActivity.this, CourseActivity.class);
+                        TabParentActivity.this.startActivity(courseIntent);
                         break;
                     case R.id.standing_orders:
 
@@ -143,10 +146,8 @@ public class TabParentActivity extends AppCompatActivity implements ChooseAccoun
                         Intent importExportIntent = new Intent(TabParentActivity.this, ImportExportActivity.class);
                         TabParentActivity.this.startActivity(importExportIntent);
                         break;
-                    case R.id.store:
-                        //do smth
-                        break;
                     case R.id.preferences:
+
                         //do smth
                         break;
                     case R.id.about:

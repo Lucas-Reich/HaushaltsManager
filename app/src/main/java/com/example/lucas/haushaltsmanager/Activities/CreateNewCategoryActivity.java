@@ -19,6 +19,7 @@ import com.example.lucas.haushaltsmanager.R;
 public class CreateNewCategoryActivity extends AppCompatActivity implements BasicTextInputDialog.BasicDialogCommunicator {
 
     private String TAG = CreateNewCategoryActivity.class.getSimpleName();
+
     private Category CATEGORY;
     Button categoryNameBtn, categoryColorBtn, createCategoryBtn;
     RadioGroup expenseType;
@@ -27,10 +28,9 @@ public class CreateNewCategoryActivity extends AppCompatActivity implements Basi
     @Override
     protected void onCreate(Bundle savedInstances) {
         super.onCreate(savedInstances);
-
         setContentView(R.layout.activity_new_category);
 
-        CATEGORY = new Category(getResources().getString(R.string.no_name), "#000000", false);
+        CATEGORY = Category.createDummyCategory(this);
         database = new ExpensesDataSource(this);
 
         categoryNameBtn = (Button) findViewById(R.id.new_category_name);

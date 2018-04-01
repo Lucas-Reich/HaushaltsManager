@@ -89,8 +89,7 @@ public class Currency implements Parcelable {
         this.shortName = shortName;
     }
 
-    @NonNull
-    public String getSymbol() {
+    public @NonNull String getSymbol() {
 
         return symbol != null ? symbol : shortName;
     }

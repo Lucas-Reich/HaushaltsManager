@@ -78,7 +78,7 @@
     <string name="choose_new_file_name">Gebe einen Dateinamen ein</string>
     <string name="input_file_name">Gebe einen Dateinamen ein</string>
     <string name="btn_create">Erstelle</string>
-    <string name="choose_directory">Wähle Pfad aus</string>
+    <string name="choose_directory">Wähle den Speicherort aus</string>
     <string name="restoreBackup">Stelle Backup wieder her</string>
     <string name="restore_backup_confirmation">Bist du dir sicher, dass du dieses Backup wiederherstellen möchtest? Alle Änderungen seit dem gehen verloren</string>
     <string name="select_end_date">Bis</string>
@@ -90,4 +90,15 @@
     <string name="error_same_accounts">Du kannst kein Geld auf dasselbe Konto überweisen</string>
     <string name="error_missing_content">Du musst alle Spalten ausfüllen</string>
     <string name="btn_save">Speichern</string>
+    <string name="input_title">Geben Sie der Buchung einen Titel</string>
+    <string name="input_tag">Fügen Sie der Buchung ein Tag hinzu</string>
+    <string name="input_notice">Fügen Sie der Buchung eine Notiz hinzu</string>
+    <string name="transfer">Überweisung</string>
+    <string name="edit">Bearbeiten</string>
+    <string name="delete">Löschen</string>
+    <string name="make_main">Wähle als Hauptkonto</string>
+    <string name="failed_to_delete_account">Fehler beim löschen des Kontos. Das Konto kann nicht gelöscht werden, da es noch Buchungen mit diesem Konto gibt.</string>
+    <string name="deleted_account">Konto wurde gelöscht.</string>
+    <string name="choose_category">Wählen Sie eine Kategorie aus</string>
+    <string name="changed_main_account">" ist nun das Hauptkonto"</string>
 </resources>

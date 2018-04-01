@@ -114,7 +114,7 @@
         android:layout_weight="1"
         android:orientation="vertical">
 
-        <com.example.lucas.haushaltsmanager.CustomViews.PieChartView
+        <com.example.lucas.haushaltsmanager.CustomViews.PieChart
             android:id="@+id/monthly_item_pie_chart"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -178,7 +178,7 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
     static final String TABLE_CURRENCIES = "CURRENCIES";
 
     static final String CURRENCIES_COL_ID = "_id";
-    static final String CURRENCIES_COL_TIMESTAMP = "timestamp";
+    static final String CURRENCIES_COL_TIMESTAMP = "created_at";
     static final String CURRENCIES_COL_SYMBOL = "symbol";
     static final String CURRENCIES_COL_NAME = "cur_name";
     static final String CURRENCIES_COL_SHORT_NAME = "short_name";

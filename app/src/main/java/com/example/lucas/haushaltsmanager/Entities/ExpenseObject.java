@@ -11,7 +11,6 @@ import com.example.lucas.haushaltsmanager.R;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -121,7 +120,7 @@ public class ExpenseObject implements Parcelable {
 
         Calendar cal = Calendar.getInstance();
 
-        Log.v(TAG, "ParcelData (Parcel source): time to put back parcel data");
+        Log.v(TAG, "Recreating ExpenseObject from parcel data");
         cal.setTimeInMillis(source.readLong());
         setDateTime(cal);
         setName(source.readString());
@@ -132,9 +131,8 @@ public class ExpenseObject implements Parcelable {
         source.readList(this.tags, Tag.class.getClassLoader());
         setNotice(source.readString());
         setAccount((Account) source.readParcelable(Account.class.getClassLoader()));
-        //children = source.createTypedArrayList(ExpenseObject.CREATOR); deprecated since 11.03.18
         source.readList(this.children, ExpenseObject.class.getClassLoader());
-        setExpenseCurrency((Currency)source.readParcelable(Currency.class.getClassLoader()));
+        setExpenseCurrency((Currency) source.readParcelable(Currency.class.getClassLoader()));
     }
 
     /**
@@ -188,12 +186,6 @@ public class ExpenseObject implements Parcelable {
     }
 
     @NonNull
-    public String getDBDateTime() {
-
-        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(getDateTime().getTime());
-    }
-
-    @NonNull
     public String getDate() {
 
         return new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(getDateTime().getTime());
@@ -208,17 +200,6 @@ public class ExpenseObject implements Parcelable {
     public void setDateTime(@NonNull Calendar date) {
 
         this.date = date;
-    }
-
-    public void setDateTime(@NonNull String date) {
-
-        try {
-
-            this.date.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).parse(date));
-        } catch (ParseException e) {
-
-            e.printStackTrace();
-        }
     }
 
     @NonNull
@@ -489,7 +470,7 @@ public class ExpenseObject implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
 
-        Log.v(TAG, "write to parcel..." + flags);
+        Log.v(TAG, "Writing ExpenseObject to parcel" + flags);
         dest.writeLong(date.getTimeInMillis());
         dest.writeString(title);
         dest.writeDouble(price);
