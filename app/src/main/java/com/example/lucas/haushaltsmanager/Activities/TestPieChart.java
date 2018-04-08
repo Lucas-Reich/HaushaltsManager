@@ -4,7 +4,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import com.example.lucas.haushaltsmanager.Views.PieChart;
+import com.example.lucas.haushaltsmanager.Views.PieChart.PieChart;
 import com.example.lucas.haushaltsmanager.DataSet;
 import com.example.lucas.haushaltsmanager.R;
 

@@ -113,10 +113,10 @@
         android:layout_weight="1"
         android:orientation="vertical">
 
-        <com.example.lucas.haushaltsmanager.Views.PieChart
+        <com.example.lucas.haushaltsmanager.Views.PieChart.PieChart
             android:id="@+id/monthly_item_pie_chart"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="120dp"
             app:use_legend="false"/>
     </LinearLayout>
 </LinearLayout>

@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager.Views;
+package com.example.lucas.haushaltsmanager.Views.PieChart;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
@@ -23,6 +23,8 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 
 import com.example.lucas.haushaltsmanager.DataSet;
 import com.example.lucas.haushaltsmanager.R;
+import com.example.lucas.haushaltsmanager.Views.PieChart.Legend.Legend;
+import com.example.lucas.haushaltsmanager.Views.PieChart.Legend.LegendItem;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,17 +36,33 @@ public class PieChart extends View {
 
     private RectF mViewBounds;
 
+    private Legend mLegend;
     private boolean mDrawLegend;
+
+    /**
+     * Flag die angibt, ob die Labels neben den Legendenelementen angezeigt werden sollen oder nicht.
+     */
+    private boolean mDrawLegendLabels = true;
     private TextPaint mNumeratorFontPaint;
     private Rect mNumeratorFontBounds;
     private Paint mNumeratorPaint;
     private RectF mNumeratorRect;
     private float mNumeratorSize;
     private float mLegendFontSize = 15f;
+
+    /**
+     * Abstand zwischen den einzelnen Legendenelementen
+     */
+    private int mNumeratorItemOffset = dpToPx(5);
+
+    /**
+     * Legendencontainer
+     */
     private Rect mLegendBounds;
 
+    private int mNumeratorChartPadding = dpToPx(10);
+
     private NumeratorStyles mNumeratorStyle;
-    private int mNumeratorItemOffset;
 
     public enum NumeratorStyles {
         CIRCLE, SQUARE
@@ -67,7 +85,7 @@ public class PieChart extends View {
     private float mDataTotal;
     private Paint mSlicePaint;
     private RectF mPieChartBounds;
-    private String mNoData;
+    private String mNoDataText;
     private boolean mPercentageValues = false;
     private boolean mSliceMargin;
     private boolean mDrawCenterText = false;
@@ -124,12 +142,14 @@ public class PieChart extends View {
 
         int holeColor;
         int numeratorColor;
+
+        mNoDataText = getResources().getString(R.string.no_data);
         try {
 
             mDrawHole = a.getBoolean(R.styleable.PieChart_draw_hole, false);
             mHoleSize = a.getInteger(R.styleable.PieChart_hole_size, 50);
             holeColor = a.getColor(R.styleable.PieChart_hole_color, Color.WHITE);
-            mNoData = a.getString(R.styleable.PieChart_no_data_text);
+            mNoDataText = a.getString(R.styleable.PieChart_no_data_text);
             mLegendPosition = LegendPositions.TOP_LEFT;
             mDrawLegend = a.getBoolean(R.styleable.PieChart_use_legend, false);
             mNumeratorStyle = NumeratorStyles.SQUARE;
@@ -195,8 +215,7 @@ public class PieChart extends View {
         mFontPaint.setColor(Color.RED);
         mFontPaint.setTextSize(mFontSize);
 
-
-        mNoData = getResources().getString(R.string.no_data);
+        mLegend = new Legend(mLegendDirection);
     }
 
     public void setHoleColor(@ColorInt int color) {
@@ -204,8 +223,7 @@ public class PieChart extends View {
         this.mHolePaint.setColor(color);
     }
 
-    public @ColorInt
-    int getHoleColor() {
+    public int getHoleColor() {
 
         return this.mHolePaint.getColor();
     }
@@ -233,8 +251,7 @@ public class PieChart extends View {
         invalidate();
     }
 
-    public @ColorInt
-    int getNumeratorColor() {
+    public int getNumeratorColor() {
 
         return this.mNumeratorPaint.getColor();
     }
@@ -278,6 +295,11 @@ public class PieChart extends View {
     public void setCenterTextColor(@ColorInt int textColor) {
 
         mFontPaint.setColor(textColor);
+    }
+
+    public void setNoDataText(@NonNull String noDataText) {
+
+        mNoDataText = noDataText;
     }
 
 
@@ -486,21 +508,18 @@ public class PieChart extends View {
         if (mPieData.isEmpty())
             return new Rect();
 
-        mNumeratorItemOffset = dpToPx(5);
-
-        //todo offset zwischen den labels einfügen
         int width = 0, height = 0;
-        for (PieSlice slice : mPieData.get(mVisibleLayer - 1)) {
+        for (PieSlice slice : getVisibleSlices()) {
 
-            Rect textSize = getTextBounds(slice.getSliceLabel(), mLegendFontSize);
+            Rect textSize = getTextBounds(slice.getLabel(), mLegendFontSize);
             if (mLegendDirection.equals(LegendDirections.LEFT_TO_RIGHT)) {
 
-                width += mNumeratorSize + textSize.width();
-                height = (int) Math.max(textSize.height(), mNumeratorSize);
+                width += mNumeratorSize + textSize.width() + mNumeratorItemOffset;
+                height = (int) Math.max(textSize.height(), mNumeratorSize) + mNumeratorChartPadding;
             } else {
 
-                width = (int) mNumeratorSize + textSize.width();
-                height += Math.max(mNumeratorSize, textSize.height());
+                width = (int) mNumeratorSize + textSize.width() + mNumeratorChartPadding;
+                height += Math.max(mNumeratorSize, textSize.height()) + mNumeratorItemOffset;
             }
         }
 
@@ -516,6 +535,7 @@ public class PieChart extends View {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         setMaxViewBounds(widthMeasureSpec, heightMeasureSpec);
+        fillLegend();
 
         //padding von der maximalen größe abziehen
         int widthPadding = getPaddingRight() + getPaddingLeft();
@@ -569,22 +589,21 @@ public class PieChart extends View {
         if (mPieData.isEmpty())
             return;
 
-        //todo offset zwischen den Elementen einfügen
-
         for (int i = 0; i < 2; i++) {
+            if (i > 0)
+                mDrawLegendLabels = false;
 
-            for (PieSlice slice : mPieData.get(mVisibleLayer - 1)) {
+            for (PieSlice slice : getVisibleSlices()) {
+                Rect textBounds = getTextBounds(slice.getLabel(), mLegendFontSize);
 
-                Rect textBounds = getTextBounds(slice.getSliceLabel(), mLegendFontSize);
+                if (mLegendDirection.equals(LegendDirections.LEFT_TO_RIGHT)) {
 
-                if (mLegendDirection.equals(LegendDirections.TOP_TO_BOTTOM)) {
-
-                    mLegendBounds.right = i == 0 ? textBounds.width() + (int) mNumeratorSize : (int) mNumeratorSize;
-                    mLegendBounds.bottom += Math.max(textBounds.height(), mNumeratorSize);
+                    mLegendBounds.right += i == 0 ? textBounds.width() + mNumeratorSize + mNumeratorItemOffset : mNumeratorSize + mNumeratorItemOffset;
+                    mLegendBounds.bottom = Math.max(textBounds.height(), (int) mNumeratorSize) + mNumeratorChartPadding;
                 } else {
 
-                    mLegendBounds.right += i == 0 ? textBounds.width() + mNumeratorSize : mNumeratorSize;
-                    mLegendBounds.bottom = Math.max(textBounds.height(), (int) mNumeratorSize);
+                    mLegendBounds.right = i == 0 ? textBounds.width() + (int) mNumeratorSize + mNumeratorChartPadding : (int) mNumeratorSize + mNumeratorChartPadding;
+                    mLegendBounds.bottom += Math.max(textBounds.height(), mNumeratorSize) + mNumeratorItemOffset;
                 }
             }
 
@@ -592,6 +611,28 @@ public class PieChart extends View {
                 return;
 
             mLegendBounds.setEmpty();
+        }
+    }
+
+    /**
+     * Methode um das Legendenelement mit LegendenItems zu befüllen
+     */
+    private void fillLegend() {
+
+        for (PieSlice slice : getVisibleSlices()) {
+
+            Rect textBounds = getTextBounds(slice.getLabel(), mLegendFontSize);
+            int width = (int) mNumeratorSize + textBounds.width();
+            int height = (int) Math.max(mNumeratorSize, textBounds.height());
+            Rect bounds = new Rect(0, 0, width, height);
+
+            LegendItem legendItem = new LegendItem(
+                    slice.getLabel(),
+                    slice.getColor(),
+                    mNumeratorStyle);
+            legendItem.setBounds(bounds);
+
+            mLegend.addItem(legendItem);
         }
     }
 
@@ -638,8 +679,6 @@ public class PieChart extends View {
     private void applyPaddingToChartAndLegend(Rect legendBounds, RectF pieChartBounds) {
 
         if (!legendBounds.isEmpty()) {
-            //offset ist nicht mit eingerechnet wodurch teile der views abgeschnitten sein könnten
-            int offset = 0;//todo map to dp
             if (isLegendLeft()) {
 
                 legendBounds.left = getPaddingLeft();
@@ -647,7 +686,7 @@ public class PieChart extends View {
                 legendBounds.right += legendBounds.left;
                 legendBounds.bottom += legendBounds.top;
 
-                pieChartBounds.left = legendBounds.right + offset;
+                pieChartBounds.left = legendBounds.right;
                 pieChartBounds.top += getPaddingTop();
                 pieChartBounds.right += legendBounds.width();
             } else if (isLegendTop()) {
@@ -658,14 +697,14 @@ public class PieChart extends View {
                 legendBounds.bottom += legendBounds.top;
 
                 pieChartBounds.left = getPaddingLeft();
-                pieChartBounds.top = legendBounds.bottom + offset;
+                pieChartBounds.top = legendBounds.bottom;
                 pieChartBounds.bottom += legendBounds.height();
             } else if (isLegendRight()) {
 
                 pieChartBounds.left = getPaddingLeft();
                 pieChartBounds.top = getPaddingTop();
 
-                legendBounds.left = (int) pieChartBounds.right + offset;
+                legendBounds.left = (int) pieChartBounds.right;
                 legendBounds.top = getPaddingTop();
                 legendBounds.right += legendBounds.left;
                 legendBounds.bottom += legendBounds.top;
@@ -675,7 +714,7 @@ public class PieChart extends View {
                 pieChartBounds.top = getPaddingTop();
 
                 legendBounds.left = getPaddingLeft();
-                legendBounds.top = (int) pieChartBounds.bottom + offset;
+                legendBounds.top = (int) pieChartBounds.bottom;
                 legendBounds.right += legendBounds.left;
                 legendBounds.bottom += legendBounds.top;
             }
@@ -767,7 +806,7 @@ public class PieChart extends View {
      * @param px Zu konvertierende pixel
      * @return In Dp konvertierte pixel
      */
-    private int pxToDp(int px) {
+    public int pxToDp(int px) {
         return (int) (px / Resources.getSystem().getDisplayMetrics().density);
     }
 
@@ -804,6 +843,18 @@ public class PieChart extends View {
     //ab hier werden visuelle sachen behandelt
 
     /**
+     * Methode um die momentan sichtbaren PieSlices aus dem gesamten Datensatz zu erhalten.
+     *
+     * @return Momentan sichtbare PieSlices
+     */
+    private List<PieSlice> getVisibleSlices() {
+        if (mPieData.isEmpty())
+            return new ArrayList<>();
+        else
+            return mPieData.get(mVisibleLayer - 1);
+    }
+
+    /**
      * Methode um das Kreisdiagramm zu zeichnen
      *
      * @param canvas Zeichen Objekt auf dem der Kreis gezeichet wird
@@ -816,9 +867,9 @@ public class PieChart extends View {
             return;
         }
 
-        for (PieSlice slice : mPieData.get(mVisibleLayer - 1)) {
+        for (PieSlice slice : getVisibleSlices()) {
 
-            mSlicePaint.setColor(slice.getSliceColor());
+            mSlicePaint.setColor(slice.getColor());
             if (mSliceMargin)
                 canvas.drawArc(mPieChartBounds, slice.getStartAngle(), slice.getPercentValue() - 2f, true, mSlicePaint);
             else
@@ -856,7 +907,7 @@ public class PieChart extends View {
      */
     private void drawNoDataText(Canvas canvas) {
 
-        drawCenterText(canvas, getResources().getString(R.string.no_data));
+        drawCenterText(canvas, mNoDataText);
     }
 
     /**
@@ -874,51 +925,120 @@ public class PieChart extends View {
     }
 
     /**
+     * Methode um Legendenelemente eines PieCharts anzeigen zu lassen.
+     *
+     * @param canvas Canvas auf dem die Legende sichtbar sein soll
+     */
+    private void drawLegend2(Canvas canvas) {
+        if (isLegendHidden())
+            return;
+
+        for (PieSlice slice : getVisibleSlices()) {
+            drawLegendItem(canvas, slice);
+        }
+    }
+
+    /**
+     * Methode um ein einzelnes Legendenelement zu zeichnen.
+     *
+     * @param canvas Canvas auf dem das Legendelement sichtbar sein soll
+     * @param slice  PieSlice, welcher angezeigt weden soll
+     */
+    private void drawLegendItem(Canvas canvas, PieSlice slice) {
+
+        drawLegendItemIcon(canvas, slice);
+        if (mDrawLegendLabels)
+            drawLegendLabel(canvas, slice.getLabel());
+    }
+
+    /**
      * Methode um die Legende zu zeichnen
      *
      * @param canvas Canvas Objekt auf dem die Legende gezeichnet werden soll
      *               todo legende in die richtige richtung (mLegendDirection) zeichnen
      */
     private void drawLegend(Canvas canvas) {
-
-        if (mLegendBounds.isEmpty())
+        if (isLegendHidden())
             return;
 
-        boolean drawLabels = true;
-        if (mPieData.get(mVisibleLayer - 1).size() * (mNumeratorSize + 5) == mLegendBounds.width())
-            drawLabels = false;
+        for (PieSlice slice : getVisibleSlices()) {
+            drawLegendItemIcon(canvas, slice);
 
-        for (PieSlice slice : mPieData.get(mVisibleLayer - 1)) {
-            mNumeratorFontPaint.getTextBounds(slice.getSliceLabel(), 0, slice.getSliceLabel().length(), mNumeratorFontBounds);
-            mNumeratorPaint.setColor(slice.getSliceColor());
-
-            switch (mNumeratorStyle) {
-
-                case CIRCLE:
-                    canvas.drawCircle(mNumeratorRect.centerX(), mNumeratorRect.centerY(), mNumeratorSize / 2, mNumeratorPaint);
-                    break;
-
-                case SQUARE:
-                    canvas.drawRect(mNumeratorRect, mNumeratorPaint);
-                    break;
-            }
-
-            mNumeratorRect.left += mNumeratorSize;
-            mNumeratorRect.right += mNumeratorSize;
+            if (mDrawLegendLabels)
+                drawLegendLabel(canvas, slice.getLabel());
 
 
-            if (drawLabels) {
-
-                canvas.drawText(slice.getSliceLabel(), mNumeratorRect.left, mNumeratorSize - ((mNumeratorSize - mNumeratorFontBounds.height()) / 2), mNumeratorFontPaint);
-                mNumeratorRect.left += mNumeratorFontBounds.width() + 5;
-                mNumeratorRect.right += mNumeratorFontBounds.width() + 5;
-            }
+            mNumeratorRect.left += mNumeratorItemOffset;
+            mNumeratorRect.right += mNumeratorItemOffset;
         }
 
         mNumeratorRect.set(0, 0, mNumeratorSize, mNumeratorSize);
     }
 
-    //ab hier werden klick ereignisse behandelt
+    /**
+     * Methode die überprüft, ob die Legende sichtbar ist oder nicht.
+     * Dabei wird der tatsächlich ausgerechnete Platz der Legende als Referenz genommen.
+     *
+     * @return Boolean
+     */
+    private boolean isLegendHidden() {
+
+        return mLegendBounds.isEmpty();
+    }
+
+    /**
+     * Methode um die Icons der Legendenelemente auf eine canvas zu zeichnen.
+     *
+     * @param canvas Hauptcanvas
+     */
+    private void drawLegendItemIcon(Canvas canvas, PieSlice slice) {
+        mNumeratorPaint.setColor(slice.getColor());
+
+        switch (mNumeratorStyle) {
+
+            case CIRCLE:
+                canvas.drawCircle(
+                        mNumeratorRect.centerX(),
+                        mNumeratorRect.centerY(),
+                        mNumeratorSize / 2,
+                        mNumeratorPaint);
+                break;
+
+            case SQUARE:
+                canvas.drawRect(mNumeratorRect, mNumeratorPaint);
+                break;
+        }
+
+        if (mLegendDirection == LegendDirections.LEFT_TO_RIGHT) {
+
+            mNumeratorRect.left += mNumeratorSize;
+            mNumeratorRect.right += mNumeratorSize;
+        } else {
+
+            mNumeratorRect.top += mNumeratorSize;
+            mNumeratorRect.bottom += mNumeratorSize;
+        }
+    }
+
+    /**
+     * Methode um ein einzelnes Label auf einer Canvas zu zeichnen
+     *
+     * @param canvas Canvas auf der das Label angezeigt werden soll
+     * @param label  Text der angezezeigt werden soll
+     */
+    private void drawLegendLabel(Canvas canvas, String label) {
+        mNumeratorFontPaint.getTextBounds(label, 0, label.length(), mNumeratorFontBounds);
+
+        if (true) {
+
+            canvas.drawText(label, mNumeratorRect.right, mNumeratorRect.bottom, mNumeratorFontPaint);
+        } else {
+
+            //canvas.drawText(label, );
+        }
+    }
+
+    //ab hier werden klick Ereignisse behandelt
 
     /**
      * Methode um Touch aktionen des Users abzufangen
@@ -933,12 +1053,6 @@ public class PieChart extends View {
 
         Point click = new Point((int) Math.floor(event.getX()), (int) Math.floor(event.getY()));
 
-        //User tippt auf das Display
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-
-            //todo implement
-        }
-
         //User nimmt den Finger vom Display
         if (event.getAction() == MotionEvent.ACTION_UP) {
 
@@ -949,7 +1063,7 @@ public class PieChart extends View {
 
                     float pointAngle = getAngleForPoint(click);
 
-                    for (PieSlice slice : mPieData.get(mVisibleLayer - 1)) {
+                    for (PieSlice slice : getVisibleSlices()) {
 
                         if (pointAngle > slice.getStartAngle() && pointAngle < slice.getEndAngle()) {
 
@@ -966,9 +1080,9 @@ public class PieChart extends View {
 
                     int counterRight = 0, counterLeft;
 
-                    for (PieSlice slice : mPieData.get(mVisibleLayer - 1)) {
+                    for (PieSlice slice : getVisibleSlices()) {
 
-                        mNumeratorFontPaint.getTextBounds(slice.getSliceLabel(), 0, slice.getSliceLabel().length(), mNumeratorFontBounds);
+                        mNumeratorFontPaint.getTextBounds(slice.getLabel(), 0, slice.getLabel().length(), mNumeratorFontBounds);
 
                         counterRight += mNumeratorFontBounds.right + mNumeratorSize;
                         counterLeft = counterRight - (mNumeratorFontBounds.width() + (int) mNumeratorSize);
@@ -1002,7 +1116,7 @@ public class PieChart extends View {
             return -1;//hole click
 
         if (mLegendBounds.contains(click.x, click.y))
-            return 1;//legend click
+            return 1;//mLegend click
 
         if (Math.sqrt(Math.pow((mPieChartBounds.centerX() - click.x), 2) + Math.pow((mPieChartBounds.centerY() - click.y), 2)) <= mPieChartBounds.width() / 2)
             return 0;//chart click
@@ -1045,7 +1159,7 @@ public class PieChart extends View {
 
         float total = 0;
 
-        for (PieSlice slice : mPieData.get(mVisibleLayer - 1)) {
+        for (PieSlice slice : getVisibleSlices()) {
 
             total += slice.getAnimValue();
         }
@@ -1062,7 +1176,7 @@ public class PieChart extends View {
         float total = getLayerTotal();
         int startAngle = 0;
 
-        for (PieSlice slice : mPieData.get(mVisibleLayer - 1)) {
+        for (PieSlice slice : getVisibleSlices()) {
 
             slice.setPercentValue(getPieArea(total, slice.getAnimValue()));
             slice.setStartAngle(startAngle);
@@ -1080,8 +1194,7 @@ public class PieChart extends View {
 
         //todo wenn nur noch ein slice zu sehen ist, kann dieser nicht mehr versteck werden!
         //todo die Slices werden beim aus und einklappen nicht richtig berechnet, sie kommen nicht auf 360°
-        if (mAnimator != null)
-            mAnimator.end();
+        stopOngoingAnimations();
 
         if (slice.getPercentValue() > 0f)
             mAnimator = ValueAnimator.ofFloat(slice.getAbsValue(), 0f);
@@ -1107,136 +1220,10 @@ public class PieChart extends View {
     }
 
     /**
-     * Klasse um die Datensets des Kreisdiagramms zu sortieren
+     * Methode um alle laufenden Animationen anzuhalten
      */
-    private class PieSlice {
-
-        /**
-         * Originaler vom User gegebener Wert
-         */
-        private float mAbsValue;
-
-        /**
-         * Basiert auf mAbsValue und ist zum animieren gedacht
-         */
-        private float mAnimValue;
-
-        /**
-         * Prozentualer Anteil am Kreis
-         */
-        private float mPercentValue;
-
-        /**
-         * Winkel ab dem der Bereich des Segments beginnt
-         */
-        private float mStartAngle;
-
-        /**
-         * Winkel ab dem der Bereich des Segments endet
-         */
-        private float mEndAngle;
-
-        /**
-         * Farbe des Kreissegments
-         */
-        private int mSliceColor;
-
-        /**
-         * Bezeichnung des Kreissegments
-         */
-        private String mSliceLabel;
-
-        /**
-         * Platz den das Kreissegment einnimt unterteilt in gewichte (Default 1).
-         */
-        private int mSliceWeight;
-
-        PieSlice(float absValue, float percentValue, float startAngle) {
-
-            constructor(absValue, percentValue, startAngle);
-        }
-
-        private void constructor(float absValue, float percentValue, float startAngle) {
-
-            this.mAbsValue = absValue;
-            this.mAnimValue = absValue;
-            this.mPercentValue = percentValue;
-            this.mStartAngle = startAngle;
-            this.mEndAngle = mStartAngle + percentValue;
-            this.mSliceColor = Color.WHITE;
-            mSliceWeight = 0;
-        }
-
-        void setWeight(int weight) {
-
-            this.mSliceWeight = weight;
-        }
-
-        int getWeight() {
-
-            return this.mSliceWeight;
-        }
-
-        float getAbsValue() {
-
-            return mAbsValue;
-        }
-
-        float getAnimValue() {
-
-            return this.mAnimValue;
-        }
-
-        void setAnimValue(float animValue) {
-
-            this.mAnimValue = animValue >= 0 ? animValue : 0f;
-        }
-
-        int getSliceColor() {
-
-            return this.mSliceColor;
-        }
-
-        void setSliceColor(@ColorInt int color) {
-
-            this.mSliceColor = color;
-        }
-
-        @NonNull
-        String getSliceLabel() {
-
-            return this.mSliceLabel != null ? mSliceLabel : "";
-        }
-
-        void setSliceLabel(@NonNull String label) {
-
-            this.mSliceLabel = label;
-        }
-
-        float getPercentValue() {
-
-            return mPercentValue;
-        }
-
-        void setPercentValue(float mCalcValue) {
-
-            this.mPercentValue = mCalcValue;
-            this.mEndAngle = this.mStartAngle + mCalcValue;
-        }
-
-        float getStartAngle() {
-
-            return mStartAngle;
-        }
-
-        void setStartAngle(float mStartAngle) {
-
-            this.mStartAngle = mStartAngle;
-        }
-
-        float getEndAngle() {
-
-            return mEndAngle;
-        }
+    private void stopOngoingAnimations() {
+        if (mAnimator != null)
+            mAnimator.end();
     }
 }

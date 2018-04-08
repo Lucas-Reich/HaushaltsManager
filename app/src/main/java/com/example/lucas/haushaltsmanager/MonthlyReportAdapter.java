@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.example.lucas.haushaltsmanager.Views.PieChart;
+import com.example.lucas.haushaltsmanager.Views.PieChart.PieChart;
 import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
 
 import java.text.DateFormatSymbols;
