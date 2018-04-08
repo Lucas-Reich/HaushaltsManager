@@ -359,6 +359,9 @@ public class TabOneBookings extends Fragment {
     private Calendar getFirstOfMonth() {
 
         Calendar firstOfMonth = Calendar.getInstance();
+        firstOfMonth.set(Calendar.HOUR_OF_DAY, 0);
+        firstOfMonth.set(Calendar.MINUTE, 0);
+        firstOfMonth.set(Calendar.SECOND, 1);
         firstOfMonth.set(Calendar.DAY_OF_MONTH, 1);
 
         return firstOfMonth;

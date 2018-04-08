@@ -1,15 +1,16 @@
 package com.example.lucas.haushaltsmanager;
 
 import android.support.annotation.ColorInt;
+import android.support.annotation.NonNull;
 
-public class DataSet {
+public class DataSet implements Comparable {
 
     private float value;
     private @ColorInt
     int color;
     private String label;
 
-    public DataSet(float dataValue, @ColorInt int dataColor, String dataLabel) {
+    public DataSet(float dataValue, @ColorInt int dataColor, @NonNull String dataLabel) {
 
         this.value = dataValue;
         this.color = dataColor;
@@ -24,7 +25,23 @@ public class DataSet {
         return color;
     }
 
+    @NonNull
     public String getLabel() {
         return label;
+    }
+
+    /**
+     * Methode die das sortieren einer (Array-)Liste ermöglicht.
+     * Die so sortierte Liste wird aufsteigend nach dem 'value' sortiert
+     * source: https://beginnersbook.com/2013/12/java-arraylist-of-object-sort-example-comparable-and-comparator/
+     *
+     * @param o Zu Vergleichendes Objekt
+     * @return int > 0, wenn dieses Objekt größer ist als 'o'
+     */
+    @Override
+    public int compareTo(@NonNull Object o) {
+        DataSet otherDataSet = (DataSet) o;
+
+        return (int) (this.getValue() - otherDataSet.getValue());
     }
 }

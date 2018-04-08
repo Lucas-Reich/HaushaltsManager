@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager.CustomViews;
+package com.example.lucas.haushaltsmanager.Views;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -11,7 +11,6 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 public class RoundedTextView extends View {

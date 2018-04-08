@@ -8,7 +8,7 @@ import android.content.DialogInterface;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 
-import com.example.lucas.haushaltsmanager.CustomViews.ColorPicker;
+import com.example.lucas.haushaltsmanager.Views.ColorPicker;
 
 public class ColorPickerDialog extends AlertDialog {
 

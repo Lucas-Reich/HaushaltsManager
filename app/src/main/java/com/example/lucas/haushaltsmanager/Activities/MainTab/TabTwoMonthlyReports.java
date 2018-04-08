@@ -39,7 +39,6 @@ public class TabTwoMonthlyReports extends Fragment {
         Log.d(TAG, "onCreate: fetching data from Database");
 
         mActiveAccounts = new ArrayList<>();
-
         setActiveAccounts();
     }
 
@@ -49,7 +48,7 @@ public class TabTwoMonthlyReports extends Fragment {
 
         mListView = (ListView) rootView.findViewById(R.id.booking_listview);
 
-        updateExpandableListView();
+        //updateExpandableListView(); todo lässt die anwendung freezen (ca. 50% cpu auslastung)
 
         return rootView;
     }
@@ -70,7 +69,7 @@ public class TabTwoMonthlyReports extends Fragment {
 
         for (Account account : getAllAccounts()) {
 
-            if (preferences.getBoolean(account.getName().toLowerCase(), false))
+            if (preferences.getBoolean(account.getName(), false))
                 mActiveAccounts.add(account.getIndex());
         }
     }

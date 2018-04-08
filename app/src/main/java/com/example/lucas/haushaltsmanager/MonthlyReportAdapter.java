@@ -9,8 +9,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.example.lucas.haushaltsmanager.CustomViews.PieChart;
-import com.example.lucas.haushaltsmanager.CustomViews.RoundedTextView;
+import com.example.lucas.haushaltsmanager.Views.PieChart;
+import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
 
 import java.text.DateFormatSymbols;
 import java.util.ArrayList;
@@ -90,7 +90,7 @@ public class MonthlyReportAdapter extends ArrayAdapter<MonthlyReport> implements
         viewHolder.colorCategory.setCenterText("");
         viewHolder.colorCategory.setCircleColor("#EF1616");// dynamisch machen
         viewHolder.txtCategory.setText(monthlyReport.getMostStressedCategory());
-        //viewHolder.pieChart.setPieData(preparePieData(monthlyReport)); todo einschalten, wenn setPieData(List<DataSet>) funktioniert
+        viewHolder.pieChart.setPieData(preparePieData(monthlyReport));
 
         return convertView;
     }
