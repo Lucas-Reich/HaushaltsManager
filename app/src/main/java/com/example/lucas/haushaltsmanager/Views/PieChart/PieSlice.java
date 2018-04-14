@@ -5,10 +5,17 @@ import android.graphics.Color;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 
+import java.util.UUID;
+
 /**
  * Klasse um die Datensets des Kreisdiagramms zu sortieren
  */
 public class PieSlice {
+
+    /**
+     * Id, mit welcher ein Slice eindeutig identifizierbar ist
+     */
+    private String id;
 
     /**
      * Originaler vom User gegebener Wert
@@ -64,6 +71,11 @@ public class PieSlice {
         this.mEndAngle = mStartAngle + percentValue;
         this.mSliceColor = Color.WHITE;
         mSliceWeight = 0;
+        id = UUID.randomUUID().toString();
+    }
+
+    public String getId() {
+        return id;
     }
 
     public void setWeight(int weight) {

@@ -1,8 +1,10 @@
 package com.example.lucas.haushaltsmanager.Views.PieChart.Legend;
 
-
 import android.content.res.Resources;
+import android.graphics.Point;
 import android.graphics.Rect;
+import android.support.annotation.ColorInt;
+import android.util.Log;
 
 import com.example.lucas.haushaltsmanager.Views.PieChart.PieChart;
 
@@ -10,97 +12,105 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Legend {
+    private String TAG = Legend.class.getSimpleName();
 
     private PieChart.LegendDirections mLegendDirection;
-    private Rect bounds;
-    private List<LegendItem> items;
+    private Rect mDesiredSize;
+    private Rect mMinimumSize;
+    private List<LegendItem> mLegendItems;
     private int mNumeratorItemOffset = dpToPx(5);
     private int mNumeratorChartPadding = dpToPx(10);
-    private int mNumeratorSize = dpToPx(20);
+    public static float legendFontSize = 50f;
 
     public Legend(PieChart.LegendDirections legendDirection) {
 
         mLegendDirection = legendDirection;
-        bounds = new Rect();
-        items = new ArrayList<>();
+        mDesiredSize = new Rect();
+        mLegendItems = new ArrayList<>();
+        mMinimumSize = new Rect();
+    }
+
+    public Rect getDesiredSize() {
+        return mDesiredSize;
+    }
+
+    public Rect getMinimumSize() {
+        return mMinimumSize;
     }
 
     public void addItem(LegendItem item) {
-        items.add(item);
+        shiftNewItem(item);
+        mLegendItems.add(item);
+        addItemSize(item);
     }
 
-    /**
-     * Methode um die Breite der Legende zu ermitteln.
-     * Dabei wird die Ausrichtung der Legende mit einbezogen.
-     *
-     * @return Legendenbreite
-     */
-    public int getWidth() {
-        int width = 0;
-        if (mLegendDirection == PieChart.LegendDirections.LEFT_TO_RIGHT) {
+    public void addItem(String label, @ColorInt int color, LegendItem.NumeratorStyles style, String sliceId) {
 
-            for (LegendItem item : items) {
-                width += item.getWidth() + mNumeratorItemOffset;
-            }
-        } else {
+        LegendItem item = new LegendItem(label, color, style,(int) legendFontSize, sliceId);
+        shiftNewItem(item);
+        mLegendItems.add(item);
+        addItemSize(item);
+    }
 
-            for (LegendItem item : items) {
-                width = Math.max(width, item.getWidth()) + mNumeratorChartPadding;
-            }
+    public LegendItem getItemForPoint(Point point) {
+        for (LegendItem item : mLegendItems) {
+            if (point.x >= item.getStartX() && point.x <= item.getEndX())
+                if (point.y >= item.getStartY() && point.y <= item.getEndY())
+                    return item;
         }
 
-        return width;
+        return null;
+    }
+
+    public void clear() {
+        mLegendItems.clear();
     }
 
     /**
-     * Methode um die Höhe der Legende zu ermitteln.
-     * Dabei wird die Auscrichtung der Legende mit einbezogen.
+     * Methode um einem neu Hinzugefügtes Legendenelement die korrekte Position zu geben.
      *
-     * @return Legendenhöhe
+     * @param item Legendenelement, welchem die Position zugeprdnet werdern soll
      */
-    public int getHeight() {
-        int height = 0;
+    private void shiftNewItem(LegendItem item) {
+        if (mLegendItems.size() == 0)
+            return;
+
+        LegendItem previousItem = mLegendItems.get(mLegendItems.size() - 1);
         if (mLegendDirection == PieChart.LegendDirections.LEFT_TO_RIGHT) {
 
-            for (LegendItem item : items) {
-                height = Math.max(height, item.getHeight()) + mNumeratorChartPadding;
-            }
+            item.shift(previousItem.getEndX(), 0);
         } else {
 
-            for (LegendItem item : items) {
-                height += item.getHeight() + mNumeratorItemOffset;
-            }
+            item.shift(0, previousItem.getEndY());
         }
+    }
 
-        return height;
+    public List<LegendItem> getLegendItems() {
+        return mLegendItems;
     }
 
     /**
-     * Methode um die Breite der Legend zu ermitteln, wenn die Legendenelemente keine Labels haben.
-     * Dabei wird die Ausrichtung der Legende mit einbezogen.
+     * Methode um die gesamte Legendengröße zu erhöhen, wenn ein neues Legendenelement hinzukommt.
      *
-     * @return Legendenbreite ohne Labels
+     * @param item Neues LegendenElement
      */
-    public int getShrinkedWidth() {
+    private void addItemSize(LegendItem item) {
 
-        if (mLegendDirection == PieChart.LegendDirections.LEFT_TO_RIGHT)
-            return items.size() * ((int) mNumeratorSize + mNumeratorItemOffset);
-        else
-            return (int) mNumeratorSize + mNumeratorChartPadding;
-    }
+        if (mLegendDirection == PieChart.LegendDirections.LEFT_TO_RIGHT) {
 
-    /**
-     * Methode um die Höhe der Legend zu ermitteln, wenn die Legendenelemente keine Labels haben.
-     * Dabei wird die Ausrichtung der Legende mit einbezogen.
-     *
-     * @return Legendenhöhe ohne Labels
-     */
-    public int getShrinkedHeight() {
+            mDesiredSize.right += item.getWidth() + mNumeratorItemOffset;
+            mDesiredSize.bottom = Math.max(mDesiredSize.height(), item.getHeight() + mNumeratorChartPadding);
 
-        if (mLegendDirection == PieChart.LegendDirections.LEFT_TO_RIGHT)
-            return (int) mNumeratorSize + mNumeratorChartPadding;
-        else
-            return items.size() * (int) (mNumeratorSize + mNumeratorItemOffset);
+            mMinimumSize.right += item.getNumeratorWidth() + mNumeratorItemOffset;
+            mMinimumSize.bottom = Math.max(mMinimumSize.height(), item.getNumeratorHeight() + mNumeratorChartPadding);
+        } else {
+
+            mDesiredSize.right = Math.max(mDesiredSize.width(), item.getWidth() + mNumeratorChartPadding);
+            mDesiredSize.bottom += item.getHeight() + mNumeratorItemOffset;
+
+            mMinimumSize.right = Math.max(mMinimumSize.width(), item.getNumeratorWidth() + mNumeratorChartPadding);
+            mMinimumSize.bottom += item.getNumeratorHeight() + mNumeratorItemOffset;
+        }
     }
 
     /**
@@ -110,7 +120,7 @@ public class Legend {
      * @param dp Zu konvertierende dp
      * @return In px konvertierte dp
      */
-    public static int dpToPx(int dp) {
+    private static int dpToPx(int dp) {
         return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
     }
 }

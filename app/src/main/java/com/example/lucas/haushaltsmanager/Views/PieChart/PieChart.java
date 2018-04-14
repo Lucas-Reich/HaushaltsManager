@@ -14,7 +14,6 @@ import android.graphics.Typeface;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -31,7 +30,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class PieChart extends View {
-
     private String TAG = PieChart.class.getSimpleName();
 
     private RectF mViewBounds;
@@ -42,31 +40,15 @@ public class PieChart extends View {
     /**
      * Flag die angibt, ob die Labels neben den Legendenelementen angezeigt werden sollen oder nicht.
      */
-    private boolean mDrawLegendLabels = true;
-    private TextPaint mNumeratorFontPaint;
-    private Rect mNumeratorFontBounds;
+    private boolean mDrawLegendLabels;
     private Paint mNumeratorPaint;
-    private RectF mNumeratorRect;
-    private float mNumeratorSize;
-    private float mLegendFontSize = 15f;
-
-    /**
-     * Abstand zwischen den einzelnen Legendenelementen
-     */
-    private int mNumeratorItemOffset = dpToPx(5);
 
     /**
      * Legendencontainer
      */
     private Rect mLegendBounds;
 
-    private int mNumeratorChartPadding = dpToPx(10);
-
-    private NumeratorStyles mNumeratorStyle;
-
-    public enum NumeratorStyles {
-        CIRCLE, SQUARE
-    }
+    private LegendItem.NumeratorStyles mNumeratorStyle;
 
     private LegendPositions mLegendPosition;
 
@@ -145,23 +127,21 @@ public class PieChart extends View {
 
         mNoDataText = getResources().getString(R.string.no_data);
         try {
-
             mDrawHole = a.getBoolean(R.styleable.PieChart_draw_hole, false);
             mHoleSize = a.getInteger(R.styleable.PieChart_hole_size, 50);
             holeColor = a.getColor(R.styleable.PieChart_hole_color, Color.WHITE);
             mNoDataText = a.getString(R.styleable.PieChart_no_data_text);
-            mLegendPosition = LegendPositions.TOP_LEFT;
+            mLegendPosition = LegendPositions.TOP_LEFT;//todo legende kann noch nicht rechts platziert werden
             mDrawLegend = a.getBoolean(R.styleable.PieChart_use_legend, false);
-            mNumeratorStyle = NumeratorStyles.SQUARE;
+            mNumeratorStyle = LegendItem.NumeratorStyles.SQUARE;
             mTransparentCircle = a.getBoolean(R.styleable.PieChart_use_transparent_circle, false);
             mCompressed = a.getBoolean(R.styleable.PieChart_use_compressed, false);
             mLayer = a.getInt(R.styleable.PieChart_layer_depth, 3);
             mSliceMargin = a.getBoolean(R.styleable.PieChart_draw_slice_margin, false);
             mCenterText = a.getString(R.styleable.PieChart_center_text);
             numeratorColor = a.getColor(R.styleable.PieChart_numerator_color, Color.BLACK);
-            mLegendDirection = LegendDirections.LEFT_TO_RIGHT;
+            mLegendDirection = LegendDirections.LEFT_TO_RIGHT;//todo wenn die legende vertikal ist, klickt man kurz nach dem letzten element auf den chart, stürzt die app ab
         } finally {
-
             a.recycle();
         }
 
@@ -184,21 +164,10 @@ public class PieChart extends View {
 
         if (mDrawLegend) {
 
-            mNumeratorSize = dpToPx(20);
-
             mNumeratorPaint = new Paint();
             mNumeratorPaint.setAntiAlias(true);
             mNumeratorPaint.setStyle(Paint.Style.FILL);
             mNumeratorPaint.setColor(numeratorColor);
-
-            mNumeratorFontPaint = new TextPaint();
-            mNumeratorFontPaint.setAntiAlias(true);
-            mNumeratorFontPaint.setColor(Color.BLACK);
-            mNumeratorFontPaint.setTextSize(Math.round(mNumeratorSize * 0.3 * getResources().getDisplayMetrics().scaledDensity));
-
-            mNumeratorFontBounds = new Rect();
-
-            mNumeratorRect = new RectF(0, 0, mNumeratorSize, mNumeratorSize);
         }
 
         mSlicePaint = new Paint();
@@ -324,7 +293,24 @@ public class PieChart extends View {
         if (mCompressed)
             createCompressedSlices(getTotal(pieData));
 
+        createLegendItems(getVisibleSlices());
         invalidate();
+    }
+
+    /**
+     * Methode um das Legendenelement mit LegendenItems zu befüllen
+     */
+    private void createLegendItems(List<PieSlice> visiblePieSlices) {
+        mLegend.clear();
+
+        for (PieSlice slice : visiblePieSlices) {
+            mLegend.addItem(
+                    slice.getLabel(),
+                    slice.getColor(),
+                    mNumeratorStyle,
+                    slice.getId()
+            );
+        }
     }
 
     /**
@@ -371,36 +357,6 @@ public class PieChart extends View {
     private float getPieArea(float total, float dataValue) {
 
         return dataValue / total * 360f;
-    }
-
-    /**
-     * Methode um einer Liste von PieSlices die passenden Gewichte zuzuordnen
-     */
-    private List<PieSlice> assignWeightsToSlices(List<PieSlice> pieSlices) {
-
-        float tempTotal = 0;
-        int currentLayer = mLayer;
-        for (PieSlice slice : pieSlices) {
-
-            if (slice.getAbsValue() + tempTotal <= mDataTotal * Math.pow(0.33, currentLayer - 1))
-                slice.setWeight(currentLayer);
-            else
-                slice.setWeight(--currentLayer);
-
-            addSliceToLayer(slice);
-            tempTotal += slice.getAbsValue();
-        }
-
-        return pieSlices;
-    }
-
-    /**
-     * Methode um ein gewogenes slice in das richtige Datenlayer zu packen.
-     *
-     * @param slice Slice, welches einsortiert werden soll.
-     */
-    private void addSliceToLayer(PieSlice slice) {
-        mPieData.get(slice.getWeight()).add(slice);
     }
 
     /**
@@ -452,23 +408,10 @@ public class PieChart extends View {
                 PieSlice slice = new PieSlice(tempTotal - currentTotal, getPieArea(tempTotal, tempTotal - currentTotal), startAngle);
                 slice.setSliceLabel(getResources().getString(R.string.others));
                 layerSlicesList.add(slice);
-                //insertOthersPlaceholder(layerSlicesList);
             }
 
             tempTotal -= currentTotal;
         }
-    }
-
-    /**
-     * Methode um einen Platzhalten in die Liste der Slice einzufügen,
-     * welcher die momentan nicht sichtbaren Slices enthält
-     */
-    private void insertOthersPlaceholder(List<PieSlice> layerSlicesList) {
-/*
-        PieSlice slice = new PieSlice(tempTotal - currentTotal, getPieArea(tempTotal, tempTotal - currentTotal), startAngle);
-        slice.setSliceLabel(getResources().getString(R.string.others));
-        layerSlicesList.add(slice);
-        */
     }
 
     /**
@@ -500,33 +443,6 @@ public class PieChart extends View {
     }
 
     /**
-     * Methode um den Minimalen Platz der Legende in pixeln zu ermitteln
-     *
-     * @return Legendenbounds
-     */
-    private Rect getLegendDesiredSize() {
-        if (mPieData.isEmpty())
-            return new Rect();
-
-        int width = 0, height = 0;
-        for (PieSlice slice : getVisibleSlices()) {
-
-            Rect textSize = getTextBounds(slice.getLabel(), mLegendFontSize);
-            if (mLegendDirection.equals(LegendDirections.LEFT_TO_RIGHT)) {
-
-                width += mNumeratorSize + textSize.width() + mNumeratorItemOffset;
-                height = (int) Math.max(textSize.height(), mNumeratorSize) + mNumeratorChartPadding;
-            } else {
-
-                width = (int) mNumeratorSize + textSize.width() + mNumeratorChartPadding;
-                height += Math.max(mNumeratorSize, textSize.height()) + mNumeratorItemOffset;
-            }
-        }
-
-        return new Rect(0, 0, width, height);
-    }
-
-    /**
      * Methode um die größe der View zu ermitteln
      *
      * @param widthMeasureSpec  Breiteninformationen
@@ -535,7 +451,6 @@ public class PieChart extends View {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         setMaxViewBounds(widthMeasureSpec, heightMeasureSpec);
-        fillLegend();
 
         //padding von der maximalen größe abziehen
         int widthPadding = getPaddingRight() + getPaddingLeft();
@@ -563,12 +478,12 @@ public class PieChart extends View {
         mViewBounds.set(0, 0, 0, 0);
         if (isLegendBottom() || isLegendTop()) {
 
-            mViewBounds.right = reconcileSize(Math.max(getChartDesiredSize().width(), getLegendDesiredSize().width()), widthMeasureSpec);
-            mViewBounds.bottom = reconcileSize(getChartDesiredSize().height() + getLegendDesiredSize().height(), heightMeasureSpec);
+            mViewBounds.right = reconcileSize(Math.max(getChartDesiredSize().width(), mLegend.getDesiredSize().width()), widthMeasureSpec);
+            mViewBounds.bottom = reconcileSize(getChartDesiredSize().height() + mLegend.getDesiredSize().height(), heightMeasureSpec);
         } else {
 
-            mViewBounds.right = reconcileSize(getChartDesiredSize().width() + getLegendDesiredSize().width(), widthMeasureSpec);
-            mViewBounds.bottom = reconcileSize(Math.max(getChartDesiredSize().height(), getLegendDesiredSize().height()), heightMeasureSpec);
+            mViewBounds.right = reconcileSize(getChartDesiredSize().width() + mLegend.getDesiredSize().width(), widthMeasureSpec);
+            mViewBounds.bottom = reconcileSize(Math.max(getChartDesiredSize().height(), mLegend.getDesiredSize().height()), heightMeasureSpec);
         }
     }
 
@@ -584,55 +499,16 @@ public class PieChart extends View {
      */
     private void resolveLegendSize(Rect availableSpace, int minChartSize) {
         Rect availableLegendSpace = getAvailableLegendSpace(availableSpace, minChartSize);
-        mLegendBounds.setEmpty();
 
-        if (mPieData.isEmpty())
-            return;
-
-        for (int i = 0; i < 2; i++) {
-            if (i > 0)
-                mDrawLegendLabels = false;
-
-            for (PieSlice slice : getVisibleSlices()) {
-                Rect textBounds = getTextBounds(slice.getLabel(), mLegendFontSize);
-
-                if (mLegendDirection.equals(LegendDirections.LEFT_TO_RIGHT)) {
-
-                    mLegendBounds.right += i == 0 ? textBounds.width() + mNumeratorSize + mNumeratorItemOffset : mNumeratorSize + mNumeratorItemOffset;
-                    mLegendBounds.bottom = Math.max(textBounds.height(), (int) mNumeratorSize) + mNumeratorChartPadding;
-                } else {
-
-                    mLegendBounds.right = i == 0 ? textBounds.width() + (int) mNumeratorSize + mNumeratorChartPadding : (int) mNumeratorSize + mNumeratorChartPadding;
-                    mLegendBounds.bottom += Math.max(textBounds.height(), mNumeratorSize) + mNumeratorItemOffset;
-                }
-            }
-
-            if (availableLegendSpace.contains(mLegendBounds))
-                return;
-
-            mLegendBounds.setEmpty();
-        }
-    }
-
-    /**
-     * Methode um das Legendenelement mit LegendenItems zu befüllen
-     */
-    private void fillLegend() {
-
-        for (PieSlice slice : getVisibleSlices()) {
-
-            Rect textBounds = getTextBounds(slice.getLabel(), mLegendFontSize);
-            int width = (int) mNumeratorSize + textBounds.width();
-            int height = (int) Math.max(mNumeratorSize, textBounds.height());
-            Rect bounds = new Rect(0, 0, width, height);
-
-            LegendItem legendItem = new LegendItem(
-                    slice.getLabel(),
-                    slice.getColor(),
-                    mNumeratorStyle);
-            legendItem.setBounds(bounds);
-
-            mLegend.addItem(legendItem);
+        if (availableLegendSpace.contains(mLegend.getDesiredSize())) {
+            mLegendBounds = mLegend.getDesiredSize();
+            mDrawLegendLabels = true;
+        } else if (availableLegendSpace.contains(mLegend.getMinimumSize())) {
+            mLegendBounds = mLegend.getMinimumSize();
+            mDrawLegendLabels = false;
+        } else {
+            mLegendBounds = new Rect();
+            mDrawLegendLabels = false;
         }
     }
 
@@ -879,7 +755,7 @@ public class PieChart extends View {
         if (mDrawHole)
             drawHole(canvas);
 
-        if (mDrawLegend)
+        if (!isLegendHidden())
             drawLegend(canvas);
 
         if (mDrawCenterText)
@@ -929,50 +805,26 @@ public class PieChart extends View {
      *
      * @param canvas Canvas auf dem die Legende sichtbar sein soll
      */
-    private void drawLegend2(Canvas canvas) {
+    private void drawLegend(Canvas canvas) {
         if (isLegendHidden())
             return;
 
-        for (PieSlice slice : getVisibleSlices()) {
-            drawLegendItem(canvas, slice);
+        for (LegendItem legendItem : mLegend.getLegendItems()) {
+            drawLegendItem(canvas, legendItem);
         }
     }
 
     /**
      * Methode um ein einzelnes Legendenelement zu zeichnen.
      *
-     * @param canvas Canvas auf dem das Legendelement sichtbar sein soll
-     * @param slice  PieSlice, welcher angezeigt weden soll
+     * @param canvas     Canvas auf dem das Legendelement sichtbar sein soll
+     * @param legendItem Legendenelement, welches auf die Canvas gezeichnet werden soll
      */
-    private void drawLegendItem(Canvas canvas, PieSlice slice) {
+    private void drawLegendItem(Canvas canvas, LegendItem legendItem) {
 
-        drawLegendItemIcon(canvas, slice);
+        canvas.drawRect(legendItem.getNumeratorBounds(), legendItem.getNumeratorPaint());
         if (mDrawLegendLabels)
-            drawLegendLabel(canvas, slice.getLabel());
-    }
-
-    /**
-     * Methode um die Legende zu zeichnen
-     *
-     * @param canvas Canvas Objekt auf dem die Legende gezeichnet werden soll
-     *               todo legende in die richtige richtung (mLegendDirection) zeichnen
-     */
-    private void drawLegend(Canvas canvas) {
-        if (isLegendHidden())
-            return;
-
-        for (PieSlice slice : getVisibleSlices()) {
-            drawLegendItemIcon(canvas, slice);
-
-            if (mDrawLegendLabels)
-                drawLegendLabel(canvas, slice.getLabel());
-
-
-            mNumeratorRect.left += mNumeratorItemOffset;
-            mNumeratorRect.right += mNumeratorItemOffset;
-        }
-
-        mNumeratorRect.set(0, 0, mNumeratorSize, mNumeratorSize);
+            canvas.drawText(legendItem.getLabel(), legendItem.getLabelX(), legendItem.getLabelY(), legendItem.getLabelPaint());
     }
 
     /**
@@ -982,60 +834,7 @@ public class PieChart extends View {
      * @return Boolean
      */
     private boolean isLegendHidden() {
-
-        return mLegendBounds.isEmpty();
-    }
-
-    /**
-     * Methode um die Icons der Legendenelemente auf eine canvas zu zeichnen.
-     *
-     * @param canvas Hauptcanvas
-     */
-    private void drawLegendItemIcon(Canvas canvas, PieSlice slice) {
-        mNumeratorPaint.setColor(slice.getColor());
-
-        switch (mNumeratorStyle) {
-
-            case CIRCLE:
-                canvas.drawCircle(
-                        mNumeratorRect.centerX(),
-                        mNumeratorRect.centerY(),
-                        mNumeratorSize / 2,
-                        mNumeratorPaint);
-                break;
-
-            case SQUARE:
-                canvas.drawRect(mNumeratorRect, mNumeratorPaint);
-                break;
-        }
-
-        if (mLegendDirection == LegendDirections.LEFT_TO_RIGHT) {
-
-            mNumeratorRect.left += mNumeratorSize;
-            mNumeratorRect.right += mNumeratorSize;
-        } else {
-
-            mNumeratorRect.top += mNumeratorSize;
-            mNumeratorRect.bottom += mNumeratorSize;
-        }
-    }
-
-    /**
-     * Methode um ein einzelnes Label auf einer Canvas zu zeichnen
-     *
-     * @param canvas Canvas auf der das Label angezeigt werden soll
-     * @param label  Text der angezezeigt werden soll
-     */
-    private void drawLegendLabel(Canvas canvas, String label) {
-        mNumeratorFontPaint.getTextBounds(label, 0, label.length(), mNumeratorFontBounds);
-
-        if (true) {
-
-            canvas.drawText(label, mNumeratorRect.right, mNumeratorRect.bottom, mNumeratorFontPaint);
-        } else {
-
-            //canvas.drawText(label, );
-        }
+        return mLegendBounds.isEmpty() || !mDrawLegend;
     }
 
     //ab hier werden klick Ereignisse behandelt
@@ -1056,7 +855,7 @@ public class PieChart extends View {
         //User nimmt den Finger vom Display
         if (event.getAction() == MotionEvent.ACTION_UP) {
 
-            switch (clickableArea(click)) {
+            switch (clickedArea(click)) {
 
                 case 0://PieChart
                     Log.d(TAG, "onTouchEvent: Du hast den PieChart angeklickt!");
@@ -1069,31 +868,21 @@ public class PieChart extends View {
 
                             Log.d(TAG, "Du bist auf Ebene " + mVisibleLayer + " und hast gerade in den Bereich mit dem Wert " + slice.getAbsValue() + " geklickt!");
 
-                            if (slice.getWeight() != mVisibleLayer && mCompressed)
+                            if (slice.getWeight() != mVisibleLayer && mCompressed) {
                                 mVisibleLayer++;
+                                createLegendItems(getVisibleSlices());
+                            }
                             break;
                         }
                     }
                     break;
                 case 1://Legend
-                    Log.d(TAG, "onTouchEvent: du hast die Legende angeklickt");
+                    LegendItem item = mLegend.getItemForPoint(click);
+                    PieSlice slice = getSliceWithId(item.getSliceId());
+                    Log.d(TAG, "Du hast auf das Legendenelement " + item.getLabel() + " geklickt!");
 
-                    int counterRight = 0, counterLeft;
+                    fadeSliceInOut(slice);
 
-                    for (PieSlice slice : getVisibleSlices()) {
-
-                        mNumeratorFontPaint.getTextBounds(slice.getLabel(), 0, slice.getLabel().length(), mNumeratorFontBounds);
-
-                        counterRight += mNumeratorFontBounds.right + mNumeratorSize;
-                        counterLeft = counterRight - (mNumeratorFontBounds.width() + (int) mNumeratorSize);
-
-                        if (click.x >= counterLeft && click.x <= counterRight) {
-
-                            Log.d(TAG, "In der Legende hast du auf das Element mit dem Wert " + slice.getAbsValue() + " geklickt!");
-                            fadeSliceInOut(slice);
-                            break;
-                        }
-                    }
                     break;
                 default://nothing
                     break;
@@ -1105,12 +894,26 @@ public class PieChart extends View {
     }
 
     /**
+     * Methode die einen PieSlice aus den aktuell sichtbaren PieSlices mit einer bestimmten id holt
+     *
+     * @param sliceId Id des zu findenden slices
+     * @return PieSlice mit der angegebenen Id oder null, falls keiner existiert
+     */
+    private PieSlice getSliceWithId(String sliceId) {
+        for (PieSlice slice : getVisibleSlices()) {
+            if (slice.getId().equals(sliceId))
+                return slice;
+        }
+        return null;
+    }
+
+    /**
      * Methode gibt einen code für den angeklickten Punkt zurück
      *
      * @param click Punkt auf den gecklickt wurde
      * @return 0 wenn auf den PieChart geklickt wurde, 1 wenn auf die Legende geklickt wurde, -1 wenn "nichts" angeklickt wurde
      */
-    private int clickableArea(Point click) {
+    private int clickedArea(Point click) {
 
         if (mDrawHole && Math.sqrt(Math.pow((mPieChartBounds.centerX() - click.x), 2) + Math.pow((mPieChartBounds.centerY() - click.y), 2)) <= mHoleRadius)
             return -1;//hole click
