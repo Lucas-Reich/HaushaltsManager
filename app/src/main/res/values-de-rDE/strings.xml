@@ -101,4 +101,6 @@
     <string name="deleted_account">Konto wurde gelöscht.</string>
     <string name="choose_category">Wählen Sie eine Kategorie aus</string>
     <string name="changed_main_account">" ist nun das Hauptkonto"</string>
+    <string name="most_bookings_in">Die meisten Ausgaben in</string>
+    <string name="no_expenses">Keine Ausgaben</string>
 </resources>

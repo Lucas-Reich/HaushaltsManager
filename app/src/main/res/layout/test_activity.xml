@@ -16,4 +16,14 @@
         app:use_compressed="true"
         app:use_legend="true"/>
 
+    <com.example.lucas.haushaltsmanager.Views.PieChart.PieChart
+        android:id="@+id/test_chart_2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <com.example.lucas.haushaltsmanager.Views.PieChart.PieChart
+        android:id="@+id/test_chart_3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
 </LinearLayout>

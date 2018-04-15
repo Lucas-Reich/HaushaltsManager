@@ -70,7 +70,7 @@
     <string name="outgoing">Outgoing</string>
     <string name="update">Update</string>
     <string name="add_child_to_booking">Create Child Booking</string>
-    <string name="choose_currency">Select the accounts currency</string>
+    <string name="choose_currency">Select the accounts mCurrency</string>
     <string name="create_new_account_name">Accountname</string>
     <string name="create_new_account_starting_balance">Start balance</string>
     <string name="create_new_account_create">Create Account</string>
@@ -108,4 +108,7 @@
     <string name="choose_category">Choose category</string>
     <string name="input_price">Input price</string>
     <string name="input_frequency">Input frequency</string>
+    <string name="most_bookings_in">Most Bookings in Category</string>
+    <string name="no_expenses">No Expenses</string>
+    <string name="no_bookings_in_month">No bookings this month</string>
 </resources>

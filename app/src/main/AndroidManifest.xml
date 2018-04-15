@@ -48,7 +48,7 @@
             android:label="CreateNewCategory"
             android:parentActivityName=".Activities.MainTab.TabParentActivity"/>
         <activity
-            android:name=".Activities.TestPieChart"
+            android:name=".Activities.TestActivity"
             android:label="TestPieChart"
             android:parentActivityName=".Activities.MainTab.TabParentActivity"/>
         <activity

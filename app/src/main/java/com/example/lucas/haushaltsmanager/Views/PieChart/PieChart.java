@@ -14,6 +14,7 @@ import android.graphics.Typeface;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -125,10 +126,9 @@ public class PieChart extends View {
         int holeColor;
         int numeratorColor;
 
-        mNoDataText = getResources().getString(R.string.no_data);
         try {
             mDrawHole = a.getBoolean(R.styleable.PieChart_draw_hole, false);
-            mHoleSize = a.getInteger(R.styleable.PieChart_hole_size, 50);
+            mHoleSize = a.getInteger(R.styleable.PieChart_hole_size, 50);//todo hole size kann nur zwischen 1 und 100 liegen, wenn andere werte angegeben werden sollte eine Exception (InvalidArgumentException) geworfen werden
             holeColor = a.getColor(R.styleable.PieChart_hole_color, Color.WHITE);
             mNoDataText = a.getString(R.styleable.PieChart_no_data_text);
             mLegendPosition = LegendPositions.TOP_LEFT;//todo legende kann noch nicht rechts platziert werden
@@ -170,6 +170,9 @@ public class PieChart extends View {
             mNumeratorPaint.setColor(numeratorColor);
         }
 
+        if(mNoDataText == null)
+            mNoDataText = getResources().getString(R.string.no_data);
+
         mSlicePaint = new Paint();
         mSlicePaint.setAntiAlias(true);
         mSlicePaint.setDither(true);
@@ -181,20 +184,19 @@ public class PieChart extends View {
 
         mFontPaint = new Paint();
         mFontPaint.setAntiAlias(true);
-        mFontPaint.setColor(Color.RED);
+        mFontPaint.setColor(getContext().getResources().getColor(R.color.alert_text_color));
         mFontPaint.setTextSize(mFontSize);
 
         mLegend = new Legend(mLegendDirection);
     }
 
     public void setHoleColor(@ColorInt int color) {
-
-        this.mHolePaint.setColor(color);
+        mHolePaint.setColor(color);
     }
 
     public int getHoleColor() {
 
-        return this.mHolePaint.getColor();
+        return mHolePaint.getColor();
     }
 
     public void useCompressedChart(boolean value) {
@@ -205,23 +207,19 @@ public class PieChart extends View {
     }
 
     public boolean isCompressed() {
-
         return this.mCompressed;
     }
 
     public boolean isHoleEnabled() {
-
         return mDrawHole;
     }
 
     public void setNumeratorColor(@ColorInt int color) {
-
-        this.mNumeratorPaint.setColor(color);
+        mNumeratorPaint.setColor(color);
         invalidate();
     }
 
     public int getNumeratorColor() {
-
         return this.mNumeratorPaint.getColor();
     }
 
@@ -236,39 +234,36 @@ public class PieChart extends View {
     }
 
     public void setCenterText(@NonNull String centerText) {
-
         mCenterText = centerText;
     }
 
     @NonNull
     public String getCenterText() {
-
         return mCenterText;
     }
 
     public void enableCenterText() {
-
         mDrawCenterText = true;
     }
 
     public void disableCenterText() {
-
         mDrawCenterText = false;
     }
 
     public boolean isCenterTextDrawingEnabled() {
-
         return mDrawCenterText;
     }
 
     public void setCenterTextColor(@ColorInt int textColor) {
-
         mFontPaint.setColor(textColor);
     }
 
     public void setNoDataText(@NonNull String noDataText) {
-
         mNoDataText = noDataText;
+    }
+
+    public void setNoDataText(@StringRes int noDataText) {
+        mNoDataText = getContext().getResources().getString(noDataText);
     }
 
 
@@ -793,7 +788,7 @@ public class PieChart extends View {
      *
      * @param canvas        Canvas auf der der Text angezeigt wird
      * @param displayString Text der angezeigt werden soll
-     */
+     *///todo Der angezeigte Text muss sich dem verfügbaren Platz anpassen (Zeilenumbruch)
     private void drawCenterText(Canvas canvas, String displayString) {
 
         Rect textBounds = getTextBounds(displayString, mFontSize);

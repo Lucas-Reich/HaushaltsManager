@@ -36,8 +36,7 @@ import com.example.lucas.haushaltsmanager.Dialogs.ChangeAccounts.ChooseAccountsD
 import com.example.lucas.haushaltsmanager.MockDataCreator;
 import com.example.lucas.haushaltsmanager.MyAlarmReceiver;
 import com.example.lucas.haushaltsmanager.R;
-import com.example.lucas.haushaltsmanager.Services.GetExchangeRatesService;
-import com.example.lucas.haushaltsmanager.Activities.TestPieChart;
+import com.example.lucas.haushaltsmanager.Activities.TestActivity;
 
 public class TabParentActivity extends AppCompatActivity implements ChooseAccountsDialogFragment.OnSelectedAccount, BasicTextInputDialog.BasicDialogCommunicator {
 
@@ -153,7 +152,7 @@ public class TabParentActivity extends AppCompatActivity implements ChooseAccoun
                         break;
                     case R.id.about:
 
-                        Intent testPieIntent = new Intent(TabParentActivity.this, TestPieChart.class);//todo replace
+                        Intent testPieIntent = new Intent(TabParentActivity.this, TestActivity.class);//todo replace
                         TabParentActivity.this.startActivity(testPieIntent);
                         break;
                 }

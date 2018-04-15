@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ChooseAccountsDialogFragment extends DialogFragment implements AdapterView.OnItemClickListener, AccountAdapter.OnDeleteAccountSelected {
-
     String TAG = ChooseAccountsDialogFragment.class.getSimpleName();
 
     ExpensesDataSource mDatabase;
@@ -211,6 +210,8 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Adap
     public void onStop() {
         super.onStop();
 
+        //todo Wenn Konten an oder abgewählt wurden und der User neben den Dialog tippt und sich das Fenster somit schließt müssen auch alle änderungen
+        // die der User gemacht hat wieder rückgängig gemacht werden (ausgenommen delete und set main account)
         mDatabase.close();
     }
 }
