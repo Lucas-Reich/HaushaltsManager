@@ -18,8 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
-
-    private String TAG = ExpandableListAdapter.class.getSimpleName();
+    private static String TAG = ExpandableListAdapter.class.getSimpleName();
 
     private Context mContext;
     private List<ExpenseObject> mGroupData;

@@ -181,7 +181,7 @@ public class TabOneBookings extends Fragment {
                 //get expense
                 ExpenseObject expense = (ExpenseObject) mListAdapter.getGroup(groupPosition);
 
-                //if the user clicks on date divider nothing should happen
+                //todo wenn man auf den date divider klickt sieht man immer noch eine klickt animation
                 if (expense.getExpenseType() == ExpenseObject.EXPENSE_TYPES.DATE_PLACEHOLDER)
                     return true;
 
@@ -262,6 +262,7 @@ public class TabOneBookings extends Fragment {
                 if (ExpandableListView.getPackedPositionType(id) == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
 
                     ExpenseObject expense = mListAdapter.getExpense(groupPosition);
+                    //todo wenn auf eine Zusammengefügte buchung geklickt wurde sollen die Fab optionen 'lösche' und 'füge kind buchung hinzu' erscheinen
 
                     if (expense.isValidExpense()) {
 
@@ -276,7 +277,7 @@ public class TabOneBookings extends Fragment {
                     return false;
                 } else if (ExpandableListView.getPackedPositionType(id) == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
 
-                    //if long click is on child element
+                    //TODO öffne den fab und zeige die optionen 'löschen' und 'extrahiere als normale buchung' an
                     Toast.makeText(getContext(), "CHILD", Toast.LENGTH_SHORT).show();
                     return true;
                 }
@@ -383,6 +384,7 @@ public class TabOneBookings extends Fragment {
     /**
      * animating the FloatingActionButtons
      * todo die ganzen animations methoden noch einmal neu schreiben da ich mit den aktuellen nicht zufrieden bin
+     * eventuell eine neue FAB view erstellen, welche die funktionalitäten beinhaltet
      *
      * @param selectedCount number of selected entries
      */
@@ -492,6 +494,11 @@ public class TabOneBookings extends Fragment {
         }
     }
 
+    /**
+     * Methode um einer kombinierten Buchung einen Titel zu geben
+     *
+     * @param title Titel der zusammengefügten Buchung
+     */
     public void onCombinedTitleSelected(String title) {
 
         ExpenseObject parentBooking = mDatabase.createChildBooking(mListAdapter.getSelectedGroupData());
@@ -504,5 +511,4 @@ public class TabOneBookings extends Fragment {
         updateExpListView();
         animateFabs(mListAdapter.getSelectedCount());
     }
-
 }
