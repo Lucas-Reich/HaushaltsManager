@@ -111,12 +111,11 @@
                     android:layout_marginBottom="3dp">
 
                     <TextView
-                        android:id="@+id/monthly_item_most_expenses"
+                        android:id="@+id/monthly_item_most_expenses_in"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="TextView"
-                        android:textColor="@color/secondary_text_color"
-                        tools:text="@string/most_bookings_in"/>
+                        android:text="@string/most_bookings_in"
+                        android:textColor="@color/secondary_text_color"/>
                 </TableRow>
 
                 <TableRow

@@ -78,9 +78,9 @@ public class MonthlyReportAdapter extends RecyclerView.Adapter<MonthlyReportAdap
             holder.categoryColor.setCircleDiameter(20);
             holder.categoryColor.setCenterText("");
             holder.categoryColor.setCircleColor("#000000");
-            holder.categoryColor.setCircleColor(report.getMostStressedCategory().getColor());//todo auf dem telefon bringt dieser teil die app zum abstürzen
+            holder.categoryColor.setCircleColor(report.getMostStressedCategory().getColor());
 
-            holder.stressedCategory.setText(report.getMostStressedCategory().getName());//todo siehe erstes todo
+            holder.stressedCategory.setText(report.getMostStressedCategory().getName());
             holder.stressedCategory.setText(mContext.getResources().getString(R.string.category));
         }
 

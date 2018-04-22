@@ -107,19 +107,10 @@ public class TabParentActivity extends AppCompatActivity implements ChooseAccoun
 
                 switch (item.getItemId()) {
 
-                    case R.id.desktop:
-
-                        //do smth
-                        break;
                     case R.id.categories:
 
                         Intent categoryIntent = new Intent(TabParentActivity.this, CategoryListActivity.class);
                         TabParentActivity.this.startActivity(categoryIntent);
-                        break;
-                    case R.id.templates:
-
-                        Intent templateIntent = new Intent(TabParentActivity.this, TemplatesActivity.class);
-                        TabParentActivity.this.startActivity(templateIntent);
                         break;
                     case R.id.course:
 
@@ -275,6 +266,7 @@ public class TabParentActivity extends AppCompatActivity implements ChooseAccoun
 
         int visibleTabPosition = mTabLayout.getSelectedTabPosition();
         Fragment fragment = getSupportFragmentManager().findFragmentByTag("android:switcher:" + mViewPager.getId() + ":" + visibleTabPosition);
+        //todo wenn in einem Tab die Ausgaben angepasst werden (konto wird an oder abgewählt), dann nehmen die anderen tabs diese aänderung nicht mit an
 
         if (fragment != null) {
 

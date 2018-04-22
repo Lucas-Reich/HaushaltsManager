@@ -19,17 +19,9 @@
         android:title="@string/left_slider_transfers"/>
     <group>
         <item
-            android:id="@+id/desktop"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="@string/left_slider_desktop"/>
-        <item
             android:id="@+id/categories"
             android:icon="@drawable/ic_menu_camera"
             android:title="@string/left_slider_categories"/>
-        <item
-            android:id="@+id/templates"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="@string/left_slider_template"/>
     </group>
 
     <group>
