@@ -52,7 +52,7 @@
     <string name="expense_screen_amount_currency">€</string>
     <string name="expense_screen_recurring_end">Enddatum auswählen</string>
     <string name="expense_screen_recurring_frequency">Häufigkeit auswählen</string>
-    <string name="choose_account">Deine Konten</string>
+    <string name="choose_account">Klicke hier, um deine Konten anzuzeigen und zu bearbeiten</string>
     <string name="account">Konten</string>
     <string name="btn_new_acc">Neues Konto</string>
     <string name="no_name">(Unbenannt)</string>
@@ -103,4 +103,8 @@
     <string name="changed_main_account">" ist nun das Hauptkonto"</string>
     <string name="most_bookings_in">Die meisten Ausgaben in</string>
     <string name="no_expenses">Keine Ausgaben</string>
+    <string name="no_bookings_in_month">Keine Buchungen diesen Monat</string>
+    <string name="category">Kategorie</string>
+    <string name="input_price">Geben Sie den Preis ein</string>
+    <string name="input_frequency">Geben Sie die Häufigkeit ein</string>
 </resources>

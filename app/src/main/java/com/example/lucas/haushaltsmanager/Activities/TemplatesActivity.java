@@ -1,9 +1,13 @@
 package com.example.lucas.haushaltsmanager.Activities;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
@@ -13,26 +17,21 @@ import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 
-public class RecurringBookingsActivity extends AppCompatActivity {
-
-    private static final String TAG = RecurringBookingsActivity.class.getSimpleName();
+public class TemplatesActivity extends AppCompatActivity {
+    private static String TAG = TemplatesActivity.class.getSimpleName();
 
     ArrayList<ExpenseObject> mExpenses;
     ListView mListView;
-    Calendar mStartDate = Calendar.getInstance();
-    Calendar mEndDate = Calendar.getInstance();
-
-    ExpensesDataSource mDatabase;
-
     Toolbar mToolbar;
     ImageButton mBackArrow;
+
+    ExpensesDataSource mDatabase;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_recurring_bookings);
+        setContentView(R.layout.activity_template_bookings);
 
         mDatabase = new ExpensesDataSource(this);
         mDatabase.open();
@@ -47,8 +46,6 @@ public class RecurringBookingsActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        updateListView();
-
         mBackArrow.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -57,10 +54,23 @@ public class RecurringBookingsActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                //TODO wenn der user nicht vom ExpenseScreen kommt soll diese funktionalität nicht bestehen
+                Intent returnTemplateIntent = new Intent();
+                returnTemplateIntent.putExtra("templateObj", mExpenses.get(position));
+                setResult(Activity.RESULT_OK, returnTemplateIntent);
+                finish();
+            }
+        });
+        updateListView();
     }
 
     private void updateListView() {
-
         prepareListData();
 
         BookingAdapter bookingAdapter = new BookingAdapter(mExpenses, this);
@@ -72,20 +82,8 @@ public class RecurringBookingsActivity extends AppCompatActivity {
 
     private void prepareListData() {
 
-        mStartDate.set(mStartDate.get(Calendar.YEAR), mStartDate.get(Calendar.MONTH), 1);
-        mEndDate.set(mEndDate.get(Calendar.YEAR), mEndDate.get(Calendar.MONTH), mEndDate.getActualMaximum(Calendar.DAY_OF_MONTH));
-
-        mExpenses = mDatabase.getRecurringBookings(mStartDate, mEndDate);
-    }
-
-    public void setStartDate(long startInMills) {
-
-        this.mStartDate.setTimeInMillis(startInMills);
-    }
-
-    public void setEndDate(long endInMills) {
-
-        this.mEndDate.setTimeInMillis(endInMills);
+        Log.d(TAG, "prepareListData: Initialisiere Templateliste");
+        mExpenses = mDatabase.getTemplates();
     }
 
     @Override
@@ -98,7 +96,6 @@ public class RecurringBookingsActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
         mDatabase.close();
     }
 }

@@ -2,7 +2,6 @@ package com.example.lucas.haushaltsmanager.Views.PieChart;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -10,30 +9,24 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.Typeface;
-import android.support.annotation.ColorInt;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
+import android.support.annotation.*;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
 import com.example.lucas.haushaltsmanager.DataSet;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Views.PieChart.Legend.Legend;
 import com.example.lucas.haushaltsmanager.Views.PieChart.Legend.LegendItem;
+import com.example.lucas.haushaltsmanager.Views.ViewWrapper;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class PieChart extends View {
+public class PieChart extends ViewWrapper {
     private String TAG = PieChart.class.getSimpleName();
-
-    private RectF mViewBounds;
 
     private Legend mLegend;
     private boolean mDrawLegend;
@@ -115,7 +108,7 @@ public class PieChart extends View {
      *                     reference to a style resource that supplies default values for
      *                     the view. Can be 0 to not look for defaults.
      */
-    private void init(Context context, AttributeSet attrs, int defStyleAttr) {
+    protected void init(Context context, AttributeSet attrs, int defStyleAttr) {
 
         TypedArray a = context.getTheme().obtainStyledAttributes(
                 attrs,
@@ -170,7 +163,7 @@ public class PieChart extends View {
             mNumeratorPaint.setColor(numeratorColor);
         }
 
-        if(mNoDataText == null)
+        if (mNoDataText == null)
             mNoDataText = getResources().getString(R.string.no_data);
 
         mSlicePaint = new Paint();
@@ -644,71 +637,6 @@ public class PieChart extends View {
     private boolean isLegendRight() {
 
         return (mLegendPosition.equals(LegendPositions.TOP_RIGHT) || mLegendPosition.equals(LegendPositions.BOTTOM_RIGHT)) && mLegendDirection.equals(LegendDirections.TOP_TO_BOTTOM);
-    }
-
-    /**
-     * Methode um herauszufinden wie viel Platz maximal zur verfügung steht
-     *
-     * @param desiredSize Optimale Größe
-     * @param measureSpec Kombinierter Wert aus Platz und Layout verhalten
-     * @return Int
-     */
-    private int reconcileSize(int desiredSize, int measureSpec) {
-
-        int mode = MeasureSpec.getMode(measureSpec);
-        int sizeInPx = MeasureSpec.getSize(measureSpec);
-
-        switch (mode) {
-            case MeasureSpec.EXACTLY:
-                return sizeInPx;
-            case MeasureSpec.AT_MOST:
-                return Math.min(sizeInPx, desiredSize);
-            case MeasureSpec.UNSPECIFIED:
-                return desiredSize;
-            default:
-                return -1;
-        }
-    }
-
-    /**
-     * Methode um Pixel in DensityPixel umzuwandeln.
-     * source: https://stackoverflow.com/a/19953871/9376633
-     *
-     * @param px Zu konvertierende pixel
-     * @return In Dp konvertierte pixel
-     */
-    public int pxToDp(int px) {
-        return (int) (px / Resources.getSystem().getDisplayMetrics().density);
-    }
-
-    /**
-     * Methode um DensityPixel in Pixel umzuwandeln.
-     * source: https://stackoverflow.com/a/19953871/9376633
-     *
-     * @param dp Zu konvertierende dp
-     * @return In px konvertierte dp
-     */
-    public static int dpToPx(int dp) {
-        return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
-    }
-
-    /**
-     * Methode den von einem String eingenommenen Platz zu ermitteln
-     * source: https://stackoverflow.com/a/4795393
-     *
-     * @param text Text dessen Größe bestimmt werden soll
-     * @return Textgröße in einem Rect gespeichert
-     */
-    private Rect getTextBounds(String text, float textSize) {
-
-        Rect textBounds = new Rect();
-
-        Paint paint = new Paint();
-        paint.setTypeface(Typeface.DEFAULT);
-        paint.setTextSize(textSize);
-        paint.getTextBounds(text, 0, text.length(), textBounds);
-
-        return textBounds;
     }
 
     //ab hier werden visuelle sachen behandelt

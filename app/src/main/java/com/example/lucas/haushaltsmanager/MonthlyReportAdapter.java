@@ -1,6 +1,7 @@
 package com.example.lucas.haushaltsmanager;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -67,10 +68,21 @@ public class MonthlyReportAdapter extends RecyclerView.Adapter<MonthlyReportAdap
         else
             holder.totalBookings.setText(String.format("%s %s", report.countBookings(), mContext.getResources().getString(R.string.month_report_bookings)));
         holder.accountCurrency.setText(report.getCurrency());
-        holder.stressedCategory.setText(report.getMostStressedCategory().getName());
 
-        holder.categoryColor.setCenterText("");
-        holder.categoryColor.setCircleColor(report.getMostStressedCategory().getColor());
+        if (report.countBookings() == 0) {
+            holder.categoryColor.setVisibility(View.GONE);
+
+            holder.stressedCategory.setText(report.getMostStressedCategory().getName());
+            holder.stressedCategory.setTextColor(Color.RED);
+        } else {
+            holder.categoryColor.setCircleDiameter(20);
+            holder.categoryColor.setCenterText("");
+            holder.categoryColor.setCircleColor("#000000");
+            holder.categoryColor.setCircleColor(report.getMostStressedCategory().getColor());//todo auf dem telefon bringt dieser teil die app zum abstürzen
+
+            holder.stressedCategory.setText(report.getMostStressedCategory().getName());//todo siehe erstes todo
+            holder.stressedCategory.setText(mContext.getResources().getString(R.string.category));
+        }
 
         holder.pieChart.setPieData(preparePieData(report));
         holder.pieChart.setNoDataText(R.string.no_bookings_in_month);

@@ -16,7 +16,10 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal"
-            android:padding="5dp">
+            android:paddingBottom="5dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="5dp"
+            android:paddingTop="5dp">
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -26,7 +29,8 @@
 
                 <TableRow
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="7dp">
 
                     <TextView
                         android:id="@+id/monthly_item_month"
@@ -40,7 +44,8 @@
 
                 <TableRow
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="3dp">
 
                     <TextView
                         android:id="@+id/monthly_item_inbound"
@@ -89,7 +94,8 @@
 
                 <TableRow
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="3dp">
 
                     <TextView
                         android:id="@+id/monthly_item_total_bookings"
@@ -101,7 +107,8 @@
 
                 <TableRow
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="3dp">
 
                     <TextView
                         android:id="@+id/monthly_item_most_expenses"
@@ -119,7 +126,8 @@
                     <com.example.lucas.haushaltsmanager.Views.RoundedTextView
                         android:id="@+id/monthly_item_category_color"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="10dp"/>
 
                     <TextView
                         android:id="@+id/monthly_item_most_stressed_category"

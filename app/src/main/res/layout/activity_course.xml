@@ -5,6 +5,11 @@
               android:layout_height="match_parent">
 
     <include
+        layout="@layout/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <include
         layout="@layout/activity_test_exp_listview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

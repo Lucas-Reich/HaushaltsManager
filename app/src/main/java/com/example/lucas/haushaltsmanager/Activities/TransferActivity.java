@@ -2,14 +2,21 @@ package com.example.lucas.haushaltsmanager.Activities;
 
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.annotation.StringRes;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
 import com.example.lucas.haushaltsmanager.Dialogs.AccountPickerDialog;
@@ -31,12 +38,15 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
     private ExpensesDataSource mDatabase;
     private Account mFromAccount, mToAccount;
     private Calendar mCalendar;
+    private Toolbar mToolbar;
+    private ImageButton mBackArrow;
 
     //Ausgabe
     private ExpenseObject mFromExpense;
     //Einnahme
     private ExpenseObject mToExpense;
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,6 +69,9 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
         mCreateTransferBtn = (Button) findViewById(R.id.transfer_create_btn);
         mAmountBtn = (Button) findViewById(R.id.transfer_amount_btn);
 
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        mBackArrow = (ImageButton) findViewById(R.id.back_arrow);
+
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
 
@@ -70,6 +83,18 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
     @Override
     protected void onStart() {
         super.onStart();
+
+        mBackArrow.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                finish();
+            }
+        });
+
+        mToolbar.setTitle("");
+        setSupportActionBar(mToolbar);
 
         mAmountBtn.setHint(R.string.placeholder_amount);
         mAmountBtn.setOnClickListener(new View.OnClickListener() {
@@ -160,6 +185,39 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
     }
 
     /**
+     * Methode um der Toolbar ein Menü hinzuzufügen.
+     *
+     * @param menu Menü
+     * @return boolean
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        //getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+
+        return true;
+    }
+
+    /**
+     * Methode um eine funktion auszulösen, wenn auf eine Menüelemente im Toolbar geklickt wurde.
+     *
+     * @param item MenuItem auf welches geklickt wurde
+     * @return boolean
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+/*
+        switch (item.getItemId()) {
+            case R.id.toolbar_first:
+                Toast.makeText(this, "Hello World!", Toast.LENGTH_SHORT).show();
+                break;
+            default:
+                break;
+        }
+*/
+        return true;
+    }
+
+    /**
      * Methode um einen Fehlerdialog anzeigen zu lassen, der den User informiert, dass noch eine Eingabe fehlt, oder die Konten gleich sind.
      *
      * @param message Message id
@@ -210,18 +268,6 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
         return DateFormat.getDateInstance(DateFormat.SHORT).format(new Date(calendar.getTimeInMillis()));
     }
 
-    @Override
-    public void onAccountSelected(Account account, String tag) {
-
-        if (tag.equals("transfers_from_account")) {
-
-            setFromAccount(account);
-        } else if (tag.equals("transfers_to_account")) {
-
-            setToAccount(account);
-        }
-    }
-
     /**
      * Methode um das Ausgehende Konto zu setzen
      *
@@ -234,6 +280,24 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
         mFromAccountBtn.setText(mFromAccount.getName());
 
         Log.d(TAG, "selected " + mFromAccount.getName() + " as from account");
+    }
+
+    /**
+     * Methode, welche den callback des AccountPickerDialogs implementiert.
+     *
+     * @param account Konto, welches vom User gewählt wurde
+     * @param tag     Tag, welches bei der Dialogerstellung mit gesendet wurde
+     */
+    @Override
+    public void onAccountSelected(Account account, String tag) {
+
+        if (tag.equals("transfers_from_account")) {
+
+            setFromAccount(account);
+        } else if (tag.equals("transfers_to_account")) {
+
+            setToAccount(account);
+        }
     }
 
     /**
@@ -250,6 +314,12 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
         Log.d(TAG, "selected " + mToAccount.getName() + " as to account");
     }
 
+    /**
+     * Methode, welche den callback des DatePickerDialogs implementiert.
+     *
+     * @param date Datum, welches vom User ausgewählt wurde
+     * @param tag  Tag, welches bei der Dialogerstellung mit gesendet wurde
+     */
     @Override
     public void onDateSelected(Calendar date, String tag) {
 
@@ -262,6 +332,12 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
         }
     }
 
+    /**
+     * Methode, welche den callback des PriceInputDialogs implementiert.
+     *
+     * @param price Preis, der vom User eingegeben wurde
+     * @param tag   Tag, welches bei der Dialogerstellung mit gesendet wurde
+     */
     @Override
     public void onPriceSelected(double price, String tag) {
 
@@ -273,7 +349,7 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
             mToExpense.setPrice(price);
             mToExpense.setExpenditure(false);
 
-            mAmountBtn.setText(String.format(this.getResources().getConfiguration().locale,"%.2f", mFromExpense.getUnsignedPrice()));
+            mAmountBtn.setText(String.format(this.getResources().getConfiguration().locale, "%.2f", mFromExpense.getUnsignedPrice()));
             //todo füge die Basis währung mit in den Text ein
         }
     }
@@ -281,6 +357,13 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
     @Override
     protected void onStop() {
         super.onStop();
+
+        mDatabase.close();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
 
         mDatabase.close();
     }

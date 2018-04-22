@@ -51,6 +51,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|left"
         android:clickable="true"
+        android:visibility="gone"
         app:srcCompat="@mipmap/ic_launcher_round"/>
 
     <!--

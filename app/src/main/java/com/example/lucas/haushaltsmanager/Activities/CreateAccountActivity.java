@@ -25,9 +25,9 @@ import com.example.lucas.haushaltsmanager.R;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CreateNewAccountActivity extends AppCompatActivity implements OnItemSelectedListener, BasicTextInputDialog.BasicDialogCommunicator, PriceInputDialog.OnPriceSelected {
+public class CreateAccountActivity extends AppCompatActivity implements OnItemSelectedListener, BasicTextInputDialog.BasicDialogCommunicator, PriceInputDialog.OnPriceSelected {
 
-    private String TAG = CreateNewAccountActivity.class.getSimpleName();
+    private String TAG = CreateAccountActivity.class.getSimpleName();
 
     Button mAccountNameBtn;
     Button mAccountBalanceBtn, mCreateAccountBtn;
@@ -156,8 +156,8 @@ public class CreateNewAccountActivity extends AppCompatActivity implements OnIte
                     break;
             }
 
-            Intent startMainTab = new Intent(CreateNewAccountActivity.this, TabParentActivity.class);
-            CreateNewAccountActivity.this.startActivity(startMainTab);
+            Intent startMainTab = new Intent(CreateAccountActivity.this, TabParentActivity.class);
+            CreateAccountActivity.this.startActivity(startMainTab);
         }
     };
 

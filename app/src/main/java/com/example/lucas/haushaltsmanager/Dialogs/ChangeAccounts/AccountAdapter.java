@@ -13,7 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckedTextView;
 import android.widget.ImageView;
 
-import com.example.lucas.haushaltsmanager.Activities.CreateNewAccountActivity;
+import com.example.lucas.haushaltsmanager.Activities.CreateAccountActivity;
 import com.example.lucas.haushaltsmanager.Activities.TransferActivity;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.R;
@@ -140,7 +140,7 @@ public class AccountAdapter extends ArrayAdapter<Account> {
                             return true;
                         case R.id.edit_account_edit:
 
-                            Intent updateAccountIntent = new Intent(mContext, CreateNewAccountActivity.class);
+                            Intent updateAccountIntent = new Intent(mContext, CreateAccountActivity.class);
                             updateAccountIntent.putExtra("mode", "update");
                             updateAccountIntent.putExtra("account_id", mAccount.getIndex());
                             mContext.startActivity(updateAccountIntent);

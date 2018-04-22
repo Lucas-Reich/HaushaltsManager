@@ -45,10 +45,6 @@
             android:icon="@drawable/ic_menu_camera"
             android:title="@string/left_slider_preferences"/>
         <item
-            android:id="@+id/follow_us"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="@string/left_slider_follow_us"/>
-        <item
             android:id="@+id/about"
             android:icon="@drawable/ic_menu_camera"
             android:title="@string/left_slider_about"/>

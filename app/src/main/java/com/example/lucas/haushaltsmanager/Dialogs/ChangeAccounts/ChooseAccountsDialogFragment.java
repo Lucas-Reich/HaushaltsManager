@@ -11,11 +11,10 @@ import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CheckedTextView;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.example.lucas.haushaltsmanager.Activities.CreateNewAccountActivity;
+import com.example.lucas.haushaltsmanager.Activities.CreateAccountActivity;
 import com.example.lucas.haushaltsmanager.Database.CannotDeleteAccountException;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
 import com.example.lucas.haushaltsmanager.Entities.Account;
@@ -108,7 +107,7 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Adap
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                Intent newAccountIntent = new Intent(getActivity(), CreateNewAccountActivity.class);
+                Intent newAccountIntent = new Intent(getActivity(), CreateAccountActivity.class);
                 newAccountIntent.putExtra("mode", "create");
                 getActivity().startActivity(newAccountIntent);
             }

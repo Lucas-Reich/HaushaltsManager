@@ -16,9 +16,9 @@ import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.R;
 
-public class CreateNewCategoryActivity extends AppCompatActivity implements BasicTextInputDialog.BasicDialogCommunicator {
+public class CreateCategoryActivity extends AppCompatActivity implements BasicTextInputDialog.BasicDialogCommunicator {
 
-    private String TAG = CreateNewCategoryActivity.class.getSimpleName();
+    private String TAG = CreateCategoryActivity.class.getSimpleName();
 
     private Category CATEGORY;
     Button categoryNameBtn, categoryColorBtn, createCategoryBtn;
@@ -54,7 +54,7 @@ public class CreateNewCategoryActivity extends AppCompatActivity implements Basi
             @Override
             public void onClick(View v) {
 
-                ColorPickerDialog dialog = new ColorPickerDialog(CreateNewCategoryActivity.this, Color.WHITE, new ColorPickerDialog.OnColorSelectedListener() {
+                ColorPickerDialog dialog = new ColorPickerDialog(CreateCategoryActivity.this, Color.WHITE, new ColorPickerDialog.OnColorSelectedListener() {
 
                     @Override
                     public void onColorSelected(int color) {
@@ -96,8 +96,8 @@ public class CreateNewCategoryActivity extends AppCompatActivity implements Basi
                 database.createCategory(CATEGORY);
                 database.close();
 
-                Intent startCategories = new Intent(CreateNewCategoryActivity.this, ShowCategoriesActivity.class);
-                CreateNewCategoryActivity.this.startActivity(startCategories);
+                Intent startCategories = new Intent(CreateCategoryActivity.this, CategoryListActivity.class);
+                CreateCategoryActivity.this.startActivity(startCategories);
             }
         });
     }

@@ -6,10 +6,12 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
 
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
@@ -26,8 +28,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 public class ImportExportActivity extends AppCompatActivity implements AccountPickerDialog.OnAccountSelected, BasicTextInputDialog.BasicDialogCommunicator, DirectoryPickerDialog.OnDirectorySelected {
-
-    String TAG = ImportExportActivity.class.getSimpleName();
+    private String TAG = ImportExportActivity.class.getSimpleName();
 
     Button mAccountBtn, mFileNameBtn, mDirectoryBtn, mFromDateBtn, mUntilDateBtn, mCreateExportBtn, mImportBtn;
     CheckBox mExpenseChk, mIncomeChk, mSetStartDateChk, mSetEndDateChk;
@@ -36,33 +37,26 @@ public class ImportExportActivity extends AppCompatActivity implements AccountPi
     Account mChosenAccount;
     Calendar mCalendar;
     Bundle mBundle;
+    ImageButton mBackArrow;
+    Toolbar mToolbar;
 
     File mExportsDirectory;
     String mFileName;
     final String mFileExtension = ".csv";
 
-
     @Override
-    protected void onStart() {
-        super.onStart();
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_import_export);
+
         mDatabase = new ExpensesDataSource(this);
         mDatabase.open();
 
         mCalendar = Calendar.getInstance();
         mBundle = new Bundle();
 
-        mExportsDirectory = new File(getFilesDir().toString() + "/Exports");
-        if (!mExportsDirectory.exists())
-            mExportsDirectory.mkdir();
-
-        mFileName = "Export_" + mCalendar.get(Calendar.YEAR) + "_" + mCalendar.get(Calendar.DAY_OF_MONTH) + "_" + (mCalendar.get(Calendar.MONTH) + 1);
-    }
-
-
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_import_export);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        mBackArrow = (ImageButton) findViewById(R.id.back_arrow);
 
         mAccountBtn = (Button) findViewById(R.id.import_export_account_btn);
         mFileNameBtn = (Button) findViewById(R.id.import_export_file_name_btn);
@@ -76,6 +70,26 @@ public class ImportExportActivity extends AppCompatActivity implements AccountPi
         mIncomeChk = (CheckBox) findViewById(R.id.import_export_income_chk);
         mSetStartDateChk = (CheckBox) findViewById(R.id.import_export_from_chk);
         mSetEndDateChk = (CheckBox) findViewById(R.id.import_export_until_chk);
+
+        mExportsDirectory = new File(getFilesDir().toString() + "/Exports");
+        if (!mExportsDirectory.exists())
+            mExportsDirectory.mkdir();
+
+        mFileName = "Export_" + mCalendar.get(Calendar.YEAR) + "_" + mCalendar.get(Calendar.DAY_OF_MONTH) + "_" + (mCalendar.get(Calendar.MONTH) + 1);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        mBackArrow.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                finish();
+            }
+        });
 
         mAccountBtn.setOnClickListener(new View.OnClickListener() {
 

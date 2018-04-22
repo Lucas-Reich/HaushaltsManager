@@ -34,12 +34,12 @@ import java.util.HashMap;
 import java.util.List;
 
 public class TabOneBookings extends Fragment {
+    private String TAG = TabOneBookings.class.getSimpleName();
 
     ExpandableListAdapter mListAdapter;
     ExpandableListView mExpListView;
     List<ExpenseObject> mListDataHeader;
     HashMap<ExpenseObject, List<ExpenseObject>> mListDataChild;
-    String TAG = TabOneBookings.class.getSimpleName();
 
     ExpensesDataSource mDatabase;
     ArrayList<ExpenseObject> mExpenses;
@@ -86,7 +86,6 @@ public class TabOneBookings extends Fragment {
         mExpListView.setBackgroundColor(Color.WHITE);
 
         updateExpListView();
-        //prepareListDataOld();
 
         final Activity mainTab = getActivity();
 

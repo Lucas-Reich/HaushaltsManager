@@ -7,23 +7,15 @@
     android:orientation="vertical"
     android:scrollbars="vertical">
 
-    <android.support.design.widget.AppBarLayout
+    <include
+        layout="@layout/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
-
-    </android.support.design.widget.AppBarLayout>
+        />
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_weight="1">
 
         <LinearLayout
@@ -58,9 +50,9 @@
                     android:id="@+id/expense_screen_amount_currency"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="start"
                     android:text="@string/expense_screen_amount_currency"
                     android:textAlignment="viewStart"
-                    android:layout_gravity="start"
                     android:textColor="@android:color/black"
                     android:textSize="40sp"/>
             </LinearLayout>
@@ -100,12 +92,12 @@
                     android:id="@+id/img_radio"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    app:srcCompat="@drawable/ic_expense_income_black" />
+                    app:srcCompat="@drawable/ic_expense_income_black"/>
 
                 <Space
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:layout_weight="1" />
+                    android:layout_weight="1"/>
 
                 <RadioGroup
                     android:id="@+id/expense_screen_expense_type"
@@ -119,14 +111,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:text="@string/expense_screen_type_expense" />
+                        android:text="@string/expense_screen_type_expense"/>
 
                     <RadioButton
                         android:id="@+id/expense_screen_radio_income"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:text="@string/expense_screen_type_income" />
+                        android:text="@string/expense_screen_type_income"/>
                 </RadioGroup>
             </LinearLayout>
 
@@ -201,15 +193,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:drawableRight="@mipmap/quickcontact_badge_overlay_normal_dark_am"
                     android:drawableEnd="@mipmap/quickcontact_badge_overlay_normal_dark_am"
+                    android:drawableRight="@mipmap/quickcontact_badge_overlay_normal_dark_am"
                     android:fontFamily="sans-serif"
                     android:gravity="end|center_vertical"
                     android:onClick="expensePopUp"
                     android:text="@string/expense_screen_date"
                     android:textAllCaps="false"
                     android:textColor="?attr/editTextColor"
-                    android:textSize="15sp" />
+                    android:textSize="15sp"/>
             </LinearLayout>
 
             <LinearLayout
@@ -265,7 +257,7 @@
                     android:text="@string/expense_screen_account"
                     android:textAllCaps="false"
                     android:textColor="?attr/editTextColor"
-                    android:textSize="15sp" />
+                    android:textSize="15sp"/>
             </LinearLayout>
 
             <CheckBox
@@ -274,13 +266,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
                 android:layout_marginTop="10dp"
-                android:text="@string/expense_screen_template" />
+                android:text="@string/expense_screen_template"/>
 
             <CheckBox
                 android:id="@+id/expense_screen_recurring"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/expense_screen_recurring" />
+                android:text="@string/expense_screen_recurring"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -299,10 +291,10 @@
                     style="@style/Widget.AppCompat.Button.Borderless"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="end"
                     android:layout_weight="1"
                     android:text="@string/expense_screen_recurring_frequency"
                     android:textAlignment="viewEnd"
-                    android:layout_gravity="end"
                     android:textAllCaps="false"
                     android:textSize="15sp"
                     android:visibility="gone"/>
@@ -325,10 +317,10 @@
                     style="@style/Widget.AppCompat.Button.Borderless"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="end"
                     android:layout_weight="1"
                     android:text="@string/expense_screen_recurring_end"
                     android:textAlignment="viewEnd"
-                    android:layout_gravity="end"
                     android:textAllCaps="false"
                     android:textSize="15sp"
                     android:visibility="gone"/>

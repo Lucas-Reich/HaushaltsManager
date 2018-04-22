@@ -9,6 +9,7 @@ import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MonthlyReport {
 
@@ -131,21 +132,19 @@ public class MonthlyReport {
      * @return Category
      */
     public Category getMostStressedCategory() {
-        if (countBookings() == 0)
+        HashMap<Category, Double> categories = sumExpensesByCategory();
+
+        if (categories.isEmpty())
             return new Category(mContext.getResources().getString(R.string.no_expenses), "#FFFFFF", false);
 
-        Category test = null;
-        double value = 0;
-        HashMap<Category, Double> categories = sumExpensesByCategory();
-        for (Category category : categories.keySet()) {
-            if (categories.get(category) > value) {
-
-                value = categories.get(category);
-                test = category;
+        Map.Entry<Category, Double> minCategory = null;
+        for (Map.Entry<Category, Double> entry : categories.entrySet()) {
+            if (null == minCategory || entry.getValue() < minCategory.getValue()) {
+                minCategory = entry;
             }
         }
 
-        return test;
+        return minCategory.getKey();
     }
 
     /**

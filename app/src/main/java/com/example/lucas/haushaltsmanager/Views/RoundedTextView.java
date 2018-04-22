@@ -11,130 +11,107 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.view.View;
 
-public class RoundedTextView extends View {
-
+public class RoundedTextView extends ViewWrapper {
     private String TAG = RoundedTextView.class.getSimpleName();
 
-    Paint mCirclePaint;
-    RectF mViewBounds;
+    private Paint mCirclePaint;
+    private int mDesiredSize = dpToPx(40);
 
-    String mCenterText = "U";
-    Paint mTextPaint;
-    Rect mTextBounds;
-
-    Paint mStrokePaint;
-
-    int mSolidColor, mStrokeColor;
+    private Rect mTextBounds;
+    private Paint mTextPaint;
+    private String mCenterText = "";
+    private float mTextSize = 50f;
 
     public RoundedTextView(Context context) {
         super(context);
-        init();
+        init(context, null, 0);
     }
 
     public RoundedTextView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        init();
+        init(context, attrs, 0);
     }
 
     public RoundedTextView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
+        init(context, attrs, defStyleAttr);
     }
 
-    private void init() {
+    protected void init(Context context, AttributeSet attrs, int defStyleAttr) {
 
+        //todo den durchmesser auch in der xml datei setzen
         mCirclePaint = new Paint();
-        mSolidColor = Color.RED;
-        mCirclePaint.setColor(mSolidColor);
+        mCirclePaint.setColor(Color.LTGRAY);
         mCirclePaint.setFlags(Paint.ANTI_ALIAS_FLAG);
 
         mViewBounds = new RectF();
 
-        mStrokePaint = new Paint();
-        mStrokeColor = Color.GREEN;
-        mStrokePaint.setColor(mStrokeColor);
-        mStrokePaint.setFlags(Paint.ANTI_ALIAS_FLAG);
-
         mTextPaint = new Paint();
         mTextPaint.setColor(Color.BLACK);
         mTextPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
-        mTextPaint.setTextSize(50f);
-        mTextPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));//make text bold
+        mTextPaint.setTextSize(mTextSize);
+        mTextPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+    }
+
+    private Rect getDesiredSize() {
+        return new Rect(0, 0, mDesiredSize, mDesiredSize);
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
-        int widthSize = MeasureSpec.getSize(widthMeasureSpec);
-        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
-        int heightSize = MeasureSpec.getSize(heightMeasureSpec);
         //TODO consider padding
-        //TODO use density pixels
         //TODO wenn die width oder height größer ist als die andere soll der sich der kreis automatisch in der mitte platzieren
+        setMaxViewBounds(widthMeasureSpec, heightMeasureSpec);
 
-        int desiredWidth = 90, desiredHeight = 90;
-        int actualWidth = 0, actualHeight = 0;
-
-        //Measure width
-        if (widthMode == MeasureSpec.UNSPECIFIED)
-            actualWidth = desiredWidth;
-        else if (widthMode == MeasureSpec.AT_MOST)
-            actualWidth = Math.min(desiredWidth, widthSize);
-        else if (widthMode == MeasureSpec.EXACTLY)
-            actualWidth = widthSize;
-
-        //Measure height
-        if (heightMode == MeasureSpec.UNSPECIFIED)
-            actualHeight = desiredHeight;
-        else if (heightMode == MeasureSpec.AT_MOST)
-            actualHeight = Math.min(desiredHeight, heightSize);
-        else if (heightMode == MeasureSpec.EXACTLY)
-            actualHeight = heightSize;
-
-
-        setViewBounds(actualWidth, actualHeight);
-        measureTextSize(mCenterText);
-        setMeasuredDimension(actualWidth, actualHeight);
+        mTextBounds = getTextBounds(mCenterText, mTextSize);
+        setMeasuredDimension((int) mViewBounds.width(), (int) mViewBounds.height());
     }
 
-    private void setViewBounds(int width, int height) {
+    /**
+     * Methode um die Maximale Größe der View zu ermitteln
+     *
+     * @param widthMeasureSpec  WidthMeasureSpec
+     * @param heightMeasureSpec HeightMeasureSpec
+     */
+    private void setMaxViewBounds(int widthMeasureSpec, int heightMeasureSpec) {
+        mViewBounds.set(0, 0, 0, 0);
 
-        int widthAndHeight = width < height ? width : height;
-        mViewBounds.set(0,0,widthAndHeight, widthAndHeight);
+        mViewBounds.right = reconcileSize(getDesiredSize().width(), widthMeasureSpec);
+        mViewBounds.bottom = reconcileSize(getDesiredSize().height(), heightMeasureSpec);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
 
-        canvas.drawCircle(mViewBounds.centerX(), mViewBounds.centerY() ,mViewBounds.width() / 2, mCirclePaint);
+        canvas.drawCircle(mViewBounds.centerX(), mViewBounds.centerY(), mViewBounds.width() / 2, mCirclePaint);
         canvas.drawText(mCenterText, mViewBounds.centerX() - (mTextBounds.width() / 2), mViewBounds.centerY() + (mTextBounds.width() / 2), mTextPaint);
     }
 
-    private void measureTextSize(String text) {
-
-        mTextBounds = new Rect(0,0, (int) mViewBounds.right, (int) mViewBounds.bottom);
-        mTextPaint.getTextBounds(text, 0, text.length(), mTextBounds);
-    }
-
     public void setCenterText(@NonNull String centerText) {
-
         mCenterText = centerText.toUpperCase();
     }
 
     public void setTextColor(@ColorInt int textColor) {
-
         mTextPaint.setColor(textColor);
     }
 
+    @NonNull
     public String getCenterText() {
-
         return mCenterText;
     }
 
-    public void setCircleColor(String circleColor) {
-
+    public void setCircleColor(@NonNull String circleColor) {
         mCirclePaint.setColor(Color.parseColor(circleColor));
+    }
+
+    /**
+     * Methode um den Durchmesser des Kreises zu verändern.
+     *
+     * @param diameter Neuer Durchmesser des Kreises
+     */
+    public void setCircleDiameter(int diameter) {
+        mDesiredSize = dpToPx(diameter);
+        invalidate();
     }
 }

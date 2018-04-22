@@ -9,11 +9,14 @@ import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
@@ -40,8 +43,7 @@ import java.util.Date;
 import java.util.List;
 
 public class ExpenseScreenActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, AccountPickerDialog.OnAccountSelected, BasicTextInputDialog.BasicDialogCommunicator, PriceInputDialog.OnPriceSelected, com.example.lucas.haushaltsmanager.Dialogs.DatePickerDialog.OnDateSelected, FrequencyAlertDialog.OnFrequencySet {
-
-    private String TAG = ExpenseScreenActivity.class.getSimpleName();
+    private static String TAG = ExpenseScreenActivity.class.getSimpleName();
 
     private creationModes CREATION_MODE;
 
@@ -62,6 +64,8 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
     private TextView mAmountTxt, mCurrencyTxt;
     private RadioGroup mExpenseTypeRadio;
     private ExpenseObject mParentBooking;
+    private Toolbar mToolbar;
+    private ImageButton mBackArrow;
 
     private ExpensesDataSource mDatabase;
 
@@ -74,8 +78,9 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
         mDatabase.open();
 
         //TODO implement the correct Toolbar functionality (back arrow, overflow menu which holds the load mTemplate button)
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
+        mBackArrow = (ImageButton) findViewById(R.id.back_arrow);
 
         mAmountTxt = (TextView) findViewById(R.id.expense_screen_amount);
         mCurrencyTxt = (TextView) findViewById(R.id.expense_screen_amount_currency);
@@ -170,6 +175,16 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
     @Override
     protected void onStart() {
         super.onStart();
+
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        mBackArrow.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                finish();
+            }
+        });
 
         if (mExpense.isExpenditure())
             mExpenseTypeRadio.check(R.id.expense_screen_radio_expense);
@@ -333,7 +348,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
                     break;
                 case CREATE_EXPENSE_MODE:
 
-                    mDatabase.createBooking(mExpense);
+                    mExpense = mDatabase.createBooking(mExpense);
                     mDatabase.insertConvertExpense(mExpense);
                     Toast.makeText(ExpenseScreenActivity.this, "Created Booking \"" + mExpense.getName() + "\"", Toast.LENGTH_SHORT).show();
                     break;
@@ -366,6 +381,29 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
         super.onDestroy();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.expense_screen_menu, menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+
+            case R.id.template:
+
+                Intent chooseTemplateIntent = new Intent(ExpenseScreenActivity.this, TemplatesActivity.class);
+                ExpenseScreenActivity.this.startActivityForResult(chooseTemplateIntent, 2);
+                break;
+            default:
+                throw new UnsupportedOperationException("Du hast auf einen Menüpunkt geklickt, welcher nicht unterstützt wird");
+        }
+
+        return true;
+    }
 
     public void expensePopUp(View view) {
 
@@ -377,7 +415,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
 
             case R.id.expense_screen_category:
 
-                Intent chooseCategoryIntent = new Intent(ExpenseScreenActivity.this, ShowCategoriesActivity.class);
+                Intent chooseCategoryIntent = new Intent(ExpenseScreenActivity.this, CategoryListActivity.class);
                 ExpenseScreenActivity.this.startActivityForResult(chooseCategoryIntent, 1);
                 break;
 
@@ -436,20 +474,34 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
      */
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        if (requestCode == 1) {
+        switch (requestCode) {
 
-            if (resultCode == Activity.RESULT_OK) {
+            case 1://Category response
 
-                Category category = data.getParcelableExtra("categoryObj");
-                mExpense.setCategory(category);
+                if (resultCode == Activity.RESULT_OK) {
 
-                mCategoryBtn.setText(category.getName());
+                    Category category = data.getParcelableExtra("categoryObj");
+                    mExpense.setCategory(category);
 
-                if (category.getDefaultExpenseType())
-                    mExpenseTypeRadio.check(R.id.expense_screen_radio_expense);
-                else
-                    mExpenseTypeRadio.check(R.id.expense_screen_radio_income);
-            }
+                    mCategoryBtn.setText(category.getName());
+
+                    if (category.getDefaultExpenseType())
+                        mExpenseTypeRadio.check(R.id.expense_screen_radio_expense);
+                    else
+                        mExpenseTypeRadio.check(R.id.expense_screen_radio_income);
+                }
+                break;
+            case 2://Template response
+
+                if (resultCode == Activity.RESULT_OK) {
+
+                    ExpenseObject templateBooking = data.getParcelableExtra("templateObj");
+                    //todo setze alle felder in dem expense screen der template booking entsprechend
+                }
+                break;
+            default:
+
+                throw new UnsupportedOperationException("Die Antwort aus mit dem response code: " + requestCode + " kann nicht verarbeitet werden");
         }
     }
 

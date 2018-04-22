@@ -28,9 +28,9 @@ import com.example.lucas.haushaltsmanager.Activities.CourseActivity;
 import com.example.lucas.haushaltsmanager.Activities.CreateBackupActivity;
 import com.example.lucas.haushaltsmanager.Activities.ImportExportActivity;
 import com.example.lucas.haushaltsmanager.Activities.RecurringBookingsActivity;
-import com.example.lucas.haushaltsmanager.Activities.ShowCategoriesActivity;
+import com.example.lucas.haushaltsmanager.Activities.CategoryListActivity;
 import com.example.lucas.haushaltsmanager.Activities.TransferActivity;
-import com.example.lucas.haushaltsmanager.BookingTemplates;
+import com.example.lucas.haushaltsmanager.Activities.TemplatesActivity;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ChangeAccounts.ChooseAccountsDialogFragment;
 import com.example.lucas.haushaltsmanager.MockDataCreator;
@@ -113,12 +113,12 @@ public class TabParentActivity extends AppCompatActivity implements ChooseAccoun
                         break;
                     case R.id.categories:
 
-                        Intent categoryIntent = new Intent(TabParentActivity.this, ShowCategoriesActivity.class);
+                        Intent categoryIntent = new Intent(TabParentActivity.this, CategoryListActivity.class);
                         TabParentActivity.this.startActivity(categoryIntent);
                         break;
                     case R.id.templates:
 
-                        Intent templateIntent = new Intent(TabParentActivity.this, BookingTemplates.class);
+                        Intent templateIntent = new Intent(TabParentActivity.this, TemplatesActivity.class);
                         TabParentActivity.this.startActivity(templateIntent);
                         break;
                     case R.id.course:
