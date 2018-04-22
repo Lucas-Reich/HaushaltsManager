@@ -2,25 +2,39 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    >
 
     <com.example.lucas.haushaltsmanager.Views.RoundedTextView
         android:id="@+id/category_item_circ_textview"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"/>
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        />
 
-    <TextView
-        android:id="@+id/category_item_name"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="12dp"
-        android:paddingLeft="15dp"
-        android:paddingStart="15dp"
-        android:paddingTop="12dp"
-        android:text="TextView"
-        android:textAlignment="viewStart"
-        android:layout_gravity="start"
-        android:textSize="18sp"/>
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/category_item_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="12dp"
+            android:paddingEnd="0dp"
+            android:paddingLeft="15dp"
+            android:paddingRight="0dp"
+            android:paddingStart="15dp"
+            android:paddingTop="12dp"
+            android:text="Kategorie"
+            android:textAlignment="viewStart"
+            android:textSize="18sp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorPrimary"/>
+    </LinearLayout>
 
 </LinearLayout>

@@ -1,7 +1,6 @@
 package com.example.lucas.haushaltsmanager.Activities;
 
 import android.app.DialogFragment;
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -10,20 +9,19 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RadioGroup;
 
+import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ColorPickerDialog;
-import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.R;
 
 public class CreateCategoryActivity extends AppCompatActivity implements BasicTextInputDialog.BasicDialogCommunicator {
-
-    private String TAG = CreateCategoryActivity.class.getSimpleName();
+    private static String TAG = CreateCategoryActivity.class.getSimpleName();
 
     private Category CATEGORY;
-    Button categoryNameBtn, categoryColorBtn, createCategoryBtn;
-    RadioGroup expenseType;
-    ExpensesDataSource database;
+    private Button mCatNameBtn, mCatColorBtn, mCreateBtn;
+    private RadioGroup mDefaultExpenseTypeRadio;
+    private ExpensesDataSource mDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstances) {
@@ -31,10 +29,21 @@ public class CreateCategoryActivity extends AppCompatActivity implements BasicTe
         setContentView(R.layout.activity_new_category);
 
         CATEGORY = Category.createDummyCategory(this);
-        database = new ExpensesDataSource(this);
+        mDatabase = new ExpensesDataSource(this);
+        mDatabase.open();
 
-        categoryNameBtn = (Button) findViewById(R.id.new_category_name);
-        categoryNameBtn.setOnClickListener(new View.OnClickListener() {
+        mCatNameBtn = (Button) findViewById(R.id.new_category_name);
+        mCatColorBtn = (Button) findViewById(R.id.new_category_color);
+        mCreateBtn = (Button) findViewById(R.id.new_category_create);
+
+        mDefaultExpenseTypeRadio = (RadioGroup) findViewById(R.id.new_category_expense_type);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        mCatNameBtn.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -48,8 +57,7 @@ public class CreateCategoryActivity extends AppCompatActivity implements BasicTe
             }
         });
 
-        categoryColorBtn = (Button) findViewById(R.id.new_category_color);
-        categoryColorBtn.setOnClickListener(new View.OnClickListener() {
+        mCatColorBtn.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -60,16 +68,15 @@ public class CreateCategoryActivity extends AppCompatActivity implements BasicTe
                     public void onColorSelected(int color) {
 
                         CATEGORY.setColor(color);
-                        Log.d(TAG, "set CATEGORY color to: " + Integer.toHexString(color));
+                        Log.d(TAG, "set category color to: " + Integer.toHexString(color));
                     }
                 });
                 dialog.show();
             }
         });
 
-        expenseType = (RadioGroup) findViewById(R.id.new_category_expense_type);
-        expenseType.check(R.id.new_category_expense);
-        expenseType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+        mDefaultExpenseTypeRadio.check(R.id.new_category_expense);
+        mDefaultExpenseTypeRadio.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -86,28 +93,38 @@ public class CreateCategoryActivity extends AppCompatActivity implements BasicTe
             }
         });
 
-        createCategoryBtn = (Button) findViewById(R.id.new_category_create);
-        createCategoryBtn.setOnClickListener(new View.OnClickListener() {
+        mCreateBtn.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
 
-                database.open();
-                database.createCategory(CATEGORY);
-                database.close();
-
-                Intent startCategories = new Intent(CreateCategoryActivity.this, CategoryListActivity.class);
-                CreateCategoryActivity.this.startActivity(startCategories);
+                //todo überprüfe ob alle nötigen sachen gesetzt wurden
+                mDatabase.createCategory(CATEGORY);
+                finish();
             }
         });
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        mDatabase.close();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        mDatabase.close();
     }
 
     @Override
     public void onTextInput(String textInput, String tag) {
 
         CATEGORY.setName(textInput);
-        categoryNameBtn.setText(textInput);
+        mCatNameBtn.setText(textInput);
 
-        Log.d(TAG, "set CATEGORY getName to: " + textInput);
+        Log.d(TAG, "set category name to: " + textInput);
     }
 }

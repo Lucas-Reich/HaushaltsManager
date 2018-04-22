@@ -103,5 +103,7 @@
     <string name="no_bookings_in_month">No bookings this month</string>
     <string name="category">Category</string>
     <string name="show_templates">Templates</string>
+    <string name="filter">Filter</string>
+    <string name="sort">Sort</string>
     <item name="deleted_account" type="id">Deleted account</item>
 </resources>

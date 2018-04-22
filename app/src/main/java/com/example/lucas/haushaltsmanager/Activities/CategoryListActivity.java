@@ -61,6 +61,7 @@ public class CategoryListActivity extends AppCompatActivity {
             }
         });
 
+        mListView.setDivider(null);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override

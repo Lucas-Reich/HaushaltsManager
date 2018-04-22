@@ -13,9 +13,6 @@ import com.example.lucas.haushaltsmanager.R;
 import java.util.Calendar;
 
 public class DatePickerDialog extends DialogFragment implements DatePicker.OnDateChangedListener {
-
-    //todo der date picker hat noch einen komischen kleinen rahmen auf der rechen seite welcher not entfernt werden muss
-
     private static String TAG = DatePickerDialog.class.getSimpleName();
 
     private OnDateSelected mCallback;

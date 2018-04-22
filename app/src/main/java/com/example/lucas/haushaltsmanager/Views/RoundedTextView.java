@@ -108,10 +108,10 @@ public class RoundedTextView extends ViewWrapper {
     /**
      * Methode um den Durchmesser des Kreises zu verändern.
      *
-     * @param diameter Neuer Durchmesser des Kreises
+     * @param diameterInPixels Neuer Durchmesser des Kreises
      */
-    public void setCircleDiameter(int diameter) {
-        mDesiredSize = dpToPx(diameter);
+    public void setCircleDiameter(int diameterInPixels) {
+        mDesiredSize = dpToPx(diameterInPixels);
         invalidate();
     }
 }

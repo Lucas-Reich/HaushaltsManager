@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ChooseAccountsDialogFragment extends DialogFragment implements AdapterView.OnItemClickListener, AccountAdapter.OnDeleteAccountSelected {
-    String TAG = ChooseAccountsDialogFragment.class.getSimpleName();
+    private static String TAG = ChooseAccountsDialogFragment.class.getSimpleName();
 
     ExpensesDataSource mDatabase;
     SharedPreferences mSettings;

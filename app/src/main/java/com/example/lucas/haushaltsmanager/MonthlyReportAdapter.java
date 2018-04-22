@@ -77,11 +77,9 @@ public class MonthlyReportAdapter extends RecyclerView.Adapter<MonthlyReportAdap
         } else {
             holder.categoryColor.setCircleDiameter(20);
             holder.categoryColor.setCenterText("");
-            holder.categoryColor.setCircleColor("#000000");
             holder.categoryColor.setCircleColor(report.getMostStressedCategory().getColor());
 
             holder.stressedCategory.setText(report.getMostStressedCategory().getName());
-            holder.stressedCategory.setText(mContext.getResources().getString(R.string.category));
         }
 
         holder.pieChart.setPieData(preparePieData(report));
