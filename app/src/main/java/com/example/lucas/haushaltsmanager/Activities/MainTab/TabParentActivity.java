@@ -24,27 +24,26 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.lucas.haushaltsmanager.Activities.CategoryListActivity;
 import com.example.lucas.haushaltsmanager.Activities.CourseActivity;
 import com.example.lucas.haushaltsmanager.Activities.CreateBackupActivity;
 import com.example.lucas.haushaltsmanager.Activities.ImportExportActivity;
 import com.example.lucas.haushaltsmanager.Activities.RecurringBookingsActivity;
-import com.example.lucas.haushaltsmanager.Activities.CategoryListActivity;
+import com.example.lucas.haushaltsmanager.Activities.TestActivity;
 import com.example.lucas.haushaltsmanager.Activities.TransferActivity;
-import com.example.lucas.haushaltsmanager.Activities.TemplatesActivity;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ChangeAccounts.ChooseAccountsDialogFragment;
 import com.example.lucas.haushaltsmanager.MockDataCreator;
 import com.example.lucas.haushaltsmanager.MyAlarmReceiver;
 import com.example.lucas.haushaltsmanager.R;
-import com.example.lucas.haushaltsmanager.Activities.TestActivity;
+import com.example.lucas.haushaltsmanager.Services.GetExchangeRatesService;
 
 public class TabParentActivity extends AppCompatActivity implements ChooseAccountsDialogFragment.OnSelectedAccount, BasicTextInputDialog.BasicDialogCommunicator {
+    private static String TAG = TabParentActivity.class.getSimpleName();
 
-    private String TAG = TabParentActivity.class.getSimpleName();
-
-    SectionsPagerAdapter mSectionsPagerAdapter;
-    TabLayout mTabLayout;
-    ViewPager mViewPager;
+    private SectionsPagerAdapter mSectionsPagerAdapter;
+    private TabLayout mTabLayout;
+    private ViewPager mViewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +74,7 @@ public class TabParentActivity extends AppCompatActivity implements ChooseAccoun
                 //startService(serviceIntent);
 
                 MockDataCreator test = new MockDataCreator(TabParentActivity.this);
+                test.createBookings(100);
             }
         });
 
@@ -139,7 +139,7 @@ public class TabParentActivity extends AppCompatActivity implements ChooseAccoun
                         break;
                     case R.id.preferences:
 
-                        //do smth
+                        //todo show preferences activity
                         break;
                     case R.id.about:
 
@@ -299,7 +299,7 @@ public class TabParentActivity extends AppCompatActivity implements ChooseAccoun
 
     /**
      * Methode um meinen BackupService periodische jeden Tag einmal laufen zu lassen.
-     *
+     * <p>
      * Anleitung siehe: https://guides.codepath.com/android/Starting-Background-Services#using-with-alarmmanager-for-periodic-tasks
      *///todo es sollte nicht jedes mal ein backup erstellt werden wenn die app aufgerufen wird
     private void scheduleBackupServiceAlarm() {

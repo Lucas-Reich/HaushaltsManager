@@ -28,12 +28,15 @@ public class MockDataCreator {
 
         mDatabase = new ExpensesDataSource(context);
         mDatabase.open();
+    }
+
+    public void createBookings(int amount) {
 
         mMainCurrency = createCurrency();
         mAccounts = createAccounts(3);
         mCategories = createCategories(3);
         createTags(3);
-        createBookings(20);
+        createBookingsInternal(amount);
     }
 
     private List<Account> createAccounts(int count) {
@@ -103,7 +106,7 @@ public class MockDataCreator {
         tagCount = counter;
     }
 
-    private void createBookings(int count) {
+    private void createBookingsInternal(int count) {
 
         String baseExpenseName = "Expense_";
         Random mRnd = new Random();

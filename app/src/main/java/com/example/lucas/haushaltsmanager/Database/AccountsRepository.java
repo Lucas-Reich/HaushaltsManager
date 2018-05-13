@@ -121,9 +121,9 @@ public class AccountsRepository {
     }
 
     /**
-     * Method for getting an account by its getName
+     * Method for getting an account by its getTitle
      *
-     * @param accountName getName of account
+     * @param accountName getTitle of account
      * @return account object if available else null
      */
     @Nullable

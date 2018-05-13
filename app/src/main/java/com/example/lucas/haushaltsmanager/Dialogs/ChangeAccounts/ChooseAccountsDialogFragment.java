@@ -15,7 +15,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Activities.CreateAccountActivity;
-import com.example.lucas.haushaltsmanager.Database.CannotDeleteAccountException;
+import com.example.lucas.haushaltsmanager.Database.Exceptions.CannotDeleteAccountException;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.R;

@@ -102,7 +102,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 TextView txtTotalAmount = (TextView) convertView.findViewById(R.id.exp_listview_header_total_amount);
                 TextView txtBaseCurrency = (TextView) convertView.findViewById(R.id.exp_listview_header_base_currency);
 
-                txtTitle.setText(groupExpense.getName());
+                txtTitle.setText(groupExpense.getTitle());
                 txtTotalAmount.setText(String.format(mContext.getResources().getConfiguration().locale, "%.2f", groupExpense.getSignedPrice()));
                 txtTotalAmount.setTextColor(groupExpense.getSignedPrice() < 0 ? mRed : mGreen);
                 txtBaseCurrency.setText("€");
@@ -141,7 +141,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 circleLetter.setTextColor(Color.WHITE);
                 circleLetter.setCenterText(category.substring(0, 1).toUpperCase());
                 circleLetter.setCircleColor(groupExpense.getCategory().getColor());
-                txtTitle2.setText(groupExpense.getName());
+                txtTitle2.setText(groupExpense.getTitle());
                 //TODO wenn es eine Multiuser funktionalität muss hier der benutzer eingetragen werden, der das Geld ausgegeben hat
                 txtPerson.setText("");
                 txtPaidPrice.setText(String.format(mContext.getResources().getConfiguration().locale, "%.2f", groupExpense.getUnsignedPrice()));
@@ -192,7 +192,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
         circleLetter.setCenterText(category.substring(0, 1).toUpperCase());
         circleLetter.setCircleColor(childExpense.getCategory().getColor());
-        txtTitle.setText(childExpense.getName());
+        txtTitle.setText(childExpense.getTitle());
         //TODO wenn es eine Multiuser funktionalität muss hier der benutzer eingetragen werden, der das Geld ausgegeben hat
         txtPerson.setText("");
         txtPaidPrice.setText(String.format("%s", childExpense.getUnsignedPrice()));
@@ -249,7 +249,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
         childViewHolder.roundedTextView.setCenterText(category.substring(0, 1).toUpperCase());
         childViewHolder.roundedTextView.setCircleColor(childExpense.getCategory().getColor());
-        childViewHolder.txtTitle.setText(childExpense.getName());
+        childViewHolder.txtTitle.setText(childExpense.getTitle());
         //TODO wenn es eine Multiuser funktionalität muss hier der benutzer eingetragen werden, der das Geld ausgegeben hat
         childViewHolder.txtPerson.setText("");
         childViewHolder.txtPaidPrice.setText(String.format(mContext.getResources().getConfiguration().locale, "%.2f", childExpense.getUnsignedPrice()));

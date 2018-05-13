@@ -233,7 +233,7 @@ public class TabOneBookings extends Fragment {
                 //get expense
                 ExpenseObject expense = (ExpenseObject) mListAdapter.getChild(groupPosition, childPosition);
 
-                Log.d(TAG, "onChildClick: " + expense.getName() + " " + expense.getIndex());
+                Log.d(TAG, "onChildClick: " + expense.getTitle() + " " + expense.getIndex());
 
                 //start expenseScreen with selected expense
                 Intent updateChildExpenseIntent = new Intent(getContext(), ExpenseScreenActivity.class);
@@ -501,9 +501,9 @@ public class TabOneBookings extends Fragment {
      */
     public void onCombinedTitleSelected(String title) {
 
-        ExpenseObject parentBooking = mDatabase.createChildBooking(mListAdapter.getSelectedGroupData());
+        ExpenseObject parentBooking = mDatabase.combineChildBookings(mListAdapter.getSelectedGroupData());
         parentBooking.setName(title);
-        //mDatabase.updateBooking(parentBooking); todo wenn die update booking funktionalität besteht wieder aktivieren
+        mDatabase.updateBooking(parentBooking);
 
         mExpenses.removeAll(mListAdapter.getSelectedGroupData());
         mExpenses.add(0, parentBooking);

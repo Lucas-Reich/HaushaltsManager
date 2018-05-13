@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager.Database;
+package com.example.lucas.haushaltsmanager.Database.Exceptions;
 
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
@@ -25,7 +25,7 @@ public class EntityNotExistingException extends Exception {
 
     public EntityNotExistingException(ExpenseObject expense) {
 
-        super("Expense " + expense.getName() + " does not exist in the database");
+        super("Expense " + expense.getTitle() + " does not exist in the database");
     }
 
     public EntityNotExistingException(Tag tag) {

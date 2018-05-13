@@ -66,7 +66,7 @@ public class TagsRepository {
     /**
      * Convenience Method for creating a new Tag
      *
-     * @param tagName getName of the tag which should be created
+     * @param tagName getTitle of the tag which should be created
      * @return the id of the created tag. -1 if the insertion failed
      */
     public long createTag(String tagName) {

@@ -92,7 +92,7 @@ public class CreateAccountActivity extends AppCompatActivity implements OnItemSe
             public void onClick(View v) {
 
                 Bundle args = new Bundle();
-                args.putString("title", "Set Account getName");
+                args.putString("title", "Set Account getTitle");
 
                 BasicTextInputDialog basicDialog = new BasicTextInputDialog();
                 basicDialog.setArguments(args);

@@ -217,7 +217,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
         mDateBtn.setText(mExpense.getDisplayableDateTime());
 
         mTitleBtn.setHint(R.string.input_title);
-        mTitleBtn.setText(mExpense.getName());
+        mTitleBtn.setText(mExpense.getTitle());
 
         mTagBtn.setHint(R.string.input_tag);
 //        mTagBtn.setText(mExpense.getTags().get(0));TODO enable
@@ -333,24 +333,24 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
                 case UPDATE_EXPENSE_MODE:
 
                     mDatabase.updateBooking(mExpense);
-                    Toast.makeText(ExpenseScreenActivity.this, "Updated Booking " + mExpense.getName(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ExpenseScreenActivity.this, "Updated Booking " + mExpense.getTitle(), Toast.LENGTH_SHORT).show();
                     break;
                 case UPDATE_CHILD_MODE:
 
                     mDatabase.updateChildBooking(mExpense);
-                    Toast.makeText(ExpenseScreenActivity.this, "Updated Booking " + mExpense.getName(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ExpenseScreenActivity.this, "Updated Booking " + mExpense.getTitle(), Toast.LENGTH_SHORT).show();
                     break;
                 case CREATE_CHILD_MODE:
 
                     mDatabase.addChildToBooking(mExpense, mParentBooking);
                     mDatabase.insertConvertExpense(mExpense);
-                    Toast.makeText(ExpenseScreenActivity.this, "Added Booking \"" + mExpense.getName() + "\" to parent Booking " + mParentBooking.getName(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ExpenseScreenActivity.this, "Added Booking \"" + mExpense.getTitle() + "\" to parent Booking " + mParentBooking.getTitle(), Toast.LENGTH_SHORT).show();
                     break;
                 case CREATE_EXPENSE_MODE:
 
                     mExpense = mDatabase.createBooking(mExpense);
                     mDatabase.insertConvertExpense(mExpense);
-                    Toast.makeText(ExpenseScreenActivity.this, "Created Booking \"" + mExpense.getName() + "\"", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ExpenseScreenActivity.this, "Created Booking \"" + mExpense.getTitle() + "\"", Toast.LENGTH_SHORT).show();
                     break;
                 default:
                     throw new UnsupportedOperationException("ExpenseScreen unterstützt keine anderen Methoden als createExpense, createChildToExpense, updateExpense und updateChildExpense");
@@ -562,8 +562,8 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
                 case "expense_screen_title":
 
                     mExpense.setName(textInput);
-                    mTitleBtn.setText(mExpense.getName());
-                    Log.d(TAG, "set expense title to " + mExpense.getName());
+                    mTitleBtn.setText(mExpense.getTitle());
+                    Log.d(TAG, "set expense title to " + mExpense.getTitle());
                     break;
 
                 case "expense_screen_tag":

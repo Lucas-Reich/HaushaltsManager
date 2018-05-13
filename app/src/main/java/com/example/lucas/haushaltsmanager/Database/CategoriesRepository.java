@@ -100,7 +100,7 @@ public class CategoriesRepository {
     }
 
     /**
-     * Convenience Method for getting a Category by its getName
+     * Convenience Method for getting a Category by its getTitle
      *
      * @param category Name of the CATEGORY
      * @return Returns an Category object
@@ -152,7 +152,7 @@ public class CategoriesRepository {
      * Convenience Method for updating a Categories color
      *
      * @param categoryId   Id of the Category which should be changed
-     * @param categoryName new getName of the CATEGORY
+     * @param categoryName new getTitle of the CATEGORY
      * @return The id of the affected row
      */
     public int updateCategoryName(long categoryId, String categoryName) {

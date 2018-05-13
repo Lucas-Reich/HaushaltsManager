@@ -362,7 +362,7 @@ public class ImportExportActivity extends AppCompatActivity implements AccountPi
         expenseString.append(expense.getIndex()).append(",");
         expenseString.append(expense.getUnsignedPrice()).append(",");
         expenseString.append(expense.isExpenditure()).append(",");
-        expenseString.append(expense.getName()).append(",");
+        expenseString.append(expense.getTitle()).append(",");
         expenseString.append(expense.getDate()).append(",");
         expenseString.append(expense.getNotice()).append(",");
         expenseString.append(expense.getExchangeRate()).append(",");

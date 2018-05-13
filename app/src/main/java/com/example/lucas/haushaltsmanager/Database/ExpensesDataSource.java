@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.CursorIndexOutOfBoundsException;
 import android.database.DatabaseUtils;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
@@ -12,6 +11,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.example.lucas.haushaltsmanager.Database.Exceptions.CannotDeleteAccountException;
+import com.example.lucas.haushaltsmanager.Database.Exceptions.CannotDeleteCategoryException;
+import com.example.lucas.haushaltsmanager.Database.Exceptions.CannotDeleteCurrencyException;
+import com.example.lucas.haushaltsmanager.Database.Exceptions.CannotDeleteTagException;
+import com.example.lucas.haushaltsmanager.Database.Exceptions.EntityNotExistingException;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
@@ -302,9 +306,9 @@ public class ExpensesDataSource {
     }
 
     /**
-     * Method for getting an account by its getName
+     * Method for getting an account by its getTitle
      *
-     * @param accountName getName of account
+     * @param accountName getTitle of account
      * @return account object if available else null
      */
     @Nullable
@@ -604,7 +608,7 @@ public class ExpensesDataSource {
         values.put(ExpensesDbHelper.BOOKINGS_COL_PRICE, expense.getUnsignedPrice());
         values.put(ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID, expense.getCategory().getIndex());
         values.put(ExpensesDbHelper.BOOKINGS_COL_EXPENDITURE, expense.isExpenditure());
-        values.put(ExpensesDbHelper.BOOKINGS_COL_TITLE, expense.getName());
+        values.put(ExpensesDbHelper.BOOKINGS_COL_TITLE, expense.getTitle());
         values.put(ExpensesDbHelper.BOOKINGS_COL_DATE, expense.getDateTime().getTimeInMillis());
         values.put(ExpensesDbHelper.BOOKINGS_COL_NOTICE, expense.getNotice());
         values.put(ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID, expense.getAccount().getIndex());
@@ -625,7 +629,7 @@ public class ExpensesDataSource {
             addChild(child, index);
         }
 
-        return new ExpenseObject(index, expense.getName(), expense.getUnsignedPrice(), expense.getDateTime(), expense.isExpenditure(), expense.getCategory(), expense.getNotice(), expense.getAccount(), expense.getExpenseCurrency(), expense.getExpenseType());
+        return new ExpenseObject(index, expense.getTitle(), expense.getUnsignedPrice(), expense.getDateTime(), expense.isExpenditure(), expense.getCategory(), expense.getNotice(), expense.getAccount(), expense.getExpenseCurrency(), expense.getExpenseType());
     }
 
     /**
@@ -736,9 +740,29 @@ public class ExpensesDataSource {
         return bookings;
     }
 
-    public int updateBooking(ExpenseObject expense) {
+    /**
+     * Methode um eine Ausgabe in der Datenbank zu updaten.
+     *
+     * @param expense Ausgabe mit geupdateten Werten.
+     * @return True bei Erfolg, False bei Fehlschlag.
+     */
+    public Boolean updateBooking(ExpenseObject expense) {
 
-        throw new UnsupportedOperationException("Updating bookings is not supported");//todo
+        //todo 'schlauen' algorithmus entwickeln welcher nur die geänderten stellen in der datenbank updated
+        ContentValues updatedExpense = new ContentValues();
+        updatedExpense.put(ExpensesDbHelper.BOOKINGS_COL_PRICE, expense.getCalcPrice());
+        updatedExpense.put(ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID, expense.getCategory().getIndex());
+        updatedExpense.put(ExpensesDbHelper.BOOKINGS_COL_EXPENDITURE, expense.isExpenditure());
+        updatedExpense.put(ExpensesDbHelper.BOOKINGS_COL_TITLE, expense.getTitle());
+        updatedExpense.put(ExpensesDbHelper.BOOKINGS_COL_DATE, expense.getDateTime().getTimeInMillis());
+        updatedExpense.put(ExpensesDbHelper.BOOKINGS_COL_NOTICE, expense.getNotice());
+        updatedExpense.put(ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID, expense.getAccount().getIndex());
+        updatedExpense.put(ExpensesDbHelper.BOOKINGS_COL_EXCHANGE_RATE, expense.getExchangeRate());
+        updatedExpense.put(ExpensesDbHelper.BOOKINGS_COL_IS_PARENT, expense.isParent());
+        updatedExpense.put(ExpensesDbHelper.BOOKINGS_COL_CURRENCY_ID, expense.getExpenseCurrency().getIndex());
+
+        int affectedRows = database.update(ExpensesDbHelper.TABLE_BOOKINGS, updatedExpense, ExpensesDbHelper.BOOKINGS_COL_ID + " = ?", new String[] {expense.getIndex() + ""});
+        return affectedRows == 1;
     }
 
     /**
@@ -791,7 +815,7 @@ public class ExpensesDataSource {
         values.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_PARENT_BOOKING_ID, parentId);
         values.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_CATEGORY_ID, child.getCategory().getIndex());
         values.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_EXPENDITURE, child.isExpenditure());
-        values.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_TITLE, child.getName());
+        values.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_TITLE, child.getTitle());
         values.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_DATE, child.getDateTime().getTimeInMillis());
         values.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_NOTICE, child.getNotice());
         values.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_ACCOUNT_ID, child.getAccount().getIndex());
@@ -824,12 +848,12 @@ public class ExpensesDataSource {
         if (isChild(parentBooking.getIndex()))
             throw new UnsupportedOperationException("Cannot add Booking to an child Booking");
 
-        if (parentBooking.isParent()) {
+        if (parentBooking.isParent()) {//wenn ich zu einer bestehenden Parent buchung ein weiteres kind hinzufügen möchte
 
             addChild(childExpense, parentBooking.getIndex());
             parentBooking.addChild(childExpense);
             return parentBooking;
-        } else {
+        } else {// wenn ich zu einer bestehenden buchung ein kind hinzufügen möchte
 
             ExpenseObject dummyParentBooking = createDummyExpense();
             addChild(parentBooking, dummyParentBooking.getIndex());
@@ -848,17 +872,18 @@ public class ExpensesDataSource {
      * Methode um eine Liste von Buchungen zusammenzufügen.
      * Dabei wird zuesrt eine DummyParent erstellt, unter welchem dann die Ausgaben platziert werden
      *
-     * @param children Buchungen die zusammengefügt werden sollen
-     * @return Übergeordnete Buchung
+     * @param childExpenses Buchungen die zusammengefügt werden sollen
+     * @return Parent der Kindbuchungen
      */
-    public ExpenseObject createChildBooking(List<ExpenseObject> children) {
+    public ExpenseObject combineChildBookings(List<ExpenseObject> childExpenses) {
 
-        ExpenseObject parentBooking = createDummyExpense();
-        parentBooking.addChildren(children);
+        ExpenseObject parentBooking = createDummyExpense();//Dummyausgabe wird erstellt und in der Datenbank gespeichert (jedoch nicht als parent, da zur zeit der erstellung keine Kinder dabei sind)
+        parentBooking.addChildren(childExpenses);//Der Dummyausgabe werden kinder hizugefügt
+        updateBooking(parentBooking);//Nun ist die Dummyausgabe ein Parent, was auch in der Datenbank gepeichert/geupdated werden muss
 
-        for (ExpenseObject child : children) {
+        for (ExpenseObject child : childExpenses) {
 
-            addChildToBooking(child, parentBooking);
+            addChild(child, parentBooking.getIndex());
             deleteBooking(child.getIndex());
         }
 
@@ -1025,7 +1050,7 @@ public class ExpensesDataSource {
     }
 
     /**
-     * Convenience Method for getting a Category by its getName
+     * Convenience Method for getting a Category by its getTitle
      *
      * @param category Name of the CATEGORY
      * @return Returns an Category object
@@ -1077,7 +1102,7 @@ public class ExpensesDataSource {
      * Convenience Method for updating a Categories color
      *
      * @param categoryId   Id of the Category which should be changed
-     * @param categoryName new getName of the CATEGORY
+     * @param categoryName new getTitle of the CATEGORY
      * @return The id of the affected row
      */
     public int updateCategoryName(long categoryId, String categoryName) {
@@ -1442,8 +1467,8 @@ public class ExpensesDataSource {
     /**
      * Method for creating a new exchange rate based on currency objects
      *
-     * @param fromCur     getName of first currency
-     * @param toCur       getName of second currency
+     * @param fromCur     getTitle of first currency
+     * @param toCur       getTitle of second currency
      * @param rate        exchange rate from currency one to currency two
      * @param dateInMills fetching date in milliseconds
      * @return state of operation

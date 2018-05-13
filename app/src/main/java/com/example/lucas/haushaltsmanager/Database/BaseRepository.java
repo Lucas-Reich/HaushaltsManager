@@ -2,6 +2,8 @@ package com.example.lucas.haushaltsmanager.Database;
 
 import android.database.Cursor;
 
+import com.example.lucas.haushaltsmanager.Database.Exceptions.EntityNotExistingException;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 

@@ -108,10 +108,10 @@ public class ExpandableListAdapterCreator {
     private ArrayList<ExpenseObject> getChildrenToDisplay(ExpenseObject parentExpense) {
 
         ArrayList<ExpenseObject> childrenToDisplay = new ArrayList<>();
-        for (ExpenseObject child : parentExpense.getChildren()) {
+        for (ExpenseObject childExpense : parentExpense.getChildren()) {
 
-            if (isExpenseVisible(child))
-                childrenToDisplay.add(child);
+            if (isExpenseVisible(childExpense))
+                childrenToDisplay.add(childExpense);
         }
 
         return childrenToDisplay;

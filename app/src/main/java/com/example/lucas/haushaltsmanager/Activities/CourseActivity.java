@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
 import com.example.lucas.haushaltsmanager.Entities.Account;
@@ -81,6 +82,9 @@ public class CourseActivity extends AppCompatActivity {
         expandableListAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * Methode um die Ausgaben aus der Datenbank zu laden.
+     */
     private void prepareDataSources() {
 
         Log.d(TAG, "prepareDataSources: Initialisiere die Buchungsliste");
@@ -89,6 +93,9 @@ public class CourseActivity extends AppCompatActivity {
         prepareAccountData();
     }
 
+    /**
+     * Methode um die Id's der aktiven Konten zu laden.
+     */
     private void prepareAccountData() {
 
         Log.d(TAG, "prepareAccountData: Initialisiere Kontenliste");
@@ -105,6 +112,13 @@ public class CourseActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * Methodem die aufgereufen wird wenn der user auf ein Menüelement klickt.
+     * Dabei hat er die Auswahl zwischen 'Sortieren' und 'Filtern'
+     *
+     * @param item angeklicktes Menüelement
+     * @return Boolean
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -112,9 +126,11 @@ public class CourseActivity extends AppCompatActivity {
 
             case R.id.course_menu_sort:
                 //todo zeige einen AlertDialog an in dem sortier optionen (Datum, Betrag, Kategorie, Alphabetisch) angezeigt werden
+                Toast.makeText(this, "Huch das wurde wohl noch nicht implementiert", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.course_menu_filter:
                 //todo zeige einen alertdialog in dem filteroptionen (Ausgabe, Einnahme, Datum, ...) angezeigt werden
+                Toast.makeText(this, "Huch das wurde wohl noch nicht implementiert", Toast.LENGTH_SHORT).show();
                 break;
             default:
                 throw new UnsupportedOperationException("Die Menüoption " + item.getItemId() + " wird nicht unterstützt!");

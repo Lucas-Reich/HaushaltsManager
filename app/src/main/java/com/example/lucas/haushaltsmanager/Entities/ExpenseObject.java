@@ -203,7 +203,7 @@ public class ExpenseObject implements Parcelable {
     }
 
     @NonNull
-    public String getName() {
+    public String getTitle() {
 
         return title;
     }
@@ -390,12 +390,12 @@ public class ExpenseObject implements Parcelable {
     @Override
     public String toString() {
 
-        return getIndex() + " " + getName() + " " + getUnsignedPrice();
+        return getIndex() + " " + getTitle() + " " + getUnsignedPrice();
     }
 
     public boolean equals(ExpenseObject otherExpense) {
 
-        boolean result = getName().equals(otherExpense.getName());
+        boolean result = getTitle().equals(otherExpense.getTitle());
         result = result && (getUnsignedPrice() == otherExpense.getUnsignedPrice());
         result = result && getExpenseCurrency().equals(otherExpense.getExpenseCurrency());
         result = result && getAccount().equals(otherExpense.getAccount());
