@@ -107,9 +107,16 @@ public class TabOneBookings extends Fragment {
                     updateExpListView();
                 } else {
 
-                    Intent createNewBookingIntent = new Intent(mainTab, ExpenseScreenActivity.class);
-                    createNewBookingIntent.putExtra("mode", "createBooking");
-                    mainTab.startActivity(createNewBookingIntent);
+                    if (mDatabase.getAllAccounts().size() != 0) {
+
+                        Intent createNewBookingIntent = new Intent(mainTab, ExpenseScreenActivity.class);
+                        createNewBookingIntent.putExtra("mode", "createBooking");
+                        mainTab.startActivity(createNewBookingIntent);
+                    } else {
+
+                        //todo zeige dem user wie er ein neues Konto anlegen kann
+                        Toast.makeText(mainTab, getResources().getString(R.string.no_account), Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });

@@ -29,10 +29,11 @@
             android:textSize="23sp"/>
 
         <View
-            android:id="@+id/view4"
+            android:id="@+id/divider8"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/colorPrimary"/>
+            android:background="@color/colorPrimary"
+            />
 
         <LinearLayout
             android:layout_width="match_parent"

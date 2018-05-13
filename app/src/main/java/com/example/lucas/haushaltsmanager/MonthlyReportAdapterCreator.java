@@ -42,7 +42,7 @@ public class MonthlyReportAdapterCreator {
      */
     private void createMonthlyReports() {
 
-        for (int i = 1; i <= getCurrentMonth(); i++) {
+        for (int i = getCurrentMonth(); i >= 1; i--) {
             mReports.add(new MonthlyReport(i + "", new ArrayList<ExpenseObject>(), getMainCurrency(), mContext));
         }
 

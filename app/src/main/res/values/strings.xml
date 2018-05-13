@@ -115,4 +115,5 @@
     <string name="show_templates">Templates</string>
     <string name="filter">Filter</string>
     <string name="sort">Sort</string>
+    <string name="no_account">First create an account before you start creating bookings</string>
 </resources>

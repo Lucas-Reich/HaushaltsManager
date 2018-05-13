@@ -45,7 +45,7 @@ public class CreateAccountActivity extends AppCompatActivity implements OnItemSe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_account_ver2);
+        setContentView(R.layout.activity_new_account);
 
         mDatabase = new ExpensesDataSource(this);
         mDatabase.open();

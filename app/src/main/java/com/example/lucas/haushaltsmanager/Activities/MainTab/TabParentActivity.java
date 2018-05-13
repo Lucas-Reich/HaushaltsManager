@@ -122,11 +122,6 @@ public class TabParentActivity extends AppCompatActivity implements ChooseAccoun
                         Intent recurringBookingIntent = new Intent(TabParentActivity.this, RecurringBookingsActivity.class);
                         TabParentActivity.this.startActivity(recurringBookingIntent);
                         break;
-                    case R.id.transfers:
-
-                        Intent transferIntent = new Intent(TabParentActivity.this, TransferActivity.class);
-                        TabParentActivity.this.startActivity(transferIntent);
-                        break;
                     case R.id.backup:
 
                         Intent backupIntent = new Intent(TabParentActivity.this, CreateBackupActivity.class);
@@ -146,6 +141,9 @@ public class TabParentActivity extends AppCompatActivity implements ChooseAccoun
                         Intent testPieIntent = new Intent(TabParentActivity.this, TestActivity.class);//todo replace
                         TabParentActivity.this.startActivity(testPieIntent);
                         break;
+                    default:
+
+                        Toast.makeText(TabParentActivity.this, "Ups, da hast du wohl etwas entdeckt was du eigentlich noch gar nicht sehen solltest.", Toast.LENGTH_SHORT).show();
                 }
 
                 DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_2);

@@ -121,7 +121,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
                 convertView = inflater.inflate(R.layout.activity_test_exp_listview_list_group_child_n, null);
 
-                RoundedTextView circleLetter = (RoundedTextView) convertView.findViewById(R.id.booking_item_circle);
+                RoundedTextView roundedTextView = (RoundedTextView) convertView.findViewById(R.id.booking_item_circle);
                 TextView txtTitle2 = (TextView) convertView.findViewById(R.id.booking_item_title);
                 TextView txtPerson = (TextView) convertView.findViewById(R.id.booking_item_person);
                 TextView txtPaidPrice = (TextView) convertView.findViewById(R.id.booking_item_paid_price);
@@ -138,9 +138,9 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
 
                 String category = groupExpense.getCategory().getName();
-                circleLetter.setTextColor(Color.WHITE);
-                circleLetter.setCenterText(category.substring(0, 1).toUpperCase());
-                circleLetter.setCircleColor(groupExpense.getCategory().getColor());
+                roundedTextView.setTextColor(Color.WHITE);
+                roundedTextView.setCenterText(category.substring(0, 1).toUpperCase());
+                roundedTextView.setCircleColor(groupExpense.getCategory().getColor());
                 txtTitle2.setText(groupExpense.getTitle());
                 //TODO wenn es eine Multiuser funktionalität muss hier der benutzer eingetragen werden, der das Geld ausgegeben hat
                 txtPerson.setText("");
@@ -247,6 +247,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
         String category = childExpense.getCategory().getName();
 
+        childViewHolder.roundedTextView.setTextColor(Color.WHITE);
         childViewHolder.roundedTextView.setCenterText(category.substring(0, 1).toUpperCase());
         childViewHolder.roundedTextView.setCircleColor(childExpense.getCategory().getColor());
         childViewHolder.txtTitle.setText(childExpense.getTitle());

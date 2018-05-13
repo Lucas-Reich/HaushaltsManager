@@ -26,9 +26,11 @@
             android:textAllCaps="false"/>
 
         <View
+            android:id="@+id/divider"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/colorPrimary"/>
+            android:background="@color/colorPrimary"
+            />
 
         <ListView
             android:id="@+id/create_backup_list_view"
