@@ -12,11 +12,14 @@ import android.view.KeyEvent;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.lucas.haushaltsmanager.R;
+import com.example.lucas.haushaltsmanager.Views.ViewWrapper;
 
 public class PriceInputDialog extends DialogFragment {
+    private static String TAG = PriceInputDialog.class.getSimpleName();
 
     private Context mContext;
     private OnPriceSelected mCallback;
@@ -47,14 +50,20 @@ public class PriceInputDialog extends DialogFragment {
 
         final Bundle args = getArguments();
         final Activity activity = getActivity();
-        final EditText input = new EditText(mContext);
-        input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        final EditText input = createInputView();
+
+        //wrapper für die text eingabe, sodass dieser eine padding gegeben werden kann
+        //Quelle: http://android.pcsalt.com/create-alertdialog-with-custom-layout-programmatically/
+        LinearLayout layout = new LinearLayout(mContext);
+        layout.setPadding(ViewWrapper.dpToPx(23), 0, 0, 0);
+        layout.addView(input);
+
 
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 
         builder.setTitle(args.getString("title"));
 
-        builder.setView(input);
+        builder.setView(layout);
 
         builder.setPositiveButton(R.string.btn_ok, new DialogInterface.OnClickListener() {
 
@@ -98,6 +107,21 @@ public class PriceInputDialog extends DialogFragment {
 
 
         return builder.create();
+    }
+
+    /**
+     * Methode um ein EditText mit einer margin links und rechts von 75 pixeln zu erstellen.
+     *
+     * @return EditText
+     */
+    private EditText createInputView() {
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+
+        EditText input = new EditText(mContext);
+        input.setLayoutParams(lp);
+        input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+
+        return input;
     }
 
     public interface OnPriceSelected {

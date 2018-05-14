@@ -62,7 +62,7 @@ public abstract class ViewWrapper extends View {
      * @param px Zu konvertierende pixel
      * @return In Dp konvertierte pixel
      */
-    protected int pxToDp(int px) {
+    public static int pxToDp(int px) {
         return (int) (px / Resources.getSystem().getDisplayMetrics().density);
     }
 
@@ -73,7 +73,7 @@ public abstract class ViewWrapper extends View {
      * @param dp Zu konvertierende dp
      * @return In px konvertierte dp
      */
-    protected static int dpToPx(int dp) {
+    public static int dpToPx(int dp) {
         return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
     }
 

@@ -427,7 +427,7 @@ public class PieChart extends ViewWrapper {
      */
     private Rect getChartDesiredSize() {
 
-        return new Rect(0, 0, dpToPx(200), dpToPx(200));
+        return new Rect(0, 0, ViewWrapper.dpToPx(200), ViewWrapper.dpToPx(200));
     }
 
     /**
@@ -447,7 +447,7 @@ public class PieChart extends ViewWrapper {
 
 
         //herausfinden wie groß die legende sein kann
-        int minChartSize = dpToPx(200);
+        int minChartSize = ViewWrapper.dpToPx(200);
         resolveLegendSize(sizeWithPadding, minChartSize);
         mPieChartBounds = resolveChartSize(mLegendBounds, sizeWithPadding);
 

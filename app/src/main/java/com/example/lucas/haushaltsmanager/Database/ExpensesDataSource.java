@@ -365,9 +365,21 @@ public class ExpensesDataSource {
         return accounts;
     }
 
-    public long updateAccount(Account account) {
+    /**
+     * Methode um die Werte eins Kontos anzupassen
+     *
+     * @param account Konto mit geänderten Werten
+     * @return True bei erfolg, false bei Fehlschlag
+     */
+    public boolean updateAccount(Account account) {
 
-        throw new UnsupportedOperationException("Updating Accounts is not Supported");//todo
+        ContentValues updatedAccount = new ContentValues();
+        updatedAccount.put(ExpensesDbHelper.ACCOUNTS_COL_NAME, account.getName());
+        updatedAccount.put(ExpensesDbHelper.ACCOUNTS_COL_BALANCE, account.getBalance());
+        updatedAccount.put(ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID, account.getCurrency().getIndex());
+
+        int affectedRows = database.update(ExpensesDbHelper.TABLE_ACCOUNTS, updatedAccount, ExpensesDbHelper.ACCOUNTS_COL_ID + " = ?", new String[]{account.getIndex() + ""});
+        return affectedRows == 1;
     }
 
     /**
@@ -467,9 +479,19 @@ public class ExpensesDataSource {
         return tags;
     }
 
-    public long updateTag(Tag tag) {
+    /**
+     * Methode um die Werte eines Tags anzupassen.
+     *
+     * @param tag Tag mit angepassten Werten
+     * @return True bei Erfolg, False bei fehlschlag
+     */
+    public boolean updateTag(Tag tag) {
 
-        throw new UnsupportedOperationException("Updating Tags is not Supported");//todo
+        ContentValues updatedTag = new ContentValues();
+        updatedTag.put(ExpensesDbHelper.TAGS_COL_NAME, tag.getName());
+
+        int affectedRows = database.update(ExpensesDbHelper.TABLE_TAGS, updatedTag, ExpensesDbHelper.TAGS_COL_ID + " = ?", new String[]{tag.getIndex() + ""});
+        return affectedRows == 1;
     }
 
     /**
@@ -761,7 +783,7 @@ public class ExpensesDataSource {
         updatedExpense.put(ExpensesDbHelper.BOOKINGS_COL_IS_PARENT, expense.isParent());
         updatedExpense.put(ExpensesDbHelper.BOOKINGS_COL_CURRENCY_ID, expense.getExpenseCurrency().getIndex());
 
-        int affectedRows = database.update(ExpensesDbHelper.TABLE_BOOKINGS, updatedExpense, ExpensesDbHelper.BOOKINGS_COL_ID + " = ?", new String[] {expense.getIndex() + ""});
+        int affectedRows = database.update(ExpensesDbHelper.TABLE_BOOKINGS, updatedExpense, ExpensesDbHelper.BOOKINGS_COL_ID + " = ?", new String[]{expense.getIndex() + ""});
         return affectedRows == 1;
     }
 
@@ -992,9 +1014,28 @@ public class ExpensesDataSource {
         return c.getInt(c.getColumnIndex("exists")) != 0;
     }
 
-    public int updateChildBooking(ExpenseObject expense) {
+    /**
+     * Methode um ein Kindbuchung zu updaten.
+     * Dabei wird die parent buchung aber nicht mit geupdated.
+     *
+     * @param child Kindbuchung mit neuen Werten
+     * @return True bei erfolg, false bei fehlschlag
+     */
+    public boolean updateChildBooking(ExpenseObject child) {
 
-        throw new UnsupportedOperationException("Updating children is not Supported");//todo
+        ContentValues updatedChild = new ContentValues();
+        updatedChild.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_PRICE, child.getUnsignedPrice());
+        updatedChild.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_CATEGORY_ID, child.getCategory().getIndex());
+        updatedChild.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_EXPENDITURE, child.isExpenditure());
+        updatedChild.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_TITLE, child.getTitle());
+        updatedChild.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_DATE, child.getDateTime().getTimeInMillis());
+        updatedChild.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_NOTICE, child.getNotice());
+        updatedChild.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_ACCOUNT_ID, child.getAccount().getIndex());
+        updatedChild.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_EXCHANGE_RATE, child.getExchangeRate());
+        updatedChild.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_CURRENCY_ID, child.getExpenseCurrency().getIndex());
+
+        int affectedRows = database.update(ExpensesDbHelper.TABLE_CHILD_BOOKINGS, updatedChild, ExpensesDbHelper.CHILD_BOOKINGS_COL_ID + " = ?", new String[]{child.getIndex() + ""});
+        return affectedRows == 1;
     }
 
     public int deleteChildBooking(long childId) {
@@ -1101,13 +1142,18 @@ public class ExpensesDataSource {
     /**
      * Convenience Method for updating a Categories color
      *
-     * @param categoryId   Id of the Category which should be changed
-     * @param categoryName new getTitle of the CATEGORY
-     * @return The id of the affected row
+     * @param category Kategorie mit geänderten Werten.
+     * @return True bei erfolg, false bei Fehlschlag.
      */
-    public int updateCategoryName(long categoryId, String categoryName) {
+    public boolean updateCategoryName(Category category) {
 
-        throw new UnsupportedOperationException("Updating Categories us not Supported");//todo
+        ContentValues updatedCategory = new ContentValues();
+        updatedCategory.put(ExpensesDbHelper.CATEGORIES_COL_NAME, category.getName());
+        updatedCategory.put(ExpensesDbHelper.CATEGORIES_COL_COLOR, category.getColor());
+        updatedCategory.put(ExpensesDbHelper.CATEGORIES_COL_EXPENSE_TYPE, category.getDefaultExpenseType());
+
+        int affectedRRows = database.update(ExpensesDbHelper.TABLE_CATEGORIES, updatedCategory, ExpensesDbHelper.CATEGORIES_COL_ID + " = ?", new String[]{category.getIndex() + ""});
+        return affectedRRows == 1;
     }
 
     /**
@@ -1187,12 +1233,20 @@ public class ExpensesDataSource {
         return getBookingById(c.getLong(c.getColumnIndex(ExpensesDbHelper.TEMPLATE_COL_BOOKING_ID)));
     }
 
-    public int updateTemplate(long templateId, long bookingId) {
+    /**
+     * Methode um Templates zu updaten.
+     *
+     * @param templateId Template welches geändert werden soll
+     * @param bookingId  Buchung die das neue Template werden soll
+     * @return True bei erfolg, false bei Fehlschlag
+     */
+    public boolean updateTemplate(long templateId, long bookingId) {
 
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.TEMPLATE_COL_BOOKING_ID, bookingId);
 
-        return database.update(ExpensesDbHelper.TABLE_TEMPLATE_BOOKINGS, values, ExpensesDbHelper.TEMPLATE_COL_ID + " = ?", new String[]{"" + templateId});
+        int affectedRows = database.update(ExpensesDbHelper.TABLE_TEMPLATE_BOOKINGS, values, ExpensesDbHelper.TEMPLATE_COL_ID + " = ?", new String[]{"" + templateId});
+        return affectedRows == 1;
     }
 
     public int deleteTemplate(long templateId) {
@@ -1294,7 +1348,17 @@ public class ExpensesDataSource {
     }
 
 
-    public int updateRecurringBooking(ExpenseObject newRecurringBooking, long startDateInMills, int frequency, long endDateInMills, long recurringId) {
+    /**
+     * Methode um Wiederkehrende Buchungen zu updaten.
+     *
+     * @param newRecurringBooking Wiederkehrende Buchung mit geänderten Werten
+     * @param startDateInMills    Neuer Startzeitpunkz
+     * @param frequency           Neue Häufigkeit
+     * @param endDateInMills      Neuer Endzeitpunkt
+     * @param recurringId         Id der anzupassenden Buchung
+     * @return True bei erfolg, False bei Fehlschlag.
+     */
+    public boolean updateRecurringBooking(ExpenseObject newRecurringBooking, long startDateInMills, int frequency, long endDateInMills, long recurringId) {
 
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID, newRecurringBooking.getIndex());
@@ -1303,7 +1367,8 @@ public class ExpensesDataSource {
         values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_END, endDateInMills);
         Log.d(TAG, "updateRecurringBooking: " + recurringId);
 
-        return database.update(ExpensesDbHelper.TABLE_RECURRING_BOOKINGS, values, ExpensesDbHelper.RECURRING_BOOKINGS_COL_ID + " = ?", new String[]{"" + recurringId});
+        int affectedRows = database.update(ExpensesDbHelper.TABLE_RECURRING_BOOKINGS, values, ExpensesDbHelper.RECURRING_BOOKINGS_COL_ID + " = ?", new String[]{"" + recurringId});
+        return affectedRows == 1;
     }
 
     public int deleteRecurringBooking(long index) {
@@ -1419,9 +1484,21 @@ public class ExpensesDataSource {
             throw new EntityNotExistingException("No entity in database");
     }
 
-    public long updateCurrency(long index) {
+    /**
+     * Methode um die Werte einer Wärhung anzupassen
+     *
+     * @param currency Währung mit angepassten Werten
+     * @return True bei Erfolg, false bei Fehlschlag
+     */
+    public boolean updateCurrency(Currency currency) {
 
-        throw new UnsupportedOperationException("Updating Currencies is not Supported");//todo create UpdateCurrency
+        ContentValues updatedCurrency = new ContentValues();
+        updatedCurrency.put(ExpensesDbHelper.CURRENCIES_COL_SYMBOL, currency.getSymbol());
+        updatedCurrency.put(ExpensesDbHelper.CURRENCIES_COL_NAME, currency.getName());
+        updatedCurrency.put(ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME, currency.getShortName());
+
+        int affectedRows = database.update(ExpensesDbHelper.TABLE_CURRENCIES, updatedCurrency, ExpensesDbHelper.CURRENCIES_COL_ID + " = ?", new String[]{currency.getIndex() + ""});
+        return affectedRows == 1;
     }
 
     /**

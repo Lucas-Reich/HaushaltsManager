@@ -11,12 +11,9 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
 import com.example.lucas.haushaltsmanager.Dialogs.AccountPickerDialog;
@@ -59,9 +56,11 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
 
         mFromExpense = ExpenseObject.createDummyExpense(this);
         mFromExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.TRANSFER_EXPENSE);
+        mFromExpense.setTitle(getResources().getString(R.string.transfer));
 
         mToExpense = ExpenseObject.createDummyExpense(this);
         mToExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.TRANSFER_EXPENSE);
+        mToExpense.setTitle(getResources().getString(R.string.transfer));
 
         mDateBtn = (Button) findViewById(R.id.transfer_date_btn);
         mFromAccountBtn = (Button) findViewById(R.id.transfer_from_account_btn);
@@ -73,11 +72,9 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
         mBackArrow = (ImageButton) findViewById(R.id.back_arrow);
 
         Bundle bundle = getIntent().getExtras();
-        if (bundle != null) {
+        if (bundle != null && bundle.containsKey("from_account"))
+            setFromAccount((Account) bundle.getParcelable("from_account"));
 
-            long fromAccountId = bundle.getLong("from_account_id");
-            setFromAccount(mDatabase.getAccountById(fromAccountId));
-        }
     }
 
     @Override
@@ -120,6 +117,8 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
                 Bundle bundle = new Bundle();
                 bundle.putString("title", getResources().getString(R.string.input_account));
                 bundle.putParcelable("active_account", getActiveAccount());
+                if (mToAccount != null)
+                    bundle.putLong("excluded_account", mToAccount.getIndex());
 
                 AccountPickerDialog accountPicker = new AccountPickerDialog();
                 accountPicker.setArguments(bundle);
@@ -136,6 +135,8 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
                 Bundle bundle = new Bundle();
                 bundle.putString("title", getResources().getString(R.string.input_account));
                 bundle.putParcelable("active_account", getActiveAccount());
+                if (mFromAccount != null)
+                    bundle.putLong("excluded_account", mFromAccount.getIndex());
 
                 AccountPickerDialog accountPicker = new AccountPickerDialog();
                 accountPicker.setArguments(bundle);
@@ -167,54 +168,15 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
                 //checke ob alles gesetzt ist
                 if (mFromExpense.isSet() && mToExpense.isSet()) {
 
-                    if (!mFromExpense.getAccount().equals(mToExpense.getAccount())) {
-
-                        //todo erst wieder enablen wenn die Datenbank nicht mehr zerstört wird
-                        //mDatabase.createBooking(mFromExpense);
-                        //mDatabase.createBooking(mToExpense);
-                    } else {
-
-                        showErrorDialog(R.string.error_same_accounts);
-                    }
+                    //todo erst wieder enablen wenn die Datenbank nicht mehr zerstört wird
+                    mDatabase.createBooking(mFromExpense);
+                    mDatabase.createBooking(mToExpense);
                 } else {
 
                     showErrorDialog(R.string.error_missing_content);
                 }
             }
         });
-    }
-
-    /**
-     * Methode um der Toolbar ein Menü hinzuzufügen.
-     *
-     * @param menu Menü
-     * @return boolean
-     */
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        //getMenuInflater().inflate(R.menu.toolbar_menu, menu);
-
-        return true;
-    }
-
-    /**
-     * Methode um eine funktion auszulösen, wenn auf eine Menüelemente im Toolbar geklickt wurde.
-     *
-     * @param item MenuItem auf welches geklickt wurde
-     * @return boolean
-     */
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-/*
-        switch (item.getItemId()) {
-            case R.id.toolbar_first:
-                Toast.makeText(this, "Hello World!", Toast.LENGTH_SHORT).show();
-                break;
-            default:
-                break;
-        }
-*/
-        return true;
     }
 
     /**
@@ -245,7 +207,7 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
     }
 
     /**
-     * Methode um das momentan akitve Konto aus den ScharedPreferences auszulesen und das dementsprechende Konto aus der Datenbank zu holen
+     * Methode um das momentan aktive Konto aus den ScharedPreferences auszulesen und das dementsprechende Konto aus der Datenbank zu holen
      *
      * @return aktives Konto
      */

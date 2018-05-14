@@ -25,7 +25,7 @@ public class ExpenseObject implements Parcelable {
         DATE_PLACEHOLDER,
         PARENT_EXPENSE,
         NORMAL_EXPENSE,
-        TRANSFER_EXPENSE
+        TRANSFER_EXPENSE,
     }
 
     private EXPENSE_TYPES expenseType;
@@ -91,7 +91,7 @@ public class ExpenseObject implements Parcelable {
     public ExpenseObject(long index, @NonNull String expenseName, double price, Calendar date, boolean expenditure, @NonNull Category category, String notice, @NonNull Account account, Currency expenseCurrency, @NonNull EXPENSE_TYPES expenseType) {
 
         setIndex(index);
-        setName(expenseName);
+        setTitle(expenseName);
         setPrice(price);
         setDateTime(date != null ? date : Calendar.getInstance());
         setExpenditure(expenditure);
@@ -123,7 +123,7 @@ public class ExpenseObject implements Parcelable {
         Log.v(TAG, "Recreating ExpenseObject from parcel data");
         cal.setTimeInMillis(source.readLong());
         setDateTime(cal);
-        setName(source.readString());
+        setTitle(source.readString());
         setPrice(source.readDouble());
         setIndex(source.readLong());
         setExpenditure(source.readByte() != 0);
@@ -208,7 +208,7 @@ public class ExpenseObject implements Parcelable {
         return title;
     }
 
-    public void setName(@NonNull String title) {
+    public void setTitle(@NonNull String title) {
 
         this.title = title;
     }

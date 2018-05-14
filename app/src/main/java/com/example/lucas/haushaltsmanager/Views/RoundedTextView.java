@@ -16,7 +16,7 @@ public class RoundedTextView extends ViewWrapper {
     private static String TAG = RoundedTextView.class.getSimpleName();
 
     private Paint mCirclePaint;
-    private int mDesiredSize = dpToPx(40);
+    private int mDesiredSize = ViewWrapper.dpToPx(40);
 
     private Rect mTextBounds;
     private Paint mTextPaint;
@@ -111,7 +111,7 @@ public class RoundedTextView extends ViewWrapper {
      * @param diameterInPixels Neuer Durchmesser des Kreises
      */
     public void setCircleDiameter(int diameterInPixels) {
-        mDesiredSize = dpToPx(diameterInPixels);
+        mDesiredSize = ViewWrapper.dpToPx(diameterInPixels);
         invalidate();
     }
 }

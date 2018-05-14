@@ -561,7 +561,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
 
                 case "expense_screen_title":
 
-                    mExpense.setName(textInput);
+                    mExpense.setTitle(textInput);
                     mTitleBtn.setText(mExpense.getTitle());
                     Log.d(TAG, "set expense title to " + mExpense.getTitle());
                     break;

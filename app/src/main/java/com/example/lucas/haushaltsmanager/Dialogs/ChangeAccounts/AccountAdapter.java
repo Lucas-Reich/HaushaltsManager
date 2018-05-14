@@ -149,7 +149,7 @@ public class AccountAdapter extends ArrayAdapter<Account> {
                         case R.id.edit_account_transfer:
 
                             Intent transferMoneyBetweenAccountsIntent = new Intent(mContext, TransferActivity.class);
-                            transferMoneyBetweenAccountsIntent.putExtra("from_account_id", mAccount.getIndex());
+                            transferMoneyBetweenAccountsIntent.putExtra("from_account", mAccount);
                             mContext.startActivity(transferMoneyBetweenAccountsIntent);
 
                             Log.d(TAG, "onMenuItemSelected: empty selected");
