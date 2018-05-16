@@ -168,43 +168,6 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         return convertView;
     }
 
-    @Deprecated //since getChildView is in place 25.03.2018
-    public View getChildViewOld(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-
-        ExpenseObject childExpense = (ExpenseObject) getChild(groupPosition, childPosition);
-
-        if (convertView == null) {
-
-            LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.activity_test_exp_listview_list_item, null);
-        }
-
-        RoundedTextView circleLetter = (RoundedTextView) convertView.findViewById(R.id.exp_listview_item_circle);
-        TextView txtTitle = (TextView) convertView.findViewById(R.id.exp_listview_item_title);
-        TextView txtPerson = (TextView) convertView.findViewById(R.id.exp_listview_item_person);
-        TextView txtPaidPrice = (TextView) convertView.findViewById(R.id.exp_listview_item_paid_price);
-        TextView txtBaseCurrency = (TextView) convertView.findViewById(R.id.exp_listview_item_currency_base);
-        TextView txtCalcPrice = (TextView) convertView.findViewById(R.id.exp_listview_item_booking_price);
-        TextView txtPaidCurrency = (TextView) convertView.findViewById(R.id.exp_listview_item_currency_paid);
-
-
-        String category = childExpense.getCategory().getName();
-
-        circleLetter.setCenterText(category.substring(0, 1).toUpperCase());
-        circleLetter.setCircleColor(childExpense.getCategory().getColor());
-        txtTitle.setText(childExpense.getTitle());
-        //TODO wenn es eine Multiuser funktionalität muss hier der benutzer eingetragen werden, der das Geld ausgegeben hat
-        txtPerson.setText("");
-        txtPaidPrice.setText(String.format("%s", childExpense.getUnsignedPrice()));
-        txtPaidPrice.setTextColor(childExpense.isExpenditure() ? mRed : mGreen);
-        txtPaidCurrency.setText(childExpense.getAccount().getCurrency().getSymbol());
-        txtPaidCurrency.setTextColor(childExpense.isExpenditure() ? mRed : mGreen);
-        txtCalcPrice.setText("");
-        txtBaseCurrency.setText("");
-
-        return convertView;
-    }
-
     /**
      * Klasse um nicht bei jedem Child die Objekte neu erstellen zu müssen
      */
@@ -250,6 +213,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         childViewHolder.roundedTextView.setTextColor(Color.WHITE);
         childViewHolder.roundedTextView.setCenterText(category.substring(0, 1).toUpperCase());
         childViewHolder.roundedTextView.setCircleColor(childExpense.getCategory().getColor());
+        childViewHolder.roundedTextView.setCircleDiameter(33);
         childViewHolder.txtTitle.setText(childExpense.getTitle());
         //TODO wenn es eine Multiuser funktionalität muss hier der benutzer eingetragen werden, der das Geld ausgegeben hat
         childViewHolder.txtPerson.setText("");

@@ -140,10 +140,10 @@ public class TabOneBookings extends Fragment {
                 } else {
 
                     //wenn zu einer buchung eine Kindbuchung hinzugefügt werden soll, dann muss die id des Parents mit übergeben werden
-                    long parentExpenseId = mListAdapter.getSelectedBookingIds()[0];
+                    ExpenseObject parentExpense = mListAdapter.getSelectedGroupData().get(0);
                     Intent createChildToBookingIntent = new Intent(mainTab, ExpenseScreenActivity.class);
                     createChildToBookingIntent.putExtra("mode", "addChild");
-                    createChildToBookingIntent.putExtra("parentBooking", parentExpenseId);
+                    createChildToBookingIntent.putExtra("parentBooking", parentExpense);
 
                     mListAdapter.deselectAll();
                     mainTab.startActivity(createChildToBookingIntent);

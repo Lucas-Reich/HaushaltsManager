@@ -49,7 +49,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
 
     private enum creationModes {
         CREATE_EXPENSE_MODE,
-        CREATE_CHILD_MODE,
+        ADD_CHILD_MODE,
         UPDATE_EXPENSE_MODE,
         UPDATE_CHILD_MODE
     }
@@ -156,7 +156,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
 
             mSaveBtn.setText(getString(R.string.add_child_to_booking));
 
-            CREATION_MODE = creationModes.CREATE_CHILD_MODE;
+            CREATION_MODE = creationModes.ADD_CHILD_MODE;
             mParentBooking = getIntent().getParcelableExtra("parentBooking");
         }
 
@@ -340,7 +340,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
                     mDatabase.updateChildBooking(mExpense);
                     Toast.makeText(ExpenseScreenActivity.this, "Updated Booking " + mExpense.getTitle(), Toast.LENGTH_SHORT).show();
                     break;
-                case CREATE_CHILD_MODE:
+                case ADD_CHILD_MODE:
 
                     mDatabase.addChildToBooking(mExpense, mParentBooking);
                     mDatabase.insertConvertExpense(mExpense);

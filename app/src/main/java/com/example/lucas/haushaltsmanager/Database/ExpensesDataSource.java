@@ -878,11 +878,12 @@ public class ExpensesDataSource {
         } else {// wenn ich zu einer bestehenden buchung ein kind hinzufügen möchte
 
             ExpenseObject dummyParentBooking = createDummyExpense();
-            addChild(parentBooking, dummyParentBooking.getIndex());
             dummyParentBooking.addChild(parentBooking);
-
-            addChild(childExpense, dummyParentBooking.getIndex());
             dummyParentBooking.addChild(childExpense);
+            updateBooking(dummyParentBooking);
+
+            addChild(parentBooking, dummyParentBooking.getIndex());
+            addChild(childExpense, dummyParentBooking.getIndex());
 
             deleteBooking(parentBooking.getIndex());
 
