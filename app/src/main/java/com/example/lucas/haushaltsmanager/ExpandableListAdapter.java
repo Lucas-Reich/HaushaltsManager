@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
+    @SuppressWarnings("unused")
     private static String TAG = ExpandableListAdapter.class.getSimpleName();
 
     private Context mContext;
@@ -233,6 +234,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         return true;
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public boolean selectGroup(int groupId) {
 
         return this.mSelectedGroups.add(groupId);
@@ -248,6 +250,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         return this.mSelectedGroups.contains(groupId);
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public boolean removeGroupFromList(int groupId) {
 
         return this.mSelectedGroups.remove((Object) groupId);

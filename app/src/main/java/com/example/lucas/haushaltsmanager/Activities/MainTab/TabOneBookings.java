@@ -257,6 +257,7 @@ public class TabOneBookings extends Fragment {
         mExpListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 
             @Override
+            @SuppressWarnings("unused")
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
                 //if selection mode is enabled do not make long clicks anymore
@@ -284,7 +285,7 @@ public class TabOneBookings extends Fragment {
                     return false;
                 } else if (ExpandableListView.getPackedPositionType(id) == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
 
-                    //TODO öffne den fab und zeige die optionen 'löschen' und 'extrahiere als normale buchung' an
+                    //todo öffne den fab und zeige die optionen 'löschen' und 'extrahiere als normale buchung' an
                     Toast.makeText(getContext(), "CHILD", Toast.LENGTH_SHORT).show();
                     return true;
                 }

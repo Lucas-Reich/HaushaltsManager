@@ -43,6 +43,7 @@ public class CreateAccountActivity extends AppCompatActivity implements OnItemSe
     private CREATION_MODES mCreationMode;
 
     @Override
+    @SuppressWarnings("ConstantConditions")
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_account);
@@ -198,6 +199,7 @@ public class CreateAccountActivity extends AppCompatActivity implements OnItemSe
     }
 
     @Override
+    @SuppressWarnings("ConstantConditions")
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
         String currencyName = parent.getItemAtPosition(position).toString();

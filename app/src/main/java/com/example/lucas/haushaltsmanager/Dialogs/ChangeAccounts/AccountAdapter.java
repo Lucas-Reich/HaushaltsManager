@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AccountAdapter extends ArrayAdapter<Account> {
+    @SuppressWarnings("unused")
     private static String TAG = AccountAdapter.class.getSimpleName();
 
     private OnDeleteAccountSelected mCallback;
@@ -39,6 +40,7 @@ public class AccountAdapter extends ArrayAdapter<Account> {
 
     @Override
     @NonNull
+    @SuppressWarnings("ConstantConditions")
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
 
         Account account = getItem(position);

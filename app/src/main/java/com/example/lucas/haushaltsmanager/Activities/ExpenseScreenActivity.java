@@ -132,7 +132,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
 
         SharedPreferences preferences = getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
 
-        if (bundle.getString("mode").equals("updateChild")) {
+        if ("updateChild".equals(bundle.getString("mode"))) {
 
             mSaveBtn.setText(getString(R.string.update));
 
@@ -142,7 +142,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
             return;
         }
 
-        if (bundle.getString("mode").equals("updateParent")) {
+        if ("updateParent".equals(bundle.getString("mode"))) {
 
             mSaveBtn.setText(getString(R.string.update));
 
@@ -152,7 +152,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
             return;
         }
 
-        if (bundle.getString("mode").equals("addChild")) {
+        if ("addChild".equals(bundle.getString("mode"))) {
 
             mSaveBtn.setText(getString(R.string.add_child_to_booking));
 
@@ -160,7 +160,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
             mParentBooking = getIntent().getParcelableExtra("parentBooking");
         }
 
-        if (bundle.getString("mode").equals("createBooking")) {
+        if ("createBooking".equals(bundle.getString("mode"))) {
 
             mSaveBtn.setText(getString(R.string.create_booking));
             CREATION_MODE = creationModes.CREATE_EXPENSE_MODE;

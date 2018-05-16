@@ -371,6 +371,7 @@ public class ExpensesDataSource {
      * @param account Konto mit geänderten Werten
      * @return True bei erfolg, false bei Fehlschlag
      */
+    @SuppressWarnings("UnusedReturnValue")
     public boolean updateAccount(Account account) {
 
         ContentValues updatedAccount = new ContentValues();
@@ -389,6 +390,7 @@ public class ExpensesDataSource {
      * @return the number of affected rows
      * @throws CannotDeleteAccountException Wenn ein Konto immer noch zu Buchungen zugewiesen ist kann es nicht gelöscht werden
      */
+    @SuppressWarnings("UnusedReturnValue")
     public int deleteAccount(long accountId) throws CannotDeleteAccountException {
 
         if (hasAccountBookings(accountId))
@@ -404,7 +406,7 @@ public class ExpensesDataSource {
      * @param accountId Id des Kontos
      * @return Boolean
      */
-    public boolean hasAccountBookings(long accountId) {
+    private boolean hasAccountBookings(long accountId) {
 
         return isEntityAssignedToBooking(accountId, ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID);
     }
@@ -530,6 +532,7 @@ public class ExpensesDataSource {
      * @param tagId     Id of the Tag which should be assigned to the booking
      * @return the index of the inserted row
      */
+    @SuppressWarnings("UnusedReturnValue")
     private long assignTagToBooking(long bookingId, long tagId) {
 
         ContentValues values = new ContentValues();
@@ -573,10 +576,10 @@ public class ExpensesDataSource {
     /**
      * Class internal Method for requesting all Bookings to a specified Tag
      *
-     * @param tagId Id of the Tag where all Bookings are requested
+     * @param tag Tag zu welchem alle Buchungen herausgefunden werden sollen
      * @return All ids of the affected Bookings
      */
-    private List<ExpenseObject> getBookingsToTag(long tagId) {
+    private List<ExpenseObject> getBookingsToTag(Tag tag) {
 
         //TODO implement
         return new ArrayList<>();
@@ -598,6 +601,13 @@ public class ExpensesDataSource {
         return database.delete(ExpensesDbHelper.TABLE_BOOKINGS_TAGS, whereClause, whereArgs);
     }
 
+    /**
+     * Methode um alle zugewiesenden Tags einer Buchung zu löschen
+     *
+     * @param bookingId Buchung, deren Tags entfernt werden sollen.
+     * @return Status der Operation
+     */
+    @SuppressWarnings("UnusedReturnValue")
     private int removeTagsFromBooking(long bookingId) {
 
         Log.d(TAG, "removeTagsFromBooking: removing tags from booking " + bookingId);
@@ -768,6 +778,7 @@ public class ExpensesDataSource {
      * @param expense Ausgabe mit geupdateten Werten.
      * @return True bei Erfolg, False bei Fehlschlag.
      */
+    @SuppressWarnings("UnusedReturnValue")
     public Boolean updateBooking(ExpenseObject expense) {
 
         //todo 'schlauen' algorithmus entwickeln welcher nur die geänderten stellen in der datenbank updated
@@ -791,9 +802,10 @@ public class ExpensesDataSource {
      * Method for deleting multiple bookings at once
      *
      * @param bookingIds array of booking ids
-     * @return number of affected rows
+     * @return True bei erfolg, False bei fehlschlag.
      */
-    public int deleteBookings(long bookingIds[]) {
+    @SuppressWarnings("UnusedReturnValue")
+    public boolean deleteBookings(long bookingIds[]) {
 
         int affectedRows = 0;
 
@@ -803,7 +815,7 @@ public class ExpensesDataSource {
             affectedRows++;
         }
 
-        return affectedRows;
+        return affectedRows == 1;
     }
 
     /**
@@ -814,7 +826,6 @@ public class ExpensesDataSource {
      */
     public int deleteBooking(long bookingId) {
 
-
         Log.d(TAG, "deleteBooking: deleting booking " + bookingId);
 
         removeTagsFromBooking(bookingId);
@@ -824,12 +835,13 @@ public class ExpensesDataSource {
 
 
     /**
-     * Function to add child to parentId
+     * Methode um eine Kindbuchung zu einer Buchung hinzuzufügen
      *
      * @param child    child to append to parent
      * @param parentId Id of parent booking
      * @return index of inserted child
      */
+    @SuppressWarnings("UnusedReturnValue")
     private long addChild(ExpenseObject child, long parentId) {
 
         ContentValues values = new ContentValues();
@@ -865,6 +877,7 @@ public class ExpensesDataSource {
      * @param parentBooking Übergeordnete Buchung
      * @return Übergeordnete Buchung
      */
+    @SuppressWarnings("UnusedReturnValue")
     public ExpenseObject addChildToBooking(ExpenseObject childExpense, ExpenseObject parentBooking) {
 
         if (isChild(parentBooking.getIndex()))
@@ -998,7 +1011,7 @@ public class ExpensesDataSource {
         return cursorToChildBooking(c);
     }
 
-    public boolean isChild(long expenseId) {
+    private boolean isChild(long expenseId) {
 
         String selectQuery;
 
@@ -1022,6 +1035,7 @@ public class ExpensesDataSource {
      * @param child Kindbuchung mit neuen Werten
      * @return True bei erfolg, false bei fehlschlag
      */
+    @SuppressWarnings("UnusedReturnValue")
     public boolean updateChildBooking(ExpenseObject child) {
 
         ContentValues updatedChild = new ContentValues();
@@ -1046,6 +1060,13 @@ public class ExpensesDataSource {
         return database.delete(ExpensesDbHelper.TABLE_CHILD_BOOKINGS, ExpensesDbHelper.CHILD_BOOKINGS_COL_ID + " = ?", new String[]{"" + childId});
     }
 
+    /**
+     * Methode die Kinder von einer Parentbuchung zu entfernen
+     *
+     * @param parentId ParentBuchung derer Kinder entfertn werden sollen
+     * @return Status der Operation
+     */
+    @SuppressWarnings("UnusedReturnValue")
     public int deleteChildrenFromParent(long parentId) {
 
         Log.d(TAG, "deleteChildrenFromParent: deleting children with parent id " + parentId);
@@ -1465,7 +1486,7 @@ public class ExpensesDataSource {
         Log.d(TAG, "getCurrencyId: " + DatabaseUtils.dumpCursorToString(c));
         c.moveToFirst();
 
-        assertNotEmpty(c);
+        assertCursorNotEmpty(c);
         long currencyId = c.getLong(c.getColumnIndex(ExpensesDbHelper.CURRENCIES_COL_ID));
         c.close();
 
@@ -1478,9 +1499,9 @@ public class ExpensesDataSource {
      * @param cursor Cursor
      * @throws EntityNotExistingException Wenn in dem Cursor keine Daten enthalten sind wird ein Fehler ausgelöst
      */
-    private void assertNotEmpty(Cursor cursor) throws EntityNotExistingException {
+    private void assertCursorNotEmpty(Cursor cursor) throws EntityNotExistingException {
 
-        //TODO wann immer etwas aus der datenbank abgefragt wird soll der cursor vor der weiterverarbeitung mit dieser funktion gepüft werden
+        //todo wann immer etwas aus der datenbank abgefragt wird soll der cursor vor der weiterverarbeitung mit dieser funktion gepüft werden
         if (cursor == null)
             throw new EntityNotExistingException("No entity in database");
     }
@@ -1604,6 +1625,7 @@ public class ExpensesDataSource {
      * @return HashMap(ExchangeRate, Download date of fetched exchange rate)
      */
     @Nullable
+    @SuppressWarnings("UnnecessaryLocalVariable")
     public HashMap<Double, Long> getExtendedExchangeRate(long fromCurIndex, long toCurIndex, long timeInMills) {
 
         HashMap<Double, Long> extendedExchangeRateInfo = new HashMap<>();
