@@ -27,7 +27,7 @@ import java.util.List;
 
 public class CreateAccountActivity extends AppCompatActivity implements OnItemSelectedListener, BasicTextInputDialog.BasicDialogCommunicator, PriceInputDialog.OnPriceSelected {
 
-    private String TAG = CreateAccountActivity.class.getSimpleName();
+    private static String TAG = CreateAccountActivity.class.getSimpleName();
 
     Button mAccountNameBtn;
     Button mAccountBalanceBtn, mCreateAccountBtn;
@@ -134,14 +134,14 @@ public class CreateAccountActivity extends AppCompatActivity implements OnItemSe
             if (!mAccount.isSet())
                 return;
 
+            SharedPreferences activeAccounts = getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
+            SharedPreferences.Editor activeAccountsEditor = activeAccounts.edit();
+            activeAccountsEditor.putBoolean(mAccount.getName(), true);
+            activeAccountsEditor.apply();
+
             switch (mCreationMode) {
 
                 case CREATE_ACCOUNT:
-
-                    SharedPreferences activeAccounts = getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
-                    SharedPreferences.Editor activeAccountsEditor = activeAccounts.edit();
-                    activeAccountsEditor.putBoolean(mAccount.getName(), true);
-                    activeAccountsEditor.apply();
 
                     Account account = mDatabase.createAccount(mAccount);
 
