@@ -138,8 +138,8 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
     public void resolveIntent(Bundle bundle) {
         if (bundle == null)
             return;
-
-        SharedPreferences preferences = getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
+        else if (!bundle.containsKey("mode"))
+            throw new UnsupportedOperationException("Du musst den Modus setzen!");
 
         if ("updateChild".equals(bundle.getString("mode"))) {
 
@@ -175,6 +175,8 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
             CREATION_MODE = creationModes.CREATE_EXPENSE_MODE;
         }
 
+
+        SharedPreferences preferences = getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
         Account account = mDatabase.getAccountById(preferences.getLong("activeAccount", 0));
         mExpense = ExpenseObject.createDummyExpense(this);
         mExpense.setAccount(account);

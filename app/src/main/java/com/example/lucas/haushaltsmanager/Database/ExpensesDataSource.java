@@ -393,7 +393,7 @@ public class ExpensesDataSource {
      * @param balance   Wert, welcher gutgeschrieben oder abgezogen werden soll
      * @return TRUE wenn die aktion erflogreich war, FALSE wenn nicht
      */
-    public boolean updateAccountBalance(long accountId, double balance) {
+    private boolean updateAccountBalance(long accountId, double balance) {
 
         Account account = getAccountById(accountId);
         double newBalance = account.getBalance() + balance;
@@ -679,7 +679,8 @@ public class ExpensesDataSource {
         for (ExpenseObject child : expense.getChildren())
             addChild(child, index);
 
-        updateAccountBalance(expense.getAccount().getIndex(), expense.getSignedPrice());
+        if (expense.getExpenseType() != ExpenseObject.EXPENSE_TYPES.DUMMY_EXPENSE && expense.getExpenseType() != ExpenseObject.EXPENSE_TYPES.DATE_PLACEHOLDER)
+            updateAccountBalance(expense.getAccount().getIndex(), expense.getSignedPrice());
 
         return new ExpenseObject(index, expense.getTitle(), expense.getUnsignedPrice(), expense.getDateTime(), expense.isExpenditure(), expense.getCategory(), expense.getNotice(), expense.getAccount(), expense.getExpenseCurrency(), expense.getExpenseType());
     }
