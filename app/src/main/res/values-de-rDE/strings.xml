@@ -111,4 +111,6 @@
     <string name="filter">Filter</string>
     <string name="sort">Sortiere</string>
     <string name="no_account">Erstelle zuerst ein Konto bevor du Buchungen erstellst</string>
+    <string name="hint_input_category_name">Geben Sie den Name der Kategorie an</string>
+    <string name="hint_choose_color">Wählen Sie eine Farbe aus</string>
 </resources>

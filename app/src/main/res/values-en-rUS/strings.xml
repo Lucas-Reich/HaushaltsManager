@@ -107,4 +107,6 @@
     <string name="sort">Sort</string>
     <item name="deleted_account" type="id">Deleted account</item>
     <string name="no_account">First create an account before you start creating bookings</string>
+    <string name="hint_input_category_name">Enter category name</string>
+    <string name="hint_choose_color">Choose a color</string>
 </resources>

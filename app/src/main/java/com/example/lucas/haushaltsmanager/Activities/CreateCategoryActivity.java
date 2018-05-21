@@ -16,11 +16,11 @@ import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.R;
 
 public class CreateCategoryActivity extends AppCompatActivity implements BasicTextInputDialog.BasicDialogCommunicator {
-    private static String TAG = CreateCategoryActivity.class.getSimpleName();
+    private static final String TAG = CreateCategoryActivity.class.getSimpleName();
 
-    private Category CATEGORY;
+    private Category mCategory;
     private Button mCatNameBtn, mCatColorBtn, mCreateBtn;
-    private RadioGroup mDefaultExpenseTypeRadio;
+    private RadioGroup mDefaultExpenseRdioGrp;
     private ExpensesDataSource mDatabase;
 
     @Override
@@ -28,7 +28,7 @@ public class CreateCategoryActivity extends AppCompatActivity implements BasicTe
         super.onCreate(savedInstances);
         setContentView(R.layout.activity_new_category);
 
-        CATEGORY = Category.createDummyCategory(this);
+        mCategory = Category.createDummyCategory(this);
         mDatabase = new ExpensesDataSource(this);
         mDatabase.open();
 
@@ -36,7 +36,7 @@ public class CreateCategoryActivity extends AppCompatActivity implements BasicTe
         mCatColorBtn = (Button) findViewById(R.id.new_category_color);
         mCreateBtn = (Button) findViewById(R.id.new_category_create);
 
-        mDefaultExpenseTypeRadio = (RadioGroup) findViewById(R.id.new_category_expense_type);
+        mDefaultExpenseRdioGrp = (RadioGroup) findViewById(R.id.new_category_expense_type);
     }
 
     @Override
@@ -67,7 +67,7 @@ public class CreateCategoryActivity extends AppCompatActivity implements BasicTe
                     @Override
                     public void onColorSelected(int color) {
 
-                        CATEGORY.setColor(color);
+                        mCategory.setColor(color);
                         Log.d(TAG, "set category color to: " + Integer.toHexString(color));
                     }
                 });
@@ -75,21 +75,22 @@ public class CreateCategoryActivity extends AppCompatActivity implements BasicTe
             }
         });
 
-        mDefaultExpenseTypeRadio.check(R.id.new_category_expense);
-        mDefaultExpenseTypeRadio.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+        mDefaultExpenseRdioGrp.check(R.id.new_category_expense);
+        mCategory.setDefaultExpenseType(true);
+        mDefaultExpenseRdioGrp.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
 
                 if (checkedId == R.id.new_category_expense) {
 
-                    CATEGORY.setDefaultExpenseType(true);
+                    mCategory.setDefaultExpenseType(true);
                 } else {
 
-                    CATEGORY.setDefaultExpenseType(false);
+                    mCategory.setDefaultExpenseType(false);
                 }
 
-                Log.d(TAG, "set expense type to : " + CATEGORY.getDefaultExpenseType());
+                Log.d(TAG, "set expense type to : " + mCategory.getDefaultExpenseType());
             }
         });
 
@@ -99,7 +100,7 @@ public class CreateCategoryActivity extends AppCompatActivity implements BasicTe
             public void onClick(View v) {
 
                 //todo überprüfe ob alle nötigen sachen gesetzt wurden
-                mDatabase.createCategory(CATEGORY);
+                mDatabase.createCategory(mCategory);
                 finish();
             }
         });
@@ -122,7 +123,7 @@ public class CreateCategoryActivity extends AppCompatActivity implements BasicTe
     @Override
     public void onTextInput(String textInput, String tag) {
 
-        CATEGORY.setName(textInput);
+        mCategory.setName(textInput);
         mCatNameBtn.setText(textInput);
 
         Log.d(TAG, "set category name to: " + textInput);
