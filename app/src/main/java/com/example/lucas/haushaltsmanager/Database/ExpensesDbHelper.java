@@ -19,11 +19,13 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
 
     static final String TEMPLATE_COL_ID = "_id";
     static final String TEMPLATE_COL_BOOKING_ID = "booking_id";
+    static final String TEMPLATE_COL_BOOKING_TYPE = "booking_type";
 
     private static final String CREATE_TEMPLATE_BOOKINGS = "CREATE TABLE " + TABLE_TEMPLATE_BOOKINGS
             + "("
             + TEMPLATE_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + TEMPLATE_COL_BOOKING_ID + " INTEGER NOT NULL"
+            + TEMPLATE_COL_BOOKING_ID + " INTEGER NOT NULL, "
+            + TEMPLATE_COL_BOOKING_TYPE + " TEXT NOT NULL"
             + ");";
 
     //define table Recurring Bookings
@@ -31,6 +33,7 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
 
     static final String RECURRING_BOOKINGS_COL_ID = "_id";
     static final String RECURRING_BOOKINGS_COL_BOOKING_ID = "booking_id";
+    static final String RECURRING_BOOKINGS_COL_BOOKING_TYPE = "booking_type";
     static final String RECURRING_BOOKINGS_COL_START = "start";
     static final String RECURRING_BOOKINGS_COL_FREQUENCY = "frequency";
     static final String RECURRING_BOOKINGS_COL_END = "end";
@@ -39,6 +42,7 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
             + "("
             + RECURRING_BOOKINGS_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + RECURRING_BOOKINGS_COL_BOOKING_ID + " INTEGER NOT NULL, "
+            + RECURRING_BOOKINGS_COL_BOOKING_TYPE + " TEXT NOT NULL, "
             + RECURRING_BOOKINGS_COL_START + " TEXT NOT NULL, "
             + RECURRING_BOOKINGS_COL_FREQUENCY + " INTEGER NOT NULL, "
             + RECURRING_BOOKINGS_COL_END + " TEXT NOT NULL"
@@ -223,14 +227,16 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
     static final String TABLE_CONVERT_EXPENSES_STACK = "CONVERT_EXPENSES_STACK";
 
     static final String CONVERT_EXPENSES_STACK_COL_ID = "_id";
-    static final String CONVERT_EXPENSES_STACK_COL_BOOKING = "booking_id";
+    static final String CONVERT_EXPENSES_STACK_COL_BOOKING_ID = "booking_id";
+    static final String CONVERT_EXPENSES_STACK_COL_BOOKING_TYPE = "booking_type";
     static final String CONVERT_EXPENSES_STACK_COL_TIMESTAMP = "created_at";
     static final String CONVERT_EXPENSES_STACK_COL_LATEST_TRY = "latest_try";
 
     private static final String CREATE_CONVERT_EXPENSES_STACK = "CREATE TABLE " + TABLE_CONVERT_EXPENSES_STACK
             + "("
             + CONVERT_EXPENSES_STACK_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + CONVERT_EXPENSES_STACK_COL_BOOKING + " INTEGER NOT NULL, "
+            + CONVERT_EXPENSES_STACK_COL_BOOKING_ID + " INTEGER NOT NULL, "
+            + CONVERT_EXPENSES_STACK_COL_BOOKING_TYPE + " TEXT NOT NULL, "
             + CONVERT_EXPENSES_STACK_COL_TIMESTAMP + " DEFAULT CURRENT_TIMESTAMP, "
             + CONVERT_EXPENSES_STACK_COL_LATEST_TRY + " TEXT "
             + ");";

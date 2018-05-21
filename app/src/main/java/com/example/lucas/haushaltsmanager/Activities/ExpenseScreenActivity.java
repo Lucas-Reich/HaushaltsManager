@@ -138,8 +138,8 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
     public void resolveIntent(Bundle bundle) {
         if (bundle == null)
             return;
-
-        SharedPreferences preferences = getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
+        else if (!bundle.containsKey("mode"))
+            throw new UnsupportedOperationException("Du musst den Modus setzen!");
 
         if ("updateChild".equals(bundle.getString("mode"))) {
 
@@ -175,6 +175,8 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
             CREATION_MODE = creationModes.CREATE_EXPENSE_MODE;
         }
 
+
+        SharedPreferences preferences = getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
         Account account = mDatabase.getAccountById(preferences.getLong("activeAccount", 0));
         mExpense = ExpenseObject.createDummyExpense(this);
         mExpense.setAccount(account);
@@ -361,8 +363,11 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
             //wenn eine Buchung in der Zukunft erstellt wurde soll ein alert dialog den user darauf hinweisen,
             //dass die Buchung als zukünftige Buchung erstellt wurde
             //AlertDialog text: "Du hast eine Buchung in der Zukunft erstellt. Diese wird dann zum entsprechenden Tag in deine Historie eingefügt"
-            if (!mExpense.isSet())
+            if (!mExpense.isSet()) {
+
+                Toast.makeText(ExpenseScreenActivity.this, R.string.error_create_expense_content_missing, Toast.LENGTH_SHORT).show();
                 return;
+            }
 
             addTagsToBooking();
 

@@ -99,7 +99,7 @@ public class ExpensesDataSource {
 
         ExpenseObject expense = new ExpenseObject(expenseId, title, price, date, expenditure, category, notice, account, expenseCurrency, ExpenseObject.EXPENSE_TYPES.CHILD_EXPENSE);
 
-        expense.setTags(getTagsToBooking(expense.getIndex()));
+        expense.setTags(getTagsToBooking(expense.getIndex(), expense.getExpenseType()));
 
         return expense;
     }
@@ -162,7 +162,7 @@ public class ExpensesDataSource {
             expense.addChildren(getChildrenToParent(expenseId));
         }
 
-        expense.setTags(getTagsToBooking(expense.getIndex()));
+        expense.setTags(getTagsToBooking(expense.getIndex(), expense.getExpenseType()));
 
         return expense;
     }
@@ -393,7 +393,7 @@ public class ExpensesDataSource {
      * @param balance   Wert, welcher gutgeschrieben oder abgezogen werden soll
      * @return TRUE wenn die aktion erflogreich war, FALSE wenn nicht
      */
-    public boolean updateAccountBalance(long accountId, double balance) {
+    private boolean updateAccountBalance(long accountId, double balance) {
 
         Account account = getAccountById(accountId);
         double newBalance = account.getBalance() + balance;
@@ -553,14 +553,14 @@ public class ExpensesDataSource {
      * @return the index of the inserted row
      */
     @SuppressWarnings("UnusedReturnValue")
-    private long assignTagToBooking(long bookingId, Tag tag) {
-
+    private long assignTagToBooking(long bookingId, Tag tag, ExpenseObject.EXPENSE_TYPES expenseType) {
         if (tag.getIndex() == -1)
             tag = createTag(tag);
 
         ContentValues values = new ContentValues();
-        values.put(ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_ID, tag.getIndex());
+        values.put(ExpensesDbHelper.BOOKINGS_TAGS_COL_TAG_ID, tag.getIndex());
         values.put(ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_ID, bookingId);
+        values.put(ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_TYPE, expenseType.name());
 
         Log.d(TAG, "assigning tag " + tag.getName() + " to booking " + bookingId);
         return database.insert(ExpensesDbHelper.TABLE_BOOKINGS_TAGS, null, values);
@@ -572,7 +572,7 @@ public class ExpensesDataSource {
      * @param bookingId The id of the Booking where the Tags should be outputted
      * @return All Tags to the specified booking in an String[]
      */
-    private List<Tag> getTagsToBooking(long bookingId) {
+    private List<Tag> getTagsToBooking(long bookingId, ExpenseObject.EXPENSE_TYPES expenseType) {
 
         String selectQuery;
         selectQuery = "SELECT "
@@ -580,7 +580,8 @@ public class ExpensesDataSource {
                 + ExpensesDbHelper.TABLE_TAGS + "." + ExpensesDbHelper.TAGS_COL_NAME
                 + " FROM " + ExpensesDbHelper.TABLE_BOOKINGS_TAGS
                 + " JOIN " + ExpensesDbHelper.TABLE_TAGS + " ON " + ExpensesDbHelper.TABLE_BOOKINGS_TAGS + "." + ExpensesDbHelper.BOOKINGS_TAGS_COL_TAG_ID + " = " + ExpensesDbHelper.TABLE_TAGS + "." + ExpensesDbHelper.TAGS_COL_ID
-                + " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS_TAGS + "." + ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_ID + " = " + bookingId;
+                + " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS_TAGS + "." + ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_ID + " = " + bookingId
+                + " AND " + ExpensesDbHelper.TABLE_BOOKINGS_TAGS + "." + ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_TYPE + " = " + expenseType.name() + ";";
         Log.d(TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
@@ -615,11 +616,13 @@ public class ExpensesDataSource {
      * @param tagId     id of tag
      * @return result of operation
      */
-    private int removeTagFromBooking(long bookingId, long tagId) {
+    private int removeTagFromBooking(long bookingId, long tagId, ExpenseObject.EXPENSE_TYPES expenseType) {
 
         Log.d(TAG, "removing tag: " + tagId + " from booking: " + bookingId);
-        String whereClause = ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_ID + " = ? AND " + ExpensesDbHelper.BOOKINGS_TAGS_COL_TAG_ID + " = ?";
-        String[] whereArgs = new String[]{"" + bookingId, "" + tagId};
+        String whereClause = ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_ID + " = ?"
+                + " AND " + ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_TYPE + " = ?"
+                + " AND " + ExpensesDbHelper.BOOKINGS_TAGS_COL_TAG_ID + " = ?";
+        String[] whereArgs = new String[]{"" + bookingId, "" + tagId, expenseType.name()};
 
         return database.delete(ExpensesDbHelper.TABLE_BOOKINGS_TAGS, whereClause, whereArgs);
     }
@@ -631,10 +634,12 @@ public class ExpensesDataSource {
      * @return Status der Operation
      */
     @SuppressWarnings("UnusedReturnValue")
-    private int removeTagsFromBooking(long bookingId) {
+    private int removeTagsFromBooking(long bookingId, ExpenseObject.EXPENSE_TYPES expenseType) {
 
-        Log.d(TAG, "removeTagsFromBooking: removing tags from booking " + bookingId);
-        return database.delete(ExpensesDbHelper.TABLE_BOOKINGS_TAGS, ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_ID + " = ?", new String[]{"" + bookingId});
+        String whereClause = ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_ID + " = ?"
+                + ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_TYPE + " = ?";
+        String[] whereArgs = new String[]{bookingId + "", expenseType.name()};
+        return database.delete(ExpensesDbHelper.TABLE_BOOKINGS_TAGS, whereClause, whereArgs);
     }
 
 
@@ -673,13 +678,14 @@ public class ExpensesDataSource {
         Log.d(TAG, "created expense at index: " + index);
 
         for (Tag tag : expense.getTags()) {
-            assignTagToBooking(index, tag);
+            assignTagToBooking(index, tag, expense.getExpenseType());
         }
 
         for (ExpenseObject child : expense.getChildren())
             addChild(child, index);
 
-        updateAccountBalance(expense.getAccount().getIndex(), expense.getSignedPrice());
+        if (expense.getExpenseType() != ExpenseObject.EXPENSE_TYPES.DUMMY_EXPENSE && expense.getExpenseType() != ExpenseObject.EXPENSE_TYPES.DATE_PLACEHOLDER)
+            updateAccountBalance(expense.getAccount().getIndex(), expense.getSignedPrice());
 
         return new ExpenseObject(index, expense.getTitle(), expense.getUnsignedPrice(), expense.getDateTime(), expense.isExpenditure(), expense.getCategory(), expense.getNotice(), expense.getAccount(), expense.getExpenseCurrency(), expense.getExpenseType());
     }
@@ -817,9 +823,9 @@ public class ExpensesDataSource {
         updatedExpense.put(ExpensesDbHelper.BOOKINGS_COL_CURRENCY_ID, expense.getExpenseCurrency().getIndex());
 
         //todo wenn der preis der Buchung angepasst wurde muss sich auch der Kontostand des Kontos anpassen
-        removeTagsFromBooking(expense.getIndex());
+        removeTagsFromBooking(expense.getIndex(), expense.getExpenseType());
         for (Tag tag : expense.getTags()) {
-            assignTagToBooking(expense.getIndex(), tag);
+            assignTagToBooking(expense.getIndex(), tag, expense.getExpenseType());
         }
 
         int affectedRows = database.update(ExpensesDbHelper.TABLE_BOOKINGS, updatedExpense, ExpensesDbHelper.BOOKINGS_COL_ID + " = ?", new String[]{expense.getIndex() + ""});
@@ -829,14 +835,14 @@ public class ExpensesDataSource {
     /**
      * Methode um mehere Buchungen auf einmal zu löschen
      *
-     * @param bookingIds array of booking ids
+     * @param expenses Buchungen die gelöscht werden sollen
      * @return True bei erfolg, False bei fehlschlag.
      *///todo wenn es einen fehler beim löschen einer buchung geben sollte muss etwas spezielles passieren
     @SuppressWarnings("UnusedReturnValue")
-    public boolean deleteBookings(long bookingIds[]) {
+    public boolean deleteBookings(ArrayList<ExpenseObject> expenses) {
         boolean result = true;
-        for (long bookingId : bookingIds)
-            result = result && deleteBooking(bookingId);
+        for (ExpenseObject expense : expenses)
+            result = result && deleteBooking(expense);
 
         return result;
     }
@@ -844,16 +850,16 @@ public class ExpensesDataSource {
     /**
      * Methode um eine Buchung zu löschen
      *
-     * @param bookingId Id of the Booking which should be deleted
+     * @param expense Buchung die gelöscht werden soll
      * @return TRUE bei Erfolg, FALSE bei Fehlschlag
      */
-    public boolean deleteBooking(long bookingId) {
-        Log.d(TAG, "deleteBooking: deleting booking " + bookingId);
+    private boolean deleteBooking(ExpenseObject expense) {
+        Log.d(TAG, "deleteBooking: deleting booking " + expense.getTitle());
 
-        removeTagsFromBooking(bookingId);
-        deleteChildrenFromParent(bookingId);
+        removeTagsFromBooking(expense.getIndex(), expense.getExpenseType());
+        deleteChildrenFromParent(expense.getIndex());
 
-        int affectedRows = database.delete(ExpensesDbHelper.TABLE_BOOKINGS, ExpensesDbHelper.BOOKINGS_COL_ID + " = ?", new String[]{"" + bookingId});
+        int affectedRows = database.delete(ExpensesDbHelper.TABLE_BOOKINGS, ExpensesDbHelper.BOOKINGS_COL_ID + " = ?", new String[]{"" + expense.getIndex()});
         return affectedRows == 1;
     }
 
@@ -887,7 +893,7 @@ public class ExpensesDataSource {
         updateAccountBalance(child.getAccount().getIndex(), child.getSignedPrice());
 
         for (Tag tag : child.getTags())
-            assignTagToBooking(childId, tag);
+            assignTagToBooking(childId, tag, child.getExpenseType());
 
         return childId;
     }
@@ -922,7 +928,7 @@ public class ExpensesDataSource {
             addChild(parentBooking, dummyParentBooking.getIndex());
             addChild(childExpense, dummyParentBooking.getIndex());
 
-            deleteBooking(parentBooking.getIndex());
+            deleteBooking(parentBooking);
 
             return dummyParentBooking;
         }
@@ -944,7 +950,7 @@ public class ExpensesDataSource {
         for (ExpenseObject child : childExpenses) {
 
             addChild(child, parentBooking.getIndex());
-            deleteBooking(child.getIndex());
+            deleteBooking(child);
         }
 
         return parentBooking;
@@ -1253,10 +1259,11 @@ public class ExpensesDataSource {
     }
 
 
-    public long createTemplateBooking(long bookingId) {
+    public long createTemplateBooking(ExpenseObject expense) {
 
         ContentValues values = new ContentValues();
-        values.put(ExpensesDbHelper.TEMPLATE_COL_BOOKING_ID, bookingId);
+        values.put(ExpensesDbHelper.TEMPLATE_COL_BOOKING_ID, expense.getIndex());
+        values.put(ExpensesDbHelper.TEMPLATE_COL_BOOKING_TYPE, expense.getExpenseType().name());
         Log.d(TAG, "creating template booking");
 
         return database.insert(ExpensesDbHelper.TABLE_TEMPLATE_BOOKINGS, null, values);
@@ -1265,7 +1272,8 @@ public class ExpensesDataSource {
     public ArrayList<ExpenseObject> getTemplates() {
 
         String selectQuery = "SELECT "
-                + ExpensesDbHelper.TEMPLATE_COL_BOOKING_ID
+                + ExpensesDbHelper.TEMPLATE_COL_BOOKING_ID + ","
+                + ExpensesDbHelper.TEMPLATE_COL_BOOKING_TYPE
                 + " FROM " + ExpensesDbHelper.TABLE_TEMPLATE_BOOKINGS + ";";
         Log.d(TAG, "getTemplates: " + selectQuery);
 
@@ -1273,24 +1281,31 @@ public class ExpensesDataSource {
         Log.d(TAG, "getTemplates: " + DatabaseUtils.dumpCursorToString(c));
         c.moveToFirst();
 
-        ArrayList<ExpenseObject> allTemplates = new ArrayList<>();
+        ArrayList<ExpenseObject> templateBookings = new ArrayList<>();
         while (!c.isAfterLast()) {
 
-            long index = c.getLong(c.getColumnIndex(ExpensesDbHelper.TEMPLATE_COL_BOOKING_ID));
-            allTemplates.add(getBookingById(index));
+            long index;
+            if (c.getString(c.getColumnIndex(ExpensesDbHelper.TEMPLATE_COL_BOOKING_TYPE)).equals(ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE.name()))
+                index = c.getLong(c.getColumnIndex(ExpensesDbHelper.TEMPLATE_COL_BOOKING_ID));
+            else if (c.getString(c.getColumnIndex(ExpensesDbHelper.TEMPLATE_COL_BOOKING_TYPE)).equals(ExpenseObject.EXPENSE_TYPES.CHILD_EXPENSE.name()))
+                index = c.getLong(c.getColumnIndex(ExpensesDbHelper.TEMPLATE_COL_BOOKING_ID));
+            else
+                throw new UnsupportedOperationException("Fehler beim auslesen des Booking_type feldes. Angegebener Booking_type wird nicht unterstützt");
+            templateBookings.add(getBookingById(index));
 
             c.moveToNext();
         }
 
         c.close();
-        return allTemplates;
+        return templateBookings;
     }
 
     @Nullable
     public ExpenseObject getTemplate(long templateId) {
 
         String selectQuery = "SELECT "
-                + ExpensesDbHelper.TEMPLATE_COL_BOOKING_ID
+                + ExpensesDbHelper.TEMPLATE_COL_BOOKING_ID + ","
+                + ExpensesDbHelper.TEMPLATE_COL_BOOKING_TYPE
                 + " FROM " + ExpensesDbHelper.TABLE_TEMPLATE_BOOKINGS
                 + " WHERE " + ExpensesDbHelper.TEMPLATE_COL_BOOKING_ID + " = " + templateId;
         Log.d(TAG, "getTemplate: " + selectQuery);
@@ -1299,20 +1314,26 @@ public class ExpensesDataSource {
         Log.d(TAG, "getTemplate: " + DatabaseUtils.dumpCursorToString(c));
         c.moveToFirst();
 
-        return getBookingById(c.getLong(c.getColumnIndex(ExpensesDbHelper.TEMPLATE_COL_BOOKING_ID)));
+        if (c.getString(c.getColumnIndex(ExpensesDbHelper.TEMPLATE_COL_BOOKING_TYPE)).equals(ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE.name()))
+            return getBookingById(c.getLong(c.getColumnIndex(ExpensesDbHelper.TEMPLATE_COL_BOOKING_ID)));
+        else if (c.getString(c.getColumnIndex(ExpensesDbHelper.TEMPLATE_COL_BOOKING_TYPE)).equals(ExpenseObject.EXPENSE_TYPES.CHILD_EXPENSE.name()))
+            return getChildBookingById(c.getLong(c.getColumnIndex(ExpensesDbHelper.TEMPLATE_COL_BOOKING_ID)));
+        else
+            throw new UnsupportedOperationException("Fehler beim auslesen des Booking_type feldes. Angegebener Booking_type wird nicht unterstützt");
     }
 
     /**
      * Methode um Templates zu updaten.
      *
      * @param templateId Template welches geändert werden soll
-     * @param bookingId  Buchung die das neue Template werden soll
+     * @param expense    Buchung die das neue Template werden soll
      * @return True bei erfolg, false bei Fehlschlag
      */
-    public boolean updateTemplate(long templateId, long bookingId) {
+    public boolean updateTemplate(long templateId, ExpenseObject expense) {
 
         ContentValues values = new ContentValues();
-        values.put(ExpensesDbHelper.TEMPLATE_COL_BOOKING_ID, bookingId);
+        values.put(ExpensesDbHelper.TEMPLATE_COL_BOOKING_ID, expense.getIndex());
+        values.put(ExpensesDbHelper.TEMPLATE_COL_BOOKING_TYPE, expense.getExpenseType().name());
 
         int affectedRows = database.update(ExpensesDbHelper.TABLE_TEMPLATE_BOOKINGS, values, ExpensesDbHelper.TEMPLATE_COL_ID + " = ?", new String[]{"" + templateId});
         return affectedRows == 1;
@@ -1325,14 +1346,15 @@ public class ExpensesDataSource {
     }
 
 
-    public long createRecurringBooking(long recurringBookingId, long startTimeInMills, int frequency, long endTimeInMills) {
+    public long createRecurringBooking(ExpenseObject expense, long startTimeInMills, int frequency, long endTimeInMills) {
 
         ContentValues values = new ContentValues();
-        values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID, recurringBookingId);
+        values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID, expense.getIndex());
+        values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_TYPE, expense.getExpenseType().name());
         values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_START, startTimeInMills);
         values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_FREQUENCY, frequency);
         values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_END, endTimeInMills);
-        Log.d(TAG, "creating recurring booking: " + recurringBookingId);
+        Log.d(TAG, "creating recurring booking: " + expense.getTitle());
 
         return database.insert(ExpensesDbHelper.TABLE_RECURRING_BOOKINGS, null, values);
     }
@@ -1383,7 +1405,12 @@ public class ExpensesDataSource {
 
                 if (start.after(dateRngStart)) {
 
-                    expense = getBookingById(c.getLong(c.getColumnIndex(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID)));
+                    if (c.getString(c.getColumnIndex(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_TYPE)).equals(ExpenseObject.EXPENSE_TYPES.CHILD_EXPENSE.name()))
+                        expense = getChildBookingById(c.getLong(c.getColumnIndex(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID)));
+                    else if (c.getString(c.getColumnIndex(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_TYPE)).equals(ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE.name()))
+                        expense = getBookingById(c.getLong(c.getColumnIndex(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID)));
+                    else
+                        throw new UnsupportedOperationException("Buchungstyp wird nicht unterstützt");
                     expense.setDateTime(start);
                     allRecurringBookings.add(expense);
                 }
@@ -1401,7 +1428,8 @@ public class ExpensesDataSource {
     public ExpenseObject getRecurringBooking(long recurringId) {
 
         String selectQuery = "SELECT "
-                + ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID
+                + ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID + ", "
+                + ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_TYPE
                 + " FROM " + ExpensesDbHelper.TABLE_RECURRING_BOOKINGS
                 + " WHERE " + ExpensesDbHelper.RECURRING_BOOKINGS_COL_ID + " = " + recurringId;
         Log.d(TAG, "getRecurringBooking: " + selectQuery);
@@ -1410,10 +1438,12 @@ public class ExpensesDataSource {
         Log.d(TAG, "getRecurringBooking: " + DatabaseUtils.dumpCursorToString(c));
         c.moveToFirst();
 
-        long bookingId = c.getLong(c.getColumnIndex(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID));
-        c.close();
-
-        return getBookingById(bookingId);
+        if (c.getString(c.getColumnIndex(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_TYPE)).equals(ExpenseObject.EXPENSE_TYPES.CHILD_EXPENSE.name()))
+            return getChildBookingById(c.getLong(c.getColumnIndex(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID)));
+        else if (c.getString(c.getColumnIndex(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_TYPE)).equals(ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE.name()))
+            return getBookingById(c.getLong(c.getColumnIndex(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID)));
+        else
+            throw new UnsupportedOperationException("Buchungstyp wird nicht unterstützt");
     }
 
 
@@ -1431,6 +1461,7 @@ public class ExpensesDataSource {
 
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID, newRecurringBooking.getIndex());
+        values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_TYPE, newRecurringBooking.getExpenseType().name());
         values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_START, startDateInMills);
         values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_FREQUENCY, frequency);
         values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_END, endDateInMills);
@@ -1792,7 +1823,8 @@ public class ExpensesDataSource {
     public void insertConvertExpense(ExpenseObject expense) {
 
         ContentValues values = new ContentValues();
-        values.put(ExpensesDbHelper.CONVERT_EXPENSES_STACK_COL_BOOKING, expense.getIndex());
+        values.put(ExpensesDbHelper.CONVERT_EXPENSES_STACK_COL_BOOKING_ID, expense.getIndex());
+        values.put(ExpensesDbHelper.CONVERT_EXPENSES_STACK_COL_BOOKING_TYPE, expense.getExpenseType().name());
         values.put(ExpensesDbHelper.CONVERT_EXPENSES_STACK_COL_LATEST_TRY, expense.getDateTime().getTimeInMillis());
 
         database.insert(ExpensesDbHelper.TABLE_CONVERT_EXPENSES_STACK, null, values);
@@ -1803,20 +1835,28 @@ public class ExpensesDataSource {
      *
      * @return list of expenses
      */
-    public ArrayList<ExpenseObject> convertExpenses() {
+    public ArrayList<ExpenseObject> getConvertExpenses() {
 
         ArrayList<ExpenseObject> convertExpenses = new ArrayList<>();
 
         String selectQuery;
         selectQuery = "SELECT * FROM " + ExpensesDbHelper.TABLE_CONVERT_EXPENSES_STACK + ";";
-        Log.d(TAG, "convertExpenses: " + selectQuery);
+        Log.d(TAG, "getConvertExpenses: " + selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
         c.moveToFirst();
 
+        ExpenseObject expense;
         while (!c.isAfterLast()) {
 
-            convertExpenses.add(cursorToExpense(c));
+            if (c.getString(c.getColumnIndex(ExpensesDbHelper.CONVERT_EXPENSES_STACK_COL_BOOKING_TYPE)).equals(ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE.name()))
+                expense = getBookingById(c.getLong(c.getColumnIndex(ExpensesDbHelper.CONVERT_EXPENSES_STACK_COL_BOOKING_ID)));
+            else if (c.getString(c.getColumnIndex(ExpensesDbHelper.CONVERT_EXPENSES_STACK_COL_BOOKING_TYPE)).equals(ExpenseObject.EXPENSE_TYPES.CHILD_EXPENSE.name()))
+                expense = getChildBookingById(c.getLong(c.getColumnIndex(ExpensesDbHelper.CONVERT_EXPENSES_STACK_COL_BOOKING_ID)));
+            else
+                throw new UnsupportedOperationException("Nicht unterstützter Buchungstyp");
+
+            convertExpenses.add(expense);
             c.moveToNext();
         }
 
@@ -1844,7 +1884,7 @@ public class ExpensesDataSource {
      */
     public void deleteConvertExpense(long index) {
 
-        database.delete(ExpensesDbHelper.TABLE_CONVERT_EXPENSES_STACK, ExpensesDbHelper.CONVERT_EXPENSES_STACK_COL_BOOKING + " = ?", new String[]{"" + index});
+        database.delete(ExpensesDbHelper.TABLE_CONVERT_EXPENSES_STACK, ExpensesDbHelper.CONVERT_EXPENSES_STACK_COL_BOOKING_ID + " = ?", new String[]{"" + index});
     }
 
     /**

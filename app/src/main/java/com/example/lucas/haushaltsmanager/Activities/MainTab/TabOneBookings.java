@@ -160,7 +160,7 @@ public class TabOneBookings extends Fragment {
             @Override
             public void onClick(View v) {
 
-                mDatabase.deleteBookings(mListAdapter.getSelectedBookingIds());
+                mDatabase.deleteBookings(mListAdapter.getSelectedGroupData());
                 mExpenses.removeAll(mListAdapter.getSelectedGroupData());
                 mListAdapter.deselectAll();
 
