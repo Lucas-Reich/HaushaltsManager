@@ -13,7 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckedTextView;
 import android.widget.ImageView;
 
-import com.example.lucas.haushaltsmanager.Activities.CreateNewAccountActivity;
+import com.example.lucas.haushaltsmanager.Activities.CreateAccountActivity;
 import com.example.lucas.haushaltsmanager.Activities.TransferActivity;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.R;
@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AccountAdapter extends ArrayAdapter<Account> {
-
+    @SuppressWarnings("unused")
     private static String TAG = AccountAdapter.class.getSimpleName();
 
     private OnDeleteAccountSelected mCallback;
@@ -40,6 +40,7 @@ public class AccountAdapter extends ArrayAdapter<Account> {
 
     @Override
     @NonNull
+    @SuppressWarnings("ConstantConditions")
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
 
         Account account = getItem(position);
@@ -60,8 +61,8 @@ public class AccountAdapter extends ArrayAdapter<Account> {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        viewHolder.account_chk.setText(String.format("   %s", account.getName()));
         viewHolder.account_chk.setChecked(mCheckedItems.get(position));
+        viewHolder.account_chk.setText(String.format("   %s", account.getName()));//mit einem linebreak (\n) kann man text in der zweiten zeile anzeigen lassen
         viewHolder.overflow_menu.setOnClickListener(new OnAccountOverflowSelectedListener(getContext(), account));
 
         return convertView;
@@ -140,7 +141,7 @@ public class AccountAdapter extends ArrayAdapter<Account> {
                             return true;
                         case R.id.edit_account_edit:
 
-                            Intent updateAccountIntent = new Intent(mContext, CreateNewAccountActivity.class);
+                            Intent updateAccountIntent = new Intent(mContext, CreateAccountActivity.class);
                             updateAccountIntent.putExtra("mode", "update");
                             updateAccountIntent.putExtra("account_id", mAccount.getIndex());
                             mContext.startActivity(updateAccountIntent);
@@ -150,7 +151,7 @@ public class AccountAdapter extends ArrayAdapter<Account> {
                         case R.id.edit_account_transfer:
 
                             Intent transferMoneyBetweenAccountsIntent = new Intent(mContext, TransferActivity.class);
-                            transferMoneyBetweenAccountsIntent.putExtra("from_account_id", mAccount.getIndex());
+                            transferMoneyBetweenAccountsIntent.putExtra("from_account", mAccount);
                             mContext.startActivity(transferMoneyBetweenAccountsIntent);
 
                             Log.d(TAG, "onMenuItemSelected: empty selected");

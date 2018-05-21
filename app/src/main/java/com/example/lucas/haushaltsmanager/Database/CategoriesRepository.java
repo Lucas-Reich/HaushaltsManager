@@ -58,7 +58,7 @@ public class CategoriesRepository {
         long categoryIndex = c.getLong(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_ID));
         String categoryName = c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_NAME));
         String categoryColor = c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_COLOR));
-        boolean defaultExpenseType = c.getInt(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_EXPENSE_TYPE)) == 1;
+        boolean defaultExpenseType = c.getInt(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE)) == 1;
 
         return new Category(categoryIndex, categoryName, categoryColor, defaultExpenseType);
     }
@@ -69,7 +69,7 @@ public class CategoriesRepository {
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.CATEGORIES_COL_NAME, category.getName());
         values.put(ExpensesDbHelper.CATEGORIES_COL_COLOR, category.getColor());
-        values.put(ExpensesDbHelper.CATEGORIES_COL_EXPENSE_TYPE, category.getDefaultExpenseType() ? 1 : 0);
+        values.put(ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE, category.getDefaultExpenseType() ? 1 : 0);
         Log.d(TAG, "created new CATEGORY");
 
         return database.insert(ExpensesDbHelper.TABLE_CATEGORIES, null, values);
@@ -81,7 +81,7 @@ public class CategoriesRepository {
                 + ExpensesDbHelper.CATEGORIES_COL_ID + ", "
                 + ExpensesDbHelper.CATEGORIES_COL_NAME + ", "
                 + ExpensesDbHelper.CATEGORIES_COL_COLOR + ", "
-                + ExpensesDbHelper.CATEGORIES_COL_EXPENSE_TYPE
+                + ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE
                 + " FROM " + ExpensesDbHelper.TABLE_CATEGORIES + ";";
         Log.d(TAG, selectQuery);
 
@@ -100,7 +100,7 @@ public class CategoriesRepository {
     }
 
     /**
-     * Convenience Method for getting a Category by its getName
+     * Convenience Method for getting a Category by its getTitle
      *
      * @param category Name of the CATEGORY
      * @return Returns an Category object
@@ -112,7 +112,7 @@ public class CategoriesRepository {
                 + ExpensesDbHelper.CATEGORIES_COL_ID + ", "
                 + ExpensesDbHelper.CATEGORIES_COL_NAME + ", "
                 + ExpensesDbHelper.CATEGORIES_COL_COLOR + ", "
-                + ExpensesDbHelper.CATEGORIES_COL_EXPENSE_TYPE
+                + ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE
                 + " FROM " + ExpensesDbHelper.TABLE_TAGS
                 + " WHERE " + ExpensesDbHelper.CATEGORIES_COL_NAME + " = '" + category + "';";
         Log.d(TAG, selectQuery);
@@ -136,7 +136,7 @@ public class CategoriesRepository {
                 + ExpensesDbHelper.CATEGORIES_COL_ID + ", "
                 + ExpensesDbHelper.CATEGORIES_COL_NAME + ", "
                 + ExpensesDbHelper.CATEGORIES_COL_COLOR + ", "
-                + ExpensesDbHelper.CATEGORIES_COL_EXPENSE_TYPE
+                + ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE
                 + " FROM " + ExpensesDbHelper.TABLE_TAGS
                 + " WHERE " + ExpensesDbHelper.CATEGORIES_COL_ID + " = " + categoryId + ";";
         Log.d(TAG, selectQuery);
@@ -152,7 +152,7 @@ public class CategoriesRepository {
      * Convenience Method for updating a Categories color
      *
      * @param categoryId   Id of the Category which should be changed
-     * @param categoryName new getName of the CATEGORY
+     * @param categoryName new getTitle of the CATEGORY
      * @return The id of the affected row
      */
     public int updateCategoryName(long categoryId, String categoryName) {

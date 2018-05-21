@@ -1,11 +1,8 @@
 package com.example.lucas.haushaltsmanager;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.util.Log;
+import android.support.annotation.*;
 
-import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 
 import java.util.ArrayList;
@@ -14,23 +11,19 @@ import java.util.HashMap;
 import java.util.List;
 
 public class ExpandableListAdapterCreator {
-
-    private String TAG = ExpandableListAdapterCreator.class.getSimpleName();
+    private static String TAG = ExpandableListAdapterCreator.class.getSimpleName();
 
     private ArrayList<ExpenseObject> mExpenses;
+    private List<Long> mActiveAccounts;
     private ArrayList<ExpenseObject> mListDataHeader;
     private HashMap<ExpenseObject, List<ExpenseObject>> mListDataChild;
-    private ExpensesDataSource mDatabase;
     private Context mContext;
-    private List<Long> mActiveAccounts;
 
     public ExpandableListAdapterCreator(ArrayList<ExpenseObject> expenses, List<Long> activeAccounts, Context context) {
 
         //die liste der aktiven konten soll hier erstellt werden
         mExpenses = expenses;
         mContext = context;
-        mDatabase = new ExpensesDataSource(mContext);
-        mDatabase.open();
         mListDataHeader = new ArrayList<>();
         mListDataChild = new HashMap<>();
         mActiveAccounts = activeAccounts;
@@ -44,68 +37,53 @@ public class ExpandableListAdapterCreator {
     public ExpandableListAdapter getExpandableListAdapter() {
 
         prepareAdapter();
-        mDatabase.close();
         return new ExpandableListAdapter(mContext, mListDataHeader, mListDataChild);
     }
 
     /**
-     * Ersatz für die prepareAdapter methode, da diese nicht in der lage ist die Datumstrenner aus der liste zu nehmen.
-     * Da diese Funktion aber noch Probleme mit der HasMap klasse hat wird sie noch nicht eingesetzt
+     * Methode welche die Liste der Buchungen für den Adapter vorbereitet.
+     * Dabei werden Buchunge, die nicht angezeigt werden soll ausgenommen und
+     * Datumstrenner zwischen zwei Buchungen mit unterschiedlichem Datum eingefügt.
      */
     private void prepareAdapter() {
-        Log.d(TAG, "prepareAdapter: Preparing new Adapter data!");
-        clearExistingViewDataSource();
 
-        int counter = 0;
         String separatorDate = "";
-        for (int i = 0; i < mExpenses.size() - 1; ) {
+        for (ExpenseObject expense : mExpenses) {
 
-            ExpenseObject expense = mExpenses.get(i);
-            if (mExpenses.get(i).getDate().equals(separatorDate) && i + 1 != mExpenses.size()) {
+            if (isExpenseVisible(expense)) {
 
-                if (isExpenseVisible(expense)) {
+                if (expense.getDate().equals(separatorDate)) {
 
-                    addDataToListViewDataSource(expense, getChildrenToDisplay(expense));
-                    counter++;
+                    addExpenseToListViewDataSource(expense, getChildrenToDisplay(expense));
+                } else {
+
+                    createAndInsertDateSeparator(expense.getDateTime());
+                    addExpenseToListViewDataSource(expense, getChildrenToDisplay(expense));
+                    separatorDate = expense.getDate();
                 }
-                i++;
-            } else {
-
-                if (counter == 0 && mListDataHeader.size() != 0)
-                    removeItemAtIndex(i - 1);
-
-                ExpenseObject dateSeparator = createDateSeparator(mExpenses.get(i).getDateTime());
-                addDataToListViewDataSource(dateSeparator, null);
-                separatorDate = expense.getDate();
-
-                counter = 0;
             }
         }
+    }
 
-        if (counter == 0 && mListDataHeader.size() != 0)
-            removeItemAtIndex(mListDataHeader.size() - 1);
+    private void createAndInsertDateSeparator(Calendar previousDate) {
+
+        ExpenseObject dateSeparator = createDateSeparator(previousDate);
+        addExpenseToListViewDataSource(dateSeparator, null);
     }
 
     /**
-     * Methode um eine Buchung aus dem Datensatz des ExpandableListAdapters basierend auf dem Index zu löschen
+     * Funktion um ein ExpenseObject zu erstellen, dass einem Datumstrenner entspricht.
      *
-     * @param index 0 basierter Index der zu löschenden Buchung
+     * @param date Datum des Datumstrenners
+     * @return Datumstrenner
      */
-    private void removeItemAtIndex(int index) {
+    private ExpenseObject createDateSeparator(Calendar date) {
 
-        ExpenseObject itemToRemove = mListDataHeader.get(index);
-        removeItem(itemToRemove);
-    }
+        ExpenseObject dateSeparator = ExpenseObject.createDummyExpense(mContext);
+        dateSeparator.setExpenseType(ExpenseObject.EXPENSE_TYPES.DATE_PLACEHOLDER);
+        dateSeparator.setDateTime(date);
 
-    /**
-     * Methode um eine Buchung aus dem Datensatz des ExpandableListAdapters zu löschen
-     *
-     * @param expense Zu löschende Buchung
-     */
-    private void removeItem(ExpenseObject expense) {
-
-        mListDataChild.remove(expense);
-        mListDataHeader.remove(expense);
+        return dateSeparator;
     }
 
     /**
@@ -114,7 +92,7 @@ public class ExpandableListAdapterCreator {
      * @param groupData GroupExpense
      * @param childData Zugehörigen Childdaten, bei null wird eine leere liste eingefügt
      */
-    private void addDataToListViewDataSource(@NonNull ExpenseObject groupData, @Nullable ArrayList<ExpenseObject> childData) {
+    private void addExpenseToListViewDataSource(@NonNull ExpenseObject groupData, @Nullable ArrayList<ExpenseObject> childData) {
 
         mListDataHeader.add(groupData);
         mListDataChild.put(groupData, childData != null ? childData : new ArrayList<ExpenseObject>());
@@ -130,10 +108,10 @@ public class ExpandableListAdapterCreator {
     private ArrayList<ExpenseObject> getChildrenToDisplay(ExpenseObject parentExpense) {
 
         ArrayList<ExpenseObject> childrenToDisplay = new ArrayList<>();
-        for (ExpenseObject child : parentExpense.getChildren()) {
+        for (ExpenseObject childExpense : parentExpense.getChildren()) {
 
-            if (isExpenseVisible(child))
-                childrenToDisplay.add(child);
+            if (isExpenseVisible(childExpense))
+                childrenToDisplay.add(childExpense);
         }
 
         return childrenToDisplay;
@@ -155,28 +133,5 @@ public class ExpandableListAdapterCreator {
             return getChildrenToDisplay(expense).size() > 0;
         } else
             return mActiveAccounts.contains(expense.getAccount().getIndex());
-    }
-
-    /**
-     * Methode um die bereits bestehenden Datengrundlage der ExpandabeListView zu löschen
-     */
-    private void clearExistingViewDataSource() {
-        mListDataHeader.clear();
-        mListDataChild.clear();
-    }
-
-    /**
-     * Funktion um ein ExpenseObject zu erstellen, dass einem Datumstrenner entspricht.
-     *
-     * @param date Datum des Datumstrenners
-     * @return Datumstrenner
-     */
-    private ExpenseObject createDateSeparator(Calendar date) {
-
-        ExpenseObject dateSeparator = ExpenseObject.createDummyExpense(mContext);
-        dateSeparator.setExpenseType(ExpenseObject.EXPENSE_TYPES.DATE_PLACEHOLDER);
-        dateSeparator.setDateTime(date);
-
-        return dateSeparator;
     }
 }

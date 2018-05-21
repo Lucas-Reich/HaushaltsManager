@@ -8,13 +8,22 @@ import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.MultiAutoCompleteTextView;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -31,6 +40,7 @@ import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Tag;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.text.DateFormat;
@@ -40,14 +50,13 @@ import java.util.Date;
 import java.util.List;
 
 public class ExpenseScreenActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, AccountPickerDialog.OnAccountSelected, BasicTextInputDialog.BasicDialogCommunicator, PriceInputDialog.OnPriceSelected, com.example.lucas.haushaltsmanager.Dialogs.DatePickerDialog.OnDateSelected, FrequencyAlertDialog.OnFrequencySet {
-
-    private String TAG = ExpenseScreenActivity.class.getSimpleName();
+    private static final String TAG = ExpenseScreenActivity.class.getSimpleName();
 
     private creationModes CREATION_MODE;
 
     private enum creationModes {
         CREATE_EXPENSE_MODE,
-        CREATE_CHILD_MODE,
+        ADD_CHILD_MODE,
         UPDATE_EXPENSE_MODE,
         UPDATE_CHILD_MODE
     }
@@ -57,11 +66,15 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
     private Calendar mRecurringEndDate = Calendar.getInstance();
     private boolean mTemplate = false, mRecurring = false;
     public int frequency = 0;
-    private Button mDateBtn, mAccountBtn, mSaveBtn, mCategoryBtn, mTitleBtn, mTagBtn, mNoticeBtn, mRecurringEndBtn, mRecurringFrequency;
+    private Button mDateBtn, mAccountBtn, mSaveBtn, mCategoryBtn, mTitleBtn, mNoticeBtn, mRecurringEndBtn, mRecurringFrequency;
+    private MultiAutoCompleteTextView mTagAutoCompTxt;
     private CheckBox mTemplateChk, mRecurringChk;
     private TextView mAmountTxt, mCurrencyTxt;
     private RadioGroup mExpenseTypeRadio;
     private ExpenseObject mParentBooking;
+    private Toolbar mToolbar;
+    private ImageButton mBackArrow;
+    private List<Tag> mTags;
 
     private ExpensesDataSource mDatabase;
 
@@ -74,15 +87,16 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
         mDatabase.open();
 
         //TODO implement the correct Toolbar functionality (back arrow, overflow menu which holds the load mTemplate button)
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
+        mBackArrow = (ImageButton) findViewById(R.id.back_arrow);
 
         mAmountTxt = (TextView) findViewById(R.id.expense_screen_amount);
         mCurrencyTxt = (TextView) findViewById(R.id.expense_screen_amount_currency);
         mCategoryBtn = (Button) findViewById(R.id.expense_screen_category);
         mExpenseTypeRadio = (RadioGroup) findViewById(R.id.expense_screen_expense_type);
         mTitleBtn = (Button) findViewById(R.id.expense_screen_title);
-        mTagBtn = (Button) findViewById(R.id.expense_screen_tag);
+        mTagAutoCompTxt = (MultiAutoCompleteTextView) findViewById(R.id.expense_screen_tag);
         mDateBtn = (Button) findViewById(R.id.expense_screen_date);
         mNoticeBtn = (Button) findViewById(R.id.expense_screen_notice);
         mAccountBtn = (Button) findViewById(R.id.expense_screen_account);
@@ -127,7 +141,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
 
         SharedPreferences preferences = getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
 
-        if (bundle.getString("mode").equals("updateChild")) {
+        if ("updateChild".equals(bundle.getString("mode"))) {
 
             mSaveBtn.setText(getString(R.string.update));
 
@@ -137,7 +151,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
             return;
         }
 
-        if (bundle.getString("mode").equals("updateParent")) {
+        if ("updateParent".equals(bundle.getString("mode"))) {
 
             mSaveBtn.setText(getString(R.string.update));
 
@@ -147,15 +161,15 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
             return;
         }
 
-        if (bundle.getString("mode").equals("addChild")) {
+        if ("addChild".equals(bundle.getString("mode"))) {
 
             mSaveBtn.setText(getString(R.string.add_child_to_booking));
 
-            CREATION_MODE = creationModes.CREATE_CHILD_MODE;
+            CREATION_MODE = creationModes.ADD_CHILD_MODE;
             mParentBooking = getIntent().getParcelableExtra("parentBooking");
         }
 
-        if (bundle.getString("mode").equals("createBooking")) {
+        if ("createBooking".equals(bundle.getString("mode"))) {
 
             mSaveBtn.setText(getString(R.string.create_booking));
             CREATION_MODE = creationModes.CREATE_EXPENSE_MODE;
@@ -164,12 +178,23 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
         Account account = mDatabase.getAccountById(preferences.getLong("activeAccount", 0));
         mExpense = ExpenseObject.createDummyExpense(this);
         mExpense.setAccount(account);
+        mExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE);
         Log.d(TAG, "resolveIntent: Creating Expense " + mExpense.toString());
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        mBackArrow.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                finish();
+            }
+        });
 
         if (mExpense.isExpenditure())
             mExpenseTypeRadio.check(R.id.expense_screen_radio_expense);
@@ -202,10 +227,12 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
         mDateBtn.setText(mExpense.getDisplayableDateTime());
 
         mTitleBtn.setHint(R.string.input_title);
-        mTitleBtn.setText(mExpense.getName());
+        mTitleBtn.setText(mExpense.getTitle());
 
-        mTagBtn.setHint(R.string.input_tag);
-//        mTagBtn.setText(mExpense.getTags().get(0));TODO enable
+        mTags = mDatabase.getAllTags();
+        initializeAutComTxtView(mTags);
+        for (Tag tag : mExpense.getTags())//kann ich einfach alle tags einer buchung nehmen oder gibt es fälle, in denen die liste noch nicht initialisiert ist?
+            showTagInMultiView(tag);
 
         mNoticeBtn.setHint(R.string.input_notice);
         mNoticeBtn.setText(mExpense.getNotice());
@@ -299,6 +326,30 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
     }
 
     /**
+     * Methode um die in der MultiAutoCompleteTextView gespeicherten Tags an die Buchung zu hängen
+     */
+    private void addTagsToBooking() {
+        mExpense.removeTags();
+
+        String input = mTagAutoCompTxt.getText().toString().replace(" ", "");
+        String tags[] = input.split(",");
+        for (String tag : tags) {
+
+            Tag tagToAdd = new Tag(tag);
+            for (Tag existingTag : mTags) {
+
+                if (existingTag.getName().equals(tag)) {
+
+                    tagToAdd = existingTag;
+                    break;
+                }
+            }
+
+            mExpense.addTag(tagToAdd);
+        }
+    }
+
+    /**
      * OnClickListener um eine Buchung zu erstellen oder um sie zu updaten.
      */
     private View.OnClickListener createBookingClickListener = new View.OnClickListener() {
@@ -313,47 +364,51 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
             if (!mExpense.isSet())
                 return;
 
+            addTagsToBooking();
+
             switch (CREATION_MODE) {
 
                 case UPDATE_EXPENSE_MODE:
 
                     mDatabase.updateBooking(mExpense);
-                    Toast.makeText(ExpenseScreenActivity.this, "Updated Booking " + mExpense.getName(), Toast.LENGTH_SHORT).show();
+                    //todo falls der preis geupdatet wurde muss auch erneut in eine fremdwährung umgerechnet werden
+                    Toast.makeText(ExpenseScreenActivity.this, "Updated Booking " + mExpense.getTitle(), Toast.LENGTH_SHORT).show();
                     break;
                 case UPDATE_CHILD_MODE:
 
                     mDatabase.updateChildBooking(mExpense);
-                    Toast.makeText(ExpenseScreenActivity.this, "Updated Booking " + mExpense.getName(), Toast.LENGTH_SHORT).show();
+                    //todo falls der preis geupdatet wurde muss auch erneut in eine fremdwährung umgerechnet werden
+                    Toast.makeText(ExpenseScreenActivity.this, "Updated Booking " + mExpense.getTitle(), Toast.LENGTH_SHORT).show();
                     break;
-                case CREATE_CHILD_MODE:
+                case ADD_CHILD_MODE:
 
-                    mDatabase.addChildToBooking(mExpense, mParentBooking.getIndex());
+                    mDatabase.addChildToBooking(mExpense, mParentBooking);
                     mDatabase.insertConvertExpense(mExpense);
-                    Toast.makeText(ExpenseScreenActivity.this, "Added Booking \"" + mExpense.getName() + "\" to parent Booking " + mParentBooking.getName(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ExpenseScreenActivity.this, "Added Booking \"" + mExpense.getTitle() + "\" to parent Booking " + mParentBooking.getTitle(), Toast.LENGTH_SHORT).show();
                     break;
                 case CREATE_EXPENSE_MODE:
 
-                    mDatabase.createBooking(mExpense);
+                    mExpense = mDatabase.createBooking(mExpense);
                     mDatabase.insertConvertExpense(mExpense);
-                    Toast.makeText(ExpenseScreenActivity.this, "Created Booking \"" + mExpense.getName() + "\"", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ExpenseScreenActivity.this, "Created Booking \"" + mExpense.getTitle() + "\"", Toast.LENGTH_SHORT).show();
                     break;
                 default:
                     throw new UnsupportedOperationException("ExpenseScreen unterstützt keine anderen Methoden als createExpense, createChildToExpense, updateExpense und updateChildExpense");
             }
-
-            if (mRecurring) {//todo noch einmal überarbeiten
+/* todo recurring und template funktionalität noch einmal überarbeiten
+            if (mRecurring) {
 
                 // frequency is saved as duration in hours, mEndDate is saved as Calendar object
                 long index = mDatabase.createRecurringBooking(mExpense.getIndex(), mCalendar.getTimeInMillis(), frequency, mRecurringEndDate.getTimeInMillis());
                 Log.d(TAG, "created mRecurring booking event at index: " + index);
             }
 
-            if (mTemplate) {//todo noch einmal überarbeiten
+            if (mTemplate) {
 
                 long index = mDatabase.createTemplateBooking(mExpense.getIndex());
                 Log.d(TAG, "created mTemplate for bookings at index: " + index);
             }
-
+*/
             Intent intent = new Intent(ExpenseScreenActivity.this, TabParentActivity.class);
             ExpenseScreenActivity.this.startActivity(intent);
         }
@@ -366,7 +421,203 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
         super.onDestroy();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.expense_screen_menu, menu);
 
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+
+            case R.id.template:
+
+                Intent chooseTemplateIntent = new Intent(ExpenseScreenActivity.this, TemplatesActivity.class);
+                ExpenseScreenActivity.this.startActivityForResult(chooseTemplateIntent, 2);
+                break;
+            default:
+                throw new UnsupportedOperationException("Du hast auf einen Menüpunkt geklickt, welcher nicht unterstützt wird");
+        }
+
+        return true;
+    }
+
+    /**
+     * Methode um die MultiAutocompleteTextView mit der die Tags angezeigt werden zu initialisieren.
+     *
+     * @param tags Liste von tags aus denen der User auswählen kann
+     */
+    private void initializeAutComTxtView(List<Tag> tags) {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, getTagNames(tags));
+        mTagAutoCompTxt.setAdapter(adapter);
+
+        mTagAutoCompTxt.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
+        mTagAutoCompTxt.setHint(R.string.hint_tag_input);
+        mTagAutoCompTxt.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                //do nothing
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                String input = s.toString();
+                if (input.endsWith(","))
+                    removeLastCharacterFromInput();
+
+                if (mTagAutoCompTxt.getText().toString().length() == 0)
+                    return;
+
+                String tags[] = input.split(",");
+                String lastTag = tags[tags.length - 1];
+
+                if (stringContainsText(lastTag) && lastTag.endsWith(" ")) {
+
+                    if (tagNotExisting(lastTag)) {
+                        appendTokenizer();
+                    }
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+                //do nothing
+            }
+        });
+
+        mTagAutoCompTxt.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    hideKeyboard(v);
+                    mTagAutoCompTxt.clearFocus();
+
+                    return true;
+                }
+
+                return false;
+            }
+        });
+    }
+
+    /**
+     * Methode um das Keyboard zu verstecken.
+     *
+     * @param view View
+     */
+    private void hideKeyboard(View view) {
+        InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null)
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+    /**
+     * Methode um zu überprüfen ob der einegegbene Tag bereits existiert.
+     *
+     * @param tagName Name des zu prüfenden Tags.
+     * @return TRUE wenn der Tag bereits existiert, FALSE wenn nicht.
+     */
+    private boolean tagNotExisting(String tagName) {
+        for (Tag tag : mTags) {
+            if (tag.getName().equals(tagName))
+                return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Methode um aus einer Liste von Tags die Namen zu extrahieren
+     *
+     * @param tags Liste der Tags
+     * @return Array der Tag Namen
+     */
+    private String[] getTagNames(List<Tag> tags) {
+        String[] tagNames = new String[tags.size()];
+        for (Tag tag : tags)
+            tagNames[tags.indexOf(tag)] = tag.getName();
+
+        return tagNames;
+    }
+
+    /**
+     * Methode um einen zusätzlichen Separator einzufügen
+     */
+    private void appendTokenizer() {
+
+        String userInput = mTagAutoCompTxt.getText().toString();
+        userInput = removeLastCharacter(userInput);
+        mTagAutoCompTxt.setText(String.format("%s, ", userInput));
+
+        placeCursorAtPosition(mTagAutoCompTxt.getText().length());
+    }
+
+    /**
+     * Methode um den letzten Character eines String zu entfernen.
+     *
+     * @param text String
+     * @return String mit einem Character weniger
+     */
+    private String removeLastCharacter(String text) {
+        return text.substring(0, text.length() - 1);
+    }
+
+    /**
+     * Methode um den letzten Character des Userinputs zu löschen
+     */
+    private void removeLastCharacterFromInput() {
+
+        String input = mTagAutoCompTxt.getText().toString();
+        mTagAutoCompTxt.setText(removeLastCharacter(input));
+        placeCursorAtPosition(input.length() - 1);
+    }
+
+    /**
+     * Methode um den Cursor an die angegebene Position zu setzen.
+     *
+     * @param position Angezielte Position des Cursors
+     */
+    private void placeCursorAtPosition(int position) {
+        mTagAutoCompTxt.setSelection(position);
+    }
+
+    /**
+     * Methode um zu überprüfen ob in einem String Buchustaben stehen oder ob dieser leer ist.
+     *
+     * @param text Zu überprüfender Text
+     * @return TRUE, wenn Buchstaben im string stehen, FALSE wenn nicht
+     */
+    private boolean stringContainsText(String text) {
+        return text.trim().length() > 0;
+    }
+
+    /**
+     * Methode um ein Tag in der MultiAutoCompleteTextView anzuzeigen.
+     *
+     * @param tag Tag, welches angezeigt werden soll
+     */
+    private void showTagInMultiView(Tag tag) {
+
+        String input = mTagAutoCompTxt.getText().toString();
+        mTagAutoCompTxt.setText(String.format("%s%s", input, tag.getName()));
+        appendTokenizer();
+    }
+
+    /**
+     * Methode die aufgerufen wird, wenn der user auf ein TextInput feld klickt.
+     * Je nachdem welches Feld angeklickt wird muss ein anderer AlertDialog aufgerufen werden.
+     *
+     * @param view View
+     */
     public void expensePopUp(View view) {
 
         Bundle bundle = new Bundle();
@@ -377,7 +628,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
 
             case R.id.expense_screen_category:
 
-                Intent chooseCategoryIntent = new Intent(ExpenseScreenActivity.this, ShowCategoriesActivity.class);
+                Intent chooseCategoryIntent = new Intent(ExpenseScreenActivity.this, CategoryListActivity.class);
                 ExpenseScreenActivity.this.startActivityForResult(chooseCategoryIntent, 1);
                 break;
 
@@ -387,14 +638,6 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
 
                 basicDialog.setArguments(bundle);
                 basicDialog.show(getFragmentManager(), "expense_screen_title");
-                break;
-
-            case R.id.expense_screen_tag:
-
-                bundle.putString("title", getResources().getString(R.string.input_tag));
-
-                basicDialog.setArguments(bundle);
-                basicDialog.show(getFragmentManager(), "expense_screen_tag");
                 break;
 
             case R.id.expense_screen_date:
@@ -436,20 +679,34 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
      */
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        if (requestCode == 1) {
+        switch (requestCode) {
 
-            if (resultCode == Activity.RESULT_OK) {
+            case 1://Category response
 
-                Category category = data.getParcelableExtra("categoryObj");
-                mExpense.setCategory(category);
+                if (resultCode == Activity.RESULT_OK) {
 
-                mCategoryBtn.setText(category.getName());
+                    Category category = data.getParcelableExtra("categoryObj");
+                    mExpense.setCategory(category);
 
-                if (category.getDefaultExpenseType())
-                    mExpenseTypeRadio.check(R.id.expense_screen_radio_expense);
-                else
-                    mExpenseTypeRadio.check(R.id.expense_screen_radio_income);
-            }
+                    mCategoryBtn.setText(category.getName());
+
+                    if (category.getDefaultExpenseType())
+                        mExpenseTypeRadio.check(R.id.expense_screen_radio_expense);
+                    else
+                        mExpenseTypeRadio.check(R.id.expense_screen_radio_income);
+                }
+                break;
+            case 2://Template response
+
+                if (resultCode == Activity.RESULT_OK) {
+
+                    ExpenseObject templateBooking = data.getParcelableExtra("templateObj");
+                    //todo setze alle felder in dem expense screen der template booking entsprechend
+                }
+                break;
+            default:
+
+                throw new UnsupportedOperationException("Die Antwort aus mit dem response code: " + requestCode + " kann nicht verarbeitet werden");
         }
     }
 
@@ -509,14 +766,14 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
 
                 case "expense_screen_title":
 
-                    mExpense.setName(textInput);
-                    mTitleBtn.setText(mExpense.getName());
-                    Log.d(TAG, "set expense title to " + mExpense.getName());
+                    mExpense.setTitle(textInput);
+                    mTitleBtn.setText(mExpense.getTitle());
+                    Log.d(TAG, "set expense title to " + mExpense.getTitle());
                     break;
 
                 case "expense_screen_tag":
 
-                    //todo implement tag functionality
+                    //todo tags sollten über eine AutocompleteTextView ausgewählt werden
                     break;
 
                 case "expense_screen_notice":

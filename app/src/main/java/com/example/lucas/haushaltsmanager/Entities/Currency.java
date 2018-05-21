@@ -1,6 +1,7 @@
 package com.example.lucas.haushaltsmanager.Entities;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;

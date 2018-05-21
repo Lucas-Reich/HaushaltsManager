@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.example.lucas.haushaltsmanager.Database.EntityNotExistingException;
+import com.example.lucas.haushaltsmanager.Database.Exceptions.EntityNotExistingException;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 
@@ -29,11 +29,11 @@ import javax.net.ssl.HttpsURLConnection;
 
 //code from: http://www.codexpedia.com/android/asynctask-and-httpurlconnection-sample-in-android/
 public class GetExchangeRatesService extends IntentService {
+    private static String TAG = GetExchangeRatesService.class.getSimpleName();
 
-    static String TAG = GetExchangeRatesService.class.getSimpleName();
-
-    static String URLPATH = "https://api.fixer.io/latest";
-    ExpensesDataSource mDatabase;
+    private static String URLPATH = "https://api.fixer.io/latest";
+    private static String ACCESS_KEY = "9a72248e16efc0df2c4fef9a2a04edef";
+    private ExpensesDataSource mDatabase;
 
     //wenn der service von einer API eine neue währung bekommen sollte dann soll diese auch in die Datenbank geschrieben werden
     //  --> wo bekomme ich das Währungssymbol her
@@ -53,7 +53,6 @@ public class GetExchangeRatesService extends IntentService {
      * Service um Umrechnungskurse aus dem Internet abzurufen und diese in die Datenbank zu schreiben
      */
     public GetExchangeRatesService() {
-
         super("ExchangeRateService");
     }
 
@@ -69,7 +68,8 @@ public class GetExchangeRatesService extends IntentService {
     protected void onHandleIntent(@Nullable Intent intent) {
 
         try {
-            JSONObject jsonResponse = getDataFromApi(new URL(URLPATH));
+            JSONObject jsonResponse = getDataFromApi(buildUrl());
+            assertHttpStatusOk(jsonResponse);
 
             Currency baseCurrency = extractBaseCurrency(jsonResponse);
             Calendar downloadDate = extractUpdateTime(jsonResponse);
@@ -77,9 +77,6 @@ public class GetExchangeRatesService extends IntentService {
 
             createExchangeRates(exchangeRates, baseCurrency, downloadDate);
 
-        } catch (MalformedURLException e) {
-
-            Log.e(TAG, "onHandleIntent: Error while querying the API Data.", e);
         } catch (JSONException e) {
 
             Log.e(TAG, "onHandleIntent: Error while parsing the response json.", e);
@@ -89,6 +86,24 @@ public class GetExchangeRatesService extends IntentService {
         }
 
         stopServiceExecution(1800000L);//30 minutes
+    }
+
+    /**
+     * Methode um die Url aufzubauen und sie mit parametern anzureichern
+     *
+     * @return Url
+     */
+    private URL buildUrl() {
+
+        URL url = null;
+        try {
+            url = new URL(String.format("%s?%s", URLPATH, ACCESS_KEY));
+        } catch (MalformedURLException e) {
+
+            //do nothing
+        }
+
+        return url;
     }
 
     /**
@@ -105,8 +120,6 @@ public class GetExchangeRatesService extends IntentService {
             urlConnection.setRequestMethod("GET");
             urlConnection.connect();
 
-            assertHttpStatusOk(urlConnection.getResponseCode());//todo Code wird hier fehlerhaft ausgeführt
-
             InputStream inputStream = urlConnection.getInputStream();
             closeUrlConnection(urlConnection);
 
@@ -122,16 +135,18 @@ public class GetExchangeRatesService extends IntentService {
 
     /**
      * Methode die prüft ob durch die API eine error status code zurückgegeben wurde.
-     * Falls den so ist wird der Service gestopt und eine neue Abfrage in 30 min. geplant.
+     * Falls dem so ist wird der Service gestoppt.
      *
-     * @param httpCode Zurückgegebener Statuscode
+     * @param response Zurückgegebener Statuscode
      */
-    private void assertHttpStatusOk(int httpCode) {
+    private void assertHttpStatusOk(JSONObject response) {
 
-        if (httpCode != 200) {
+        try {
 
-            Log.d(TAG, "resolveHttpStatusCode: Die API hat einen Fehlerstatuscode zurückgegeben. Service stoppen und neu schedulen!");
-            stopServiceExecution(1800000L);//30 minutes
+            response.getBoolean("success");
+        } catch (JSONException e) {
+
+            stopServiceExecution(null);
         }
     }
 
@@ -308,6 +323,6 @@ public class GetExchangeRatesService extends IntentService {
             ;
 
         mDatabase.close();
-        stopSelf();
+        this.stopSelf();
     }
 }

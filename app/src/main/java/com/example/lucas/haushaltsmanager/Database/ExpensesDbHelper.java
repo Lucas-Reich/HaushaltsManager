@@ -9,7 +9,6 @@ import android.util.Log;
 import java.util.ArrayList;
 
 class ExpensesDbHelper extends SQLiteOpenHelper {
-
     private static final String TAG = ExpensesDbHelper.class.getSimpleName();
 
     private static final String DB_NAME = "expenses.db";
@@ -51,6 +50,7 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
 
     static final String BOOKINGS_COL_ID = "_id";
     static final String BOOKINGS_COL_CREATED_AT = "created_at";
+    static final String BOOKINGS_COL_EXPENSE_TYPE = "expense_type";
     static final String BOOKINGS_COL_PRICE = "price";
     static final String BOOKINGS_COL_CATEGORY_ID = "category_id";
     static final String BOOKINGS_COL_EXPENDITURE = "expenditure";
@@ -66,6 +66,7 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
             + "("
             + BOOKINGS_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + BOOKINGS_COL_CREATED_AT + " DEFAULT CURRENT_TIMESTAMP, "
+            + BOOKINGS_COL_EXPENSE_TYPE + " TEXT NOT NULL, "//hinzugefügt 17.5.18
             + BOOKINGS_COL_PRICE + " REAL NOT NULL, "
             + BOOKINGS_COL_CATEGORY_ID + " INTEGER NOT NULL, "
             + BOOKINGS_COL_EXPENDITURE + " INTEGER NOT NULL, "
@@ -84,6 +85,7 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
 
     static final String CHILD_BOOKINGS_COL_ID = "_id";
     static final String CHILD_BOOKINGS_COL_CREATED_AT = "created_at";
+    static final String CHILD_BOOKINGS_COL_EXPENSE_TYPE = "expense_type";
     static final String CHILD_BOOKINGS_COL_PARENT_BOOKING_ID = "booking_id";
     static final String CHILD_BOOKINGS_COL_PRICE = "price";
     static final String CHILD_BOOKINGS_COL_CATEGORY_ID = "category_id";
@@ -99,6 +101,7 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
             + "("
             + CHILD_BOOKINGS_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + CHILD_BOOKINGS_COL_CREATED_AT + " DEFAULT CURRENT_TIMESTAMP, "
+            + CHILD_BOOKINGS_COL_EXPENSE_TYPE + " TEXT NOT NULL, "//hinzugefügt 17.5.18
             + CHILD_BOOKINGS_COL_PARENT_BOOKING_ID + " INTEGER NOT NULL, "
             + CHILD_BOOKINGS_COL_PRICE + " REAL NOT NULL, "
             + CHILD_BOOKINGS_COL_CATEGORY_ID + " INTEGER NOT NULL, "
@@ -148,14 +151,14 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
     static final String CATEGORIES_COL_ID = "_id";
     static final String CATEGORIES_COL_NAME = "cat_name";
     static final String CATEGORIES_COL_COLOR = "color";
-    static final String CATEGORIES_COL_EXPENSE_TYPE = "expense_type";//todo rename to default_expense_type
+    static final String CATEGORIES_COL_DEFAULT_EXPENSE_TYPE = "default_expense_type";//renamed CURRENCIES_COL_EXPENSE_TYPE -> CURRENCIES_COL_DEFAULT_EXPENSE_TYPE
 
     private final static String CREATE_CATEGORIES = "CREATE TABLE " + TABLE_CATEGORIES
             + "("
             + CATEGORIES_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + CATEGORIES_COL_NAME + " TEXT NOT NULL, "
             + CATEGORIES_COL_COLOR + " TEXT NOT NULL, "
-            + CATEGORIES_COL_EXPENSE_TYPE + " INTEGER NOT NULL"
+            + CATEGORIES_COL_DEFAULT_EXPENSE_TYPE + " INTEGER NOT NULL"
             + ");";
 
 
@@ -163,14 +166,16 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
     static final String TABLE_BOOKINGS_TAGS = "BOOKING_TAGS";
 
     static final String BOOKINGS_TAGS_COL_ID = "_id";
-    static final String BOOKINGS_TAGS_COL_BOOKING_ID = "booking_id";
     static final String BOOKINGS_TAGS_COL_TAG_ID = "tag_id";
+    static final String BOOKINGS_TAGS_COL_BOOKING_ID = "booking_id";
+    static final String BOOKINGS_TAGS_COL_BOOKING_TYPE = "booking_type";
 
     private static final String CREATE_BOOKINGS_TAGS = "CREATE TABLE " + TABLE_BOOKINGS_TAGS
             + "("
             + BOOKINGS_TAGS_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + BOOKINGS_TAGS_COL_TAG_ID + " INTEGER NOT NULL, "
             + BOOKINGS_TAGS_COL_BOOKING_ID + " INTEGER NOT NULL, "
-            + BOOKINGS_TAGS_COL_TAG_ID + " INTEGER NOT NULL "
+            + BOOKINGS_TAGS_COL_BOOKING_TYPE + " TEXT NOT NULL"
             + ");";
 
 
@@ -178,7 +183,7 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
     static final String TABLE_CURRENCIES = "CURRENCIES";
 
     static final String CURRENCIES_COL_ID = "_id";
-    static final String CURRENCIES_COL_TIMESTAMP = "created_at";
+    static final String CURRENCIES_COL_CREATED_AT = "created_at";//renamed CURRENCIES_COL_TIMESTAMP -> CURRENCIES_COL_CREATED_AT 17.05.2018
     static final String CURRENCIES_COL_SYMBOL = "symbol";
     static final String CURRENCIES_COL_NAME = "cur_name";
     static final String CURRENCIES_COL_SHORT_NAME = "short_name";
@@ -186,7 +191,7 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
     private static final String CREATE_CURRENCIES = "CREATE TABLE " + TABLE_CURRENCIES
             + "("
             + CURRENCIES_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + CURRENCIES_COL_TIMESTAMP + " DEFAULT CURRENT_TIMESTAMP, "
+            + CURRENCIES_COL_CREATED_AT + " DEFAULT CURRENT_TIMESTAMP, "
             + CURRENCIES_COL_SYMBOL + " TEXT, "
             + CURRENCIES_COL_NAME + " TEXT NOT NULL, "
             + CURRENCIES_COL_SHORT_NAME + " TEXT NOT NULL"
@@ -203,7 +208,7 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
     static final String CURRENCY_EXCHANGE_RATES_COL_TIMESTAMP = "created_at";
     static final String CURRENCY_EXCHANGE_RATES_COL_SERVER_DATE = "server_date";
 
-    private static String CREATE_CURRENCY_EXCHANGE_RATES = "CREATE TABLE " + TABLE_CURRENCY_EXCHANGE_RATES
+    private static final String CREATE_CURRENCY_EXCHANGE_RATES = "CREATE TABLE " + TABLE_CURRENCY_EXCHANGE_RATES
             + "("
             + CURRENCIES_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + CURRENCY_EXCHANGE_RATES_COL_TIMESTAMP + " DEFAULT CURRENT_TIMESTAMP, "
@@ -222,7 +227,7 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
     static final String CONVERT_EXPENSES_STACK_COL_TIMESTAMP = "created_at";
     static final String CONVERT_EXPENSES_STACK_COL_LATEST_TRY = "latest_try";
 
-    static final String CREATE_CONVERT_EXPENSES_STACK = "CREATE TABLE " + TABLE_CONVERT_EXPENSES_STACK
+    private static final String CREATE_CONVERT_EXPENSES_STACK = "CREATE TABLE " + TABLE_CONVERT_EXPENSES_STACK
             + "("
             + CONVERT_EXPENSES_STACK_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + CONVERT_EXPENSES_STACK_COL_BOOKING + " INTEGER NOT NULL, "

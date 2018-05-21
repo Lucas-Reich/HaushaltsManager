@@ -4,6 +4,11 @@
               android:layout_height="wrap_content"
               android:orientation="vertical">
 
+    <include
+        layout="@layout/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
     <TextView
         android:id="@+id/import_export_headline"
         android:layout_width="match_parent"
@@ -115,9 +120,11 @@
     </LinearLayout>
 
     <View
+        android:id="@+id/divider3"
         android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@color/highlighted_item_color"/>
+        android:layout_height="1dp"
+        android:background="@color/colorPrimary"
+        />
 
     <TextView
         android:id="@+id/textView7"

@@ -13,23 +13,11 @@
         android:id="@+id/standing_orders"
         android:icon="@drawable/ic_menu_camera"
         android:title="@string/left_slider_standing_order"/>
-    <item
-        android:id="@+id/transfers"
-        android:icon="@drawable/ic_menu_camera"
-        android:title="@string/left_slider_transfers"/>
     <group>
-        <item
-            android:id="@+id/desktop"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="@string/left_slider_desktop"/>
         <item
             android:id="@+id/categories"
             android:icon="@drawable/ic_menu_camera"
             android:title="@string/left_slider_categories"/>
-        <item
-            android:id="@+id/templates"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="@string/left_slider_template"/>
     </group>
 
     <group>
@@ -44,10 +32,6 @@
             android:id="@+id/preferences"
             android:icon="@drawable/ic_menu_camera"
             android:title="@string/left_slider_preferences"/>
-        <item
-            android:id="@+id/follow_us"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="@string/left_slider_follow_us"/>
         <item
             android:id="@+id/about"
             android:icon="@drawable/ic_menu_camera"

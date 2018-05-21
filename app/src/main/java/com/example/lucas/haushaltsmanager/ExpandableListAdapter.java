@@ -10,16 +10,16 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.lucas.haushaltsmanager.CustomViews.RoundedTextView;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
-
-    private String TAG = ExpandableListAdapter.class.getSimpleName();
+    @SuppressWarnings("unused")
+    private static String TAG = ExpandableListAdapter.class.getSimpleName();
 
     private Context mContext;
     private List<ExpenseObject> mGroupData;
@@ -84,7 +84,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
 
         //todo ich MUSS die convertView wiederbenutzen und sie nicht jedes mal wieder neu initialisieren
-        final ExpenseObject groupExpense = (ExpenseObject) getGroup(groupPosition);
+        ExpenseObject groupExpense = (ExpenseObject) getGroup(groupPosition);
         LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         switch (groupExpense.getExpenseType()) {
@@ -103,7 +103,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 TextView txtTotalAmount = (TextView) convertView.findViewById(R.id.exp_listview_header_total_amount);
                 TextView txtBaseCurrency = (TextView) convertView.findViewById(R.id.exp_listview_header_base_currency);
 
-                txtTitle.setText(groupExpense.getName());
+                txtTitle.setText(groupExpense.getTitle());
                 txtTotalAmount.setText(String.format(mContext.getResources().getConfiguration().locale, "%.2f", groupExpense.getSignedPrice()));
                 txtTotalAmount.setTextColor(groupExpense.getSignedPrice() < 0 ? mRed : mGreen);
                 txtBaseCurrency.setText("€");
@@ -122,7 +122,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
                 convertView = inflater.inflate(R.layout.activity_test_exp_listview_list_group_child_n, null);
 
-                RoundedTextView circleLetter = (RoundedTextView) convertView.findViewById(R.id.booking_item_circle);
+                RoundedTextView roundedTextView = (RoundedTextView) convertView.findViewById(R.id.booking_item_circle);
                 TextView txtTitle2 = (TextView) convertView.findViewById(R.id.booking_item_title);
                 TextView txtPerson = (TextView) convertView.findViewById(R.id.booking_item_person);
                 TextView txtPaidPrice = (TextView) convertView.findViewById(R.id.booking_item_paid_price);
@@ -139,10 +139,10 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
 
                 String category = groupExpense.getCategory().getName();
-                circleLetter.setTextColor(Color.WHITE);
-                circleLetter.setCenterText(category.substring(0, 1).toUpperCase());
-                circleLetter.setCircleColor(groupExpense.getCategory().getColor());
-                txtTitle2.setText(groupExpense.getName());
+                roundedTextView.setTextColor(Color.WHITE);
+                roundedTextView.setCenterText(category.substring(0, 1).toUpperCase());
+                roundedTextView.setCircleColor(groupExpense.getCategory().getColor());
+                txtTitle2.setText(groupExpense.getTitle());
                 //TODO wenn es eine Multiuser funktionalität muss hier der benutzer eingetragen werden, der das Geld ausgegeben hat
                 txtPerson.setText("");
                 txtPaidPrice.setText(String.format(mContext.getResources().getConfiguration().locale, "%.2f", groupExpense.getUnsignedPrice()));
@@ -164,44 +164,9 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                     txtBaseCurrency2.setText(preferences.getString("mainCurrency", "€"));
                 }
                 break;
+            default:
+                throw new UnsupportedOperationException("Für den Buchungstyp: " + groupExpense.getExpenseType().name() + " gibt es keine View methode!");
         }
-
-        return convertView;
-    }
-
-    @Deprecated //since getChildView is in place 25.03.2018
-    public View getChildViewOld(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-
-        ExpenseObject childExpense = (ExpenseObject) getChild(groupPosition, childPosition);
-
-        if (convertView == null) {
-
-            LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.activity_test_exp_listview_list_item, null);
-        }
-
-        RoundedTextView circleLetter = (RoundedTextView) convertView.findViewById(R.id.exp_listview_item_circle);
-        TextView txtTitle = (TextView) convertView.findViewById(R.id.exp_listview_item_title);
-        TextView txtPerson = (TextView) convertView.findViewById(R.id.exp_listview_item_person);
-        TextView txtPaidPrice = (TextView) convertView.findViewById(R.id.exp_listview_item_paid_price);
-        TextView txtBaseCurrency = (TextView) convertView.findViewById(R.id.exp_listview_item_currency_base);
-        TextView txtCalcPrice = (TextView) convertView.findViewById(R.id.exp_listview_item_booking_price);
-        TextView txtPaidCurrency = (TextView) convertView.findViewById(R.id.exp_listview_item_currency_paid);
-
-
-        String category = childExpense.getCategory().getName();
-
-        circleLetter.setCenterText(category.substring(0, 1).toUpperCase());
-        circleLetter.setCircleColor(childExpense.getCategory().getColor());
-        txtTitle.setText(childExpense.getName());
-        //TODO wenn es eine Multiuser funktionalität muss hier der benutzer eingetragen werden, der das Geld ausgegeben hat
-        txtPerson.setText("");
-        txtPaidPrice.setText(String.format("%s", childExpense.getUnsignedPrice()));
-        txtPaidPrice.setTextColor(childExpense.isExpenditure() ? mRed : mGreen);
-        txtPaidCurrency.setText(childExpense.getAccount().getCurrency().getSymbol());
-        txtPaidCurrency.setTextColor(childExpense.isExpenditure() ? mRed : mGreen);
-        txtCalcPrice.setText("");
-        txtBaseCurrency.setText("");
 
         return convertView;
     }
@@ -248,9 +213,11 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
         String category = childExpense.getCategory().getName();
 
+        childViewHolder.roundedTextView.setTextColor(Color.WHITE);
         childViewHolder.roundedTextView.setCenterText(category.substring(0, 1).toUpperCase());
         childViewHolder.roundedTextView.setCircleColor(childExpense.getCategory().getColor());
-        childViewHolder.txtTitle.setText(childExpense.getName());
+        childViewHolder.roundedTextView.setCircleDiameter(33);
+        childViewHolder.txtTitle.setText(childExpense.getTitle());
         //TODO wenn es eine Multiuser funktionalität muss hier der benutzer eingetragen werden, der das Geld ausgegeben hat
         childViewHolder.txtPerson.setText("");
         childViewHolder.txtPaidPrice.setText(String.format(mContext.getResources().getConfiguration().locale, "%.2f", childExpense.getUnsignedPrice()));
@@ -269,6 +236,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         return true;
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public boolean selectGroup(int groupId) {
 
         return this.mSelectedGroups.add(groupId);
@@ -284,6 +252,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         return this.mSelectedGroups.contains(groupId);
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public boolean removeGroupFromList(int groupId) {
 
         return this.mSelectedGroups.remove((Object) groupId);

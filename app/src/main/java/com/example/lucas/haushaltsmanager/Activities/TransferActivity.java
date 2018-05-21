@@ -2,14 +2,18 @@ package com.example.lucas.haushaltsmanager.Activities;
 
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.annotation.StringRes;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
 import com.example.lucas.haushaltsmanager.Dialogs.AccountPickerDialog;
@@ -31,12 +35,15 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
     private ExpensesDataSource mDatabase;
     private Account mFromAccount, mToAccount;
     private Calendar mCalendar;
+    private Toolbar mToolbar;
+    private ImageButton mBackArrow;
 
     //Ausgabe
     private ExpenseObject mFromExpense;
     //Einnahme
     private ExpenseObject mToExpense;
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,9 +56,11 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
 
         mFromExpense = ExpenseObject.createDummyExpense(this);
         mFromExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.TRANSFER_EXPENSE);
+        mFromExpense.setTitle(getResources().getString(R.string.transfer));
 
         mToExpense = ExpenseObject.createDummyExpense(this);
         mToExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.TRANSFER_EXPENSE);
+        mToExpense.setTitle(getResources().getString(R.string.transfer));
 
         mDateBtn = (Button) findViewById(R.id.transfer_date_btn);
         mFromAccountBtn = (Button) findViewById(R.id.transfer_from_account_btn);
@@ -59,17 +68,30 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
         mCreateTransferBtn = (Button) findViewById(R.id.transfer_create_btn);
         mAmountBtn = (Button) findViewById(R.id.transfer_amount_btn);
 
-        Bundle bundle = getIntent().getExtras();
-        if (bundle != null) {
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        mBackArrow = (ImageButton) findViewById(R.id.back_arrow);
 
-            long fromAccountId = bundle.getLong("from_account_id");
-            setFromAccount(mDatabase.getAccountById(fromAccountId));
-        }
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null && bundle.containsKey("from_account"))
+            setFromAccount((Account) bundle.getParcelable("from_account"));
+
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+
+        mBackArrow.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                finish();
+            }
+        });
+
+        mToolbar.setTitle("");
+        setSupportActionBar(mToolbar);
 
         mAmountBtn.setHint(R.string.placeholder_amount);
         mAmountBtn.setOnClickListener(new View.OnClickListener() {
@@ -95,6 +117,8 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
                 Bundle bundle = new Bundle();
                 bundle.putString("title", getResources().getString(R.string.input_account));
                 bundle.putParcelable("active_account", getActiveAccount());
+                if (mToAccount != null)
+                    bundle.putLong("excluded_account", mToAccount.getIndex());
 
                 AccountPickerDialog accountPicker = new AccountPickerDialog();
                 accountPicker.setArguments(bundle);
@@ -111,6 +135,8 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
                 Bundle bundle = new Bundle();
                 bundle.putString("title", getResources().getString(R.string.input_account));
                 bundle.putParcelable("active_account", getActiveAccount());
+                if (mFromAccount != null)
+                    bundle.putLong("excluded_account", mFromAccount.getIndex());
 
                 AccountPickerDialog accountPicker = new AccountPickerDialog();
                 accountPicker.setArguments(bundle);
@@ -142,15 +168,9 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
                 //checke ob alles gesetzt ist
                 if (mFromExpense.isSet() && mToExpense.isSet()) {
 
-                    if (!mFromExpense.getAccount().equals(mToExpense.getAccount())) {
-
-                        //todo erst wieder enablen wenn die Datenbank nicht mehr zerstört wird
-                        //mDatabase.createBooking(mFromExpense);
-                        //mDatabase.createBooking(mToExpense);
-                    } else {
-
-                        showErrorDialog(R.string.error_same_accounts);
-                    }
+                    //todo erst wieder enablen wenn die Datenbank nicht mehr zerstört wird
+                    mDatabase.createBooking(mFromExpense);
+                    mDatabase.createBooking(mToExpense);
                 } else {
 
                     showErrorDialog(R.string.error_missing_content);
@@ -187,7 +207,7 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
     }
 
     /**
-     * Methode um das momentan akitve Konto aus den ScharedPreferences auszulesen und das dementsprechende Konto aus der Datenbank zu holen
+     * Methode um das momentan aktive Konto aus den ScharedPreferences auszulesen und das dementsprechende Konto aus der Datenbank zu holen
      *
      * @return aktives Konto
      */
@@ -210,18 +230,6 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
         return DateFormat.getDateInstance(DateFormat.SHORT).format(new Date(calendar.getTimeInMillis()));
     }
 
-    @Override
-    public void onAccountSelected(Account account, String tag) {
-
-        if (tag.equals("transfers_from_account")) {
-
-            setFromAccount(account);
-        } else if (tag.equals("transfers_to_account")) {
-
-            setToAccount(account);
-        }
-    }
-
     /**
      * Methode um das Ausgehende Konto zu setzen
      *
@@ -234,6 +242,24 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
         mFromAccountBtn.setText(mFromAccount.getName());
 
         Log.d(TAG, "selected " + mFromAccount.getName() + " as from account");
+    }
+
+    /**
+     * Methode, welche den callback des AccountPickerDialogs implementiert.
+     *
+     * @param account Konto, welches vom User gewählt wurde
+     * @param tag     Tag, welches bei der Dialogerstellung mit gesendet wurde
+     */
+    @Override
+    public void onAccountSelected(Account account, String tag) {
+
+        if (tag.equals("transfers_from_account")) {
+
+            setFromAccount(account);
+        } else if (tag.equals("transfers_to_account")) {
+
+            setToAccount(account);
+        }
     }
 
     /**
@@ -250,6 +276,12 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
         Log.d(TAG, "selected " + mToAccount.getName() + " as to account");
     }
 
+    /**
+     * Methode, welche den callback des DatePickerDialogs implementiert.
+     *
+     * @param date Datum, welches vom User ausgewählt wurde
+     * @param tag  Tag, welches bei der Dialogerstellung mit gesendet wurde
+     */
     @Override
     public void onDateSelected(Calendar date, String tag) {
 
@@ -262,6 +294,12 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
         }
     }
 
+    /**
+     * Methode, welche den callback des PriceInputDialogs implementiert.
+     *
+     * @param price Preis, der vom User eingegeben wurde
+     * @param tag   Tag, welches bei der Dialogerstellung mit gesendet wurde
+     */
     @Override
     public void onPriceSelected(double price, String tag) {
 
@@ -273,7 +311,7 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
             mToExpense.setPrice(price);
             mToExpense.setExpenditure(false);
 
-            mAmountBtn.setText(String.format(this.getResources().getConfiguration().locale,"%.2f", mFromExpense.getUnsignedPrice()));
+            mAmountBtn.setText(String.format(this.getResources().getConfiguration().locale, "%.2f", mFromExpense.getUnsignedPrice()));
             //todo füge die Basis währung mit in den Text ein
         }
     }
@@ -281,6 +319,13 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
     @Override
     protected void onStop() {
         super.onStop();
+
+        mDatabase.close();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
 
         mDatabase.close();
     }

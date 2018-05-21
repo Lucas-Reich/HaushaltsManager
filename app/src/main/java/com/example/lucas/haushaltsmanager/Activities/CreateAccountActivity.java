@@ -25,9 +25,9 @@ import com.example.lucas.haushaltsmanager.R;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CreateNewAccountActivity extends AppCompatActivity implements OnItemSelectedListener, BasicTextInputDialog.BasicDialogCommunicator, PriceInputDialog.OnPriceSelected {
+public class CreateAccountActivity extends AppCompatActivity implements OnItemSelectedListener, BasicTextInputDialog.BasicDialogCommunicator, PriceInputDialog.OnPriceSelected {
 
-    private String TAG = CreateNewAccountActivity.class.getSimpleName();
+    private static String TAG = CreateAccountActivity.class.getSimpleName();
 
     Button mAccountNameBtn;
     Button mAccountBalanceBtn, mCreateAccountBtn;
@@ -43,9 +43,10 @@ public class CreateNewAccountActivity extends AppCompatActivity implements OnIte
     private CREATION_MODES mCreationMode;
 
     @Override
+    @SuppressWarnings("ConstantConditions")
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_account_ver2);
+        setContentView(R.layout.activity_new_account);
 
         mDatabase = new ExpensesDataSource(this);
         mDatabase.open();
@@ -92,7 +93,7 @@ public class CreateNewAccountActivity extends AppCompatActivity implements OnIte
             public void onClick(View v) {
 
                 Bundle args = new Bundle();
-                args.putString("title", "Set Account getName");
+                args.putString("title", "Set Account getTitle");
 
                 BasicTextInputDialog basicDialog = new BasicTextInputDialog();
                 basicDialog.setArguments(args);
@@ -134,14 +135,14 @@ public class CreateNewAccountActivity extends AppCompatActivity implements OnIte
             if (!mAccount.isSet())
                 return;
 
+            SharedPreferences activeAccounts = getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
+            SharedPreferences.Editor activeAccountsEditor = activeAccounts.edit();
+            activeAccountsEditor.putBoolean(mAccount.getName(), true);
+            activeAccountsEditor.apply();
+
             switch (mCreationMode) {
 
                 case CREATE_ACCOUNT:
-
-                    SharedPreferences activeAccounts = getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
-                    SharedPreferences.Editor activeAccountsEditor = activeAccounts.edit();
-                    activeAccountsEditor.putBoolean(mAccount.getName(), true);
-                    activeAccountsEditor.apply();
 
                     Account account = mDatabase.createAccount(mAccount);
 
@@ -156,8 +157,8 @@ public class CreateNewAccountActivity extends AppCompatActivity implements OnIte
                     break;
             }
 
-            Intent startMainTab = new Intent(CreateNewAccountActivity.this, TabParentActivity.class);
-            CreateNewAccountActivity.this.startActivity(startMainTab);
+            Intent startMainTab = new Intent(CreateAccountActivity.this, TabParentActivity.class);
+            CreateAccountActivity.this.startActivity(startMainTab);
         }
     };
 
@@ -198,6 +199,7 @@ public class CreateNewAccountActivity extends AppCompatActivity implements OnIte
     }
 
     @Override
+    @SuppressWarnings("ConstantConditions")
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
         String currencyName = parent.getItemAtPosition(position).toString();

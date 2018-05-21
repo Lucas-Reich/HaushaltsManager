@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager.CustomViews;
+package com.example.lucas.haushaltsmanager.Views;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

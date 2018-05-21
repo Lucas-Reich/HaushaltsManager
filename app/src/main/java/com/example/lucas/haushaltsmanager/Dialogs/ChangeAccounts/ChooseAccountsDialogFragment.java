@@ -11,12 +11,11 @@ import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CheckedTextView;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.example.lucas.haushaltsmanager.Activities.CreateNewAccountActivity;
-import com.example.lucas.haushaltsmanager.Database.CannotDeleteAccountException;
+import com.example.lucas.haushaltsmanager.Activities.CreateAccountActivity;
+import com.example.lucas.haushaltsmanager.Database.Exceptions.CannotDeleteAccountException;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.R;
@@ -25,8 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ChooseAccountsDialogFragment extends DialogFragment implements AdapterView.OnItemClickListener, AccountAdapter.OnDeleteAccountSelected {
-
-    String TAG = ChooseAccountsDialogFragment.class.getSimpleName();
+    private static String TAG = ChooseAccountsDialogFragment.class.getSimpleName();
 
     ExpensesDataSource mDatabase;
     SharedPreferences mSettings;
@@ -109,7 +107,7 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Adap
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                Intent newAccountIntent = new Intent(getActivity(), CreateNewAccountActivity.class);
+                Intent newAccountIntent = new Intent(getActivity(), CreateAccountActivity.class);
                 newAccountIntent.putExtra("mode", "create");
                 getActivity().startActivity(newAccountIntent);
             }
@@ -211,6 +209,8 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Adap
     public void onStop() {
         super.onStop();
 
+        //todo Wenn Konten an oder abgewählt wurden und der User neben den Dialog tippt und sich das Fenster somit schließt müssen auch alle änderungen
+        // die der User gemacht hat wieder rückgängig gemacht werden (ausgenommen delete und set main account)
         mDatabase.close();
     }
 }

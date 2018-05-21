@@ -24,27 +24,26 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.lucas.haushaltsmanager.Activities.CategoryListActivity;
 import com.example.lucas.haushaltsmanager.Activities.CourseActivity;
 import com.example.lucas.haushaltsmanager.Activities.CreateBackupActivity;
 import com.example.lucas.haushaltsmanager.Activities.ImportExportActivity;
 import com.example.lucas.haushaltsmanager.Activities.RecurringBookingsActivity;
-import com.example.lucas.haushaltsmanager.Activities.ShowCategoriesActivity;
+import com.example.lucas.haushaltsmanager.Activities.TestActivity;
 import com.example.lucas.haushaltsmanager.Activities.TransferActivity;
-import com.example.lucas.haushaltsmanager.BookingTemplates;
+import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ChangeAccounts.ChooseAccountsDialogFragment;
 import com.example.lucas.haushaltsmanager.MockDataCreator;
 import com.example.lucas.haushaltsmanager.MyAlarmReceiver;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Services.GetExchangeRatesService;
-import com.example.lucas.haushaltsmanager.Activities.TestPieChart;
 
-public class TabParentActivity extends AppCompatActivity implements ChooseAccountsDialogFragment.OnSelectedAccount {
+public class TabParentActivity extends AppCompatActivity implements ChooseAccountsDialogFragment.OnSelectedAccount, BasicTextInputDialog.BasicDialogCommunicator {
+    private static String TAG = TabParentActivity.class.getSimpleName();
 
-    private String TAG = TabParentActivity.class.getSimpleName();
-
-    SectionsPagerAdapter mSectionsPagerAdapter;
-    TabLayout mTabLayout;
-    ViewPager mViewPager;
+    private SectionsPagerAdapter mSectionsPagerAdapter;
+    private TabLayout mTabLayout;
+    private ViewPager mViewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +74,7 @@ public class TabParentActivity extends AppCompatActivity implements ChooseAccoun
                 //startService(serviceIntent);
 
                 MockDataCreator test = new MockDataCreator(TabParentActivity.this);
+                test.createBookings(100);
             }
         });
 
@@ -107,19 +107,10 @@ public class TabParentActivity extends AppCompatActivity implements ChooseAccoun
 
                 switch (item.getItemId()) {
 
-                    case R.id.desktop:
-
-                        //do smth
-                        break;
                     case R.id.categories:
 
-                        Intent categoryIntent = new Intent(TabParentActivity.this, ShowCategoriesActivity.class);
+                        Intent categoryIntent = new Intent(TabParentActivity.this, CategoryListActivity.class);
                         TabParentActivity.this.startActivity(categoryIntent);
-                        break;
-                    case R.id.templates:
-
-                        Intent templateIntent = new Intent(TabParentActivity.this, BookingTemplates.class);
-                        TabParentActivity.this.startActivity(templateIntent);
                         break;
                     case R.id.course:
 
@@ -130,11 +121,6 @@ public class TabParentActivity extends AppCompatActivity implements ChooseAccoun
 
                         Intent recurringBookingIntent = new Intent(TabParentActivity.this, RecurringBookingsActivity.class);
                         TabParentActivity.this.startActivity(recurringBookingIntent);
-                        break;
-                    case R.id.transfers:
-
-                        Intent transferIntent = new Intent(TabParentActivity.this, TransferActivity.class);
-                        TabParentActivity.this.startActivity(transferIntent);
                         break;
                     case R.id.backup:
 
@@ -148,13 +134,16 @@ public class TabParentActivity extends AppCompatActivity implements ChooseAccoun
                         break;
                     case R.id.preferences:
 
-                        //do smth
+                        //todo show preferences activity
                         break;
                     case R.id.about:
 
-                        Intent testPieIntent = new Intent(TabParentActivity.this, TestPieChart.class);//todo replace
+                        Intent testPieIntent = new Intent(TabParentActivity.this, TestActivity.class);//todo zeige die AboutActivity
                         TabParentActivity.this.startActivity(testPieIntent);
                         break;
+                    default:
+
+                        Toast.makeText(TabParentActivity.this, "Ups, da hast du wohl etwas entdeckt was du eigentlich noch gar nicht sehen solltest.", Toast.LENGTH_SHORT).show();
                 }
 
                 DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_2);
@@ -274,8 +263,8 @@ public class TabParentActivity extends AppCompatActivity implements ChooseAccoun
     public void onAccountSelected(long accountId, boolean isChecked) {
 
         int visibleTabPosition = mTabLayout.getSelectedTabPosition();
-
         Fragment fragment = getSupportFragmentManager().findFragmentByTag("android:switcher:" + mViewPager.getId() + ":" + visibleTabPosition);
+        //todo wenn in einem Tab die Ausgaben angepasst werden (konto wird an oder abgewählt), dann nehmen die anderen tabs diese aänderung nicht mit an
 
         if (fragment != null) {
 
@@ -294,9 +283,21 @@ public class TabParentActivity extends AppCompatActivity implements ChooseAccoun
         }
     }
 
+    @Override
+    public void onTextInput(String textInput, String tag) {
+
+        int visibleTabPosition = mTabLayout.getSelectedTabPosition();
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag("android:switcher:" + mViewPager.getId() + ":" + visibleTabPosition);
+
+        if (tag.equals("tab_one_combine_bookings")) {
+
+            ((TabOneBookings) fragment).onCombinedTitleSelected(textInput);
+        }
+    }
+
     /**
      * Methode um meinen BackupService periodische jeden Tag einmal laufen zu lassen.
-     *
+     * <p>
      * Anleitung siehe: https://guides.codepath.com/android/Starting-Background-Services#using-with-alarmmanager-for-periodic-tasks
      *///todo es sollte nicht jedes mal ein backup erstellt werden wenn die app aufgerufen wird
     private void scheduleBackupServiceAlarm() {

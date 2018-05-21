@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager.Database;
+package com.example.lucas.haushaltsmanager.Database.Exceptions;
 
 public class CannotDeleteAccountException extends Exception {
 

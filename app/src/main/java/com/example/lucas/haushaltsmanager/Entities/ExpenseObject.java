@@ -19,13 +19,15 @@ import java.util.List;
 import java.util.Locale;
 
 public class ExpenseObject implements Parcelable {
+    private static String TAG = ExpenseObject.class.getSimpleName();
 
     public enum EXPENSE_TYPES {
         DUMMY_EXPENSE,
         DATE_PLACEHOLDER,
         PARENT_EXPENSE,
         NORMAL_EXPENSE,
-        TRANSFER_EXPENSE
+        TRANSFER_EXPENSE,
+        CHILD_EXPENSE
     }
 
     private EXPENSE_TYPES expenseType;
@@ -86,12 +88,10 @@ public class ExpenseObject implements Parcelable {
      */
     private List<ExpenseObject> children = new ArrayList<>();
 
-    private String TAG = ExpenseObject.class.getSimpleName();
-
     public ExpenseObject(long index, @NonNull String expenseName, double price, Calendar date, boolean expenditure, @NonNull Category category, String notice, @NonNull Account account, Currency expenseCurrency, @NonNull EXPENSE_TYPES expenseType) {
 
         setIndex(index);
-        setName(expenseName);
+        setTitle(expenseName);
         setPrice(price);
         setDateTime(date != null ? date : Calendar.getInstance());
         setExpenditure(expenditure);
@@ -123,7 +123,7 @@ public class ExpenseObject implements Parcelable {
         Log.v(TAG, "Recreating ExpenseObject from parcel data");
         cal.setTimeInMillis(source.readLong());
         setDateTime(cal);
-        setName(source.readString());
+        setTitle(source.readString());
         setPrice(source.readDouble());
         setIndex(source.readLong());
         setExpenditure(source.readByte() != 0);
@@ -203,12 +203,12 @@ public class ExpenseObject implements Parcelable {
     }
 
     @NonNull
-    public String getName() {
+    public String getTitle() {
 
         return title;
     }
 
-    public void setName(@NonNull String title) {
+    public void setTitle(@NonNull String title) {
 
         this.title = title;
     }
@@ -289,6 +289,11 @@ public class ExpenseObject implements Parcelable {
         this.category = category;
     }
 
+    public void removeTags() {
+
+        tags.clear();
+    }
+
     @NonNull
     public List<Tag> getTags() {
 
@@ -300,12 +305,14 @@ public class ExpenseObject implements Parcelable {
         tags.add(tag);
     }
 
+    /**
+     * Methode um ein Liste von Tags zu einer Buchung hinzuzufügen
+     *
+     * @param tags Tags die der Buchung hinzugefügt werden sollen
+     */
     public void setTags(@NonNull List<Tag> tags) {
-
-        for (Tag tag : tags) {
-
+        for (Tag tag : tags)
             addTag(tag);
-        }
     }
 
     @NonNull
@@ -332,27 +339,25 @@ public class ExpenseObject implements Parcelable {
 
     public void addChild(@NonNull ExpenseObject child) {
 
+        child.setExpenseType(EXPENSE_TYPES.CHILD_EXPENSE);
         children.add(child);
         setExpenseType(EXPENSE_TYPES.PARENT_EXPENSE);
     }
 
+    /**
+     * Methode um einer Buchung mehrere Buchungen hinzuzufügen
+     *
+     * @param children Buchungen die als Kinder hinzugefügt werden sollen
+     */
     public void addChildren(@NonNull List<ExpenseObject> children) {
-
-        for (ExpenseObject childExpense : children) {
-
+        for (ExpenseObject childExpense : children)
             addChild(childExpense);
-        }
     }
 
     @NonNull
     public List<ExpenseObject> getChildren() {
 
         return this.children;
-    }
-
-    public int countChildren() {
-
-        return this.children.size();
     }
 
     public boolean isParent() {
@@ -382,7 +387,7 @@ public class ExpenseObject implements Parcelable {
         return getIndex() > -1 && account.isValid() && category.isValid() && getExpenseCurrency().isValid() && areTagsValid();
     }
 
-    public boolean areTagsValid() {
+    private boolean areTagsValid() {
 
         boolean result = true;
         for (Tag tag : getTags()) {
@@ -395,12 +400,12 @@ public class ExpenseObject implements Parcelable {
     @Override
     public String toString() {
 
-        return getIndex() + " " + getName() + " " + getUnsignedPrice();
+        return getIndex() + " " + getTitle() + " " + getUnsignedPrice();
     }
 
     public boolean equals(ExpenseObject otherExpense) {
 
-        boolean result = getName().equals(otherExpense.getName());
+        boolean result = getTitle().equals(otherExpense.getTitle());
         result = result && (getUnsignedPrice() == otherExpense.getUnsignedPrice());
         result = result && getExpenseCurrency().equals(otherExpense.getExpenseCurrency());
         result = result && getAccount().equals(otherExpense.getAccount());
@@ -445,10 +450,6 @@ public class ExpenseObject implements Parcelable {
 
         return this.expenseType;
     }
-
-
-    //Parcelable is super slow DO NOT USE IN PRODUCTION
-    //TODO make faster!!
 
     /**
      * can be ignored mostly

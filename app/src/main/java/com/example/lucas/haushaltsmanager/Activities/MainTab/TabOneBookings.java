@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -21,13 +20,12 @@ import android.widget.ExpandableListView;
 import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Activities.ExpenseScreenActivity;
-import com.example.lucas.haushaltsmanager.ExpandableListAdapterCreator;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
+import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Entities.Account;
-import com.example.lucas.haushaltsmanager.Entities.Category;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.ExpandableListAdapter;
+import com.example.lucas.haushaltsmanager.ExpandableListAdapterCreator;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.util.ArrayList;
@@ -36,12 +34,12 @@ import java.util.HashMap;
 import java.util.List;
 
 public class TabOneBookings extends Fragment {
+    private String TAG = TabOneBookings.class.getSimpleName();
 
     ExpandableListAdapter mListAdapter;
     ExpandableListView mExpListView;
     List<ExpenseObject> mListDataHeader;
     HashMap<ExpenseObject, List<ExpenseObject>> mListDataChild;
-    String TAG = TabOneBookings.class.getSimpleName();
 
     ExpensesDataSource mDatabase;
     ArrayList<ExpenseObject> mExpenses;
@@ -80,15 +78,16 @@ public class TabOneBookings extends Fragment {
      * Anleitung um eine ExpandableListView ohne indicators zu machen
      */
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstances) {
-
         View rootView = inflater.inflate(R.layout.tab_one_bookings, container, false);
 
         //get ListView
         mExpListView = (ExpandableListView) rootView.findViewById(R.id.lvExp);
         mExpListView.setBackgroundColor(Color.WHITE);
+        setOnGroupClickListener();
+        setOnChildClickListener();
+        setOnItemLongClickListener();
 
         updateExpListView();
-        //prepareListDataOld();
 
         final Activity mainTab = getActivity();
 
@@ -110,9 +109,16 @@ public class TabOneBookings extends Fragment {
                     updateExpListView();
                 } else {
 
-                    Intent createNewBookingIntent = new Intent(mainTab, ExpenseScreenActivity.class);
-                    createNewBookingIntent.putExtra("mode", "createBooking");
-                    mainTab.startActivity(createNewBookingIntent);
+                    if (mDatabase.getAllAccounts().size() != 0) {
+
+                        Intent createNewBookingIntent = new Intent(mainTab, ExpenseScreenActivity.class);
+                        createNewBookingIntent.putExtra("mode", "createBooking");
+                        mainTab.startActivity(createNewBookingIntent);
+                    } else {
+
+                        //todo zeige dem user wie er ein neues Konto anlegen kann
+                        Toast.makeText(mainTab, getResources().getString(R.string.no_account), Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });
@@ -125,20 +131,20 @@ public class TabOneBookings extends Fragment {
 
                 if (mListAdapter.getSelectedCount() > 1) {
 
-                    //todo bevor die Buchungen zusammengefügt werden sollte ein alert dialog den user nach einem namen für die KombiBuchung fragen
-                    ExpenseObject parentBooking = mDatabase.createChildBooking(mListAdapter.getSelectedGroupData());
-                    mExpenses.removeAll(mListAdapter.getSelectedGroupData());
-                    mExpenses.add(0, parentBooking);
-                    mListAdapter.deselectAll();
-                    updateExpListView();
-                    animateFabs(mListAdapter.getSelectedCount());
+                    Bundle bundle = new Bundle();
+                    bundle.putString("title", getResources().getString(R.string.input_title));
+
+                    BasicTextInputDialog textInputDialog = new BasicTextInputDialog();
+                    textInputDialog.setArguments(bundle);
+                    textInputDialog.show(getActivity().getFragmentManager(), "tab_one_combine_bookings");
+
                 } else {
 
                     //wenn zu einer buchung eine Kindbuchung hinzugefügt werden soll, dann muss die id des Parents mit übergeben werden
-                    long parentExpenseId = mListAdapter.getSelectedBookingIds()[0];
+                    ExpenseObject parentExpense = mListAdapter.getSelectedGroupData().get(0);
                     Intent createChildToBookingIntent = new Intent(mainTab, ExpenseScreenActivity.class);
                     createChildToBookingIntent.putExtra("mode", "addChild");
-                    createChildToBookingIntent.putExtra("parentBooking", parentExpenseId);
+                    createChildToBookingIntent.putExtra("parentBooking", parentExpense);
 
                     mListAdapter.deselectAll();
                     mainTab.startActivity(createChildToBookingIntent);
@@ -172,6 +178,45 @@ public class TabOneBookings extends Fragment {
         rotateForwardAnim = AnimationUtils.loadAnimation(mainTab, R.anim.rotate_forward);
         rotateBackwardAnim = AnimationUtils.loadAnimation(mainTab, R.anim.rotate_backward);
 
+        return rootView;
+    }
+
+    /**
+     * Methdoe um einen ChildClickListener auf die ExpandableListView zu setzen.
+     */
+    private void setOnChildClickListener() {
+
+        //ExpandableListView Child click listener
+        mExpListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+
+            @Override
+            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+
+                if (mSelectionMode)
+                    return true;
+
+                mListAdapter.clearSelected();
+
+                //get expense
+                ExpenseObject expense = (ExpenseObject) mListAdapter.getChild(groupPosition, childPosition);
+
+                Log.d(TAG, "onChildClick: " + expense.getTitle() + " " + expense.getIndex());
+
+                //start expenseScreen with selected expense
+                Intent updateChildExpenseIntent = new Intent(getContext(), ExpenseScreenActivity.class);
+                updateChildExpenseIntent.putExtra("mode", "updateChild");
+                updateChildExpenseIntent.putExtra("updateChildExpense", expense);
+                //updateChildExpenseIntent.putExtra("childExpense", expense.getIndex());
+                startActivity(updateChildExpenseIntent);
+                return true;
+            }
+        });
+    }
+
+    /**
+     * Methode um einen GroupClickListener auf die ExpandableListView zu setzen.
+     */
+    private void setOnGroupClickListener() {
 
         //OnClickMethods for ExpandableListView
         //ExpandableListView Group click listener
@@ -183,7 +228,7 @@ public class TabOneBookings extends Fragment {
                 //get expense
                 ExpenseObject expense = (ExpenseObject) mListAdapter.getGroup(groupPosition);
 
-                //if the user clicks on date divider nothing should happen
+                //todo wenn man auf den date divider klickt sieht man immer noch eine klickt animation
                 if (expense.getExpenseType() == ExpenseObject.EXPENSE_TYPES.DATE_PLACEHOLDER)
                     return true;
 
@@ -219,39 +264,18 @@ public class TabOneBookings extends Fragment {
                 return true;
             }
         });
+    }
 
-
-        //ExpandableListView Child click listener
-        mExpListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-
-            @Override
-            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-
-                if (mSelectionMode)
-                    return true;
-
-                mListAdapter.clearSelected();
-
-                //get expense
-                ExpenseObject expense = (ExpenseObject) mListAdapter.getChild(groupPosition, childPosition);
-
-                Log.d(TAG, "onChildClick: " + expense.getName() + " " + expense.getIndex());
-
-                //start expenseScreen with selected expense
-                Intent updateChildExpenseIntent = new Intent(getContext(), ExpenseScreenActivity.class);
-                updateChildExpenseIntent.putExtra("mode", "updateChild");
-                updateChildExpenseIntent.putExtra("updateChildExpense", expense);
-                //updateChildExpenseIntent.putExtra("childExpense", expense.getIndex());
-                startActivity(updateChildExpenseIntent);
-                return true;
-            }
-        });
-
+    /**
+     * Methode um einen LongClickListener auf die ExpandableListView zu setzen.
+     */
+    private void setOnItemLongClickListener() {
 
         //ExpandableListView Long click listener for selecting multiple groups
         mExpListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 
             @Override
+            @SuppressWarnings("unused")
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
                 //if selection mode is enabled do not make long clicks anymore
@@ -264,6 +288,7 @@ public class TabOneBookings extends Fragment {
                 if (ExpandableListView.getPackedPositionType(id) == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
 
                     ExpenseObject expense = mListAdapter.getExpense(groupPosition);
+                    //todo wenn auf eine Zusammengefügte buchung geklickt wurde sollen die Fab optionen 'lösche' und 'füge kind buchung hinzu' erscheinen
 
                     if (expense.isValidExpense()) {
 
@@ -278,7 +303,7 @@ public class TabOneBookings extends Fragment {
                     return false;
                 } else if (ExpandableListView.getPackedPositionType(id) == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
 
-                    //if long click is on child element
+                    //todo öffne den fab und zeige die optionen 'löschen' und 'extrahiere als normale buchung' an
                     Toast.makeText(getContext(), "CHILD", Toast.LENGTH_SHORT).show();
                     return true;
                 }
@@ -286,7 +311,6 @@ public class TabOneBookings extends Fragment {
                 return false;
             }
         });
-        return rootView;
     }
 
     /**
@@ -360,6 +384,9 @@ public class TabOneBookings extends Fragment {
     private Calendar getFirstOfMonth() {
 
         Calendar firstOfMonth = Calendar.getInstance();
+        firstOfMonth.set(Calendar.HOUR_OF_DAY, 0);
+        firstOfMonth.set(Calendar.MINUTE, 0);
+        firstOfMonth.set(Calendar.SECOND, 1);
         firstOfMonth.set(Calendar.DAY_OF_MONTH, 1);
 
         return firstOfMonth;
@@ -382,6 +409,7 @@ public class TabOneBookings extends Fragment {
     /**
      * animating the FloatingActionButtons
      * todo die ganzen animations methoden noch einmal neu schreiben da ich mit den aktuellen nicht zufrieden bin
+     * eventuell eine neue FAB view erstellen, welche die funktionalitäten beinhaltet
      *
      * @param selectedCount number of selected entries
      */
@@ -489,5 +517,23 @@ public class TabOneBookings extends Fragment {
 
             combOpen = false;
         }
+    }
+
+    /**
+     * Methode um einer kombinierten Buchung einen Titel zu geben
+     *
+     * @param title Titel der zusammengefügten Buchung
+     */
+    public void onCombinedTitleSelected(String title) {
+
+        ExpenseObject parentBooking = mDatabase.combineChildBookings(mListAdapter.getSelectedGroupData());
+        parentBooking.setTitle(title);
+        mDatabase.updateBooking(parentBooking);
+
+        mExpenses.removeAll(mListAdapter.getSelectedGroupData());
+        mExpenses.add(0, parentBooking);
+        mListAdapter.deselectAll();
+        updateExpListView();
+        animateFabs(mListAdapter.getSelectedCount());
     }
 }

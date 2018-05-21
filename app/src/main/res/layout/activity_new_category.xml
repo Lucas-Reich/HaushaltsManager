@@ -29,7 +29,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:text="@string/category_name"
+            android:hint="@string/hint_input_category_name"
             android:textAlignment="textEnd"/>
     </LinearLayout>
 
@@ -56,7 +56,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:text="@string/choose_category_color"
+            android:hint="@string/hint_choose_color"
             android:textAlignment="textEnd"/>
 
     </LinearLayout>

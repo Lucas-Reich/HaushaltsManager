@@ -7,11 +7,13 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -26,15 +28,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CreateBackupActivity extends AppCompatActivity implements DirectoryPickerDialog.OnDirectorySelected, BasicTextInputDialog.BasicDialogCommunicator {
+    private static final String TAG = CreateBackupActivity.class.getSimpleName();
 
-    String TAG = CreateBackupActivity.class.getSimpleName();
-
-    FloatingActionButton mCreateBackupFab;
-    Button mChooseDirectoryBtn;
-    File mBackupDirectory;
-    ListView mListView;
-    ArrayAdapter<String> mListViewAdapter;
-    List<String> mOldBackups;
+    private FloatingActionButton mCreateBackupFab;
+    private Button mChooseDirectoryBtn;
+    private File mBackupDirectory;
+    private ListView mListView;
+    private ArrayAdapter<String> mListViewAdapter;
+    private List<String> mOldBackups;
+    private Toolbar mToolbar;
+    private ImageButton mBackArrow;
 
     //.SavedDataFile
     final String mBackupExtension = ".sdf";
@@ -49,12 +52,14 @@ public class CreateBackupActivity extends AppCompatActivity implements Directory
         if (!mBackupDirectory.exists())
             mBackupDirectory.mkdir();
 
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        mBackArrow = (ImageButton) findViewById(R.id.back_arrow);
+
         mChooseDirectoryBtn = (Button) findViewById(R.id.create_backup_directory_btn);
         mListView = (ListView) findViewById(R.id.create_backup_list_view);
         //mListView.setEmptyView(); todo wenn keine alten Backups vorhanden sind soll "Keine Existierenden Backups vorhanden" angezeigt werden
         //todo die backups sollen so sortiert sein, dass der aktuellste eintrag an erster stelle steht
 
-        refreshListView();
 
         mCreateBackupFab = (FloatingActionButton) findViewById(R.id.create_backup_create_backup_btn);
     }
@@ -62,6 +67,17 @@ public class CreateBackupActivity extends AppCompatActivity implements Directory
     @Override
     protected void onStart() {
         super.onStart();
+
+        updateListView();
+
+        mBackArrow.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                finish();
+            }
+        });
 
         mChooseDirectoryBtn.setText(mBackupDirectory.getName());
         mChooseDirectoryBtn.setOnClickListener(new View.OnClickListener() {
@@ -107,7 +123,7 @@ public class CreateBackupActivity extends AppCompatActivity implements Directory
     /**
      * Methode um die ListView neu zu laden, wenn sich die Anzahl der Backups geändert hat.
      */
-    private void refreshListView() {
+    private void updateListView() {
 
         mOldBackups = getBackupsInDirectory(mBackupDirectory);
 
@@ -133,7 +149,7 @@ public class CreateBackupActivity extends AppCompatActivity implements Directory
 
         Toast.makeText(this, R.string.creating_backup, Toast.LENGTH_SHORT).show();
 
-        refreshListView();
+        updateListView();
     }
 
     /**
@@ -152,7 +168,7 @@ public class CreateBackupActivity extends AppCompatActivity implements Directory
             return false;
 
         return true;
-    }//todo
+    }//todo überprüfen ob der user für das gewählte verzeichnis auch die nötigen rechte besitzt (schreiben)
 
     /**
      * Methode um das vom User ausgewählte Backup wiederherzustellen
@@ -238,7 +254,7 @@ public class CreateBackupActivity extends AppCompatActivity implements Directory
                 mBackupDirectory = file;
                 mChooseDirectoryBtn.setText(mBackupDirectory.getName());
 
-                refreshListView();
+                updateListView();
             }
         }
     }

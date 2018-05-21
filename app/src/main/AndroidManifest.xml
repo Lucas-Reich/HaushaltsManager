@@ -28,11 +28,11 @@
             android:label="HaushaltsManager"
             android:parentActivityName=".Activities.MainTab.TabParentActivity"/>
         <activity
-            android:name=".Activities.ShowCategoriesActivity"
+            android:name=".Activities.CategoryListActivity"
             android:label="Categories"
             android:parentActivityName=".Activities.MainTab.TabParentActivity"/>
         <activity
-            android:name=".BookingTemplates"
+            android:name=".Activities.TemplatesActivity"
             android:label="BookingTemplate"
             android:parentActivityName=".Activities.MainTab.TabParentActivity"/>
         <activity
@@ -40,15 +40,15 @@
             android:label="RecurringBookings"
             android:parentActivityName=".Activities.MainTab.TabParentActivity"/>
         <activity
-            android:name=".Activities.CreateNewAccountActivity"
+            android:name=".Activities.CreateAccountActivity"
             android:label="CreateNewAccount"
             android:parentActivityName=".Activities.MainTab.TabParentActivity"/>
         <activity
-            android:name=".Activities.CreateNewCategoryActivity"
+            android:name=".Activities.CreateCategoryActivity"
             android:label="CreateNewCategory"
             android:parentActivityName=".Activities.MainTab.TabParentActivity"/>
         <activity
-            android:name=".Activities.TestPieChart"
+            android:name=".Activities.TestActivity"
             android:label="TestPieChart"
             android:parentActivityName=".Activities.MainTab.TabParentActivity"/>
         <activity

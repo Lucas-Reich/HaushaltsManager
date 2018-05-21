@@ -11,7 +11,7 @@
         android:layout_height="match_parent"
         android:orientation="horizontal">
 
-        <com.example.lucas.haushaltsmanager.CustomViews.RoundedTextView
+        <com.example.lucas.haushaltsmanager.Views.RoundedTextView
             android:id="@+id/booking_item_circle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -103,15 +103,16 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
-                    <include
-                        layout="@layout/exp_listview_separator"
-                        layout_width="match_parent"
+                    <View
+                        android:id="@+id/divider5"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"/>
+                        android:layout_height="1dp"
+                        android:layout_weight="1"
+                        android:background="@color/colorPrimary"/>
                 </TableRow>
 
             </TableLayout>
+
         </LinearLayout>
 
     </LinearLayout>

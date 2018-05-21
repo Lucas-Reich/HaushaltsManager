@@ -1,23 +1,29 @@
 package com.example.lucas.haushaltsmanager;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MonthlyReport {
 
-    private String month;
-    private List<ExpenseObject> expenses;
-    private String currency;
+    private String mMonth;
+    private List<ExpenseObject> mExpenses;
+    private String mCurrency;
+    private Context mContext;
 
-    public MonthlyReport(@NonNull String month,@NonNull ArrayList<ExpenseObject> expenses,@NonNull String currency) {
+    public MonthlyReport(@NonNull String month, @NonNull ArrayList<ExpenseObject> expense, @NonNull String currency, Context context) {
 
-        this.month = month;
-        this.expenses = expenses;
-        this.currency = currency;
+        mMonth = month;
+        mExpenses = expense;
+        mCurrency = currency;
+        mContext = context;
     }
 
     /**
@@ -26,8 +32,7 @@ public class MonthlyReport {
      * @param expense Neue Buchungen
      */
     public void addExpense(ExpenseObject expense) {
-
-        this.expenses.add(expense);
+        mExpenses.add(expense);
     }
 
     /**
@@ -37,8 +42,7 @@ public class MonthlyReport {
      */
     @NonNull
     public String getMonth() {
-
-        return month;
+        return mMonth;
     }
 
     /**
@@ -47,7 +51,7 @@ public class MonthlyReport {
      * @param month Monat
      */
     public void setMonth(String month) {
-        this.month = month;
+        mMonth = month;
     }
 
     /**
@@ -57,7 +61,7 @@ public class MonthlyReport {
      */
     @NonNull
     public List<ExpenseObject> getExpenses() {
-        return expenses;
+        return mExpenses;
     }
 
     /**
@@ -67,8 +71,7 @@ public class MonthlyReport {
      */
     @NonNull
     String getCurrency() {
-
-        return currency;
+        return mCurrency;
     }
 
     /**
@@ -77,8 +80,7 @@ public class MonthlyReport {
      * @return Anzahl an Buchungen
      */
     public int countBookings() {
-
-        return expenses.size();
+        return mExpenses.size();
     }
 
     /**
@@ -89,33 +91,27 @@ public class MonthlyReport {
     public double countIncomingMoney() {
 
         double incomingMoney = 0;
+        for (ExpenseObject expense : mExpenses) {
 
-        for (ExpenseObject expense : expenses) {
-
-            if (!expense.isExpenditure()) {
-
+            if (!expense.isExpenditure())
                 incomingMoney += expense.getUnsignedPrice();
-            }
         }
 
         return incomingMoney;
     }
 
     /**
-     * Methode um die Gesamten Ausgaben des Monats zu errechnen.
+     * Methode um die gesamten Ausgaben des Monats zu errechnen.
      *
-     * @return Ausgaben des Monats
+     * @return Monatliche Ausgaben
      */
     public double countOutgoingMoney() {
 
         double outgoingMoney = 0;
+        for (ExpenseObject expense : mExpenses) {
 
-        for (ExpenseObject expense : expenses) {
-
-            if (expense.isExpenditure()) {
-
+            if (expense.isExpenditure())
                 outgoingMoney += expense.getUnsignedPrice();
-            }
         }
 
         return outgoingMoney;
@@ -127,96 +123,47 @@ public class MonthlyReport {
      * @return Ausgaben total
      */
     public double calcMonthlyTotal() {
-
         return (countIncomingMoney() - countOutgoingMoney());
     }
 
     /**
-     * Methode um herauszufinden, in welches Kategorie die meisten Ausgaben gemacht wurden.
+     * Methode, welche die Kategorie mit den meisten Ausgaben des Monats zurückgibt.
      *
-     * @return Kategorie mit den meisten Ausgaben
+     * @return Category
      */
-    public String getMostStressedCategory() {
+    public Category getMostStressedCategory() {
+        HashMap<Category, Double> categories = sumExpensesByCategory();
 
-        MonthlyExpenses mostStressedCategory = new MonthlyExpenses("Keine Ausgaben", 0);
+        if (categories.isEmpty())
+            return new Category(mContext.getResources().getString(R.string.no_expenses), "#FFFFFF", false);
 
-        ArrayList<MonthlyExpenses> monthlyExpenses = new ArrayList<>();
-
-        for (ExpenseObject expense : expenses) {
-
-            int index = containsHelper(monthlyExpenses, expense.getCategory().getName());
-
-            if (index == -1) {
-
-                monthlyExpenses.add(new MonthlyExpenses(expense.getCategory().getName(), expense.getUnsignedPrice()));
-            } else {
-
-                MonthlyExpenses monthly = monthlyExpenses.get(index);
-
-                if (expense.isExpenditure()) {
-
-                    monthly.spendMoney += expense.getUnsignedPrice();
-                } else {
-
-                    monthly.spendMoney -= expense.getUnsignedPrice();
-                }
-                monthlyExpenses.set(index, monthly);
+        Map.Entry<Category, Double> minCategory = null;
+        for (Map.Entry<Category, Double> entry : categories.entrySet()) {
+            if (null == minCategory || entry.getValue() < minCategory.getValue()) {
+                minCategory = entry;
             }
         }
 
-        for (MonthlyExpenses monthlyExpense : monthlyExpenses) {
-
-            if (monthlyExpense.getSpendMoney() >= mostStressedCategory.getSpendMoney()) {
-
-                mostStressedCategory = monthlyExpense;
-            }
-        }
-
-        return mostStressedCategory.getCategory();
+        return minCategory.getKey();
     }
 
     /**
-     * @param monthlyExpenses ArrayList of monthly expenses
-     * @param category        Category getName which has to be found
-     * @return index of the CATEGORY getName if found or -1 if not in List
+     * Methode um die Ausgaben eines Monats nach der Kategorie aufzusummieren.
+     *
+     * @return HashMap
      */
-    private int containsHelper(ArrayList<MonthlyExpenses> monthlyExpenses, String category) {
+    private HashMap<Category, Double> sumExpensesByCategory() {
 
-        for (MonthlyExpenses monthlyExpense : monthlyExpenses) {
+        HashMap<Category, Double> categories = new HashMap<>();
+        for (ExpenseObject expense : mExpenses) {
+            Category expenseCategory = expense.getCategory();
 
-            if (monthlyExpense.getCategory().equals(category)) {
+            if (!categories.containsKey(expenseCategory))
+                categories.put(expenseCategory, 0d);
 
-                return monthlyExpenses.indexOf(monthlyExpense);
-            }
-        }
-        return -1;
-    }
-
-    private class MonthlyExpenses {
-
-        private String category;
-        private double spendMoney;
-
-        MonthlyExpenses(String month, double spendMoney) {
-
-            this.category = month;
-            this.spendMoney = spendMoney;
+            categories.put(expenseCategory, categories.get(expenseCategory) + expense.getSignedPrice());
         }
 
-        public String getCategory() {
-            return category;
-        }
-
-        public void setCategory(String category) {
-            this.category = category;
-        }
-
-        public double getSpendMoney() {
-            return spendMoney;
-        }
-
-        public void setSpendMoney(double spendMoney) {
-            this.spendMoney = spendMoney;
-        }
+        return categories;
     }
 }
