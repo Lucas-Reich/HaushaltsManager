@@ -363,8 +363,11 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
             //wenn eine Buchung in der Zukunft erstellt wurde soll ein alert dialog den user darauf hinweisen,
             //dass die Buchung als zukünftige Buchung erstellt wurde
             //AlertDialog text: "Du hast eine Buchung in der Zukunft erstellt. Diese wird dann zum entsprechenden Tag in deine Historie eingefügt"
-            if (!mExpense.isSet())
+            if (!mExpense.isSet()) {
+
+                Toast.makeText(ExpenseScreenActivity.this, R.string.error_create_expense_content_missing, Toast.LENGTH_SHORT).show();
                 return;
+            }
 
             addTagsToBooking();
 

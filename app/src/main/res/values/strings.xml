@@ -119,4 +119,5 @@
     <string name="hint_input_category_name">Enter category name</string>
     <string name="hint_choose_color">Choose a color</string>
     <string name="error_category_name_missing">Please enter at least a name to create a category</string>
+    <string name="error_create_expense_content_missing">Please fill out all fields to create a Booking</string>
 </resources>
