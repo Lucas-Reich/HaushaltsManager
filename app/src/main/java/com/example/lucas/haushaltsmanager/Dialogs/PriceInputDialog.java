@@ -19,7 +19,7 @@ import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Views.ViewWrapper;
 
 public class PriceInputDialog extends DialogFragment {
-    private static String TAG = PriceInputDialog.class.getSimpleName();
+    private static final String TAG = PriceInputDialog.class.getSimpleName();
 
     private Context mContext;
     private OnPriceSelected mCallback;

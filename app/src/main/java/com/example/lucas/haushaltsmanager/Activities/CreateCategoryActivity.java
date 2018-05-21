@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
@@ -99,9 +100,13 @@ public class CreateCategoryActivity extends AppCompatActivity implements BasicTe
             @Override
             public void onClick(View v) {
 
-                //todo überprüfe ob alle nötigen sachen gesetzt wurden
-                mDatabase.createCategory(mCategory);
-                finish();
+                if (!mCatNameBtn.getText().toString().isEmpty()) {
+                    mDatabase.createCategory(mCategory);
+                    finish();
+                } else {
+
+                    Toast.makeText(CreateCategoryActivity.this, getResources().getString(R.string.error_category_name_missing), Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }

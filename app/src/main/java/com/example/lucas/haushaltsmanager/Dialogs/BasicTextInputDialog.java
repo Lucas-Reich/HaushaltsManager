@@ -7,9 +7,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.InputType;
+import android.view.KeyEvent;
+import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Views.ViewWrapper;
@@ -47,6 +52,22 @@ public class BasicTextInputDialog extends DialogFragment {
         Bundle bundle = getArguments();
         String dialogTitle = bundle.getString("title") != null ? bundle.getString("title") : "";
         final EditText mTextInput = createInputView();
+        mTextInput.setMaxLines(1);
+        mTextInput.setInputType(InputType.TYPE_CLASS_TEXT);
+        mTextInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    mCallback.onTextInput(mTextInput.getText().toString(), getTag());
+                    dismiss();
+
+                    return true;
+                }
+
+                return false;
+            }
+        });
 
         //wrapper für die text eingabe, sodass dieser eine padding gegeben werden kann
         //Quelle: http://android.pcsalt.com/create-alertdialog-with-custom-layout-programmatically/

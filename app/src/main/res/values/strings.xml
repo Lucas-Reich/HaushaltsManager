@@ -118,4 +118,5 @@
     <string name="no_account">First create an account before you start creating bookings</string>
     <string name="hint_input_category_name">Enter category name</string>
     <string name="hint_choose_color">Choose a color</string>
+    <string name="error_category_name_missing">Please enter at least a name to create a category</string>
 </resources>
