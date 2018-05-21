@@ -39,7 +39,7 @@ public class ExchangeService extends IntentService {
         long baseCurIndex = preferences.getLong("BaseCurrency", 0);
 
         database.open();
-        expenses = database.convertExpenses();
+        expenses = database.getConvertExpenses();
 
         for (ExpenseObject expense : expenses) {
 
