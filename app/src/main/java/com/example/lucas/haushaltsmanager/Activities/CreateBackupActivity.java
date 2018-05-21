@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CreateBackupActivity extends AppCompatActivity implements DirectoryPickerDialog.OnDirectorySelected, BasicTextInputDialog.BasicDialogCommunicator {
-    private static String TAG = CreateBackupActivity.class.getSimpleName();
+    private static final String TAG = CreateBackupActivity.class.getSimpleName();
 
     private FloatingActionButton mCreateBackupFab;
     private Button mChooseDirectoryBtn;
@@ -168,7 +168,7 @@ public class CreateBackupActivity extends AppCompatActivity implements Directory
             return false;
 
         return true;
-    }//todo
+    }//todo überprüfen ob der user für das gewählte verzeichnis auch die nötigen rechte besitzt (schreiben)
 
     /**
      * Methode um das vom User ausgewählte Backup wiederherzustellen

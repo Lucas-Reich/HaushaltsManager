@@ -270,7 +270,7 @@ public class ImportExportActivity extends AppCompatActivity implements AccountPi
             Toast.makeText(this, "Imported the data successfully!", Toast.LENGTH_SHORT).show();
         }
 */
-    }//todo
+    }//todo erstelle die import from csv methode
 
     /**
      * Methode um einen String mit ExpenseObject daten in ein ExpenseObject zu transformieren

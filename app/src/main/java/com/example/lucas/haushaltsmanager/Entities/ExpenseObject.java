@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class ExpenseObject implements Parcelable {
+    private static String TAG = ExpenseObject.class.getSimpleName();
 
     public enum EXPENSE_TYPES {
         DUMMY_EXPENSE,
@@ -26,6 +27,7 @@ public class ExpenseObject implements Parcelable {
         PARENT_EXPENSE,
         NORMAL_EXPENSE,
         TRANSFER_EXPENSE,
+        CHILD_EXPENSE
     }
 
     private EXPENSE_TYPES expenseType;
@@ -85,8 +87,6 @@ public class ExpenseObject implements Parcelable {
      * Children of expense
      */
     private List<ExpenseObject> children = new ArrayList<>();
-
-    private String TAG = ExpenseObject.class.getSimpleName();
 
     public ExpenseObject(long index, @NonNull String expenseName, double price, Calendar date, boolean expenditure, @NonNull Category category, String notice, @NonNull Account account, Currency expenseCurrency, @NonNull EXPENSE_TYPES expenseType) {
 
@@ -289,23 +289,30 @@ public class ExpenseObject implements Parcelable {
         this.category = category;
     }
 
+    public void removeTags() {
+
+        tags.clear();
+    }
+
     @NonNull
     public List<Tag> getTags() {
 
         return tags;
     }
 
-    private void addTag(@NonNull Tag tag) {
+    public void addTag(@NonNull Tag tag) {
 
         tags.add(tag);
     }
 
+    /**
+     * Methode um ein Liste von Tags zu einer Buchung hinzuzufügen
+     *
+     * @param tags Tags die der Buchung hinzugefügt werden sollen
+     */
     public void setTags(@NonNull List<Tag> tags) {
-
-        for (Tag tag : tags) {
-
+        for (Tag tag : tags)
             addTag(tag);
-        }
     }
 
     @NonNull
@@ -332,16 +339,19 @@ public class ExpenseObject implements Parcelable {
 
     public void addChild(@NonNull ExpenseObject child) {
 
+        child.setExpenseType(EXPENSE_TYPES.CHILD_EXPENSE);
         children.add(child);
         setExpenseType(EXPENSE_TYPES.PARENT_EXPENSE);
     }
 
+    /**
+     * Methode um einer Buchung mehrere Buchungen hinzuzufügen
+     *
+     * @param children Buchungen die als Kinder hinzugefügt werden sollen
+     */
     public void addChildren(@NonNull List<ExpenseObject> children) {
-
-        for (ExpenseObject childExpense : children) {
-
+        for (ExpenseObject childExpense : children)
             addChild(childExpense);
-        }
     }
 
     @NonNull

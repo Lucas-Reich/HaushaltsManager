@@ -7,23 +7,9 @@
     android:orientation="vertical"
     >
 
-    <com.example.lucas.haushaltsmanager.Views.PieChart.PieChart
-        android:id="@+id/test_chart"
-        android:layout_width="wrap_content"
+    <MultiAutoCompleteTextView
+        android:id="@+id/multiTextView"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/booking_income"
-        app:draw_hole="true"
-        app:use_compressed="true"
-        app:use_legend="true"/>
-
-    <com.example.lucas.haushaltsmanager.Views.PieChart.PieChart
-        android:id="@+id/test_chart_2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-
-    <com.example.lucas.haushaltsmanager.Views.PieChart.PieChart
-        android:id="@+id/test_chart_3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-
+        />
 </LinearLayout>

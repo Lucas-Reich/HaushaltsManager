@@ -10,8 +10,8 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -84,7 +84,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
 
         //todo ich MUSS die convertView wiederbenutzen und sie nicht jedes mal wieder neu initialisieren
-        final ExpenseObject groupExpense = (ExpenseObject) getGroup(groupPosition);
+        ExpenseObject groupExpense = (ExpenseObject) getGroup(groupPosition);
         LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         switch (groupExpense.getExpenseType()) {
@@ -164,6 +164,8 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                     txtBaseCurrency2.setText(preferences.getString("mainCurrency", "€"));
                 }
                 break;
+            default:
+                throw new UnsupportedOperationException("Für den Buchungstyp: " + groupExpense.getExpenseType().name() + " gibt es keine View methode!");
         }
 
         return convertView;

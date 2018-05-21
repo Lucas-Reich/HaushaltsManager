@@ -78,12 +78,14 @@ public class TabOneBookings extends Fragment {
      * Anleitung um eine ExpandableListView ohne indicators zu machen
      */
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstances) {
-
         View rootView = inflater.inflate(R.layout.tab_one_bookings, container, false);
 
         //get ListView
         mExpListView = (ExpandableListView) rootView.findViewById(R.id.lvExp);
         mExpListView.setBackgroundColor(Color.WHITE);
+        setOnGroupClickListener();
+        setOnChildClickListener();
+        setOnItemLongClickListener();
 
         updateExpListView();
 
@@ -129,7 +131,6 @@ public class TabOneBookings extends Fragment {
 
                 if (mListAdapter.getSelectedCount() > 1) {
 
-                    //todo bevor die Buchungen zusammengefügt werden sollte ein alert dialog den user nach einem namen für die KombiBuchung fragen
                     Bundle bundle = new Bundle();
                     bundle.putString("title", getResources().getString(R.string.input_title));
 
@@ -177,6 +178,45 @@ public class TabOneBookings extends Fragment {
         rotateForwardAnim = AnimationUtils.loadAnimation(mainTab, R.anim.rotate_forward);
         rotateBackwardAnim = AnimationUtils.loadAnimation(mainTab, R.anim.rotate_backward);
 
+        return rootView;
+    }
+
+    /**
+     * Methdoe um einen ChildClickListener auf die ExpandableListView zu setzen.
+     */
+    private void setOnChildClickListener() {
+
+        //ExpandableListView Child click listener
+        mExpListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+
+            @Override
+            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+
+                if (mSelectionMode)
+                    return true;
+
+                mListAdapter.clearSelected();
+
+                //get expense
+                ExpenseObject expense = (ExpenseObject) mListAdapter.getChild(groupPosition, childPosition);
+
+                Log.d(TAG, "onChildClick: " + expense.getTitle() + " " + expense.getIndex());
+
+                //start expenseScreen with selected expense
+                Intent updateChildExpenseIntent = new Intent(getContext(), ExpenseScreenActivity.class);
+                updateChildExpenseIntent.putExtra("mode", "updateChild");
+                updateChildExpenseIntent.putExtra("updateChildExpense", expense);
+                //updateChildExpenseIntent.putExtra("childExpense", expense.getIndex());
+                startActivity(updateChildExpenseIntent);
+                return true;
+            }
+        });
+    }
+
+    /**
+     * Methode um einen GroupClickListener auf die ExpandableListView zu setzen.
+     */
+    private void setOnGroupClickListener() {
 
         //OnClickMethods for ExpandableListView
         //ExpandableListView Group click listener
@@ -224,34 +264,12 @@ public class TabOneBookings extends Fragment {
                 return true;
             }
         });
+    }
 
-
-        //ExpandableListView Child click listener
-        mExpListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-
-            @Override
-            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-
-                if (mSelectionMode)
-                    return true;
-
-                mListAdapter.clearSelected();
-
-                //get expense
-                ExpenseObject expense = (ExpenseObject) mListAdapter.getChild(groupPosition, childPosition);
-
-                Log.d(TAG, "onChildClick: " + expense.getTitle() + " " + expense.getIndex());
-
-                //start expenseScreen with selected expense
-                Intent updateChildExpenseIntent = new Intent(getContext(), ExpenseScreenActivity.class);
-                updateChildExpenseIntent.putExtra("mode", "updateChild");
-                updateChildExpenseIntent.putExtra("updateChildExpense", expense);
-                //updateChildExpenseIntent.putExtra("childExpense", expense.getIndex());
-                startActivity(updateChildExpenseIntent);
-                return true;
-            }
-        });
-
+    /**
+     * Methode um einen LongClickListener auf die ExpandableListView zu setzen.
+     */
+    private void setOnItemLongClickListener() {
 
         //ExpandableListView Long click listener for selecting multiple groups
         mExpListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -293,7 +311,6 @@ public class TabOneBookings extends Fragment {
                 return false;
             }
         });
-        return rootView;
     }
 
     /**

@@ -96,7 +96,7 @@
     <string name="error_missing_content">You have to set all values</string>
     <string name="btn_save">Save</string>
     <string name="input_title">Input Title</string>
-    <string name="input_tag">Input Tag</string>
+    <string name="hint_tag_input">Input Tag</string>
     <string name="input_notice">Input Notice</string>
     <string name="transfer">Transfer</string>
     <string name="edit">Edit</string>

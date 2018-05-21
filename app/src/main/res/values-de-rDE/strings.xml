@@ -91,7 +91,7 @@
     <string name="error_missing_content">Du musst alle Spalten ausfüllen</string>
     <string name="btn_save">Speichern</string>
     <string name="input_title">Geben Sie der Buchung einen Titel</string>
-    <string name="input_tag">Fügen Sie der Buchung ein Tag hinzu</string>
+    <string name="hint_tag_input">Fügen Sie der Buchung ein Tag hinzu</string>
     <string name="input_notice">Fügen Sie der Buchung eine Notiz hinzu</string>
     <string name="transfer">Überweisung</string>
     <string name="edit">Bearbeiten</string>

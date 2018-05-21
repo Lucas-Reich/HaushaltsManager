@@ -138,7 +138,7 @@ public class TabParentActivity extends AppCompatActivity implements ChooseAccoun
                         break;
                     case R.id.about:
 
-                        Intent testPieIntent = new Intent(TabParentActivity.this, TestActivity.class);//todo replace
+                        Intent testPieIntent = new Intent(TabParentActivity.this, TestActivity.class);//todo zeige die AboutActivity
                         TabParentActivity.this.startActivity(testPieIntent);
                         break;
                     default:
