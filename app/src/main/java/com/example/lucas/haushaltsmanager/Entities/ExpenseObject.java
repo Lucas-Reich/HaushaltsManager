@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class ExpenseObject implements Parcelable {
-    private static String TAG = ExpenseObject.class.getSimpleName();
+    private static final String TAG = ExpenseObject.class.getSimpleName();
 
     public enum EXPENSE_TYPES {
         DUMMY_EXPENSE,
@@ -133,6 +133,7 @@ public class ExpenseObject implements Parcelable {
         setAccount((Account) source.readParcelable(Account.class.getClassLoader()));
         source.readList(this.children, ExpenseObject.class.getClassLoader());
         setExpenseCurrency((Currency) source.readParcelable(Currency.class.getClassLoader()));
+        setExpenseType(EXPENSE_TYPES.valueOf(source.readString()));
     }
 
     /**
@@ -151,6 +152,11 @@ public class ExpenseObject implements Parcelable {
         return this.expenseCurrency.getRateToBase();
     }
 
+    /**
+     * Methode um den Preis der Buchung in die Standartwährung umzurechnen.
+     *
+     * @return Umgerechneter Preis
+     */
     @Nullable
     public Double getCalcPrice() {
 
@@ -483,6 +489,7 @@ public class ExpenseObject implements Parcelable {
         dest.writeParcelable(account, flags);
         dest.writeList(children);
         dest.writeParcelable(expenseCurrency, flags);
+        dest.writeString(expenseType.name());
     }
 
     /**

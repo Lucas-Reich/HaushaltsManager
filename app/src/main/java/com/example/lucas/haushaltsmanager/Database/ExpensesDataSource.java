@@ -581,7 +581,7 @@ public class ExpensesDataSource {
                 + " FROM " + ExpensesDbHelper.TABLE_BOOKINGS_TAGS
                 + " JOIN " + ExpensesDbHelper.TABLE_TAGS + " ON " + ExpensesDbHelper.TABLE_BOOKINGS_TAGS + "." + ExpensesDbHelper.BOOKINGS_TAGS_COL_TAG_ID + " = " + ExpensesDbHelper.TABLE_TAGS + "." + ExpensesDbHelper.TAGS_COL_ID
                 + " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS_TAGS + "." + ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_ID + " = " + bookingId
-                + " AND " + ExpensesDbHelper.TABLE_BOOKINGS_TAGS + "." + ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_TYPE + " = " + expenseType.name() + ";";
+                + " AND " + ExpensesDbHelper.TABLE_BOOKINGS_TAGS + "." + ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_TYPE + " = '" + expenseType.name() + "';";
         Log.d(TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
@@ -637,7 +637,7 @@ public class ExpensesDataSource {
     private int removeTagsFromBooking(long bookingId, ExpenseObject.EXPENSE_TYPES expenseType) {
 
         String whereClause = ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_ID + " = ?"
-                + ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_TYPE + " = ?";
+                + " AND " + ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_TYPE + " = ?";
         String[] whereArgs = new String[]{bookingId + "", expenseType.name()};
         return database.delete(ExpensesDbHelper.TABLE_BOOKINGS_TAGS, whereClause, whereArgs);
     }
@@ -811,7 +811,7 @@ public class ExpensesDataSource {
         //todo 'schlauen' algorithmus entwickeln welcher nur die geänderten stellen in der datenbank updated
         ContentValues updatedExpense = new ContentValues();
         updatedExpense.put(ExpensesDbHelper.BOOKINGS_COL_EXPENSE_TYPE, expense.getExpenseType().name());
-        updatedExpense.put(ExpensesDbHelper.BOOKINGS_COL_PRICE, expense.getCalcPrice());
+        updatedExpense.put(ExpensesDbHelper.BOOKINGS_COL_PRICE, expense.getUnsignedPrice());
         updatedExpense.put(ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID, expense.getCategory().getIndex());
         updatedExpense.put(ExpensesDbHelper.BOOKINGS_COL_EXPENDITURE, expense.isExpenditure());
         updatedExpense.put(ExpensesDbHelper.BOOKINGS_COL_TITLE, expense.getTitle());

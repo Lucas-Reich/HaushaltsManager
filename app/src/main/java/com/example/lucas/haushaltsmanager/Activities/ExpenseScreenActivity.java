@@ -331,6 +331,9 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
      * Methode um die in der MultiAutoCompleteTextView gespeicherten Tags an die Buchung zu hängen
      */
     private void addTagsToBooking() {
+        if (mTagAutoCompTxt.getText().toString().isEmpty())
+            return;
+
         mExpense.removeTags();
 
         String input = mTagAutoCompTxt.getText().toString().replace(" ", "");
