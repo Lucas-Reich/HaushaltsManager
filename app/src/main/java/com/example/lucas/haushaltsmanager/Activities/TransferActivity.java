@@ -283,9 +283,9 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
         mFromAccount = newAccount;
         mFromExpense.setAccount(mFromAccount);
         mFromExpense.setExpenseCurrency(mFromAccount.getCurrency());
-        mFromAccountBtn.setText(mFromAccount.getName());
+        mFromAccountBtn.setText(mFromAccount.getTitle());
 
-        Log.d(TAG, "selected " + mFromAccount.getName() + " as from account");
+        Log.d(TAG, "selected " + mFromAccount.getTitle() + " as from account");
     }
 
     /**
@@ -298,9 +298,9 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
         mToAccount = newAccount;
         mToExpense.setAccount(mToAccount);
         mToExpense.setExpenseCurrency(mToAccount.getCurrency());
-        mToAccountBtn.setText(mToAccount.getName());
+        mToAccountBtn.setText(mToAccount.getTitle());
 
-        Log.d(TAG, "selected " + mToAccount.getName() + " as to account");
+        Log.d(TAG, "selected " + mToAccount.getTitle() + " as to account");
     }
 
     /**
@@ -363,8 +363,8 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
             mToExpense.setExpenditure(false);
         } else {
 
+            //todo Buchungen in einer anderen Wärhung, zu der es keinen Wechselkurs gibt werden mit dem preis 0,00€ in die datenbank geschrieben
             //flag setzen, welches die toExpense in den convert-expenses-stack schreibt, wenn der user die überweisung betstätigt
-            //todo den umrechnungskurs für die buchungen anfordern
         }
     }
 

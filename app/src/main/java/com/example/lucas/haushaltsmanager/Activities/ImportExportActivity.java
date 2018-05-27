@@ -371,7 +371,7 @@ public class ImportExportActivity extends AppCompatActivity implements AccountPi
         expenseString.append(expense.getCategory().getColor()).append(",");
         expenseString.append(expense.getCategory().getDefaultExpenseType()).append(",");
         expenseString.append(expense.getAccount().getIndex()).append(",");
-        expenseString.append(expense.getAccount().getName()).append(",");
+        expenseString.append(expense.getAccount().getTitle()).append(",");
         expenseString.append(expense.getAccount().getBalance()).append(",");
         expenseString.append(expense.getExpenseCurrency().getIndex()).append(",");
         expenseString.append(expense.getExpenseCurrency().getName()).append(",");
@@ -401,7 +401,7 @@ public class ImportExportActivity extends AppCompatActivity implements AccountPi
         if (tag.equals("choose_account")) {
 
             mChosenAccount = account;
-            mAccountBtn.setText(mChosenAccount.getName());
+            mAccountBtn.setText(mChosenAccount.getTitle());
         }
     }
 

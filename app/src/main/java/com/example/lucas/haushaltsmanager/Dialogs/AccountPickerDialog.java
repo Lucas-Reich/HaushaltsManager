@@ -84,7 +84,7 @@ public class AccountPickerDialog extends DialogFragment {
 
         for (int i = 0; i < accounts.size(); i++) {
 
-            accountStrings[i] = accounts.get(i).getName();
+            accountStrings[i] = accounts.get(i).getTitle();
         }
 
         return accountStrings;

@@ -70,7 +70,7 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Adap
         mAccounts = mDatabase.getAllAccounts();
         for (Account account : mAccounts) {
 
-            mCheckedAccounts.add(mSettings.getBoolean(account.getName(), false));
+            mCheckedAccounts.add(mSettings.getBoolean(account.getTitle(), false));
         }
     }
 
@@ -156,7 +156,7 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Adap
             accountChk.setChecked(true);
         }
 
-        mSettingsEditor.putBoolean(mAccounts.get(position).getName(), mCheckedAccounts.get(position));
+        mSettingsEditor.putBoolean(mAccounts.get(position).getTitle(), mCheckedAccounts.get(position));
         mCallback.onAccountSelected(mAccounts.get(position).getIndex(), mCheckedAccounts.get(position));
     }
 
@@ -173,7 +173,7 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Adap
 
             SharedPreferences preferences = mContext.getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = preferences.edit();
-            editor.remove(account.getName());
+            editor.remove(account.getTitle());
             editor.apply();
             //was passiert wenn ich das aktuelle acktive konto lösche
             Toast.makeText(mContext, mContext.getResources().getString(R.string.deleted_account), Toast.LENGTH_SHORT).show();
@@ -198,7 +198,7 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Adap
         editor.putLong("activeAccount", account.getIndex());
         editor.apply();
 
-        Toast.makeText(mContext, account.getName() + mContext.getResources().getString(R.string.changed_main_account), Toast.LENGTH_SHORT).show();
+        Toast.makeText(mContext, account.getTitle() + mContext.getResources().getString(R.string.changed_main_account), Toast.LENGTH_SHORT).show();
     }
 
     public interface OnSelectedAccount {

@@ -62,7 +62,7 @@ public class AccountAdapter extends ArrayAdapter<Account> {
         }
 
         viewHolder.account_chk.setChecked(mCheckedItems.get(position));
-        viewHolder.account_chk.setText(String.format("   %s", account.getName()));//mit einem linebreak (\n) kann man text in der zweiten zeile anzeigen lassen
+        viewHolder.account_chk.setText(String.format("   %s", account.getTitle()));//mit einem linebreak (\n) kann man text in der zweiten zeile anzeigen lassen
         viewHolder.overflow_menu.setOnClickListener(new OnAccountOverflowSelectedListener(getContext(), account));
 
         return convertView;

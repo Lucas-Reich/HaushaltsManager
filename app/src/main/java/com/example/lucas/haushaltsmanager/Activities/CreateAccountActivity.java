@@ -86,14 +86,15 @@ public class CreateAccountActivity extends AppCompatActivity implements OnItemSe
     protected void onStart() {
         super.onStart();
 
-        mAccountNameBtn.setHint(mAccount.getName());
+        mAccountNameBtn.setHint(mAccount.getTitle());
         mAccountNameBtn.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
 
                 Bundle args = new Bundle();
-                args.putString("title", "Set Account getTitle");
+                args.putString("title", getResources().getString(R.string.set_account_title));
+                args.putString("hint", mAccount.getTitle());
 
                 BasicTextInputDialog basicDialog = new BasicTextInputDialog();
                 basicDialog.setArguments(args);
@@ -108,7 +109,7 @@ public class CreateAccountActivity extends AppCompatActivity implements OnItemSe
             public void onClick(View v) {
 
                 Bundle args = new Bundle();
-                args.putString("title", "Set Account Balance");
+                args.putString("title", getResources().getString(R.string.set_Account_balance));
 
                 PriceInputDialog priceInputDialog = new PriceInputDialog();
                 priceInputDialog.setArguments(args);
@@ -137,7 +138,7 @@ public class CreateAccountActivity extends AppCompatActivity implements OnItemSe
 
             SharedPreferences activeAccounts = getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
             SharedPreferences.Editor activeAccountsEditor = activeAccounts.edit();
-            activeAccountsEditor.putBoolean(mAccount.getName(), true);
+            activeAccountsEditor.putBoolean(mAccount.getTitle(), true);
             activeAccountsEditor.apply();
 
             switch (mCreationMode) {
@@ -218,9 +219,9 @@ public class CreateAccountActivity extends AppCompatActivity implements OnItemSe
         if (tag.equals("create_account_name")) {
 
             mAccount.setName(textInput);
-            mAccountNameBtn.setText(mAccount.getName());
+            mAccountNameBtn.setText(mAccount.getTitle());
 
-            Log.d(TAG, "set Account name to" + mAccount.getName());
+            Log.d(TAG, "set Account name to" + mAccount.getTitle());
         }
     }
 

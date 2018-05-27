@@ -325,7 +325,7 @@ public class TabOneBookings extends Fragment {
 
         for (Account account : mDatabase.getAllAccounts()) {
 
-            if (preferences.getBoolean(account.getName(), false))
+            if (preferences.getBoolean(account.getTitle(), false))
                 mActiveAccounts.add(account.getIndex());
         }
     }

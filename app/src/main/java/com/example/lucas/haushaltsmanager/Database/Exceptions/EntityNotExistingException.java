@@ -15,7 +15,7 @@ public class EntityNotExistingException extends Exception {
 
     public EntityNotExistingException(Account account) {
 
-        super("Account " + account.getName() + " does not exist in the database");
+        super("Account " + account.getTitle() + " does not exist in the database");
     }
 
     public EntityNotExistingException(Category category) {

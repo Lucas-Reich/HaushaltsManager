@@ -19,13 +19,13 @@ import com.example.lucas.haushaltsmanager.DataSet;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Views.PieChart.Legend.Legend;
 import com.example.lucas.haushaltsmanager.Views.PieChart.Legend.LegendItem;
-import com.example.lucas.haushaltsmanager.Views.ViewWrapper;
+import com.example.lucas.haushaltsmanager.Views.ViewUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class PieChart extends ViewWrapper {
+public class PieChart extends ViewUtils {
     private String TAG = PieChart.class.getSimpleName();
 
     private Legend mLegend;
@@ -427,7 +427,7 @@ public class PieChart extends ViewWrapper {
      */
     private Rect getChartDesiredSize() {
 
-        return new Rect(0, 0, ViewWrapper.dpToPx(200), ViewWrapper.dpToPx(200));
+        return new Rect(0, 0, ViewUtils.dpToPx(200), ViewUtils.dpToPx(200));
     }
 
     /**
@@ -447,7 +447,7 @@ public class PieChart extends ViewWrapper {
 
 
         //herausfinden wie groß die legende sein kann
-        int minChartSize = ViewWrapper.dpToPx(200);
+        int minChartSize = ViewUtils.dpToPx(200);
         resolveLegendSize(sizeWithPadding, minChartSize);
         mPieChartBounds = resolveChartSize(mLegendBounds, sizeWithPadding);
 

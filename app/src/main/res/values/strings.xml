@@ -122,4 +122,6 @@
     <string name="error_create_expense_content_missing">Please fill out all fields to create a Booking</string>
     <string name="not_implemented">Oops! Looks like you found something you shouldn\'t see</string>
     <string name="category_transfer">Transfer</string>
+    <string name="set_account_title">Set Account Title</string>
+    <string name="set_Account_balance">Set account balance</string>
 </resources>

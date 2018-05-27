@@ -221,7 +221,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
 
         mCurrencyTxt.setText(mExpense.getAccount().getCurrency().getSymbol());
 
-        mAccountBtn.setText(mExpense.getAccount().getName());
+        mAccountBtn.setText(mExpense.getAccount().getTitle());
 
         mCategoryBtn.setHint(R.string.choose_category);
         mCategoryBtn.setText(mExpense.getCategory().getName());
@@ -752,10 +752,10 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
         if (tag.equals("expense_screen_account")) {
 
             mExpense.setAccount(account);
-            mAccountBtn.setText(mExpense.getAccount().getName());
+            mAccountBtn.setText(mExpense.getAccount().getTitle());
             mCurrencyTxt.setText(mExpense.getAccount().getCurrency().getSymbol());
 
-            Log.d(TAG, "set expense mAccount to: " + mExpense.getAccount().getName());
+            Log.d(TAG, "set expense mAccount to: " + mExpense.getAccount().getTitle());
         }
     }
 

@@ -10,21 +10,21 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 
-public abstract class ViewWrapper extends View {
+public abstract class ViewUtils extends View {
 
     protected RectF mViewBounds;
 
-    public ViewWrapper(Context context) {
+    public ViewUtils(Context context) {
         super(context);
         init(context, null, 0);
     }
 
-    public ViewWrapper(Context context, @Nullable AttributeSet attrs) {
+    public ViewUtils(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         init(context, attrs, 0);
     }
 
-    public ViewWrapper(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public ViewUtils(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context, attrs, defStyleAttr);
     }

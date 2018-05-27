@@ -12,11 +12,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 
-public class RoundedTextView extends ViewWrapper {
+public class RoundedTextView extends ViewUtils {
     private static String TAG = RoundedTextView.class.getSimpleName();
 
     private Paint mCirclePaint;
-    private int mDesiredSize = ViewWrapper.dpToPx(40);
+    private int mDesiredSize = ViewUtils.dpToPx(40);
 
     private Rect mTextBounds;
     private Paint mTextPaint;
@@ -111,7 +111,7 @@ public class RoundedTextView extends ViewWrapper {
      * @param diameterInPixels Neuer Durchmesser des Kreises
      */
     public void setCircleDiameter(int diameterInPixels) {
-        mDesiredSize = ViewWrapper.dpToPx(diameterInPixels);
+        mDesiredSize = ViewUtils.dpToPx(diameterInPixels);
         invalidate();
     }
 }

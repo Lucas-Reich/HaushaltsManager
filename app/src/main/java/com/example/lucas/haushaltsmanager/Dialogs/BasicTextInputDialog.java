@@ -15,10 +15,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.lucas.haushaltsmanager.R;
-import com.example.lucas.haushaltsmanager.Views.ViewWrapper;
+import com.example.lucas.haushaltsmanager.Views.ViewUtils;
 
 public class BasicTextInputDialog extends DialogFragment {
-    private static String TAG = BasicTextInputDialog.class.getSimpleName();
+    private static final String TAG = BasicTextInputDialog.class.getSimpleName();
 
     BasicDialogCommunicator mCallback;
     Context mContext;
@@ -52,6 +52,7 @@ public class BasicTextInputDialog extends DialogFragment {
         final EditText mTextInput = createInputView();
         mTextInput.setMaxLines(1);
         mTextInput.setInputType(InputType.TYPE_CLASS_TEXT);
+        mTextInput.setHint(bundle.getString("hint") != null ? bundle.getString("hint") : "");
         mTextInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -70,7 +71,7 @@ public class BasicTextInputDialog extends DialogFragment {
         //wrapper für die text eingabe, sodass dieser eine padding gegeben werden kann
         //Quelle: http://android.pcsalt.com/create-alertdialog-with-custom-layout-programmatically/
         LinearLayout layout = new LinearLayout(mContext);
-        layout.setPadding(ViewWrapper.dpToPx(23), 0, 0, 0);
+        layout.setPadding(ViewUtils.dpToPx(23), 0, 0, 0);
         layout.addView(mTextInput);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
