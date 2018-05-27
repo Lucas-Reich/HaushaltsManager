@@ -115,4 +115,5 @@
     <string name="hint_choose_color">Wählen Sie eine Farbe aus</string>
     <string name="error_category_name_missing">Gib mindestens einen Namen ein, um eine Kategorie zu erstellen.</string>
     <string name="error_create_expense_content_missing">Bitte fülle alle felder aus, um eine Buchung zu erstellen</string>
+    <string name="not_implemented">Oops! Es sieht so aus, als ob du etwas gefunden hast was du eigentlich noch nicht sehen solltest.</string>
 </resources>

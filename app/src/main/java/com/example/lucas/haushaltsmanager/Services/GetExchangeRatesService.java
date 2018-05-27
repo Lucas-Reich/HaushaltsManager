@@ -226,7 +226,7 @@ public class GetExchangeRatesService extends IntentService {
     private Currency extractBaseCurrency(JSONObject response) throws JSONException {
 
         String baseCurrencyShortName = response.getString("base");
-        return mDatabase.getCurrency(baseCurrencyShortName);
+        return mDatabase.getCurrencyById(baseCurrencyShortName);
     }
 
     /**
@@ -257,7 +257,7 @@ public class GetExchangeRatesService extends IntentService {
         while (exchangeRatesJson.keys().hasNext()) {
 
             String currencyShortName = exchangeRatesJson.keys().next();
-            Currency toCurrency = mDatabase.getCurrency(currencyShortName);
+            Currency toCurrency = mDatabase.getCurrencyById(currencyShortName);
             double rateToBase = exchangeRatesJson.getDouble(currencyShortName);
             ratesToBase.put(toCurrency, rateToBase);
         }

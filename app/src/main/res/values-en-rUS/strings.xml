@@ -111,4 +111,6 @@
     <string name="hint_choose_color">Choose a color</string>
     <string name="error_category_name_missing">Please enter at least a name to create a category</string>
     <string name="error_create_expense_content_missing">Please fill out all fields to create a Booking</string>
+    <string name="not_implemented">Oops! Looks like you found something you shouldn\'t see</string>
+    <string name="category_transfer">Transfer</string>
 </resources>

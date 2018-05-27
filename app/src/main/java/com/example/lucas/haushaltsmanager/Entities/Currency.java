@@ -146,7 +146,7 @@ public class Currency implements Parcelable {
 
         boolean result = getName().equals(otherCurrency.getName());
         result = result && getShortName().equals(otherCurrency.getShortName());
-        result = result && getSymbol().equals(otherCurrency.getShortName());
+        result = result && getSymbol().equals(otherCurrency.getSymbol());
         result = result && (getRateToBase() == otherCurrency.getRateToBase());
 
         return result;

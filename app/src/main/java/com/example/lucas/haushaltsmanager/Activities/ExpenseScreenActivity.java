@@ -730,7 +730,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
         String curName = parent.getItemAtPosition(position).toString();
-        Currency currency = mDatabase.getCurrency(curName);
+        Currency currency = mDatabase.getCurrencyById(curName);
 
         mExpense.setExpenseCurrency(currency);
         mCurrencyTxt.setText(String.format("%s", mExpense.getExpenseCurrency().getSymbol()));

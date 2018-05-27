@@ -93,7 +93,7 @@ public class ExpensesDataSource {
         Account account = new Account(accountId, accountName, accountBalance, currency);
 
         long currencyId = c.getLong(c.getColumnIndex(ExpensesDbHelper.CHILD_BOOKINGS_COL_CURRENCY_ID));
-        Currency expenseCurrency = getCurrency(currencyId);
+        Currency expenseCurrency = getCurrencyById(currencyId);
         expenseCurrency.setRateToBase(exchangeRate);
 
 
@@ -147,7 +147,7 @@ public class ExpensesDataSource {
         int exchangeRate = c.getInt(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_EXCHANGE_RATE));
 
         long currencyId = c.getLong(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_CURRENCY_ID));
-        Currency expenseCurrency = getCurrency(currencyId);
+        Currency expenseCurrency = getCurrencyById(currencyId);
         expenseCurrency.setRateToBase(exchangeRate);
 
         ExpenseObject.EXPENSE_TYPES expense_type = ExpenseObject.EXPENSE_TYPES.valueOf(c.getString(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_EXPENSE_TYPE)));
@@ -247,7 +247,7 @@ public class ExpensesDataSource {
     private ExpenseObject createDummyExpense() {
 
         SharedPreferences preferences = mContext.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
-        Currency currency = getCurrency(preferences.getLong("mainCurrencyIndex", 1));
+        Currency currency = getCurrencyById(preferences.getLong("mainCurrencyIndex", 1));
 
         ExpenseObject dummyExpense = ExpenseObject.createDummyExpense(mContext);
         dummyExpense.setExpenseCurrency(currency);
@@ -1134,6 +1134,7 @@ public class ExpensesDataSource {
         values.put(ExpensesDbHelper.CATEGORIES_COL_NAME, category.getName());
         values.put(ExpensesDbHelper.CATEGORIES_COL_COLOR, category.getColor());
         values.put(ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE, category.getDefaultExpenseType() ? 1 : 0);
+        values.put(ExpensesDbHelper.CATEGORIES_COL_HIDDEN, 0);
         Log.d(TAG, "created new CATEGORY");
 
 
@@ -1148,7 +1149,8 @@ public class ExpensesDataSource {
                 + ExpensesDbHelper.CATEGORIES_COL_NAME + ", "
                 + ExpensesDbHelper.CATEGORIES_COL_COLOR + ", "
                 + ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE
-                + " FROM " + ExpensesDbHelper.TABLE_CATEGORIES + ";";
+                + " FROM " + ExpensesDbHelper.TABLE_CATEGORIES
+                + " WHERE " + ExpensesDbHelper.CATEGORIES_COL_HIDDEN + " != '" + 1 + "';";
         Log.d(TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
@@ -1168,19 +1170,19 @@ public class ExpensesDataSource {
     /**
      * Convenience Method for getting a Category by its getTitle
      *
-     * @param category Name of the CATEGORY
+     * @param categoryName Name of the CATEGORY
      * @return Returns an Category object
      */
     @Nullable
-    public Category getCategoryByName(String category) {
+    public Category getCategoryByName(String categoryName) {
 
         String selectQuery = "SELECT "
                 + ExpensesDbHelper.CATEGORIES_COL_ID + ", "
                 + ExpensesDbHelper.CATEGORIES_COL_NAME + ", "
                 + ExpensesDbHelper.CATEGORIES_COL_COLOR + ", "
                 + ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE
-                + " FROM " + ExpensesDbHelper.TABLE_TAGS
-                + " WHERE " + ExpensesDbHelper.CATEGORIES_COL_NAME + " = '" + category + "';";
+                + " FROM " + ExpensesDbHelper.TABLE_CATEGORIES
+                + " WHERE " + ExpensesDbHelper.CATEGORIES_COL_NAME + " = '" + categoryName + "';";
         Log.d(TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
@@ -1203,7 +1205,7 @@ public class ExpensesDataSource {
                 + ExpensesDbHelper.CATEGORIES_COL_NAME + ", "
                 + ExpensesDbHelper.CATEGORIES_COL_COLOR + ", "
                 + ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE
-                + " FROM " + ExpensesDbHelper.TABLE_TAGS
+                + " FROM " + ExpensesDbHelper.TABLE_CATEGORIES
                 + " WHERE " + ExpensesDbHelper.CATEGORIES_COL_ID + " = " + categoryId + ";";
         Log.d(TAG, selectQuery);
 
@@ -1491,7 +1493,7 @@ public class ExpensesDataSource {
     }
 
     @NonNull
-    public Currency getCurrency(long currencyId) {
+    public Currency getCurrencyById(long currencyId) {
 
         String selectQuery = "SELECT "
                 + ExpensesDbHelper.CURRENCIES_COL_ID + ", "
@@ -1510,7 +1512,7 @@ public class ExpensesDataSource {
     }
 
     @Nullable
-    public Currency getCurrency(String shortName) {
+    public Currency getCurrencyById(String shortName) {
 
         String selectQuery = "SELECT "
                 + ExpensesDbHelper.CURRENCIES_COL_ID + ", "

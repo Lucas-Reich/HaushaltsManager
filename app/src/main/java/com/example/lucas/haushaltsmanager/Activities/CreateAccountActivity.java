@@ -204,7 +204,7 @@ public class CreateAccountActivity extends AppCompatActivity implements OnItemSe
 
         String currencyName = parent.getItemAtPosition(position).toString();
 
-        this.mAccount.setCurrency(mDatabase.getCurrency(currencyName));
+        this.mAccount.setCurrency(mDatabase.getCurrencyById(currencyName));
     }
 
     @Override

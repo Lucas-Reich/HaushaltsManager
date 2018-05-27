@@ -6,10 +6,15 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.example.lucas.haushaltsmanager.Entities.Category;
+import com.example.lucas.haushaltsmanager.R;
+
 import java.util.ArrayList;
 
 class ExpensesDbHelper extends SQLiteOpenHelper {
     private static final String TAG = ExpensesDbHelper.class.getSimpleName();
+
+    private Context mContext;
 
     private static final String DB_NAME = "expenses.db";
     private static final int DB_VERSION = 1;
@@ -156,13 +161,15 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
     static final String CATEGORIES_COL_NAME = "cat_name";
     static final String CATEGORIES_COL_COLOR = "color";
     static final String CATEGORIES_COL_DEFAULT_EXPENSE_TYPE = "default_expense_type";//renamed CURRENCIES_COL_EXPENSE_TYPE -> CURRENCIES_COL_DEFAULT_EXPENSE_TYPE
+    static final String CATEGORIES_COL_HIDDEN = "hidden";
 
     private final static String CREATE_CATEGORIES = "CREATE TABLE " + TABLE_CATEGORIES
             + "("
             + CATEGORIES_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + CATEGORIES_COL_NAME + " TEXT NOT NULL, "
             + CATEGORIES_COL_COLOR + " TEXT NOT NULL, "
-            + CATEGORIES_COL_DEFAULT_EXPENSE_TYPE + " INTEGER NOT NULL"
+            + CATEGORIES_COL_DEFAULT_EXPENSE_TYPE + " INTEGER NOT NULL, "
+            + CATEGORIES_COL_HIDDEN + " INTEGER NOT NULL"
             + ");";
 
 
@@ -245,6 +252,7 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
     ExpensesDbHelper(Context context) {
 
         super(context, DB_NAME, null, DB_VERSION);
+        mContext = context;
         Log.d(TAG, "DbHelper hat die Datenbank " + getDatabaseName() + " erzeugt");
     }
 
@@ -267,6 +275,7 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
 
             Log.d(TAG, "Die Tabelle Categories wird mit SQL-Befehl: " + CREATE_CATEGORIES + " angelegt.");
             db.execSQL(CREATE_CATEGORIES);
+            insertHiddenCategories(db);
 
             Log.d(TAG, "Die Tabelle Bookings_Tags wird mit SQL-Befehl: " + CREATE_BOOKINGS_TAGS + " angelegt.");
             db.execSQL(CREATE_BOOKINGS_TAGS);
@@ -360,6 +369,28 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
             values.put(CURRENCIES_COL_SYMBOL, entry[2]);
 
             db.insert(TABLE_CURRENCIES, null, values);
+        }
+    }
+
+    /**
+     * Initialisiere System Kategorien.
+     *
+     * @param db Datenbank
+     */
+    private void insertHiddenCategories(SQLiteDatabase db) {
+
+        ArrayList<Category> categories = new ArrayList<>();
+        categories.add(new Category(mContext.getResources().getString(R.string.category_transfer), "#0033cc", true));
+
+        for (Category category : categories) {
+
+            ContentValues values = new ContentValues();
+            values.put(CATEGORIES_COL_NAME, category.getName());
+            values.put(CATEGORIES_COL_COLOR, category.getColor());
+            values.put(CATEGORIES_COL_DEFAULT_EXPENSE_TYPE, category.getDefaultExpenseType());
+            values.put(CATEGORIES_COL_HIDDEN, 1);
+
+            db.insert(TABLE_CATEGORIES, null, values);
         }
     }
 }

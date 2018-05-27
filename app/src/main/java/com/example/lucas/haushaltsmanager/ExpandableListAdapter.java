@@ -164,6 +164,55 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                     txtBaseCurrency2.setText(preferences.getString("mainCurrency", "€"));
                 }
                 break;
+
+            case TRANSFER_EXPENSE:
+
+                SharedPreferences preferences2 = mContext.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
+
+                convertView = inflater.inflate(R.layout.activity_test_exp_listview_list_group_child_n, null);
+
+                RoundedTextView roundedTextView3 = (RoundedTextView) convertView.findViewById(R.id.booking_item_circle);
+                TextView txtTitle3 = (TextView) convertView.findViewById(R.id.booking_item_title);
+                TextView txtPerson3 = (TextView) convertView.findViewById(R.id.booking_item_person);
+                TextView txtPaidPrice3 = (TextView) convertView.findViewById(R.id.booking_item_paid_price);
+                TextView txtPaidCurrency3 = (TextView) convertView.findViewById(R.id.booking_item_currency_paid);
+                TextView txtCalcPrice3 = (TextView) convertView.findViewById(R.id.booking_item_booking_price);
+                TextView txtBaseCurrency3 = (TextView) convertView.findViewById(R.id.booking_item_currency_base);
+
+
+                //if group is selected by the user the entry has to be highligted on redrawing
+                if (mSelectedGroups.contains(getGroupId(groupPosition))) {
+
+                    convertView.setBackgroundColor(mContext.getResources().getColor(R.color.highlighted_item_color));
+                }
+
+
+                String category2 = groupExpense.getCategory().getName();
+                roundedTextView3.setTextColor(Color.WHITE);
+                roundedTextView3.setCenterText(category2.substring(0, 1).toUpperCase());
+                roundedTextView3.setCircleColor(groupExpense.getCategory().getColor());
+                txtTitle3.setText(groupExpense.getTitle());
+                //TODO wenn es eine Multiuser funktionalität muss hier der benutzer eingetragen werden, der das Geld ausgegeben hat
+                txtPerson3.setText("");
+                txtPaidPrice3.setText(String.format(mContext.getResources().getConfiguration().locale, "%.2f", groupExpense.getUnsignedPrice()));
+                txtPaidPrice3.setTextColor(groupExpense.isExpenditure() ? mRed : mGreen);
+                txtPaidCurrency3.setText(groupExpense.getExpenseCurrency().getSymbol());
+                txtPaidCurrency3.setTextColor(groupExpense.isExpenditure() ? mRed : mGreen);
+
+                if (groupExpense.getExpenseCurrency().getIndex() == preferences2.getLong("mainCurrencyIndex", 0)) {
+                    //booking currency is the same as the base currency
+
+                    txtCalcPrice3.setText("");
+                    txtBaseCurrency3.setText("");
+                } else {
+                    //booking currency is not the same currency as the base currency
+
+                    txtPaidPrice3.setText(String.format(mContext.getResources().getConfiguration().locale, "%.2f", groupExpense.getUnsignedPrice()));
+                    txtPaidCurrency3.setText(groupExpense.getExpenseCurrency().getSymbol());
+                    txtCalcPrice3.setText(String.format(mContext.getResources().getConfiguration().locale, "%.2f", groupExpense.getCalcPrice()));
+                    txtBaseCurrency3.setText(preferences2.getString("mainCurrency", "€"));
+                }
+                break;
             default:
                 throw new UnsupportedOperationException("Für den Buchungstyp: " + groupExpense.getExpenseType().name() + " gibt es keine View methode!");
         }
