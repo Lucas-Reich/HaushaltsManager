@@ -28,6 +28,7 @@ import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -63,14 +64,12 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
         mFromExpense.setExpenditure(true);
         mFromExpense.setCategory(getTransferCategory());
         mFromExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.TRANSFER_EXPENSE);
-        mFromExpense.setTitle(getResources().getString(R.string.transfer));
 
         mToExpense = ExpenseObject.createDummyExpense(this);
         mToExpense.setPrice(0);
         mToExpense.setExpenditure(false);
         mToExpense.setCategory(getTransferCategory());
         mToExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.TRANSFER_EXPENSE);
-        mToExpense.setTitle(getResources().getString(R.string.transfer));
 
         mDateBtn = (Button) findViewById(R.id.transfer_date_btn);
         mFromAccountBtn = (Button) findViewById(R.id.transfer_from_account_btn);
@@ -178,8 +177,14 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
                 //checke ob alles gesetzt ist
                 if (mFromExpense.isSet() && mToExpense.isSet()) {
 
-                    mDatabase.createBooking(mFromExpense);
-                    mDatabase.createBooking(mToExpense);
+                    ArrayList<ExpenseObject> bookings = new ArrayList<>();
+                    bookings.add(mFromExpense);
+                    bookings.add(mToExpense);
+
+
+                    ExpenseObject parent = mDatabase.combineAsChildBookings(bookings);
+                    parent.setTitle(String.format("%s\n%s -> %s", getString(R.string.transfer), mFromAccount.getTitle(), mToAccount.getTitle()));
+                    mDatabase.updateBooking(parent);
 
                     Intent intent = new Intent(TransferActivity.this, TabParentActivity.class);
                     TransferActivity.this.startActivity(intent);
@@ -281,6 +286,7 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
     private void setFromAccount(Account newAccount) {
 
         mFromAccount = newAccount;
+        mToExpense.setTitle(String.format("%s %s", getString(R.string.transfer_from), mFromAccount.getTitle()));
         mFromExpense.setAccount(mFromAccount);
         mFromExpense.setExpenseCurrency(mFromAccount.getCurrency());
         mFromAccountBtn.setText(mFromAccount.getTitle());
@@ -296,6 +302,7 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
     private void setToAccount(Account newAccount) {
 
         mToAccount = newAccount;
+        mFromExpense.setTitle(String.format("%s %s", getString(R.string.transfer_to), mToAccount.getTitle()));
         mToExpense.setAccount(mToAccount);
         mToExpense.setExpenseCurrency(mToAccount.getCurrency());
         mToAccountBtn.setText(mToAccount.getTitle());

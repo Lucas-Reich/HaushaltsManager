@@ -941,7 +941,7 @@ public class ExpensesDataSource {
      * @param childExpenses Buchungen die zusammengefügt werden sollen
      * @return Parent der Kindbuchungen
      */
-    public ExpenseObject combineChildBookings(List<ExpenseObject> childExpenses) {
+    public ExpenseObject combineAsChildBookings(List<ExpenseObject> childExpenses) {
 
         ExpenseObject parentBooking = createDummyExpense();//Dummyausgabe wird erstellt und in der Datenbank gespeichert (jedoch nicht als parent, da zur zeit der erstellung keine Kinder dabei sind)
         parentBooking.addChildren(childExpenses);//Der Dummyausgabe werden kinder hizugefügt

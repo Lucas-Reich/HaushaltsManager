@@ -526,7 +526,7 @@ public class TabOneBookings extends Fragment {
      */
     public void onCombinedTitleSelected(String title) {
 
-        ExpenseObject parentBooking = mDatabase.combineChildBookings(mListAdapter.getSelectedGroupData());
+        ExpenseObject parentBooking = mDatabase.combineAsChildBookings(mListAdapter.getSelectedGroupData());
         parentBooking.setTitle(title);
         mDatabase.updateBooking(parentBooking);
 
