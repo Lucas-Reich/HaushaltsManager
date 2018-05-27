@@ -119,4 +119,6 @@
     <string name="set_Account_balance">Gebe den Eröffnungsgetrag ein</string>
     <string name="set_account_title">Gib einen Kontonamen ein</string>
     <string name="category_transfer">Überweisung</string>
+    <string name="transfer_from">Überweisung von</string>
+    <string name="transfer_to">Überweisung nach</string>
 </resources>

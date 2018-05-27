@@ -83,7 +83,6 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
 
-        //todo ich MUSS die convertView wiederbenutzen und sie nicht jedes mal wieder neu initialisieren
         ExpenseObject groupExpense = (ExpenseObject) getGroup(groupPosition);
         LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -245,13 +244,13 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.activity_test_exp_listview_list_item, null);
 
-            childViewHolder.roundedTextView = (RoundedTextView) convertView.findViewById(R.id.exp_listview_item_circle);
-            childViewHolder.txtTitle = (TextView) convertView.findViewById(R.id.exp_listview_item_title);
-            childViewHolder.txtPerson = (TextView) convertView.findViewById(R.id.exp_listview_item_person);
-            childViewHolder.txtPaidPrice = (TextView) convertView.findViewById(R.id.exp_listview_item_paid_price);
-            childViewHolder.txtBaseCurrency = (TextView) convertView.findViewById(R.id.exp_listview_item_currency_base);
-            childViewHolder.txtCalcPrice = (TextView) convertView.findViewById(R.id.exp_listview_item_booking_price);
-            childViewHolder.txtPaidCurrency = (TextView) convertView.findViewById(R.id.exp_listview_item_currency_paid);
+            childViewHolder.roundedTextView = (RoundedTextView) convertView.findViewById(R.id.exp_list_view_item_circle);
+            childViewHolder.txtTitle = (TextView) convertView.findViewById(R.id.exp_list_view_item_title);
+            childViewHolder.txtPerson = (TextView) convertView.findViewById(R.id.exp_list_view_item_person);
+            childViewHolder.txtPaidPrice = (TextView) convertView.findViewById(R.id.exp_list_view_item_paid_price);
+            childViewHolder.txtBaseCurrency = (TextView) convertView.findViewById(R.id.exp_list_view_item_currency_base);
+            childViewHolder.txtCalcPrice = (TextView) convertView.findViewById(R.id.exp_list_view_item_booking_price);
+            childViewHolder.txtPaidCurrency = (TextView) convertView.findViewById(R.id.exp_list_view_item_currency_paid);
 
             convertView.setTag(childViewHolder);
         } else {
