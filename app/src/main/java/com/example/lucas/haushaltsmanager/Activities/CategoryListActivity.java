@@ -20,7 +20,7 @@ import com.example.lucas.haushaltsmanager.R;
 import java.util.ArrayList;
 
 public class CategoryListActivity extends AppCompatActivity {
-    private String TAG = CategoryListActivity.class.getSimpleName();
+    private static final String TAG = CategoryListActivity.class.getSimpleName();
 
     ExpensesDataSource mDatabase;
     ListView mListView;

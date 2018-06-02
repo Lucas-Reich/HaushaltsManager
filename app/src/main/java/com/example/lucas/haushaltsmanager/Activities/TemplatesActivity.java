@@ -19,7 +19,7 @@ import com.example.lucas.haushaltsmanager.R;
 import java.util.ArrayList;
 
 public class TemplatesActivity extends AppCompatActivity {
-    private static String TAG = TemplatesActivity.class.getSimpleName();
+    private static final String TAG = TemplatesActivity.class.getSimpleName();
 
     ArrayList<ExpenseObject> mExpenses;
     ListView mListView;

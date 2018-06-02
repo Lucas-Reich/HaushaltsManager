@@ -19,7 +19,7 @@ import java.util.List;
 
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
     @SuppressWarnings("unused")
-    private static String TAG = ExpandableListAdapter.class.getSimpleName();
+    private static final String TAG = ExpandableListAdapter.class.getSimpleName();
 
     private Context mContext;
     private List<ExpenseObject> mGroupData;
@@ -105,7 +105,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 txtTitle.setText(groupExpense.getTitle());
                 txtTotalAmount.setText(String.format(mContext.getResources().getConfiguration().locale, "%.2f", groupExpense.getSignedPrice()));
                 txtTotalAmount.setTextColor(groupExpense.getSignedPrice() < 0 ? mRed : mGreen);
-                txtBaseCurrency.setText("€");
+                txtBaseCurrency.setText(getMainCurrencySymbol());
                 txtBaseCurrency.setTextColor(groupExpense.getSignedPrice() < 0 ? mRed : mGreen);
                 break;
             case DATE_PLACEHOLDER:
@@ -126,8 +126,6 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 TextView txtPerson = (TextView) convertView.findViewById(R.id.booking_item_person);
                 TextView txtPaidPrice = (TextView) convertView.findViewById(R.id.booking_item_paid_price);
                 TextView txtPaidCurrency = (TextView) convertView.findViewById(R.id.booking_item_currency_paid);
-                TextView txtCalcPrice = (TextView) convertView.findViewById(R.id.booking_item_booking_price);
-                TextView txtBaseCurrency2 = (TextView) convertView.findViewById(R.id.booking_item_currency_base);
 
 
                 //if group is selected by the user the entry has to be highligted on redrawing
@@ -146,28 +144,13 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 txtPerson.setText("");
                 txtPaidPrice.setText(String.format(mContext.getResources().getConfiguration().locale, "%.2f", groupExpense.getUnsignedPrice()));
                 txtPaidPrice.setTextColor(groupExpense.isExpenditure() ? mRed : mGreen);
-                txtPaidCurrency.setText(groupExpense.getExpenseCurrency().getSymbol());
+                txtPaidCurrency.setText(getMainCurrencySymbol());
                 txtPaidCurrency.setTextColor(groupExpense.isExpenditure() ? mRed : mGreen);
-
-                if (groupExpense.getExpenseCurrency().getIndex() == preferences.getLong("mainCurrencyIndex", 0)) {
-                    //booking currency is the same as the base currency
-
-                    txtCalcPrice.setText("");
-                    txtBaseCurrency2.setText("");
-                } else {
-                    //booking currency is not the same currency as the base currency
-
-                    txtPaidPrice.setText(String.format(mContext.getResources().getConfiguration().locale, "%.2f", groupExpense.getUnsignedPrice()));
-                    txtPaidCurrency.setText(groupExpense.getExpenseCurrency().getSymbol());
-                    txtCalcPrice.setText(String.format(mContext.getResources().getConfiguration().locale, "%.2f", groupExpense.getCalcPrice()));
-                    txtBaseCurrency2.setText(preferences.getString("mainCurrency", "€"));
-                }
                 break;
 
             case TRANSFER_EXPENSE:
 
-                SharedPreferences preferences2 = mContext.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
-
+                //todo eigenes layout für tramsfer expenses definieren
                 convertView = inflater.inflate(R.layout.activity_test_exp_listview_list_group_child_n, null);
 
                 RoundedTextView roundedTextView3 = (RoundedTextView) convertView.findViewById(R.id.booking_item_circle);
@@ -175,8 +158,6 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 TextView txtPerson3 = (TextView) convertView.findViewById(R.id.booking_item_person);
                 TextView txtPaidPrice3 = (TextView) convertView.findViewById(R.id.booking_item_paid_price);
                 TextView txtPaidCurrency3 = (TextView) convertView.findViewById(R.id.booking_item_currency_paid);
-                TextView txtCalcPrice3 = (TextView) convertView.findViewById(R.id.booking_item_booking_price);
-                TextView txtBaseCurrency3 = (TextView) convertView.findViewById(R.id.booking_item_currency_base);
 
 
                 //if group is selected by the user the entry has to be highligted on redrawing
@@ -195,28 +176,25 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 txtPerson3.setText("");
                 txtPaidPrice3.setText(String.format(mContext.getResources().getConfiguration().locale, "%.2f", groupExpense.getUnsignedPrice()));
                 txtPaidPrice3.setTextColor(groupExpense.isExpenditure() ? mRed : mGreen);
-                txtPaidCurrency3.setText(groupExpense.getExpenseCurrency().getSymbol());
+                txtPaidCurrency3.setText(getMainCurrencySymbol());
                 txtPaidCurrency3.setTextColor(groupExpense.isExpenditure() ? mRed : mGreen);
-
-                if (groupExpense.getExpenseCurrency().getIndex() == preferences2.getLong("mainCurrencyIndex", 0)) {
-                    //booking currency is the same as the base currency
-
-                    txtCalcPrice3.setText("");
-                    txtBaseCurrency3.setText("");
-                } else {
-                    //booking currency is not the same currency as the base currency
-
-                    txtPaidPrice3.setText(String.format(mContext.getResources().getConfiguration().locale, "%.2f", groupExpense.getUnsignedPrice()));
-                    txtPaidCurrency3.setText(groupExpense.getExpenseCurrency().getSymbol());
-                    txtCalcPrice3.setText(String.format(mContext.getResources().getConfiguration().locale, "%.2f", groupExpense.getCalcPrice()));
-                    txtBaseCurrency3.setText(preferences2.getString("mainCurrency", "€"));
-                }
                 break;
             default:
                 throw new UnsupportedOperationException("Für den Buchungstyp: " + groupExpense.getExpenseType().name() + " gibt es keine View methode!");
         }
 
         return convertView;
+    }
+
+    /**
+     * Methode um das Symbol der Hauptwährung aus den SharedPreferences auszulesen.
+     *
+     * @return MainCurrencySymbol
+     */
+    private String getMainCurrencySymbol() {
+        SharedPreferences preferences = mContext.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
+
+        return preferences.getString("mainCurrencySymbol", "€");
     }
 
     /**
@@ -228,8 +206,6 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         TextView txtPerson;
         TextView txtPaidPrice;
         TextView txtBaseCurrency;
-        TextView txtCalcPrice;
-        TextView txtPaidCurrency;
     }
 
     @Override
@@ -248,9 +224,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             childViewHolder.txtTitle = (TextView) convertView.findViewById(R.id.exp_list_view_item_title);
             childViewHolder.txtPerson = (TextView) convertView.findViewById(R.id.exp_list_view_item_person);
             childViewHolder.txtPaidPrice = (TextView) convertView.findViewById(R.id.exp_list_view_item_paid_price);
-            childViewHolder.txtBaseCurrency = (TextView) convertView.findViewById(R.id.exp_list_view_item_currency_base);
-            childViewHolder.txtCalcPrice = (TextView) convertView.findViewById(R.id.exp_list_view_item_booking_price);
-            childViewHolder.txtPaidCurrency = (TextView) convertView.findViewById(R.id.exp_list_view_item_currency_paid);
+            childViewHolder.txtBaseCurrency = (TextView) convertView.findViewById(R.id.exp_list_view_item_paid_currency);
 
             convertView.setTag(childViewHolder);
         } else {
@@ -270,10 +244,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         childViewHolder.txtPerson.setText("");
         childViewHolder.txtPaidPrice.setText(String.format(mContext.getResources().getConfiguration().locale, "%.2f", childExpense.getUnsignedPrice()));
         childViewHolder.txtPaidPrice.setTextColor(childExpense.isExpenditure() ? mRed : mGreen);
-        childViewHolder.txtPaidCurrency.setText(childExpense.getAccount().getCurrency().getSymbol());
-        childViewHolder.txtPaidCurrency.setTextColor(childExpense.isExpenditure() ? mRed : mGreen);
-        childViewHolder.txtCalcPrice.setText("");
-        childViewHolder.txtBaseCurrency.setText("");
+        childViewHolder.txtBaseCurrency.setText("€");//todo mit der hauptwährung des users austauschen (shared preferences)
 
         return convertView;
     }

@@ -67,15 +67,13 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
     static final String BOOKINGS_COL_DATE = "date";
     static final String BOOKINGS_COL_NOTICE = "notice";
     static final String BOOKINGS_COL_ACCOUNT_ID = "account_id";
-    static final String BOOKINGS_COL_EXCHANGE_RATE = "exchange_rate";
-    static final String BOOKINGS_COL_IS_PARENT = "is_parent";
-    static final String BOOKINGS_COL_CURRENCY_ID = "currency_id";
+    static final String BOOKINGS_COL_IS_PARENT = "is_parent";//todo brauchen wir das flag noch, wenn der expense type mit gespeichert wird?
 
     private static final String CREATE_BOOKINGS = "CREATE TABLE " + TABLE_BOOKINGS
             + "("
             + BOOKINGS_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + BOOKINGS_COL_CREATED_AT + " DEFAULT CURRENT_TIMESTAMP, "
-            + BOOKINGS_COL_EXPENSE_TYPE + " TEXT NOT NULL, "//hinzugefügt 17.5.18
+            + BOOKINGS_COL_EXPENSE_TYPE + " TEXT NOT NULL, "
             + BOOKINGS_COL_PRICE + " REAL NOT NULL, "
             + BOOKINGS_COL_CATEGORY_ID + " INTEGER NOT NULL, "
             + BOOKINGS_COL_EXPENDITURE + " INTEGER NOT NULL, "
@@ -83,9 +81,7 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
             + BOOKINGS_COL_DATE + " TEXT NOT NULL, "
             + BOOKINGS_COL_NOTICE + " TEXT, "
             + BOOKINGS_COL_ACCOUNT_ID + " INTEGER NOT NULL, "
-            + BOOKINGS_COL_EXCHANGE_RATE + " TEXT, "
-            + BOOKINGS_COL_IS_PARENT + " INTEGER NOT NULL, "
-            + BOOKINGS_COL_CURRENCY_ID + " INTEGER "
+            + BOOKINGS_COL_IS_PARENT + " INTEGER NOT NULL"
             + ");";
 
 
@@ -103,8 +99,6 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
     static final String CHILD_BOOKINGS_COL_DATE = "date";
     static final String CHILD_BOOKINGS_COL_NOTICE = "notice";
     static final String CHILD_BOOKINGS_COL_ACCOUNT_ID = "account_id";
-    static final String CHILD_BOOKINGS_COL_EXCHANGE_RATE = "exchange_rate";
-    static final String CHILD_BOOKINGS_COL_CURRENCY_ID = "currency_id";
 
     private static final String CREATE_CHILD_BOOKINGS = "CREATE TABLE " + TABLE_CHILD_BOOKINGS
             + "("
@@ -118,9 +112,7 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
             + CHILD_BOOKINGS_COL_TITLE + " TEXT NOT NULL, "
             + CHILD_BOOKINGS_COL_DATE + " TEXT NOT NULL, "
             + CHILD_BOOKINGS_COL_NOTICE + " TEXT, "
-            + CHILD_BOOKINGS_COL_ACCOUNT_ID + " INTEGER NOT NULL, "
-            + CHILD_BOOKINGS_COL_EXCHANGE_RATE + " TEXT, "
-            + CHILD_BOOKINGS_COL_CURRENCY_ID + " INTEGER "
+            + CHILD_BOOKINGS_COL_ACCOUNT_ID + " INTEGER NOT NULL"
             + ");";
 
 
@@ -160,7 +152,7 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
     static final String CATEGORIES_COL_ID = "_id";
     static final String CATEGORIES_COL_NAME = "cat_name";
     static final String CATEGORIES_COL_COLOR = "color";
-    static final String CATEGORIES_COL_DEFAULT_EXPENSE_TYPE = "default_expense_type";//renamed CURRENCIES_COL_EXPENSE_TYPE -> CURRENCIES_COL_DEFAULT_EXPENSE_TYPE
+    static final String CATEGORIES_COL_DEFAULT_EXPENSE_TYPE = "default_expense_type";
     static final String CATEGORIES_COL_HIDDEN = "hidden";
 
     private final static String CREATE_CATEGORIES = "CREATE TABLE " + TABLE_CATEGORIES
@@ -194,7 +186,7 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
     static final String TABLE_CURRENCIES = "CURRENCIES";
 
     static final String CURRENCIES_COL_ID = "_id";
-    static final String CURRENCIES_COL_CREATED_AT = "created_at";//renamed CURRENCIES_COL_TIMESTAMP -> CURRENCIES_COL_CREATED_AT 17.05.2018
+    static final String CURRENCIES_COL_CREATED_AT = "created_at";
     static final String CURRENCIES_COL_SYMBOL = "symbol";
     static final String CURRENCIES_COL_NAME = "cur_name";
     static final String CURRENCIES_COL_SHORT_NAME = "short_name";
@@ -206,46 +198,6 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
             + CURRENCIES_COL_SYMBOL + " TEXT, "
             + CURRENCIES_COL_NAME + " TEXT NOT NULL, "
             + CURRENCIES_COL_SHORT_NAME + " TEXT NOT NULL"
-            + ");";
-
-
-    //defining table Currency_Exchange_Rates
-    static final String TABLE_CURRENCY_EXCHANGE_RATES = "CURRENCY_EXCHANGE_RATES";
-
-    static final String CURRENCY_EXCHANGE_RATES_COL_ID = "_id";
-    static final String CURRENCY_EXCHANGE_RATES_COL_FROM_CURRENCY_ID = "from_currency_id";
-    static final String CURRENCY_EXCHANGE_RATES_COL_TO_CURRENCY_ID = "to_currency_id";
-    static final String CURRENCY_EXCHANGE_RATES_COL_EXCHANGE_RATE = "exchange_rate";
-    static final String CURRENCY_EXCHANGE_RATES_COL_TIMESTAMP = "created_at";
-    static final String CURRENCY_EXCHANGE_RATES_COL_SERVER_DATE = "server_date";
-
-    private static final String CREATE_CURRENCY_EXCHANGE_RATES = "CREATE TABLE " + TABLE_CURRENCY_EXCHANGE_RATES
-            + "("
-            + CURRENCIES_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + CURRENCY_EXCHANGE_RATES_COL_TIMESTAMP + " DEFAULT CURRENT_TIMESTAMP, "
-            + CURRENCY_EXCHANGE_RATES_COL_FROM_CURRENCY_ID + " INTEGER NOT NULL, "
-            + CURRENCY_EXCHANGE_RATES_COL_TO_CURRENCY_ID + " INTEGER NOT NULL, "
-            + CURRENCY_EXCHANGE_RATES_COL_EXCHANGE_RATE + " INTEGER NOT NULL, "
-            + CURRENCY_EXCHANGE_RATES_COL_SERVER_DATE + " TEXT NOT NULL "
-            + ");";
-
-
-    //defining table Convert_Expense_Stack
-    static final String TABLE_CONVERT_EXPENSES_STACK = "CONVERT_EXPENSES_STACK";
-
-    static final String CONVERT_EXPENSES_STACK_COL_ID = "_id";
-    static final String CONVERT_EXPENSES_STACK_COL_BOOKING_ID = "booking_id";
-    static final String CONVERT_EXPENSES_STACK_COL_BOOKING_TYPE = "booking_type";
-    static final String CONVERT_EXPENSES_STACK_COL_TIMESTAMP = "created_at";
-    static final String CONVERT_EXPENSES_STACK_COL_LATEST_TRY = "latest_try";
-
-    private static final String CREATE_CONVERT_EXPENSES_STACK = "CREATE TABLE " + TABLE_CONVERT_EXPENSES_STACK
-            + "("
-            + CONVERT_EXPENSES_STACK_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + CONVERT_EXPENSES_STACK_COL_BOOKING_ID + " INTEGER NOT NULL, "
-            + CONVERT_EXPENSES_STACK_COL_BOOKING_TYPE + " TEXT NOT NULL, "
-            + CONVERT_EXPENSES_STACK_COL_TIMESTAMP + " DEFAULT CURRENT_TIMESTAMP, "
-            + CONVERT_EXPENSES_STACK_COL_LATEST_TRY + " TEXT "
             + ");";
 
 
@@ -290,11 +242,6 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
             db.execSQL(CREATE_CURRENCIES);
             insertCurrencies(db);
 
-            Log.d(TAG, "Die Tabelle Currency_Exchange_Rates wird mit SQL-Befehl: " + CREATE_CURRENCY_EXCHANGE_RATES + " angelegt.");
-            db.execSQL(CREATE_CURRENCY_EXCHANGE_RATES);
-
-            Log.d(TAG, "Die Tabelle Convert_Expenses_STACK wird mit SQL-Befehl: " + CREATE_CONVERT_EXPENSES_STACK + " angelegt.");
-            db.execSQL(CREATE_CONVERT_EXPENSES_STACK);
         } catch (Exception ex) {
 
             Log.e(TAG, "Fehler beim Anlegen der Tabelle: " + ex.getMessage());
@@ -313,8 +260,6 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_TEMPLATE_BOOKINGS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_RECURRING_BOOKINGS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CURRENCIES);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CURRENCY_EXCHANGE_RATES);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CONVERT_EXPENSES_STACK);
 
         onCreate(db);
     }

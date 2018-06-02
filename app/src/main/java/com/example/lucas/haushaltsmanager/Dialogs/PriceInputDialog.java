@@ -49,7 +49,6 @@ public class PriceInputDialog extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
         final Bundle args = getArguments();
-        final Activity activity = getActivity();
         final EditText input = createInputView();
 
         //wrapper für die text eingabe, sodass dieser eine padding gegeben werden kann
@@ -59,7 +58,7 @@ public class PriceInputDialog extends DialogFragment {
         layout.addView(input);
 
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 
         builder.setTitle(args.getString("title"));
 

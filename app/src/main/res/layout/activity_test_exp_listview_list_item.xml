@@ -13,6 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_marginRight="5dp"
+        android:layout_weight="1"
         tools:ignore="RtlHardcoded"/>
 
     <LinearLayout
@@ -20,6 +21,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="12dp"
         android:layout_marginRight="12dp"
+        android:layout_weight="1"
         android:orientation="vertical">
 
         <TableRow
@@ -48,7 +50,7 @@
                 android:textSize="16sp"/>
 
             <TextView
-                android:id="@+id/exp_list_view_item_currency_paid"
+                android:id="@+id/exp_list_view_item_paid_currency"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
@@ -73,25 +75,6 @@
                 android:textColor="@android:color/black"
                 android:textSize="12sp"/>
 
-            <TextView
-                android:id="@+id/exp_list_view_item_booking_price"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:text="15"
-                android:textAlignment="textEnd"
-                android:textSize="10sp"
-                tools:ignore="SmallSp"/>
-
-            <TextView
-                android:id="@+id/exp_list_view_item_currency_base"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:text="€"
-                android:textAlignment="viewStart"
-                android:textSize="10sp"
-                tools:ignore="SmallSp"/>
         </TableRow>
 
         <TableRow

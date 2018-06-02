@@ -23,7 +23,7 @@ import java.util.List;
 
 public class AccountAdapter extends ArrayAdapter<Account> {
     @SuppressWarnings("unused")
-    private static String TAG = AccountAdapter.class.getSimpleName();
+    private static final String TAG = AccountAdapter.class.getSimpleName();
 
     private OnDeleteAccountSelected mCallback;
 

@@ -8,11 +8,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.Spinner;
 
 import com.example.lucas.haushaltsmanager.Activities.MainTab.TabParentActivity;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
@@ -22,16 +18,11 @@ import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.R;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class CreateAccountActivity extends AppCompatActivity implements OnItemSelectedListener, BasicTextInputDialog.BasicDialogCommunicator, PriceInputDialog.OnPriceSelected {
-
-    private static String TAG = CreateAccountActivity.class.getSimpleName();
+public class CreateAccountActivity extends AppCompatActivity implements BasicTextInputDialog.BasicDialogCommunicator, PriceInputDialog.OnPriceSelected {
+    private static final String TAG = CreateAccountActivity.class.getSimpleName();
 
     Button mAccountNameBtn;
     Button mAccountBalanceBtn, mCreateAccountBtn;
-    Spinner mAccountCurrencySpin;
     ExpensesDataSource mDatabase;
     Account mAccount;
 
@@ -66,6 +57,7 @@ public class CreateAccountActivity extends AppCompatActivity implements OnItemSe
                     mCreationMode = CREATION_MODES.CREATE_ACCOUNT;
 
                     mAccount = Account.createDummyAccount(this);
+                    mAccount.setCurrency(getDefaultCurrency());
                     break;
                 default:
                     break;
@@ -75,11 +67,6 @@ public class CreateAccountActivity extends AppCompatActivity implements OnItemSe
         mAccountNameBtn = (Button) findViewById(R.id.new_account_name);
         mAccountBalanceBtn = (Button) findViewById(R.id.new_account_balance);
         mCreateAccountBtn = (Button) findViewById(R.id.new_account_create);
-
-        mAccountCurrencySpin = (Spinner) findViewById(R.id.new_account_currency);
-        mAccountCurrencySpin.setOnItemSelectedListener(this);
-        refreshSpinnerContents();
-        setVisibleSpinnerItem(mAccount.getCurrency().getShortName());
     }
 
     @Override
@@ -163,56 +150,6 @@ public class CreateAccountActivity extends AppCompatActivity implements OnItemSe
         }
     };
 
-    /**
-     * Methode um die in dem Spinner angezeigten Währungen neu zu laden
-     */
-    private void refreshSpinnerContents() {
-
-        ArrayList<Currency> currencies = mDatabase.getAllCurrencies();
-
-        List<String> currencyShortNames = new ArrayList<>();
-        for (Currency currency : currencies) {
-
-            currencyShortNames.add(currency.getShortName());
-        }
-
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, currencyShortNames);
-
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        mAccountCurrencySpin.setAdapter(dataAdapter);
-    }
-
-    /**
-     * Methode um das sichtbare Element des Spinners auf das visibleItem zu setzen
-     *
-     * @param visibleItem Anzuzeigendes Element
-     */
-    private void setVisibleSpinnerItem(String visibleItem) {
-
-        int index = 0;
-        for (int i = 0; i < mAccountCurrencySpin.getCount(); i++) {
-            if (mAccountCurrencySpin.getItemAtPosition(i).equals(visibleItem))
-                index = i;
-        }
-
-        mAccountCurrencySpin.setSelection(index);
-    }
-
-    @Override
-    @SuppressWarnings("ConstantConditions")
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-        String currencyName = parent.getItemAtPosition(position).toString();
-
-        this.mAccount.setCurrency(mDatabase.getCurrencyById(currencyName));
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> arg0) {
-
-    }
-
     @Override
     public void onTextInput(String textInput, String tag) {
 
@@ -235,5 +172,12 @@ public class CreateAccountActivity extends AppCompatActivity implements OnItemSe
 
             Log.d(TAG, "set account balance to " + mAccount.getBalance());
         }
+    }
+
+    private Currency getDefaultCurrency() {
+        SharedPreferences preferences = this.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
+
+        long mainCurrencIndex = preferences.getLong("mainCurrencyIndex", 32);
+        return mDatabase.getCurrencyById(mainCurrencIndex);
     }
 }

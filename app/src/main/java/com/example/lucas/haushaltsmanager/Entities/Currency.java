@@ -10,27 +10,19 @@ import android.util.Log;
 import com.example.lucas.haushaltsmanager.R;
 
 public class Currency implements Parcelable {
-
-    private static String TAG = Currency.class.getSimpleName();
+    private static final String TAG = Currency.class.getSimpleName();
 
     private long index;
     private String name;
     private String shortName;
     private String symbol;
-    private double rateToBase;
 
-    public Currency(long index, @NonNull String currencyName, @NonNull String currencyShortName, @NonNull String currencySymbol, Double rateToBase) {
+    public Currency(long index, @NonNull String currencyName, @NonNull String currencyShortName, @NonNull String currencySymbol) {
 
         setIndex(index);
         setName(currencyName);
         setShortName(currencyShortName);
         setSymbol(currencySymbol);
-        setRateToBase(rateToBase != null ? rateToBase : 0);
-    }
-
-    public Currency(long index, @NonNull String currencyName, @NonNull String currencyShortName, @NonNull String currencySymbol) {
-
-        this(index, currencyName, currencyShortName, currencySymbol, null);
     }
 
     /**
@@ -45,7 +37,6 @@ public class Currency implements Parcelable {
         setName(source.readString());
         setShortName(source.readString());
         setSymbol(source.readString());
-        setRateToBase(source.readDouble());
     }
 
     /**
@@ -55,7 +46,7 @@ public class Currency implements Parcelable {
      */
     public static Currency createDummyCurrency(Context context) {
 
-        return new Currency(-1, context.getResources().getString(R.string.no_name), "NON", "", null);
+        return new Currency(-1, context.getResources().getString(R.string.no_name), "NON", "");
     }
 
     public long getIndex() {
@@ -100,16 +91,6 @@ public class Currency implements Parcelable {
         this.symbol = symbol;
     }
 
-    public double getRateToBase() {
-
-        return rateToBase;
-    }
-
-    public void setRateToBase(double rate) {
-
-        this.rateToBase = rate;
-    }
-
     /**
      * Methode die die Felder der Währung checkt ob diese gesetzt sind oder nicht.
      * Sind alle Felder gesetzt, dann kann die Währung ohne Probleme in die Datenbank geschrieben werden.
@@ -133,7 +114,7 @@ public class Currency implements Parcelable {
     }
     public String toString() {
 
-        return getIndex() + " " + getName() + " " + getRateToBase();
+        return getIndex() + " " + getName();
     }
 
     /**
@@ -147,7 +128,6 @@ public class Currency implements Parcelable {
         boolean result = getName().equals(otherCurrency.getName());
         result = result && getShortName().equals(otherCurrency.getShortName());
         result = result && getSymbol().equals(otherCurrency.getSymbol());
-        result = result && (getRateToBase() == otherCurrency.getRateToBase());
 
         return result;
     }
@@ -169,7 +149,6 @@ public class Currency implements Parcelable {
         dest.writeString(name);
         dest.writeString(shortName);
         dest.writeString(symbol);
-        dest.writeDouble(rateToBase);
     }
 
     public static final Parcelable.Creator<Currency> CREATOR = new Parcelable.Creator<Currency>() {

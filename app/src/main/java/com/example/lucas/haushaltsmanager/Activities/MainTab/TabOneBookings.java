@@ -34,7 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class TabOneBookings extends Fragment {
-    private String TAG = TabOneBookings.class.getSimpleName();
+    private static final String TAG = TabOneBookings.class.getSimpleName();
 
     ExpandableListAdapter mListAdapter;
     ExpandableListView mExpListView;

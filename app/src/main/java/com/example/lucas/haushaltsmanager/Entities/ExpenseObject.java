@@ -79,16 +79,11 @@ public class ExpenseObject implements Parcelable {
     private Account account;
 
     /**
-     * Currency of expense
-     */
-    private Currency expenseCurrency;
-
-    /**
      * Children of expense
      */
     private List<ExpenseObject> children = new ArrayList<>();
 
-    public ExpenseObject(long index, @NonNull String expenseName, double price, Calendar date, boolean expenditure, @NonNull Category category, String notice, @NonNull Account account, Currency expenseCurrency, @NonNull EXPENSE_TYPES expenseType) {
+    public ExpenseObject(long index, @NonNull String expenseName, double price, Calendar date, boolean expenditure, @NonNull Category category, String notice, @NonNull Account account, @NonNull EXPENSE_TYPES expenseType) {
 
         setIndex(index);
         setTitle(expenseName);
@@ -98,13 +93,12 @@ public class ExpenseObject implements Parcelable {
         setCategory(category);
         setNotice(notice != null ? notice : "");
         setAccount(account);
-        setExpenseCurrency(expenseCurrency != null ? expenseCurrency : account.getCurrency());
         setExpenseType(expenseType);
     }
 
-    public ExpenseObject(@NonNull String title, double price, boolean expenditure, @NonNull Category category, Currency expenseCurrency, @NonNull Account account) {
+    public ExpenseObject(@NonNull String title, double price, boolean expenditure, @NonNull Category category, @NonNull Account account) {
 
-        this(-1, title, price, Calendar.getInstance(), expenditure, category, null, account, expenseCurrency, EXPENSE_TYPES.NORMAL_EXPENSE);
+        this(-1, title, price, Calendar.getInstance(), expenditure, category, null, account, EXPENSE_TYPES.NORMAL_EXPENSE);
     }
 
     /**
@@ -132,7 +126,6 @@ public class ExpenseObject implements Parcelable {
         setNotice(source.readString());
         setAccount((Account) source.readParcelable(Account.class.getClassLoader()));
         source.readList(this.children, ExpenseObject.class.getClassLoader());
-        setExpenseCurrency((Currency) source.readParcelable(Currency.class.getClassLoader()));
         setExpenseType(EXPENSE_TYPES.valueOf(source.readString()));
     }
 
@@ -144,45 +137,7 @@ public class ExpenseObject implements Parcelable {
      */
     public static ExpenseObject createDummyExpense(@NonNull Context context) {
 
-        return new ExpenseObject(-1, context.getResources().getString(R.string.no_name), 0, Calendar.getInstance(), false, Category.createDummyCategory(context), null, Account.createDummyAccount(context), Currency.createDummyCurrency(context), EXPENSE_TYPES.DUMMY_EXPENSE);
-    }
-
-    public double getExchangeRate() {
-
-        return this.expenseCurrency.getRateToBase();
-    }
-
-    /**
-     * Methode um den Preis der Buchung in die Standartwährung umzurechnen.
-     *
-     * @return Umgerechneter Preis
-     */
-    @Nullable
-    public Double getCalcPrice() {
-
-        DecimalFormat df = new DecimalFormat("#.##");
-        double rate;
-
-        if (this.expenseCurrency.getRateToBase() != 0) {
-
-            rate = this.expenseCurrency.getRateToBase() * this.price;
-            return Double.parseDouble(df.format(rate));
-        } else {
-
-            rate = this.account.getCurrency().getRateToBase() * this.price;
-            return Double.parseDouble(df.format(rate));
-        }
-    }
-
-    @NonNull
-    public Currency getExpenseCurrency() {
-
-        return this.expenseCurrency;
-    }
-
-    public void setExpenseCurrency(@NonNull Currency expenseCurrency) {
-
-        this.expenseCurrency = expenseCurrency;
+        return new ExpenseObject(-1, context.getResources().getString(R.string.no_name), 0, Calendar.getInstance(), false, Category.createDummyCategory(context), null, Account.createDummyAccount(context), EXPENSE_TYPES.DUMMY_EXPENSE);
     }
 
     @NonNull
@@ -390,7 +345,7 @@ public class ExpenseObject implements Parcelable {
      */
     public boolean isValid() {
 
-        return getIndex() > -1 && account.isValid() && category.isValid() && getExpenseCurrency().isValid() && areTagsValid();
+        return getIndex() > -1 && account.isValid() && category.isValid() && areTagsValid();
     }
 
     private boolean areTagsValid() {
@@ -413,13 +368,11 @@ public class ExpenseObject implements Parcelable {
 
         boolean result = getTitle().equals(otherExpense.getTitle());
         result = result && (getUnsignedPrice() == otherExpense.getUnsignedPrice());
-        result = result && getExpenseCurrency().equals(otherExpense.getExpenseCurrency());
         result = result && getAccount().equals(otherExpense.getAccount());
         result = result && getExpenseType().equals(otherExpense.getExpenseType());
         result = result && getDateTime().equals(otherExpense.getDateTime());
         result = result && getNotice().equals(otherExpense.getNotice());
         result = result && getCategory().equals(otherExpense.getCategory());
-        result = result && (getExchangeRate() == otherExpense.getExchangeRate());
 
         for (Tag tag : getTags()) {
             for (Tag otherTag : otherExpense.getTags()) {
@@ -488,7 +441,6 @@ public class ExpenseObject implements Parcelable {
         dest.writeString(notice);
         dest.writeParcelable(account, flags);
         dest.writeList(children);
-        dest.writeParcelable(expenseCurrency, flags);
         dest.writeString(expenseType.name());
     }
 

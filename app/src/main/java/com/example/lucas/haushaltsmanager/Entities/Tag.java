@@ -9,8 +9,7 @@ import android.util.Log;
 import com.example.lucas.haushaltsmanager.R;
 
 public class Tag implements Parcelable {
-
-    private String TAG = Tag.class.getSimpleName();
+    private static final String TAG = Tag.class.getSimpleName();
 
     private long index;
     private String name;

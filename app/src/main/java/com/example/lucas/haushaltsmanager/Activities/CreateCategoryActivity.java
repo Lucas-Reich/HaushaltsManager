@@ -21,7 +21,7 @@ public class CreateCategoryActivity extends AppCompatActivity implements BasicTe
 
     private Category mCategory;
     private Button mCatNameBtn, mCatColorBtn, mCreateBtn;
-    private RadioGroup mDefaultExpenseRdioGrp;
+    private RadioGroup mDefaultExpenseRadioGrp;
     private ExpensesDataSource mDatabase;
 
     @Override
@@ -37,7 +37,7 @@ public class CreateCategoryActivity extends AppCompatActivity implements BasicTe
         mCatColorBtn = (Button) findViewById(R.id.new_category_color);
         mCreateBtn = (Button) findViewById(R.id.new_category_create);
 
-        mDefaultExpenseRdioGrp = (RadioGroup) findViewById(R.id.new_category_expense_type);
+        mDefaultExpenseRadioGrp = (RadioGroup) findViewById(R.id.new_category_expense_type);
     }
 
     @Override
@@ -76,9 +76,9 @@ public class CreateCategoryActivity extends AppCompatActivity implements BasicTe
             }
         });
 
-        mDefaultExpenseRdioGrp.check(R.id.new_category_expense);
+        mDefaultExpenseRadioGrp.check(R.id.new_category_expense);
         mCategory.setDefaultExpenseType(true);
-        mDefaultExpenseRdioGrp.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+        mDefaultExpenseRadioGrp.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {

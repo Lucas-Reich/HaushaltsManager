@@ -17,7 +17,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -25,7 +24,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.MultiAutoCompleteTextView;
 import android.widget.RadioGroup;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,12 +42,11 @@ import com.example.lucas.haushaltsmanager.Entities.Tag;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-public class ExpenseScreenActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, AccountPickerDialog.OnAccountSelected, BasicTextInputDialog.BasicDialogCommunicator, PriceInputDialog.OnPriceSelected, com.example.lucas.haushaltsmanager.Dialogs.DatePickerDialog.OnDateSelected, FrequencyAlertDialog.OnFrequencySet {
+public class ExpenseScreenActivity extends AppCompatActivity implements AccountPickerDialog.OnAccountSelected, BasicTextInputDialog.BasicDialogCommunicator, PriceInputDialog.OnPriceSelected, com.example.lucas.haushaltsmanager.Dialogs.DatePickerDialog.OnDateSelected, FrequencyAlertDialog.OnFrequencySet {
     private static final String TAG = ExpenseScreenActivity.class.getSimpleName();
 
     private creationModes CREATION_MODE;
@@ -106,30 +103,6 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
         mRecurringChk = (CheckBox) findViewById(R.id.expense_screen_recurring);
 
         resolveIntent(getIntent().getExtras());
-
-        //ab hier wird der CurrencySelector erstellt
-
-        //todo den currencySelector klassenweit sichtbar machen und ihn dann in der funktion setExpenseCurrency anpassen
-        Spinner currencySelector = (Spinner) findViewById(R.id.expense_screen_select_currency);
-
-        currencySelector.setOnItemSelectedListener(this);
-
-        ArrayList<Currency> currencies = mDatabase.getAllCurrencies();
-
-        List<String> currencyShortNames = new ArrayList<>();
-        for (Currency currency : currencies) {
-
-            currencyShortNames.add(currency.getShortName());
-        }
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, currencyShortNames);
-
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        currencySelector.setAdapter(adapter);
-
-        SharedPreferences preferences = getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
-        currencySelector.setSelection(((int) preferences.getLong("mainCurrencyIndex", 32)) - 1);
     }
 
     /**
@@ -148,6 +121,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
 
             CREATION_MODE = creationModes.UPDATE_CHILD_MODE;
             mExpense = getIntent().getParcelableExtra("updateChildExpense");
+            //todo use function showExpenseOnExpenseScreen
             Log.d(TAG, "resolveIntent: Updating Child Expense " + mExpense.toString());
             return;
         }
@@ -158,6 +132,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
 
             CREATION_MODE = creationModes.UPDATE_EXPENSE_MODE;
             mExpense = getIntent().getParcelableExtra("updateParentExpense");
+            //todo use function showExpenseOnExpenseScreen
             Log.d(TAG, "resolveIntent: Updating Parent Expense " + mExpense.toString());
             return;
         }
@@ -376,25 +351,21 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
                 case UPDATE_EXPENSE_MODE:
 
                     mDatabase.updateBooking(mExpense);
-                    //todo falls der preis geupdatet wurde muss auch erneut in eine fremdwährung umgerechnet werden
                     Toast.makeText(ExpenseScreenActivity.this, "Updated Booking " + mExpense.getTitle(), Toast.LENGTH_SHORT).show();
                     break;
                 case UPDATE_CHILD_MODE:
 
                     mDatabase.updateChildBooking(mExpense);
-                    //todo falls der preis geupdatet wurde muss auch erneut in eine fremdwährung umgerechnet werden
                     Toast.makeText(ExpenseScreenActivity.this, "Updated Booking " + mExpense.getTitle(), Toast.LENGTH_SHORT).show();
                     break;
                 case ADD_CHILD_MODE:
 
                     mDatabase.addChildToBooking(mExpense, mParentBooking);
-                    mDatabase.insertConvertExpense(mExpense);
                     Toast.makeText(ExpenseScreenActivity.this, "Added Booking \"" + mExpense.getTitle() + "\" to parent Booking " + mParentBooking.getTitle(), Toast.LENGTH_SHORT).show();
                     break;
                 case CREATE_EXPENSE_MODE:
 
                     mExpense = mDatabase.createBooking(mExpense);
-                    mDatabase.insertConvertExpense(mExpense);
                     Toast.makeText(ExpenseScreenActivity.this, "Created Booking \"" + mExpense.getTitle() + "\"", Toast.LENGTH_SHORT).show();
                     break;
                 default:
@@ -531,7 +502,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
      * @param tagName Name des zu prüfenden Tags.
      * @return TRUE wenn der Tag bereits existiert, FALSE wenn nicht.
      */
-    private boolean tagNotExisting(String tagName) {
+    private boolean tagNotExisting(String tagName) {//todo rename
         for (Tag tag : mTags) {
             if (tag.getName().equals(tagName))
                 return false;
@@ -720,7 +691,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
         setDate(expense.getDateTime());
         setNotice(expense.getNotice());
         setAccount(expense.getAccount());
-        setExpenseCurrency(expense.getExpenseCurrency());
+        setExpenseCurrency();
     }
 
     /**
@@ -818,42 +789,16 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
 
         mAccountBtn.setText(account.getTitle());
         mExpense.setAccount(account);
-
-        setExpenseCurrency(account.getCurrency());
     }
 
     /**
      * Methode, welche die angezeigte Währung und die Währung der zu speichernden Ausgabe anpasst.
-     *
-     * @param currency Währung
      */
-    private void setExpenseCurrency(Currency currency) {
+    private void setExpenseCurrency() {
 
-        mCurrencySymbolTxt.setText(currency.getSymbol());
-        //todo zeige auf dem currencySelector die aktuelle währung an
-        mExpense.setExpenseCurrency(currency);
-    }
+        SharedPreferences preferences = this.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
 
-    /**
-     * Callback Methode des Currency selectors
-     *
-     * @param parent   parent
-     * @param view     view
-     * @param position Die vom Nutzer ausgewählte position
-     * @param id       id
-     */
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-        String curName = parent.getItemAtPosition(position).toString();
-        Currency currency = mDatabase.getCurrencyById(curName);
-
-        mExpense.setExpenseCurrency(currency);
-        mCurrencySymbolTxt.setText(String.format("%s", mExpense.getExpenseCurrency().getSymbol()));
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> arg0) {
+        mCurrencySymbolTxt.setText(preferences.getString("mainCurrencySymbol", "€"));
     }
 
     /**

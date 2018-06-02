@@ -30,16 +30,14 @@ import com.example.lucas.haushaltsmanager.Activities.CreateBackupActivity;
 import com.example.lucas.haushaltsmanager.Activities.ImportExportActivity;
 import com.example.lucas.haushaltsmanager.Activities.RecurringBookingsActivity;
 import com.example.lucas.haushaltsmanager.Activities.TestActivity;
-import com.example.lucas.haushaltsmanager.Activities.TransferActivity;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ChangeAccounts.ChooseAccountsDialogFragment;
 import com.example.lucas.haushaltsmanager.MockDataCreator;
 import com.example.lucas.haushaltsmanager.MyAlarmReceiver;
 import com.example.lucas.haushaltsmanager.R;
-import com.example.lucas.haushaltsmanager.Services.GetExchangeRatesService;
 
 public class TabParentActivity extends AppCompatActivity implements ChooseAccountsDialogFragment.OnSelectedAccount, BasicTextInputDialog.BasicDialogCommunicator {
-    private static String TAG = TabParentActivity.class.getSimpleName();
+    private static final String TAG = TabParentActivity.class.getSimpleName();
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private TabLayout mTabLayout;
@@ -47,16 +45,6 @@ public class TabParentActivity extends AppCompatActivity implements ChooseAccoun
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-        //todo die shared preferences in den dafür vorgehenen bereich bringen
-        SharedPreferences settings = getSharedPreferences("UserSettings", 0);
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putString("mainCurrency", "€");
-        editor.putLong("mainCurrencyIndex", 32);
-
-        editor.apply();
-
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tab_main_mit_nav_drawer);
 
@@ -64,14 +52,11 @@ public class TabParentActivity extends AppCompatActivity implements ChooseAccoun
         scheduleBackupServiceAlarm();
 
 
-        //TODO remove den GetExchangeRateService test button
+        //TODO den test button removen
         FloatingActionButton testService = (FloatingActionButton) findViewById(R.id.service_fab);
         testService.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                //Intent serviceIntent = new Intent(getBaseContext(), GetExchangeRatesService.class);
-                //startService(serviceIntent);
 
                 MockDataCreator test = new MockDataCreator(TabParentActivity.this);
                 test.createBookings(100);

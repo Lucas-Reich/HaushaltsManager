@@ -10,7 +10,7 @@ import java.util.Calendar;
 import java.util.List;
 
 public class MonthlyReportAdapterCreator {
-    private String TAG = MonthlyReportAdapterCreator.class.getSimpleName();
+    private static final String TAG = MonthlyReportAdapterCreator.class.getSimpleName();
 
     private ArrayList<ExpenseObject> mExpenses;
     private Context mContext;
@@ -68,7 +68,7 @@ public class MonthlyReportAdapterCreator {
     private String getMainCurrency() {
         SharedPreferences preferences = mContext.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
 
-        return preferences.getString("mainCurrency", "€");
+        return preferences.getString("mainCurrencySymbol", "€");
     }
 
     /**

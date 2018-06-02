@@ -115,7 +115,7 @@ public class MockDataCreator {
         int counter = 0;
         for (; counter < count; counter++) {
 
-            ExpenseObject expense = new ExpenseObject(baseExpenseName + counter, 10d, mRnd.nextBoolean(),mCategories.get(mRnd.nextInt(categoryCount - 1)) , mMainCurrency, mAccounts.get(mRnd.nextInt(accountCount - 1)));
+            ExpenseObject expense = new ExpenseObject(baseExpenseName + counter, 10d, mRnd.nextBoolean(),mCategories.get(mRnd.nextInt(categoryCount - 1)), mAccounts.get(mRnd.nextInt(accountCount - 1)));
 
             if (mRnd.nextInt(7) == 5)
                 expense.addChildren(createChildBookings(3));
@@ -136,7 +136,7 @@ public class MockDataCreator {
         Log.d(TAG, "createChildBookings: creating child expenses");
         for (int i = 0; i < count; i++) {
 
-            ExpenseObject expense = new ExpenseObject(baseChildExpenseName + i, 10d, mRnd.nextBoolean(),mCategories.get(mRnd.nextInt(categoryCount - 1)) , mMainCurrency, mAccounts.get(mRnd.nextInt(accountCount - 1)));
+            ExpenseObject expense = new ExpenseObject(baseChildExpenseName + i, 10d, mRnd.nextBoolean(),mCategories.get(mRnd.nextInt(categoryCount - 1)), mAccounts.get(mRnd.nextInt(accountCount - 1)));
             children.add(expense);
         }
         return children;

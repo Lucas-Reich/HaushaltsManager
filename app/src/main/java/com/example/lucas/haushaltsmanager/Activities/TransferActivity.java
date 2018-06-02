@@ -1,5 +1,6 @@
 package com.example.lucas.haushaltsmanager.Activities;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -23,7 +24,6 @@ import com.example.lucas.haushaltsmanager.Dialogs.DatePickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.R;
 
@@ -33,8 +33,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class TransferActivity extends AppCompatActivity implements AccountPickerDialog.OnAccountSelected, DatePickerDialog.OnDateSelected, PriceInputDialog.OnPriceSelected {
-
-    private static String TAG = TransferActivity.class.getSimpleName();
+    private static final String TAG = TransferActivity.class.getSimpleName();
 
     private Button mDateBtn, mFromAccountBtn, mToAccountBtn, mCreateTransferBtn, mAmountBtn;
     private ExpensesDataSource mDatabase;
@@ -275,7 +274,7 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
             setToAccount(account);
         }
 
-        setToExpense(mFromExpense.getExpenseCurrency(), mFromExpense.getUnsignedPrice());
+        setToExpense(mFromExpense.getUnsignedPrice());
     }
 
     /**
@@ -288,7 +287,6 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
         mFromAccount = newAccount;
         mToExpense.setTitle(String.format("%s %s", getString(R.string.transfer_from), mFromAccount.getTitle()));
         mFromExpense.setAccount(mFromAccount);
-        mFromExpense.setExpenseCurrency(mFromAccount.getCurrency());
         mFromAccountBtn.setText(mFromAccount.getTitle());
 
         Log.d(TAG, "selected " + mFromAccount.getTitle() + " as from account");
@@ -304,7 +302,6 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
         mToAccount = newAccount;
         mFromExpense.setTitle(String.format("%s %s", getString(R.string.transfer_to), mToAccount.getTitle()));
         mToExpense.setAccount(mToAccount);
-        mToExpense.setExpenseCurrency(mToAccount.getCurrency());
         mToAccountBtn.setText(mToAccount.getTitle());
 
         Log.d(TAG, "selected " + mToAccount.getTitle() + " as to account");
@@ -337,47 +334,28 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
     @Override
     public void onPriceSelected(double price, String tag) {
 
+        SharedPreferences preferences = this.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
+
         if (tag.equals("transfers_amount_input")) {
 
             mFromExpense.setPrice(price);
             mFromExpense.setExpenditure(true);
-            mAmountBtn.setText(String.format(this.getResources().getConfiguration().locale, "%.2f %s", mFromExpense.getUnsignedPrice(), mFromExpense.getExpenseCurrency().getSymbol()));
+            mAmountBtn.setText(String.format(this.getResources().getConfiguration().locale, "%.2f %s", mFromExpense.getUnsignedPrice(), preferences.getString("mainCurrencySymbol", "€")));
 
-            setToExpense(mFromExpense.getExpenseCurrency(), price);
+            setToExpense(price);
         }
     }
 
     /**
      * Methode um den Betrag der ToExpense zu setzen, da dieser eventuell umgerechnet werden muss.
      *
-     * @param fromCurrency Ausgangswährung (mFromExpense.getExpenseCurrency)
-     * @param newPrice     Den Preis, welcher umgerechnet werden muss
+     * @param newPrice Den Preis, welcher umgerechnet werden muss
      */
-    private void setToExpense(Currency fromCurrency, double newPrice) {
+    private void setToExpense(double newPrice) {
 
-        if (fromCurrency.equals(mToExpense.getExpenseCurrency())) {
-
-            mToExpense.setPrice(newPrice);
-            mToExpense.setExpenditure(false);
-            return;
-        }
-
-
-        Double conversionRate = getConversionRate(fromCurrency, mToExpense.getExpenseCurrency(), mToExpense.getDateTime().getTimeInMillis());
-        if (conversionRate != null) {
-
-            mToExpense.setPrice(newPrice * conversionRate);
-            mToExpense.setExpenditure(false);
-        } else {
-
-            //todo Buchungen in einer anderen Wärhung, zu der es keinen Wechselkurs gibt werden mit dem preis 0,00€ in die datenbank geschrieben
-            //flag setzen, welches die toExpense in den convert-expenses-stack schreibt, wenn der user die überweisung betstätigt
-        }
-    }
-
-    @Nullable
-    private Double getConversionRate(Currency fromCurrency, Currency toCurrency, long timestamp) {
-        return mDatabase.getExchangeRate(fromCurrency.getIndex(), toCurrency.getIndex(), timestamp);
+        mToExpense.setPrice(newPrice);
+        mToExpense.setExpenditure(false);
+        return;
     }
 
     @Override

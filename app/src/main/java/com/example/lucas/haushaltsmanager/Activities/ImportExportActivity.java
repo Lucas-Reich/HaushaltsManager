@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 public class ImportExportActivity extends AppCompatActivity implements AccountPickerDialog.OnAccountSelected, BasicTextInputDialog.BasicDialogCommunicator, DirectoryPickerDialog.OnDirectorySelected {
-    private String TAG = ImportExportActivity.class.getSimpleName();
+    private static final String TAG = ImportExportActivity.class.getSimpleName();
 
     Button mAccountBtn, mFileNameBtn, mDirectoryBtn, mFromDateBtn, mUntilDateBtn, mCreateExportBtn, mImportBtn;
     CheckBox mExpenseChk, mIncomeChk, mSetStartDateChk, mSetEndDateChk;
@@ -365,7 +365,6 @@ public class ImportExportActivity extends AppCompatActivity implements AccountPi
         expenseString.append(expense.getTitle()).append(",");
         expenseString.append(expense.getDate()).append(",");
         expenseString.append(expense.getNotice()).append(",");
-        expenseString.append(expense.getExchangeRate()).append(",");
         expenseString.append(expense.getCategory().getIndex()).append(",");
         expenseString.append(expense.getCategory().getTitle()).append(",");
         expenseString.append(expense.getCategory().getColor()).append(",");
@@ -373,11 +372,6 @@ public class ImportExportActivity extends AppCompatActivity implements AccountPi
         expenseString.append(expense.getAccount().getIndex()).append(",");
         expenseString.append(expense.getAccount().getTitle()).append(",");
         expenseString.append(expense.getAccount().getBalance()).append(",");
-        expenseString.append(expense.getExpenseCurrency().getIndex()).append(",");
-        expenseString.append(expense.getExpenseCurrency().getName()).append(",");
-        expenseString.append(expense.getExpenseCurrency().getShortName()).append(",");
-        expenseString.append(expense.getExpenseCurrency().getSymbol()).append(",");
-        expenseString.append(expense.getExchangeRate()).append("\n");
 
         for (ExpenseObject expenseChild : expense.getChildren()) {
 

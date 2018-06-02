@@ -13,7 +13,7 @@ import com.example.lucas.haushaltsmanager.R;
 import java.util.Calendar;
 
 public class DatePickerDialog extends DialogFragment implements DatePicker.OnDateChangedListener {
-    private static String TAG = DatePickerDialog.class.getSimpleName();
+    private static final String TAG = DatePickerDialog.class.getSimpleName();
 
     private OnDateSelected mCallback;
     private Context mContext;

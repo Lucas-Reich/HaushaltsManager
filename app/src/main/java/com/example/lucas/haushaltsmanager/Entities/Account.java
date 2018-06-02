@@ -9,15 +9,14 @@ import android.util.Log;
 import com.example.lucas.haushaltsmanager.R;
 
 public class Account implements Parcelable {
-
-    private String TAG = Account.class.getSimpleName();
+    private static final String TAG = Account.class.getSimpleName();
 
     private long index;
     private String name;
     private double balance;
     private Currency currency;
 
-    public Account(long index, @NonNull String accountName,double balance, @NonNull Currency currency) {
+    public Account(long index, @NonNull String accountName, double balance, @NonNull Currency currency) {
 
         setIndex(index);
         setName(accountName);

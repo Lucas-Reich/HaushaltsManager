@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class ExpandableListAdapterCreator {
-    private static String TAG = ExpandableListAdapterCreator.class.getSimpleName();
+    private static final String TAG = ExpandableListAdapterCreator.class.getSimpleName();
 
     private ArrayList<ExpenseObject> mExpenses;
     private List<Long> mActiveAccounts;

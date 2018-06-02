@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ChooseAccountsDialogFragment extends DialogFragment implements AdapterView.OnItemClickListener, AccountAdapter.OnDeleteAccountSelected {
-    private static String TAG = ChooseAccountsDialogFragment.class.getSimpleName();
+    private static final String TAG = ChooseAccountsDialogFragment.class.getSimpleName();
 
     ExpensesDataSource mDatabase;
     SharedPreferences mSettings;
@@ -175,7 +175,7 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Adap
             SharedPreferences.Editor editor = preferences.edit();
             editor.remove(account.getTitle());
             editor.apply();
-            //was passiert wenn ich das aktuelle acktive konto lösche
+            //todo was passiert wenn ich das aktuell aktive konto lösche
             Toast.makeText(mContext, mContext.getResources().getString(R.string.deleted_account), Toast.LENGTH_SHORT).show();
         } catch (CannotDeleteAccountException e) {
 
@@ -193,7 +193,7 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Adap
     @Override
     public void onAccountSetMain(Account account) {
 
-        SharedPreferences preferences = mContext.getSharedPreferences("UserSettings",  Context.MODE_PRIVATE);
+        SharedPreferences preferences = mContext.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putLong("activeAccount", account.getIndex());
         editor.apply();

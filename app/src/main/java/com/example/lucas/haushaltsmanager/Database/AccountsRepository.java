@@ -64,7 +64,7 @@ public class AccountsRepository {
         String currencyShortName = c.getString(c.getColumnIndex(ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME));
         String currencySymbol = c.getString(c.getColumnIndex(ExpensesDbHelper.CURRENCIES_COL_SYMBOL));
 
-        Currency currency = new Currency(currencyID, currencyName, currencyShortName, currencySymbol, null);
+        Currency currency = new Currency(currencyID, currencyName, currencyShortName, currencySymbol);
 
         return new Account(accountIndex, accountName, accountBalance, currency);
     }

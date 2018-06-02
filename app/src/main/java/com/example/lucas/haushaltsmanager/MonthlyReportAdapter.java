@@ -19,17 +19,17 @@ import java.util.Locale;
 /**
  * source: https://www.androidhive.info/2016/05/android-working-with-card-view-and-recycler-view/
  */
-public class MonthlyReportAdapter extends RecyclerView.Adapter<MonthlyReportAdapter.MyViewHolder> {
+public class MonthlyReportAdapter extends RecyclerView.Adapter<MonthlyReportAdapter.ViewHolder> {
 
     private Context mContext;
     private List<MonthlyReport> mReports;
 
-    class MyViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder {
         TextView month, inbound, outbound, total, accountCurrency, stressedCategory, totalBookings;
         RoundedTextView categoryColor;
         PieChart pieChart;
 
-        MyViewHolder(View view) {
+        ViewHolder(View view) {
             super(view);
             month = (TextView) view.findViewById(R.id.monthly_item_month);
             inbound = (TextView) view.findViewById(R.id.monthly_item_inbound);
@@ -51,13 +51,13 @@ public class MonthlyReportAdapter extends RecyclerView.Adapter<MonthlyReportAdap
     }
 
     @Override
-    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.monthly_report_card, parent, false);
 
-        return new MyViewHolder(itemView);
+        return new ViewHolder(itemView);
     }
 
-    public void onBindViewHolder(final MyViewHolder holder, int position) {
+    public void onBindViewHolder(final ViewHolder holder, int position) {
         MonthlyReport report = mReports.get(position);
         holder.month.setText(getMonth(Integer.parseInt(report.getMonth())));
         holder.inbound.setText(formatMoney(report.countIncomingMoney()));

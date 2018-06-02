@@ -16,28 +16,22 @@ import java.util.ArrayList;
 
 public class BookingAdapter extends ArrayAdapter<ExpenseObject> implements View.OnClickListener {
 
-    private SharedPreferences preferences;
-
     private static class ViewHolder {
         TextView circleLetter;
         TextView txtTitle;
+        TextView txtPrice;
+        TextView txtCurrencySymbol;
         TextView txtPerson;
-        TextView txtCalcPrice;
-        TextView txtPaidPrice;
-        TextView txtBaseCurrency;
-        TextView txtPaidCurrency;
     }
 
     public BookingAdapter(ArrayList<ExpenseObject> data, Context context) {
         super(context, R.layout.booking_item, data);
-
-        this.preferences = context.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
     }
 
     @Override
     public void onClick(View v) {
 
-        Toast.makeText(getContext(), "du hast gecklickt", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "du hast geklickt", Toast.LENGTH_SHORT).show();
     }
 
     @NonNull
@@ -55,11 +49,9 @@ public class BookingAdapter extends ArrayAdapter<ExpenseObject> implements View.
 
             viewHolder.circleLetter = (TextView) convertView.findViewById(R.id.booking_item_circle);
             viewHolder.txtTitle = (TextView) convertView.findViewById(R.id.booking_item_title);
+            viewHolder.txtPrice = (TextView) convertView.findViewById(R.id.booking_item_paid_price);
+            viewHolder.txtCurrencySymbol = (TextView) convertView.findViewById(R.id.booking_item_currency_paid);
             viewHolder.txtPerson = (TextView) convertView.findViewById(R.id.booking_item_person);
-            viewHolder.txtPaidPrice = (TextView) convertView.findViewById(R.id.booking_item_paid_price);
-            viewHolder.txtBaseCurrency = (TextView) convertView.findViewById(R.id.booking_item_currency_base);
-            viewHolder.txtCalcPrice = (TextView) convertView.findViewById(R.id.booking_item_booking_price);
-            viewHolder.txtPaidCurrency = (TextView) convertView.findViewById(R.id.booking_item_currency_paid);
 
             convertView.setTag(viewHolder);
         } else {
@@ -73,18 +65,8 @@ public class BookingAdapter extends ArrayAdapter<ExpenseObject> implements View.
         viewHolder.txtTitle.setText(expenseObject.getTitle());
         //TODO wenn es eine Multiuser funktionalität muss hier der benutzer eingetragen werden, der das Geld ausgegeben hat
         viewHolder.txtPerson.setText("");
-        viewHolder.txtPaidPrice.setText(String.format("%s", expenseObject.getUnsignedPrice()));
-        viewHolder.txtPaidCurrency.setText(expenseObject.getAccount().getCurrency().getSymbol());
-
-        if (expenseObject.getExpenseCurrency().getIndex() == preferences.getLong("mainCurrencyIndex", 0)) {
-
-            viewHolder.txtCalcPrice.setText("");
-            viewHolder.txtBaseCurrency.setText("");
-        } else {
-
-            viewHolder.txtCalcPrice.setText(String.format("%s", expenseObject.getCalcPrice()));
-            viewHolder.txtBaseCurrency.setText(String.format("%s", expenseObject.getExpenseCurrency().getSymbol()));
-        }
+        viewHolder.txtPrice.setText(String.format("%s", expenseObject.getUnsignedPrice()));
+        viewHolder.txtCurrencySymbol.setText(expenseObject.getAccount().getCurrency().getSymbol());
 
         return convertView;
     }

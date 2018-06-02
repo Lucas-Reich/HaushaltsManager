@@ -14,7 +14,7 @@ import com.example.lucas.haushaltsmanager.R;
 import java.util.ArrayList;
 
 public class AccountPickerDialog extends DialogFragment {
-    private static String TAG = AccountPickerDialog.class.getSimpleName();
+    private static final String TAG = AccountPickerDialog.class.getSimpleName();
 
     private ExpensesDataSource mDatabase;
     private OnAccountSelected mCallback;
