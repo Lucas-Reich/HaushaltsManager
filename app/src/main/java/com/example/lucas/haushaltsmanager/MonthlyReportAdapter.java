@@ -72,14 +72,14 @@ public class MonthlyReportAdapter extends RecyclerView.Adapter<MonthlyReportAdap
         if (report.countBookings() == 0) {
             holder.categoryColor.setVisibility(View.GONE);
 
-            holder.stressedCategory.setText(report.getMostStressedCategory().getName());
+            holder.stressedCategory.setText(report.getMostStressedCategory().getTitle());
             holder.stressedCategory.setTextColor(Color.RED);
         } else {
             holder.categoryColor.setCircleDiameter(20);
             holder.categoryColor.setCenterText("");
             holder.categoryColor.setCircleColor(report.getMostStressedCategory().getColor());
 
-            holder.stressedCategory.setText(report.getMostStressedCategory().getName());
+            holder.stressedCategory.setText(report.getMostStressedCategory().getTitle());
         }
 
         holder.pieChart.setPieData(preparePieData(report));

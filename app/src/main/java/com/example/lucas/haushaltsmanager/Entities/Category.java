@@ -69,7 +69,7 @@ public class Category implements Parcelable {
     }
 
     @NonNull
-    public String getName() {
+    public String getTitle() {
 
         return name;
     }
@@ -134,7 +134,7 @@ public class Category implements Parcelable {
      */
     public boolean equals(Category otherCategory) {
 
-        boolean result = getName().equals(otherCategory.getName());
+        boolean result = getTitle().equals(otherCategory.getTitle());
         result = result && getColor().equals(otherCategory.getColor());
         result = result && (getDefaultExpenseType() == otherCategory.getDefaultExpenseType());
 
@@ -143,7 +143,7 @@ public class Category implements Parcelable {
 
     public String toString() {
 
-        return getIndex() + " " + getName() + " " + getColor();
+        return getIndex() + " " + getTitle() + " " + getColor();
     }
 
     /**

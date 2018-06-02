@@ -137,7 +137,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 }
 
 
-                String category = groupExpense.getCategory().getName();
+                String category = groupExpense.getCategory().getTitle();
                 roundedTextView.setTextColor(Color.WHITE);
                 roundedTextView.setCenterText(category.substring(0, 1).toUpperCase());
                 roundedTextView.setCircleColor(groupExpense.getCategory().getColor());
@@ -186,7 +186,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 }
 
 
-                String category2 = groupExpense.getCategory().getName();
+                String category2 = groupExpense.getCategory().getTitle();
                 roundedTextView3.setTextColor(Color.WHITE);
                 roundedTextView3.setCenterText(category2.substring(0, 1).toUpperCase());
                 roundedTextView3.setCircleColor(groupExpense.getCategory().getColor());
@@ -259,7 +259,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         }
 
 
-        String category = childExpense.getCategory().getName();
+        String category = childExpense.getCategory().getTitle();
 
         childViewHolder.roundedTextView.setTextColor(Color.WHITE);
         childViewHolder.roundedTextView.setCenterText(category.substring(0, 1).toUpperCase());

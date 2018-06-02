@@ -67,7 +67,7 @@ public class BookingAdapter extends ArrayAdapter<ExpenseObject> implements View.
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        String category = expenseObject.getCategory().getName();
+        String category = expenseObject.getCategory().getTitle();
 
         viewHolder.circleLetter.setText(category.substring(0, 1).toUpperCase());
         viewHolder.txtTitle.setText(expenseObject.getTitle());

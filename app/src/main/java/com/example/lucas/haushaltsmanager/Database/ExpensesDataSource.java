@@ -1131,7 +1131,7 @@ public class ExpensesDataSource {
 
         //TODO erstelle neue Kategorie wenn sie nicht bereits existiert
         ContentValues values = new ContentValues();
-        values.put(ExpensesDbHelper.CATEGORIES_COL_NAME, category.getName());
+        values.put(ExpensesDbHelper.CATEGORIES_COL_NAME, category.getTitle());
         values.put(ExpensesDbHelper.CATEGORIES_COL_COLOR, category.getColor());
         values.put(ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE, category.getDefaultExpenseType() ? 1 : 0);
         values.put(ExpensesDbHelper.CATEGORIES_COL_HIDDEN, 0);
@@ -1139,7 +1139,7 @@ public class ExpensesDataSource {
 
 
         long index = database.insert(ExpensesDbHelper.TABLE_CATEGORIES, null, values);
-        return new Category(index, category.getName(), category.getColor(), category.getDefaultExpenseType());
+        return new Category(index, category.getTitle(), category.getColor(), category.getDefaultExpenseType());
     }
 
     public ArrayList<Category> getAllCategories() {
@@ -1225,7 +1225,7 @@ public class ExpensesDataSource {
     public boolean updateCategoryName(Category category) {
 
         ContentValues updatedCategory = new ContentValues();
-        updatedCategory.put(ExpensesDbHelper.CATEGORIES_COL_NAME, category.getName());
+        updatedCategory.put(ExpensesDbHelper.CATEGORIES_COL_NAME, category.getTitle());
         updatedCategory.put(ExpensesDbHelper.CATEGORIES_COL_COLOR, category.getColor());
         updatedCategory.put(ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE, category.getDefaultExpenseType());
 

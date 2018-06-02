@@ -385,7 +385,7 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
         for (Category category : categories) {
 
             ContentValues values = new ContentValues();
-            values.put(CATEGORIES_COL_NAME, category.getName());
+            values.put(CATEGORIES_COL_NAME, category.getTitle());
             values.put(CATEGORIES_COL_COLOR, category.getColor());
             values.put(CATEGORIES_COL_DEFAULT_EXPENSE_TYPE, category.getDefaultExpenseType());
             values.put(CATEGORIES_COL_HIDDEN, 1);

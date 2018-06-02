@@ -20,7 +20,7 @@ public class EntityNotExistingException extends Exception {
 
     public EntityNotExistingException(Category category) {
 
-        super("Category " + category.getName() + " does not exist in the database");
+        super("Category " + category.getTitle() + " does not exist in the database");
     }
 
     public EntityNotExistingException(ExpenseObject expense) {

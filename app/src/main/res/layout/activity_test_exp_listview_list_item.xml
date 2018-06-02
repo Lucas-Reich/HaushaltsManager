@@ -12,7 +12,8 @@
         android:id="@+id/exp_list_view_item_circle"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_marginRight="5dp"/>
+        android:layout_marginRight="5dp"
+        tools:ignore="RtlHardcoded"/>
 
     <LinearLayout
         android:layout_width="match_parent"

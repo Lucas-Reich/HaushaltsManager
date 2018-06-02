@@ -69,7 +69,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
     private Button mDateBtn, mAccountBtn, mSaveBtn, mCategoryBtn, mTitleBtn, mNoticeBtn, mRecurringEndBtn, mRecurringFrequency;
     private MultiAutoCompleteTextView mTagAutoCompTxt;
     private CheckBox mTemplateChk, mRecurringChk;
-    private TextView mAmountTxt, mCurrencyTxt;
+    private TextView mPriceTxt, mCurrencySymbolTxt;
     private RadioGroup mExpenseTypeRadio;
     private ExpenseObject mParentBooking;
     private Toolbar mToolbar;
@@ -91,8 +91,8 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
         setSupportActionBar(mToolbar);
         mBackArrow = (ImageButton) findViewById(R.id.back_arrow);
 
-        mAmountTxt = (TextView) findViewById(R.id.expense_screen_amount);
-        mCurrencyTxt = (TextView) findViewById(R.id.expense_screen_amount_currency);
+        mPriceTxt = (TextView) findViewById(R.id.expense_screen_amount);
+        mCurrencySymbolTxt = (TextView) findViewById(R.id.expense_screen_currency_symbol);
         mCategoryBtn = (Button) findViewById(R.id.expense_screen_category);
         mExpenseTypeRadio = (RadioGroup) findViewById(R.id.expense_screen_expense_type);
         mTitleBtn = (Button) findViewById(R.id.expense_screen_title);
@@ -109,6 +109,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
 
         //ab hier wird der CurrencySelector erstellt
 
+        //todo den currencySelector klassenweit sichtbar machen und ihn dann in der funktion setExpenseCurrency anpassen
         Spinner currencySelector = (Spinner) findViewById(R.id.expense_screen_select_currency);
 
         currencySelector.setOnItemSelectedListener(this);
@@ -179,8 +180,8 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
         SharedPreferences preferences = getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
         Account account = mDatabase.getAccountById(preferences.getLong("activeAccount", 0));
         mExpense = ExpenseObject.createDummyExpense(this);
-        mExpense.setAccount(account);
         mExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE);
+        setAccount(account);
         Log.d(TAG, "resolveIntent: Creating Expense " + mExpense.toString());
     }
 
@@ -198,11 +199,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
             }
         });
 
-        if (mExpense.isExpenditure())
-            mExpenseTypeRadio.check(R.id.expense_screen_radio_expense);
-        else
-            mExpenseTypeRadio.check(R.id.expense_screen_radio_income);
-
+        setExpenseType(mExpense.isExpenditure());
         mExpenseTypeRadio.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
@@ -219,12 +216,12 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
             }
         });
 
-        mCurrencyTxt.setText(mExpense.getAccount().getCurrency().getSymbol());
+        mCurrencySymbolTxt.setText(mExpense.getAccount().getCurrency().getSymbol());
 
         mAccountBtn.setText(mExpense.getAccount().getTitle());
 
         mCategoryBtn.setHint(R.string.choose_category);
-        mCategoryBtn.setText(mExpense.getCategory().getName());
+        mCategoryBtn.setText(mExpense.getCategory().getTitle());
 
         mDateBtn.setText(mExpense.getDisplayableDateTime());
 
@@ -239,8 +236,8 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
         mNoticeBtn.setHint(R.string.input_notice);
         mNoticeBtn.setText(mExpense.getNotice());
 
-        mAmountTxt.setText(String.format("%s", mExpense.getUnsignedPrice()));
-        mAmountTxt.setOnClickListener(new View.OnClickListener() {
+        mPriceTxt.setText(String.format("%s", mExpense.getUnsignedPrice()));
+        mPriceTxt.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -410,13 +407,13 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
                 long index = mDatabase.createRecurringBooking(mExpense.getIndex(), mCalendar.getTimeInMillis(), frequency, mRecurringEndDate.getTimeInMillis());
                 Log.d(TAG, "created mRecurring booking event at index: " + index);
             }
+*/
 
             if (mTemplate) {
 
-                long index = mDatabase.createTemplateBooking(mExpense.getIndex());
+                long index = mDatabase.createTemplateBooking(mExpense);
                 Log.d(TAG, "created mTemplate for bookings at index: " + index);
             }
-*/
             Intent intent = new Intent(ExpenseScreenActivity.this, TabParentActivity.class);
             ExpenseScreenActivity.this.startActivity(intent);
         }
@@ -687,35 +684,154 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
      */
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
+        if (resultCode != Activity.RESULT_OK)
+            return;//todo einen fehler ausgeben, bzw loggen
+
         switch (requestCode) {
 
             case 1://Category response
 
-                if (resultCode == Activity.RESULT_OK) {
-
-                    Category category = data.getParcelableExtra("categoryObj");
-                    mExpense.setCategory(category);
-
-                    mCategoryBtn.setText(category.getName());
-
-                    if (category.getDefaultExpenseType())
-                        mExpenseTypeRadio.check(R.id.expense_screen_radio_expense);
-                    else
-                        mExpenseTypeRadio.check(R.id.expense_screen_radio_income);
-                }
+                Category category = data.getParcelableExtra("categoryObj");
+                setCategory(category);
                 break;
             case 2://Template response
 
-                if (resultCode == Activity.RESULT_OK) {
-
-                    ExpenseObject templateBooking = data.getParcelableExtra("templateObj");
-                    //todo setze alle felder in dem expense screen der template booking entsprechend
-                }
+                ExpenseObject templateBooking = data.getParcelableExtra("templateObj");
+                showExpenseOnExpenseScreen(templateBooking);
                 break;
             default:
 
                 throw new UnsupportedOperationException("Die Antwort aus mit dem response code: " + requestCode + " kann nicht verarbeitet werden");
         }
+    }
+
+    /**
+     * Methode um die Felder des ExpenseScreens mit den Daten einer Buchung auszufüllen.
+     *
+     * @param expense Anzuzeigende Ausgabe
+     */
+    private void showExpenseOnExpenseScreen(ExpenseObject expense) {
+
+        setPrice(expense.getUnsignedPrice());
+        setExpenseType(expense.isExpenditure());
+        setCategory(expense.getCategory());
+        setTitle(expense.getTitle());
+        setTags(expense.getTags());
+        setDate(expense.getDateTime());
+        setNotice(expense.getNotice());
+        setAccount(expense.getAccount());
+        setExpenseCurrency(expense.getExpenseCurrency());
+    }
+
+    /**
+     * Methode, welche den angezeigten Preis und den Preis der zu speichernden Ausgabe anpasst.
+     *
+     * @param price Preis
+     */
+    private void setPrice(double price) {
+
+        mPriceTxt.setText(String.format("%s", price));
+        mExpense.setPrice(price);
+    }
+
+    /**
+     * Methode, welche den angezeigten Ausgabentyp und den Ausgabentype der zu speichernden Ausgabe anpasst.
+     *
+     * @param expenseType Boolean
+     */
+    private void setExpenseType(boolean expenseType) {
+
+        if (expenseType)
+            mExpenseTypeRadio.check(R.id.expense_screen_radio_expense);
+        else
+            mExpenseTypeRadio.check(R.id.expense_screen_radio_income);
+        mExpense.setExpenditure(expenseType);
+    }
+
+    /**
+     * Methode, welche die angezeigte Kategorie und die Kategorie der zu speichernden Ausgabe anpasst.
+     *
+     * @param category Kategorie
+     */
+    private void setCategory(Category category) {
+
+        mCategoryBtn.setText(category.getTitle());
+        mExpense.setCategory(category);
+
+        if (category.getDefaultExpenseType())
+            mExpenseTypeRadio.check(R.id.expense_screen_radio_expense);
+        else
+            mExpenseTypeRadio.check(R.id.expense_screen_radio_income);
+    }
+
+    /**
+     * Method, welche den angezeigten Titel und den Titel der zu speichernden Ausgabe anpasst.
+     *
+     * @param title Titel
+     */
+    private void setTitle(String title) {
+
+        mTitleBtn.setText(title);
+        mExpense.setTitle(title);
+    }
+
+
+    /**
+     * Methode, welche die angezeigten Tags und die Tags der zu speichernden Ausgabe anpasst.
+     *
+     * @param tags Tags
+     */
+    private void setTags(List<Tag> tags) {
+
+        //todo zeige die tags in der view an
+        mExpense.setTags(tags);
+    }
+
+    /**
+     * Nethode, welche das angezeigte Datum und das Datum der zu speichernden Ausgabe anpasst.
+     *
+     * @param date Datum
+     */
+    private void setDate(Calendar date) {
+
+        mDateBtn.setText(DateFormat.getDateInstance(DateFormat.SHORT).format(new Date(date.getTimeInMillis())));
+        mExpense.setDateTime(date);
+    }
+
+    /**
+     * Methode, welche die angezeigte Notiz und die Notiz der zu speichernden Ausgabe anpasst
+     *
+     * @param notice Notiz
+     */
+    private void setNotice(String notice) {
+
+        mNoticeBtn.setText(notice);
+        mExpense.setNotice(notice);
+    }
+
+    /**
+     * Methode, welche das angezeigte Konto und das Konto der zu speichernden Ausgabe anpasst.
+     *
+     * @param account Konto
+     */
+    private void setAccount(Account account) {
+
+        mAccountBtn.setText(account.getTitle());
+        mExpense.setAccount(account);
+
+        setExpenseCurrency(account.getCurrency());
+    }
+
+    /**
+     * Methode, welche die angezeigte Währung und die Währung der zu speichernden Ausgabe anpasst.
+     *
+     * @param currency Währung
+     */
+    private void setExpenseCurrency(Currency currency) {
+
+        mCurrencySymbolTxt.setText(currency.getSymbol());
+        //todo zeige auf dem currencySelector die aktuelle währung an
+        mExpense.setExpenseCurrency(currency);
     }
 
     /**
@@ -733,7 +849,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
         Currency currency = mDatabase.getCurrencyById(curName);
 
         mExpense.setExpenseCurrency(currency);
-        mCurrencyTxt.setText(String.format("%s", mExpense.getExpenseCurrency().getSymbol()));
+        mCurrencySymbolTxt.setText(String.format("%s", mExpense.getExpenseCurrency().getSymbol()));
     }
 
     @Override
@@ -748,15 +864,8 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
      */
     @Override
     public void onAccountSelected(Account account, String tag) {
-
-        if (tag.equals("expense_screen_account")) {
-
-            mExpense.setAccount(account);
-            mAccountBtn.setText(mExpense.getAccount().getTitle());
-            mCurrencyTxt.setText(mExpense.getAccount().getCurrency().getSymbol());
-
-            Log.d(TAG, "set expense mAccount to: " + mExpense.getAccount().getTitle());
-        }
+        if (tag.equals("expense_screen_account"))
+            setAccount(account);
     }
 
     /**
@@ -768,29 +877,19 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
     @Override
     public void onTextInput(String textInput, String tag) {
 
-        if (!textInput.isEmpty()) {
+        if (textInput.isEmpty())
+            return; //todo throw error, log
 
-            switch (tag) {
+        switch (tag) {
 
-                case "expense_screen_title":
+            case "expense_screen_title":
 
-                    mExpense.setTitle(textInput);
-                    mTitleBtn.setText(mExpense.getTitle());
-                    Log.d(TAG, "set expense title to " + mExpense.getTitle());
-                    break;
+                setTitle(textInput);
+                break;
+            case "expense_screen_notice":
 
-                case "expense_screen_tag":
-
-                    //todo tags sollten über eine AutocompleteTextView ausgewählt werden
-                    break;
-
-                case "expense_screen_notice":
-
-                    mExpense.setNotice(textInput);
-                    mNoticeBtn.setText(mExpense.getNotice());
-                    Log.d(TAG, "set expense notice to " + mExpense.getNotice());
-                    break;
-            }
+                setNotice(textInput);
+                break;
         }
     }
 
@@ -802,14 +901,8 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
      */
     @Override
     public void onPriceSelected(double price, String tag) {
-
-        if (tag.equals("expense_screen_price")) {
-
-            mExpense.setPrice(price);
-            mAmountTxt.setText(String.format("%s", mExpense.getUnsignedPrice()));
-
-            Log.d(TAG, "set expense amount to " + mExpense.getUnsignedPrice());
-        }
+        if (tag.equals("expense_screen_price"))
+            setPrice(price);
     }
 
     /**
@@ -827,10 +920,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AdapterV
             mRecurringEndBtn.setText(DateFormat.getDateInstance(DateFormat.SHORT).format(new Date(mRecurringEndDate.getTimeInMillis())));
             Log.d(TAG, "updated recurring end date to " + DateFormat.getDateInstance(DateFormat.SHORT).format(new Date(mRecurringEndDate.getTimeInMillis())));
         } else if (tag.equals("expense_screen_date")) {
-
-            mExpense.setDateTime(date);
-            mDateBtn.setText(mExpense.getDisplayableDateTime());
-            Log.d(TAG, "updated expense date to " + mExpense.getDisplayableDateTime());
+            setDate(date);
         }
     }
 
