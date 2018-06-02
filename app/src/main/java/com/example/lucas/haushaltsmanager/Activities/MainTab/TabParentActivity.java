@@ -30,8 +30,10 @@ import com.example.lucas.haushaltsmanager.Activities.CreateBackupActivity;
 import com.example.lucas.haushaltsmanager.Activities.ImportExportActivity;
 import com.example.lucas.haushaltsmanager.Activities.RecurringBookingsActivity;
 import com.example.lucas.haushaltsmanager.Activities.TestActivity;
+import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ChangeAccounts.ChooseAccountsDialogFragment;
+import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.MockDataCreator;
 import com.example.lucas.haushaltsmanager.MyAlarmReceiver;
 import com.example.lucas.haushaltsmanager.R;
@@ -47,6 +49,9 @@ public class TabParentActivity extends AppCompatActivity implements ChooseAccoun
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tab_main_mit_nav_drawer);
+
+        //todo in die user einstellungen verlagern
+        setSharedPreferencesProperties();
 
         //Methode die jeden Tag einmal den BackupService laufen lässt
         scheduleBackupServiceAlarm();
@@ -138,6 +143,19 @@ public class TabParentActivity extends AppCompatActivity implements ChooseAccoun
         });
     }
 
+    /**
+     * Methode um die Hauptwährung und das Symbol der Hauptwährung in die SharedPreferences zu schreiben.
+     */
+    private void setSharedPreferencesProperties() {
+        //todo das setzen der Hauptwährung sollte in den einstellungen passieren
+
+        ExpensesDataSource database = new ExpensesDataSource(this);
+        Currency mainCurrency = database.getCurrencyById("EUR");
+
+        SharedPreferences preferences = this.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
+        preferences.edit().putLong("mainCurrencyIndex", mainCurrency.getIndex()).apply();
+        preferences.edit().putString("mainCurrencySymbol", mainCurrency.getSymbol()).apply();
+    }
     @Override
     public void onBackPressed() {
 
