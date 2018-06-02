@@ -75,10 +75,6 @@
             android:exported="false"
             android:label="ExchangeRateService"/>
         <service
-            android:name=".Services.ExchangeService"
-            android:exported="false"
-            android:label="ExchangeService"/>
-        <service
             android:name=".Services.BackupService"
             android:exported="false"
             android:label="BackupService"
