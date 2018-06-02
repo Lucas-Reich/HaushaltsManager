@@ -86,7 +86,7 @@ public class ExpenseObjectsRepository {
         int exchangeRate = c.getInt(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_EXCHANGE_RATE));
 
         long currencyId = c.getLong(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_CURRENCY_ID));
-        Currency expenseCurrency = currenciesRepository.getCurrencyById(currencyId);
+        Currency expenseCurrency = currenciesRepository.getCurrencyByShortName(currencyId);
         expenseCurrency.setRateToBase(exchangeRate);
 
         ExpenseObject expense = new ExpenseObject(expenseId, title, price, expenditure, date, category, notice, account, expenseCurrency);

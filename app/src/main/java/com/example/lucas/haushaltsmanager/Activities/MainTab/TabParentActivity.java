@@ -150,11 +150,13 @@ public class TabParentActivity extends AppCompatActivity implements ChooseAccoun
         //todo das setzen der Hauptwährung sollte in den einstellungen passieren
 
         ExpensesDataSource database = new ExpensesDataSource(this);
-        Currency mainCurrency = database.getCurrencyById("EUR");
+        database.open();
+        Currency mainCurrency = database.getCurrencyByShortName("EUR");
 
         SharedPreferences preferences = this.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
         preferences.edit().putLong("mainCurrencyIndex", mainCurrency.getIndex()).apply();
         preferences.edit().putString("mainCurrencySymbol", mainCurrency.getSymbol()).apply();
+        database.close();
     }
     @Override
     public void onBackPressed() {

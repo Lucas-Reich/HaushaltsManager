@@ -1477,7 +1477,7 @@ public class ExpensesDataSource {
     }
 
     @Nullable
-    public Currency getCurrencyById(String shortName) {
+    public Currency getCurrencyByShortName(String shortName) {
 
         String selectQuery = "SELECT "
                 + ExpensesDbHelper.CURRENCIES_COL_ID + ", "

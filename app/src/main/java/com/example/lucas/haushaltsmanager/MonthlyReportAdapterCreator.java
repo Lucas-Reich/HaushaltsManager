@@ -111,7 +111,7 @@ public class MonthlyReportAdapterCreator {
     private void addExpenseToReport(ExpenseObject expense) {
 
         int expenseMonth = expense.getDateTime().get(Calendar.MONTH);
-        mReports.get(expenseMonth).addExpense(expense);
+        mReports.get(mReports.size() - expenseMonth - 1).addExpense(expense);
     }
 
     /**
