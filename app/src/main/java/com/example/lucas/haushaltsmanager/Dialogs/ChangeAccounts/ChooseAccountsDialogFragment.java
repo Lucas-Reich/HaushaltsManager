@@ -171,11 +171,19 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Adap
         try {
             mDatabase.deleteAccount(account.getIndex());
 
-            SharedPreferences preferences = mContext.getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.remove(account.getTitle());
-            editor.apply();
-            //todo was passiert wenn ich das aktuell aktive konto lösche
+            SharedPreferences accountPreferences = mContext.getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
+            accountPreferences.edit().remove(account.getTitle()).apply();
+
+
+            //Checke ob das aktuelle Haupkonto das gerade gelöschte ist.
+            //Ist dem so wird das erste Konto als ersatz in den SharedSpreferences hinterlegt.
+            SharedPreferences userPreferences = mContext.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
+            long activeAccountId = userPreferences.getLong("activeAccount", -1);
+            if (activeAccountId == -1 || activeAccountId == account.getIndex()) {
+                long newActiveAccountIndex = mDatabase.getAllAccounts().get(0).getIndex();
+                userPreferences.edit().putLong("activeAccount", newActiveAccountIndex).apply();
+            }
+
             Toast.makeText(mContext, mContext.getResources().getString(R.string.deleted_account), Toast.LENGTH_SHORT).show();
         } catch (CannotDeleteAccountException e) {
 
