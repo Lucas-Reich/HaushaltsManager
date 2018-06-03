@@ -36,7 +36,6 @@ import com.example.lucas.haushaltsmanager.Dialogs.FrequencyAlertDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Tag;
 import com.example.lucas.haushaltsmanager.R;
@@ -688,7 +687,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AccountP
         setCategory(expense.getCategory());
         setTitle(expense.getTitle());
         setTags(expense.getTags());
-        setDate(expense.getDateTime());
+        //funktion setzt das Datum der Buchung nicht neu, da bei einer Buchung immer das aktuellst Datum genommen werden sollte. Außer wenn es explizit vom user geändert wird.
         setNotice(expense.getNotice());
         setAccount(expense.getAccount());
         setExpenseCurrency();
