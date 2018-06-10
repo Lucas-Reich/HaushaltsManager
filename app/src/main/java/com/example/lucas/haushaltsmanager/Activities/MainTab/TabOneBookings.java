@@ -47,6 +47,7 @@ public class TabOneBookings extends Fragment {
 
     FloatingActionButton fabBig, fabSmallTop, fabSmallLeft;
     Animation openFabAnim, closeFabAnim, rotateForwardAnim, rotateBackwardAnim;
+    boolean fabBigIsAnimated = false;
 
 
     @Override
@@ -150,8 +151,8 @@ public class TabOneBookings extends Fragment {
                 if (extractChildMode()) {
 
                     mDatabase.convertChildrenToBooking(mListAdapter.getSelectedChildData());
+                    prepareDataSources(true);
                     resetActivityViewState();
-                    //todo mExpenses neu laden, da convertChildrenToBookings die angepassten Buchungen nicht zurück gibt
                 }
 
                 //todo snackbar einfügen, die es ermöglicht die aktion wieder rückgängig zu machen
@@ -259,7 +260,7 @@ public class TabOneBookings extends Fragment {
                         if (!mListAdapter.isGroupSelected(groupExpense)) {
                             if (hasUserSelectedItems())
                                 mListAdapter.selectGroup(groupExpense);
-                            animateFabs2(mListAdapter.getSelectedGroupCount(), mListAdapter.getSelectedChildCount(), mListAdapter.getSelectedParentCount());
+                            animateFabs(mListAdapter.getSelectedGroupCount(), mListAdapter.getSelectedChildCount(), mListAdapter.getSelectedParentCount());
                         }
                         return false;
                     case NORMAL_EXPENSE:
@@ -277,7 +278,7 @@ public class TabOneBookings extends Fragment {
                             mListAdapter.selectGroup(groupExpense);
                             view.setBackgroundColor(getResources().getColor(R.color.highlighted_item_color));
                         }
-                        animateFabs2(mListAdapter.getSelectedGroupCount(), mListAdapter.getSelectedChildCount(), mListAdapter.getSelectedParentCount());
+                        animateFabs(mListAdapter.getSelectedGroupCount(), mListAdapter.getSelectedChildCount(), mListAdapter.getSelectedParentCount());
                         return true;
                     default:
                         return true;
@@ -370,7 +371,7 @@ public class TabOneBookings extends Fragment {
                             view.setBackgroundColor(getResources().getColor(R.color.highlighted_item_color));
 
                             disableLongClick();
-                            animateFabs2(mListAdapter.getSelectedGroupCount(), mListAdapter.getSelectedChildCount(), mListAdapter.getSelectedParentCount());
+                            animateFabs(mListAdapter.getSelectedGroupCount(), mListAdapter.getSelectedChildCount(), mListAdapter.getSelectedParentCount());
                             return true;
                         }
 
@@ -384,7 +385,7 @@ public class TabOneBookings extends Fragment {
                             view.setBackgroundColor(getResources().getColor(R.color.highlighted_item_color));
 
                             disableLongClick();
-                            animateFabs2(mListAdapter.getSelectedGroupCount(), mListAdapter.getSelectedChildCount(), mListAdapter.getSelectedParentCount());
+                            animateFabs(mListAdapter.getSelectedGroupCount(), mListAdapter.getSelectedChildCount(), mListAdapter.getSelectedParentCount());
 
                             return true;
                         }
@@ -532,7 +533,7 @@ public class TabOneBookings extends Fragment {
      */
     public void updateExpListView() {
 
-        prepareDataSources();
+        prepareDataSources(false);
 
         mListAdapter = new ExpandableListAdapterCreator(mExpenses, mActiveAccounts, getContext()).getExpandableListAdapter();
 
@@ -544,13 +545,9 @@ public class TabOneBookings extends Fragment {
     /**
      * Methode um die Ausgabenliste zu initialiesieren, wenn dies noch nicht geschehen ist
      */
-    private void prepareDataSources() {
-
-        if (mExpenses.isEmpty()) {
-
-            Log.d(TAG, "prepareDataSources: Initialisiere Buchungsliste.");
+    private void prepareDataSources(boolean fetchExpenses) {
+        if (mExpenses.isEmpty() || fetchExpenses)
             mExpenses = mDatabase.getBookings(getFirstOfMonth().getTimeInMillis(), getLastOfMonth().getTimeInMillis());
-        }
     }
 
     /**
@@ -589,7 +586,7 @@ public class TabOneBookings extends Fragment {
      * @param selectedGroups   Anzahl der ausgewählten Gruppen
      * @param selectedChildren Anzahl der ausgewählten Kinder
      */
-    private void animateFabs2(int selectedGroups, int selectedChildren, int selectedParents) {
+    private void animateFabs(int selectedGroups, int selectedChildren, int selectedParents) {
 
         //wenn keine buchung ausgewählt ist sollen die Buttons in den Normalzustand zurückkehren
         if (selectedChildren == 0 && selectedParents == 0 && selectedGroups == 0) {
@@ -689,8 +686,10 @@ public class TabOneBookings extends Fragment {
      * Wird diese Animation getriggert dreht sich das Pluszeichen um 45°.
      */
     public void animatePlusOpen() {
-        //todo das plus dreht sich jedes mal wenn die funktion aufgerufen wird, auch wenn der button bereits offen ist
-        fabBig.startAnimation(rotateForwardAnim);
+        if (!fabBigIsAnimated) {
+            fabBig.startAnimation(rotateForwardAnim);
+            fabBigIsAnimated = true;
+        }
     }
 
     /**
@@ -698,8 +697,10 @@ public class TabOneBookings extends Fragment {
      * Wird diese Animation getriggert dreht sich das Pluszeichen um -45°.
      */
     public void animatePlusClose() {
-        //todo das plus dreht sich jedes mal wenn die funktion aufgerufen wird, auch wenn der button bereits offen ist
-        fabBig.startAnimation(rotateBackwardAnim);
+        if (fabBigIsAnimated) {
+            fabBig.startAnimation(rotateBackwardAnim);
+            fabBigIsAnimated = false;
+        }
     }
 
     /**
