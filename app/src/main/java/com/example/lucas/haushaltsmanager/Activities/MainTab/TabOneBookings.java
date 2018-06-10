@@ -293,11 +293,9 @@ public class TabOneBookings extends Fragment {
      */
     private boolean extractChildMode() {
 
-        boolean areChildrenSelected = mListAdapter.getSelectedChildCount() > 0
+        return mListAdapter.getSelectedChildCount() > 0
                 && mListAdapter.getSelectedParentCount() == 0
                 && mListAdapter.getSelectedGroupCount() == 0;
-
-        return areChildrenSelected;
     }
 
     /**
@@ -365,7 +363,6 @@ public class TabOneBookings extends Fragment {
 
                     case ExpandableListView.PACKED_POSITION_TYPE_GROUP:
                         ExpenseObject groupExpense = (ExpenseObject) mListAdapter.getGroup(groupPosition);
-                        //todo wenn auf eine Zusammengefügte buchung geklickt wurde sollen die Fab optionen 'lösche' und 'füge kind buchung hinzu' erscheinen
 
                         if (groupExpense.isValidExpense()) {
 
@@ -584,35 +581,6 @@ public class TabOneBookings extends Fragment {
         lastOfMonth.set(Calendar.DAY_OF_MONTH, lastDayMonth);
 
         return lastOfMonth;
-    }
-
-    /**
-     * animating the FloatingActionButtons
-     * todo die ganzen animations methoden noch einmal neu schreiben da ich mit den aktuellen nicht zufrieden bin
-     * eventuell eine neue FAB view erstellen, welche die funktionalitäten beinhaltet
-     *
-     * @param selectedCount number of selected entries
-     */
-    private void animateFabs(int selectedCount) {
-
-        switch (selectedCount) {
-
-            case 0:// beide buttons müssen nicht funktional und nicht sichtbar sein
-                resetButtonAnimations();
-                break;
-            case 1:// beide buttons müssen sichtbar sein und auf dem combineButton muss das addChild icon zu sehen sein
-                fabSmallLeft.setImageResource(R.drawable.ic_add_child_white);
-                openFabSmallTop();
-                openFabSmallLeft();
-                animatePlusOpen();
-                break;
-            default:// beide buttons müssen sichtbar und funktional sein und auf dem combineButton muss das combineBookings icon sichtbar sein
-                fabSmallLeft.setImageResource(R.drawable.ic_combine_white);
-                openFabSmallLeft();
-                openFabSmallTop();
-                animatePlusOpen();
-                break;
-        }
     }
 
     /**
