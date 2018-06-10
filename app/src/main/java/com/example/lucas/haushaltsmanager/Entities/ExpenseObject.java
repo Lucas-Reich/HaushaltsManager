@@ -396,7 +396,7 @@ public class ExpenseObject implements Parcelable {
      */
     public boolean isValidExpense() {
 
-        return this.expenseType == EXPENSE_TYPES.NORMAL_EXPENSE || this.expenseType == EXPENSE_TYPES.PARENT_EXPENSE;
+        return this.expenseType == EXPENSE_TYPES.NORMAL_EXPENSE || this.expenseType == EXPENSE_TYPES.PARENT_EXPENSE || expenseType == EXPENSE_TYPES.CHILD_EXPENSE;
     }
 
     public void setExpenseType(@NonNull EXPENSE_TYPES expenseType) {

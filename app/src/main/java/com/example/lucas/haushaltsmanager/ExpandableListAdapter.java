@@ -24,7 +24,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     private Context mContext;
     private List<ExpenseObject> mGroupData;
     private HashMap<ExpenseObject, List<ExpenseObject>> mChildData;
-    private ArrayList<Integer> mSelectedGroups;
+    private ArrayList<ExpenseObject> mSelectedGroups, mSelectedChildren;
     private int mRed, mGreen;
 
     public ExpandableListAdapter(Context context, List<ExpenseObject> mGroupData, HashMap<ExpenseObject, List<ExpenseObject>> mChildData) {
@@ -33,6 +33,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         this.mGroupData = mGroupData;
         this.mChildData = mChildData;
         this.mSelectedGroups = new ArrayList<>();
+        this.mSelectedChildren = new ArrayList<>();
 
         this.mRed = context.getResources().getColor(R.color.booking_expense);
         this.mGreen = context.getResources().getColor(R.color.booking_income);
@@ -116,8 +117,6 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 date.setText(groupExpense.getDate());
                 break;
             case NORMAL_EXPENSE:
-
-                SharedPreferences preferences = mContext.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
 
                 convertView = inflater.inflate(R.layout.activity_test_exp_listview_list_group_child_n, null);
 
@@ -244,7 +243,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         childViewHolder.txtPerson.setText("");
         childViewHolder.txtPaidPrice.setText(String.format(mContext.getResources().getConfiguration().locale, "%.2f", childExpense.getUnsignedPrice()));
         childViewHolder.txtPaidPrice.setTextColor(childExpense.isExpenditure() ? mRed : mGreen);
-        childViewHolder.txtBaseCurrency.setText("€");//todo mit der hauptwährung des users austauschen (shared preferences)
+        childViewHolder.txtBaseCurrency.setText(getMainCurrencySymbol());
 
         return convertView;
     }
@@ -255,66 +254,138 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         return true;
     }
 
-    @SuppressWarnings("UnusedReturnValue")
-    public boolean selectGroup(int groupId) {
-
-        return this.mSelectedGroups.add(groupId);
+    /**
+     * Methode um ein Group in die Liste der ausgewählten Buchungen zu packen.
+     *
+     * @param groupExpense Ausgewählte Buchung
+     */
+    public void selectGroup(ExpenseObject groupExpense) {
+        mSelectedGroups.add(groupExpense);
     }
 
-    public ExpenseObject getExpense(int expenseId) {
-
-        return this.mGroupData.get(expenseId);
+    /**
+     * Methode um eine Kindbuchung in die Liste der ausgewählten Buchungen zu packen.
+     *
+     * @param childExpense Ausgewählte KindBuchung
+     */
+    public void selectChild(ExpenseObject childExpense) {
+        mSelectedChildren.add(childExpense);
     }
 
-    public boolean isSelected(int groupId) {
-
-        return this.mSelectedGroups.contains(groupId);
+    /**
+     * Methode um eine überprüfen ob eine Buchung ausgewählt ist oder nicht.
+     *
+     * @param groupExpense Id der zu überprüfenden GroupBuchung
+     * @return True wenn sie ausgewählt ist, False andernfalls
+     */
+    public boolean isGroupSelected(ExpenseObject groupExpense) {
+        return mSelectedGroups.contains(groupExpense);
     }
 
-    @SuppressWarnings("UnusedReturnValue")
-    public boolean removeGroupFromList(int groupId) {
-
-        return this.mSelectedGroups.remove((Object) groupId);
+    /**
+     * Methode um eine überprüfen ob eine KindBuchung ausgewählt ist oder nicht.
+     *
+     * @param childExpense Id der zu überprüfenden KindBuchung
+     * @return True wenn sie ausgewählt ist, False andernfalls
+     */
+    public boolean isChildSelected(ExpenseObject childExpense) {
+        return mSelectedChildren.contains(childExpense);
     }
 
+    /**
+     * Methode um eine GroupBuchung aus der Liste der ausgewählten Buchungen zu löschen.
+     *
+     * @param groupExpense Id der zu entfernenden Buchung
+     */
+    public void removeGroupFromList(ExpenseObject groupExpense) {
+        mSelectedGroups.remove(groupExpense);
+    }
+
+    /**
+     * Methode um eine ChildBuchung aus der Liste der ausgewählten Buchungen zu löschen.
+     *
+     * @param childExpense Id der zu entfernenden Buchung
+     */
+    public void removeChildFromList(ExpenseObject childExpense) {
+        mSelectedChildren.remove(childExpense);
+    }
+
+    /**
+     * Methode um die List der ausgewählte Buchungen zu löschen.
+     */
     public void deselectAll() {
-
-        this.mSelectedGroups.clear();
+        mSelectedGroups.clear();
+        mSelectedChildren.clear();
     }
 
-    public int getSelectedCount() {
+    /**
+     * Methode um die Anzahl der ausgewählten GroupBuchungen in erfahrung zu bringen.
+     *
+     * @return Anzahl der ausgewählten GroupBuchungen
+     */
+    public int getSelectedGroupCount() {
+        int count = 0;
+        for (ExpenseObject expense : mSelectedGroups) {
+            if (!expense.isParent())
+                count++;
+        }
 
-        return this.mSelectedGroups.size();
+        return count;
     }
 
-    public void clearSelected() {
+    public int getSelectedParentCount() {
+        int count = 0;
+        for(ExpenseObject expense : mSelectedGroups) {
+            if (expense.isParent())
+                count++;
+        }
 
-        this.mSelectedGroups.clear();
+        return count;
     }
 
+    /**
+     * Methode um die Anzahl der ausgewählten KindBuchungen in erfahrung zu bringen.
+     *
+     * @return Anzahl der ausgewählten KindBuchungen
+     */
+    public int getSelectedChildCount() {
+        return mSelectedChildren.size();
+    }
+
+    /**
+     * Methode um die Anzahl der ausgewählten Buchungen in erfahrung zu bringen.
+     *
+     * @return Anzahl der ausgewählten Buchungen
+     */
+    public int getSelectedItemsCount() {
+        return mSelectedChildren.size() + mSelectedGroups.size();
+    }
+
+    /**
+     * Methode um alle ausgewählten GroupBuchungen als ExpenseObject zu erhalten
+     *
+     * @return Liste der GroupBuchungen
+     */
     public ArrayList<ExpenseObject> getSelectedGroupData() {
-
-        ArrayList<ExpenseObject> groupData = new ArrayList<>();
-
-        for (int groupId : this.mSelectedGroups) {
-
-            groupData.add(mGroupData.get(groupId));
-        }
-
-        return groupData;
+        return mSelectedGroups;
     }
 
-    public long[] getSelectedBookingIds() {
+    /**
+     * Methode um alle ausgewählten KindBuchungen als ExpenseObject zu erhalten
+     *
+     * @return Liste der GroupBuchungen
+     */
+    public ArrayList<ExpenseObject> getSelectedChildData() {
+        return mSelectedChildren;
+    }
 
-        long bookingIds[] = new long[this.mSelectedGroups.size()];
-        int counter = 0;
-
-        for (long groupId : this.mSelectedGroups) {
-
-            bookingIds[counter] = this.mGroupData.get((int) groupId).getIndex();
-            counter++;
-        }
-
-        return bookingIds;
+    /**
+     * Methode um alle Kindbuchungen zu einer ParentBuchung zu bekommen.
+     *
+     * @param parentExpense ParentBuchung
+     * @return Liste aller KindBuchungen
+     */
+    public List<ExpenseObject> getAllChildrenToParent(ExpenseObject parentExpense) {
+        return mChildData.get(parentExpense);
     }
 }

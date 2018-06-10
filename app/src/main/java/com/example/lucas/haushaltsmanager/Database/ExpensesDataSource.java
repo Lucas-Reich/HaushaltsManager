@@ -833,6 +833,7 @@ public class ExpensesDataSource {
         removeTagsFromBooking(expense.getIndex(), expense.getExpenseType());
         deleteChildrenFromParent(expense.getIndex());
 
+        //todo der Kontostand muss nach dem löschen einer Buchung geupdatet werden
         int affectedRows = database.delete(ExpensesDbHelper.TABLE_BOOKINGS, ExpensesDbHelper.BOOKINGS_COL_ID + " = ?", new String[]{"" + expense.getIndex()});
         return affectedRows == 1;
     }
@@ -882,7 +883,7 @@ public class ExpensesDataSource {
     @SuppressWarnings("UnusedReturnValue")
     public ExpenseObject addChildToBooking(ExpenseObject childExpense, ExpenseObject parentBooking) {
 
-        if (isChild(parentBooking.getIndex()))
+        if (isChild(parentBooking))
             throw new UnsupportedOperationException("Cannot add Booking to an child Booking");
 
         if (parentBooking.isParent()) {//wenn ich zu einer bestehenden Parent buchung ein weiteres kind hinzufügen möchte
@@ -907,6 +908,51 @@ public class ExpensesDataSource {
     }
 
     /**
+     * Methode um eine Kindbuchung in eine Normale Buchung zu konvertieren.
+     *
+     * @param child Zu konvertierende KindBuchung
+     * @return Konvertierete Kindbuchung
+     */
+    public ExpenseObject convertChildToBooking(ExpenseObject child) {
+
+        if (deleteChildBooking(child)) {
+
+            child.setExpenseType(ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE);
+            return createBooking(child);
+        }
+
+        return null;
+    }
+
+    /**
+     * Methode um mehere Kinder zu normalen Buchungen zu konvertieren.
+     *
+     * @param children Liste der zu konvertierenden KindBuchungen
+     */
+    public void convertChildrenToBooking(ArrayList<ExpenseObject> children) {
+        for (ExpenseObject child : children) {
+            convertChildToBooking(child);
+        }
+    }
+
+    /**
+     * Methode um mehrere Kinder an eine ParentBuchung anzuhängen.
+     *
+     * @param parent   Parent der Kinder
+     * @param children Kinder welche dem Parent hinzugefügt werden sollen
+     * @return Parent, dem die Kinder hinzugefügt wurden
+     */
+    public ExpenseObject addChildrenToBooking(ExpenseObject parent, ArrayList<ExpenseObject> children) {
+
+        ExpenseObject updatedParent = parent;
+        for (ExpenseObject child : children) {
+            updatedParent = addChildToBooking(child, parent);
+        }
+
+        return updatedParent;
+    }
+
+    /**
      * Methode um eine Liste von Buchungen zusammenzufügen.
      * Dabei wird zuesrt eine DummyParent erstellt, unter welchem dann die Ausgaben platziert werden
      *
@@ -926,6 +972,29 @@ public class ExpensesDataSource {
         }
 
         return parentBooking;
+    }
+
+    /**
+     * Methode um mehrere ParentBookings zu einer zusammenzufügen.
+     *
+     * @param parentBookings Liste der ParentBookings
+     * @return Parent der zusammengefügten Buchungen
+     */
+    public ExpenseObject combineParentBookings(ArrayList<ExpenseObject> parentBookings) {
+        if (parentBookings.size() == 1)
+            return parentBookings.get(0);
+
+        ArrayList<ExpenseObject> childrenOfParents = new ArrayList<>();
+        for (ExpenseObject parentExpense : parentBookings) {
+            if (parentExpense.isParent())
+                childrenOfParents.addAll(getChildrenToParent(parentExpense.getIndex()));
+            else
+                childrenOfParents.add(parentExpense);
+        }
+
+        deleteBookings(parentBookings);
+
+        return combineAsChildBookings(childrenOfParents);
     }
 
     /**
@@ -1025,15 +1094,16 @@ public class ExpensesDataSource {
     /**
      * Methode um herauszufinden ob eine Buchung eine Kindbuchung ist
      *
-     * @param expenseId Id der zu überprüfenden Buchung
+     * @param expense Zu überprüfende Buchung
      * @return TRUE, wenn die Buchung eine Kindbuchung ist. FALSE, wenn nicht.
      */
-    private boolean isChild(long expenseId) {
+    private boolean isChild(ExpenseObject expense) {
 
         String selectQuery = "SELECT"
                 + " COUNT(1) 'exists'"
                 + " FROM " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS
-                + " WHERE " + ExpensesDbHelper.CHILD_BOOKINGS_COL_ID + " = " + expenseId + ";";
+                + " WHERE " + ExpensesDbHelper.CHILD_BOOKINGS_COL_ID + " = " + expense.getIndex()
+                + " AND " + ExpensesDbHelper.CHILD_BOOKINGS_COL_TITLE + " = '" + expense.getTitle() + "';";
         Log.d(TAG, "isChild: " + selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
@@ -1071,11 +1141,32 @@ public class ExpensesDataSource {
         return affectedRows == 1;
     }
 
-    public int deleteChildBooking(long childId) {
+    /**
+     * Methode um Mehrere Kindbuchungen auf einmal zu löschen.
+     *
+     * @param children List der zu löschenden Kinder
+     */
+    public void deleteChildBookings(ArrayList<ExpenseObject> children) {
+
+        for (ExpenseObject child : children) {
+            deleteChildBooking(child);
+        }
+    }
+
+    /**
+     * Methode um eine Kindbuchung zu löschen.
+     *
+     * @param child Zu löschende Kindbuchung
+     * @return True wenn erfoglreich gelöscht wurde, False wenn nicht
+     */
+    public boolean deleteChildBooking(ExpenseObject child) {
 
         //TODO wenn das kind das letzte des parents war muss der parent wieder als normale buchung eingefügt werden
-        Log.d(TAG, "deleted child booking at index " + childId);
-        return database.delete(ExpensesDbHelper.TABLE_CHILD_BOOKINGS, ExpensesDbHelper.CHILD_BOOKINGS_COL_ID + " = ?", new String[]{"" + childId});
+        Log.d(TAG, "deleted child booking at index " + child.getTitle());
+        return database.delete(
+                ExpensesDbHelper.TABLE_CHILD_BOOKINGS,
+                ExpensesDbHelper.CHILD_BOOKINGS_COL_ID + " = ?",
+                new String[]{"" + child.getIndex()}) == 1;
     }
 
     /**

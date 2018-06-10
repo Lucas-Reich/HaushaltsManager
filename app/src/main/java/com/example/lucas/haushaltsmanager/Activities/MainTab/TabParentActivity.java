@@ -294,9 +294,9 @@ public class TabParentActivity extends AppCompatActivity implements ChooseAccoun
         int visibleTabPosition = mTabLayout.getSelectedTabPosition();
         Fragment fragment = getSupportFragmentManager().findFragmentByTag("android:switcher:" + mViewPager.getId() + ":" + visibleTabPosition);
 
-        if (tag.equals("tab_one_combine_bookings")) {
+        if (tag.contains("tab_one")) {
 
-            ((TabOneBookings) fragment).onCombinedTitleSelected(textInput);
+            ((TabOneBookings) fragment).onCombinedTitleSelected(textInput, tag);
         }
     }
 

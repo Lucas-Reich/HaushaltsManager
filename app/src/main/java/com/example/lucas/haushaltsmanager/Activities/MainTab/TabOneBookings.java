@@ -45,10 +45,8 @@ public class TabOneBookings extends Fragment {
     ArrayList<ExpenseObject> mExpenses;
     List<Long> mActiveAccounts;
 
-    FloatingActionButton fabMainAction, fabDelete, fabCombine;
+    FloatingActionButton fabBig, fabSmallTop, fabSmallLeft;
     Animation openFabAnim, closeFabAnim, rotateForwardAnim, rotateBackwardAnim;
-    boolean combOpen = false, delOpen = false, fabOpen = false;
-    boolean mSelectionMode = false;
 
 
     @Override
@@ -80,7 +78,6 @@ public class TabOneBookings extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstances) {
         View rootView = inflater.inflate(R.layout.tab_one_bookings, container, false);
 
-        //get ListView
         mExpListView = (ExpandableListView) rootView.findViewById(R.id.lvExp);
         mExpListView.setBackgroundColor(Color.WHITE);
         setOnGroupClickListener();
@@ -91,25 +88,19 @@ public class TabOneBookings extends Fragment {
 
         final Activity mainTab = getActivity();
 
-        // Animated Floating Action Buttons
-        fabMainAction = (FloatingActionButton) rootView.findViewById(R.id.fab);
-        fabMainAction.setOnClickListener(new View.OnClickListener() {
+
+        fabBig = (FloatingActionButton) rootView.findViewById(R.id.fab);
+        fabBig.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
 
-                if (delOpen || combOpen) {
+                if (hasUserSelectedItems()) {
 
-                    mListAdapter.deselectAll();
-                    mSelectionMode = false;
-                    closeDelete();
-                    closeCombine();
-                    animateIconClose();
-
-                    updateExpListView();
+                    resetActivityViewState();
                 } else {
 
-                    if (mDatabase.getAllAccounts().size() != 0) {
+                    if (mDatabase.getAllAccounts().size() != 0) {//todo elegantere Möglichkeit finden den user zu zwingen ein Konto zu erstellen, bevor er eine Buchung erstellt
 
                         Intent createNewBookingIntent = new Intent(mainTab, ExpenseScreenActivity.class);
                         createNewBookingIntent.putExtra("mode", "createBooking");
@@ -123,50 +114,60 @@ public class TabOneBookings extends Fragment {
             }
         });
 
-        fabCombine = (FloatingActionButton) rootView.findViewById(R.id.fab_combine);
-        fabCombine.setOnClickListener(new View.OnClickListener() {
+        fabSmallLeft = (FloatingActionButton) rootView.findViewById(R.id.fab_small_left);
+        fabSmallLeft.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
 
-                if (mListAdapter.getSelectedCount() > 1) {
+                if (combineBookingsMode()) {
 
                     Bundle bundle = new Bundle();
                     bundle.putString("title", getResources().getString(R.string.input_title));
 
                     BasicTextInputDialog textInputDialog = new BasicTextInputDialog();
                     textInputDialog.setArguments(bundle);
-                    textInputDialog.show(getActivity().getFragmentManager(), "tab_one_combine_bookings");
+                    if (mListAdapter.getSelectedGroupCount() == mListAdapter.getSelectedItemsCount())
+                        textInputDialog.show(getActivity().getFragmentManager(), "tab_one_combine_parents");
+                    else if (mListAdapter.getSelectedGroupCount() == mListAdapter.getSelectedItemsCount())
+                        textInputDialog.show(getActivity().getFragmentManager(), "tab_one_combine_groups");
+                    else if (mListAdapter.getSelectedGroupCount() >= 1 || mListAdapter.getSelectedParentCount() >= 1)//todo der titel sollte nich neu erstellt werden
+                        textInputDialog.show(getActivity().getFragmentManager(), "tab_one_combine_parents_groups");
+                }
 
-                } else {
+                if (addChildMode()) {
 
-                    //wenn zu einer buchung eine Kindbuchung hinzugefügt werden soll, dann muss die id des Parents mit übergeben werden
                     ExpenseObject parentExpense = mListAdapter.getSelectedGroupData().get(0);
+
                     Intent createChildToBookingIntent = new Intent(mainTab, ExpenseScreenActivity.class);
                     createChildToBookingIntent.putExtra("mode", "addChild");
                     createChildToBookingIntent.putExtra("parentBooking", parentExpense);
 
-                    mListAdapter.deselectAll();
+                    resetActivityViewState();
                     mainTab.startActivity(createChildToBookingIntent);
+                }
+
+                if (extractChildMode()) {
+
+                    mDatabase.convertChildrenToBooking(mListAdapter.getSelectedChildData());
+                    resetActivityViewState();
+                    //todo mExpenses neu laden, da convertChildrenToBookings die angepassten Buchungen nicht zurück gibt
                 }
 
                 //todo snackbar einfügen, die es ermöglicht die aktion wieder rückgängig zu machen
             }
         });
 
-        fabDelete = (FloatingActionButton) rootView.findViewById(R.id.fab_delete);
-        fabDelete.setOnClickListener(new View.OnClickListener() {
+        fabSmallTop = (FloatingActionButton) rootView.findViewById(R.id.fab_small_top);
+        fabSmallTop.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
 
+                mDatabase.deleteChildBookings(mListAdapter.getSelectedChildData());
                 mDatabase.deleteBookings(mListAdapter.getSelectedGroupData());
-                mExpenses.removeAll(mListAdapter.getSelectedGroupData());
-                mListAdapter.deselectAll();
 
-                updateExpListView();
-                animateFabs(mListAdapter.getSelectedCount());
-
+                resetActivityViewState();
                 //todo snackbar einfügen die es ermöglicht die aktion wieder rückgängig zu machen
             }
         });
@@ -185,29 +186,41 @@ public class TabOneBookings extends Fragment {
      * Methdoe um einen ChildClickListener auf die ExpandableListView zu setzen.
      */
     private void setOnChildClickListener() {
-
-        //ExpandableListView Child click listener
         mExpListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
 
             @Override
-            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+            public boolean onChildClick(ExpandableListView parent, View view, int groupPosition, int childPosition, long id) {
+                ExpenseObject childExpense = (ExpenseObject) mListAdapter.getChild(groupPosition, childPosition);
 
-                if (mSelectionMode)
+                if (!hasUserSelectedItems()) {
+
+                    Intent updateChildExpenseIntent = new Intent(getContext(), ExpenseScreenActivity.class);
+                    updateChildExpenseIntent.putExtra("mode", "updateChild");
+                    updateChildExpenseIntent.putExtra("updateChildExpense", childExpense);
+
+                    resetActivityViewState();
+                    startActivity(updateChildExpenseIntent);
                     return true;
+                }
 
-                mListAdapter.clearSelected();
+                ExpenseObject parentExpense = (ExpenseObject) mListAdapter.getGroup(groupPosition);
+                if (!mListAdapter.isGroupSelected(parentExpense)) {
+                    if (mListAdapter.isChildSelected(childExpense)) {
 
-                //get expense
-                ExpenseObject expense = (ExpenseObject) mListAdapter.getChild(groupPosition, childPosition);
+                        mListAdapter.removeChildFromList(childExpense);
+                        view.setBackgroundColor(Color.WHITE);
 
-                Log.d(TAG, "onChildClick: " + expense.getTitle() + " " + expense.getIndex());
+                        if (mListAdapter.getSelectedItemsCount() == 0)
+                            enableLongClick();
+                    } else {
 
-                //start expenseScreen with selected expense
-                Intent updateChildExpenseIntent = new Intent(getContext(), ExpenseScreenActivity.class);
-                updateChildExpenseIntent.putExtra("mode", "updateChild");
-                updateChildExpenseIntent.putExtra("updateChildExpense", expense);
-                //updateChildExpenseIntent.putExtra("childExpense", expense.getIndex());
-                startActivity(updateChildExpenseIntent);
+                        mListAdapter.selectChild(childExpense);
+                        view.setBackgroundColor(getResources().getColor(R.color.highlighted_item_color));
+                    }
+                } else {
+
+                    Toast.makeText(getActivity(), R.string.error_parent_already_highlighted, Toast.LENGTH_LONG).show();
+                }
                 return true;
             }
         });
@@ -217,100 +230,217 @@ public class TabOneBookings extends Fragment {
      * Methode um einen GroupClickListener auf die ExpandableListView zu setzen.
      */
     private void setOnGroupClickListener() {
-
-        //OnClickMethods for ExpandableListView
-        //ExpandableListView Group click listener
         mExpListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
 
             @Override
             public boolean onGroupClick(ExpandableListView parent, View view, int groupPosition, long id) {
+                ExpenseObject groupExpense = (ExpenseObject) mListAdapter.getGroup(groupPosition);
 
-                //get expense
-                ExpenseObject expense = (ExpenseObject) mListAdapter.getGroup(groupPosition);
+                if (mListAdapter.getSelectedItemsCount() == 0 && groupExpense.getExpenseType() != ExpenseObject.EXPENSE_TYPES.PARENT_EXPENSE) {
 
-                //todo wenn man auf den date divider klickt sieht man immer noch eine klickt animation
-                if (expense.getExpenseType() == ExpenseObject.EXPENSE_TYPES.DATE_PLACEHOLDER)
-                    return true;
-
-                //if user clicks on parent the default behaviour should happen
-                if (expense.isParent())
-                    return false;
-
-                if (!mSelectionMode) {
-
+                    //falls keine Buchung markiert ist soll die Buchung im ExpenseScreen aufgerufen werden
                     Intent updateParentExpenseIntent = new Intent(getContext(), ExpenseScreenActivity.class);
                     updateParentExpenseIntent.putExtra("mode", "updateParent");
-                    updateParentExpenseIntent.putExtra("updateParentExpense", expense);
-                    //updateParentExpenseIntent.putExtra("parentExpense", expense.getIndex());
+                    updateParentExpenseIntent.putExtra("updateParentExpense", groupExpense);
+
+                    resetActivityViewState();
                     startActivity(updateParentExpenseIntent);
-                } else {
-
-                    if (mListAdapter.isSelected(groupPosition)) {
-
-                        mListAdapter.removeGroupFromList(groupPosition);
-                        view.setBackgroundColor(Color.WHITE);
-
-                        if (mListAdapter.getSelectedCount() == 0)
-                            mSelectionMode = false;
-                    } else {
-
-                        mListAdapter.selectGroup(groupPosition);
-                        view.setBackgroundColor(getResources().getColor(R.color.highlighted_item_color));
-                    }
-
-                    animateFabs(mListAdapter.getSelectedCount());
+                    return true;
                 }
 
-                return true;
+                switch (groupExpense.getExpenseType()) {
+                    case TRANSFER_EXPENSE:
+                        //ignoriere transferBuchungen
+                        return true;
+                    case DATE_PLACEHOLDER:
+                        //ignoriere Datumstrenner
+                        return true;
+                    case PARENT_EXPENSE:
+                        if (!mListAdapter.isGroupSelected(groupExpense)) {
+                            if (hasUserSelectedItems())
+                                mListAdapter.selectGroup(groupExpense);
+                            animateFabs2(mListAdapter.getSelectedGroupCount(), mListAdapter.getSelectedChildCount(), mListAdapter.getSelectedParentCount());
+                        }
+                        return false;
+                    case NORMAL_EXPENSE:
+                    case CHILD_EXPENSE:
+
+                        if (mListAdapter.isGroupSelected(groupExpense)) {
+
+                            mListAdapter.removeGroupFromList(groupExpense);
+                            view.setBackgroundColor(Color.WHITE);
+
+                            if (mListAdapter.getSelectedItemsCount() == 0)
+                                enableLongClick();
+                        } else {
+
+                            mListAdapter.selectGroup(groupExpense);
+                            view.setBackgroundColor(getResources().getColor(R.color.highlighted_item_color));
+                        }
+                        animateFabs2(mListAdapter.getSelectedGroupCount(), mListAdapter.getSelectedChildCount(), mListAdapter.getSelectedParentCount());
+                        return true;
+                    default:
+                        return true;
+                }
             }
         });
+    }
+
+    /**
+     * Methode um herauszufinden, ob wir und im extractChildrenMode befinden.
+     *
+     * @return True wenn dem so ist, False wenn nicht
+     */
+    private boolean extractChildMode() {
+
+        boolean areChildrenSelected = mListAdapter.getSelectedChildCount() > 0
+                && mListAdapter.getSelectedParentCount() == 0
+                && mListAdapter.getSelectedGroupCount() == 0;
+
+        return areChildrenSelected;
+    }
+
+    /**
+     * Methode um herauszufinden, ob wir uns im combineBookingsMode sind.
+     *
+     * @return True wenn dem so ist, False wenn nicht
+     */
+    private boolean combineBookingsMode() {
+
+        boolean areGroupsSelected = mListAdapter.getSelectedChildCount() == 0
+                && mListAdapter.getSelectedParentCount() == 0
+                && mListAdapter.getSelectedGroupCount() > 1;
+
+        boolean areParentsSelected = mListAdapter.getSelectedChildCount() == 0
+                && mListAdapter.getSelectedParentCount() > 1
+                && mListAdapter.getSelectedGroupCount() == 0;
+
+        boolean areParentAndGroupsSelected = mListAdapter.getSelectedChildCount() == 0
+                && mListAdapter.getSelectedParentCount() >= 1
+                && mListAdapter.getSelectedGroupCount() >= 0;
+
+        return areGroupsSelected || areParentsSelected || areParentAndGroupsSelected;
+    }
+
+    /**
+     * Methode um herauszufinden, ob wir momentan im addChildMode sind.
+     *
+     * @return True wenn dem so ist, False wenn nicht
+     */
+    private boolean addChildMode() {
+
+        boolean isGroupSelected = mListAdapter.getSelectedChildCount() == 0
+                && mListAdapter.getSelectedParentCount() == 0
+                && mListAdapter.getSelectedGroupCount() == 1;
+
+        boolean isParentSelected = mListAdapter.getSelectedChildCount() == 0
+                && mListAdapter.getSelectedParentCount() == 1
+                && mListAdapter.getSelectedGroupCount() == 0;
+
+        return isGroupSelected ^ isParentSelected;
+    }
+
+    /**
+     * Methode um herauszufinden ob der User Elemente in der Liste ausgewählt hat oder nicht.
+     *
+     * @return True wenn Elemente ausgewählt sind, False wenn nicht
+     */
+    private boolean hasUserSelectedItems() {
+        return mListAdapter.getSelectedItemsCount() != 0;
     }
 
     /**
      * Methode um einen LongClickListener auf die ExpandableListView zu setzen.
      */
     private void setOnItemLongClickListener() {
-
-        //ExpandableListView Long click listener for selecting multiple groups
         mExpListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 
             @Override
-            @SuppressWarnings("unused")
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-
-                //if selection mode is enabled do not make long clicks anymore
-                if (mSelectionMode)
-                    return true;
 
                 int groupPosition = ExpandableListView.getPackedPositionGroup(id);
                 int childPosition = ExpandableListView.getPackedPositionChild(id);
 
-                if (ExpandableListView.getPackedPositionType(id) == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
+                switch (ExpandableListView.getPackedPositionType(id)) {
 
-                    ExpenseObject expense = mListAdapter.getExpense(groupPosition);
-                    //todo wenn auf eine Zusammengefügte buchung geklickt wurde sollen die Fab optionen 'lösche' und 'füge kind buchung hinzu' erscheinen
+                    case ExpandableListView.PACKED_POSITION_TYPE_GROUP:
+                        ExpenseObject groupExpense = (ExpenseObject) mListAdapter.getGroup(groupPosition);
+                        //todo wenn auf eine Zusammengefügte buchung geklickt wurde sollen die Fab optionen 'lösche' und 'füge kind buchung hinzu' erscheinen
 
-                    if (expense.isValidExpense()) {
+                        if (groupExpense.isValidExpense()) {
 
-                        mListAdapter.selectGroup(groupPosition);
-                        view.setBackgroundColor(getResources().getColor(R.color.highlighted_item_color));
+                            mListAdapter.selectGroup(groupExpense);
+                            view.setBackgroundColor(getResources().getColor(R.color.highlighted_item_color));
 
-                        mSelectionMode = true;
-                        animateFabs(mListAdapter.getSelectedCount());
+                            disableLongClick();
+                            animateFabs2(mListAdapter.getSelectedGroupCount(), mListAdapter.getSelectedChildCount(), mListAdapter.getSelectedParentCount());
+                            return true;
+                        }
+
+                        return false;
+                    case ExpandableListView.PACKED_POSITION_TYPE_CHILD:
+                        ExpenseObject childExpense = (ExpenseObject) mListAdapter.getChild(groupPosition, childPosition);
+
+                        if (childExpense.isValidExpense()) {
+
+                            mListAdapter.selectChild(childExpense);
+                            view.setBackgroundColor(getResources().getColor(R.color.highlighted_item_color));
+
+                            disableLongClick();
+                            animateFabs2(mListAdapter.getSelectedGroupCount(), mListAdapter.getSelectedChildCount(), mListAdapter.getSelectedParentCount());
+
+                            return true;
+                        }
                         return true;
-                    }
+                    default:
 
-                    return false;
-                } else if (ExpandableListView.getPackedPositionType(id) == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
-
-                    //todo öffne den fab und zeige die optionen 'löschen' und 'extrahiere als normale buchung' an
-                    Toast.makeText(getContext(), "CHILD", Toast.LENGTH_SHORT).show();
-                    return true;
+                        return false;
                 }
-
-                return false;
             }
         });
+    }
+
+    /**
+     * Helper Methode um den Longclick der ExpandableListView zu deaktivieren
+     */
+    private void disableLongClick() {
+        mExpListView.setLongClickable(false);
+    }
+
+    /**
+     * Helper Methode um den Longclick der ExpandableListView zu aktivieren
+     */
+    private void enableLongClick() {
+        mExpListView.setLongClickable(true);
+    }
+
+    /**
+     * Methode um die View in ihren Ausgangszustand zurückzusetzen.
+     */
+    private void resetActivityViewState() {
+
+        resetExpandableListView();
+        resetButtonAnimations();
+    }
+
+    /**
+     * Methode umd die ExpandableListView in ihren Ausgangstzstand zurückzusetzen.
+     */
+    private void resetExpandableListView() {
+
+        mListAdapter.deselectAll();
+        updateExpListView();
+        enableLongClick();
+    }
+
+    /**
+     * Methode um die Buttonanimationen auf ihre Uhrsprungszustand zurückzusetzen
+     */
+    private void resetButtonAnimations() {
+
+        closeFabSmallTop();
+        closeFabSmallLeft();
+        animatePlusClose();
     }
 
     /**
@@ -327,6 +457,56 @@ public class TabOneBookings extends Fragment {
 
             if (preferences.getBoolean(account.getTitle(), false))
                 mActiveAccounts.add(account.getIndex());
+        }
+    }
+
+    /**
+     * Methode um einer kombinierten Buchung einen Titel zu geben
+     *
+     * @param title Titel der zusammengefügten Buchung
+     */
+    public void onCombinedTitleSelected(String title, String tag) {
+
+        ExpenseObject parentBooking;
+        switch (tag) {
+            case "tab_one_combine_parents":
+                parentBooking = mDatabase.combineAsChildBookings(mListAdapter.getSelectedGroupData());
+                mExpenses.removeAll(mListAdapter.getSelectedGroupData());
+                break;
+            case "tab_one_combine_groups":
+                parentBooking = mDatabase.combineAsChildBookings(mListAdapter.getSelectedGroupData());
+                mExpenses.removeAll(mListAdapter.getSelectedGroupData());
+                break;
+            case "tab_one_combine_parents_groups":
+                parentBooking = mDatabase.combineParentBookings(mListAdapter.getSelectedGroupData());
+                mExpenses.removeAll(mListAdapter.getSelectedGroupData());
+                //removeChildrenFromListView(mListAdapter.getSelectedChildData());
+                break;
+            default:
+                throw new UnsupportedOperationException("Kombimöglichkeit " + tag + " wird nicht unterstützt!");
+        }
+
+        parentBooking.setTitle(title);
+        mDatabase.updateBooking(parentBooking);
+        mExpenses.add(0, parentBooking);
+
+        resetActivityViewState();
+    }
+
+    /**
+     * Methode, welche die angegebenen Kinder aus der ListView löscht.
+     *
+     * @param childrenToRemove Zu löschende Kinder
+     */
+    public void removeChildrenFromListView(ArrayList<ExpenseObject> childrenToRemove) {
+
+        for (ExpenseObject child : childrenToRemove) {
+            for (ExpenseObject expense : mExpenses) {
+                if (expense.getChildren().contains(child)) {
+                    expense.getChildren().remove(child);
+                    break;
+                }
+            }
         }
     }
 
@@ -418,22 +598,121 @@ public class TabOneBookings extends Fragment {
         switch (selectedCount) {
 
             case 0:// beide buttons müssen nicht funktional und nicht sichtbar sein
-                closeCombine();
-                closeDelete();
-                animateIconClose();
+                resetButtonAnimations();
                 break;
             case 1:// beide buttons müssen sichtbar sein und auf dem combineButton muss das addChild icon zu sehen sein
-                fabCombine.setImageResource(R.drawable.ic_add_child_white);
-                openDelete();
-                openCombine();
-                animateIconOpen();
+                fabSmallLeft.setImageResource(R.drawable.ic_add_child_white);
+                openFabSmallTop();
+                openFabSmallLeft();
+                animatePlusOpen();
                 break;
             default:// beide buttons müssen sichtbar und funktional sein und auf dem combineButton muss das combineBookings icon sichtbar sein
-                fabCombine.setImageResource(R.drawable.ic_combine_white);
-                openCombine();
-                openDelete();
-                animateIconOpen();
+                fabSmallLeft.setImageResource(R.drawable.ic_combine_white);
+                openFabSmallLeft();
+                openFabSmallTop();
+                animatePlusOpen();
                 break;
+        }
+    }
+
+    /**
+     * Methode die für die Animationen der FloatingActionButtons zuständig ist.
+     *
+     * @param selectedGroups   Anzahl der ausgewählten Gruppen
+     * @param selectedChildren Anzahl der ausgewählten Kinder
+     */
+    private void animateFabs2(int selectedGroups, int selectedChildren, int selectedParents) {
+
+        //wenn keine buchung ausgewählt ist sollen die Buttons in den Normalzustand zurückkehren
+        if (selectedChildren == 0 && selectedParents == 0 && selectedGroups == 0) {
+            resetButtonAnimations();
+        }
+
+        //wenn eine Group ausgewählt ist sollen die Buttons add child und Delete angezeigt werden
+        if (selectedChildren == 0 && selectedParents == 0 && selectedGroups == 1) {
+
+            openFabSmallTop();
+            openFabSmallLeft();
+            fabSmallLeft.setImageResource(R.drawable.ic_add_child_white);
+
+            animatePlusOpen();
+        }
+
+        //wenn zwei Groups ausgewählt sind sollen die Buttons Combine und Delete angezeigt werden
+        if (selectedChildren == 0 && selectedParents == 0 && selectedGroups > 1) {
+
+            openFabSmallTop();
+            openFabSmallLeft();
+            fabSmallLeft.setImageResource(R.drawable.ic_combine_white);
+
+            animatePlusOpen();
+        }
+
+        //wenn eine Group und ein Parent ausgewählt sind sollen der Button AddToParent angezezeigt werden
+        if (selectedChildren == 0 && selectedParents == 1 && selectedGroups > 0) {
+
+            openFabSmallLeft();
+            fabSmallLeft.setImageResource(R.drawable.ic_merge_bookings_white);
+        }
+
+        //wenn eine oder mehrere ChildBuchung/en ausgewählt ist/sind sollen die Buttons extract und delete angezeigt werden
+        if (selectedChildren > 0 && selectedParents == 0 && selectedGroups == 0) {
+
+            openFabSmallTop();
+            openFabSmallLeft();
+            fabSmallLeft.setImageResource(R.drawable.ic_extract_child_white);
+
+            animatePlusOpen();
+        }
+
+        //wenn eine ParentBuchung ausgewählt ist sollen die Buttons add Child und delete angezeigt werden
+        if (selectedChildren == 0 && selectedParents == 1 && selectedGroups == 0) {
+
+            openFabSmallTop();
+            openFabSmallLeft();
+            fabSmallLeft.setImageResource(R.drawable.ic_add_child_white);
+
+            animatePlusOpen();
+        }
+
+        //wenn eine oder mehrere ParentBuchungen ausgewählt sind sollen die Buttons combine und delete angezeigt werden
+        if (selectedChildren == 0 && selectedParents > 1 && selectedGroups == 0) {
+
+            openFabSmallTop();
+            openFabSmallLeft();
+            fabSmallLeft.setImageResource(R.drawable.ic_merge_bookings_white);
+
+            animatePlusOpen();
+        }
+    }
+
+    /**
+     * Methode um einen FloatingActionButton anzuzeigen.
+     *
+     * @param fab FAB
+     */
+    public void showFab(FloatingActionButton fab) {
+
+        if (fab.getVisibility() != View.VISIBLE) {
+
+            fab.setVisibility(View.VISIBLE);
+            fab.startAnimation(openFabAnim);
+            fab.setClickable(true);
+        }
+    }
+
+    /**
+     * Methode um einen FloatingActinButton zu verstecken.
+     *
+     * @param fab FAB
+     */
+    public void closeFab(FloatingActionButton fab) {
+
+        if (fab.getVisibility() != View.GONE) {
+
+            fab.setVisibility(View.GONE);
+            fab.startAnimation(closeFabAnim);
+            fab.setClickable(false);
         }
     }
 
@@ -441,99 +720,45 @@ public class TabOneBookings extends Fragment {
      * Methode die das plus auf dem Button animiert.
      * Wird diese Animation getriggert dreht sich das Pluszeichen um 45°.
      */
-    public void animateIconOpen() {
-
-        if (!fabOpen) {
-
-            fabMainAction.startAnimation(rotateForwardAnim);
-            fabOpen = true;
-        }
+    public void animatePlusOpen() {
+        //todo das plus dreht sich jedes mal wenn die funktion aufgerufen wird, auch wenn der button bereits offen ist
+        fabBig.startAnimation(rotateForwardAnim);
     }
 
     /**
      * Methode die das plus auf dem Button animiert.
      * Wird diese Animation getriggert dreht sich das Pluszeichen um -45°.
      */
-    public void animateIconClose() {
-
-        if (fabOpen) {
-
-            fabMainAction.startAnimation(rotateBackwardAnim);
-            fabOpen = false;
-        }
+    public void animatePlusClose() {
+        //todo das plus dreht sich jedes mal wenn die funktion aufgerufen wird, auch wenn der button bereits offen ist
+        fabBig.startAnimation(rotateBackwardAnim);
     }
 
     /**
      * Methode die den LöschFab sichtbar und anklickbar macht.
      */
-    public void openDelete() {
-
-        if (!delOpen) {
-
-            fabDelete.startAnimation(openFabAnim);
-            fabDelete.setClickable(true);
-
-            delOpen = true;
-        }
+    public void openFabSmallTop() {
+        showFab(fabSmallTop);
     }
 
     /**
      * Methode die den LöschFab unsichtbar und nicht mehr anklickbar macht.
      */
-    public void closeDelete() {
-
-        if (delOpen) {
-
-            fabDelete.startAnimation(closeFabAnim);
-            fabDelete.setClickable(false);
-
-            delOpen = false;
-        }
+    public void closeFabSmallTop() {
+        closeFab(fabSmallTop);
     }
 
     /**
      * Methode die den KombinierFab sichtbar und anklickbar macht.
      */
-    public void openCombine() {
-
-        if (!combOpen) {
-
-            fabCombine.startAnimation(openFabAnim);
-            fabCombine.setClickable(true);
-
-            combOpen = true;
-        }
+    public void openFabSmallLeft() {
+        showFab(fabSmallLeft);
     }
 
     /**
-     * Methode die den KombinierFab sichtbar und anklickbar macht.
+     * Methode die den KombinierFab unsichtbar und nicht mehr anklickbar macht.
      */
-    public void closeCombine() {
-
-        if (combOpen) {
-
-            fabCombine.startAnimation(closeFabAnim);
-            fabCombine.setClickable(false);
-
-            combOpen = false;
-        }
-    }
-
-    /**
-     * Methode um einer kombinierten Buchung einen Titel zu geben
-     *
-     * @param title Titel der zusammengefügten Buchung
-     */
-    public void onCombinedTitleSelected(String title) {
-
-        ExpenseObject parentBooking = mDatabase.combineAsChildBookings(mListAdapter.getSelectedGroupData());
-        parentBooking.setTitle(title);
-        mDatabase.updateBooking(parentBooking);
-
-        mExpenses.removeAll(mListAdapter.getSelectedGroupData());
-        mExpenses.add(0, parentBooking);
-        mListAdapter.deselectAll();
-        updateExpListView();
-        animateFabs(mListAdapter.getSelectedCount());
+    public void closeFabSmallLeft() {
+        closeFab(fabSmallLeft);
     }
 }

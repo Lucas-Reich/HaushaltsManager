@@ -126,4 +126,6 @@
     <string name="set_Account_balance">Set account balance</string>
     <string name="transfer_from">Transfer from</string>
     <string name="transfer_to">Transfer to</string>
+    <!-- todo bessere übersetzung einfallen lassen -->
+    <string name="error_parent_already_highlighted">Children of an already selected Parent cannot be selected!</string>
 </resources>
