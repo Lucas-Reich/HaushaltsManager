@@ -478,7 +478,6 @@ public class TabOneBookings extends Fragment {
             case "tab_one_combine_parents_groups":
                 parentBooking = mDatabase.combineParentBookings(mListAdapter.getSelectedGroupData());
                 mExpenses.removeAll(mListAdapter.getSelectedGroupData());
-                //removeChildrenFromListView(mListAdapter.getSelectedChildData());
                 break;
             default:
                 throw new UnsupportedOperationException("Kombimöglichkeit " + tag + " wird nicht unterstützt!");
