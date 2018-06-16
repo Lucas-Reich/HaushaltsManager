@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CourseActivity extends AppCompatActivity {
-    private static String TAG = CourseActivity.class.getSimpleName();
+    private static final String TAG = CourseActivity.class.getSimpleName();
 
     private ArrayList<ExpenseObject> mExpenses;
     private ExpensesDataSource mDatabase;

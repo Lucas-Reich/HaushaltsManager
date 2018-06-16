@@ -80,23 +80,6 @@
                         android:textColor="@android:color/black"
                         android:textSize="12sp"/>
 
-                    <TextView
-                        android:id="@+id/booking_item_booking_price"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="end"
-                        android:text="15"
-                        android:textAlignment="textEnd"
-                        android:textSize="10sp"/>
-
-                    <TextView
-                        android:id="@+id/booking_item_currency_base"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="start"
-                        android:text="€"
-                        android:textAlignment="viewStart"
-                        android:textSize="10sp"/>
                 </TableRow>
 
                 <TableRow

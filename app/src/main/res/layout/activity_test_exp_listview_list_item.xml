@@ -1,120 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:orientation="vertical">
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="?android:attr/expandableListPreferredChildPaddingLeft"
+    android:paddingStart="?android:attr/expandableListPreferredChildPaddingLeft"
+    tools:ignore="RtlSymmetry">
+
+    <com.example.lucas.haushaltsmanager.Views.RoundedTextView
+        android:id="@+id/exp_list_view_item_circle"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginRight="5dp"
+        android:layout_weight="1"
+        tools:ignore="RtlHardcoded"/>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:paddingLeft="?android:attr/expandableListPreferredChildPaddingLeft"
-        android:paddingStart="?android:attr/expandableListPreferredChildPaddingLeft">
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="12dp"
+        android:layout_marginRight="12dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
 
-        <com.example.lucas.haushaltsmanager.Views.RoundedTextView
-            android:id="@+id/exp_listview_item_circle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            />
-
-        <LinearLayout
+        <TableRow
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="12dp"
-            android:layout_marginRight="12dp"
-            android:layout_weight="1"
+            android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <TableLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/exp_list_view_item_title"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center">
+                android:layout_gravity="start"
+                android:layout_weight="1"
+                android:text="Category"
+                android:textAlignment="viewStart"
+                android:textColor="@android:color/black"
+                android:textSize="21sp"/>
 
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
+            <TextView
+                android:id="@+id/exp_list_view_item_paid_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:text="17"
+                android:textAlignment="textEnd"
+                android:textSize="16sp"/>
 
-                    <TextView
-                        android:id="@+id/exp_listview_item_title"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="start"
-                        android:layout_weight="1"
-                        android:text="Kategorie"
-                        android:textAlignment="viewStart"
-                        android:textColor="@android:color/black"
-                        android:textSize="21sp"/>
+            <TextView
+                android:id="@+id/exp_list_view_item_paid_currency"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:text="$"
+                android:textAlignment="viewStart"
+                android:textSize="16sp"/>
+        </TableRow>
 
-                    <TextView
-                        android:id="@+id/exp_listview_item_paid_price"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="end"
-                        android:text="17"
-                        android:textAlignment="textEnd"
-                        android:textSize="16sp"/>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-                    <TextView
-                        android:id="@+id/exp_listview_item_currency_paid"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="start"
-                        android:text="$"
-                        android:textAlignment="viewStart"
-                        android:textSize="16sp"/>
-                </TableRow>
+            <TextView
+                android:id="@+id/exp_list_view_item_person"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_weight="1"
+                android:text="Lucas"
+                android:textAlignment="viewStart"
+                android:textColor="@android:color/black"
+                android:textSize="12sp"/>
 
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+        </TableRow>
 
-                    <TextView
-                        android:id="@+id/exp_listview_item_person"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="start"
-                        android:layout_weight="1"
-                        android:text="Lucas"
-                        android:textAlignment="viewStart"
-                        android:textColor="@android:color/black"
-                        android:textSize="12sp"/>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-                    <TextView
-                        android:id="@+id/exp_listview_item_booking_price"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="end"
-                        android:text="15"
-                        android:textAlignment="textEnd"
-                        android:textSize="10sp"/>
+            <View
+                android:id="@+id/divider6"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_weight="1"
+                android:background="@color/colorPrimary"/>
 
-                    <TextView
-                        android:id="@+id/exp_listview_item_currency_base"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="start"
-                        android:text="€"
-                        android:textAlignment="viewStart"
-                        android:textSize="10sp"/>
-                </TableRow>
-
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <View
-                        android:id="@+id/divider6"
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_weight="1"
-                        android:background="@color/colorPrimary"/>
-
-                </TableRow>
-
-            </TableLayout>
-
-        </LinearLayout>
+        </TableRow>
 
     </LinearLayout>
 

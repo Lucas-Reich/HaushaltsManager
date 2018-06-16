@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ChooseAccountsDialogFragment extends DialogFragment implements AdapterView.OnItemClickListener, AccountAdapter.OnDeleteAccountSelected {
-    private static String TAG = ChooseAccountsDialogFragment.class.getSimpleName();
+    private static final String TAG = ChooseAccountsDialogFragment.class.getSimpleName();
 
     ExpensesDataSource mDatabase;
     SharedPreferences mSettings;
@@ -70,7 +70,7 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Adap
         mAccounts = mDatabase.getAllAccounts();
         for (Account account : mAccounts) {
 
-            mCheckedAccounts.add(mSettings.getBoolean(account.getName(), false));
+            mCheckedAccounts.add(mSettings.getBoolean(account.getTitle(), false));
         }
     }
 
@@ -156,7 +156,7 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Adap
             accountChk.setChecked(true);
         }
 
-        mSettingsEditor.putBoolean(mAccounts.get(position).getName(), mCheckedAccounts.get(position));
+        mSettingsEditor.putBoolean(mAccounts.get(position).getTitle(), mCheckedAccounts.get(position));
         mCallback.onAccountSelected(mAccounts.get(position).getIndex(), mCheckedAccounts.get(position));
     }
 
@@ -171,11 +171,19 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Adap
         try {
             mDatabase.deleteAccount(account.getIndex());
 
-            SharedPreferences preferences = mContext.getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.remove(account.getName());
-            editor.apply();
-            //was passiert wenn ich das aktuelle acktive konto lösche
+            SharedPreferences accountPreferences = mContext.getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
+            accountPreferences.edit().remove(account.getTitle()).apply();
+
+
+            //Checke ob das aktuelle Haupkonto das gerade gelöschte ist.
+            //Ist dem so wird das erste Konto als ersatz in den SharedSpreferences hinterlegt.
+            SharedPreferences userPreferences = mContext.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
+            long activeAccountId = userPreferences.getLong("activeAccount", -1);
+            if (activeAccountId == -1 || activeAccountId == account.getIndex()) {
+                long newActiveAccountIndex = mDatabase.getAllAccounts().get(0).getIndex();
+                userPreferences.edit().putLong("activeAccount", newActiveAccountIndex).apply();
+            }
+
             Toast.makeText(mContext, mContext.getResources().getString(R.string.deleted_account), Toast.LENGTH_SHORT).show();
         } catch (CannotDeleteAccountException e) {
 
@@ -193,12 +201,12 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Adap
     @Override
     public void onAccountSetMain(Account account) {
 
-        SharedPreferences preferences = mContext.getSharedPreferences("UserSettings",  Context.MODE_PRIVATE);
+        SharedPreferences preferences = mContext.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putLong("activeAccount", account.getIndex());
         editor.apply();
 
-        Toast.makeText(mContext, account.getName() + mContext.getResources().getString(R.string.changed_main_account), Toast.LENGTH_SHORT).show();
+        Toast.makeText(mContext, account.getTitle() + mContext.getResources().getString(R.string.changed_main_account), Toast.LENGTH_SHORT).show();
     }
 
     public interface OnSelectedAccount {

@@ -22,7 +22,7 @@ import com.example.lucas.haushaltsmanager.R;
 import java.util.ArrayList;
 
 public class TabTwoMonthlyReports extends Fragment {
-    private String TAG = TabTwoMonthlyReports.class.getSimpleName();
+    private static final String TAG = TabTwoMonthlyReports.class.getSimpleName();
 
     private RecyclerView mRecyclerView;
     private ArrayList<Long> mActiveAccounts;
@@ -61,7 +61,7 @@ public class TabTwoMonthlyReports extends Fragment {
 
         for (Account account : getAllAccounts()) {
 
-            if (preferences.getBoolean(account.getName(), false))
+            if (preferences.getBoolean(account.getTitle(), false))
                 mActiveAccounts.add(account.getIndex());
         }
     }

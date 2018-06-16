@@ -16,7 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.lucas.haushaltsmanager.R;
-import com.example.lucas.haushaltsmanager.Views.ViewWrapper;
+import com.example.lucas.haushaltsmanager.Views.ViewUtils;
 
 public class PriceInputDialog extends DialogFragment {
     private static final String TAG = PriceInputDialog.class.getSimpleName();
@@ -49,17 +49,16 @@ public class PriceInputDialog extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
         final Bundle args = getArguments();
-        final Activity activity = getActivity();
         final EditText input = createInputView();
 
         //wrapper für die text eingabe, sodass dieser eine padding gegeben werden kann
         //Quelle: http://android.pcsalt.com/create-alertdialog-with-custom-layout-programmatically/
         LinearLayout layout = new LinearLayout(mContext);
-        layout.setPadding(ViewWrapper.dpToPx(23), 0, 0, 0);
+        layout.setPadding(ViewUtils.dpToPx(23), 0, 0, 0);
         layout.addView(input);
 
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 
         builder.setTitle(args.getString("title"));
 

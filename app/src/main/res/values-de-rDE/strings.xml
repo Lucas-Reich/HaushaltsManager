@@ -115,4 +115,12 @@
     <string name="hint_choose_color">Wählen Sie eine Farbe aus</string>
     <string name="error_category_name_missing">Gib mindestens einen Namen ein, um eine Kategorie zu erstellen.</string>
     <string name="error_create_expense_content_missing">Bitte fülle alle felder aus, um eine Buchung zu erstellen</string>
+    <string name="not_implemented">Oops! Es sieht so aus, als ob du etwas gefunden hast was du eigentlich noch nicht sehen solltest.</string>
+    <string name="set_Account_balance">Gebe den Eröffnungsgetrag ein</string>
+    <string name="set_account_title">Gib einen Kontonamen ein</string>
+    <string name="category_transfer">Überweisung</string>
+    <string name="transfer_from">Überweisung von</string>
+    <string name="transfer_to">Überweisung nach</string>
+    <!-- todo bessere übersetzung einfallen lassen -->
+    <string name="error_parent_already_highlighted">Kinder einer bereits ausgewählten Parentbuchung können nicht ausgewählt werden!</string>
 </resources>

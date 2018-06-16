@@ -4,21 +4,19 @@ import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.example.lucas.haushaltsmanager.R;
 
 public class Account implements Parcelable {
-
-    private String TAG = Account.class.getSimpleName();
+    private static final String TAG = Account.class.getSimpleName();
 
     private long index;
     private String name;
     private double balance;
     private Currency currency;
 
-    public Account(long index, @NonNull String accountName,double balance, @NonNull Currency currency) {
+    public Account(long index, @NonNull String accountName, double balance, @NonNull Currency currency) {
 
         setIndex(index);
         setName(accountName);
@@ -70,7 +68,7 @@ public class Account implements Parcelable {
     }
 
     @NonNull
-    public String getName() {
+    public String getTitle() {
 
         return name;
     }
@@ -133,7 +131,7 @@ public class Account implements Parcelable {
 
         boolean result;
 
-        result = this.name.equals(otherAccount.getName());
+        result = this.name.equals(otherAccount.getTitle());
         result = result && (this.index == otherAccount.getIndex());
 
         return result;
@@ -142,7 +140,7 @@ public class Account implements Parcelable {
     @Override
     public String toString() {
 
-        return getIndex() + " " + getName() + " " + getBalance();
+        return getIndex() + " " + getTitle() + " " + getBalance();
     }
 
 
