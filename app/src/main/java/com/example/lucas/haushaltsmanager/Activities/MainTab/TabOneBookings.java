@@ -128,11 +128,11 @@ public class TabOneBookings extends Fragment {
 
                     BasicTextInputDialog textInputDialog = new BasicTextInputDialog();
                     textInputDialog.setArguments(bundle);
-                    if (mListAdapter.getSelectedGroupCount() == mListAdapter.getSelectedItemsCount())
+                    if (mListAdapter.getSelectedGroupCount() == mListAdapter.getSelectedItemsCount())//Kombiniere Parentbuchungen
                         textInputDialog.show(getActivity().getFragmentManager(), "tab_one_combine_parents");
-                    else if (mListAdapter.getSelectedGroupCount() == mListAdapter.getSelectedItemsCount())
+                    else if (mListAdapter.getSelectedGroupCount() == mListAdapter.getSelectedItemsCount())//Kombiniere Groupbuchungen
                         textInputDialog.show(getActivity().getFragmentManager(), "tab_one_combine_groups");
-                    else if (mListAdapter.getSelectedGroupCount() >= 1 || mListAdapter.getSelectedParentCount() >= 1)//todo der titel sollte nich neu erstellt werden
+                    else if (mListAdapter.getSelectedGroupCount() >= 1 || mListAdapter.getSelectedParentCount() >= 1)//Kombiniere Parent- und Groupbuchungen todo der titel sollte nich neu erstellt werden
                         textInputDialog.show(getActivity().getFragmentManager(), "tab_one_combine_parents_groups");
                 }
 
@@ -150,7 +150,7 @@ public class TabOneBookings extends Fragment {
 
                 if (extractChildMode()) {
 
-                    mDatabase.convertChildrenToBooking(mListAdapter.getSelectedChildData());
+                    mDatabase.extractChildrenFromBooking(mListAdapter.getSelectedChildData());
                     prepareDataSources(true);
                     resetActivityViewState();
                 }
@@ -316,7 +316,7 @@ public class TabOneBookings extends Fragment {
 
         boolean areParentAndGroupsSelected = mListAdapter.getSelectedChildCount() == 0
                 && mListAdapter.getSelectedParentCount() >= 1
-                && mListAdapter.getSelectedGroupCount() >= 0;
+                && mListAdapter.getSelectedGroupCount() >= 1;
 
         return areGroupsSelected || areParentsSelected || areParentAndGroupsSelected;
     }

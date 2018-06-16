@@ -913,7 +913,7 @@ public class ExpensesDataSource {
      * @param child Zu konvertierende KindBuchung
      * @return Konvertierete Kindbuchung
      */
-    public ExpenseObject convertChildToBooking(ExpenseObject child) {
+    public ExpenseObject extractChildFromBooking(ExpenseObject child) {
 
         if (deleteChildBooking(child)) {
 
@@ -929,9 +929,9 @@ public class ExpensesDataSource {
      *
      * @param children Liste der zu konvertierenden KindBuchungen
      */
-    public void convertChildrenToBooking(ArrayList<ExpenseObject> children) {
+    public void extractChildrenFromBooking(ArrayList<ExpenseObject> children) {
         for (ExpenseObject child : children) {
-            convertChildToBooking(child);
+            extractChildFromBooking(child);
         }
     }
 
