@@ -91,10 +91,12 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
             case PARENT_EXPENSE:
 
-                convertView = inflater.inflate(R.layout.activity_test_exp_listview_list_group_child_y, null);
+                convertView = inflater.inflate(R.layout.activity_exp_listview_parent, null);
 
                 ImageView image = (ImageView) convertView.findViewById(R.id.expandable_icon);
                 int imageResourceId = isExpanded ? R.drawable.ic_expand_less_black_24dp : R.drawable.ic_expand_more_black_24dp;
+                if (isExpanded)
+                    convertView.findViewById(R.id.exp_listview_parent_divider).setVisibility(View.GONE);
 
                 image.setImageResource(imageResourceId);
                 image.setVisibility(View.VISIBLE);
@@ -111,14 +113,14 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 break;
             case DATE_PLACEHOLDER:
 
-                convertView = inflater.inflate(R.layout.activity_test_exp_listview_list_group_sep_date, null);
+                convertView = inflater.inflate(R.layout.activity_exp_listview_date, null);
 
                 TextView date = (TextView) convertView.findViewById(R.id.exp_listview_sep_header_date);
                 date.setText(groupExpense.getDate());
                 break;
             case NORMAL_EXPENSE:
 
-                convertView = inflater.inflate(R.layout.activity_test_exp_listview_list_group_child_n, null);
+                convertView = inflater.inflate(R.layout.activity_exp_listview_group, null);
 
                 RoundedTextView roundedTextView = (RoundedTextView) convertView.findViewById(R.id.booking_item_circle);
                 TextView txtTitle2 = (TextView) convertView.findViewById(R.id.booking_item_title);
@@ -150,7 +152,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             case TRANSFER_EXPENSE:
 
                 //todo eigenes layout für tramsfer expenses definieren
-                convertView = inflater.inflate(R.layout.activity_test_exp_listview_list_group_child_n, null);
+                convertView = inflater.inflate(R.layout.activity_exp_listview_group, null);
 
                 RoundedTextView roundedTextView3 = (RoundedTextView) convertView.findViewById(R.id.booking_item_circle);
                 TextView txtTitle3 = (TextView) convertView.findViewById(R.id.booking_item_title);
@@ -217,7 +219,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
             childViewHolder = new ChildViewHolder();
             LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.activity_test_exp_listview_list_item, null);
+            convertView = inflater.inflate(R.layout.activity_exp_listview_child, null);
 
             childViewHolder.roundedTextView = (RoundedTextView) convertView.findViewById(R.id.exp_list_view_item_circle);
             childViewHolder.txtTitle = (TextView) convertView.findViewById(R.id.exp_list_view_item_title);
@@ -244,6 +246,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         childViewHolder.txtPaidPrice.setText(String.format(mContext.getResources().getConfiguration().locale, "%.2f", childExpense.getUnsignedPrice()));
         childViewHolder.txtPaidPrice.setTextColor(childExpense.isExpenditure() ? mRed : mGreen);
         childViewHolder.txtBaseCurrency.setText(getMainCurrencySymbol());
+        childViewHolder.txtBaseCurrency.setTextColor(childExpense.isExpenditure() ? mRed : mGreen);
 
         return convertView;
     }

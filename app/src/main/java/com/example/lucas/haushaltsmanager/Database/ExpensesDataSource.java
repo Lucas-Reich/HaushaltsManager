@@ -371,19 +371,18 @@ public class ExpensesDataSource {
     /**
      * Methode um den Kontostand eines Kontos anzupassen.
      *
-     * @param accountId Konot das angepasst werden soll
-     * @param balance   Wert, welcher gutgeschrieben oder abgezogen werden soll
+     * @param account Konto das angepasst werden soll
+     * @param balance Wert, welcher gutgeschrieben oder abgezogen werden soll
      * @return TRUE wenn die aktion erflogreich war, FALSE wenn nicht
      */
-    private boolean updateAccountBalance(long accountId, double balance) {
-
-        Account account = getAccountById(accountId);
+    @SuppressWarnings("UnusedReturnValue")
+    private boolean updateAccountBalance(Account account, double balance) {
         double newBalance = account.getBalance() + balance;
 
         ContentValues updatedAccount = new ContentValues();
         updatedAccount.put(ExpensesDbHelper.ACCOUNTS_COL_BALANCE, newBalance);
 
-        int affectedRows = database.update(ExpensesDbHelper.TABLE_ACCOUNTS, updatedAccount, ExpensesDbHelper.ACCOUNTS_COL_ID + " = ?", new String[]{accountId + ""});
+        int affectedRows = database.update(ExpensesDbHelper.TABLE_ACCOUNTS, updatedAccount, ExpensesDbHelper.ACCOUNTS_COL_ID + " = ?", new String[]{account.getIndex() + ""});
         return affectedRows == 1;
     }
 
@@ -665,7 +664,7 @@ public class ExpensesDataSource {
             addChild(child, index);
 
         if (expense.getExpenseType() != ExpenseObject.EXPENSE_TYPES.DUMMY_EXPENSE && expense.getExpenseType() != ExpenseObject.EXPENSE_TYPES.DATE_PLACEHOLDER)
-            updateAccountBalance(expense.getAccount().getIndex(), expense.getSignedPrice());
+            updateAccountBalance(expense.getAccount(), expense.getSignedPrice());
 
         return new ExpenseObject(index, expense.getTitle(), expense.getUnsignedPrice(), expense.getDateTime(), expense.isExpenditure(), expense.getCategory(), expense.getNotice(), expense.getAccount(), expense.getExpenseType());
     }
@@ -832,8 +831,8 @@ public class ExpensesDataSource {
 
         removeTagsFromBooking(expense.getIndex(), expense.getExpenseType());
         deleteChildrenFromParent(expense.getIndex());
+        updateAccountBalance(expense.getAccount(), expense.getSignedPrice());
 
-        //todo der Kontostand muss nach dem löschen einer Buchung geupdatet werden
         int affectedRows = database.delete(ExpensesDbHelper.TABLE_BOOKINGS, ExpensesDbHelper.BOOKINGS_COL_ID + " = ?", new String[]{"" + expense.getIndex()});
         return affectedRows == 1;
     }
@@ -863,7 +862,7 @@ public class ExpensesDataSource {
         long childId = database.insert(ExpensesDbHelper.TABLE_CHILD_BOOKINGS, null, values);
         Log.d(TAG, "created child expense at index: " + childId);
 
-        updateAccountBalance(child.getAccount().getIndex(), child.getSignedPrice());
+        updateAccountBalance(child.getAccount(), child.getSignedPrice());
 
         for (Tag tag : child.getTags())
             assignTagToBooking(childId, tag, child.getExpenseType());
@@ -922,6 +921,28 @@ public class ExpensesDataSource {
         }
 
         return null;
+    }
+
+    /**
+     * Methode um die Id eines Parents zu einer ChildBuchung zu bekommen.
+     *
+     * @param childId Id des Kindes
+     * @return Id des Parents
+     */
+    private long getParentId(long childId) {
+
+        String selectQuery = "SELECT"
+                + " " + ExpensesDbHelper.CHILD_BOOKINGS_COL_PARENT_BOOKING_ID
+                + " FROM " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS
+                + " WHERE " + ExpensesDbHelper.CHILD_BOOKINGS_COL_ID + " = " + childId + ";";
+
+        Cursor c = database.rawQuery(selectQuery, null);
+        c.moveToFirst();
+
+        long parentId = c.getLong(c.getColumnIndex(ExpensesDbHelper.CHILD_BOOKINGS_COL_PARENT_BOOKING_ID));
+        c.close();
+
+        return parentId;
     }
 
     /**
@@ -1116,6 +1137,28 @@ public class ExpensesDataSource {
     }
 
     /**
+     * Methode um die Anzahl der Kindbuchungen zu einer Parentbuchung zu bekommen.
+     *
+     * @param parentId ParentId
+     * @return Anzahl der Kinder der ParentBuchung
+     */
+    private int getChilrenCount(long parentId) {
+
+        String selectQuery = "SELECT"
+                + " COUNT(*) AS attached_children"
+                + " FROM " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS
+                + " WHERE " + ExpensesDbHelper.CHILD_BOOKINGS_COL_PARENT_BOOKING_ID + " = " + parentId + ";";
+
+        Cursor c = database.rawQuery(selectQuery, null);
+        c.moveToFirst();
+
+        int attachedChildrenToParentCount = c.getInt(c.getColumnIndex("attached_children"));
+        c.close();
+
+        return attachedChildrenToParentCount;
+    }
+
+    /**
      * Methode um ein Kindbuchung zu updaten.
      * Dabei wird die parent buchung aber nicht mit geupdated.
      *
@@ -1161,12 +1204,27 @@ public class ExpensesDataSource {
      */
     public boolean deleteChildBooking(ExpenseObject child) {
 
+//        if (getChilrenCount(getParentId(child.getIndex())) == 1)
+//            deleteBooking(getParentToChild(child.getIndex()));
+
         //TODO wenn das kind das letzte des parents war muss der parent wieder als normale buchung eingefügt werden
         Log.d(TAG, "deleted child booking at index " + child.getTitle());
         return database.delete(
                 ExpensesDbHelper.TABLE_CHILD_BOOKINGS,
                 ExpensesDbHelper.CHILD_BOOKINGS_COL_ID + " = ?",
                 new String[]{"" + child.getIndex()}) == 1;
+    }
+
+    /**
+     * Mwthode um die Parentbuchung zu einer ChildBuchung zu bekommen.
+     *
+     * @param childIndex Id des Kindes
+     * @return Parentbuchung
+     */
+    private ExpenseObject getParentToChild(long childIndex) {
+        long parentId = getParentId(childIndex);
+
+        return getBookingById(parentId);
     }
 
     /**
