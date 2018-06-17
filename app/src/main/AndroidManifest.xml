@@ -55,6 +55,10 @@
             android:label="ExportImportActivity"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
         <activity
+            android:name=".Activities.ImportExportTab.ImportExportActivityVer2"
+            android:label="@string/title_activity_import_export_ver2"
+            android:theme="@style/AppTheme" />
+        <activity
             android:name=".Activities.CreateBackupActivity"
             android:label="CreateBackupActivity"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
@@ -74,12 +78,6 @@
             android:exported="false"
             android:label="BackupService"
             android:permission="android.permission.BIND_JOB_SERVICE"/>
-
-        <activity
-            android:name=".Activities.ImportExportTab.ImportExportActivityVer2"
-            android:label="@string/title_activity_import_export_ver2"
-            android:theme="@style/AppTheme">
-        </activity>
     </application>
 
 </manifest>

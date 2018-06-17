@@ -28,6 +28,7 @@ import com.example.lucas.haushaltsmanager.Activities.CategoryListActivity;
 import com.example.lucas.haushaltsmanager.Activities.CourseActivity;
 import com.example.lucas.haushaltsmanager.Activities.CreateBackupActivity;
 import com.example.lucas.haushaltsmanager.Activities.ImportExportActivity;
+import com.example.lucas.haushaltsmanager.Activities.ImportExportTab.ImportExportActivityVer2;
 import com.example.lucas.haushaltsmanager.Activities.RecurringBookingsActivity;
 import com.example.lucas.haushaltsmanager.Activities.TestActivity;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
@@ -119,7 +120,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
                         break;
                     case R.id.import_export:
 
-                        Intent importExportIntent = new Intent(ParentActivity.this, ImportExportActivity.class);
+                        Intent importExportIntent = new Intent(ParentActivity.this, ImportExportActivityVer2.class);
                         ParentActivity.this.startActivity(importExportIntent);
                         break;
                     case R.id.preferences:

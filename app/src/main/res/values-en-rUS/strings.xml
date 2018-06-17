@@ -121,4 +121,6 @@
     <string name="error_parent_already_highlighted">Children of an already selected Parent cannot be selected!</string>
     <string name="tab_import_title">Import</string>
     <string name="tab_export_title">Export</string>
+    <string name="confirmation_dialog_title">Confirm Selection</string>
+    <string name="import_bookings_confirmation">Are you sure that you want to import this bookings?</string>
 </resources>

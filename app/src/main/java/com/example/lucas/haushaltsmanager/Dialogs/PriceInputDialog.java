@@ -1,6 +1,5 @@
 package com.example.lucas.haushaltsmanager.Dialogs;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;

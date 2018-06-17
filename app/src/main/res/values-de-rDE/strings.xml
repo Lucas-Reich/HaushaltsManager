@@ -123,4 +123,8 @@
     <string name="transfer_to">Überweisung nach</string>
     <!-- todo bessere übersetzung einfallen lassen -->
     <string name="error_parent_already_highlighted">Kinder einer bereits ausgewählten Parentbuchung können nicht ausgewählt werden!</string>
+    <string name="import_bookings_confirmation">Bist du sicher, dass du die Ausgewählten Buchungen importieren möchtest?</string>
+    <string name="confirmation_dialog_title">Bestätige Auswahl</string>
+    <string name="tab_export_title">Exportieren</string>
+    <string name="tab_import_title">Importieren</string>
 </resources>
