@@ -237,7 +237,7 @@ public class TabOneBookings extends Fragment {
             public boolean onGroupClick(ExpandableListView parent, View view, int groupPosition, long id) {
                 ExpenseObject groupExpense = (ExpenseObject) mListAdapter.getGroup(groupPosition);
 
-                if (mListAdapter.getSelectedItemsCount() == 0 && groupExpense.getExpenseType() != ExpenseObject.EXPENSE_TYPES.PARENT_EXPENSE) {
+                if (mListAdapter.getSelectedItemsCount() == 0 && groupExpense.getExpenseType() != ExpenseObject.EXPENSE_TYPES.PARENT_EXPENSE && groupExpense.getExpenseType() != ExpenseObject.EXPENSE_TYPES.DATE_PLACEHOLDER) {
 
                     //falls keine Buchung markiert ist soll die Buchung im ExpenseScreen aufgerufen werden
                     Intent updateParentExpenseIntent = new Intent(getContext(), ExpenseScreenActivity.class);
@@ -257,7 +257,7 @@ public class TabOneBookings extends Fragment {
                         //ignoriere Datumstrenner
                         return true;
                     case PARENT_EXPENSE:
-                        if (!mListAdapter.isGroupSelected(groupExpense)) {
+                        if (!mListAdapter.isGroupSelected(groupExpense) && groupExpense.getExpenseType() != ExpenseObject.EXPENSE_TYPES.DATE_PLACEHOLDER) {
                             if (hasUserSelectedItems())
                                 mListAdapter.selectGroup(groupExpense);
                             animateFabs(mListAdapter.getSelectedGroupCount(), mListAdapter.getSelectedChildCount(), mListAdapter.getSelectedParentCount());
