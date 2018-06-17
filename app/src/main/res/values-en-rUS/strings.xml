@@ -119,4 +119,6 @@
     <string name="transfer_to">Transfer to</string>
     <!-- todo bessere übersetzung einfallen lassen -->
     <string name="error_parent_already_highlighted">Children of an already selected Parent cannot be selected!</string>
+    <string name="tab_import_title">Import</string>
+    <string name="tab_export_title">Export</string>
 </resources>

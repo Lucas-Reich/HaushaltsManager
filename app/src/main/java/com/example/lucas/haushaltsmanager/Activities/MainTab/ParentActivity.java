@@ -158,6 +158,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
         preferences.edit().putString("mainCurrencySymbol", mainCurrency.getSymbol()).apply();
         database.close();
     }
+
     @Override
     public void onBackPressed() {
 
@@ -215,16 +216,14 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
 
             switch (position) {
                 case 0:
-
                     return new TabOneBookings();
                 case 1:
-
                     return new TabTwoMonthlyReports();
                 case 2:
-
                     return new TabThree();
+                default:
+                    return null;
             }
-            return null;
         }
 
         @Override

@@ -128,4 +128,11 @@
     <string name="transfer_to">Transfer to</string>
     <!-- todo bessere übersetzung einfallen lassen -->
     <string name="error_parent_already_highlighted">Children of an already selected Parent cannot be selected!</string>
+    <string name="title_activity_import_export_ver2">ImportExportActivityVer2</string>
+    <string name="tab_text_1">Tab 1</string>
+    <string name="tab_text_2">Tab 2</string>
+    <string name="tab_text_3">Tab 3</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="tab_import_title">Import</string>
+    <string name="tab_export_title">Export</string>
 </resources>
