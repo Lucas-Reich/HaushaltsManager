@@ -27,6 +27,10 @@ public class DirectoryPickerDialog extends DialogFragment {
     ArrayAdapter<String> mAdapter;
     File mCurrentDir;
     List<String> mSubDirectories;
+    private String mSearchMode;// todo funktionalität implementieren
+
+    public static final String SEARCH_MODE_DIRECTORY = "directory";
+    public static final String SEARCH_MODE_FILE = "file";
 
     @Override
     public void onAttach(Context context) {
@@ -42,7 +46,7 @@ public class DirectoryPickerDialog extends DialogFragment {
         }
     }
 
-    //sollte ich noch einen "go up" button einfügen, um ein directory zurückzugehen??
+    //todo einen "go up" button einfügen, welcher einen ein verzeichniss nach oben bringt
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
@@ -50,6 +54,7 @@ public class DirectoryPickerDialog extends DialogFragment {
 
         Bundle args = getArguments();
         mDialogTitle = args.getString("title") != null ? args.getString("title") : "";
+        mSearchMode = args.getString("search_mode") != null ? args.getString("search_mode") : SEARCH_MODE_FILE;
 
         mListView = new ListView(mContext);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

@@ -27,14 +27,13 @@ import android.widget.Toast;
 import com.example.lucas.haushaltsmanager.Activities.CategoryListActivity;
 import com.example.lucas.haushaltsmanager.Activities.CourseActivity;
 import com.example.lucas.haushaltsmanager.Activities.CreateBackupActivity;
-import com.example.lucas.haushaltsmanager.Activities.ImportExportActivity;
-import com.example.lucas.haushaltsmanager.Activities.ImportExportTab.ImportExportActivityVer2;
 import com.example.lucas.haushaltsmanager.Activities.RecurringBookingsActivity;
 import com.example.lucas.haushaltsmanager.Activities.TestActivity;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ChangeAccounts.ChooseAccountsDialogFragment;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
+import com.example.lucas.haushaltsmanager.Activities.ImportExportActivityVer3;
 import com.example.lucas.haushaltsmanager.MockDataCreator;
 import com.example.lucas.haushaltsmanager.MyAlarmReceiver;
 import com.example.lucas.haushaltsmanager.R;
@@ -120,7 +119,10 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
                         break;
                     case R.id.import_export:
 
-                        Intent importExportIntent = new Intent(ParentActivity.this, ImportExportActivityVer2.class);
+                        //Intent importExportIntent = new Intent(ParentActivity.this, ImportExportActivityVer2.class);
+                        //ParentActivity.this.startActivity(importExportIntent);
+
+                        Intent importExportIntent = new Intent(ParentActivity.this, ImportExportActivityVer3.class);
                         ParentActivity.this.startActivity(importExportIntent);
                         break;
                     case R.id.preferences:

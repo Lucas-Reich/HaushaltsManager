@@ -57,7 +57,7 @@
         <activity
             android:name=".Activities.ImportExportTab.ImportExportActivityVer2"
             android:label="@string/title_activity_import_export_ver2"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"/>
         <activity
             android:name=".Activities.CreateBackupActivity"
             android:label="CreateBackupActivity"
@@ -68,6 +68,9 @@
         <activity
             android:name=".Activities.CourseActivity"
             android:label="CourseActivity"/>
+        <activity
+            android:name=".Activities.ImportExportActivityVer3"
+            android:label="ImportExportActivityVer3"/>
 
         <receiver
             android:name=".MyAlarmReceiver"
