@@ -93,29 +93,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         switch (groupExpense.getExpenseType()) {
-
-//            case PARENT_EXPENSE:
-//
-//                convertView = inflater.inflate(R.layout.activity_exp_listview_parent, null);
-//
-//                ImageView image = (ImageView) convertView.findViewById(R.id.expandable_icon);
-//                int imageResourceId = isExpanded ? R.drawable.ic_expand_less_black_24dp : R.drawable.ic_expand_more_black_24dp;
-//                if (isExpanded)
-//                    convertView.findViewById(R.id.exp_listview_parent_divider).setVisibility(View.GONE);
-//
-//                image.setImageResource(imageResourceId);
-//                image.setVisibility(View.VISIBLE);
-//
-//                TextView txtTitle = (TextView) convertView.findViewById(R.id.exp_listview_header_name);
-//                TextView txtTotalAmount = (TextView) convertView.findViewById(R.id.exp_listview_header_total_amount);
-//                TextView txtBaseCurrency = (TextView) convertView.findViewById(R.id.exp_listview_header_base_currency);
-//
-//                txtTitle.setText(groupExpense.getTitle());
-//                txtTotalAmount.setText(String.format(mContext.getResources().getConfiguration().locale, "%.2f", groupExpense.getSignedPrice()));
-//                txtTotalAmount.setTextColor(groupExpense.getSignedPrice() < 0 ? mRed : mGreen);
-//                txtBaseCurrency.setText(getMainCurrencySymbol());
-//                txtBaseCurrency.setTextColor(groupExpense.getSignedPrice() < 0 ? mRed : mGreen);
-//                break;
+            
             case PARENT_EXPENSE:
 
                 convertView = inflater.inflate(R.layout.activity_exp_listview_parent_ver2, null);
