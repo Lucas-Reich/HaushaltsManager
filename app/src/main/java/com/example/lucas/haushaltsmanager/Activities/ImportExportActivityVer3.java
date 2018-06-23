@@ -16,9 +16,8 @@ import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationAlertDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.DirectoryPickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ErrorAlertDialog;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
-import com.example.lucas.haushaltsmanager.FileAdapter;
 import com.example.lucas.haushaltsmanager.ExpenseObjectExporter;
-import com.example.lucas.haushaltsmanager.ExpenseObjectImporter;
+import com.example.lucas.haushaltsmanager.FileAdapter;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.io.File;
@@ -201,15 +200,14 @@ public class ImportExportActivityVer3 extends AppCompatActivity implements Direc
                 getImportableFilesInDirectory(mSelectedDirectory);
                 updateListView();
                 break;
-            default:
-                return;
         }
     }
 
     /**
      * Methode um alle Buchungen aus der Datenbank abzufragen.
-     *
+     * <p>
      * TODO: 23.06.2018 Den User fragen welche Buchungen er genau exportieren möchte
+     *
      * @return Alle Buchungen
      */
     private ArrayList<ExpenseObject> getAllExpenses() {

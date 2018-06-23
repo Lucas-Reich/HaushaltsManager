@@ -107,7 +107,7 @@ public class CreateAccountActivity extends AppCompatActivity implements BasicTex
             }
         });
 
-        mAccountBalanceBtn.setHint(mAccount.getBalance() + "");
+        mAccountBalanceBtn.setHint(String.format(this.getResources().getConfiguration().locale, "%.2f", mAccount.getBalance()));
         mAccountBalanceBtn.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -195,7 +195,7 @@ public class CreateAccountActivity extends AppCompatActivity implements BasicTex
     private Currency getDefaultCurrency() {
         SharedPreferences preferences = this.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
 
-        long mainCurrencIndex = preferences.getLong("mainCurrencyIndex", 32);
-        return mDatabase.getCurrencyById(mainCurrencIndex);
+        long mainCurrencyIndex = preferences.getLong("mainCurrencyIndex", 32);
+        return mDatabase.getCurrencyById(mainCurrencyIndex);
     }
 }
