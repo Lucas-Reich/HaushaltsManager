@@ -123,4 +123,9 @@
     <string name="tab_export_title">Export</string>
     <string name="confirmation_dialog_title">Confirm Selection</string>
     <string name="import_bookings_confirmation">Are you sure that you want to import this bookings?</string>
+    <string name="export_directory_confirmation">Are you sure that you want to Export the bookings to the current directory?</string>
+    <string name="create_export">Create Export</string>
+    <string name="btn_yes">Yes</string>
+    <string name="btn_no">No</string>
+    <string name="error_no_directory_selected">You have to select a directory before continuing!</string>
 </resources>

@@ -345,7 +345,7 @@ public class ImportExportActivity extends AppCompatActivity implements AccountPi
 
         } catch (FileNotFoundException e) {
 
-            Log.d(TAG, "Error while creating the csv export file: " + e.toString());
+            Log.d(TAG, "Error while creating the csv exportFile file: " + e.toString());
         }
     }
 

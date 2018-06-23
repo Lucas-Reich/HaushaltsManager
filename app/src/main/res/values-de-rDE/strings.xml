@@ -127,4 +127,9 @@
     <string name="confirmation_dialog_title">Bestätige Auswahl</string>
     <string name="tab_export_title">Exportieren</string>
     <string name="tab_import_title">Importieren</string>
+    <string name="export_directory_confirmation">Bist du sicher, dass du die Buchungen in das aktuell ausgewählte Verzeichniss exportieren möchtest?</string>
+    <string name="create_export">Erstelle Export</string>
+    <string name="btn_yes">Ja</string>
+    <string name="btn_no">Nein</string>
+    <string name="error_no_directory_selected">Um fortzufahren musst du zuerst ein Verzeichniss auswählen!</string>
 </resources>

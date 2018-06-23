@@ -19,7 +19,7 @@ public class FileAdapter extends ArrayAdapter<File> {
     }
 
     public FileAdapter(List<File> data, Context context) {
-        super(context, R.layout.file_item, data);
+        super(context, android.R.layout.simple_list_item_1, data);
     }
 
     @NonNull
@@ -31,9 +31,9 @@ public class FileAdapter extends ArrayAdapter<File> {
         if (convertView == null) {
             viewHolder = new ViewHolder();
             LayoutInflater inflater = LayoutInflater.from(getContext());
-            convertView = inflater.inflate(R.layout.file_item, parent, false);
+            convertView = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
 
-            viewHolder.txtFileName = (TextView) convertView.findViewById(R.id.file_item_name);
+            viewHolder.txtFileName = (TextView) convertView.findViewById(android.R.id.text1);
 
             convertView.setTag(viewHolder);
         } else {

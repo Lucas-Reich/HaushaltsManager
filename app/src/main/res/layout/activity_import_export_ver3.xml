@@ -29,7 +29,7 @@
             android:id="@+id/activity_impot_divider"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="?android:attr/listDivider"/>
+            android:background="@color/colorPrimary"/>
 
         <ListView
             android:id="@+id/activity_import_importable_files_list"
@@ -43,6 +43,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|right|end"
+        android:layout_marginBottom="18dp"
+        android:layout_marginRight="18dp"
         android:clickable="true"
         app:srcCompat="@drawable/ic_add_white"/>
 

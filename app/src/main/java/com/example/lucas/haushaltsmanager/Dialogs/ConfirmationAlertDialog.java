@@ -34,16 +34,15 @@ public class ConfirmationAlertDialog extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final Bundle args = getArguments();
-        TextView message = new TextView(mContext);
-        message.setText(args.getString("message"));
+        String message = args.getString("message");
 
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 
         builder.setTitle(args.getString("title"));
 
-        builder.setView(message);
+        builder.setMessage(message);
 
-        builder.setPositiveButton(R.string.btn_ok, new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.btn_yes, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
@@ -51,7 +50,7 @@ public class ConfirmationAlertDialog extends DialogFragment {
             }
         });
 
-        builder.setNegativeButton(R.string.btn_cancel, new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.btn_no, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 

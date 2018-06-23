@@ -11,10 +11,14 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationAlertDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.DirectoryPickerDialog;
+import com.example.lucas.haushaltsmanager.Dialogs.ErrorAlertDialog;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.FileAdapter;
+import com.example.lucas.haushaltsmanager.ExpenseObjectExporter;
+import com.example.lucas.haushaltsmanager.ExpenseObjectImporter;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.io.File;
@@ -29,6 +33,7 @@ public class ImportExportActivityVer3 extends AppCompatActivity implements Direc
     private FloatingActionButton mAddExportFab;
     private Button mSelectDirectoryBtn;
     private Toolbar mToolbar;
+    private File mSelectedDirectory;
 
     private enum SupportedFileExtensions {
         CSV,
@@ -62,7 +67,7 @@ public class ImportExportActivityVer3 extends AppCompatActivity implements Direc
             public void onClick(View v) {
 
                 Bundle bundle = new Bundle();
-                bundle.putString("title", "Title");// todo change
+                bundle.putString("title", getString(R.string.choose_directory));
                 bundle.putString("search_mode", DirectoryPickerDialog.SEARCH_MODE_DIRECTORY);
 
                 DirectoryPickerDialog directoryPicker = new DirectoryPickerDialog();
@@ -91,9 +96,21 @@ public class ImportExportActivityVer3 extends AppCompatActivity implements Direc
             @Override
             public void onClick(View v) {
 
+                if (mSelectedDirectory == null) {
+
+                    Bundle bundle = new Bundle();
+                    bundle.putString("title", getString(R.string.error));
+                    bundle.putString("message", getString(R.string.error_no_directory_selected));
+
+                    ErrorAlertDialog errorDialog = new ErrorAlertDialog();
+                    errorDialog.setArguments(bundle);
+                    errorDialog.show(getFragmentManager(), "import_error_export");
+                    return;
+                }
+
                 Bundle bundle = new Bundle();
-                bundle.putString("title", "Erstelle Export");// todo change
-                bundle.putString("message", "Möchtest du wirklich deine Daten in das aktuelle Verzeichniss Exportieren?");// todo change
+                bundle.putString("title", getString(R.string.create_export));
+                bundle.putString("message", getString(R.string.export_directory_confirmation));
 
                 ConfirmationAlertDialog confirmationDialog = new ConfirmationAlertDialog();
                 confirmationDialog.setArguments(bundle);
@@ -112,6 +129,7 @@ public class ImportExportActivityVer3 extends AppCompatActivity implements Direc
      * @return Liste mit den unterstützten Datein
      */
     private List<File> getImportableFilesInDirectory(File path) {
+        mSelectableFileList.clear();
         for (File file : path.listFiles()) {
             for (SupportedFileExtensions fileExtension : SupportedFileExtensions.values()) {
                 if (file.getName().contains(fileExtension.toString())) {
@@ -122,18 +140,6 @@ public class ImportExportActivityVer3 extends AppCompatActivity implements Direc
 
         }
         return new ArrayList<>();
-    }
-
-    /**
-     * Methode um eine komplette Buchung in einen String zu konvertieren.
-     * todo Überlegen ob es sinn macht eine toJson methode in die Entities einzubauen, welche die aufgabe übernimmt
-     *
-     * @param expenseString String welcher zu einer Buchung konvertiert werden soll
-     * @return Buchung
-     */
-    private ExpenseObject stringToExpense(String expenseString) {
-
-        return ExpenseObject.createDummyExpense(this);
     }
 
     /**
@@ -157,6 +163,9 @@ public class ImportExportActivityVer3 extends AppCompatActivity implements Direc
     public void onDirectorySelected(File file, String tag) {
         if (tag.equals("import_select_directory") && file.isDirectory()) {
 
+            mSelectDirectoryBtn.setText(file.getName());
+            mSelectedDirectory = file;
+
             mSelectableFileList.clear();
             mSelectableFileList.addAll(getImportableFilesInDirectory(file));
 
@@ -177,14 +186,20 @@ public class ImportExportActivityVer3 extends AppCompatActivity implements Direc
 
         switch (tag) {
             case "import_confirm_import":
-                //todo import prozedur starten
-                // soll noch der dateityp geprüft werden (getFileExtension)? also nur csvs erlauben oder so
-                mSelectedFile.getName();
+
+                // todo aktivieren
+                // ExpenseObjectImporter fileImporter = new ExpenseObjectImporter(mSelectedFile, this);
+                // fileImporter.readAndSaveExpenseObjects();
+
                 Toast.makeText(this, R.string.not_implemented, Toast.LENGTH_SHORT).show();
                 break;
             case "import_confirm_export":
-                //todo rexport prozedur starten
-                Toast.makeText(this, R.string.not_implemented, Toast.LENGTH_SHORT).show();
+
+                ExpenseObjectExporter fileExporter = new ExpenseObjectExporter(mSelectedDirectory);
+                fileExporter.convertAndExportExpenses(getAllExpenses());
+
+                getImportableFilesInDirectory(mSelectedDirectory);
+                updateListView();
                 break;
             default:
                 return;
@@ -192,15 +207,17 @@ public class ImportExportActivityVer3 extends AppCompatActivity implements Direc
     }
 
     /**
-     * Methode, welche den Dateityp einer Datei extrahiert
+     * Methode um alle Buchungen aus der Datenbank abzufragen.
      *
-     * @param file Datei
-     * @return Dateityp der angegebenen Datei
+     * TODO: 23.06.2018 Den User fragen welche Buchungen er genau exportieren möchte
+     * @return Alle Buchungen
      */
-    private String getFileExtension(File file) {
-        String fileName = file.getName();
-        int dotIndex = fileName.indexOf(".");
+    private ArrayList<ExpenseObject> getAllExpenses() {
+        ExpensesDataSource database = new ExpensesDataSource(this);
+        database.open();
+        ArrayList<ExpenseObject> expenses = database.getBookings();
+        database.close();
 
-        return fileName.substring(dotIndex + 1);
+        return expenses;
     }
 }
