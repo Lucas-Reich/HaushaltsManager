@@ -38,8 +38,8 @@ import com.example.lucas.haushaltsmanager.MockDataCreator;
 import com.example.lucas.haushaltsmanager.MyAlarmReceiver;
 import com.example.lucas.haushaltsmanager.R;
 
-public class TabParentActivity extends AppCompatActivity implements ChooseAccountsDialogFragment.OnSelectedAccount, BasicTextInputDialog.BasicDialogCommunicator {
-    private static final String TAG = TabParentActivity.class.getSimpleName();
+public class ParentActivity extends AppCompatActivity implements ChooseAccountsDialogFragment.OnSelectedAccount, BasicTextInputDialog.BasicDialogCommunicator {
+    private static final String TAG = ParentActivity.class.getSimpleName();
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private TabLayout mTabLayout;
@@ -63,7 +63,7 @@ public class TabParentActivity extends AppCompatActivity implements ChooseAccoun
             @Override
             public void onClick(View v) {
 
-                MockDataCreator test = new MockDataCreator(TabParentActivity.this);
+                MockDataCreator test = new MockDataCreator(ParentActivity.this);
                 test.createBookings(100);
             }
         });
@@ -99,28 +99,28 @@ public class TabParentActivity extends AppCompatActivity implements ChooseAccoun
 
                     case R.id.categories:
 
-                        Intent categoryIntent = new Intent(TabParentActivity.this, CategoryListActivity.class);
-                        TabParentActivity.this.startActivity(categoryIntent);
+                        Intent categoryIntent = new Intent(ParentActivity.this, CategoryListActivity.class);
+                        ParentActivity.this.startActivity(categoryIntent);
                         break;
                     case R.id.course:
 
-                        Intent courseIntent = new Intent(TabParentActivity.this, CourseActivity.class);
-                        TabParentActivity.this.startActivity(courseIntent);
+                        Intent courseIntent = new Intent(ParentActivity.this, CourseActivity.class);
+                        ParentActivity.this.startActivity(courseIntent);
                         break;
                     case R.id.standing_orders:
 
-                        Intent recurringBookingIntent = new Intent(TabParentActivity.this, RecurringBookingsActivity.class);
-                        TabParentActivity.this.startActivity(recurringBookingIntent);
+                        Intent recurringBookingIntent = new Intent(ParentActivity.this, RecurringBookingsActivity.class);
+                        ParentActivity.this.startActivity(recurringBookingIntent);
                         break;
                     case R.id.backup:
 
-                        Intent backupIntent = new Intent(TabParentActivity.this, CreateBackupActivity.class);
-                        TabParentActivity.this.startActivity(backupIntent);
+                        Intent backupIntent = new Intent(ParentActivity.this, CreateBackupActivity.class);
+                        ParentActivity.this.startActivity(backupIntent);
                         break;
                     case R.id.import_export:
 
-                        Intent importExportIntent = new Intent(TabParentActivity.this, ImportExportActivity.class);
-                        TabParentActivity.this.startActivity(importExportIntent);
+                        Intent importExportIntent = new Intent(ParentActivity.this, ImportExportActivity.class);
+                        ParentActivity.this.startActivity(importExportIntent);
                         break;
                     case R.id.preferences:
 
@@ -128,12 +128,12 @@ public class TabParentActivity extends AppCompatActivity implements ChooseAccoun
                         break;
                     case R.id.about:
 
-                        Intent testPieIntent = new Intent(TabParentActivity.this, TestActivity.class);//todo zeige die AboutActivity
-                        TabParentActivity.this.startActivity(testPieIntent);
+                        Intent testPieIntent = new Intent(ParentActivity.this, TestActivity.class);//todo zeige die AboutActivity
+                        ParentActivity.this.startActivity(testPieIntent);
                         break;
                     default:
 
-                        Toast.makeText(TabParentActivity.this, "Ups, da hast du wohl etwas entdeckt was du eigentlich noch gar nicht sehen solltest.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ParentActivity.this, "Ups, da hast du wohl etwas entdeckt was du eigentlich noch gar nicht sehen solltest.", Toast.LENGTH_SHORT).show();
                 }
 
                 DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_2);

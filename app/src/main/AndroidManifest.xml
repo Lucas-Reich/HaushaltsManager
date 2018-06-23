@@ -14,7 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".Activities.MainTab.TabParentActivity"
+            android:name=".Activities.MainTab.ParentActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -26,39 +26,39 @@
         <activity
             android:name=".Activities.ExpenseScreenActivity"
             android:label="HaushaltsManager"
-            android:parentActivityName=".Activities.MainTab.TabParentActivity"/>
+            android:parentActivityName=".Activities.MainTab.ParentActivity"/>
         <activity
             android:name=".Activities.CategoryListActivity"
             android:label="Categories"
-            android:parentActivityName=".Activities.MainTab.TabParentActivity"/>
+            android:parentActivityName=".Activities.MainTab.ParentActivity"/>
         <activity
             android:name=".Activities.TemplatesActivity"
             android:label="BookingTemplate"
-            android:parentActivityName=".Activities.MainTab.TabParentActivity"/>
+            android:parentActivityName=".Activities.MainTab.ParentActivity"/>
         <activity
             android:name=".Activities.RecurringBookingsActivity"
             android:label="RecurringBookings"
-            android:parentActivityName=".Activities.MainTab.TabParentActivity"/>
+            android:parentActivityName=".Activities.MainTab.ParentActivity"/>
         <activity
             android:name=".Activities.CreateAccountActivity"
             android:label="CreateNewAccount"
-            android:parentActivityName=".Activities.MainTab.TabParentActivity"/>
+            android:parentActivityName=".Activities.MainTab.ParentActivity"/>
         <activity
             android:name=".Activities.CreateCategoryActivity"
             android:label="CreateNewCategory"
-            android:parentActivityName=".Activities.MainTab.TabParentActivity"/>
+            android:parentActivityName=".Activities.MainTab.ParentActivity"/>
         <activity
             android:name=".Activities.TestActivity"
             android:label="TestPieChart"
-            android:parentActivityName=".Activities.MainTab.TabParentActivity"/>
+            android:parentActivityName=".Activities.MainTab.ParentActivity"/>
         <activity
             android:name=".Activities.ImportExportActivity"
             android:label="ExportImportActivity"
-            android:parentActivityName=".Activities.MainTab.TabParentActivity"/>
+            android:parentActivityName=".Activities.MainTab.ParentActivity"/>
         <activity
             android:name=".Activities.CreateBackupActivity"
             android:label="CreateBackupActivity"
-            android:parentActivityName=".Activities.MainTab.TabParentActivity"/>
+            android:parentActivityName=".Activities.MainTab.ParentActivity"/>
         <activity
             android:name=".Activities.TransferActivity"
             android:label="TransfersActivity"/>

@@ -17,7 +17,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 
-import com.example.lucas.haushaltsmanager.Activities.MainTab.TabParentActivity;
+import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
 import com.example.lucas.haushaltsmanager.Dialogs.AccountPickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.DatePickerDialog;
@@ -185,7 +185,7 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
                     parent.setTitle(String.format("%s\n%s -> %s", getString(R.string.transfer), mFromAccount.getTitle(), mToAccount.getTitle()));
                     mDatabase.updateBooking(parent);
 
-                    Intent intent = new Intent(TransferActivity.this, TabParentActivity.class);
+                    Intent intent = new Intent(TransferActivity.this, ParentActivity.class);
                     TransferActivity.this.startActivity(intent);
                 } else {
 

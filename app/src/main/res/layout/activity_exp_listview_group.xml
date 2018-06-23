@@ -41,7 +41,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="start"
                         android:layout_weight="1"
-                        android:text="Kategorie"
+                        android:text="Buchungstitel"
                         android:textAlignment="viewStart"
                         android:textColor="@android:color/black"
                         android:textSize="21sp"/>

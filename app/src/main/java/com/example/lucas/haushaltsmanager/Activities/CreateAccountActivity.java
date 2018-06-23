@@ -10,7 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import com.example.lucas.haushaltsmanager.Activities.MainTab.TabParentActivity;
+import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
@@ -145,7 +145,7 @@ public class CreateAccountActivity extends AppCompatActivity implements BasicTex
                     break;
             }
 
-            Intent startMainTab = new Intent(CreateAccountActivity.this, TabParentActivity.class);
+            Intent startMainTab = new Intent(CreateAccountActivity.this, ParentActivity.class);
             CreateAccountActivity.this.startActivity(startMainTab);
         }
     };
