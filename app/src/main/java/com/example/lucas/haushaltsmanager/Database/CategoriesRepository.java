@@ -68,7 +68,7 @@ public class CategoriesRepository {
         //TODO erstelle neue Kategorie wenn sie nicht bereits existiert
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.CATEGORIES_COL_NAME, category.getTitle());
-        values.put(ExpensesDbHelper.CATEGORIES_COL_COLOR, category.getColor());
+        values.put(ExpensesDbHelper.CATEGORIES_COL_COLOR, category.getColorString());
         values.put(ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE, category.getDefaultExpenseType() ? 1 : 0);
         Log.d(TAG, "created new CATEGORY");
 

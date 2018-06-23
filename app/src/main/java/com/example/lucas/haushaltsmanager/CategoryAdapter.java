@@ -53,7 +53,7 @@ public class CategoryAdapter extends ArrayAdapter<Category> implements View.OnCl
 
         viewHolder.txtCategoryName.setText(String.format("%s", categoryObject.getTitle()));
         viewHolder.circTextView.setCenterText(String.format("%s", categoryObject.getTitle().substring(0,1).toUpperCase()));
-        viewHolder.circTextView.setCircleColor(categoryObject.getColor());
+        viewHolder.circTextView.setCircleColor(categoryObject.getColorString());
         viewHolder.circTextView.setTextColor(Color.WHITE);
 
         return convertView;

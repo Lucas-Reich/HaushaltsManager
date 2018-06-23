@@ -27,7 +27,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.lucas.haushaltsmanager.Activities.MainTab.TabParentActivity;
+import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
 import com.example.lucas.haushaltsmanager.Dialogs.AccountPickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
@@ -384,7 +384,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AccountP
                 long index = mDatabase.createTemplateBooking(mExpense);
                 Log.d(TAG, "created mTemplate for bookings at index: " + index);
             }
-            Intent intent = new Intent(ExpenseScreenActivity.this, TabParentActivity.class);
+            Intent intent = new Intent(ExpenseScreenActivity.this, ParentActivity.class);
             ExpenseScreenActivity.this.startActivity(intent);
         }
     };

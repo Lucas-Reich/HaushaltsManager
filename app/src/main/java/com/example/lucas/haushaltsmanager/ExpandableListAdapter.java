@@ -3,6 +3,7 @@ package com.example.lucas.haushaltsmanager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,12 +11,16 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Views.PieChart.PieChart;
 import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
     @SuppressWarnings("unused")
@@ -88,37 +93,37 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         switch (groupExpense.getExpenseType()) {
-
+            
             case PARENT_EXPENSE:
 
-                convertView = inflater.inflate(R.layout.activity_test_exp_listview_list_group_child_y, null);
+                convertView = inflater.inflate(R.layout.activity_exp_listview_parent_ver2, null);
+                if (isExpanded)
+                    convertView.findViewById(R.id.exp_listview_parent_v2_divider).setVisibility(View.GONE);
 
-                ImageView image = (ImageView) convertView.findViewById(R.id.expandable_icon);
-                int imageResourceId = isExpanded ? R.drawable.ic_expand_less_black_24dp : R.drawable.ic_expand_more_black_24dp;
+                PieChart pieChart = (PieChart) convertView.findViewById(R.id.exp_listview_parent_v2_pie_chart);
+                TextView txtTitle22 = (TextView) convertView.findViewById(R.id.exp_listview_parent_v2_title);
+                TextView txtPrice = (TextView) convertView.findViewById(R.id.exp_listview_parent_v2_price);
+                TextView txtCurrencySymbol = (TextView) convertView.findViewById(R.id.exp_listview_parent_v2_currency_symbol);
+                TextView txtPerson2 = (TextView) convertView.findViewById(R.id.exp_listview_parent_v2_person);
 
-                image.setImageResource(imageResourceId);
-                image.setVisibility(View.VISIBLE);
-
-                TextView txtTitle = (TextView) convertView.findViewById(R.id.exp_listview_header_name);
-                TextView txtTotalAmount = (TextView) convertView.findViewById(R.id.exp_listview_header_total_amount);
-                TextView txtBaseCurrency = (TextView) convertView.findViewById(R.id.exp_listview_header_base_currency);
-
-                txtTitle.setText(groupExpense.getTitle());
-                txtTotalAmount.setText(String.format(mContext.getResources().getConfiguration().locale, "%.2f", groupExpense.getSignedPrice()));
-                txtTotalAmount.setTextColor(groupExpense.getSignedPrice() < 0 ? mRed : mGreen);
-                txtBaseCurrency.setText(getMainCurrencySymbol());
-                txtBaseCurrency.setTextColor(groupExpense.getSignedPrice() < 0 ? mRed : mGreen);
+                pieChart.setPieData(preparePieData(getAllChildrenToParent(groupExpense)));
+                txtTitle22.setText(groupExpense.getTitle());
+                txtPrice.setText(String.format(mContext.getResources().getConfiguration().locale, "%.2f", groupExpense.getSignedPrice()));
+                txtPrice.setTextColor(groupExpense.getSignedPrice() < 0 ? mRed : mGreen);
+                txtCurrencySymbol.setText(getMainCurrencySymbol());
+                txtCurrencySymbol.setTextColor(groupExpense.getSignedPrice() < 0 ? mRed : mGreen);
+                txtPerson2.setText("");// sollen User bei einer Multiuser funktionalität auch bei ParentBuchungen angezeigt werden || falls nicht, einen leeren string übergeben sodass das Format gleich bleibt!
                 break;
             case DATE_PLACEHOLDER:
 
-                convertView = inflater.inflate(R.layout.activity_test_exp_listview_list_group_sep_date, null);
+                convertView = inflater.inflate(R.layout.activity_exp_listview_date, null);
 
                 TextView date = (TextView) convertView.findViewById(R.id.exp_listview_sep_header_date);
                 date.setText(groupExpense.getDate());
                 break;
             case NORMAL_EXPENSE:
 
-                convertView = inflater.inflate(R.layout.activity_test_exp_listview_list_group_child_n, null);
+                convertView = inflater.inflate(R.layout.activity_exp_listview_group, null);
 
                 RoundedTextView roundedTextView = (RoundedTextView) convertView.findViewById(R.id.booking_item_circle);
                 TextView txtTitle2 = (TextView) convertView.findViewById(R.id.booking_item_title);
@@ -137,7 +142,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 String category = groupExpense.getCategory().getTitle();
                 roundedTextView.setTextColor(Color.WHITE);
                 roundedTextView.setCenterText(category.substring(0, 1).toUpperCase());
-                roundedTextView.setCircleColor(groupExpense.getCategory().getColor());
+                roundedTextView.setCircleColor(groupExpense.getCategory().getColorString());
                 txtTitle2.setText(groupExpense.getTitle());
                 //TODO wenn es eine Multiuser funktionalität muss hier der benutzer eingetragen werden, der das Geld ausgegeben hat
                 txtPerson.setText("");
@@ -150,7 +155,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             case TRANSFER_EXPENSE:
 
                 //todo eigenes layout für tramsfer expenses definieren
-                convertView = inflater.inflate(R.layout.activity_test_exp_listview_list_group_child_n, null);
+                convertView = inflater.inflate(R.layout.activity_exp_listview_group, null);
 
                 RoundedTextView roundedTextView3 = (RoundedTextView) convertView.findViewById(R.id.booking_item_circle);
                 TextView txtTitle3 = (TextView) convertView.findViewById(R.id.booking_item_title);
@@ -169,7 +174,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 String category2 = groupExpense.getCategory().getTitle();
                 roundedTextView3.setTextColor(Color.WHITE);
                 roundedTextView3.setCenterText(category2.substring(0, 1).toUpperCase());
-                roundedTextView3.setCircleColor(groupExpense.getCategory().getColor());
+                roundedTextView3.setCircleColor(groupExpense.getCategory().getColorString());
                 txtTitle3.setText(groupExpense.getTitle());
                 //TODO wenn es eine Multiuser funktionalität muss hier der benutzer eingetragen werden, der das Geld ausgegeben hat
                 txtPerson3.setText("");
@@ -183,6 +188,34 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         }
 
         return convertView;
+    }
+
+    /**
+     * Methode um die Datensätze eines PieCharts erstellen soll.
+     *
+     * @param expenses Buchungen
+     * @return DataSets
+     */
+    private List<DataSet> preparePieData(List<ExpenseObject> expenses) {
+
+        List<DataSet> dataSets = new ArrayList<>();
+        Map<Category, Integer> summedCategories = new HashMap<>();
+
+        for (ExpenseObject expense : expenses) {
+            Category category = expense.getCategory();
+            Integer count = summedCategories.get(category);
+
+            if (count != null)
+                summedCategories.put(category, count + 1);
+            else
+                summedCategories.put(category, 1);
+        }
+
+        for (Map.Entry<Category, Integer> category : summedCategories.entrySet()) {
+            dataSets.add(new DataSet(category.getValue(), category.getKey().getColorInt(), category.getKey().getTitle()));
+        }
+
+        return dataSets;
     }
 
     /**
@@ -217,7 +250,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
             childViewHolder = new ChildViewHolder();
             LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.activity_test_exp_listview_list_item, null);
+            convertView = inflater.inflate(R.layout.activity_exp_listview_child, null);
 
             childViewHolder.roundedTextView = (RoundedTextView) convertView.findViewById(R.id.exp_list_view_item_circle);
             childViewHolder.txtTitle = (TextView) convertView.findViewById(R.id.exp_list_view_item_title);
@@ -236,7 +269,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
         childViewHolder.roundedTextView.setTextColor(Color.WHITE);
         childViewHolder.roundedTextView.setCenterText(category.substring(0, 1).toUpperCase());
-        childViewHolder.roundedTextView.setCircleColor(childExpense.getCategory().getColor());
+        childViewHolder.roundedTextView.setCircleColor(childExpense.getCategory().getColorString());
         childViewHolder.roundedTextView.setCircleDiameter(33);
         childViewHolder.txtTitle.setText(childExpense.getTitle());
         //TODO wenn es eine Multiuser funktionalität muss hier der benutzer eingetragen werden, der das Geld ausgegeben hat
@@ -244,6 +277,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         childViewHolder.txtPaidPrice.setText(String.format(mContext.getResources().getConfiguration().locale, "%.2f", childExpense.getUnsignedPrice()));
         childViewHolder.txtPaidPrice.setTextColor(childExpense.isExpenditure() ? mRed : mGreen);
         childViewHolder.txtBaseCurrency.setText(getMainCurrencySymbol());
+        childViewHolder.txtBaseCurrency.setTextColor(childExpense.isExpenditure() ? mRed : mGreen);
 
         return convertView;
     }
@@ -335,7 +369,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
     public int getSelectedParentCount() {
         int count = 0;
-        for(ExpenseObject expense : mSelectedGroups) {
+        for (ExpenseObject expense : mSelectedGroups) {
             if (expense.isParent())
                 count++;
         }

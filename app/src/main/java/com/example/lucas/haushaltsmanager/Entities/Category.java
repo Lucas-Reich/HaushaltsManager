@@ -79,9 +79,20 @@ public class Category implements Parcelable {
         this.name = name;
     }
 
-    public String getColor() {
+    public String getColorString() {
 
         return this.color;
+    }
+
+    /**
+     * Methode um den Integerwert der Farbe zu ermitteln.
+     *
+     * @return ColorInt
+     */
+    @ColorInt
+    public int getColorInt() {
+
+        return (int) Long.parseLong(color.substring(1), 16);
     }
 
     public void setColor(@NonNull String color) {
@@ -135,7 +146,7 @@ public class Category implements Parcelable {
     public boolean equals(Category otherCategory) {
 
         boolean result = getTitle().equals(otherCategory.getTitle());
-        result = result && getColor().equals(otherCategory.getColor());
+        result = result && getColorString().equals(otherCategory.getColorString());
         result = result && (getDefaultExpenseType() == otherCategory.getDefaultExpenseType());
 
         return result;
@@ -143,7 +154,7 @@ public class Category implements Parcelable {
 
     public String toString() {
 
-        return getIndex() + " " + getTitle() + " " + getColor();
+        return getIndex() + " " + getTitle() + " " + getColorString();
     }
 
     /**
