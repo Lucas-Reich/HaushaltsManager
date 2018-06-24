@@ -91,7 +91,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         boolean isSelected = isGroupSelected(groupExpense);
 
         switch (groupExpense.getExpenseType()) {
-            
+
             case PARENT_EXPENSE:
 
                 convertView = inflater.inflate(R.layout.activity_exp_listview_parent, null);
@@ -221,6 +221,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
      * Klasse um nicht bei jedem Child die Objekte neu erstellen zu müssen
      */
     private class ChildViewHolder {
+
         RoundedTextView roundedTextView;
         TextView txtTitle;
         TextView txtPerson;
@@ -402,6 +403,20 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     }
 
     /**
+     * Methode um alle ausgewählten KindBuchungen inklusive ihres Parents zu bekommen.
+     */
+    public HashMap<Long, ExpenseObject> getSelectedMappedChildData() {
+
+        HashMap<Long, ExpenseObject> mappedSelectedChildren = new HashMap<>();
+        for (ExpenseObject child : mSelectedChildren) {
+
+            mappedSelectedChildren.put(getParentForChildBooking(child).getIndex(), child);
+        }
+
+        return mappedSelectedChildren;
+    }
+
+    /**
      * Methode um alle Kindbuchungen zu einer ParentBuchung zu bekommen.
      *
      * @param parentExpense ParentBuchung
@@ -409,5 +424,21 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
      */
     public List<ExpenseObject> getAllChildrenToParent(ExpenseObject parentExpense) {
         return mChildData.get(parentExpense);
+    }
+
+    /**
+     * Methode um die ParentBuchung einer KindBuchung zu erhalten.
+     *
+     * @param childBooking KinDBuchung
+     * @return Parent der KindBuchung oder NULL
+     */
+    public ExpenseObject getParentForChildBooking(ExpenseObject childBooking) {
+
+        for (Map.Entry<ExpenseObject, List<ExpenseObject>> entry : mChildData.entrySet()) {
+            if (entry.getValue().contains(childBooking))
+                return entry.getKey();
+        }
+
+        return null;
     }
 }

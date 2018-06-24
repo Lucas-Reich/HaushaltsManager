@@ -41,7 +41,11 @@ public class PriceInputDialog extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
         final Bundle args = getArguments();
+        String title = args.containsKey("title") ? args.getString("title") : "";
+
         final EditText input = createInputView();
+        String hint = args.containsKey("hint") ? args.getString("hint") : getString(R.string.placeholder_amount);
+        input.setHint(hint);
 
         //wrapper für die text eingabe, sodass dieser eine padding gegeben werden kann
         //Quelle: http://android.pcsalt.com/create-alertdialog-with-custom-layout-programmatically/
@@ -52,7 +56,7 @@ public class PriceInputDialog extends DialogFragment {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 
-        builder.setTitle(args.getString("title"));
+        builder.setTitle(title);
 
         builder.setView(layout);
 

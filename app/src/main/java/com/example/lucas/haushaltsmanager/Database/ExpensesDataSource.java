@@ -103,6 +103,8 @@ public class ExpensesDataSource {
      * @return An remapped ExpenseObject
      */
     private ExpenseObject cursorToExpense(Cursor c) {
+        if (c.isAfterLast())
+            return null;
 
         int expenseId = c.getInt(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_ID));
 

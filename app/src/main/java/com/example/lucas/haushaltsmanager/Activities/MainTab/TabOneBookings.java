@@ -7,7 +7,9 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -32,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TabOneBookings extends Fragment {
     private static final String TAG = TabOneBookings.class.getSimpleName();
@@ -88,6 +91,9 @@ public class TabOneBookings extends Fragment {
         updateExpListView();
 
         final Activity mainTab = getActivity();
+
+
+        final CoordinatorLayout coordinatorLayout = (CoordinatorLayout) rootView.findViewById(R.id.tab_one_bookings_layout);
 
 
         fabBig = (FloatingActionButton) rootView.findViewById(R.id.fab);
@@ -186,11 +192,13 @@ public class TabOneBookings extends Fragment {
             @Override
             public void onClick(View v) {
 
-                mDatabase.deleteChildBookings(mListAdapter.getSelectedChildData());
-                mDatabase.deleteBookings(mListAdapter.getSelectedGroupData());
+//                mDatabase.deleteChildBookings(mListAdapter.getSelectedChildData());
+//                mDatabase.deleteBookings(mListAdapter.getSelectedGroupData());
+                showSnackbar(coordinatorLayout, mListAdapter.getSelectedGroupData(), mListAdapter.getSelectedMappedChildData());
 
                 resetActivityViewState();
-                //todo snackbar einfügen die es ermöglicht die aktion wieder rückgängig zu machen
+
+//                mSnackbar.show();// todo die zu löschenden Buchungen werden nicht in der UndoDeletionClickListener gespeichert und können daher auch nicht wiederhergestellt werden
             }
         });
 
@@ -755,5 +763,45 @@ public class TabOneBookings extends Fragment {
      */
     public void closeFabSmallLeft() {
         closeFab(fabSmallLeft);
+    }
+
+    private void showSnackbar(View v, ArrayList<ExpenseObject> groups, HashMap<Long, ExpenseObject> children) {
+
+        Snackbar test = Snackbar.make(v, "Hallo", Snackbar.LENGTH_LONG).setAction("Revert", new UndoDeletionClickListener(groups, children));
+        test.show();
+    }
+
+    /**
+     * Klasse die einen ClickListener für gelöschte Buchungen implementiert, welcher die gelöschten GroupBuchungen und ChildBuchungen als Argumente übernimmt.
+     */
+    class UndoDeletionClickListener implements View.OnClickListener {
+
+        private ArrayList<ExpenseObject> mDeletedGroups;
+        private HashMap<Long, ExpenseObject> mDeletedChildren;
+
+        UndoDeletionClickListener(ArrayList<ExpenseObject> deletedGroups, HashMap<Long, ExpenseObject> deletedChildren) {
+
+            mDeletedGroups = deletedGroups;
+            mDeletedChildren = deletedChildren;
+        }
+
+        @Override
+        public void onClick(View v) {
+            mDatabase.createBookings(mDeletedGroups);
+
+            for (final Map.Entry<Long, ExpenseObject> deletedChild : mDeletedChildren.entrySet()) {
+                ExpenseObject parentExpense = mDatabase.getBookingById(deletedChild.getKey());
+
+                if (parentExpense != null) {
+                    mDatabase.addChildToBooking(deletedChild.getValue(), parentExpense);
+                } else {
+                    mDatabase.combineAsChildBookings(new ArrayList<ExpenseObject>() {{
+                        deletedChild.getKey();
+                    }});
+                }
+
+                updateExpListView();
+            }
+        }
     }
 }

@@ -194,23 +194,20 @@ public class ExpenseScreenActivity extends AppCompatActivity {
 
         mAccountBtn.setText(mExpense.getAccount().getTitle());
 
-        mCategoryBtn.setHint(R.string.choose_category);
-        mCategoryBtn.setText(mExpense.getCategory().getTitle());
+        mCategoryBtn.setHint(mExpense.getCategory().getTitle());
 
         mDateBtn.setText(mExpense.getDisplayableDateTime());
 
-        mTitleBtn.setHint(R.string.input_title);
-        mTitleBtn.setText(mExpense.getTitle());
+        mTitleBtn.setHint(mExpense.getTitle());
 
         mTags = mDatabase.getAllTags();
         initializeAutComTxtView(mTags);
         for (Tag tag : mExpense.getTags())//kann ich einfach alle tags einer buchung nehmen oder gibt es fälle, in denen die liste noch nicht initialisiert ist?
             showTagInMultiView(tag);
 
-        mNoticeBtn.setHint(R.string.input_notice);
-        mNoticeBtn.setText(mExpense.getNotice());
+        mNoticeBtn.setHint(mExpense.getNotice());
 
-        mPriceTxt.setText(String.format("%s", mExpense.getUnsignedPrice()));
+        mPriceTxt.setHint(String.format(getResources().getConfiguration().locale, "%.2f", mExpense.getUnsignedPrice()));
         mPriceTxt.setOnClickListener(new View.OnClickListener() {
 
             @Override
