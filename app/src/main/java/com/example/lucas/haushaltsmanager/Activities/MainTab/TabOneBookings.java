@@ -51,6 +51,8 @@ public class TabOneBookings extends Fragment {
     FloatingActionButton fabBig, fabSmallTop, fabSmallLeft;
     Animation openFabAnim, closeFabAnim, rotateForwardAnim, rotateBackwardAnim;
     boolean fabBigIsAnimated = false;
+    private ArrayList<ExpenseObject> mExpensesToDelete = new ArrayList<>();
+    private HashMap<Long, ExpenseObject> mMappedChildrenToDelete = new HashMap<>();
 
 
     @Override
@@ -192,13 +194,24 @@ public class TabOneBookings extends Fragment {
             @Override
             public void onClick(View v) {
 
+                final String string = "BlaKeks";
+                final ArrayList<ExpenseObject> expenses = mExpensesToDelete;
+                expenses.add(ExpenseObject.createDummyExpense(getContext()));
+                expenses.add(ExpenseObject.createDummyExpense(getContext()));
+                expenses.add(ExpenseObject.createDummyExpense(getContext()));
 //                mDatabase.deleteChildBookings(mListAdapter.getSelectedChildData());
 //                mDatabase.deleteBookings(mListAdapter.getSelectedGroupData());
-                showSnackbar(coordinatorLayout, mListAdapter.getSelectedGroupData(), mListAdapter.getSelectedMappedChildData());
+//                showSnackbar(coordinatorLayout, mListAdapter.getSelectedGroupData(), mListAdapter.getSelectedMappedChildData());
+                Snackbar snackbar = Snackbar.make(coordinatorLayout, "Hallo", Snackbar.LENGTH_LONG).setAction("Click", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        Toast.makeText(getContext(), "" + expenses.size(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+                snackbar.show();
 
                 resetActivityViewState();
-
-//                mSnackbar.show();// todo die zu löschenden Buchungen werden nicht in der UndoDeletionClickListener gespeichert und können daher auch nicht wiederhergestellt werden
             }
         });
 
@@ -763,6 +776,24 @@ public class TabOneBookings extends Fragment {
      */
     public void closeFabSmallLeft() {
         closeFab(fabSmallLeft);
+    }
+
+    private void restoreBookings() {
+        mDatabase.createBookings(mExpensesToDelete);
+
+        for (final Map.Entry<Long, ExpenseObject> deletedChild : mMappedChildrenToDelete.entrySet()) {
+            ExpenseObject parentExpense = mDatabase.getBookingById(deletedChild.getKey());
+
+            if (parentExpense != null) {
+                mDatabase.addChildToBooking(deletedChild.getValue(), parentExpense);
+            } else {
+                mDatabase.combineAsChildBookings(new ArrayList<ExpenseObject>() {{
+                    deletedChild.getKey();
+                }});
+            }
+
+            updateExpListView();
+        }
     }
 
     private void showSnackbar(View v, ArrayList<ExpenseObject> groups, HashMap<Long, ExpenseObject> children) {
