@@ -1,82 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:paddingBottom="5dp"
-    android:paddingEnd="12dp"
-    android:paddingLeft="0dp"
-    android:paddingRight="12dp"
-    android:paddingStart="0dp"
-    android:paddingTop="10dp">
+    android:layout_height="wrap_content">
 
-    <ImageView
-        android:id="@+id/expandable_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
-        android:contentDescription="arrow state image"
-        android:paddingEnd="9dp"
-        android:paddingLeft="9dp"
-        android:paddingRight="9dp"
-        android:paddingStart="9dp"
-        android:visibility="invisible"
-        app:srcCompat="@drawable/ic_expand_more_black_24dp"/>
+    <com.example.lucas.haushaltsmanager.Views.PieChart.PieChart
+        android:id="@+id/exp_listview_parent_v2_pie_chart"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="10dp"/>
 
-    <TableLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        >
+        android:layout_gravity="center"
+        android:layout_marginEnd="12dp"
+        android:layout_marginRight="12dp"
+        android:orientation="vertical">
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:paddingBottom="5dp">
+            android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/exp_listview_header_name"
+                android:id="@+id/exp_listview_parent_v2_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="start"
                 android:layout_weight="1"
-                android:text="BookingName"/>
+                android:text="Buchungstitel"
+                android:textColor="@android:color/black"
+                android:textSize="21sp"/>
 
             <TextView
-                android:id="@+id/exp_listview_header_total_amount"
+                android:id="@+id/exp_listview_parent_v2_price"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
-                android:text="0.00"
-                android:textAlignment="textEnd"
+                android:text="20"
                 android:textSize="16sp"/>
 
             <TextView
-                android:id="@+id/exp_listview_header_base_currency"
+                android:id="@+id/exp_listview_parent_v2_currency_symbol"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="start"
                 android:text="€"
                 android:textSize="16sp"/>
-
         </TableRow>
 
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <View
-                android:id="@+id/exp_listview_parent_divider"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
+            <TextView
+                android:id="@+id/exp_listview_parent_v2_person"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
                 android:layout_weight="1"
-                android:background="@color/colorPrimary"/>
-
+                android:text="Lucas"
+                android:textColor="@android:color/black"
+                android:textSize="12sp"/>
         </TableRow>
 
-    </TableLayout>
+        <View
+            android:id="@+id/exp_listview_parent_v2_divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider"
+            />
+
+    </LinearLayout>
 
 </LinearLayout>

@@ -257,10 +257,16 @@ public class TabOneBookings extends Fragment {
                         //ignoriere Datumstrenner
                         return true;
                     case PARENT_EXPENSE:
-                        if (!mListAdapter.isGroupSelected(groupExpense) && groupExpense.getExpenseType() != ExpenseObject.EXPENSE_TYPES.DATE_PLACEHOLDER) {
+                        if (!mListAdapter.isGroupSelected(groupExpense)) {
                             if (hasUserSelectedItems())
                                 mListAdapter.selectGroup(groupExpense);
                             animateFabs(mListAdapter.getSelectedGroupCount(), mListAdapter.getSelectedChildCount(), mListAdapter.getSelectedParentCount());
+                        } else {
+                            mListAdapter.removeGroupFromList(groupExpense);
+                            animateFabs(mListAdapter.getSelectedGroupCount(), mListAdapter.getSelectedChildCount(), mListAdapter.getSelectedParentCount());
+
+                            if (mListAdapter.getSelectedItemsCount() == 0)
+                                enableLongClick();
                         }
                         return false;
                     case NORMAL_EXPENSE:

@@ -184,11 +184,6 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
 
         switch (item.getItemId()) {
 
-            case R.id.action_settings:
-
-                Toast.makeText(this, "replace", Toast.LENGTH_SHORT).show();
-                break;
-
             case R.id.choose_account:
 
                 ChooseAccountsDialogFragment chooseAccountFragment = new ChooseAccountsDialogFragment();

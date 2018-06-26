@@ -13,7 +13,7 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 
 public class RoundedTextView extends ViewUtils {
-    private static String TAG = RoundedTextView.class.getSimpleName();
+    private final static String TAG = RoundedTextView.class.getSimpleName();
 
     private Paint mCirclePaint;
     private int mDesiredSize = ViewUtils.dpToPx(40);
@@ -21,7 +21,7 @@ public class RoundedTextView extends ViewUtils {
     private Rect mTextBounds;
     private Paint mTextPaint;
     private String mCenterText = "";
-    private float mTextSize = 50f;//todo schriftgröße des angezeigten Buchstabens soll abhängig von der viewgröße sein
+    private float mTextSize = 62f;//todo schriftgröße des angezeigten Buchstabens soll abhängig von der viewgröße sein
 
     public RoundedTextView(Context context) {
         super(context);

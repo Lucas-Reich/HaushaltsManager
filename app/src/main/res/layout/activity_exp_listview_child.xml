@@ -6,6 +6,7 @@
     android:layout_height="wrap_content"
     android:paddingLeft="?android:attr/expandableListPreferredChildPaddingLeft"
     android:paddingStart="?android:attr/expandableListPreferredChildPaddingLeft"
+    android:paddingTop="5dp"
     tools:ignore="RtlSymmetry">
 
     <com.example.lucas.haushaltsmanager.Views.RoundedTextView
@@ -86,7 +87,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_weight="1"
-                android:background="@color/colorPrimary"/>
+                android:background="?android:attr/listDivider"/>
 
         </TableRow>
 

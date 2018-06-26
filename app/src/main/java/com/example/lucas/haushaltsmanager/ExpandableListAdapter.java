@@ -3,12 +3,10 @@ package com.example.lucas.haushaltsmanager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.lucas.haushaltsmanager.Entities.Category;
@@ -20,7 +18,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
     @SuppressWarnings("unused")
@@ -91,14 +88,17 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
         ExpenseObject groupExpense = (ExpenseObject) getGroup(groupPosition);
         LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        boolean isSelected = isGroupSelected(groupExpense);
 
         switch (groupExpense.getExpenseType()) {
             
             case PARENT_EXPENSE:
 
-                convertView = inflater.inflate(R.layout.activity_exp_listview_parent_ver2, null);
+                convertView = inflater.inflate(R.layout.activity_exp_listview_parent, null);
                 if (isExpanded)
                     convertView.findViewById(R.id.exp_listview_parent_v2_divider).setVisibility(View.GONE);
+                if (isSelected)
+                    convertView.setBackgroundColor(mContext.getResources().getColor(R.color.highlighted_item_color));
 
                 PieChart pieChart = (PieChart) convertView.findViewById(R.id.exp_listview_parent_v2_pie_chart);
                 TextView txtTitle22 = (TextView) convertView.findViewById(R.id.exp_listview_parent_v2_title);
@@ -124,20 +124,14 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             case NORMAL_EXPENSE:
 
                 convertView = inflater.inflate(R.layout.activity_exp_listview_group, null);
+                if (isSelected)
+                    convertView.setBackgroundColor(mContext.getResources().getColor(R.color.highlighted_item_color));
 
                 RoundedTextView roundedTextView = (RoundedTextView) convertView.findViewById(R.id.booking_item_circle);
                 TextView txtTitle2 = (TextView) convertView.findViewById(R.id.booking_item_title);
                 TextView txtPerson = (TextView) convertView.findViewById(R.id.booking_item_person);
                 TextView txtPaidPrice = (TextView) convertView.findViewById(R.id.booking_item_paid_price);
                 TextView txtPaidCurrency = (TextView) convertView.findViewById(R.id.booking_item_currency_paid);
-
-
-                //if group is selected by the user the entry has to be highligted on redrawing
-                if (mSelectedGroups.contains(getGroupId(groupPosition))) {
-
-                    convertView.setBackgroundColor(mContext.getResources().getColor(R.color.highlighted_item_color));
-                }
-
 
                 String category = groupExpense.getCategory().getTitle();
                 roundedTextView.setTextColor(Color.WHITE);
@@ -156,20 +150,14 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
                 //todo eigenes layout für tramsfer expenses definieren
                 convertView = inflater.inflate(R.layout.activity_exp_listview_group, null);
+                if (isSelected)
+                    convertView.setBackgroundColor(mContext.getResources().getColor(R.color.highlighted_item_color));
 
                 RoundedTextView roundedTextView3 = (RoundedTextView) convertView.findViewById(R.id.booking_item_circle);
                 TextView txtTitle3 = (TextView) convertView.findViewById(R.id.booking_item_title);
                 TextView txtPerson3 = (TextView) convertView.findViewById(R.id.booking_item_person);
                 TextView txtPaidPrice3 = (TextView) convertView.findViewById(R.id.booking_item_paid_price);
                 TextView txtPaidCurrency3 = (TextView) convertView.findViewById(R.id.booking_item_currency_paid);
-
-
-                //if group is selected by the user the entry has to be highligted on redrawing
-                if (mSelectedGroups.contains(getGroupId(groupPosition))) {
-
-                    convertView.setBackgroundColor(mContext.getResources().getColor(R.color.highlighted_item_color));
-                }
-
 
                 String category2 = groupExpense.getCategory().getTitle();
                 roundedTextView3.setTextColor(Color.WHITE);
