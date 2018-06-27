@@ -6,9 +6,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
@@ -25,6 +27,8 @@ public class CreateAccountActivity extends AppCompatActivity implements BasicTex
     Button mAccountBalanceBtn, mCreateAccountBtn;
     ExpensesDataSource mDatabase;
     Account mAccount;
+    private ImageButton mBackArrow;
+    private Toolbar mToolbar;
 
     private enum CREATION_MODES {
         CREATE_ACCOUNT,
@@ -67,11 +71,25 @@ public class CreateAccountActivity extends AppCompatActivity implements BasicTex
         mAccountNameBtn = (Button) findViewById(R.id.new_account_name);
         mAccountBalanceBtn = (Button) findViewById(R.id.new_account_balance);
         mCreateAccountBtn = (Button) findViewById(R.id.new_account_create);
+
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
+        mBackArrow = (ImageButton) findViewById(R.id.back_arrow);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        mBackArrow.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                finish();
+            }
+        });
 
         mAccountNameBtn.setHint(mAccount.getTitle());
         mAccountNameBtn.setOnClickListener(new View.OnClickListener() {

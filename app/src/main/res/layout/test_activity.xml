@@ -7,6 +7,11 @@
     android:orientation="vertical"
     >
 
+    <include
+        layout="@layout/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
     <MultiAutoCompleteTextView
         android:id="@+id/multiTextView"
         android:layout_width="match_parent"

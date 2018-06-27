@@ -3,6 +3,7 @@ package com.example.lucas.haushaltsmanager.Activities;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.MultiAutoCompleteTextView;
 import android.widget.TextView;
 
@@ -25,10 +27,36 @@ public class TestActivity extends AppCompatActivity {
     private List<Tag> mTagsToCreate = new ArrayList<>();
     private List<Tag> mTags = new ArrayList<>();
 
+    private Toolbar mToolbar;
+    private ImageButton mBackArrow;
+
     @Override
     public void onCreate(Bundle savedInstances) {
         super.onCreate(savedInstances);
         setContentView(R.layout.test_activity);
+
+
+        mTagAutoCompTxt = (MultiAutoCompleteTextView) findViewById(R.id.multiTextView);
+        initializeAutComTxtView(mTags);
+
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
+        mBackArrow = (ImageButton) findViewById(R.id.back_arrow);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        mBackArrow.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                finish();
+            }
+        });
 
         mTags.add(new Tag("eins"));
         mTags.add(new Tag("zwei"));
@@ -40,11 +68,6 @@ public class TestActivity extends AppCompatActivity {
         mTags.add(new Tag("acht"));
         mTags.add(new Tag("neun"));
         mTags.add(new Tag("zehn"));
-
-
-        mTagAutoCompTxt = (MultiAutoCompleteTextView) findViewById(R.id.multiTextView);
-        initializeAutComTxtView(mTags);
-
     }
 
     /**
