@@ -85,7 +85,7 @@ public class RoundedTextView extends ViewUtils {
     protected void onDraw(Canvas canvas) {
 
         canvas.drawCircle(mViewBounds.centerX(), mViewBounds.centerY(), mViewBounds.width() / 2, mCirclePaint);
-        canvas.drawText(mCenterText, mViewBounds.centerX() - (mTextBounds.width() / 2), mViewBounds.centerY() + (mTextBounds.width() / 2), mTextPaint);
+        canvas.drawText(mCenterText, mViewBounds.centerX() - (mTextBounds.width() / 2), mViewBounds.centerY() + (mTextBounds.height() / 2), mTextPaint);
     }
 
     public void setCenterText(@NonNull String centerText) {
