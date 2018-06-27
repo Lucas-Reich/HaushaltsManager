@@ -96,15 +96,15 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
                 convertView = inflater.inflate(R.layout.activity_exp_listview_parent, null);
                 if (isExpanded)
-                    convertView.findViewById(R.id.exp_listview_parent_v2_divider).setVisibility(View.GONE);
+                    convertView.findViewById(R.id.exp_listview_paren_divider).setVisibility(View.GONE);
                 if (isSelected)
                     convertView.setBackgroundColor(mContext.getResources().getColor(R.color.highlighted_item_color));
 
-                PieChart pieChart = (PieChart) convertView.findViewById(R.id.exp_listview_parent_v2_pie_chart);
-                TextView txtTitle22 = (TextView) convertView.findViewById(R.id.exp_listview_parent_v2_title);
-                TextView txtPrice = (TextView) convertView.findViewById(R.id.exp_listview_parent_v2_price);
-                TextView txtCurrencySymbol = (TextView) convertView.findViewById(R.id.exp_listview_parent_v2_currency_symbol);
-                TextView txtPerson2 = (TextView) convertView.findViewById(R.id.exp_listview_parent_v2_person);
+                PieChart pieChart = (PieChart) convertView.findViewById(R.id.exp_listview_parent_pie_chart);
+                TextView txtTitle22 = (TextView) convertView.findViewById(R.id.exp_listview_parent_title);
+                TextView txtPrice = (TextView) convertView.findViewById(R.id.exp_listview_parent_price);
+                TextView txtCurrencySymbol = (TextView) convertView.findViewById(R.id.exp_listview_parent_currency_symbol);
+                TextView txtPerson2 = (TextView) convertView.findViewById(R.id.exp_listview_parent_person);
 
                 pieChart.setPieData(preparePieData(getAllChildrenToParent(groupExpense)));
                 txtTitle22.setText(groupExpense.getTitle());
@@ -127,11 +127,11 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 if (isSelected)
                     convertView.setBackgroundColor(mContext.getResources().getColor(R.color.highlighted_item_color));
 
-                RoundedTextView roundedTextView = (RoundedTextView) convertView.findViewById(R.id.booking_item_circle);
-                TextView txtTitle2 = (TextView) convertView.findViewById(R.id.booking_item_title);
-                TextView txtPerson = (TextView) convertView.findViewById(R.id.booking_item_person);
-                TextView txtPaidPrice = (TextView) convertView.findViewById(R.id.booking_item_paid_price);
-                TextView txtPaidCurrency = (TextView) convertView.findViewById(R.id.booking_item_currency_paid);
+                RoundedTextView roundedTextView = (RoundedTextView) convertView.findViewById(R.id.exp_listview_group_rounded_textview);
+                TextView txtTitle2 = (TextView) convertView.findViewById(R.id.exp_listview_group_title);
+                TextView txtPerson = (TextView) convertView.findViewById(R.id.exp_listview_group_person);
+                TextView txtPaidPrice = (TextView) convertView.findViewById(R.id.exp_listview_group_price);
+                TextView txtPaidCurrency = (TextView) convertView.findViewById(R.id.exp_listview_group_currency_symbol);
 
                 String category = groupExpense.getCategory().getTitle();
                 roundedTextView.setTextColor(Color.WHITE);
@@ -153,11 +153,11 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 if (isSelected)
                     convertView.setBackgroundColor(mContext.getResources().getColor(R.color.highlighted_item_color));
 
-                RoundedTextView roundedTextView3 = (RoundedTextView) convertView.findViewById(R.id.booking_item_circle);
-                TextView txtTitle3 = (TextView) convertView.findViewById(R.id.booking_item_title);
-                TextView txtPerson3 = (TextView) convertView.findViewById(R.id.booking_item_person);
-                TextView txtPaidPrice3 = (TextView) convertView.findViewById(R.id.booking_item_paid_price);
-                TextView txtPaidCurrency3 = (TextView) convertView.findViewById(R.id.booking_item_currency_paid);
+                RoundedTextView roundedTextView3 = (RoundedTextView) convertView.findViewById(R.id.exp_listview_group_rounded_textview);
+                TextView txtTitle3 = (TextView) convertView.findViewById(R.id.exp_listview_group_title);
+                TextView txtPerson3 = (TextView) convertView.findViewById(R.id.exp_listview_group_person);
+                TextView txtPaidPrice3 = (TextView) convertView.findViewById(R.id.exp_listview_group_price);
+                TextView txtPaidCurrency3 = (TextView) convertView.findViewById(R.id.exp_listview_group_currency_symbol);
 
                 String category2 = groupExpense.getCategory().getTitle();
                 roundedTextView3.setTextColor(Color.WHITE);
