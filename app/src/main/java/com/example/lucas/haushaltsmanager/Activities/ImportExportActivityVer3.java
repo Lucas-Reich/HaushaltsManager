@@ -8,6 +8,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -32,6 +33,7 @@ public class ImportExportActivityVer3 extends AppCompatActivity implements Direc
     private FloatingActionButton mAddExportFab;
     private Button mSelectDirectoryBtn;
     private Toolbar mToolbar;
+    private ImageButton mBackArrow;
     private File mSelectedDirectory;
 
     private enum SupportedFileExtensions {
@@ -54,12 +56,25 @@ public class ImportExportActivityVer3 extends AppCompatActivity implements Direc
         mListView = (ListView) findViewById(R.id.activity_import_importable_files_list);
         mAddExportFab = (FloatingActionButton) findViewById(R.id.activity_import_add_export_btn);
         mSelectDirectoryBtn = (Button) findViewById(R.id.activity_import_directory_picker);
+
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
+        mBackArrow = (ImageButton) findViewById(R.id.back_arrow);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        mBackArrow.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                finish();
+            }
+        });
 
         mSelectDirectoryBtn.setOnClickListener(new View.OnClickListener() {
             @Override
