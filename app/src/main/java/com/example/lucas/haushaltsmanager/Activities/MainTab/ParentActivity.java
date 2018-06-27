@@ -158,6 +158,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
         preferences.edit().putString("mainCurrencySymbol", mainCurrency.getSymbol()).apply();
         database.close();
     }
+
     @Override
     public void onBackPressed() {
 
