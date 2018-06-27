@@ -145,7 +145,7 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Adap
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-        CheckedTextView accountChk = (CheckedTextView) view.findViewById(R.id.list_view_account_item_account_chk);
+        CheckedTextView accountChk = (CheckedTextView) view.findViewById(R.id.listview_account_item_chkbox);
         if (accountChk.isChecked()) {
 
             mCheckedAccounts.set(position, false);
