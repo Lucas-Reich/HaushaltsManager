@@ -68,20 +68,9 @@ public class AccountAdapter extends ArrayAdapter<Account> {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        viewHolder.layout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                if (viewHolder.account_chk.isChecked())
-                    viewHolder.account_chk.setChecked(false);
-                else
-                    viewHolder.account_chk.setChecked(true);
-            }
-        });
-
         viewHolder.account_chk.setChecked(mCheckedItems.get(position));
         viewHolder.account_name.setText(account.getTitle());
-        viewHolder.account_balance.setText("100");
+        viewHolder.account_balance.setText(String.format(getContext().getResources().getConfiguration().locale, "%.2f", account.getBalance()));
         viewHolder.account_overflow_menu.setOnClickListener(new OnAccountOverflowSelectedListener(getContext(), account));
 
         return convertView;
