@@ -1,8 +1,10 @@
 package com.example.lucas.haushaltsmanager.Activities;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -13,9 +15,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.codekidlabs.storagechooser.StorageChooser;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationAlertDialog;
-import com.example.lucas.haushaltsmanager.Dialogs.DirectoryPickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ErrorAlertDialog;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.ExpenseObjectExporter;
@@ -80,17 +82,22 @@ public class ImportExportActivity extends AppCompatActivity implements Confirmat
         mSelectDirectoryBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                getReadExternalStoragePermission();
 
-                Bundle bundle = new Bundle();
-                bundle.putString("title", getString(R.string.choose_directory));
-                bundle.putString("search_mode", DirectoryPickerDialog.SEARCH_MODE_DIRECTORY);
+                StorageChooser choose = new StorageChooser.Builder()
+                        .withActivity(ImportExportActivity.this)
+                        .withFragmentManager(getFragmentManager())
+                        .withMemoryBar(true)
+                        .allowAddFolder(true)
+                        .allowCustomPath(true)
+                        .setType(StorageChooser.DIRECTORY_CHOOSER)
+                        .build();
+                choose.show();
+                choose.setOnSelectListener(new StorageChooser.OnSelectListener() {
 
-                DirectoryPickerDialog directoryPicker = new DirectoryPickerDialog();
-                directoryPicker.setArguments(bundle);
-                directoryPicker.setDirectoryChosenListener(new DirectoryPickerDialog.OnDirectorySelected() {
                     @Override
-                    public void onDirectorySelected(File file, String tag) {
-
+                    public void onSelect(String directory) {
+                        File file = new File(directory);
                         mSelectDirectoryBtn.setText(file.getName());
                         mSelectedDirectory = file;
 
@@ -100,7 +107,6 @@ public class ImportExportActivity extends AppCompatActivity implements Confirmat
                         updateListView();
                     }
                 });
-                directoryPicker.show(getFragmentManager(), "import_select_directory");
             }
         });
 
@@ -151,6 +157,15 @@ public class ImportExportActivity extends AppCompatActivity implements Confirmat
 
         getImportableFilesInDirectory(new File(getFilesDir().toString()));
         updateListView();
+    }
+
+    /**
+     * Methode um die Berechtigung zum lesen und schreiben des externen Speichers zu erhalten
+     */
+    private void getReadExternalStoragePermission() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            ActivityCompat.requestPermissions(this, new String[]{"android.permission.READ_EXTERNAL_STORAGE"}, 0);
+        }
     }
 
     /**

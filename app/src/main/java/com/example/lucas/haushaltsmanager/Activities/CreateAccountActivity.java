@@ -20,7 +20,7 @@ import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.R;
 
-public class CreateAccountActivity extends AppCompatActivity implements BasicTextInputDialog.BasicDialogCommunicator, PriceInputDialog.OnPriceSelected {
+public class CreateAccountActivity extends AppCompatActivity implements PriceInputDialog.OnPriceSelected {
     private static final String TAG = CreateAccountActivity.class.getSimpleName();
 
     Button mAccountNameBtn;
@@ -102,6 +102,17 @@ public class CreateAccountActivity extends AppCompatActivity implements BasicTex
                 args.putString("hint", mAccount.getTitle());
 
                 BasicTextInputDialog basicDialog = new BasicTextInputDialog();
+                basicDialog.setOnTextInputListener(new BasicTextInputDialog.BasicDialogCommunicator() {
+
+                    @Override
+                    public void onTextInput(String textInput, String tag) {
+
+                        mAccount.setName(textInput);
+                        mAccountNameBtn.setText(mAccount.getTitle());
+
+                        Log.d(TAG, "set Account name to" + mAccount.getTitle());
+                    }
+                });
                 basicDialog.setArguments(args);
                 basicDialog.show(getFragmentManager(), "create_account_name");
             }
@@ -167,18 +178,6 @@ public class CreateAccountActivity extends AppCompatActivity implements BasicTex
             CreateAccountActivity.this.startActivity(startMainTab);
         }
     };
-
-    @Override
-    public void onTextInput(String textInput, String tag) {
-
-        if (tag.equals("create_account_name")) {
-
-            mAccount.setName(textInput);
-            mAccountNameBtn.setText(mAccount.getTitle());
-
-            Log.d(TAG, "set Account name to" + mAccount.getTitle());
-        }
-    }
 
     @Override
     public void onPriceSelected(double price, String tag) {

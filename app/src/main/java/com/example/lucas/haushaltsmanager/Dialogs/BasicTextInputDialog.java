@@ -26,15 +26,7 @@ public class BasicTextInputDialog extends DialogFragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-
-        try {
-
-            mCallback = (BasicDialogCommunicator) context;
-            mContext = context;
-        } catch (ClassCastException e) {
-
-            throw new ClassCastException(context.toString() + " must implement BasicDialogCommunicator");
-        }
+        mContext = context;
     }
 
     @Override
@@ -48,11 +40,11 @@ public class BasicTextInputDialog extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
         Bundle bundle = getArguments();
-        String dialogTitle = bundle.getString("title") != null ? bundle.getString("title") : "";
+        String dialogTitle = bundle.containsKey("title") ? bundle.getString("title") : "";
         final EditText mTextInput = createInputView();
         mTextInput.setMaxLines(1);
         mTextInput.setInputType(InputType.TYPE_CLASS_TEXT);
-        mTextInput.setHint(bundle.getString("hint") != null ? bundle.getString("hint") : "");
+        mTextInput.setHint(bundle.containsKey("hint") ? bundle.getString("hint") : "");
         mTextInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -115,6 +107,16 @@ public class BasicTextInputDialog extends DialogFragment {
             input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
 
         return input;
+    }
+
+    /**
+     * Methode um einen Listener zu registrieren, welcher aufgerufen wird, wenn der User den Text einegegeben hat.
+     *
+     * @param listener Listener, welcher aufgerufen werden soll
+     */
+    public void setOnTextInputListener(BasicTextInputDialog.BasicDialogCommunicator listener) {
+
+        mCallback = listener;
     }
 
     public interface BasicDialogCommunicator {

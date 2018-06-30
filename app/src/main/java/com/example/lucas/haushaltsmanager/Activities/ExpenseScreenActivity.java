@@ -45,7 +45,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-public class ExpenseScreenActivity extends AppCompatActivity implements AccountPickerDialog.OnAccountSelected, BasicTextInputDialog.BasicDialogCommunicator, PriceInputDialog.OnPriceSelected, com.example.lucas.haushaltsmanager.Dialogs.DatePickerDialog.OnDateSelected, FrequencyAlertDialog.OnFrequencySet {
+public class ExpenseScreenActivity extends AppCompatActivity implements AccountPickerDialog.OnAccountSelected, PriceInputDialog.OnPriceSelected, com.example.lucas.haushaltsmanager.Dialogs.DatePickerDialog.OnDateSelected, FrequencyAlertDialog.OnFrequencySet {
     private static final String TAG = ExpenseScreenActivity.class.getSimpleName();
 
     private creationModes CREATION_MODE;
@@ -612,6 +612,14 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AccountP
                 bundle.putString("title", getResources().getString(R.string.input_title));
 
                 basicDialog.setArguments(bundle);
+                basicDialog.setOnTextInputListener(new BasicTextInputDialog.BasicDialogCommunicator() {
+
+                    @Override
+                    public void onTextInput(String textInput, String tag) {
+
+                        setTitle(textInput);
+                    }
+                });
                 basicDialog.show(getFragmentManager(), "expense_screen_title");
                 break;
 
@@ -629,6 +637,14 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AccountP
                 bundle.putString("title", getResources().getString(R.string.input_notice));
 
                 basicDialog.setArguments(bundle);
+                basicDialog.setOnTextInputListener(new BasicTextInputDialog.BasicDialogCommunicator() {
+
+                    @Override
+                    public void onTextInput(String textInput, String tag) {
+
+                        setNotice(textInput);
+                    }
+                });
                 basicDialog.show(getFragmentManager(), "expense_screen_notice");
                 break;
 
@@ -810,31 +826,6 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AccountP
     public void onAccountSelected(Account account, String tag) {
         if (tag.equals("expense_screen_account"))
             setAccount(account);
-    }
-
-    /**
-     * Methode die den Callback des BasicTextInputDialogs implementiert
-     *
-     * @param textInput Daten die vom user eigegeben wurden
-     * @param tag       Dialog tag
-     */
-    @Override
-    public void onTextInput(String textInput, String tag) {
-
-        if (textInput.isEmpty())
-            return; //todo throw error, log
-
-        switch (tag) {
-
-            case "expense_screen_title":
-
-                setTitle(textInput);
-                break;
-            case "expense_screen_notice":
-
-                setNotice(textInput);
-                break;
-        }
     }
 
     /**

@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CreateBackupActivity extends AppCompatActivity implements BasicTextInputDialog.BasicDialogCommunicator {
+public class CreateBackupActivity extends AppCompatActivity {
     private static final String TAG = CreateBackupActivity.class.getSimpleName();
 
     private FloatingActionButton mCreateBackupFab;
@@ -125,6 +125,14 @@ public class CreateBackupActivity extends AppCompatActivity implements BasicText
                 bundle.putString("title", getResources().getString(R.string.choose_new_backup_name));
 
                 BasicTextInputDialog basicDialog = new BasicTextInputDialog();
+                basicDialog.setOnTextInputListener(new BasicTextInputDialog.BasicDialogCommunicator() {
+
+                    @Override
+                    public void onTextInput(String textInput, String tag) {
+
+                        createBackup(textInput);
+                    }
+                });
                 basicDialog.setArguments(bundle);
                 basicDialog.show(getFragmentManager(), "create_backup_name");
             }
@@ -255,14 +263,5 @@ public class CreateBackupActivity extends AppCompatActivity implements BasicText
         }
 
         return backups;
-    }
-
-    @Override
-    public void onTextInput(String textInput, String tag) {
-
-        if (tag.equals("create_backup_name")) {
-
-            createBackup(textInput);
-        }
     }
 }

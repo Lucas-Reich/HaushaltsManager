@@ -125,8 +125,6 @@
     <string name="error_parent_already_highlighted">Kinder einer bereits ausgewählten Parentbuchung können nicht ausgewählt werden!</string>
     <string name="import_bookings_confirmation">Bist du sicher, dass du die Ausgewählten Buchungen importieren möchtest?</string>
     <string name="confirmation_dialog_title">Bestätige Auswahl</string>
-    <string name="tab_export_title">Exportieren</string>
-    <string name="tab_import_title">Importieren</string>
     <string name="export_directory_confirmation">Bist du sicher, dass du die Buchungen in das aktuell ausgewählte Verzeichniss exportieren möchtest?</string>
     <string name="create_export">Erstelle Export</string>
     <string name="btn_yes">Ja</string>
@@ -134,4 +132,6 @@
     <string name="error_no_directory_selected">Um fortzufahren musst du zuerst ein Verzeichniss auswählen!</string>
     <string name="hint_choose_directory">Klicke hier um einen Speicherort auszuwählen</string>
     <string name="no_files_to_import">In diesem Verzeichniss gibt es keine Datein die importiert werden können!</string>
+    <string name="create_new_directory">Erstelle Verzeichniss</string>
+    <string name="directory_already_existing">Fehler! Das Verzeichniss gibt es bereits!</string>
 </resources>

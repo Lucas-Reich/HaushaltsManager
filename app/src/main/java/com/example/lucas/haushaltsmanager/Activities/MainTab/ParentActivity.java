@@ -50,15 +50,6 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tab_main_mit_nav_drawer);
 
-
-        // todo im DirectoryPickerDialog nach der Berechtigung für den externen Speicher fragen
-//        if (Build.VERSION.SDK_INT >= 23) {
-//            ActivityCompat.requestPermissions(this, new String[]{"android.permission.READ_EXTERNAL_STORAGE"}, 0);
-//            //prüfe ob die berechtigung auch gegeben wurde
-//            // int permissionCheck = ContextCompat.checkSelfPermission(this, "android.permission.READ_EXTERNAL_STORAGE");
-//        }
-
-
         //todo in die user einstellungen verlagern
         setSharedPreferencesProperties();
 

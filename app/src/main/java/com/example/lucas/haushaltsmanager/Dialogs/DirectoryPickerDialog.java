@@ -14,7 +14,9 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import com.codekidlabs.storagechooser.StorageChooser;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.io.File;
@@ -30,6 +32,7 @@ public class DirectoryPickerDialog extends DialogFragment {
     private File mCurrentDir;
     private List<String> mSubDirectories;
     private String mSearchMode;// todo funktionalität implementieren
+    private boolean mAllowDirectoryCreation = true;// todo set false
 
     public static final String SEARCH_MODE_DIRECTORY = "directory";
     public static final String SEARCH_MODE_FILE = "file";
@@ -81,7 +84,45 @@ public class DirectoryPickerDialog extends DialogFragment {
             }
         });
 
+        if (mAllowDirectoryCreation) {
+
+            dialog.setNeutralButton(R.string.create_new_directory, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+
+                    BasicTextInputDialog textInputDialog = new BasicTextInputDialog();
+                    textInputDialog.setArguments(new Bundle());
+                    textInputDialog.setOnTextInputListener(new BasicTextInputDialog.BasicDialogCommunicator() {
+
+                        @Override
+                        public void onTextInput(String textInput, String tag) {
+
+                            Toast.makeText(mContext, textInput, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    textInputDialog.show(getFragmentManager(), "penis");
+                    String newDirName = "neuesDir"; // todo den namen des verzeichnisses vom user erfragen
+
+                    File newDir = new File(mCurrentDir.toString() + newDirName);
+                    createNewDirectory(newDir);
+                }
+            });
+        }
+
         return dialog.create();
+    }
+
+    /**
+     * Methode um ein neues Verzeichniss zu erstellen.
+     *
+     * @param directory Zu erstellendes Verzeichniss
+     */
+    private void createNewDirectory(File directory) {
+        if (!directory.exists())
+            directory.mkdir();
+        else
+            Toast.makeText(mContext, R.string.directory_already_existing, Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -158,6 +199,16 @@ public class DirectoryPickerDialog extends DialogFragment {
         mListView.setAdapter(mAdapter);
 
         mAdapter.notifyDataSetChanged();
+    }
+
+    /**
+     * Methode um es dem User zu erlauben ein neues Verzeichniss zu erstellen.
+     *
+     * @param allow TRUE wenn es erlaubt sein soll, FALSE wenn nicht.
+     */
+    public void allowDirectoryCreation(boolean allow) {
+
+        mAllowDirectoryCreation = allow;
     }
 
     /**
