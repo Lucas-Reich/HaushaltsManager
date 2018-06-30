@@ -50,6 +50,15 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tab_main_mit_nav_drawer);
 
+
+        // todo im DirectoryPickerDialog nach der Berechtigung für den externen Speicher fragen
+//        if (Build.VERSION.SDK_INT >= 23) {
+//            ActivityCompat.requestPermissions(this, new String[]{"android.permission.READ_EXTERNAL_STORAGE"}, 0);
+//            //prüfe ob die berechtigung auch gegeben wurde
+//            // int permissionCheck = ContextCompat.checkSelfPermission(this, "android.permission.READ_EXTERNAL_STORAGE");
+//        }
+
+
         //todo in die user einstellungen verlagern
         setSharedPreferencesProperties();
 
@@ -118,6 +127,9 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
                         ParentActivity.this.startActivity(backupIntent);
                         break;
                     case R.id.import_export:
+
+                        //Intent importExportIntent = new Intent(ParentActivity.this, ImportExportActivityVer2.class);
+                        //ParentActivity.this.startActivity(importExportIntent);
 
                         Intent importExportIntent = new Intent(ParentActivity.this, ImportExportActivity.class);
                         ParentActivity.this.startActivity(importExportIntent);
@@ -216,16 +228,14 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
 
             switch (position) {
                 case 0:
-
                     return new TabOneBookings();
                 case 1:
-
                     return new TabTwoMonthlyReports();
                 case 2:
-
                     return new TabThree();
+                default:
+                    return null;
             }
-            return null;
         }
 
         @Override
