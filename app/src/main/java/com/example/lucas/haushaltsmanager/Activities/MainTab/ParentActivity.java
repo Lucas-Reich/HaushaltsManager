@@ -5,13 +5,11 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -29,7 +27,7 @@ import android.widget.Toast;
 import com.example.lucas.haushaltsmanager.Activities.CategoryListActivity;
 import com.example.lucas.haushaltsmanager.Activities.CourseActivity;
 import com.example.lucas.haushaltsmanager.Activities.CreateBackupActivity;
-import com.example.lucas.haushaltsmanager.Activities.ImportExportActivityVer3;
+import com.example.lucas.haushaltsmanager.Activities.ImportExportActivity;
 import com.example.lucas.haushaltsmanager.Activities.RecurringBookingsActivity;
 import com.example.lucas.haushaltsmanager.Activities.TestActivity;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
@@ -133,7 +131,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
                         //Intent importExportIntent = new Intent(ParentActivity.this, ImportExportActivityVer2.class);
                         //ParentActivity.this.startActivity(importExportIntent);
 
-                        Intent importExportIntent = new Intent(ParentActivity.this, ImportExportActivityVer3.class);
+                        Intent importExportIntent = new Intent(ParentActivity.this, ImportExportActivity.class);
                         ParentActivity.this.startActivity(importExportIntent);
                         break;
                     case R.id.preferences:

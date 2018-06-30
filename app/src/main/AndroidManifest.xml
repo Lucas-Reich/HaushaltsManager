@@ -51,14 +51,6 @@
             android:label="TestPieChart"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
         <activity
-            android:name=".Activities.ImportExportActivity"
-            android:label="ExportImportActivity"
-            android:parentActivityName=".Activities.MainTab.ParentActivity"/>
-        <activity
-            android:name=".Activities.ImportExportTab.ImportExportActivityVer2"
-            android:label="@string/title_activity_import_export_ver2"
-            android:theme="@style/AppTheme"/>
-        <activity
             android:name=".Activities.CreateBackupActivity"
             android:label="CreateBackupActivity"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
@@ -69,7 +61,7 @@
             android:name=".Activities.CourseActivity"
             android:label="CourseActivity"/>
         <activity
-            android:name=".Activities.ImportExportActivityVer3"
+            android:name=".Activities.ImportExportActivity"
             android:label="ImportExportActivityVer3"/>
 
         <receiver

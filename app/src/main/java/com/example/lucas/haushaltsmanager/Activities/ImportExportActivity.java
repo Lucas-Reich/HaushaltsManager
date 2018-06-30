@@ -1,87 +1,72 @@
 package com.example.lucas.haushaltsmanager.Activities;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
-import com.example.lucas.haushaltsmanager.Dialogs.AccountPickerDialog;
-import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
+import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationAlertDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.DirectoryPickerDialog;
-import com.example.lucas.haushaltsmanager.Entities.Account;
+import com.example.lucas.haushaltsmanager.Dialogs.ErrorAlertDialog;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+import com.example.lucas.haushaltsmanager.ExpenseObjectExporter;
+import com.example.lucas.haushaltsmanager.FileAdapter;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.List;
 
-public class ImportExportActivity extends AppCompatActivity implements AccountPickerDialog.OnAccountSelected, BasicTextInputDialog.BasicDialogCommunicator {
-    private static final String TAG = ImportExportActivity.class.getSimpleName();
+public class ImportExportActivity extends AppCompatActivity implements ConfirmationAlertDialog.OnConfirmationResult {
 
-    Button mAccountBtn, mFileNameBtn, mDirectoryBtn, mFromDateBtn, mUntilDateBtn, mCreateExportBtn, mImportBtn;
-    CheckBox mExpenseChk, mIncomeChk, mSetStartDateChk, mSetEndDateChk;
-    ArrayList<ExpenseObject> mExpenses;
-    ExpensesDataSource mDatabase;
-    Account mChosenAccount;
-    Calendar mCalendar;
-    Bundle mBundle;
-    ImageButton mBackArrow;
-    Toolbar mToolbar;
+    private List<File> mSelectableFileList;
+    private ListView mListView;
+    private File mSelectedFile;
+    private FloatingActionButton mAddExportFab;
+    private Button mSelectDirectoryBtn;
+    private ImageButton mBackArrow;
+    private File mSelectedDirectory;
 
-    File mExportsDirectory;
-    String mFileName;
-    final String mFileExtension = ".csv";
+    private enum SupportedFileExtensions {
+        CSV,
+        CUSTOM_FILE_EXTENSION;
+
+        @Override
+        public String toString() {
+            return super.toString().toLowerCase();
+        }
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_import_export);
 
-        mDatabase = new ExpensesDataSource(this);
-        mDatabase.open();
+        mSelectableFileList = new ArrayList<>();
 
-        mCalendar = Calendar.getInstance();
-        mBundle = new Bundle();
+        mListView = (ListView) findViewById(R.id.activity_import_importable_files_list);
+        mAddExportFab = (FloatingActionButton) findViewById(R.id.activity_import_add_export_btn);
+        mSelectDirectoryBtn = (Button) findViewById(R.id.activity_import_directory_picker);
 
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
         mBackArrow = (ImageButton) findViewById(R.id.back_arrow);
-
-        mAccountBtn = (Button) findViewById(R.id.import_export_account_btn);
-        mFileNameBtn = (Button) findViewById(R.id.import_export_file_name_btn);
-        mDirectoryBtn = (Button) findViewById(R.id.import_export_directory_btn);
-        mFromDateBtn = (Button) findViewById(R.id.import_export_from_btn);
-        mUntilDateBtn = (Button) findViewById(R.id.import_export_until_btn);
-        mCreateExportBtn = (Button) findViewById(R.id.import_export_create_export_btn);
-        mImportBtn = (Button) findViewById(R.id.import_export_import_btn);
-
-        mExpenseChk = (CheckBox) findViewById(R.id.import_export_expense_chk);
-        mIncomeChk = (CheckBox) findViewById(R.id.import_export_income_chk);
-        mSetStartDateChk = (CheckBox) findViewById(R.id.import_export_from_chk);
-        mSetEndDateChk = (CheckBox) findViewById(R.id.import_export_until_chk);
-
-        mExportsDirectory = new File(getFilesDir().toString() + "/Exports");
-        if (!mExportsDirectory.exists())
-            mExportsDirectory.mkdir();
-
-        mFileName = "Export_" + mCalendar.get(Calendar.YEAR) + "_" + mCalendar.get(Calendar.DAY_OF_MONTH) + "_" + (mCalendar.get(Calendar.MONTH) + 1);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
 
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
         mBackArrow.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -91,341 +76,161 @@ public class ImportExportActivity extends AppCompatActivity implements AccountPi
             }
         });
 
-        mAccountBtn.setOnClickListener(new View.OnClickListener() {
-
+        mSelectDirectoryBtn.setHint(R.string.hint_choose_directory);
+        mSelectDirectoryBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                mBundle.clear();
-                mBundle.putString("title", getResources().getString(R.string.choose_account));
-
-                AccountPickerDialog accountPicker = new AccountPickerDialog();
-                accountPicker.setArguments(mBundle);
-                accountPicker.show(getFragmentManager(), "choose_account");
-            }
-        });
-
-        mFileNameBtn.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-
-                mBundle.clear();
-                mBundle.putString("title", getResources().getString(R.string.choose_new_file_name));
-
-                BasicTextInputDialog dialog = new BasicTextInputDialog();
-                dialog.setArguments(mBundle);
-                dialog.show(getFragmentManager(), "choose_file_name");
-
-            }
-        });
-
-        mDirectoryBtn.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-
-                mBundle.clear();
-                mBundle.putString("title", getResources().getString(R.string.choose_directory));
+                Bundle bundle = new Bundle();
+                bundle.putString("title", getString(R.string.choose_directory));
+                bundle.putString("search_mode", DirectoryPickerDialog.SEARCH_MODE_DIRECTORY);
 
                 DirectoryPickerDialog directoryPicker = new DirectoryPickerDialog();
-                directoryPicker.setArguments(mBundle);
+                directoryPicker.setArguments(bundle);
                 directoryPicker.setDirectoryChosenListener(new DirectoryPickerDialog.OnDirectorySelected() {
                     @Override
                     public void onDirectorySelected(File file, String tag) {
 
-                        mExportsDirectory = file;
+                        mSelectDirectoryBtn.setText(file.getName());
+                        mSelectedDirectory = file;
+
+                        mSelectableFileList.clear();
+                        mSelectableFileList.addAll(getImportableFilesInDirectory(file));
+
+                        updateListView();
                     }
                 });
-                directoryPicker.show(getFragmentManager(), "choose_export_directory");
+                directoryPicker.show(getFragmentManager(), "import_select_directory");
             }
         });
 
-        mCreateExportBtn.setOnClickListener(new View.OnClickListener() {
+        TextView emptyListViewText = new TextView(this);
+        emptyListViewText.setText(R.string.no_files_to_import);
+        mListView.setEmptyView(emptyListViewText);
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+                mSelectedFile = mSelectableFileList.get(position);
+
+                Bundle bundle = new Bundle();
+                bundle.putString("title", getString(R.string.confirmation_dialog_title));
+                bundle.putString("message", getString(R.string.import_bookings_confirmation));
+
+                ConfirmationAlertDialog confirmationDialog = new ConfirmationAlertDialog();
+                confirmationDialog.setArguments(bundle);
+                confirmationDialog.show(getFragmentManager(), "import_confirm_import");
+            }
+        });
+
+        mAddExportFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                createFile(false);
+                if (mSelectedDirectory == null) {
+
+                    Bundle bundle = new Bundle();
+                    bundle.putString("title", getString(R.string.error));
+                    bundle.putString("message", getString(R.string.error_no_directory_selected));
+
+                    ErrorAlertDialog errorDialog = new ErrorAlertDialog();
+                    errorDialog.setArguments(bundle);
+                    errorDialog.show(getFragmentManager(), "import_error_export");
+                    return;
+                }
+
+                Bundle bundle = new Bundle();
+                bundle.putString("title", getString(R.string.create_export));
+                bundle.putString("message", getString(R.string.export_directory_confirmation));
+
+                ConfirmationAlertDialog confirmationDialog = new ConfirmationAlertDialog();
+                confirmationDialog.setArguments(bundle);
+                confirmationDialog.show(getFragmentManager(), "import_confirm_export");
             }
         });
 
-        mImportBtn.setOnClickListener(new View.OnClickListener() {
+        getImportableFilesInDirectory(new File(getFilesDir().toString()));
+        updateListView();
+    }
 
-            @Override
-            public void onClick(View v) {
-
-                mBundle.clear();
-                mBundle.putString("title", getResources().getString(R.string.choose_directory));
-
-                DirectoryPickerDialog importFilePicker = new DirectoryPickerDialog();
-                importFilePicker.setArguments(mBundle);
-                importFilePicker.setDirectoryChosenListener(new DirectoryPickerDialog.OnDirectorySelected() {
-                    @Override
-                    public void onDirectorySelected(File file, String tag) {
-
-                        importDataFromCsvFile(file);
+    /**
+     * Methode um alle Datein in einem Verzeichniss zu bekommen, die importiert werden können.
+     *
+     * @param path Pfad, welcher überprüft werden soll
+     * @return Liste mit den unterstützten Datein
+     */
+    private List<File> getImportableFilesInDirectory(File path) {
+        mSelectableFileList.clear();
+        if (path.listFiles() != null) {
+            for (File file : path.listFiles()) {
+                for (SupportedFileExtensions fileExtension : SupportedFileExtensions.values()) {
+                    if (file.getName().contains(fileExtension.toString())) {
+                        mSelectableFileList.add(file);
+                        break;
                     }
-                });
-                importFilePicker.show(getFragmentManager(), "choose_import_directory");
+                }
+
             }
-        });
-    }
-
-    /**
-     * Methode die überprüft ob der angegebene Dateiname keine Probleme macht
-     *
-     * @param fileName Dateinname
-     * @return boolean
-     */
-    private boolean isFileNameValid(String fileName) {
-
-        File file = new File(String.format("%s/%s%s", mExportsDirectory.toString(), fileName, mFileExtension));
-        return !file.exists();
-    }
-
-    /**
-     * Methode die überprüft ob alle nötigen Informationen gegeben sind, um ein ExpenseObject zu erstellen
-     * und ob die Datei eine Csv Datei ist.
-     *
-     * @return status der Datei
-     */
-    private boolean isDataFromFileValid(File file) {
-
-        //gucke ob die datei eine von mir erstellte datei ist
-        //  -> nein: andere formate werden noch nicht unterstützt
-
-        if (file.isDirectory())
-            return false;
-
-        if (!file.getName().contains(mFileExtension))
-            return false;
-
-        //todo checke die erste zeile der Datei nach den nötigen Informationen
-        return true;
-    }
-
-    /**
-     * Methode um einen AlertDialog zu erstellen, um den User auf einen Dateinamenskonflikt hinzuweisen.
-     */
-    private void createErrorAlertDialog(@StringRes int errorMessage) {
-
-        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-
-        dialog.setTitle(R.string.error);
-
-        dialog.setMessage(errorMessage);
-
-        dialog.setPositiveButton(R.string.overwrite_existing_file, new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-                createFile(true);
-            }
-        });
-
-        dialog.setNegativeButton(R.string.abort_file_writing, new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-                //do nothing
-            }
-        });
-
-        dialog.setNeutralButton(R.string.choose_new_file_name, new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-                mBundle.clear();
-                mBundle.putString("title", getResources().getString(R.string.input_file_name));
-
-                BasicTextInputDialog dialog1 = new BasicTextInputDialog();
-                dialog1.setArguments(mBundle);
-                dialog1.show(getFragmentManager(), "choose_file_name");
-            }
-        });
-
-        dialog.create().show();
-    }
-
-    /**
-     * Methode um die Daten aus einer Datei (eigenes oder fremdes Format) in die App Datenbankstruktur zu importieren.
-     *
-     * @param file Pfad zu der zu importierenden Datei
-     */
-    private void importDataFromCsvFile(File file) {
-
-        throw new UnsupportedOperationException("Importing Data is not supported!");
-/*
-        ArrayList<ExpenseObject> importetBookingData = new ArrayList<>();
-
-        if (isDataFromFileValid(file)) {
-
-            //öffne die datei
-
-            //lese die erste zeile aus
-
-            //speicher die elemente der ersten zeile (datenbankspaltennamen) in einer variablen
-
-            //gehe durch jede zeile der datei
-            for(String rowEntry : String FILECONTENTS) {
-
-                //wandle die raw daten in ExpenseObjects um mithilfe von stringToExpenseObject()
-                //speichere diese ExpenseObjects in importedBookingData
-                importedBookingData.add(stringToExpense(rowEntry));
-            }
-
-            //schreibe die ExpenseObjects aus importedBookingData in die Datenbank (createBookings)
-            mDatabase.createBookings(importedBookingData);
-
-            Toast.makeText(this, "Imported the data successfully!", Toast.LENGTH_SHORT).show();
         }
-*/
-    }//todo erstelle die import from csv methode
+        return new ArrayList<>();
+    }
 
     /**
-     * Methode um einen String mit ExpenseObject daten in ein ExpenseObject zu transformieren
-     *
-     * @param expenseString string expense data
-     * @return Umgewandeltes ExpenseObject
-     *///sollte ich dieser funktion auch noch die überschriften (erste zeile aus der Datei) mit übergeben?
-    private ExpenseObject stringToExpense(String expenseString) {
-
-        throw new UnsupportedOperationException("Transforming a string to an ExpenseObject is not supported!");
-/*
-        ExpenseObject expense = ExpenseObject.createDummyExpense(this);
-
-        return expense;
-*/
-    }//todo string to expense funktionalität implementieren
-
-    /**
-     * Methode um die Buchungen in eine Datei zu schreiben und diese Datei dann zu speichern
-     * Anleitung: https://stackoverflow.com/a/30074268/9376633
+     * Methode um die ListView nach einer Änderung anzuzeigen.
      */
-    private void createFile(boolean bypassValidation) {
+    private void updateListView() {
 
-        if (!bypassValidation || !isFileNameValid(mFileName)) {
+        FileAdapter fileAdapter = new FileAdapter(mSelectableFileList, this);
 
-            createErrorAlertDialog(R.string.file_already_existing_err_msg);
+        mListView.setAdapter(fileAdapter);
+
+        fileAdapter.notifyDataSetChanged();
+    }
+
+    /**
+     * Methode die den Callback des ConfirmationAlertDialogs implementiert.
+     *
+     * @param result Von user gegebene Antwort.
+     * @param tag    mitgesendetes Tag
+     */
+    @Override
+    public void onConfirmationResult(boolean result, String tag) {
+        if (!result)
             return;
-        }
 
+        switch (tag) {
+            case "import_confirm_import":
 
-        mExpenses = mDatabase.getBookings();
+                // todo aktivieren
+                // ExpenseObjectImporter fileImporter = new ExpenseObjectImporter(mSelectedFile, this);
+                // fileImporter.readAndSaveExpenseObjects();
 
-        //zeige via ladezeiten an wie lange die operation noch dauert
-        try {
+                Toast.makeText(this, R.string.not_implemented, Toast.LENGTH_SHORT).show();
+                break;
+            case "import_confirm_export":
 
-            PrintWriter printWriter = new PrintWriter(new File(String.format("%s/%s%s", mExportsDirectory.toString(), mFileName, mFileExtension)));
-            StringBuilder expensesString = new StringBuilder();
+                ExpenseObjectExporter fileExporter = new ExpenseObjectExporter(mSelectedDirectory);
+                fileExporter.convertAndExportExpenses(getAllExpenses());
 
-            //muss ich noch ein is_parent feld mit einfügen um die Kinder von ExpenseObjects später wieder zuzuordnen??
-            //muss ich auch noch ein parent_id feld einfügen um sicherzustellen dass kinder dem richtigen parent zugewiesen werden??
-            expensesString.append("_id").append(",");
-            expensesString.append("booking_id").append(",");
-            expensesString.append("price").append(",");
-            expensesString.append("expenditure").append(",");
-            expensesString.append("title").append(",");
-            expensesString.append("date").append(",");
-            expensesString.append("notice").append(",");
-            expensesString.append("exchange_rate").append(",");
-            expensesString.append("category_id").append(",");
-            expensesString.append("cat_name").append(",");
-            expensesString.append("color").append(",");
-            expensesString.append("expense_type").append(",");
-            expensesString.append("account_id").append(",");
-            expensesString.append("acc_name").append(",");
-            expensesString.append("balance").append(",");
-            expensesString.append("currency_id").append(",");
-            expensesString.append("cur_name").append(",");
-            expensesString.append("short_name").append(",");
-            expensesString.append("symbol").append(",");
-            expensesString.append("currency_id").append("\n");
-
-            for (ExpenseObject expense : mExpenses) {
-
-                expensesString.append(expenseObjectToString(expense));
-            }
-
-            printWriter.write(expensesString.toString());
-            printWriter.close();
-
-            Log.d(TAG, "Exported File to location: " + mExportsDirectory.toString());
-            //erstelle Toast bei erfolgreichem speichern mit message "Exported Data Succesfully"
-
-        } catch (FileNotFoundException e) {
-
-            Log.d(TAG, "Error while creating the csv exportFile file: " + e.toString());
+                getImportableFilesInDirectory(mSelectedDirectory);
+                updateListView();
+                break;
         }
     }
 
     /**
-     * Methode um ein ExpenseObject und alle seine Kinder in ein String zu transformieren
+     * Methode um alle Buchungen aus der Datenbank abzufragen.
+     * <p>
+     * TODO: 23.06.2018 Den User fragen welche Buchungen er genau exportieren möchte
      *
-     * @param expense ExpenseObject das umgewandelt werden soll
-     * @return ExpenseObject mit allen Kindern als String
+     * @return Alle Buchungen
      */
-    private StringBuilder expenseObjectToString(ExpenseObject expense) {
+    private ArrayList<ExpenseObject> getAllExpenses() {
+        ExpensesDataSource database = new ExpensesDataSource(this);
+        database.open();
+        ArrayList<ExpenseObject> expenses = database.getBookings();
+        database.close();
 
-        StringBuilder expenseString = new StringBuilder();
-
-        expenseString.append(expense.getIndex()).append(",");
-        expenseString.append(expense.getUnsignedPrice()).append(",");
-        expenseString.append(expense.isExpenditure()).append(",");
-        expenseString.append(expense.getTitle()).append(",");
-        expenseString.append(expense.getDate()).append(",");
-        expenseString.append(expense.getNotice()).append(",");
-        expenseString.append(expense.getCategory().getIndex()).append(",");
-        expenseString.append(expense.getCategory().getTitle()).append(",");
-        expenseString.append(expense.getCategory().getColorString()).append(",");
-        expenseString.append(expense.getCategory().getDefaultExpenseType()).append(",");
-        expenseString.append(expense.getAccount().getIndex()).append(",");
-        expenseString.append(expense.getAccount().getTitle()).append(",");
-        expenseString.append(expense.getAccount().getBalance()).append(",");
-
-        for (ExpenseObject expenseChild : expense.getChildren()) {
-
-            expenseString.append(expenseObjectToString(expenseChild));
-        }
-
-        return expenseString;
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        if (mDatabase.isOpen())
-            mDatabase.close();
-    }
-
-    @Override
-    public void onAccountSelected(Account account, String tag) {
-
-        if (tag.equals("choose_account")) {
-
-            mChosenAccount = account;
-            mAccountBtn.setText(mChosenAccount.getTitle());
-        }
-    }
-
-    @Override
-    public void onTextInput(String textInput, String tag) {
-
-        if (tag.equals("choose_file_name")) {
-
-            if (isFileNameValid(textInput)) {
-
-                mFileName = textInput;
-                mFileNameBtn.setText(mFileName);
-            } else {
-
-                createErrorAlertDialog(R.string.file_already_existing_err_msg);
-            }
-        }
+        return expenses;
     }
 }
