@@ -5,11 +5,13 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -27,13 +29,13 @@ import android.widget.Toast;
 import com.example.lucas.haushaltsmanager.Activities.CategoryListActivity;
 import com.example.lucas.haushaltsmanager.Activities.CourseActivity;
 import com.example.lucas.haushaltsmanager.Activities.CreateBackupActivity;
+import com.example.lucas.haushaltsmanager.Activities.ImportExportActivityVer3;
 import com.example.lucas.haushaltsmanager.Activities.RecurringBookingsActivity;
 import com.example.lucas.haushaltsmanager.Activities.TestActivity;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ChangeAccounts.ChooseAccountsDialogFragment;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
-import com.example.lucas.haushaltsmanager.Activities.ImportExportActivityVer3;
 import com.example.lucas.haushaltsmanager.MockDataCreator;
 import com.example.lucas.haushaltsmanager.MyAlarmReceiver;
 import com.example.lucas.haushaltsmanager.R;
@@ -49,6 +51,15 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tab_main_mit_nav_drawer);
+
+
+        // todo im DirectoryPickerDialog nach der Berechtigung für den externen Speicher fragen
+//        if (Build.VERSION.SDK_INT >= 23) {
+//            ActivityCompat.requestPermissions(this, new String[]{"android.permission.READ_EXTERNAL_STORAGE"}, 0);
+//            //prüfe ob die berechtigung auch gegeben wurde
+//            // int permissionCheck = ContextCompat.checkSelfPermission(this, "android.permission.READ_EXTERNAL_STORAGE");
+//        }
+
 
         //todo in die user einstellungen verlagern
         setSharedPreferencesProperties();

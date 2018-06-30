@@ -132,4 +132,6 @@
     <string name="btn_yes">Ja</string>
     <string name="btn_no">Nein</string>
     <string name="error_no_directory_selected">Um fortzufahren musst du zuerst ein Verzeichniss auswählen!</string>
+    <string name="hint_choose_directory">Klicke hier um einen Speicherort auszuwählen</string>
+    <string name="no_files_to_import">In diesem Verzeichniss gibt es keine Datein die importiert werden können!</string>
 </resources>

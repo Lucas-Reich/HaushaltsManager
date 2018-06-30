@@ -13,9 +13,9 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 
-import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
 import com.example.lucas.haushaltsmanager.Dialogs.AccountPickerDialog;
+import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.DirectoryPickerDialog;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
@@ -27,7 +27,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class ImportExportActivity extends AppCompatActivity implements AccountPickerDialog.OnAccountSelected, BasicTextInputDialog.BasicDialogCommunicator, DirectoryPickerDialog.OnDirectorySelected {
+public class ImportExportActivity extends AppCompatActivity implements AccountPickerDialog.OnAccountSelected, BasicTextInputDialog.BasicDialogCommunicator {
     private static final String TAG = ImportExportActivity.class.getSimpleName();
 
     Button mAccountBtn, mFileNameBtn, mDirectoryBtn, mFromDateBtn, mUntilDateBtn, mCreateExportBtn, mImportBtn;
@@ -130,6 +130,13 @@ public class ImportExportActivity extends AppCompatActivity implements AccountPi
 
                 DirectoryPickerDialog directoryPicker = new DirectoryPickerDialog();
                 directoryPicker.setArguments(mBundle);
+                directoryPicker.setDirectoryChosenListener(new DirectoryPickerDialog.OnDirectorySelected() {
+                    @Override
+                    public void onDirectorySelected(File file, String tag) {
+
+                        mExportsDirectory = file;
+                    }
+                });
                 directoryPicker.show(getFragmentManager(), "choose_export_directory");
             }
         });
@@ -153,6 +160,13 @@ public class ImportExportActivity extends AppCompatActivity implements AccountPi
 
                 DirectoryPickerDialog importFilePicker = new DirectoryPickerDialog();
                 importFilePicker.setArguments(mBundle);
+                importFilePicker.setDirectoryChosenListener(new DirectoryPickerDialog.OnDirectorySelected() {
+                    @Override
+                    public void onDirectorySelected(File file, String tag) {
+
+                        importDataFromCsvFile(file);
+                    }
+                });
                 importFilePicker.show(getFragmentManager(), "choose_import_directory");
             }
         });
@@ -412,22 +426,6 @@ public class ImportExportActivity extends AppCompatActivity implements AccountPi
 
                 createErrorAlertDialog(R.string.file_already_existing_err_msg);
             }
-        }
-    }
-
-    @Override
-    public void onDirectorySelected(File file, String tag) {
-
-        switch (tag) {
-
-            case "choose_export_directory":
-
-                mExportsDirectory = file;
-                break;
-            case "choose_import_directory":
-
-                importDataFromCsvFile(file);
-                break;
         }
     }
 }

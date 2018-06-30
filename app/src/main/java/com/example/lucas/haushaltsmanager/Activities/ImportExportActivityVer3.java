@@ -10,6 +10,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
@@ -25,14 +26,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ImportExportActivityVer3 extends AppCompatActivity implements DirectoryPickerDialog.OnDirectorySelected, ConfirmationAlertDialog.OnConfirmationResult {
+public class ImportExportActivityVer3 extends AppCompatActivity implements ConfirmationAlertDialog.OnConfirmationResult {
 
     private List<File> mSelectableFileList;
     private ListView mListView;
     private File mSelectedFile;
     private FloatingActionButton mAddExportFab;
     private Button mSelectDirectoryBtn;
-    private Toolbar mToolbar;
     private ImageButton mBackArrow;
     private File mSelectedDirectory;
 
@@ -57,7 +57,7 @@ public class ImportExportActivityVer3 extends AppCompatActivity implements Direc
         mAddExportFab = (FloatingActionButton) findViewById(R.id.activity_import_add_export_btn);
         mSelectDirectoryBtn = (Button) findViewById(R.id.activity_import_directory_picker);
 
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         mBackArrow = (ImageButton) findViewById(R.id.back_arrow);
     }
@@ -76,6 +76,7 @@ public class ImportExportActivityVer3 extends AppCompatActivity implements Direc
             }
         });
 
+        mSelectDirectoryBtn.setHint(R.string.hint_choose_directory);
         mSelectDirectoryBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -86,10 +87,26 @@ public class ImportExportActivityVer3 extends AppCompatActivity implements Direc
 
                 DirectoryPickerDialog directoryPicker = new DirectoryPickerDialog();
                 directoryPicker.setArguments(bundle);
+                directoryPicker.setDirectoryChosenListener(new DirectoryPickerDialog.OnDirectorySelected() {
+                    @Override
+                    public void onDirectorySelected(File file, String tag) {
+
+                        mSelectDirectoryBtn.setText(file.getName());
+                        mSelectedDirectory = file;
+
+                        mSelectableFileList.clear();
+                        mSelectableFileList.addAll(getImportableFilesInDirectory(file));
+
+                        updateListView();
+                    }
+                });
                 directoryPicker.show(getFragmentManager(), "import_select_directory");
             }
         });
 
+        TextView emptyListViewText = new TextView(this);
+        emptyListViewText.setText(R.string.no_files_to_import);
+        mListView.setEmptyView(emptyListViewText);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -144,14 +161,16 @@ public class ImportExportActivityVer3 extends AppCompatActivity implements Direc
      */
     private List<File> getImportableFilesInDirectory(File path) {
         mSelectableFileList.clear();
-        for (File file : path.listFiles()) {
-            for (SupportedFileExtensions fileExtension : SupportedFileExtensions.values()) {
-                if (file.getName().contains(fileExtension.toString())) {
-                    mSelectableFileList.add(file);
-                    break;
+        if (path.listFiles() != null) {
+            for (File file : path.listFiles()) {
+                for (SupportedFileExtensions fileExtension : SupportedFileExtensions.values()) {
+                    if (file.getName().contains(fileExtension.toString())) {
+                        mSelectableFileList.add(file);
+                        break;
+                    }
                 }
-            }
 
+            }
         }
         return new ArrayList<>();
     }
@@ -166,25 +185,6 @@ public class ImportExportActivityVer3 extends AppCompatActivity implements Direc
         mListView.setAdapter(fileAdapter);
 
         fileAdapter.notifyDataSetChanged();
-    }
-
-    /**
-     * Methode die von der ParentActivity aufgerufen wird, wenn der User ein neues Directory ausgewählt hat.
-     *
-     * @param file Pfad zum neuen Directory
-     */
-    @Override
-    public void onDirectorySelected(File file, String tag) {
-        if (tag.equals("import_select_directory") && file.isDirectory()) {
-
-            mSelectDirectoryBtn.setText(file.getName());
-            mSelectedDirectory = file;
-
-            mSelectableFileList.clear();
-            mSelectableFileList.addAll(getImportableFilesInDirectory(file));
-
-            updateListView();
-        }
     }
 
     /**

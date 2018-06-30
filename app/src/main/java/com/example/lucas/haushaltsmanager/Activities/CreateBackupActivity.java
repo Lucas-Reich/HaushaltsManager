@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CreateBackupActivity extends AppCompatActivity implements DirectoryPickerDialog.OnDirectorySelected, BasicTextInputDialog.BasicDialogCommunicator {
+public class CreateBackupActivity extends AppCompatActivity implements BasicTextInputDialog.BasicDialogCommunicator {
     private static final String TAG = CreateBackupActivity.class.getSimpleName();
 
     private FloatingActionButton mCreateBackupFab;
@@ -90,6 +90,19 @@ public class CreateBackupActivity extends AppCompatActivity implements Directory
 
                 DirectoryPickerDialog directoryPicker = new DirectoryPickerDialog();
                 directoryPicker.setArguments(bundle);
+                directoryPicker.setDirectoryChosenListener(new DirectoryPickerDialog.OnDirectorySelected() {
+                    @Override
+                    public void onDirectorySelected(File file, String tag) {
+
+                        if (validateDirectory(file)) {
+
+                            mBackupDirectory = file;
+                            mChooseDirectoryBtn.setText(mBackupDirectory.getName());
+
+                            updateListView();
+                        }
+                    }
+                });
                 directoryPicker.show(getFragmentManager(), "choose_directory");
             }
         });
@@ -242,21 +255,6 @@ public class CreateBackupActivity extends AppCompatActivity implements Directory
         }
 
         return backups;
-    }
-
-    @Override
-    public void onDirectorySelected(File file, String tag) {
-
-        if (tag.equals("choose_directory")) {
-
-            if (validateDirectory(file)) {
-
-                mBackupDirectory = file;
-                mChooseDirectoryBtn.setText(mBackupDirectory.getName());
-
-                updateListView();
-            }
-        }
     }
 
     @Override
