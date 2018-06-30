@@ -17,6 +17,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.codekidlabs.storagechooser.StorageChooser;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.DirectoryPickerDialog;
 import com.example.lucas.haushaltsmanager.R;
@@ -85,25 +86,27 @@ public class CreateBackupActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                Bundle bundle = new Bundle();
-                bundle.putString("title", getResources().getString(R.string.choose_directory));
+                StorageChooser storageChooser = new StorageChooser.Builder()
+                        .withActivity(CreateBackupActivity.this)
+                        .withFragmentManager(getFragmentManager())
+                        .withMemoryBar(true)
+                        .allowAddFolder(true)
+                        .allowCustomPath(true)
+                        .setType(StorageChooser.DIRECTORY_CHOOSER)
+                        .build();
 
-                DirectoryPickerDialog directoryPicker = new DirectoryPickerDialog();
-                directoryPicker.setArguments(bundle);
-                directoryPicker.setDirectoryChosenListener(new DirectoryPickerDialog.OnDirectorySelected() {
+                storageChooser.show();
+                storageChooser.setOnSelectListener(new StorageChooser.OnSelectListener() {
+
                     @Override
-                    public void onDirectorySelected(File file, String tag) {
+                    public void onSelect(String directory) {
 
-                        if (validateDirectory(file)) {
+                        mBackupDirectory = new File(directory);
+                        mChooseDirectoryBtn.setText(mBackupDirectory.getName());
 
-                            mBackupDirectory = file;
-                            mChooseDirectoryBtn.setText(mBackupDirectory.getName());
-
-                            updateListView();
-                        }
+                        updateListView();
                     }
                 });
-                directoryPicker.show(getFragmentManager(), "choose_directory");
             }
         });
 
