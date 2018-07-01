@@ -127,13 +127,34 @@ public class TabOneBookings extends Fragment {
                     bundle.putString("title", getResources().getString(R.string.input_title));
 
                     BasicTextInputDialog textInputDialog = new BasicTextInputDialog();
+                    textInputDialog.setOnTextInputListener(new BasicTextInputDialog.BasicDialogCommunicator() {
+                        @Override
+                        public void onTextInput(String title) {
+
+                            ExpenseObject parentBooking;
+                            if (mListAdapter.getSelectedGroupCount() == mListAdapter.getSelectedItemsCount()) {//Kombiniere Parentbuchungen
+
+                                parentBooking = mDatabase.combineAsChildBookings(mListAdapter.getSelectedGroupData());
+                                mExpenses.removeAll(mListAdapter.getSelectedGroupData());
+                            } else if (mListAdapter.getSelectedGroupCount() == mListAdapter.getSelectedItemsCount()) {//Kombiniere Groupbuchungen
+
+                                parentBooking = mDatabase.combineAsChildBookings(mListAdapter.getSelectedGroupData());
+                                mExpenses.removeAll(mListAdapter.getSelectedGroupData());
+                            } else {//Kombiniere Parent- und Groupbuchungen todo der titel sollte nich neu erstellt werden
+
+                                parentBooking = mDatabase.combineParentBookings(mListAdapter.getSelectedGroupData());
+                                mExpenses.removeAll(mListAdapter.getSelectedGroupData());
+                            }
+
+                            parentBooking.setTitle(title);
+                            mDatabase.updateBooking(parentBooking);
+                            mExpenses.add(0, parentBooking);
+
+                            resetActivityViewState();
+                        }
+                    });
                     textInputDialog.setArguments(bundle);
-                    if (mListAdapter.getSelectedGroupCount() == mListAdapter.getSelectedItemsCount())//Kombiniere Parentbuchungen
-                        textInputDialog.show(getActivity().getFragmentManager(), "tab_one_combine_parents");
-                    else if (mListAdapter.getSelectedGroupCount() == mListAdapter.getSelectedItemsCount())//Kombiniere Groupbuchungen
-                        textInputDialog.show(getActivity().getFragmentManager(), "tab_one_combine_groups");
-                    else if (mListAdapter.getSelectedGroupCount() >= 1 || mListAdapter.getSelectedParentCount() >= 1)//Kombiniere Parent- und Groupbuchungen todo der titel sollte nich neu erstellt werden
-                        textInputDialog.show(getActivity().getFragmentManager(), "tab_one_combine_parents_groups");
+                    textInputDialog.show(getActivity().getFragmentManager(), "");
                 }
 
                 if (addChildMode()) {

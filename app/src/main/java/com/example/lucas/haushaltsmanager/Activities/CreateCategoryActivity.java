@@ -56,7 +56,7 @@ public class CreateCategoryActivity extends AppCompatActivity {
                 basicDialog.setOnTextInputListener(new BasicTextInputDialog.BasicDialogCommunicator() {
 
                     @Override
-                    public void onTextInput(String textInput, String tag) {
+                    public void onTextInput(String textInput) {
 
                         mCategory.setName(textInput);
                         mCatNameBtn.setText(textInput);

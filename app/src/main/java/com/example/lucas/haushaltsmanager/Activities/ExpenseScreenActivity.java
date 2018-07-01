@@ -615,7 +615,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AccountP
                 basicDialog.setOnTextInputListener(new BasicTextInputDialog.BasicDialogCommunicator() {
 
                     @Override
-                    public void onTextInput(String textInput, String tag) {
+                    public void onTextInput(String textInput) {
 
                         setTitle(textInput);
                     }
@@ -640,7 +640,7 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AccountP
                 basicDialog.setOnTextInputListener(new BasicTextInputDialog.BasicDialogCommunicator() {
 
                     @Override
-                    public void onTextInput(String textInput, String tag) {
+                    public void onTextInput(String textInput) {
 
                         setNotice(textInput);
                     }

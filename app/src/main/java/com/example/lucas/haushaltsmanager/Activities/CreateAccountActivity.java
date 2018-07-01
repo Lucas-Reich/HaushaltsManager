@@ -105,7 +105,7 @@ public class CreateAccountActivity extends AppCompatActivity implements PriceInp
                 basicDialog.setOnTextInputListener(new BasicTextInputDialog.BasicDialogCommunicator() {
 
                     @Override
-                    public void onTextInput(String textInput, String tag) {
+                    public void onTextInput(String textInput) {
 
                         mAccount.setName(textInput);
                         mAccountNameBtn.setText(mAccount.getTitle());

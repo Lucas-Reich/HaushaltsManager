@@ -38,7 +38,7 @@ import com.example.lucas.haushaltsmanager.MockDataCreator;
 import com.example.lucas.haushaltsmanager.MyAlarmReceiver;
 import com.example.lucas.haushaltsmanager.R;
 
-public class ParentActivity extends AppCompatActivity implements ChooseAccountsDialogFragment.OnSelectedAccount, BasicTextInputDialog.BasicDialogCommunicator {
+public class ParentActivity extends AppCompatActivity implements ChooseAccountsDialogFragment.OnSelectedAccount {
     private static final String TAG = ParentActivity.class.getSimpleName();
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
@@ -282,18 +282,6 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
                     //todo ((TabThree) fragment).refreshListOnAccountSelected(accountId, isChecked);
                     break;
             }
-        }
-    }
-
-    @Override
-    public void onTextInput(String textInput, String tag) {
-
-        int visibleTabPosition = mTabLayout.getSelectedTabPosition();
-        Fragment fragment = getSupportFragmentManager().findFragmentByTag("android:switcher:" + mViewPager.getId() + ":" + visibleTabPosition);
-
-        if (tag.contains("tab_one")) {
-
-            ((TabOneBookings) fragment).onCombinedTitleSelected(textInput, tag);
         }
     }
 

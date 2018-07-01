@@ -96,7 +96,7 @@ public class DirectoryPickerDialog extends DialogFragment {
                     textInputDialog.setOnTextInputListener(new BasicTextInputDialog.BasicDialogCommunicator() {
 
                         @Override
-                        public void onTextInput(String textInput, String tag) {
+                        public void onTextInput(String textInput) {
 
                             Toast.makeText(mContext, textInput, Toast.LENGTH_SHORT).show();
                         }

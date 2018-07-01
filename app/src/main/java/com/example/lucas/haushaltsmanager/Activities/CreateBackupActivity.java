@@ -131,7 +131,7 @@ public class CreateBackupActivity extends AppCompatActivity {
                 basicDialog.setOnTextInputListener(new BasicTextInputDialog.BasicDialogCommunicator() {
 
                     @Override
-                    public void onTextInput(String textInput, String tag) {
+                    public void onTextInput(String textInput) {
 
                         createBackup(textInput);
                     }

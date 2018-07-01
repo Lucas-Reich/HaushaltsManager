@@ -27,14 +27,7 @@ public class BasicTextInputDialog extends DialogFragment {
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        try {
-
-            mCallback = (BasicDialogCommunicator) context;
-            mContext = context;
-        } catch (ClassCastException e) {
-
-            throw new ClassCastException(context.toString() + " must implement BasicDialogCommunicator");
-        }
+        mContext = context;
     }
 
     @Override
@@ -58,7 +51,7 @@ public class BasicTextInputDialog extends DialogFragment {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    mCallback.onTextInput(mTextInput.getText().toString(), getTag());
+                    mCallback.onTextInput(mTextInput.getText().toString());
                     dismiss();
 
                     return true;
@@ -84,7 +77,7 @@ public class BasicTextInputDialog extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                mCallback.onTextInput(mTextInput.getText().toString(), getTag());
+                mCallback.onTextInput(mTextInput.getText().toString());
                 dismiss();
             }
         });
@@ -129,6 +122,6 @@ public class BasicTextInputDialog extends DialogFragment {
 
     public interface BasicDialogCommunicator {
 
-        void onTextInput(String textInput, String tag);
+        void onTextInput(String textInput);
     }
 }
