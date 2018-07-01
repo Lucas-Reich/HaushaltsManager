@@ -6,12 +6,11 @@ import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.widget.TextView;
 
 import com.example.lucas.haushaltsmanager.R;
 
-public class ConfirmationAlertDialog extends DialogFragment {
-    private static final String TAG = ConfirmationAlertDialog.class.getSimpleName();
+public class ConfirmationDialog extends DialogFragment {
+    private static final String TAG = ConfirmationDialog.class.getSimpleName();
 
     private Context mContext;
     private OnConfirmationResult mCallback;
@@ -20,15 +19,7 @@ public class ConfirmationAlertDialog extends DialogFragment {
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        try {
-
-            mCallback = (OnConfirmationResult) context;
-            mContext = context;
-        } catch (ClassCastException e) {
-
-            throw new ClassCastException(context.toString() + " must implement OnConfirmationResult!");
-        }
-
+        mContext = context;
     }
 
     @Override
@@ -46,7 +37,7 @@ public class ConfirmationAlertDialog extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                mCallback.onConfirmationResult(true, getTag());
+                mCallback.onConfirmationResult(true);
             }
         });
 
@@ -54,14 +45,18 @@ public class ConfirmationAlertDialog extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                mCallback.onConfirmationResult(false, getTag());
+                mCallback.onConfirmationResult(false);
             }
         });
 
         return builder.create();
     }
 
+    public void setOnConfirmationListener(ConfirmationDialog.OnConfirmationResult listener) {
+        mCallback = listener;
+    }
+
     public interface OnConfirmationResult {
-        void onConfirmationResult(boolean result, String tag);
+        void onConfirmationResult(boolean result);
     }
 }

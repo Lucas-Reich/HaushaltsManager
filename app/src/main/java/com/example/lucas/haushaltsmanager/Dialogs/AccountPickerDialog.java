@@ -2,7 +2,6 @@ package com.example.lucas.haushaltsmanager.Dialogs;
 
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -19,19 +18,6 @@ public class AccountPickerDialog extends DialogFragment {
     private ExpensesDataSource mDatabase;
     private OnAccountSelected mCallback;
     private long excludedAccountId = -1;
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-        try {
-
-            mCallback = (OnAccountSelected) context;
-        } catch (ClassCastException e) {
-
-            throw new ClassCastException(context.toString() + " must implement OnAccountSelected");
-        }
-    }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -60,7 +46,7 @@ public class AccountPickerDialog extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int selectedAccount) {
 
-                mCallback.onAccountSelected(accounts.get(selectedAccount), getTag());
+                mCallback.onAccountSelected(accounts.get(selectedAccount));
                 mDatabase.close();
                 dismiss();
             }
@@ -111,8 +97,17 @@ public class AccountPickerDialog extends DialogFragment {
         mDatabase.close();
     }
 
+    /**
+     * Methode um einen Listener zu registrieren, welcher aufgerufen wird, wenn der User ein Konto ausgewählt hat.
+     *
+     * @param listener Listener
+     */
+    public void setOnAccountSelectedListener(AccountPickerDialog.OnAccountSelected listener) {
+        mCallback = listener;
+    }
+
     public interface OnAccountSelected {
 
-        void onAccountSelected(Account account, String tag);
+        void onAccountSelected(Account account);
     }
 }

@@ -93,6 +93,7 @@
     <string name="select_end_date">Until</string>
     <string name="input_date">Input Date</string>
     <string name="error_same_accounts">You cannot transfer from and to the same account!</string>
+    <!-- todo bessere übersetzung einfallen lassen -->
     <string name="error_missing_content">You have to set all values</string>
     <string name="btn_save">Save</string>
     <string name="input_title">Input Title</string>

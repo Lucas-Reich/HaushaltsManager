@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-public class TransferActivity extends AppCompatActivity implements AccountPickerDialog.OnAccountSelected, DatePickerDialog.OnDateSelected, PriceInputDialog.OnPriceSelected {
+public class TransferActivity extends AppCompatActivity {
     private static final String TAG = TransferActivity.class.getSimpleName();
 
     private Button mDateBtn, mFromAccountBtn, mToAccountBtn, mCreateTransferBtn, mAmountBtn;
@@ -112,6 +112,18 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
 
                 PriceInputDialog expenseInput = new PriceInputDialog();
                 expenseInput.setArguments(bundle);
+                expenseInput.setOnPriceSelectedListener(new PriceInputDialog.OnPriceSelected() {
+                    @Override
+                    public void onPriceSelected(double price) {
+                        SharedPreferences preferences = getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
+
+                        mFromExpense.setPrice(price);
+                        mFromExpense.setExpenditure(true);
+                        mAmountBtn.setText(String.format(getResources().getConfiguration().locale, "%.2f %s", mFromExpense.getUnsignedPrice(), preferences.getString("mainCurrencySymbol", "€")));
+
+                        setToExpense(price);
+                    }
+                });
                 expenseInput.show(getFragmentManager(), "transfers_amount_input");
             }
         });
@@ -130,6 +142,14 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
 
                 AccountPickerDialog accountPicker = new AccountPickerDialog();
                 accountPicker.setArguments(bundle);
+                accountPicker.setOnAccountSelectedListener(new AccountPickerDialog.OnAccountSelected() {
+                    @Override
+                    public void onAccountSelected(Account account) {
+
+                        setFromAccount(account);
+                        setToExpense(mFromExpense.getUnsignedPrice());
+                    }
+                });
                 accountPicker.show(getFragmentManager(), "transfers_from_account");
             }
         });
@@ -148,6 +168,14 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
 
                 AccountPickerDialog accountPicker = new AccountPickerDialog();
                 accountPicker.setArguments(bundle);
+                accountPicker.setOnAccountSelectedListener(new AccountPickerDialog.OnAccountSelected() {
+                    @Override
+                    public void onAccountSelected(Account account) {
+
+                        setToAccount(account);
+                        setToExpense(mFromExpense.getUnsignedPrice());
+                    }
+                });
                 accountPicker.show(getFragmentManager(), "transfers_to_account");
             }
         });
@@ -164,6 +192,16 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
 
                 DatePickerDialog datePicker = new DatePickerDialog();
                 datePicker.setArguments(bundle);
+                datePicker.setOnDateSelectedListener(new DatePickerDialog.OnDateSelected() {
+                    @Override
+                    public void onDateSelected(Calendar date) {
+
+                        mCalendar = date;
+                        mFromExpense.setDateTime(date);
+                        mToExpense.setDateTime(date);
+                        mDateBtn.setText(transformCalendarToReadableDate(date));
+                    }
+                });
                 datePicker.show(getFragmentManager(), "transfers_date");
             }
         });
@@ -190,7 +228,6 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
                 } else {
 
                     showErrorDialog(R.string.error_missing_content);
-                    //todo bessere übersetzung einfallen lassen
                 }
             }
         });
@@ -258,26 +295,6 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
     }
 
     /**
-     * Methode, welche den callback des AccountPickerDialogs implementiert.
-     *
-     * @param account Konto, welches vom User gewählt wurde
-     * @param tag     Tag, welches bei der Dialogerstellung mit gesendet wurde
-     */
-    @Override
-    public void onAccountSelected(Account account, String tag) {
-
-        if (tag.equals("transfers_from_account")) {
-
-            setFromAccount(account);
-        } else if (tag.equals("transfers_to_account")) {
-
-            setToAccount(account);
-        }
-
-        setToExpense(mFromExpense.getUnsignedPrice());
-    }
-
-    /**
      * Methode um das Ausgehende Konto zu setzen
      *
      * @param newAccount Das neue ausgehende Konto
@@ -308,45 +325,6 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
     }
 
     /**
-     * Methode, welche den callback des DatePickerDialogs implementiert.
-     *
-     * @param date Datum, welches vom User ausgewählt wurde
-     * @param tag  Tag, welches bei der Dialogerstellung mit gesendet wurde
-     */
-    @Override
-    public void onDateSelected(Calendar date, String tag) {
-
-        if (tag.equals("transfers_date")) {
-
-            mCalendar = date;
-            mFromExpense.setDateTime(date);
-            mToExpense.setDateTime(date);
-            mDateBtn.setText(transformCalendarToReadableDate(date));
-        }
-    }
-
-    /**
-     * Methode, welche den callback des PriceInputDialogs implementiert.
-     *
-     * @param price Preis, der vom User eingegeben wurde
-     * @param tag   Tag, welches bei der Dialogerstellung mit gesendet wurde
-     */
-    @Override
-    public void onPriceSelected(double price, String tag) {
-
-        SharedPreferences preferences = this.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
-
-        if (tag.equals("transfers_amount_input")) {
-
-            mFromExpense.setPrice(price);
-            mFromExpense.setExpenditure(true);
-            mAmountBtn.setText(String.format(this.getResources().getConfiguration().locale, "%.2f %s", mFromExpense.getUnsignedPrice(), preferences.getString("mainCurrencySymbol", "€")));
-
-            setToExpense(price);
-        }
-    }
-
-    /**
      * Methode um den Betrag der ToExpense zu setzen, da dieser eventuell umgerechnet werden muss.
      *
      * @param newPrice Den Preis, welcher umgerechnet werden muss
@@ -355,7 +333,6 @@ public class TransferActivity extends AppCompatActivity implements AccountPicker
 
         mToExpense.setPrice(newPrice);
         mToExpense.setExpenditure(false);
-        return;
     }
 
     @Override

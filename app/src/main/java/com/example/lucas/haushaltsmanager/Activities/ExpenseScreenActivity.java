@@ -32,7 +32,7 @@ import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
 import com.example.lucas.haushaltsmanager.Dialogs.AccountPickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.DatePickerDialog;
-import com.example.lucas.haushaltsmanager.Dialogs.FrequencyAlertDialog;
+import com.example.lucas.haushaltsmanager.Dialogs.FrequencyInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
@@ -45,7 +45,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-public class ExpenseScreenActivity extends AppCompatActivity implements AccountPickerDialog.OnAccountSelected, PriceInputDialog.OnPriceSelected, com.example.lucas.haushaltsmanager.Dialogs.DatePickerDialog.OnDateSelected, FrequencyAlertDialog.OnFrequencySet {
+public class ExpenseScreenActivity extends AppCompatActivity {
     private static final String TAG = ExpenseScreenActivity.class.getSimpleName();
 
     private creationModes CREATION_MODE;
@@ -221,6 +221,13 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AccountP
 
                 PriceInputDialog priceDialog = new PriceInputDialog();
                 priceDialog.setArguments(bundle);
+                priceDialog.setOnPriceSelectedListener(new PriceInputDialog.OnPriceSelected() {
+                    @Override
+                    public void onPriceSelected(double price) {
+
+                        setPrice(price);
+                    }
+                });
                 priceDialog.show(getFragmentManager(), "expense_screen_price");
             }
         });
@@ -252,8 +259,15 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AccountP
                         Bundle bundle = new Bundle();
                         bundle.putString("title", getString(R.string.input_frequency));
 
-                        FrequencyAlertDialog frequencyDialog = new FrequencyAlertDialog();
+                        FrequencyInputDialog frequencyDialog = new FrequencyInputDialog();
                         frequencyDialog.setArguments(bundle);
+                        frequencyDialog.setOnFrequencySet(new FrequencyInputDialog.OnFrequencySet() {
+                            @Override
+                            public void onFrequencySet(int frequencyInHours) {
+
+                                mRecurringFrequency.setText(String.format("%s Tage", frequencyInHours));
+                            }
+                        });
                         frequencyDialog.show(getFragmentManager(), "expense_screen_frequency");
                     }
                 });
@@ -270,6 +284,15 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AccountP
 
                         DatePickerDialog datePicker = new DatePickerDialog();
                         datePicker.setArguments(dateBundle);
+                        datePicker.setOnDateSelectedListener(new DatePickerDialog.OnDateSelected() {
+                            @Override
+                            public void onDateSelected(Calendar date) {
+
+                                mRecurringEndDate = date;
+                                mRecurringEndBtn.setText(DateFormat.getDateInstance(DateFormat.SHORT).format(new Date(mRecurringEndDate.getTimeInMillis())));
+                                Log.d(TAG, "updated recurring end date to " + DateFormat.getDateInstance(DateFormat.SHORT).format(new Date(mRecurringEndDate.getTimeInMillis())));
+                            }
+                        });
                         datePicker.show(getFragmentManager(), "expense_screen_recurring");
                     }
                 });
@@ -629,6 +652,13 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AccountP
 
                 DatePickerDialog datePicker = new DatePickerDialog();
                 datePicker.setArguments(bundle);
+                datePicker.setOnDateSelectedListener(new DatePickerDialog.OnDateSelected() {
+                    @Override
+                    public void onDateSelected(Calendar date) {
+
+                        setDate(date);
+                    }
+                });
                 datePicker.show(getFragmentManager(), "expense_screen_date");
                 break;
 
@@ -655,6 +685,13 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AccountP
 
                 AccountPickerDialog accountPicker = new AccountPickerDialog();
                 accountPicker.setArguments(bundle);
+                accountPicker.setOnAccountSelectedListener(new AccountPickerDialog.OnAccountSelected() {
+                    @Override
+                    public void onAccountSelected(Account account) {
+
+                        setAccount(account);
+                    }
+                });
                 accountPicker.show(getFragmentManager(), "expense_screen_account");
                 break;
         }
@@ -814,57 +851,5 @@ public class ExpenseScreenActivity extends AppCompatActivity implements AccountP
         SharedPreferences preferences = this.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
 
         mCurrencySymbolTxt.setText(preferences.getString("mainCurrencySymbol", "€"));
-    }
-
-    /**
-     * Methode die den Callback des AccountPickerDialogFragments implementiert
-     *
-     * @param account Konto das ausgewählt wurde
-     * @param tag     Tag mit dem das DialogFragment aufgerufen wurde
-     */
-    @Override
-    public void onAccountSelected(Account account, String tag) {
-        if (tag.equals("expense_screen_account"))
-            setAccount(account);
-    }
-
-    /**
-     * Methode die den Callback des PriceInputDialogs implementiert
-     *
-     * @param price Preis den der User einegeben hat
-     * @param tag   Dialog tag
-     */
-    @Override
-    public void onPriceSelected(double price, String tag) {
-        if (tag.equals("expense_screen_price"))
-            setPrice(price);
-    }
-
-    /**
-     * Methode die den Callback des DatePickerDialogs implementiert
-     *
-     * @param date Dateum das der User ausgewählt hat
-     * @param tag  Dialog tag
-     */
-    @Override
-    public void onDateSelected(Calendar date, String tag) {
-
-        if (tag.equals("expense_screen_recurring")) {
-
-            mRecurringEndDate = date;
-            mRecurringEndBtn.setText(DateFormat.getDateInstance(DateFormat.SHORT).format(new Date(mRecurringEndDate.getTimeInMillis())));
-            Log.d(TAG, "updated recurring end date to " + DateFormat.getDateInstance(DateFormat.SHORT).format(new Date(mRecurringEndDate.getTimeInMillis())));
-        } else if (tag.equals("expense_screen_date")) {
-            setDate(date);
-        }
-    }
-
-    @Override
-    public void onFrequencySet(int frequencyInHours, String tag) {
-
-        if (tag.equals("expense_screen_frequency")) {
-
-            mRecurringFrequency.setText(String.format("%s Tage", frequencyInHours));
-        }
     }
 }

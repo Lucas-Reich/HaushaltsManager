@@ -17,7 +17,7 @@ import android.widget.Toast;
 
 import com.codekidlabs.storagechooser.StorageChooser;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
-import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationAlertDialog;
+import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ErrorAlertDialog;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.ExpenseObjectExporter;
@@ -28,7 +28,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ImportExportActivity extends AppCompatActivity implements ConfirmationAlertDialog.OnConfirmationResult {
+public class ImportExportActivity extends AppCompatActivity {
 
     private List<File> mSelectableFileList;
     private ListView mListView;
@@ -123,8 +123,19 @@ public class ImportExportActivity extends AppCompatActivity implements Confirmat
                 bundle.putString("title", getString(R.string.confirmation_dialog_title));
                 bundle.putString("message", getString(R.string.import_bookings_confirmation));
 
-                ConfirmationAlertDialog confirmationDialog = new ConfirmationAlertDialog();
+                ConfirmationDialog confirmationDialog = new ConfirmationDialog();
                 confirmationDialog.setArguments(bundle);
+                confirmationDialog.setOnConfirmationListener(new ConfirmationDialog.OnConfirmationResult() {
+                    @Override
+                    public void onConfirmationResult(boolean result) {
+
+                        // todo aktivieren
+                        // ExpenseObjectImporter fileImporter = new ExpenseObjectImporter(mSelectedFile, this);
+                        // fileImporter.readAndSaveExpenseObjects();
+
+                        Toast.makeText(ImportExportActivity.this, R.string.not_implemented, Toast.LENGTH_SHORT).show();
+                    }
+                });
                 confirmationDialog.show(getFragmentManager(), "import_confirm_import");
             }
         });
@@ -149,8 +160,19 @@ public class ImportExportActivity extends AppCompatActivity implements Confirmat
                 bundle.putString("title", getString(R.string.create_export));
                 bundle.putString("message", getString(R.string.export_directory_confirmation));
 
-                ConfirmationAlertDialog confirmationDialog = new ConfirmationAlertDialog();
+                ConfirmationDialog confirmationDialog = new ConfirmationDialog();
                 confirmationDialog.setArguments(bundle);
+                confirmationDialog.setOnConfirmationListener(new ConfirmationDialog.OnConfirmationResult() {
+                    @Override
+                    public void onConfirmationResult(boolean result) {
+
+                        ExpenseObjectExporter fileExporter = new ExpenseObjectExporter(mSelectedDirectory);
+                        fileExporter.convertAndExportExpenses(getAllExpenses());
+
+                        getImportableFilesInDirectory(mSelectedDirectory);
+                        updateListView();
+                    }
+                });
                 confirmationDialog.show(getFragmentManager(), "import_confirm_export");
             }
         });
@@ -200,37 +222,6 @@ public class ImportExportActivity extends AppCompatActivity implements Confirmat
         mListView.setAdapter(fileAdapter);
 
         fileAdapter.notifyDataSetChanged();
-    }
-
-    /**
-     * Methode die den Callback des ConfirmationAlertDialogs implementiert.
-     *
-     * @param result Von user gegebene Antwort.
-     * @param tag    mitgesendetes Tag
-     */
-    @Override
-    public void onConfirmationResult(boolean result, String tag) {
-        if (!result)
-            return;
-
-        switch (tag) {
-            case "import_confirm_import":
-
-                // todo aktivieren
-                // ExpenseObjectImporter fileImporter = new ExpenseObjectImporter(mSelectedFile, this);
-                // fileImporter.readAndSaveExpenseObjects();
-
-                Toast.makeText(this, R.string.not_implemented, Toast.LENGTH_SHORT).show();
-                break;
-            case "import_confirm_export":
-
-                ExpenseObjectExporter fileExporter = new ExpenseObjectExporter(mSelectedDirectory);
-                fileExporter.convertAndExportExpenses(getAllExpenses());
-
-                getImportableFilesInDirectory(mSelectedDirectory);
-                updateListView();
-                break;
-        }
     }
 
     /**

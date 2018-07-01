@@ -20,7 +20,7 @@ import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.R;
 
-public class CreateAccountActivity extends AppCompatActivity implements PriceInputDialog.OnPriceSelected {
+public class CreateAccountActivity extends AppCompatActivity {
     private static final String TAG = CreateAccountActivity.class.getSimpleName();
 
     Button mAccountNameBtn;
@@ -28,7 +28,6 @@ public class CreateAccountActivity extends AppCompatActivity implements PriceInp
     ExpensesDataSource mDatabase;
     Account mAccount;
     private ImageButton mBackArrow;
-    private Toolbar mToolbar;
 
     private enum CREATION_MODES {
         CREATE_ACCOUNT,
@@ -72,7 +71,7 @@ public class CreateAccountActivity extends AppCompatActivity implements PriceInp
         mAccountBalanceBtn = (Button) findViewById(R.id.new_account_balance);
         mCreateAccountBtn = (Button) findViewById(R.id.new_account_create);
 
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         mBackArrow = (ImageButton) findViewById(R.id.back_arrow);
     }
@@ -129,6 +128,16 @@ public class CreateAccountActivity extends AppCompatActivity implements PriceInp
 
                 PriceInputDialog priceInputDialog = new PriceInputDialog();
                 priceInputDialog.setArguments(args);
+                priceInputDialog.setOnPriceSelectedListener(new PriceInputDialog.OnPriceSelected() {
+                    @Override
+                    public void onPriceSelected(double price) {
+
+                        mAccount.setBalance(price);
+                        mAccountBalanceBtn.setText(String.format(getResources().getConfiguration().locale, "%.2f", mAccount.getBalance()));
+
+                        Log.d(TAG, "set account balance to " + mAccount.getBalance());
+                    }
+                });
                 priceInputDialog.show(getFragmentManager(), "create_account_price");
             }
         });
@@ -178,18 +187,6 @@ public class CreateAccountActivity extends AppCompatActivity implements PriceInp
             CreateAccountActivity.this.startActivity(startMainTab);
         }
     };
-
-    @Override
-    public void onPriceSelected(double price, String tag) {
-
-        if (tag.equals("create_account_price")) {
-
-            mAccount.setBalance(price);
-            mAccountBalanceBtn.setText(String.format(this.getResources().getConfiguration().locale, "%.2f", mAccount.getBalance()));
-
-            Log.d(TAG, "set account balance to " + mAccount.getBalance());
-        }
-    }
 
     private Currency getDefaultCurrency() {
         SharedPreferences preferences = this.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);

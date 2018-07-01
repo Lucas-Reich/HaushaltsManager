@@ -27,14 +27,7 @@ public class PriceInputDialog extends DialogFragment {
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        try {
-
-            mCallback = (OnPriceSelected) context;
-            mContext = context;
-        } catch (ClassCastException e) {
-
-            throw new ClassCastException(context.toString() + " must implement OnPriceSelected!");
-        }
+        mContext = context;
     }
 
     @Override
@@ -70,9 +63,9 @@ public class PriceInputDialog extends DialogFragment {
 
                 String price = input.getText().toString();
                 if (price.isEmpty())
-                    mCallback.onPriceSelected(0, getTag());
+                    mCallback.onPriceSelected(0);
                 else
-                    mCallback.onPriceSelected(Double.parseDouble(price), getTag());
+                    mCallback.onPriceSelected(Double.parseDouble(price));
 
             }
         });
@@ -94,7 +87,7 @@ public class PriceInputDialog extends DialogFragment {
 
                 if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || actionId == EditorInfo.IME_ACTION_DONE) {
 
-                    mCallback.onPriceSelected(Double.parseDouble(input.getText().toString()), getTag());
+                    mCallback.onPriceSelected(Double.parseDouble(input.getText().toString()));
                     dismiss();
                     return false;
                 }
@@ -122,7 +115,16 @@ public class PriceInputDialog extends DialogFragment {
         return input;
     }
 
+    /**
+     * Methode um einen Listener zu registrieren, welcher aufgerufen wird, wenn der User einen Preis eingegeben hat.
+     *
+     * @param listener Listener
+     */
+    public void setOnPriceSelectedListener(PriceInputDialog.OnPriceSelected listener) {
+        mCallback = listener;
+    }
+
     public interface OnPriceSelected {
-        void onPriceSelected(double price, String tag);
+        void onPriceSelected(double price);
     }
 }
