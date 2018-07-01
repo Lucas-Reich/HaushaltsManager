@@ -134,4 +134,7 @@
     <string name="no_files_to_import">In diesem Verzeichniss gibt es keine Datein die importiert werden können!</string>
     <string name="create_new_directory">Erstelle Verzeichniss</string>
     <string name="directory_already_existing">Fehler! Das Verzeichniss gibt es bereits!</string>
+    <string name="bookings_successfully_restored">Buchungen wurden erfolgreich wiederhergestellt!</string>
+    <string name="revert_deletion">Löschen rückgängig machen?</string>
+    <string name="revert_action">Rückgänig machen</string>
 </resources>

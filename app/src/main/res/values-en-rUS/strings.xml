@@ -130,4 +130,7 @@
     <string name="no_files_to_import">There are no files to import in this directory!</string>
     <string name="create_new_directory">Create Directory</string>
     <string name="directory_already_existing">Error! Directory already exists!</string>
+    <string name="revert_action">Undo</string>
+    <string name="revert_deletion">Undo deletion?</string>
+    <string name="bookings_successfully_restored">Bookings have been successfully restored!</string>
 </resources>

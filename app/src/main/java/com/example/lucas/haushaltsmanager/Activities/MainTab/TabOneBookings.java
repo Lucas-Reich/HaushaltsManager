@@ -1,5 +1,6 @@
 package com.example.lucas.haushaltsmanager.Activities.MainTab;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -7,6 +8,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -51,8 +53,6 @@ public class TabOneBookings extends Fragment {
     FloatingActionButton fabBig, fabSmallTop, fabSmallLeft;
     Animation openFabAnim, closeFabAnim, rotateForwardAnim, rotateBackwardAnim;
     boolean fabBigIsAnimated = false;
-    private ArrayList<ExpenseObject> mExpensesToDelete = new ArrayList<>();
-    private HashMap<Long, ExpenseObject> mMappedChildrenToDelete = new HashMap<>();
 
 
     @Override
@@ -93,10 +93,6 @@ public class TabOneBookings extends Fragment {
         updateExpListView();
 
         final Activity mainTab = getActivity();
-
-
-        final CoordinatorLayout coordinatorLayout = (CoordinatorLayout) rootView.findViewById(R.id.tab_one_bookings_layout);
-
 
         fabBig = (FloatingActionButton) rootView.findViewById(R.id.fab);
         fabBig.setOnClickListener(new View.OnClickListener() {
@@ -183,8 +179,6 @@ public class TabOneBookings extends Fragment {
                     prepareDataSources(true);
                     resetActivityViewState();
                 }
-
-                //todo snackbar einfügen, die es ermöglicht die aktion wieder rückgängig zu machen
             }
         });
 
@@ -194,23 +188,15 @@ public class TabOneBookings extends Fragment {
             @Override
             public void onClick(View v) {
 
-                final String string = "BlaKeks";
-                final ArrayList<ExpenseObject> expenses = mExpensesToDelete;
-                expenses.add(ExpenseObject.createDummyExpense(getContext()));
-                expenses.add(ExpenseObject.createDummyExpense(getContext()));
-                expenses.add(ExpenseObject.createDummyExpense(getContext()));
-//                mDatabase.deleteChildBookings(mListAdapter.getSelectedChildData());
-//                mDatabase.deleteBookings(mListAdapter.getSelectedGroupData());
-//                showSnackbar(coordinatorLayout, mListAdapter.getSelectedGroupData(), mListAdapter.getSelectedMappedChildData());
-                Snackbar snackbar = Snackbar.make(coordinatorLayout, "Hallo", Snackbar.LENGTH_LONG).setAction("Click", new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
+                showSnackbar(
+                        mListAdapter.getSelectedGroupData(),
+                        mListAdapter.getSelectedMappedChildData(),
+                        R.string.revert_deletion,
+                        R.string.bookings_successfully_restored
+                );
 
-                        Toast.makeText(getContext(), "" + expenses.size(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-                snackbar.show();
-
+                mDatabase.deleteChildBookings(mListAdapter.getSelectedChildData());
+                mDatabase.deleteBookings(mListAdapter.getSelectedGroupData());
                 resetActivityViewState();
             }
         });
@@ -778,28 +764,21 @@ public class TabOneBookings extends Fragment {
         closeFab(fabSmallLeft);
     }
 
-    private void restoreBookings() {
-        mDatabase.createBookings(mExpensesToDelete);
+    /**
+     * Methode um eine Snackbar anzuzeigen.
+     *
+     * @param groups         Gruppen die gelöscht wurden
+     * @param children       Kinder die gelöscht wurden
+     * @param message        Nachricht die in der Snackbar angezeigt werden soll
+     * @param successMessage Nachricht die angezeigt wird wenn alles erfolgreich bearbeitet wurde
+     */
+    private void showSnackbar(ArrayList<ExpenseObject> groups, HashMap<Long, ExpenseObject> children, @StringRes int message, @StringRes int successMessage) {
 
-        for (final Map.Entry<Long, ExpenseObject> deletedChild : mMappedChildrenToDelete.entrySet()) {
-            ExpenseObject parentExpense = mDatabase.getBookingById(deletedChild.getKey());
-
-            if (parentExpense != null) {
-                mDatabase.addChildToBooking(deletedChild.getValue(), parentExpense);
-            } else {
-                mDatabase.combineAsChildBookings(new ArrayList<ExpenseObject>() {{
-                    deletedChild.getKey();
-                }});
-            }
-
-            updateExpListView();
-        }
-    }
-
-    private void showSnackbar(View v, ArrayList<ExpenseObject> groups, HashMap<Long, ExpenseObject> children) {
-
-        Snackbar test = Snackbar.make(v, "Hallo", Snackbar.LENGTH_LONG).setAction("Revert", new UndoDeletionClickListener(groups, children));
-        test.show();
+        CoordinatorLayout coordinatorLayout = (CoordinatorLayout) getView().findViewById(R.id.tab_one_bookings_layout);
+        Snackbar
+                .make(coordinatorLayout, message, Snackbar.LENGTH_LONG)
+                .setAction(R.string.revert_action, new UndoDeletionClickListener(groups, children, successMessage))
+                .show();
     }
 
     /**
@@ -809,15 +788,19 @@ public class TabOneBookings extends Fragment {
 
         private ArrayList<ExpenseObject> mDeletedGroups;
         private HashMap<Long, ExpenseObject> mDeletedChildren;
+        private String mSuccessMessage;
 
-        UndoDeletionClickListener(ArrayList<ExpenseObject> deletedGroups, HashMap<Long, ExpenseObject> deletedChildren) {
+        @SuppressLint("UseSparseArrays")
+        UndoDeletionClickListener(ArrayList<ExpenseObject> deletedGroups, HashMap<Long, ExpenseObject> deletedChildren, @StringRes int successMessage) {
 
-            mDeletedGroups = deletedGroups;
-            mDeletedChildren = deletedChildren;
+            mDeletedGroups = new ArrayList<>(deletedGroups);
+            mDeletedChildren = new HashMap<>(deletedChildren);
+            mSuccessMessage = getString(successMessage);
         }
 
         @Override
         public void onClick(View v) {
+
             mDatabase.createBookings(mDeletedGroups);
 
             for (final Map.Entry<Long, ExpenseObject> deletedChild : mDeletedChildren.entrySet()) {
@@ -830,6 +813,8 @@ public class TabOneBookings extends Fragment {
                         deletedChild.getKey();
                     }});
                 }
+
+                Toast.makeText(getContext(), mSuccessMessage, Toast.LENGTH_SHORT).show();
 
                 updateExpListView();
             }
