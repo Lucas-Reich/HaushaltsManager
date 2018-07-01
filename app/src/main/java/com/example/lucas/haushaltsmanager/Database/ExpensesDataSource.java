@@ -641,7 +641,8 @@ public class ExpensesDataSource {
      *
      * @param expense The expense which has to be stored in the DB
      * @return Id of the created Booking
-     */
+     *///todo sollten Funktionen welche objekte in die Datenbank schreiben, objekte die nicht gespeichert werden konnten zurück geben?
+    // Beispiel: Mehrere Buchungen sollen gespeichert werden und eine Buchung kann nicht gespeichert werden --> woher weiß der aufrufende code welcher Buchung nicht gespeichert werden konnte?
     public ExpenseObject createBooking(ExpenseObject expense) {
 
         ContentValues values = new ContentValues();
