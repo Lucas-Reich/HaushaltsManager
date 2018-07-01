@@ -197,6 +197,8 @@ public class TabOneBookings extends Fragment {
 
                 mDatabase.deleteChildBookings(mListAdapter.getSelectedChildData());
                 mDatabase.deleteBookings(mListAdapter.getSelectedGroupData());
+
+                prepareDataSources(true);
                 resetActivityViewState();
             }
         });
@@ -814,10 +816,12 @@ public class TabOneBookings extends Fragment {
                     }});
                 }
 
-                Toast.makeText(getContext(), mSuccessMessage, Toast.LENGTH_SHORT).show();
-
-                updateExpListView();
             }
+
+            // todo überprüfen ob die buchung wirklich wiederhergestellt wurde
+            Toast.makeText(getContext(), mSuccessMessage, Toast.LENGTH_SHORT).show();
+            prepareDataSources(true);
+            updateExpListView();
         }
     }
 }
