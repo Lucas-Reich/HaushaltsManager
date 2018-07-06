@@ -10,8 +10,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.CheckedTextView;
+import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.example.lucas.haushaltsmanager.Activities.CreateAccountActivity;
 import com.example.lucas.haushaltsmanager.Activities.TransferActivity;
@@ -28,8 +30,11 @@ public class AccountAdapter extends ArrayAdapter<Account> {
     private OnDeleteAccountSelected mCallback;
 
     private static class ViewHolder {
-        CheckedTextView account_chk;
-        ImageView overflow_menu;
+        LinearLayout layout;
+        CheckBox account_chk;
+        TextView account_name;
+        TextView account_balance;
+        ImageView account_overflow_menu;
     }
 
     private List<Boolean> mCheckedItems = new ArrayList<>();
@@ -44,16 +49,18 @@ public class AccountAdapter extends ArrayAdapter<Account> {
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
 
         Account account = getItem(position);
-        ViewHolder viewHolder;
+        final ViewHolder viewHolder;
 
         if (convertView == null) {
-
             viewHolder = new ViewHolder();
             LayoutInflater inflater = LayoutInflater.from(getContext());
             convertView = inflater.inflate(R.layout.list_view_account_item, parent, false);
 
-            viewHolder.account_chk = (CheckedTextView) convertView.findViewById(R.id.list_view_account_item_account_chk);
-            viewHolder.overflow_menu = (ImageView) convertView.findViewById(R.id.list_view_account_item_overflow);
+            viewHolder.layout = (LinearLayout) convertView.findViewById(R.id.listview_account_item_layout);
+            viewHolder.account_chk = (CheckBox) convertView.findViewById(R.id.listview_account_item_chkbox);
+            viewHolder.account_name = (TextView) convertView.findViewById(R.id.listview_account_item_name);
+            viewHolder.account_balance = (TextView) convertView.findViewById(R.id.listview_account_item_balance);
+            viewHolder.account_overflow_menu = (ImageView) convertView.findViewById(R.id.listview_account_item_overflow_menu);
 
             convertView.setTag(viewHolder);
         } else {
@@ -62,8 +69,9 @@ public class AccountAdapter extends ArrayAdapter<Account> {
         }
 
         viewHolder.account_chk.setChecked(mCheckedItems.get(position));
-        viewHolder.account_chk.setText(String.format("   %s", account.getTitle()));//mit einem linebreak (\n) kann man text in der zweiten zeile anzeigen lassen
-        viewHolder.overflow_menu.setOnClickListener(new OnAccountOverflowSelectedListener(getContext(), account));
+        viewHolder.account_name.setText(account.getTitle());
+        viewHolder.account_balance.setText(String.format(getContext().getResources().getConfiguration().locale, "%.2f", account.getBalance()));
+        viewHolder.account_overflow_menu.setOnClickListener(new OnAccountOverflowSelectedListener(getContext(), account));
 
         return convertView;
     }
@@ -94,6 +102,7 @@ public class AccountAdapter extends ArrayAdapter<Account> {
 
     public interface OnDeleteAccountSelected {
         void onDeleteAccountSelected(Account account);
+
         void onAccountSetMain(Account account);
     }
 
@@ -134,7 +143,7 @@ public class AccountAdapter extends ArrayAdapter<Account> {
 
                         case R.id.edit_account_delete:
 
-                            //user wird nicht noch einmal um betstätigung gefragt!
+                            //user wird nicht noch einmal um bestätigung gefragt!
                             mCallback.onDeleteAccountSelected(mAccount);
 
                             Log.d(TAG, "onMenuItemClick: delete selected");

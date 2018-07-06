@@ -1,15 +1,16 @@
 package com.example.lucas.haushaltsmanager.Activities.MainTab;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +23,6 @@ import android.widget.Toast;
 import com.example.lucas.haushaltsmanager.Activities.ExpenseScreenActivity;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
-import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.ExpandableListAdapter;
 import com.example.lucas.haushaltsmanager.ExpandableListAdapterCreator;
@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TabOneBookings extends Fragment {
     private static final String TAG = TabOneBookings.class.getSimpleName();
@@ -42,12 +43,11 @@ public class TabOneBookings extends Fragment {
     HashMap<ExpenseObject, List<ExpenseObject>> mListDataChild;
 
     ExpensesDataSource mDatabase;
-    ArrayList<ExpenseObject> mExpenses;
-    List<Long> mActiveAccounts;
 
     FloatingActionButton fabBig, fabSmallTop, fabSmallLeft;
     Animation openFabAnim, closeFabAnim, rotateForwardAnim, rotateBackwardAnim;
     boolean fabBigIsAnimated = false;
+    private ParentActivity mParent;
 
 
     @Override
@@ -55,13 +55,12 @@ public class TabOneBookings extends Fragment {
         super.onCreate(savedInstanceState);
 
         mListDataHeader = new ArrayList<>();
-        mActiveAccounts = new ArrayList<>();
         mListDataChild = new HashMap<>();
-        mExpenses = new ArrayList<>();
 
         mDatabase = new ExpensesDataSource(getContext());
         mDatabase.open();
-        setActiveAccounts();
+
+        mParent = (ParentActivity) getActivity();
     }
 
     @Override
@@ -85,10 +84,9 @@ public class TabOneBookings extends Fragment {
         setOnChildClickListener();
         setOnItemLongClickListener();
 
-        updateExpListView();
+        updateView();
 
         final Activity mainTab = getActivity();
-
 
         fabBig = (FloatingActionButton) rootView.findViewById(R.id.fab);
         fabBig.setOnClickListener(new View.OnClickListener() {
@@ -127,13 +125,32 @@ public class TabOneBookings extends Fragment {
                     bundle.putString("title", getResources().getString(R.string.input_title));
 
                     BasicTextInputDialog textInputDialog = new BasicTextInputDialog();
+                    textInputDialog.setOnTextInputListener(new BasicTextInputDialog.BasicDialogCommunicator() {
+                        @Override
+                        public void onTextInput(String title) {
+
+                            ExpenseObject parentBooking;
+                            if (mListAdapter.getSelectedGroupCount() == mListAdapter.getSelectedItemsCount()) {//Kombiniere Parentbuchungen
+
+                                parentBooking = mDatabase.combineAsChildBookings(mListAdapter.getSelectedGroupData());
+                            } else if (mListAdapter.getSelectedGroupCount() == mListAdapter.getSelectedItemsCount()) {//Kombiniere Groupbuchungen
+
+                                parentBooking = mDatabase.combineAsChildBookings(mListAdapter.getSelectedGroupData());
+                            } else {//Kombiniere Parent- und Groupbuchungen todo der titel sollte nich neu erstellt werden
+
+                                parentBooking = mDatabase.combineParentBookings(mListAdapter.getSelectedGroupData());
+                            }
+
+                            mParent.deleteGroupBookings(mListAdapter.getSelectedGroupData());
+                            parentBooking.setTitle(title);
+                            mDatabase.updateBooking(parentBooking);
+                            mParent.addGroupBooking(parentBooking);
+
+                            resetActivityViewState();
+                        }
+                    });
                     textInputDialog.setArguments(bundle);
-                    if (mListAdapter.getSelectedGroupCount() == mListAdapter.getSelectedItemsCount())//Kombiniere Parentbuchungen
-                        textInputDialog.show(getActivity().getFragmentManager(), "tab_one_combine_parents");
-                    else if (mListAdapter.getSelectedGroupCount() == mListAdapter.getSelectedItemsCount())//Kombiniere Groupbuchungen
-                        textInputDialog.show(getActivity().getFragmentManager(), "tab_one_combine_groups");
-                    else if (mListAdapter.getSelectedGroupCount() >= 1 || mListAdapter.getSelectedParentCount() >= 1)//Kombiniere Parent- und Groupbuchungen todo der titel sollte nich neu erstellt werden
-                        textInputDialog.show(getActivity().getFragmentManager(), "tab_one_combine_parents_groups");
+                    textInputDialog.show(getActivity().getFragmentManager(), "");
                 }
 
                 if (addChildMode()) {
@@ -151,11 +168,8 @@ public class TabOneBookings extends Fragment {
                 if (extractChildMode()) {
 
                     mDatabase.extractChildrenFromBooking(mListAdapter.getSelectedChildData());
-                    prepareDataSources(true);
                     resetActivityViewState();
                 }
-
-                //todo snackbar einfügen, die es ermöglicht die aktion wieder rückgängig zu machen
             }
         });
 
@@ -165,11 +179,20 @@ public class TabOneBookings extends Fragment {
             @Override
             public void onClick(View v) {
 
+                showSnackbar(
+                        mListAdapter.getSelectedGroupData(),
+                        mListAdapter.getSelectedMappedChildData(),
+                        R.string.revert_deletion,
+                        R.string.bookings_successfully_restored
+                );
+
                 mDatabase.deleteChildBookings(mListAdapter.getSelectedChildData());
+                mParent.deleteChildBookings(mListAdapter.getSelectedMappedChildData());
+
                 mDatabase.deleteBookings(mListAdapter.getSelectedGroupData());
+                mParent.deleteGroupBookings(mListAdapter.getSelectedGroupData());
 
                 resetActivityViewState();
-                //todo snackbar einfügen die es ermöglicht die aktion wieder rückgängig zu machen
             }
         });
 
@@ -257,10 +280,16 @@ public class TabOneBookings extends Fragment {
                         //ignoriere Datumstrenner
                         return true;
                     case PARENT_EXPENSE:
-                        if (!mListAdapter.isGroupSelected(groupExpense) && groupExpense.getExpenseType() != ExpenseObject.EXPENSE_TYPES.DATE_PLACEHOLDER) {
+                        if (!mListAdapter.isGroupSelected(groupExpense)) {
                             if (hasUserSelectedItems())
                                 mListAdapter.selectGroup(groupExpense);
                             animateFabs(mListAdapter.getSelectedGroupCount(), mListAdapter.getSelectedChildCount(), mListAdapter.getSelectedParentCount());
+                        } else {
+                            mListAdapter.removeGroupFromList(groupExpense);
+                            animateFabs(mListAdapter.getSelectedGroupCount(), mListAdapter.getSelectedChildCount(), mListAdapter.getSelectedParentCount());
+
+                            if (mListAdapter.getSelectedItemsCount() == 0)
+                                enableLongClick();
                         }
                         return false;
                     case NORMAL_EXPENSE:
@@ -427,7 +456,7 @@ public class TabOneBookings extends Fragment {
     private void resetExpandableListView() {
 
         mListAdapter.deselectAll();
-        updateExpListView();
+        updateView();
         enableLongClick();
     }
 
@@ -442,111 +471,19 @@ public class TabOneBookings extends Fragment {
     }
 
     /**
-     * Methode um die mActiveAccounts liste zu initialisieren.
-     * Dabei werden die Indizes der akitven Konten in der mActiveAccounts liste gespeichert
-     */
-    private void setActiveAccounts() {
-        Log.d(TAG, "setActiveAccounts: erneuere aktiven Kontenliste");
-        mActiveAccounts.clear();
-
-        SharedPreferences preferences = getContext().getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
-
-        for (Account account : mDatabase.getAllAccounts()) {
-
-            if (preferences.getBoolean(account.getTitle(), false))
-                mActiveAccounts.add(account.getIndex());
-        }
-    }
-
-    /**
-     * Methode um einer kombinierten Buchung einen Titel zu geben
-     *
-     * @param title Titel der zusammengefügten Buchung
-     */
-    public void onCombinedTitleSelected(String title, String tag) {
-
-        ExpenseObject parentBooking;
-        switch (tag) {
-            case "tab_one_combine_parents":
-                parentBooking = mDatabase.combineAsChildBookings(mListAdapter.getSelectedGroupData());
-                mExpenses.removeAll(mListAdapter.getSelectedGroupData());
-                break;
-            case "tab_one_combine_groups":
-                parentBooking = mDatabase.combineAsChildBookings(mListAdapter.getSelectedGroupData());
-                mExpenses.removeAll(mListAdapter.getSelectedGroupData());
-                break;
-            case "tab_one_combine_parents_groups":
-                parentBooking = mDatabase.combineParentBookings(mListAdapter.getSelectedGroupData());
-                mExpenses.removeAll(mListAdapter.getSelectedGroupData());
-                break;
-            default:
-                throw new UnsupportedOperationException("Kombimöglichkeit " + tag + " wird nicht unterstützt!");
-        }
-
-        parentBooking.setTitle(title);
-        mDatabase.updateBooking(parentBooking);
-        mExpenses.add(0, parentBooking);
-
-        resetActivityViewState();
-    }
-
-    /**
-     * Methode, welche die angegebenen Kinder aus der ListView löscht.
-     *
-     * @param childrenToRemove Zu löschende Kinder
-     */
-    public void removeChildrenFromListView(ArrayList<ExpenseObject> childrenToRemove) {
-
-        for (ExpenseObject child : childrenToRemove) {
-            for (ExpenseObject expense : mExpenses) {
-                if (expense.getChildren().contains(child)) {
-                    expense.getChildren().remove(child);
-                    break;
-                }
-            }
-        }
-    }
-
-    /**
-     * Methode um die ein Konto in der aktiven Kontoliste zu aktivieren oder deaktivieren
-     * !Nachdem Änderungen an der aktiven Kontoliste gemacht wurden wird die ExpandableListView neu instanziiert
-     *
-     * @param accountId AccountId des zu ändernden Kontos
-     * @param isChecked status des Kontos
-     */
-    public void refreshListOnAccountSelected(long accountId, boolean isChecked) {
-
-        if (mActiveAccounts.contains(accountId) == isChecked)
-            return;
-
-        if (mActiveAccounts.contains(accountId) && !isChecked)
-            mActiveAccounts.remove(accountId);
-        else
-            mActiveAccounts.add(accountId);
-
-        updateExpListView();
-    }
-
-    /**
      * Methode um die ExpandableListView nach einer Änderung neu anzuzeigen.
      */
-    public void updateExpListView() {
+    public void updateView() {
 
-        prepareDataSources(false);
-
-        mListAdapter = new ExpandableListAdapterCreator(mExpenses, mActiveAccounts, getContext()).getExpandableListAdapter();
+        mListAdapter = new ExpandableListAdapterCreator(
+                mParent.getExpenses(getFirstOfMonth(), getLastOfMonth()),
+                mParent.getActiveAccounts(),
+                getContext()
+        ).getExpandableListAdapter();
 
         mExpListView.setAdapter(mListAdapter);
 
         mListAdapter.notifyDataSetChanged();
-    }
-
-    /**
-     * Methode um die Ausgabenliste zu initialiesieren, wenn dies noch nicht geschehen ist
-     */
-    private void prepareDataSources(boolean fetchExpenses) {
-        if (mExpenses.isEmpty() || fetchExpenses)
-            mExpenses = mDatabase.getBookings(getFirstOfMonth().getTimeInMillis(), getLastOfMonth().getTimeInMillis());
     }
 
     /**
@@ -728,5 +665,83 @@ public class TabOneBookings extends Fragment {
      */
     public void closeFabSmallLeft() {
         closeFab(fabSmallLeft);
+    }
+
+    /**
+     * Methode um eine Snackbar anzuzeigen.
+     *
+     * @param groups         Gruppen die gelöscht wurden
+     * @param children       Kinder die gelöscht wurden
+     * @param message        Nachricht die in der Snackbar angezeigt werden soll
+     * @param successMessage Nachricht die angezeigt wird wenn alles erfolgreich bearbeitet wurde
+     */
+    private void showSnackbar(ArrayList<ExpenseObject> groups, HashMap<Long, ExpenseObject> children, @StringRes int message, @StringRes int successMessage) {
+
+        CoordinatorLayout coordinatorLayout = (CoordinatorLayout) getView().findViewById(R.id.tab_one_bookings_layout);
+        Snackbar
+                .make(coordinatorLayout, message, Snackbar.LENGTH_LONG)
+                .setAction(R.string.revert_action, new UndoDeletionClickListener(groups, children, successMessage))
+                .show();
+    }
+
+    /**
+     * Klasse die einen ClickListener für gelöschte Buchungen implementiert, welcher die gelöschten GroupBuchungen und ChildBuchungen als Argumente übernimmt.
+     */
+    class UndoDeletionClickListener implements View.OnClickListener {
+
+        private ArrayList<ExpenseObject> mDeletedGroups;
+        private HashMap<Long, ExpenseObject> mDeletedChildren;
+        private String mSuccessMessage;
+
+        @SuppressLint("UseSparseArrays")
+        UndoDeletionClickListener(ArrayList<ExpenseObject> deletedGroups, HashMap<Long, ExpenseObject> deletedChildren, @StringRes int successMessage) {
+
+            mDeletedGroups = new ArrayList<>(deletedGroups);
+            mDeletedChildren = new HashMap<>(deletedChildren);
+            mSuccessMessage = getString(successMessage);
+        }
+
+        @Override
+        public void onClick(View v) {
+
+            mDatabase.createBookings(mDeletedGroups);
+
+            for (final Map.Entry<Long, ExpenseObject> deletedChild : mDeletedChildren.entrySet()) {
+                ExpenseObject parentExpense = mDatabase.getBookingById(deletedChild.getKey());
+
+                if (parentExpense != null) {
+                    mDatabase.addChildToBooking(deletedChild.getValue(), parentExpense);
+                    mParent.addChildBooking(deletedChild.getKey().intValue(), deletedChild.getValue());
+                } else {
+                    mDatabase.combineAsChildBookings(new ArrayList<ExpenseObject>() {{
+                        deletedChild.getKey();
+                    }});
+                }
+
+            }
+
+            // todo überprüfen ob die buchung wirklich wiederhergestellt wurde
+            Toast.makeText(getContext(), mSuccessMessage, Toast.LENGTH_SHORT).show();
+            updateView();
+        }
+    }
+
+
+    /**
+     * Methode um herauszufinden, ob der aktuelle tab gerade sichtbar geworden ist oder nicht.
+     * Quelle: https://stackoverflow.com/a/9779971
+     *
+     * @param isVisibleToUser Indikator ob die aktuelle UI für den User sichtbar ist. Default ist True.
+     */
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+
+        if (this.isVisible()) {
+            if (isVisibleToUser) {
+                updateView();
+                //todo nur updaten wenn etwas passiert ist
+            }
+        }
     }
 }

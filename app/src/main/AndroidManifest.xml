@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.lucas.haushaltsmanager">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="com.example.lucas.haushaltsmanager">
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
@@ -52,10 +51,6 @@
             android:label="TestPieChart"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
         <activity
-            android:name=".Activities.ImportExportActivity"
-            android:label="ExportImportActivity"
-            android:parentActivityName=".Activities.MainTab.ParentActivity"/>
-        <activity
             android:name=".Activities.CreateBackupActivity"
             android:label="CreateBackupActivity"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
@@ -65,6 +60,9 @@
         <activity
             android:name=".Activities.CourseActivity"
             android:label="CourseActivity"/>
+        <activity
+            android:name=".Activities.ImportExportActivity"
+            android:label="ImportExportActivityVer3"/>
 
         <receiver
             android:name=".MyAlarmReceiver"

@@ -12,7 +12,7 @@ import android.widget.EditText;
 
 import com.example.lucas.haushaltsmanager.R;
 
-public class FrequencyAlertDialog extends DialogFragment {
+public class FrequencyInputDialog extends DialogFragment {
 
     private OnFrequencySet mCallback;
     private Context mContext;
@@ -21,14 +21,7 @@ public class FrequencyAlertDialog extends DialogFragment {
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        try {
-
-            mCallback = (OnFrequencySet) context;
-            mContext = context;
-        } catch (ClassCastException e) {
-
-            throw new ClassCastException(context.toString() + " must implement OnFrequencySelected!");
-        }
+        mContext = context;
     }
 
     @Override
@@ -49,7 +42,7 @@ public class FrequencyAlertDialog extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                mCallback.onFrequencySet(getFrequencyFromInput(frequencyInput), getTag());
+                mCallback.onFrequencySet(getFrequencyFromInput(frequencyInput));
                 dismiss();
             }
         });
@@ -79,7 +72,16 @@ public class FrequencyAlertDialog extends DialogFragment {
         return Integer.parseInt(frequency) * 24;
     }
 
+    /**
+     * Methode um einen Listener zu registrieren, welcher aufgerufen wird, wenn der User eine Häufigkeit angegeben hat.
+     *
+     * @param listener Listener
+     */
+    public void setOnFrequencySet(FrequencyInputDialog.OnFrequencySet listener) {
+        mCallback = listener;
+    }
+
     public interface OnFrequencySet {
-        void onFrequencySet(int frequencyInHours, String tag);
+        void onFrequencySet(int frequencyInHours);
     }
 }

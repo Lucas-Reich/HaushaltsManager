@@ -17,6 +17,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.codekidlabs.storagechooser.StorageChooser;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.DirectoryPickerDialog;
 import com.example.lucas.haushaltsmanager.R;
@@ -27,7 +28,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CreateBackupActivity extends AppCompatActivity implements DirectoryPickerDialog.OnDirectorySelected, BasicTextInputDialog.BasicDialogCommunicator {
+public class CreateBackupActivity extends AppCompatActivity {
     private static final String TAG = CreateBackupActivity.class.getSimpleName();
 
     private FloatingActionButton mCreateBackupFab;
@@ -85,12 +86,27 @@ public class CreateBackupActivity extends AppCompatActivity implements Directory
             @Override
             public void onClick(View v) {
 
-                Bundle bundle = new Bundle();
-                bundle.putString("title", getResources().getString(R.string.choose_directory));
+                StorageChooser storageChooser = new StorageChooser.Builder()
+                        .withActivity(CreateBackupActivity.this)
+                        .withFragmentManager(getFragmentManager())
+                        .withMemoryBar(true)
+                        .allowAddFolder(true)
+                        .allowCustomPath(true)
+                        .setType(StorageChooser.DIRECTORY_CHOOSER)
+                        .build();
 
-                DirectoryPickerDialog directoryPicker = new DirectoryPickerDialog();
-                directoryPicker.setArguments(bundle);
-                directoryPicker.show(getFragmentManager(), "choose_directory");
+                storageChooser.show();
+                storageChooser.setOnSelectListener(new StorageChooser.OnSelectListener() {
+
+                    @Override
+                    public void onSelect(String directory) {
+
+                        mBackupDirectory = new File(directory);
+                        mChooseDirectoryBtn.setText(mBackupDirectory.getName());
+
+                        updateListView();
+                    }
+                });
             }
         });
 
@@ -112,6 +128,14 @@ public class CreateBackupActivity extends AppCompatActivity implements Directory
                 bundle.putString("title", getResources().getString(R.string.choose_new_backup_name));
 
                 BasicTextInputDialog basicDialog = new BasicTextInputDialog();
+                basicDialog.setOnTextInputListener(new BasicTextInputDialog.BasicDialogCommunicator() {
+
+                    @Override
+                    public void onTextInput(String textInput) {
+
+                        createBackup(textInput);
+                    }
+                });
                 basicDialog.setArguments(bundle);
                 basicDialog.show(getFragmentManager(), "create_backup_name");
             }
@@ -242,29 +266,5 @@ public class CreateBackupActivity extends AppCompatActivity implements Directory
         }
 
         return backups;
-    }
-
-    @Override
-    public void onDirectorySelected(File file, String tag) {
-
-        if (tag.equals("choose_directory")) {
-
-            if (validateDirectory(file)) {
-
-                mBackupDirectory = file;
-                mChooseDirectoryBtn.setText(mBackupDirectory.getName());
-
-                updateListView();
-            }
-        }
-    }
-
-    @Override
-    public void onTextInput(String textInput, String tag) {
-
-        if (tag.equals("create_backup_name")) {
-
-            createBackup(textInput);
-        }
     }
 }

@@ -1,7 +1,6 @@
 package com.example.lucas.haushaltsmanager;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,11 +46,11 @@ public class BookingAdapter extends ArrayAdapter<ExpenseObject> implements View.
             convertView = inflater.inflate(R.layout.booking_item, parent, false);
 
 
-            viewHolder.circleLetter = (TextView) convertView.findViewById(R.id.booking_item_circle);
-            viewHolder.txtTitle = (TextView) convertView.findViewById(R.id.booking_item_title);
-            viewHolder.txtPrice = (TextView) convertView.findViewById(R.id.booking_item_paid_price);
-            viewHolder.txtCurrencySymbol = (TextView) convertView.findViewById(R.id.booking_item_currency_paid);
-            viewHolder.txtPerson = (TextView) convertView.findViewById(R.id.booking_item_person);
+            viewHolder.circleLetter = (TextView) convertView.findViewById(R.id.exp_listview_group_rounded_textview);
+            viewHolder.txtTitle = (TextView) convertView.findViewById(R.id.exp_listview_group_title);
+            viewHolder.txtPrice = (TextView) convertView.findViewById(R.id.exp_listview_group_price);
+            viewHolder.txtCurrencySymbol = (TextView) convertView.findViewById(R.id.exp_listview_group_currency_symbol);
+            viewHolder.txtPerson = (TextView) convertView.findViewById(R.id.exp_listview_group_person);
 
             convertView.setTag(viewHolder);
         } else {

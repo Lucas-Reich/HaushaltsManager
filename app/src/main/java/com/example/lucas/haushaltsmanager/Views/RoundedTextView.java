@@ -13,7 +13,7 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 
 public class RoundedTextView extends ViewUtils {
-    private static String TAG = RoundedTextView.class.getSimpleName();
+    private final static String TAG = RoundedTextView.class.getSimpleName();
 
     private Paint mCirclePaint;
     private int mDesiredSize = ViewUtils.dpToPx(40);
@@ -21,7 +21,7 @@ public class RoundedTextView extends ViewUtils {
     private Rect mTextBounds;
     private Paint mTextPaint;
     private String mCenterText = "";
-    private float mTextSize = 50f;//todo schriftgröße des angezeigten Buchstabens soll abhängig von der viewgröße sein
+    private float mTextSize = 62f;//todo schriftgröße des angezeigten Buchstabens soll abhängig von der viewgröße sein
 
     public RoundedTextView(Context context) {
         super(context);
@@ -51,7 +51,6 @@ public class RoundedTextView extends ViewUtils {
         mTextPaint.setColor(Color.BLACK);
         mTextPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
         mTextPaint.setTextSize(mTextSize);
-        mTextPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
     }
 
     private Rect getDesiredSize() {
@@ -85,7 +84,7 @@ public class RoundedTextView extends ViewUtils {
     protected void onDraw(Canvas canvas) {
 
         canvas.drawCircle(mViewBounds.centerX(), mViewBounds.centerY(), mViewBounds.width() / 2, mCirclePaint);
-        canvas.drawText(mCenterText, mViewBounds.centerX() - (mTextBounds.width() / 2), mViewBounds.centerY() + (mTextBounds.width() / 2), mTextPaint);
+        canvas.drawText(mCenterText, mViewBounds.centerX() - (mTextBounds.width() / 2), mViewBounds.centerY() + (mTextBounds.height() / 2), mTextPaint);
     }
 
     public void setCenterText(@NonNull String centerText) {

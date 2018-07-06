@@ -16,4 +16,27 @@ public class TabThree extends Fragment {
 
         return rootView;
     }
+
+    public void updateView() {
+
+        //todo
+    }
+
+    /**
+     * Methode um herauszufinden, ob der aktuelle tab gerade sichtbar geworden ist oder nicht.
+     * Quelle: https://stackoverflow.com/a/9779971
+     *
+     * @param isVisibleToUser Indikator ob die aktuelle UI für den User sichtbar ist. Default ist True.
+     */
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+
+        if (this.isVisible()) {
+            if (isVisibleToUser) {
+                updateView();
+                //todo die view sollte nur geupdated werden wenn es auch wirklich veränderungen gab
+            }
+        }
+    }
 }

@@ -3,12 +3,10 @@ package com.example.lucas.haushaltsmanager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.lucas.haushaltsmanager.Entities.Category;
@@ -20,7 +18,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
     @SuppressWarnings("unused")
@@ -91,20 +88,23 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
         ExpenseObject groupExpense = (ExpenseObject) getGroup(groupPosition);
         LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        boolean isSelected = isGroupSelected(groupExpense);
 
         switch (groupExpense.getExpenseType()) {
-            
+
             case PARENT_EXPENSE:
 
-                convertView = inflater.inflate(R.layout.activity_exp_listview_parent_ver2, null);
+                convertView = inflater.inflate(R.layout.activity_exp_listview_parent, null);
                 if (isExpanded)
-                    convertView.findViewById(R.id.exp_listview_parent_v2_divider).setVisibility(View.GONE);
+                    convertView.findViewById(R.id.exp_listview_paren_divider).setVisibility(View.GONE);
+                if (isSelected)
+                    convertView.setBackgroundColor(mContext.getResources().getColor(R.color.highlighted_item_color));
 
-                PieChart pieChart = (PieChart) convertView.findViewById(R.id.exp_listview_parent_v2_pie_chart);
-                TextView txtTitle22 = (TextView) convertView.findViewById(R.id.exp_listview_parent_v2_title);
-                TextView txtPrice = (TextView) convertView.findViewById(R.id.exp_listview_parent_v2_price);
-                TextView txtCurrencySymbol = (TextView) convertView.findViewById(R.id.exp_listview_parent_v2_currency_symbol);
-                TextView txtPerson2 = (TextView) convertView.findViewById(R.id.exp_listview_parent_v2_person);
+                PieChart pieChart = (PieChart) convertView.findViewById(R.id.exp_listview_parent_pie_chart);
+                TextView txtTitle22 = (TextView) convertView.findViewById(R.id.exp_listview_parent_title);
+                TextView txtPrice = (TextView) convertView.findViewById(R.id.exp_listview_parent_price);
+                TextView txtCurrencySymbol = (TextView) convertView.findViewById(R.id.exp_listview_parent_currency_symbol);
+                TextView txtPerson2 = (TextView) convertView.findViewById(R.id.exp_listview_parent_person);
 
                 pieChart.setPieData(preparePieData(getAllChildrenToParent(groupExpense)));
                 txtTitle22.setText(groupExpense.getTitle());
@@ -124,20 +124,14 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             case NORMAL_EXPENSE:
 
                 convertView = inflater.inflate(R.layout.activity_exp_listview_group, null);
-
-                RoundedTextView roundedTextView = (RoundedTextView) convertView.findViewById(R.id.booking_item_circle);
-                TextView txtTitle2 = (TextView) convertView.findViewById(R.id.booking_item_title);
-                TextView txtPerson = (TextView) convertView.findViewById(R.id.booking_item_person);
-                TextView txtPaidPrice = (TextView) convertView.findViewById(R.id.booking_item_paid_price);
-                TextView txtPaidCurrency = (TextView) convertView.findViewById(R.id.booking_item_currency_paid);
-
-
-                //if group is selected by the user the entry has to be highligted on redrawing
-                if (mSelectedGroups.contains(getGroupId(groupPosition))) {
-
+                if (isSelected)
                     convertView.setBackgroundColor(mContext.getResources().getColor(R.color.highlighted_item_color));
-                }
 
+                RoundedTextView roundedTextView = (RoundedTextView) convertView.findViewById(R.id.exp_listview_group_rounded_textview);
+                TextView txtTitle2 = (TextView) convertView.findViewById(R.id.exp_listview_group_title);
+                TextView txtPerson = (TextView) convertView.findViewById(R.id.exp_listview_group_person);
+                TextView txtPaidPrice = (TextView) convertView.findViewById(R.id.exp_listview_group_price);
+                TextView txtPaidCurrency = (TextView) convertView.findViewById(R.id.exp_listview_group_currency_symbol);
 
                 String category = groupExpense.getCategory().getTitle();
                 roundedTextView.setTextColor(Color.WHITE);
@@ -156,20 +150,14 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
                 //todo eigenes layout für tramsfer expenses definieren
                 convertView = inflater.inflate(R.layout.activity_exp_listview_group, null);
-
-                RoundedTextView roundedTextView3 = (RoundedTextView) convertView.findViewById(R.id.booking_item_circle);
-                TextView txtTitle3 = (TextView) convertView.findViewById(R.id.booking_item_title);
-                TextView txtPerson3 = (TextView) convertView.findViewById(R.id.booking_item_person);
-                TextView txtPaidPrice3 = (TextView) convertView.findViewById(R.id.booking_item_paid_price);
-                TextView txtPaidCurrency3 = (TextView) convertView.findViewById(R.id.booking_item_currency_paid);
-
-
-                //if group is selected by the user the entry has to be highligted on redrawing
-                if (mSelectedGroups.contains(getGroupId(groupPosition))) {
-
+                if (isSelected)
                     convertView.setBackgroundColor(mContext.getResources().getColor(R.color.highlighted_item_color));
-                }
 
+                RoundedTextView roundedTextView3 = (RoundedTextView) convertView.findViewById(R.id.exp_listview_group_rounded_textview);
+                TextView txtTitle3 = (TextView) convertView.findViewById(R.id.exp_listview_group_title);
+                TextView txtPerson3 = (TextView) convertView.findViewById(R.id.exp_listview_group_person);
+                TextView txtPaidPrice3 = (TextView) convertView.findViewById(R.id.exp_listview_group_price);
+                TextView txtPaidCurrency3 = (TextView) convertView.findViewById(R.id.exp_listview_group_currency_symbol);
 
                 String category2 = groupExpense.getCategory().getTitle();
                 roundedTextView3.setTextColor(Color.WHITE);
@@ -233,6 +221,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
      * Klasse um nicht bei jedem Child die Objekte neu erstellen zu müssen
      */
     private class ChildViewHolder {
+
         RoundedTextView roundedTextView;
         TextView txtTitle;
         TextView txtPerson;
@@ -414,6 +403,20 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     }
 
     /**
+     * Methode um alle ausgewählten KindBuchungen inklusive ihres Parents zu bekommen.
+     */
+    public HashMap<Long, ExpenseObject> getSelectedMappedChildData() {
+
+        HashMap<Long, ExpenseObject> mappedSelectedChildren = new HashMap<>();
+        for (ExpenseObject child : mSelectedChildren) {
+
+            mappedSelectedChildren.put(getParentForChildBooking(child).getIndex(), child);
+        }
+
+        return mappedSelectedChildren;
+    }
+
+    /**
      * Methode um alle Kindbuchungen zu einer ParentBuchung zu bekommen.
      *
      * @param parentExpense ParentBuchung
@@ -421,5 +424,21 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
      */
     public List<ExpenseObject> getAllChildrenToParent(ExpenseObject parentExpense) {
         return mChildData.get(parentExpense);
+    }
+
+    /**
+     * Methode um die ParentBuchung einer KindBuchung zu erhalten.
+     *
+     * @param childBooking KinDBuchung
+     * @return Parent der KindBuchung oder NULL
+     */
+    public ExpenseObject getParentForChildBooking(ExpenseObject childBooking) {
+
+        for (Map.Entry<ExpenseObject, List<ExpenseObject>> entry : mChildData.entrySet()) {
+            if (entry.getValue().contains(childBooking))
+                return entry.getKey();
+        }
+
+        return null;
     }
 }

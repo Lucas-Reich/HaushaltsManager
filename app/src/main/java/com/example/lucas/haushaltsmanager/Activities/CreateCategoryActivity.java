@@ -16,7 +16,7 @@ import com.example.lucas.haushaltsmanager.Dialogs.ColorPickerDialog;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.R;
 
-public class CreateCategoryActivity extends AppCompatActivity implements BasicTextInputDialog.BasicDialogCommunicator {
+public class CreateCategoryActivity extends AppCompatActivity {
     private static final String TAG = CreateCategoryActivity.class.getSimpleName();
 
     private Category mCategory;
@@ -52,7 +52,18 @@ public class CreateCategoryActivity extends AppCompatActivity implements BasicTe
                 Bundle args = new Bundle();
                 args.putString("title", getResources().getString(R.string.category_name));
 
-                DialogFragment basicDialog = new BasicTextInputDialog();
+                BasicTextInputDialog basicDialog = new BasicTextInputDialog();
+                basicDialog.setOnTextInputListener(new BasicTextInputDialog.BasicDialogCommunicator() {
+
+                    @Override
+                    public void onTextInput(String textInput) {
+
+                        mCategory.setName(textInput);
+                        mCatNameBtn.setText(textInput);
+
+                        Log.d(TAG, "set category name to: " + textInput);
+                    }
+                });
                 basicDialog.setArguments(args);
                 basicDialog.show(getFragmentManager(), "categoryName");
             }
@@ -123,14 +134,5 @@ public class CreateCategoryActivity extends AppCompatActivity implements BasicTe
         super.onDestroy();
 
         mDatabase.close();
-    }
-
-    @Override
-    public void onTextInput(String textInput, String tag) {
-
-        mCategory.setName(textInput);
-        mCatNameBtn.setText(textInput);
-
-        Log.d(TAG, "set category name to: " + textInput);
     }
 }

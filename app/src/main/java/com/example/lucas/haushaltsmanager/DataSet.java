@@ -5,9 +5,9 @@ import android.support.annotation.NonNull;
 
 public class DataSet implements Comparable {
 
+    @ColorInt
+    private int color;
     private float value;
-    private @ColorInt
-    int color;
     private String label;
 
     public DataSet(float dataValue, @ColorInt int dataColor, @NonNull String dataLabel) {

@@ -19,6 +19,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,33 +32,42 @@ import com.example.lucas.haushaltsmanager.Activities.ImportExportActivity;
 import com.example.lucas.haushaltsmanager.Activities.RecurringBookingsActivity;
 import com.example.lucas.haushaltsmanager.Activities.TestActivity;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
-import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ChangeAccounts.ChooseAccountsDialogFragment;
+import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
+import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.MockDataCreator;
 import com.example.lucas.haushaltsmanager.MyAlarmReceiver;
 import com.example.lucas.haushaltsmanager.R;
 
-public class ParentActivity extends AppCompatActivity implements ChooseAccountsDialogFragment.OnSelectedAccount, BasicTextInputDialog.BasicDialogCommunicator {
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
+
+public class ParentActivity extends AppCompatActivity implements ChooseAccountsDialogFragment.OnSelectedAccount {
     private static final String TAG = ParentActivity.class.getSimpleName();
 
-    private SectionsPagerAdapter mSectionsPagerAdapter;
     private TabLayout mTabLayout;
     private ViewPager mViewPager;
+    private ArrayList<ExpenseObject> mExpenses = new ArrayList<>();
+    private ArrayList<Long> mActiveAccounts = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tab_main_mit_nav_drawer);
 
-        //todo in die user einstellungen verlagern
         setSharedPreferencesProperties();
+
+        setActiveAccounts();
+        updateExpenses();
 
         //Methode die jeden Tag einmal den BackupService laufen lässt
         scheduleBackupServiceAlarm();
 
 
-        //TODO den test button removen
+        //TODO den test button entfernen
         FloatingActionButton testService = (FloatingActionButton) findViewById(R.id.service_fab);
         testService.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,7 +83,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
         setSupportActionBar(toolbar);
         // Create the mReportAdapter that will return a fragment for each of the three
         // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections mReportAdapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
@@ -152,12 +162,13 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
         ExpensesDataSource database = new ExpensesDataSource(this);
         database.open();
         Currency mainCurrency = database.getCurrencyByShortName("EUR");
+        database.close();
 
         SharedPreferences preferences = this.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
         preferences.edit().putLong("mainCurrencyIndex", mainCurrency.getIndex()).apply();
         preferences.edit().putString("mainCurrencySymbol", mainCurrency.getSymbol()).apply();
-        database.close();
     }
+
     @Override
     public void onBackPressed() {
 
@@ -183,11 +194,6 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
-
-            case R.id.action_settings:
-
-                Toast.makeText(this, "replace", Toast.LENGTH_SHORT).show();
-                break;
 
             case R.id.choose_account:
 
@@ -220,16 +226,14 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
 
             switch (position) {
                 case 0:
-
                     return new TabOneBookings();
                 case 1:
-
                     return new TabTwoMonthlyReports();
                 case 2:
-
                     return new TabThree();
+                default:
+                    return null;
             }
-            return null;
         }
 
         @Override
@@ -258,45 +262,29 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
     }
 
     /**
-     * Anleitung von: https://stackoverflow.com/questions/27204409/android-calling-a-function-inside-a-fragment-from-a-custom-action-bar
-     * <p>
-     * Der User hat im ChooseAccountDialogFragment ein Konto angewählt.
-     *
-     * @param accountId Id des angewählten Kontos.
-     * @param isChecked Status des Kontos (aktiv - true oder inaktiv - false)
+    /**
+     * Methode um die Daten des aktuell sichtbaren Tabs upzudaten.
+     * Quelle: https://stackoverflow.com/a/27211004
      */
-    public void onAccountSelected(long accountId, boolean isChecked) {
+    public void updateChildView() {
 
         int visibleTabPosition = mTabLayout.getSelectedTabPosition();
         Fragment fragment = getSupportFragmentManager().findFragmentByTag("android:switcher:" + mViewPager.getId() + ":" + visibleTabPosition);
-        //todo wenn in einem Tab die Ausgaben angepasst werden (konto wird an oder abgewählt), dann nehmen die anderen tabs diese aänderung nicht mit an
 
         if (fragment != null) {
 
             switch (visibleTabPosition) {
 
                 case 0:
-                    ((TabOneBookings) fragment).refreshListOnAccountSelected(accountId, isChecked);
+                    ((TabOneBookings) fragment).updateView();
                     break;
                 case 1:
-                    ((TabTwoMonthlyReports) fragment).refreshListOnAccountSelected(accountId, isChecked);
+                    ((TabTwoMonthlyReports) fragment).updateView();
                     break;
                 case 3:
-                    //todo ((TabThree) fragment).refreshListOnAccountSelected(accountId, isChecked);
+                    ((TabThree) fragment).updateView();
                     break;
             }
-        }
-    }
-
-    @Override
-    public void onTextInput(String textInput, String tag) {
-
-        int visibleTabPosition = mTabLayout.getSelectedTabPosition();
-        Fragment fragment = getSupportFragmentManager().findFragmentByTag("android:switcher:" + mViewPager.getId() + ":" + visibleTabPosition);
-
-        if (tag.contains("tab_one")) {
-
-            ((TabOneBookings) fragment).onCombinedTitleSelected(textInput, tag);
         }
     }
 
@@ -316,5 +304,211 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
         AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
 
         alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, startInMillis, AlarmManager.INTERVAL_DAY, pendingIntent);
+    }
+
+    //ab hier werden die aktiven konten gesetzt
+
+    /**
+     * Methode um die mActiveAccounts liste zu initialisieren
+     */
+    private void setActiveAccounts() {
+        Log.d(TAG, "setActiveAccounts: Erneuere aktive Kontenliste");
+
+        SharedPreferences preferences = getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
+
+        for (Account account : getAllAccounts()) {
+
+            if (preferences.getBoolean(account.getTitle(), false))
+                mActiveAccounts.add(account.getIndex());
+        }
+    }
+
+    /**
+     * Methode um alle verfügbaren Konten aus der Datenbank zu holen
+     *
+     * @return Liste alles verfügbaren Konten
+     */
+    private ArrayList<Account> getAllAccounts() {
+
+        ExpensesDataSource database = new ExpensesDataSource(this);
+        database.open();
+
+        ArrayList<Account> accounts = database.getAllAccounts();
+        database.close();
+
+        return accounts;
+    }
+
+    ArrayList<Long> getActiveAccounts() {
+
+        return mActiveAccounts;
+    }
+
+    /**
+     * Anleitung von: https://stackoverflow.com/questions/27204409/android-calling-a-function-inside-a-fragment-from-a-custom-action-bar
+     * <p>
+     * Der User hat im ChooseAccountDialogFragment ein Konto angewählt.
+     *
+     * @param accountId Id des angewählten Kontos.
+     * @param isChecked Status des Kontos (aktiv - true oder inaktiv - false)
+     */
+    public void onAccountSelected(long accountId, boolean isChecked) {
+        if (mActiveAccounts.contains(accountId) == isChecked)
+            return;
+
+        if (mActiveAccounts.contains(accountId) && !isChecked)
+            mActiveAccounts.remove(accountId);
+        else
+            mActiveAccounts.add(accountId);
+
+        updateChildView();
+    }
+
+    //ab hier wird die Buchungsliste erstellt
+
+    /**
+     * Methode um die Liste der Buchungen zu erneuern.
+     */
+    void updateExpenses() {
+
+        ExpensesDataSource database = new ExpensesDataSource(this);
+        database.open();
+
+        mExpenses = database.getBookings();
+        database.close();
+    }
+
+    /**
+     * Methode für die KindFragments um alle anzuzeigenden Buchungen zu erhalten
+     *
+     * @return Anzuzeigende Buchungen
+     */
+    ArrayList<ExpenseObject> getExpenses() {
+
+        return mExpenses;
+    }
+
+    /**
+     * Methode für die KindFragmente um alle Buchungen in einem bestimmten Zeitraum zu bekommen.
+     *
+     * @param from Start des Zeitraums
+     * @param to   Ende des Zeitraums
+     * @return Buchungen innerhalb des angegebenen Zeitraums
+     */
+    ArrayList<ExpenseObject> getExpenses(Calendar from, Calendar to) {
+
+        ArrayList<ExpenseObject> bookingsWithinTimeFrame = new ArrayList<>();
+        for (ExpenseObject expense : mExpenses) {
+
+            if (expense.getDateTime().after(from) && expense.getDateTime().before(to)) {
+                bookingsWithinTimeFrame.add(expense);
+            }
+        }
+
+        return bookingsWithinTimeFrame;
+    }
+
+    /**
+     * Methode um eine Group- oder Parentbuchung aus der Liste der Buchungen zu löschen.
+     *
+     * @param expense Zu löschende Buchung.
+     */
+    void deleteGroupBooking(ExpenseObject expense) {
+
+        mExpenses.remove(expense);
+    }
+
+    /**
+     * Methode um mehrere Group- oder Parentbuchungen aus der Liste der Buchungen zu löschen.
+     *
+     * @param expenses Zu löschende Buchungen
+     */
+    void deleteGroupBookings(ArrayList<ExpenseObject> expenses) {
+
+        for (ExpenseObject expense : expenses) {
+            deleteGroupBooking(expense);
+        }
+    }
+
+    /**
+     * Methode um ein Group- oder Parentbuchung in die Liste der Buchungen einzufügen.
+     *
+     * @param expense Hinzuzufügende Buchung
+     */
+    void addGroupBooking(ExpenseObject expense) {
+
+        mExpenses.add(expense);
+    }
+
+    /**
+     * Methode um mehrere Group- oder Parentbuchungen in die Liste der Buchungen einzufügen.
+     *
+     * @param expenses Hinzuzufügenden Buchungen
+     */
+    void addGroupBookings(ArrayList<ExpenseObject> expenses) {
+
+        for (ExpenseObject expense : expenses) {
+            addGroupBooking(expense);
+        }
+    }
+
+    /**
+     * Methode um eine bestimmte KindBuchung zu löchen.
+     *
+     * @param indexOfParent ParentBuchung des Kindes
+     * @param child         Zu löschendes Kind
+     */
+    void deleteChildBooking(int indexOfParent, ExpenseObject child) {
+
+        ExpenseObject parentExpense = mExpenses.get(indexOfParent);
+        parentExpense.removeChild(child);
+
+        mExpenses.set(indexOfParent, parentExpense);
+    }
+
+    /**
+     * Methode um bestimmte Kindbuchungen aus der Liste der Buchungen zu löschen.
+     * Dabei ist KEY = ParentBuchung und VALUE = KindBuchung.
+     *
+     * @param children Zu löschende Kindbuchungen
+     */
+    void deleteChildBookings(HashMap<Long, ExpenseObject> children) {
+
+        for (Map.Entry<Long, ExpenseObject> entry : children.entrySet()) {
+            deleteChildBooking(
+                    entry.getKey().intValue(),
+                    entry.getValue()
+            );
+        }
+    }
+
+    /**
+     * Methode um ein neues Kind zu einer bestehenden Buchung hinzufügen soll.
+     *
+     * @param indexOfParent ParentBuchung zu der das Kind hinzugefügt werden soll
+     * @param child         Hinzuzufügende KindBuchung
+     */
+    void addChildBooking(int indexOfParent, ExpenseObject child) {
+
+        ExpenseObject parentExpense = mExpenses.get(indexOfParent);
+        parentExpense.addChild(child);
+
+        mExpenses.set(indexOfParent, parentExpense);
+    }
+
+    /**
+     * Methode um bestimmte KindBuchungen zu bestimmten ParentBuchungen hinzuzufügen.
+     * Dabei ist KEY = ParentBuchung und VALUE = KindBuchung.
+     *
+     * @param children Hinzuzufügende KindBuchungen
+     */
+    void addChildBookings(HashMap<Long, ExpenseObject> children) {
+
+        for (Map.Entry<Long, ExpenseObject> entry : children.entrySet()) {
+            addChildBooking(
+                    entry.getKey().intValue(),
+                    entry.getValue()
+            );
+        }
     }
 }

@@ -23,15 +23,8 @@ public class DatePickerDialog extends DialogFragment implements DatePicker.OnDat
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        try {
-
-            mCallback = (OnDateSelected) context;
-            mContext = context;
-            mCalendar = Calendar.getInstance();
-        } catch (ClassCastException e) {
-
-            throw new ClassCastException(context.toString() + " must implement OnDateSelected");
-        }
+        mContext = context;
+        mCalendar = Calendar.getInstance();
     }
 
     @Override
@@ -55,7 +48,7 @@ public class DatePickerDialog extends DialogFragment implements DatePicker.OnDat
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                mCallback.onDateSelected(mCalendar, getTag());
+                mCallback.onDateSelected(mCalendar);
                 dismiss();
             }
         });
@@ -71,6 +64,15 @@ public class DatePickerDialog extends DialogFragment implements DatePicker.OnDat
         return builder.create();
     }
 
+    /**
+     * Methode um einen Listener zu setzen, welcher aufegrufen wird, wenn der User ein Datum ausgewählt hat.
+     *
+     * @param listener Listener
+     */
+    public void setOnDateSelectedListener(DatePickerDialog.OnDateSelected listener) {
+        mCallback = listener;
+    }
+
     @Override
     public void onStop() {
         super.onStop();
@@ -83,6 +85,6 @@ public class DatePickerDialog extends DialogFragment implements DatePicker.OnDat
     }
 
     public interface OnDateSelected {
-        void onDateSelected(Calendar date, String tag);
+        void onDateSelected(Calendar date);
     }
 }

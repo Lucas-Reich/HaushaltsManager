@@ -1,16 +1,22 @@
 package com.example.lucas.haushaltsmanager.Dialogs;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import com.codekidlabs.storagechooser.StorageChooser;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.io.File;
@@ -20,58 +26,36 @@ import java.util.List;
 public class DirectoryPickerDialog extends DialogFragment {
     private static final String TAG = DirectoryPickerDialog.class.getSimpleName();
 
-    OnDirectorySelected mCallback;
-    String mDialogTitle;
-    Context mContext;
-    ListView mListView;
-    ArrayAdapter<String> mAdapter;
-    File mCurrentDir;
-    List<String> mSubDirectories;
+    private OnDirectorySelected mCallback;
+    private Context mContext;
+    private ListView mListView;
+    private File mCurrentDir;
+    private List<String> mSubDirectories;
+    private String mSearchMode;// todo funktionalität implementieren
+    private boolean mAllowDirectoryCreation = true;// todo set false
+
+    public static final String SEARCH_MODE_DIRECTORY = "directory";
+    public static final String SEARCH_MODE_FILE = "file";
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-
-        try {
-
-            mCallback = (OnDirectorySelected) context;
-            mContext = context;
-        } catch (ClassCastException e) {
-
-            throw new ClassCastException(context.toString() + " must implement OnDirectorySelected");
-        }
+        mContext = context;
     }
 
-    //sollte ich noch einen "go up" button einfügen, um ein directory zurückzugehen??
+    //todo einen "go up" button einfügen, welcher einen ein verzeichniss nach oben bringt
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-        mCurrentDir = mContext.getFilesDir(); // das start verzeichniss sollte noch weiter unten sein als in files
+        getReadExternalStoragePermission();
+
+        mCurrentDir = Environment.getExternalStorageDirectory();
 
         Bundle args = getArguments();
-        mDialogTitle = args.getString("title") != null ? args.getString("title") : "";
+        String mDialogTitle = args.getString("title") != null ? args.getString("title") : "";
+        mSearchMode = args.getString("search_mode") != null ? args.getString("search_mode") : SEARCH_MODE_FILE;
 
-        mListView = new ListView(mContext);
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                if (position == 1) {
-
-                    mCurrentDir = mCurrentDir.getParentFile();
-                } else {
-
-                    File picketSubDir = new File(mCurrentDir + mSubDirectories.get(position));
-                    if (picketSubDir.isDirectory()) {
-
-                        mCurrentDir = picketSubDir;
-                    }
-                }
-
-                refreshListView(mCurrentDir);
-            }
-        });
+        prepareListView();
 
         refreshListView(mCurrentDir);
 
@@ -86,7 +70,8 @@ public class DirectoryPickerDialog extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                mCallback.onDirectorySelected(mCurrentDir, getTag());
+                if (mCallback != null)
+                    mCallback.onDirectorySelected(mCurrentDir, "");
             }
         });
 
@@ -99,7 +84,45 @@ public class DirectoryPickerDialog extends DialogFragment {
             }
         });
 
+        if (mAllowDirectoryCreation) {
+
+            dialog.setNeutralButton(R.string.create_new_directory, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+
+                    BasicTextInputDialog textInputDialog = new BasicTextInputDialog();
+                    textInputDialog.setArguments(new Bundle());
+                    textInputDialog.setOnTextInputListener(new BasicTextInputDialog.BasicDialogCommunicator() {
+
+                        @Override
+                        public void onTextInput(String textInput) {
+
+                            Toast.makeText(mContext, textInput, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    textInputDialog.show(getFragmentManager(), "penis");
+                    String newDirName = "neuesDir"; // todo den namen des verzeichnisses vom user erfragen
+
+                    File newDir = new File(mCurrentDir.toString() + newDirName);
+                    createNewDirectory(newDir);
+                }
+            });
+        }
+
         return dialog.create();
+    }
+
+    /**
+     * Methode um ein neues Verzeichniss zu erstellen.
+     *
+     * @param directory Zu erstellendes Verzeichniss
+     */
+    private void createNewDirectory(File directory) {
+        if (!directory.exists())
+            directory.mkdir();
+        else
+            Toast.makeText(mContext, R.string.directory_already_existing, Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -126,6 +149,43 @@ public class DirectoryPickerDialog extends DialogFragment {
     }
 
     /**
+     * Methode um die ListView vorzubereiten.
+     */
+    private void prepareListView() {
+
+        mListView = new ListView(mContext);
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                if (position == 1) {
+
+                    mCurrentDir = mCurrentDir.getParentFile();
+                } else {
+
+                    File picketSubDir = new File(mCurrentDir + mSubDirectories.get(position));
+                    if (picketSubDir.isDirectory()) {
+
+                        mCurrentDir = picketSubDir;
+                    }
+                }
+
+                refreshListView(mCurrentDir);
+            }
+        });
+    }
+
+    /**
+     * Methode um die Berechtigung zum lesen und schreiben des externen Speichers zu erhalten
+     */
+    private void getReadExternalStoragePermission() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            ActivityCompat.requestPermissions((Activity) mContext, new String[]{"android.permission.READ_EXTERNAL_STORAGE"}, 0);
+        }
+    }
+
+    /**
      * Methode um die Unterverzeichnisse zu einem Verzeichniss in einer ListView anzeigt
      *
      * @param currentDir Das aktuelle Verzeichniss
@@ -134,11 +194,31 @@ public class DirectoryPickerDialog extends DialogFragment {
 
         mSubDirectories = getSubDirectories(currentDir);
 
-        mAdapter = new ArrayAdapter<>(mContext, android.R.layout.simple_list_item_1, mSubDirectories);
+        ArrayAdapter<String> mAdapter = new ArrayAdapter<>(mContext, android.R.layout.simple_list_item_1, mSubDirectories);
 
         mListView.setAdapter(mAdapter);
 
         mAdapter.notifyDataSetChanged();
+    }
+
+    /**
+     * Methode um es dem User zu erlauben ein neues Verzeichniss zu erstellen.
+     *
+     * @param allow TRUE wenn es erlaubt sein soll, FALSE wenn nicht.
+     */
+    public void allowDirectoryCreation(boolean allow) {
+
+        mAllowDirectoryCreation = allow;
+    }
+
+    /**
+     * Methode um einen listener auf das Directory choosen event zu setzen.
+     *
+     * @param listener Listener der aufgerufen werden soll
+     */
+    public void setDirectoryChosenListener(DirectoryPickerDialog.OnDirectorySelected listener) {
+
+        mCallback = listener;
     }
 
     public interface OnDirectorySelected {

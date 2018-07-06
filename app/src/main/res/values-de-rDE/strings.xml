@@ -46,13 +46,13 @@
     <string name="expense_screen_error_create">Fehler beim erstellen der Buchung. Gib mindestens einen Betrag, einen Titel und eine Kategorie an!</string>
     <string name="tab_one_title">Ausgaben</string>
     <string name="tab_three_title">Berichte</string>
-    <string name="tab_two_title">Monatsübersicht</string>
+    <string name="tab_two_title">Monatliche Übersicht</string>
     <string name="month_report_booking">Buchung</string>
     <string name="month_report_bookings">Buchungen</string>
     <string name="expense_screen_amount_currency">€</string>
     <string name="expense_screen_recurring_end">Enddatum auswählen</string>
     <string name="expense_screen_recurring_frequency">Häufigkeit auswählen</string>
-    <string name="choose_account">Klicke hier, um deine Konten anzuzeigen und zu bearbeiten</string>
+    <string name="choose_account">Passe deine Konten an</string>
     <string name="account">Konten</string>
     <string name="btn_new_acc">Neues Konto</string>
     <string name="no_name">(Unbenannt)</string>
@@ -123,4 +123,18 @@
     <string name="transfer_to">Überweisung nach</string>
     <!-- todo bessere übersetzung einfallen lassen -->
     <string name="error_parent_already_highlighted">Kinder einer bereits ausgewählten Parentbuchung können nicht ausgewählt werden!</string>
+    <string name="import_bookings_confirmation">Bist du sicher, dass du die Ausgewählten Buchungen importieren möchtest?</string>
+    <string name="confirmation_dialog_title">Bestätige Auswahl</string>
+    <string name="export_directory_confirmation">Bist du sicher, dass du die Buchungen in das aktuell ausgewählte Verzeichniss exportieren möchtest?</string>
+    <string name="create_export">Erstelle Export</string>
+    <string name="btn_yes">Ja</string>
+    <string name="btn_no">Nein</string>
+    <string name="error_no_directory_selected">Um fortzufahren musst du zuerst ein Verzeichniss auswählen!</string>
+    <string name="hint_choose_directory">Klicke hier um einen Speicherort auszuwählen</string>
+    <string name="no_files_to_import">In diesem Verzeichniss gibt es keine Datein die importiert werden können!</string>
+    <string name="create_new_directory">Erstelle Verzeichniss</string>
+    <string name="directory_already_existing">Fehler! Das Verzeichniss gibt es bereits!</string>
+    <string name="bookings_successfully_restored">Buchungen wurden erfolgreich wiederhergestellt!</string>
+    <string name="revert_deletion">Löschen rückgängig machen?</string>
+    <string name="revert_action">Rückgänig machen</string>
 </resources>

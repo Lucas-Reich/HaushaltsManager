@@ -293,6 +293,13 @@ public class ExpenseObject implements Parcelable {
         return account;
     }
 
+    public void removeChild(ExpenseObject child) {
+
+        this.children.remove(child);
+        if (children.size() == 0)
+            setExpenseType(EXPENSE_TYPES.NORMAL_EXPENSE);
+    }
+
     public void setAccount(@NonNull Account account) {
 
         this.account = account;

@@ -1,38 +1,30 @@
 package com.example.lucas.haushaltsmanager.Activities.MainTab;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
-import com.example.lucas.haushaltsmanager.Entities.Account;
-import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
-import com.example.lucas.haushaltsmanager.MonthlyReportAdapterCreator;
 import com.example.lucas.haushaltsmanager.MonthlyReportAdapter;
+import com.example.lucas.haushaltsmanager.MonthlyReportAdapterCreator;
 import com.example.lucas.haushaltsmanager.R;
-
-import java.util.ArrayList;
 
 public class TabTwoMonthlyReports extends Fragment {
     private static final String TAG = TabTwoMonthlyReports.class.getSimpleName();
 
     private RecyclerView mRecyclerView;
-    private ArrayList<Long> mActiveAccounts;
+    private ParentActivity mParent;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mActiveAccounts = new ArrayList<>();
-        setActiveAccounts();
+
+        mParent = (ParentActivity) getActivity();
     }
 
     @Override
@@ -41,7 +33,7 @@ public class TabTwoMonthlyReports extends Fragment {
 
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.tab_two_recycler_view);
 
-        updateExpandableListView();
+        updateView();
 
         return rootView;
     }
@@ -52,57 +44,15 @@ public class TabTwoMonthlyReports extends Fragment {
     }
 
     /**
-     * Methode um die mActiveAccounts liste zu initialisieren
-     */
-    private void setActiveAccounts() {
-        Log.d(TAG, "setActiveAccounts: Erneuere aktive Kontenliste");
-
-        SharedPreferences preferences = getContext().getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
-
-        for (Account account : getAllAccounts()) {
-
-            if (preferences.getBoolean(account.getTitle(), false))
-                mActiveAccounts.add(account.getIndex());
-        }
-    }
-
-    /**
-     * Methode um alle verfügbaren Konten aus der Datenbank zu holen
-     *
-     * @return Liste alles verfügbaren Konten
-     */
-    private ArrayList<Account> getAllAccounts() {
-
-        ExpensesDataSource database = new ExpensesDataSource(getContext());
-        database.open();
-
-        ArrayList<Account> accounts = database.getAllAccounts();
-        database.close();
-
-        return accounts;
-    }
-
-    /**
-     * Methode um die Ansicht des Tabs beim hinzufügen oder abwählen eines Kontos in ChooseAccountDialogFragment mit neuen Daten zu erneuern
-     */
-    public void refreshListOnAccountSelected(long accountId, boolean isChecked) {
-        if (mActiveAccounts.contains(accountId) == isChecked)
-            return;
-
-        if (mActiveAccounts.contains(accountId) && !isChecked)
-            mActiveAccounts.remove(accountId);
-        else
-            mActiveAccounts.add(accountId);
-
-        updateExpandableListView();
-    }
-
-    /**
      * Methode um die ExpandableListView nach eine Änderung neu anzuzeigen
      */
-    public void updateExpandableListView() {
+    public void updateView() {
 
-        MonthlyReportAdapter adapter = new MonthlyReportAdapterCreator(getExpenses(), getContext(), mActiveAccounts).getAdapter();
+        MonthlyReportAdapter adapter = new MonthlyReportAdapterCreator(
+                mParent.getExpenses(),
+                getContext(),
+                mParent.getActiveAccounts()
+        ).getAdapter();
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setAdapter(adapter);
@@ -110,19 +60,22 @@ public class TabTwoMonthlyReports extends Fragment {
         adapter.notifyDataSetChanged();
     }
 
+
     /**
-     * Methode um die Ausgaben des aktuellen Jahres aus der Datenbank zu holen
+     * Methode um herauszufinden, ob der aktuelle tab gerade sichtbar geworden ist oder nicht.
+     * Quelle: https://stackoverflow.com/a/9779971
      *
-     * @return Liste der Buchungen des aktuellen Jahres
+     * @param isVisibleToUser Indikator ob die aktuelle UI für den User sichtbar ist. Default ist True.
      */
-    private ArrayList<ExpenseObject> getExpenses() {
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
 
-        ExpensesDataSource database = new ExpensesDataSource(getContext());
-        database.open();
-
-        ArrayList<ExpenseObject> expenses = database.getBookings();
-        database.close();
-
-        return expenses;
+        if (this.isVisible()) {
+            if (isVisibleToUser) {
+                updateView();
+                //todo nur updaten wenn etwas passiert ist
+            }
+        }
     }
 }

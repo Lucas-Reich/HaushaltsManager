@@ -6,9 +6,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
@@ -18,13 +20,14 @@ import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.R;
 
-public class CreateAccountActivity extends AppCompatActivity implements BasicTextInputDialog.BasicDialogCommunicator, PriceInputDialog.OnPriceSelected {
+public class CreateAccountActivity extends AppCompatActivity {
     private static final String TAG = CreateAccountActivity.class.getSimpleName();
 
     Button mAccountNameBtn;
     Button mAccountBalanceBtn, mCreateAccountBtn;
     ExpensesDataSource mDatabase;
     Account mAccount;
+    private ImageButton mBackArrow;
 
     private enum CREATION_MODES {
         CREATE_ACCOUNT,
@@ -67,11 +70,25 @@ public class CreateAccountActivity extends AppCompatActivity implements BasicTex
         mAccountNameBtn = (Button) findViewById(R.id.new_account_name);
         mAccountBalanceBtn = (Button) findViewById(R.id.new_account_balance);
         mCreateAccountBtn = (Button) findViewById(R.id.new_account_create);
+
+        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
+        mBackArrow = (ImageButton) findViewById(R.id.back_arrow);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        mBackArrow.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                finish();
+            }
+        });
 
         mAccountNameBtn.setHint(mAccount.getTitle());
         mAccountNameBtn.setOnClickListener(new View.OnClickListener() {
@@ -84,12 +101,23 @@ public class CreateAccountActivity extends AppCompatActivity implements BasicTex
                 args.putString("hint", mAccount.getTitle());
 
                 BasicTextInputDialog basicDialog = new BasicTextInputDialog();
+                basicDialog.setOnTextInputListener(new BasicTextInputDialog.BasicDialogCommunicator() {
+
+                    @Override
+                    public void onTextInput(String textInput) {
+
+                        mAccount.setName(textInput);
+                        mAccountNameBtn.setText(mAccount.getTitle());
+
+                        Log.d(TAG, "set Account name to" + mAccount.getTitle());
+                    }
+                });
                 basicDialog.setArguments(args);
                 basicDialog.show(getFragmentManager(), "create_account_name");
             }
         });
 
-        mAccountBalanceBtn.setHint(mAccount.getBalance() + "");
+        mAccountBalanceBtn.setHint(String.format(this.getResources().getConfiguration().locale, "%.2f", mAccount.getBalance()));
         mAccountBalanceBtn.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -100,6 +128,16 @@ public class CreateAccountActivity extends AppCompatActivity implements BasicTex
 
                 PriceInputDialog priceInputDialog = new PriceInputDialog();
                 priceInputDialog.setArguments(args);
+                priceInputDialog.setOnPriceSelectedListener(new PriceInputDialog.OnPriceSelected() {
+                    @Override
+                    public void onPriceSelected(double price) {
+
+                        mAccount.setBalance(price);
+                        mAccountBalanceBtn.setText(String.format(getResources().getConfiguration().locale, "%.2f", mAccount.getBalance()));
+
+                        Log.d(TAG, "set account balance to " + mAccount.getBalance());
+                    }
+                });
                 priceInputDialog.show(getFragmentManager(), "create_account_price");
             }
         });
@@ -150,34 +188,10 @@ public class CreateAccountActivity extends AppCompatActivity implements BasicTex
         }
     };
 
-    @Override
-    public void onTextInput(String textInput, String tag) {
-
-        if (tag.equals("create_account_name")) {
-
-            mAccount.setName(textInput);
-            mAccountNameBtn.setText(mAccount.getTitle());
-
-            Log.d(TAG, "set Account name to" + mAccount.getTitle());
-        }
-    }
-
-    @Override
-    public void onPriceSelected(double price, String tag) {
-
-        if (tag.equals("create_account_price")) {
-
-            mAccount.setBalance(price);
-            mAccountBalanceBtn.setText(String.format(this.getResources().getConfiguration().locale, "%.2f", mAccount.getBalance()));
-
-            Log.d(TAG, "set account balance to " + mAccount.getBalance());
-        }
-    }
-
     private Currency getDefaultCurrency() {
         SharedPreferences preferences = this.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
 
-        long mainCurrencIndex = preferences.getLong("mainCurrencyIndex", 32);
-        return mDatabase.getCurrencyById(mainCurrencIndex);
+        long mainCurrencyIndex = preferences.getLong("mainCurrencyIndex", 32);
+        return mDatabase.getCurrencyById(mainCurrencyIndex);
     }
 }

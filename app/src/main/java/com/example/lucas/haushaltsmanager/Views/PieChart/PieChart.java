@@ -26,7 +26,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class PieChart extends ViewUtils {
-    private String TAG = PieChart.class.getSimpleName();
+    private final static String TAG = PieChart.class.getSimpleName();
 
     private Legend mLegend;
     private boolean mDrawLegend;
@@ -317,7 +317,6 @@ public class PieChart extends ViewUtils {
      * @param dataSets Vom User gegebene Daten
      */
     private void convertToSlices(List<DataSet> dataSets) {
-
         float startAngle = 0;
         List<PieSlice> defaultLayer = new ArrayList<>();
         for (DataSet dataSet : dataSets) {
@@ -767,7 +766,7 @@ public class PieChart extends ViewUtils {
      *
      * @param event Interaktionsart des Users
      * @return Boolean ob das event gehandelt wurde
-     */
+     *///todo die funktion perfomClick einfügen und die click logik dorthin verlagern, da klicks auch anders ausgelöst werden können
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (!mTouchEnabled)
