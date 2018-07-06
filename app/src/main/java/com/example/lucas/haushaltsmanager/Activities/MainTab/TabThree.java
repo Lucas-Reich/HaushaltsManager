@@ -17,6 +17,10 @@ public class TabThree extends Fragment {
         return rootView;
     }
 
+    public void updateView() {
+
+        //todo
+    }
 
     /**
      * Methode um herauszufinden, ob der aktuelle tab gerade sichtbar geworden ist oder nicht.
@@ -30,7 +34,8 @@ public class TabThree extends Fragment {
 
         if (this.isVisible()) {
             if (isVisibleToUser) {
-                //todo wenn der Tab sichtbar wird soll die ParentActivity nach den aktuellsten ListDaten gefragt werden
+                updateView();
+                //todo die view sollte nur geupdated werden wenn es auch wirklich veränderungen gab
             }
         }
     }

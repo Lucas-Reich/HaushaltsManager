@@ -43,7 +43,6 @@ import com.example.lucas.haushaltsmanager.R;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class ParentActivity extends AppCompatActivity implements ChooseAccountsDialogFragment.OnSelectedAccount {
@@ -263,37 +262,11 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
     }
 
     /**
-     * Anleitung von: https://stackoverflow.com/questions/27204409/android-calling-a-function-inside-a-fragment-from-a-custom-action-bar
-     * <p>
-     * Der User hat im ChooseAccountDialogFragment ein Konto angewählt.
-     *
-     * @param accountId Id des angewählten Kontos.
-     * @param isChecked Status des Kontos (aktiv - true oder inaktiv - false)
+    /**
+     * Methode um die Daten des aktuell sichtbaren Tabs upzudaten.
+     * Quelle: https://stackoverflow.com/a/27211004
      */
-//    public void onAccountSelected(long accountId, boolean isChecked) {
-//
-//        int visibleTabPosition = mTabLayout.getSelectedTabPosition();
-//        Fragment fragment = getSupportFragmentManager().findFragmentByTag("android:switcher:" + mViewPager.getId() + ":" + visibleTabPosition);
-//        //todo wenn in einem Tab die Ausgaben angepasst werden (konto wird an oder abgewählt), dann nehmen die anderen tabs diese aänderung nicht mit an
-//
-//        if (fragment != null) {
-//
-//            switch (visibleTabPosition) {
-//
-//                case 0:
-//                    ((TabOneBookings) fragment).refreshListOnAccountSelected(accountId, isChecked);
-//                    break;
-//                case 1:
-//                    ((TabTwoMonthlyReports) fragment).refreshListOnAccountSelected(accountId, isChecked);
-//                    break;
-//                case 3:
-//                    //todo ((TabThree) fragment).refreshListOnAccountSelected(accountId, isChecked);
-//                    break;
-//            }
-//        }
-//    }
-
-    public void refreshVisibleListView() {
+    public void updateChildView() {
 
         int visibleTabPosition = mTabLayout.getSelectedTabPosition();
         Fragment fragment = getSupportFragmentManager().findFragmentByTag("android:switcher:" + mViewPager.getId() + ":" + visibleTabPosition);
@@ -303,13 +276,13 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
             switch (visibleTabPosition) {
 
                 case 0:
-                    ((TabOneBookings) fragment).updateExpListView();
+                    ((TabOneBookings) fragment).updateView();
                     break;
                 case 1:
-                    ((TabTwoMonthlyReports) fragment).updateExpandableListView();
+                    ((TabTwoMonthlyReports) fragment).updateView();
                     break;
                 case 3:
-                    //todo ((TabThree) fragment).refreshListOnAccountSelected(accountId, isChecked);
+                    ((TabThree) fragment).updateView();
                     break;
             }
         }
@@ -334,6 +307,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
     }
 
     //ab hier werden die aktiven konten gesetzt
+
     /**
      * Methode um die mActiveAccounts liste zu initialisieren
      */
@@ -387,7 +361,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
         else
             mActiveAccounts.add(accountId);
 
-        refreshVisibleListView();
+        updateChildView();
     }
 
     //ab hier wird die Buchungsliste erstellt

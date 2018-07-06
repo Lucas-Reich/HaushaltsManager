@@ -33,7 +33,7 @@ public class TabTwoMonthlyReports extends Fragment {
 
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.tab_two_recycler_view);
 
-        updateExpandableListView();
+        updateView();
 
         return rootView;
     }
@@ -46,7 +46,7 @@ public class TabTwoMonthlyReports extends Fragment {
     /**
      * Methode um die ExpandableListView nach eine Änderung neu anzuzeigen
      */
-    public void updateExpandableListView() {
+    public void updateView() {
 
         MonthlyReportAdapter adapter = new MonthlyReportAdapterCreator(
                 mParent.getExpenses(),
@@ -73,7 +73,7 @@ public class TabTwoMonthlyReports extends Fragment {
 
         if (this.isVisible()) {
             if (isVisibleToUser) {
-                updateExpandableListView();
+                updateView();
                 //todo nur updaten wenn etwas passiert ist
             }
         }

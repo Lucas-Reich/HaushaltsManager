@@ -2,9 +2,7 @@ package com.example.lucas.haushaltsmanager.Activities.MainTab;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -13,7 +11,6 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,7 +23,6 @@ import android.widget.Toast;
 import com.example.lucas.haushaltsmanager.Activities.ExpenseScreenActivity;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
-import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.ExpandableListAdapter;
 import com.example.lucas.haushaltsmanager.ExpandableListAdapterCreator;
@@ -88,7 +84,7 @@ public class TabOneBookings extends Fragment {
         setOnChildClickListener();
         setOnItemLongClickListener();
 
-        updateExpListView();
+        updateView();
 
         final Activity mainTab = getActivity();
 
@@ -460,7 +456,7 @@ public class TabOneBookings extends Fragment {
     private void resetExpandableListView() {
 
         mListAdapter.deselectAll();
-        updateExpListView();
+        updateView();
         enableLongClick();
     }
 
@@ -477,7 +473,7 @@ public class TabOneBookings extends Fragment {
     /**
      * Methode um die ExpandableListView nach einer Änderung neu anzuzeigen.
      */
-    public void updateExpListView() {
+    public void updateView() {
 
         mListAdapter = new ExpandableListAdapterCreator(
                 mParent.getExpenses(getFirstOfMonth(), getLastOfMonth()),
@@ -726,7 +722,7 @@ public class TabOneBookings extends Fragment {
 
             // todo überprüfen ob die buchung wirklich wiederhergestellt wurde
             Toast.makeText(getContext(), mSuccessMessage, Toast.LENGTH_SHORT).show();
-            updateExpListView();
+            updateView();
         }
     }
 
@@ -743,7 +739,7 @@ public class TabOneBookings extends Fragment {
 
         if (this.isVisible()) {
             if (isVisibleToUser) {
-                updateExpListView();
+                updateView();
                 //todo nur updaten wenn etwas passiert ist
             }
         }
