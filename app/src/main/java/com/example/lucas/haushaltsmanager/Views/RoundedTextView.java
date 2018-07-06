@@ -51,7 +51,6 @@ public class RoundedTextView extends ViewUtils {
         mTextPaint.setColor(Color.BLACK);
         mTextPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
         mTextPaint.setTextSize(mTextSize);
-        mTextPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
     }
 
     private Rect getDesiredSize() {
