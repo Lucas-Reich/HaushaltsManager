@@ -31,33 +31,39 @@ import com.example.lucas.haushaltsmanager.Activities.ImportExportActivity;
 import com.example.lucas.haushaltsmanager.Activities.RecurringBookingsActivity;
 import com.example.lucas.haushaltsmanager.Activities.TestActivity;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
-import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ChangeAccounts.ChooseAccountsDialogFragment;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
+import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.MockDataCreator;
 import com.example.lucas.haushaltsmanager.MyAlarmReceiver;
 import com.example.lucas.haushaltsmanager.R;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
+
 public class ParentActivity extends AppCompatActivity implements ChooseAccountsDialogFragment.OnSelectedAccount {
     private static final String TAG = ParentActivity.class.getSimpleName();
 
-    private SectionsPagerAdapter mSectionsPagerAdapter;
     private TabLayout mTabLayout;
     private ViewPager mViewPager;
+    private ArrayList<ExpenseObject> mExpenses = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tab_main_mit_nav_drawer);
 
-        //todo in die user einstellungen verlagern
         setSharedPreferencesProperties();
+
+        updateExpenses();
 
         //Methode die jeden Tag einmal den BackupService laufen lässt
         scheduleBackupServiceAlarm();
 
 
-        //TODO den test button removen
+        //TODO den test button entfernen
         FloatingActionButton testService = (FloatingActionButton) findViewById(R.id.service_fab);
         testService.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,7 +79,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
         setSupportActionBar(toolbar);
         // Create the mReportAdapter that will return a fragment for each of the three
         // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections mReportAdapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
@@ -119,9 +125,6 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
                         break;
                     case R.id.import_export:
 
-                        //Intent importExportIntent = new Intent(ParentActivity.this, ImportExportActivityVer2.class);
-                        //ParentActivity.this.startActivity(importExportIntent);
-
                         Intent importExportIntent = new Intent(ParentActivity.this, ImportExportActivity.class);
                         ParentActivity.this.startActivity(importExportIntent);
                         break;
@@ -155,11 +158,11 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
         ExpensesDataSource database = new ExpensesDataSource(this);
         database.open();
         Currency mainCurrency = database.getCurrencyByShortName("EUR");
+        database.close();
 
         SharedPreferences preferences = this.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
         preferences.edit().putLong("mainCurrencyIndex", mainCurrency.getIndex()).apply();
         preferences.edit().putString("mainCurrencySymbol", mainCurrency.getSymbol()).apply();
-        database.close();
     }
 
     @Override
@@ -301,5 +304,153 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
         AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
 
         alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, startInMillis, AlarmManager.INTERVAL_DAY, pendingIntent);
+    }
+
+    //ab hier wird die Buchungsliste erstellt
+
+    /**
+     * Methode um die Liste der Buchungen zu erneuern.
+     */
+    void updateExpenses() {
+
+        ExpensesDataSource database = new ExpensesDataSource(this);
+        database.open();
+
+        mExpenses = database.getBookings();
+        database.close();
+    }
+
+    /**
+     * Methode für die KindFragments um alle anzuzeigenden Buchungen zu erhalten
+     *
+     * @return Anzuzeigende Buchungen
+     */
+    ArrayList<ExpenseObject> getExpenses() {
+
+        return mExpenses;
+    }
+
+    /**
+     * Methode für die KindFragmente um alle Buchungen in einem bestimmten Zeitraum zu bekommen.
+     *
+     * @param from Start des Zeitraums
+     * @param to   Ende des Zeitraums
+     * @return Buchungen innerhalb des angegebenen Zeitraums
+     */
+    ArrayList<ExpenseObject> getExpenses(Calendar from, Calendar to) {
+
+        ArrayList<ExpenseObject> bookingsWithinTimeFrame = new ArrayList<>();
+        for (ExpenseObject expense : mExpenses) {
+
+            if (expense.getDateTime().after(from) && expense.getDateTime().before(to)) {
+                bookingsWithinTimeFrame.add(expense);
+            }
+        }
+
+        return bookingsWithinTimeFrame;
+    }
+
+    /**
+     * Methode um eine Group- oder Parentbuchung aus der Liste der Buchungen zu löschen.
+     *
+     * @param expense Zu löschende Buchung.
+     */
+    void deleteGroupBooking(ExpenseObject expense) {
+
+        mExpenses.remove(expense);
+    }
+
+    /**
+     * Methode um mehrere Group- oder Parentbuchungen aus der Liste der Buchungen zu löschen.
+     *
+     * @param expenses Zu löschende Buchungen
+     */
+    void deleteGroupBookings(ArrayList<ExpenseObject> expenses) {
+
+        for (ExpenseObject expense : expenses) {
+            deleteGroupBooking(expense);
+        }
+    }
+
+    /**
+     * Methode um ein Group- oder Parentbuchung in die Liste der Buchungen einzufügen.
+     *
+     * @param expense Hinzuzufügende Buchung
+     */
+    void addGroupBooking(ExpenseObject expense) {
+
+        mExpenses.add(expense);
+    }
+
+    /**
+     * Methode um mehrere Group- oder Parentbuchungen in die Liste der Buchungen einzufügen.
+     *
+     * @param expenses Hinzuzufügenden Buchungen
+     */
+    void addGroupBookings(ArrayList<ExpenseObject> expenses) {
+
+        for (ExpenseObject expense : expenses) {
+            addGroupBooking(expense);
+        }
+    }
+
+    /**
+     * Methode um eine bestimmte KindBuchung zu löchen.
+     *
+     * @param indexOfParent ParentBuchung des Kindes
+     * @param child         Zu löschendes Kind
+     */
+    void deleteChildBooking(int indexOfParent, ExpenseObject child) {
+        
+        ExpenseObject parentExpense = mExpenses.get(indexOfParent);
+        parentExpense.removeChild(child);
+
+        mExpenses.set(indexOfParent, parentExpense);
+    }
+
+    /**
+     * Methode um bestimmte Kindbuchungen aus der Liste der Buchungen zu löschen.
+     * Dabei ist KEY = ParentBuchung und VALUE = KindBuchung.
+     *
+     * @param children Zu löschende Kindbuchungen
+     */
+    void deleteChildBookings(HashMap<Long, ExpenseObject> children) {
+
+        for (Map.Entry<Long, ExpenseObject> entry : children.entrySet()) {
+            deleteChildBooking(
+                    entry.getKey().intValue(),
+                    entry.getValue()
+            );
+        }
+    }
+
+    /**
+     * Methode um ein neues Kind zu einer bestehenden Buchung hinzufügen soll.
+     *
+     * @param indexOfParent ParentBuchung zu der das Kind hinzugefügt werden soll
+     * @param child         Hinzuzufügende KindBuchung
+     */
+    void addChildBooking(int indexOfParent, ExpenseObject child) {
+
+        ExpenseObject parentExpense = mExpenses.get(indexOfParent);
+        parentExpense.addChild(child);
+
+        mExpenses.set(indexOfParent, parentExpense);
+    }
+
+    /**
+     * Methode um bestimmte KindBuchungen zu bestimmten ParentBuchungen hinzuzufügen.
+     * Dabei ist KEY = ParentBuchung und VALUE = KindBuchung.
+     *
+     * @param children Hinzuzufügende KindBuchungen
+     */
+    void addChildBookings(HashMap<Long, ExpenseObject> children) {
+
+        for (Map.Entry<Long, ExpenseObject> entry : children.entrySet()) {
+            addChildBooking(
+                    entry.getKey().intValue(),
+                    entry.getValue()
+            );
+        }
     }
 }

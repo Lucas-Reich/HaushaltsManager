@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
 import com.example.lucas.haushaltsmanager.Entities.Account;
@@ -26,6 +27,7 @@ public class TabTwoMonthlyReports extends Fragment {
 
     private RecyclerView mRecyclerView;
     private ArrayList<Long> mActiveAccounts;
+    private ParentActivity mParent;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -33,6 +35,8 @@ public class TabTwoMonthlyReports extends Fragment {
 
         mActiveAccounts = new ArrayList<>();
         setActiveAccounts();
+
+        mParent = (ParentActivity) getActivity();
     }
 
     @Override
@@ -102,7 +106,7 @@ public class TabTwoMonthlyReports extends Fragment {
      */
     public void updateExpandableListView() {
 
-        MonthlyReportAdapter adapter = new MonthlyReportAdapterCreator(getExpenses(), getContext(), mActiveAccounts).getAdapter();
+        MonthlyReportAdapter adapter = new MonthlyReportAdapterCreator(mParent.getExpenses(), getContext(), mActiveAccounts).getAdapter();
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setAdapter(adapter);
@@ -110,19 +114,21 @@ public class TabTwoMonthlyReports extends Fragment {
         adapter.notifyDataSetChanged();
     }
 
+
     /**
-     * Methode um die Ausgaben des aktuellen Jahres aus der Datenbank zu holen
+     * Methode um herauszufinden, ob der aktuelle tab gerade sichtbar geworden ist oder nicht.
+     * Quelle: https://stackoverflow.com/a/9779971
      *
-     * @return Liste der Buchungen des aktuellen Jahres
+     * @param isVisibleToUser Indikator ob die aktuelle UI für den User sichtbar ist. Default ist True.
      */
-    private ArrayList<ExpenseObject> getExpenses() {
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
 
-        ExpensesDataSource database = new ExpensesDataSource(getContext());
-        database.open();
-
-        ArrayList<ExpenseObject> expenses = database.getBookings();
-        database.close();
-
-        return expenses;
+        if (this.isVisible()) {
+            if (isVisibleToUser) {
+                //todo wenn der Tab sichtbar wird soll die ParentActivity nach den aktuellsten ListDaten gefragt werden
+            }
+        }
     }
 }

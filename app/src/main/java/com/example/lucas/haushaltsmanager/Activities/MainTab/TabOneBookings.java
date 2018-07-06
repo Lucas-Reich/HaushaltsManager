@@ -47,12 +47,12 @@ public class TabOneBookings extends Fragment {
     HashMap<ExpenseObject, List<ExpenseObject>> mListDataChild;
 
     ExpensesDataSource mDatabase;
-    ArrayList<ExpenseObject> mExpenses;
     List<Long> mActiveAccounts;
 
     FloatingActionButton fabBig, fabSmallTop, fabSmallLeft;
     Animation openFabAnim, closeFabAnim, rotateForwardAnim, rotateBackwardAnim;
     boolean fabBigIsAnimated = false;
+    private ParentActivity mParent;
 
 
     @Override
@@ -62,11 +62,12 @@ public class TabOneBookings extends Fragment {
         mListDataHeader = new ArrayList<>();
         mActiveAccounts = new ArrayList<>();
         mListDataChild = new HashMap<>();
-        mExpenses = new ArrayList<>();
 
         mDatabase = new ExpensesDataSource(getContext());
         mDatabase.open();
         setActiveAccounts();
+
+        mParent = (ParentActivity) getActivity();
     }
 
     @Override
@@ -139,20 +140,18 @@ public class TabOneBookings extends Fragment {
                             if (mListAdapter.getSelectedGroupCount() == mListAdapter.getSelectedItemsCount()) {//Kombiniere Parentbuchungen
 
                                 parentBooking = mDatabase.combineAsChildBookings(mListAdapter.getSelectedGroupData());
-                                mExpenses.removeAll(mListAdapter.getSelectedGroupData());
                             } else if (mListAdapter.getSelectedGroupCount() == mListAdapter.getSelectedItemsCount()) {//Kombiniere Groupbuchungen
 
                                 parentBooking = mDatabase.combineAsChildBookings(mListAdapter.getSelectedGroupData());
-                                mExpenses.removeAll(mListAdapter.getSelectedGroupData());
                             } else {//Kombiniere Parent- und Groupbuchungen todo der titel sollte nich neu erstellt werden
 
                                 parentBooking = mDatabase.combineParentBookings(mListAdapter.getSelectedGroupData());
-                                mExpenses.removeAll(mListAdapter.getSelectedGroupData());
                             }
 
+                            mParent.deleteGroupBookings(mListAdapter.getSelectedGroupData());
                             parentBooking.setTitle(title);
                             mDatabase.updateBooking(parentBooking);
-                            mExpenses.add(0, parentBooking);
+                            mParent.addGroupBooking(parentBooking);
 
                             resetActivityViewState();
                         }
@@ -176,7 +175,6 @@ public class TabOneBookings extends Fragment {
                 if (extractChildMode()) {
 
                     mDatabase.extractChildrenFromBooking(mListAdapter.getSelectedChildData());
-                    prepareDataSources(true);
                     resetActivityViewState();
                 }
             }
@@ -196,9 +194,11 @@ public class TabOneBookings extends Fragment {
                 );
 
                 mDatabase.deleteChildBookings(mListAdapter.getSelectedChildData());
-                mDatabase.deleteBookings(mListAdapter.getSelectedGroupData());
+                mParent.deleteChildBookings(mListAdapter.getSelectedMappedChildData());
 
-                prepareDataSources(true);
+                mDatabase.deleteBookings(mListAdapter.getSelectedGroupData());
+                mParent.deleteGroupBookings(mListAdapter.getSelectedGroupData());
+
                 resetActivityViewState();
             }
         });
@@ -495,52 +495,20 @@ public class TabOneBookings extends Fragment {
     }
 
     /**
-     * Methode um einer kombinierten Buchung einen Titel zu geben
-     *
-     * @param title Titel der zusammengefügten Buchung
-     */
-    public void onCombinedTitleSelected(String title, String tag) {
-
-        ExpenseObject parentBooking;
-        switch (tag) {
-            case "tab_one_combine_parents":
-                parentBooking = mDatabase.combineAsChildBookings(mListAdapter.getSelectedGroupData());
-                mExpenses.removeAll(mListAdapter.getSelectedGroupData());
-                break;
-            case "tab_one_combine_groups":
-                parentBooking = mDatabase.combineAsChildBookings(mListAdapter.getSelectedGroupData());
-                mExpenses.removeAll(mListAdapter.getSelectedGroupData());
-                break;
-            case "tab_one_combine_parents_groups":
-                parentBooking = mDatabase.combineParentBookings(mListAdapter.getSelectedGroupData());
-                mExpenses.removeAll(mListAdapter.getSelectedGroupData());
-                break;
-            default:
-                throw new UnsupportedOperationException("Kombimöglichkeit " + tag + " wird nicht unterstützt!");
-        }
-
-        parentBooking.setTitle(title);
-        mDatabase.updateBooking(parentBooking);
-        mExpenses.add(0, parentBooking);
-
-        resetActivityViewState();
-    }
-
-    /**
      * Methode, welche die angegebenen Kinder aus der ListView löscht.
      *
      * @param childrenToRemove Zu löschende Kinder
      */
     public void removeChildrenFromListView(ArrayList<ExpenseObject> childrenToRemove) {
 
-        for (ExpenseObject child : childrenToRemove) {
-            for (ExpenseObject expense : mExpenses) {
-                if (expense.getChildren().contains(child)) {
-                    expense.getChildren().remove(child);
-                    break;
-                }
-            }
-        }
+//        for (ExpenseObject child : childrenToRemove) {
+//            for (ExpenseObject expense : mExpenses) {
+//                if (expense.getChildren().contains(child)) {
+//                    expense.getChildren().remove(child);
+//                    break;
+//                }
+//            }
+//        }
     }
 
     /**
@@ -568,21 +536,11 @@ public class TabOneBookings extends Fragment {
      */
     public void updateExpListView() {
 
-        prepareDataSources(false);
-
-        mListAdapter = new ExpandableListAdapterCreator(mExpenses, mActiveAccounts, getContext()).getExpandableListAdapter();
+        mListAdapter = new ExpandableListAdapterCreator(mParent.getExpenses(getFirstOfMonth(), getLastOfMonth()), mActiveAccounts, getContext()).getExpandableListAdapter();
 
         mExpListView.setAdapter(mListAdapter);
 
         mListAdapter.notifyDataSetChanged();
-    }
-
-    /**
-     * Methode um die Ausgabenliste zu initialiesieren, wenn dies noch nicht geschehen ist
-     */
-    private void prepareDataSources(boolean fetchExpenses) {
-        if (mExpenses.isEmpty() || fetchExpenses)
-            mExpenses = mDatabase.getBookings(getFirstOfMonth().getTimeInMillis(), getLastOfMonth().getTimeInMillis());
     }
 
     /**
@@ -810,6 +768,7 @@ public class TabOneBookings extends Fragment {
 
                 if (parentExpense != null) {
                     mDatabase.addChildToBooking(deletedChild.getValue(), parentExpense);
+                    mParent.addChildBooking(deletedChild.getKey().intValue(), deletedChild.getValue());
                 } else {
                     mDatabase.combineAsChildBookings(new ArrayList<ExpenseObject>() {{
                         deletedChild.getKey();
@@ -820,8 +779,25 @@ public class TabOneBookings extends Fragment {
 
             // todo überprüfen ob die buchung wirklich wiederhergestellt wurde
             Toast.makeText(getContext(), mSuccessMessage, Toast.LENGTH_SHORT).show();
-            prepareDataSources(true);
             updateExpListView();
+        }
+    }
+
+
+    /**
+     * Methode um herauszufinden, ob der aktuelle tab gerade sichtbar geworden ist oder nicht.
+     * Quelle: https://stackoverflow.com/a/9779971
+     *
+     * @param isVisibleToUser Indikator ob die aktuelle UI für den User sichtbar ist. Default ist True.
+     */
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+
+        if (this.isVisible()) {
+            if (isVisibleToUser) {
+                //todo wenn der Tab sichtbar wird soll die ParentActivity nach den aktuellsten ListDaten gefragt werden
+            }
         }
     }
 }
