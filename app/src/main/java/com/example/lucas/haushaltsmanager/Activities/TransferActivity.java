@@ -240,7 +240,7 @@ public class TransferActivity extends AppCompatActivity {
      */
     private Category getTransferCategory() {
 
-        return mDatabase.getCategoryById(1);
+        return mDatabase.getChildCategoryById(1);
     }
 
     /**

@@ -72,7 +72,7 @@ public class CategoriesRepository {
         values.put(ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE, category.getDefaultExpenseType() ? 1 : 0);
         Log.d(TAG, "created new CATEGORY");
 
-        return database.insert(ExpensesDbHelper.TABLE_CATEGORIES, null, values);
+        return database.insert(ExpensesDbHelper.TABLE_CHILD_CATEGORIES, null, values);
     }
 
     public ArrayList<Category> getAllCategories() {
@@ -82,7 +82,7 @@ public class CategoriesRepository {
                 + ExpensesDbHelper.CATEGORIES_COL_NAME + ", "
                 + ExpensesDbHelper.CATEGORIES_COL_COLOR + ", "
                 + ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE
-                + " FROM " + ExpensesDbHelper.TABLE_CATEGORIES + ";";
+                + " FROM " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + ";";
         Log.d(TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
@@ -142,7 +142,7 @@ public class CategoriesRepository {
         Log.d(TAG, selectQuery);
 
         Cursor c = database.rawQuery(selectQuery, null);
-        Log.d(TAG, "getCategoryById: " + DatabaseUtils.dumpCursorToString(c));
+        Log.d(TAG, "getChildCategoryById: " + DatabaseUtils.dumpCursorToString(c));
         c.moveToFirst();
 
         return c.isAfterLast() ? null : cursorToCategory(c);
@@ -170,6 +170,6 @@ public class CategoriesRepository {
 
         //TODO kategorien können nicht gelöscht werden, wenn es noch buchungen gibt, die in dieser Kategorie gemacht wurden
         Log.d(TAG, "delete Category + " + categoryId);
-        return database.delete(ExpensesDbHelper.TABLE_CATEGORIES, ExpensesDbHelper.CATEGORIES_COL_ID + " = ?", new String[]{"" + categoryId});
+        return database.delete(ExpensesDbHelper.TABLE_CHILD_CATEGORIES, ExpensesDbHelper.CATEGORIES_COL_ID + " = ?", new String[]{"" + categoryId});
     }
 }

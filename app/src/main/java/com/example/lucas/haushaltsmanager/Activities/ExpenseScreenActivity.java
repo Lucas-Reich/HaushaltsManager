@@ -108,7 +108,7 @@ public class ExpenseScreenActivity extends AppCompatActivity {
      * Methode um herauszufinden mit welcher Intention (createChild, createBooking, updateChild, updateBooking)
      * der ExpenseScreen aufgerufen wurde
      */
-    public void resolveIntent(Bundle bundle) {
+    private void resolveIntent(Bundle bundle) {
         if (bundle == null)
             return;
         else if (!bundle.containsKey("mode"))

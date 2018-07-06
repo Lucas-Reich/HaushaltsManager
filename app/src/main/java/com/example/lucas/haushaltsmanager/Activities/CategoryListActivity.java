@@ -8,9 +8,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
+import android.widget.ExpandableListView;
 import android.widget.ImageButton;
-import android.widget.ListView;
 
 import com.example.lucas.haushaltsmanager.CategoryAdapter;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
@@ -18,40 +17,49 @@ import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class CategoryListActivity extends AppCompatActivity {
     private static final String TAG = CategoryListActivity.class.getSimpleName();
 
-    ExpensesDataSource mDatabase;
-    ListView mListView;
-    ArrayList<Category> mCategories;
-    FloatingActionButton mAddCategoryFab;
-    ImageButton mBackArrow;
-    Toolbar mToolbar;
+    private ExpensesDataSource mDatabase;
+    private ArrayList<Category> mCategories;
+    private FloatingActionButton mAddCategoryFab;
+    private ImageButton mBackArrow;
+    private ExpandableListView mExpListView;
+    private CategoryAdapter mListAdapter;
+
+    private List<String> mListDataHeader;
+    private HashMap<String, Category> mListDataChild;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_categories);
+        setContentView(R.layout.activity_categories_ver2);
 
         mDatabase = new ExpensesDataSource(this);
         mDatabase.open();
 
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
 
         mBackArrow = (ImageButton) findViewById(R.id.back_arrow);
 
-        mListView = (ListView) findViewById(R.id.categories_listview);
+        mExpListView = (ExpandableListView) findViewById(R.id.categories_exp_list_view);
 
-        mAddCategoryFab = (FloatingActionButton) findViewById(R.id.categories_add_category);
+        mAddCategoryFab = (FloatingActionButton) findViewById(R.id.categories_fab);
+
+        mListDataHeader = new ArrayList<>();
+        mListDataChild = new HashMap<>();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-
         updateListView();
 
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
         mBackArrow.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -61,17 +69,26 @@ public class CategoryListActivity extends AppCompatActivity {
             }
         });
 
-        mListView.setDivider(null);
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
+        mExpListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
 
-                //TODO wenn der nutzer durch das menü in die activity gekommen ist den intent verbieten/ ausschalten
-                Intent returnIntent = new Intent();
-                returnIntent.putExtra("categoryObj", mCategories.get(position));
-                setResult(Activity.RESULT_OK, returnIntent);
-                finish();
+                Category clickedCategory = (Category) mListAdapter.getChild(groupPosition, childPosition);
+                if (getCallingActivity() != null) {
+
+                    Intent returnCategoryIntent = new Intent();
+                    returnCategoryIntent.putExtra("categoryObj", clickedCategory);
+                    setResult(Activity.RESULT_OK, returnCategoryIntent);
+                    finish();
+                } else {
+
+                    Intent updateCategoryIntent = new Intent(CategoryListActivity.this, CreateCategoryActivity.class);
+                    updateCategoryIntent.putExtra("mode", "updateCategory");
+                    updateCategoryIntent.putExtra("updateCategory", clickedCategory);
+                    CategoryListActivity.this.startActivity(updateCategoryIntent);
+                }
+
+                return true;
             }
         });
 
@@ -81,6 +98,7 @@ public class CategoryListActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 Intent createCategoryIntent = new Intent(CategoryListActivity.this, CreateCategoryActivity.class);
+                createCategoryIntent.putExtra("mode", "createCategory");
                 CategoryListActivity.this.startActivity(createCategoryIntent);
             }
         });
@@ -93,11 +111,11 @@ public class CategoryListActivity extends AppCompatActivity {
 
         prepareDataSources();
 
-        CategoryAdapter categoryAdapter = new CategoryAdapter(mCategories, this);
+        mListAdapter = new CategoryAdapter(mCategories, this);
 
-        mListView.setAdapter(categoryAdapter);
+        mExpListView.setAdapter(mListAdapter);
 
-        categoryAdapter.notifyDataSetChanged();
+        mListAdapter.notifyDataSetChanged();
     }
 
     /**

@@ -6,7 +6,7 @@
     >
 
     <com.example.lucas.haushaltsmanager.Views.RoundedTextView
-        android:id="@+id/category_item_circ_textview"
+        android:id="@+id/category_itemn_rounded_text_view"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="center"

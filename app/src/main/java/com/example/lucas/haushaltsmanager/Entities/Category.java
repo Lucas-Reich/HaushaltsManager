@@ -9,14 +9,18 @@ import android.util.Log;
 
 import com.example.lucas.haushaltsmanager.R;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
 public class Category implements Parcelable {
 
     private String TAG = Category.class.getSimpleName();
 
-    private long index;
-    private String name;
-    private String color;
-    private boolean defaultExpenseType;
+    private long mIndex;
+    private String mName;
+    private String mColor;
+    private boolean mDefaultExpenseType;
+    private ArrayList<Category> mChildren;
 
     public Category(long index, @NonNull String categoryName, @NonNull String color, boolean defaultExpenseType) {
 
@@ -24,6 +28,7 @@ public class Category implements Parcelable {
         setName(categoryName);
         setColor(color);
         setDefaultExpenseType(defaultExpenseType);
+        mChildren = new ArrayList<>();
     }
 
     public Category(@NonNull String categoryName, @NonNull String color, Boolean defaultExpenseType) {
@@ -43,7 +48,6 @@ public class Category implements Parcelable {
         Log.v(TAG, "Recreating Category from parcel data");
         setIndex(source.readLong());
         setName(source.readString());
-        ;
         setColor(source.readString());
         setDefaultExpenseType(source.readInt() == 1);
     }
@@ -60,28 +64,28 @@ public class Category implements Parcelable {
 
     public long getIndex() {
 
-        return index;
+        return mIndex;
     }
 
     private void setIndex(long index) {
 
-        this.index = index;
+        this.mIndex = index;
     }
 
     @NonNull
     public String getTitle() {
 
-        return name;
+        return mName;
     }
 
     public void setName(@NonNull String name) {
 
-        this.name = name;
+        this.mName = name;
     }
 
     public String getColorString() {
 
-        return this.color;
+        return mColor;
     }
 
     /**
@@ -92,27 +96,27 @@ public class Category implements Parcelable {
     @ColorInt
     public int getColorInt() {
 
-        return (int) Long.parseLong(color.substring(1), 16);
+        return (int) Long.parseLong(mColor.substring(1), 16);
     }
 
     public void setColor(@NonNull String color) {
 
-        this.color = color;
+        this.mColor = color;
     }
 
     public void setColor(@ColorInt int color) {
 
-        this.color = "#" + Integer.toHexString(color);
+        this.mColor = "#" + Integer.toHexString(color);
     }
 
     public boolean getDefaultExpenseType() {
 
-        return this.defaultExpenseType;
+        return this.mDefaultExpenseType;
     }
 
     public void setDefaultExpenseType(boolean expenseType) {
 
-        this.defaultExpenseType = expenseType;
+        this.mDefaultExpenseType = expenseType;
     }
 
     /**
@@ -123,11 +127,23 @@ public class Category implements Parcelable {
      */
     public boolean isSet() {
 
-        return !this.name.isEmpty() && !this.color.isEmpty();
+        return !this.mName.isEmpty() && !this.mColor.isEmpty();
+    }
+
+    public void addChild(Category child) {
+        mChildren.add(child);
+    }
+
+    public void addChildren(ArrayList<Category> children) {
+        mChildren.addAll(children);
+    }
+
+    public ArrayList<Category> getChildren() {
+        return mChildren;
     }
 
     /**
-     * Wenn der index der Kategorie größer als null ist, dann gibt es die Kategorie bereits in der Datenbank
+     * Wenn der mIndex der Kategorie größer als null ist, dann gibt es die Kategorie bereits in der Datenbank
      * und man kann sie sicher verwenden.
      *
      * @return boolean
@@ -178,10 +194,10 @@ public class Category implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
 
         Log.v(TAG, "write to parcel..." + flags);
-        dest.writeLong(index);
-        dest.writeString(name);
-        dest.writeString(color);
-        dest.writeInt(defaultExpenseType ? 1 : 0);
+        dest.writeLong(mIndex);
+        dest.writeString(mName);
+        dest.writeString(mColor);
+        dest.writeInt(mDefaultExpenseType ? 1 : 0);
     }
 
     /**

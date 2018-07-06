@@ -133,4 +133,5 @@
     <string name="revert_action">Undo</string>
     <string name="revert_deletion">Undo deletion?</string>
     <string name="bookings_successfully_restored">Bookings have been successfully restored!</string>
+    <string name="create_category">Create Category</string>
 </resources>
