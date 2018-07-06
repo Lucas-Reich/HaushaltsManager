@@ -27,7 +27,7 @@ public class CourseActivity extends AppCompatActivity {
 
     private ArrayList<ExpenseObject> mExpenses;
     private ExpensesDataSource mDatabase;
-    private List<Long> mActiveAccounts;
+    private ArrayList<Long> mActiveAccounts;
 
     private ExpandableListView mExpListView;
 

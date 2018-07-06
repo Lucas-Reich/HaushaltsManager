@@ -26,15 +26,12 @@ public class TabTwoMonthlyReports extends Fragment {
     private static final String TAG = TabTwoMonthlyReports.class.getSimpleName();
 
     private RecyclerView mRecyclerView;
-    private ArrayList<Long> mActiveAccounts;
     private ParentActivity mParent;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mActiveAccounts = new ArrayList<>();
-        setActiveAccounts();
 
         mParent = (ParentActivity) getActivity();
     }
@@ -56,57 +53,15 @@ public class TabTwoMonthlyReports extends Fragment {
     }
 
     /**
-     * Methode um die mActiveAccounts liste zu initialisieren
-     */
-    private void setActiveAccounts() {
-        Log.d(TAG, "setActiveAccounts: Erneuere aktive Kontenliste");
-
-        SharedPreferences preferences = getContext().getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
-
-        for (Account account : getAllAccounts()) {
-
-            if (preferences.getBoolean(account.getTitle(), false))
-                mActiveAccounts.add(account.getIndex());
-        }
-    }
-
-    /**
-     * Methode um alle verfügbaren Konten aus der Datenbank zu holen
-     *
-     * @return Liste alles verfügbaren Konten
-     */
-    private ArrayList<Account> getAllAccounts() {
-
-        ExpensesDataSource database = new ExpensesDataSource(getContext());
-        database.open();
-
-        ArrayList<Account> accounts = database.getAllAccounts();
-        database.close();
-
-        return accounts;
-    }
-
-    /**
-     * Methode um die Ansicht des Tabs beim hinzufügen oder abwählen eines Kontos in ChooseAccountDialogFragment mit neuen Daten zu erneuern
-     */
-    public void refreshListOnAccountSelected(long accountId, boolean isChecked) {
-        if (mActiveAccounts.contains(accountId) == isChecked)
-            return;
-
-        if (mActiveAccounts.contains(accountId) && !isChecked)
-            mActiveAccounts.remove(accountId);
-        else
-            mActiveAccounts.add(accountId);
-
-        updateExpandableListView();
-    }
-
-    /**
      * Methode um die ExpandableListView nach eine Änderung neu anzuzeigen
      */
     public void updateExpandableListView() {
 
-        MonthlyReportAdapter adapter = new MonthlyReportAdapterCreator(mParent.getExpenses(), getContext(), mActiveAccounts).getAdapter();
+        MonthlyReportAdapter adapter = new MonthlyReportAdapterCreator(
+                mParent.getExpenses(),
+                getContext(),
+                mParent.getActiveAccounts()
+        ).getAdapter();
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setAdapter(adapter);

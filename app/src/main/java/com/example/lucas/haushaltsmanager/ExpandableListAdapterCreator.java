@@ -19,7 +19,7 @@ public class ExpandableListAdapterCreator {
     private HashMap<ExpenseObject, List<ExpenseObject>> mListDataChild;
     private Context mContext;
 
-    public ExpandableListAdapterCreator(ArrayList<ExpenseObject> expenses, List<Long> activeAccounts, Context context) {
+    public ExpandableListAdapterCreator(ArrayList<ExpenseObject> expenses, ArrayList<Long> activeAccounts, Context context) {
 
         //die liste der aktiven konten soll hier erstellt werden
         mExpenses = expenses;

@@ -19,6 +19,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,6 +33,7 @@ import com.example.lucas.haushaltsmanager.Activities.RecurringBookingsActivity;
 import com.example.lucas.haushaltsmanager.Activities.TestActivity;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
 import com.example.lucas.haushaltsmanager.Dialogs.ChangeAccounts.ChooseAccountsDialogFragment;
+import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.MockDataCreator;
@@ -41,6 +43,7 @@ import com.example.lucas.haushaltsmanager.R;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ParentActivity extends AppCompatActivity implements ChooseAccountsDialogFragment.OnSelectedAccount {
@@ -49,6 +52,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
     private TabLayout mTabLayout;
     private ViewPager mViewPager;
     private ArrayList<ExpenseObject> mExpenses = new ArrayList<>();
+    private ArrayList<Long> mActiveAccounts = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +61,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
 
         setSharedPreferencesProperties();
 
+        setActiveAccounts();
         updateExpenses();
 
         //Methode die jeden Tag einmal den BackupService laufen lässt
@@ -265,21 +270,43 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
      * @param accountId Id des angewählten Kontos.
      * @param isChecked Status des Kontos (aktiv - true oder inaktiv - false)
      */
-    public void onAccountSelected(long accountId, boolean isChecked) {
+//    public void onAccountSelected(long accountId, boolean isChecked) {
+//
+//        int visibleTabPosition = mTabLayout.getSelectedTabPosition();
+//        Fragment fragment = getSupportFragmentManager().findFragmentByTag("android:switcher:" + mViewPager.getId() + ":" + visibleTabPosition);
+//        //todo wenn in einem Tab die Ausgaben angepasst werden (konto wird an oder abgewählt), dann nehmen die anderen tabs diese aänderung nicht mit an
+//
+//        if (fragment != null) {
+//
+//            switch (visibleTabPosition) {
+//
+//                case 0:
+//                    ((TabOneBookings) fragment).refreshListOnAccountSelected(accountId, isChecked);
+//                    break;
+//                case 1:
+//                    ((TabTwoMonthlyReports) fragment).refreshListOnAccountSelected(accountId, isChecked);
+//                    break;
+//                case 3:
+//                    //todo ((TabThree) fragment).refreshListOnAccountSelected(accountId, isChecked);
+//                    break;
+//            }
+//        }
+//    }
+
+    public void refreshVisibleListView() {
 
         int visibleTabPosition = mTabLayout.getSelectedTabPosition();
         Fragment fragment = getSupportFragmentManager().findFragmentByTag("android:switcher:" + mViewPager.getId() + ":" + visibleTabPosition);
-        //todo wenn in einem Tab die Ausgaben angepasst werden (konto wird an oder abgewählt), dann nehmen die anderen tabs diese aänderung nicht mit an
 
         if (fragment != null) {
 
             switch (visibleTabPosition) {
 
                 case 0:
-                    ((TabOneBookings) fragment).refreshListOnAccountSelected(accountId, isChecked);
+                    ((TabOneBookings) fragment).updateExpListView();
                     break;
                 case 1:
-                    ((TabTwoMonthlyReports) fragment).refreshListOnAccountSelected(accountId, isChecked);
+                    ((TabTwoMonthlyReports) fragment).updateExpandableListView();
                     break;
                 case 3:
                     //todo ((TabThree) fragment).refreshListOnAccountSelected(accountId, isChecked);
@@ -304,6 +331,63 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
         AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
 
         alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, startInMillis, AlarmManager.INTERVAL_DAY, pendingIntent);
+    }
+
+    //ab hier werden die aktiven konten gesetzt
+    /**
+     * Methode um die mActiveAccounts liste zu initialisieren
+     */
+    private void setActiveAccounts() {
+        Log.d(TAG, "setActiveAccounts: Erneuere aktive Kontenliste");
+
+        SharedPreferences preferences = getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
+
+        for (Account account : getAllAccounts()) {
+
+            if (preferences.getBoolean(account.getTitle(), false))
+                mActiveAccounts.add(account.getIndex());
+        }
+    }
+
+    /**
+     * Methode um alle verfügbaren Konten aus der Datenbank zu holen
+     *
+     * @return Liste alles verfügbaren Konten
+     */
+    private ArrayList<Account> getAllAccounts() {
+
+        ExpensesDataSource database = new ExpensesDataSource(this);
+        database.open();
+
+        ArrayList<Account> accounts = database.getAllAccounts();
+        database.close();
+
+        return accounts;
+    }
+
+    ArrayList<Long> getActiveAccounts() {
+
+        return mActiveAccounts;
+    }
+
+    /**
+     * Anleitung von: https://stackoverflow.com/questions/27204409/android-calling-a-function-inside-a-fragment-from-a-custom-action-bar
+     * <p>
+     * Der User hat im ChooseAccountDialogFragment ein Konto angewählt.
+     *
+     * @param accountId Id des angewählten Kontos.
+     * @param isChecked Status des Kontos (aktiv - true oder inaktiv - false)
+     */
+    public void onAccountSelected(long accountId, boolean isChecked) {
+        if (mActiveAccounts.contains(accountId) == isChecked)
+            return;
+
+        if (mActiveAccounts.contains(accountId) && !isChecked)
+            mActiveAccounts.remove(accountId);
+        else
+            mActiveAccounts.add(accountId);
+
+        refreshVisibleListView();
     }
 
     //ab hier wird die Buchungsliste erstellt
@@ -401,7 +485,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
      * @param child         Zu löschendes Kind
      */
     void deleteChildBooking(int indexOfParent, ExpenseObject child) {
-        
+
         ExpenseObject parentExpense = mExpenses.get(indexOfParent);
         parentExpense.removeChild(child);
 

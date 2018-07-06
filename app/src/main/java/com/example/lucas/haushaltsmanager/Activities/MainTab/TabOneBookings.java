@@ -47,7 +47,6 @@ public class TabOneBookings extends Fragment {
     HashMap<ExpenseObject, List<ExpenseObject>> mListDataChild;
 
     ExpensesDataSource mDatabase;
-    List<Long> mActiveAccounts;
 
     FloatingActionButton fabBig, fabSmallTop, fabSmallLeft;
     Animation openFabAnim, closeFabAnim, rotateForwardAnim, rotateBackwardAnim;
@@ -60,12 +59,10 @@ public class TabOneBookings extends Fragment {
         super.onCreate(savedInstanceState);
 
         mListDataHeader = new ArrayList<>();
-        mActiveAccounts = new ArrayList<>();
         mListDataChild = new HashMap<>();
 
         mDatabase = new ExpensesDataSource(getContext());
         mDatabase.open();
-        setActiveAccounts();
 
         mParent = (ParentActivity) getActivity();
     }
@@ -478,65 +475,15 @@ public class TabOneBookings extends Fragment {
     }
 
     /**
-     * Methode um die mActiveAccounts liste zu initialisieren.
-     * Dabei werden die Indizes der akitven Konten in der mActiveAccounts liste gespeichert
-     */
-    private void setActiveAccounts() {
-        Log.d(TAG, "setActiveAccounts: erneuere aktiven Kontenliste");
-        mActiveAccounts.clear();
-
-        SharedPreferences preferences = getContext().getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
-
-        for (Account account : mDatabase.getAllAccounts()) {
-
-            if (preferences.getBoolean(account.getTitle(), false))
-                mActiveAccounts.add(account.getIndex());
-        }
-    }
-
-    /**
-     * Methode, welche die angegebenen Kinder aus der ListView löscht.
-     *
-     * @param childrenToRemove Zu löschende Kinder
-     */
-    public void removeChildrenFromListView(ArrayList<ExpenseObject> childrenToRemove) {
-
-//        for (ExpenseObject child : childrenToRemove) {
-//            for (ExpenseObject expense : mExpenses) {
-//                if (expense.getChildren().contains(child)) {
-//                    expense.getChildren().remove(child);
-//                    break;
-//                }
-//            }
-//        }
-    }
-
-    /**
-     * Methode um die ein Konto in der aktiven Kontoliste zu aktivieren oder deaktivieren
-     * !Nachdem Änderungen an der aktiven Kontoliste gemacht wurden wird die ExpandableListView neu instanziiert
-     *
-     * @param accountId AccountId des zu ändernden Kontos
-     * @param isChecked status des Kontos
-     */
-    public void refreshListOnAccountSelected(long accountId, boolean isChecked) {
-
-        if (mActiveAccounts.contains(accountId) == isChecked)
-            return;
-
-        if (mActiveAccounts.contains(accountId) && !isChecked)
-            mActiveAccounts.remove(accountId);
-        else
-            mActiveAccounts.add(accountId);
-
-        updateExpListView();
-    }
-
-    /**
      * Methode um die ExpandableListView nach einer Änderung neu anzuzeigen.
      */
     public void updateExpListView() {
 
-        mListAdapter = new ExpandableListAdapterCreator(mParent.getExpenses(getFirstOfMonth(), getLastOfMonth()), mActiveAccounts, getContext()).getExpandableListAdapter();
+        mListAdapter = new ExpandableListAdapterCreator(
+                mParent.getExpenses(getFirstOfMonth(), getLastOfMonth()),
+                mParent.getActiveAccounts(),
+                getContext()
+        ).getExpandableListAdapter();
 
         mExpListView.setAdapter(mListAdapter);
 
