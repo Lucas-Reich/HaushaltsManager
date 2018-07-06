@@ -1,26 +1,17 @@
 package com.example.lucas.haushaltsmanager.Activities.MainTab;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
-import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
-import com.example.lucas.haushaltsmanager.Entities.Account;
-import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
-import com.example.lucas.haushaltsmanager.MonthlyReportAdapterCreator;
 import com.example.lucas.haushaltsmanager.MonthlyReportAdapter;
+import com.example.lucas.haushaltsmanager.MonthlyReportAdapterCreator;
 import com.example.lucas.haushaltsmanager.R;
-
-import java.util.ArrayList;
 
 public class TabTwoMonthlyReports extends Fragment {
     private static final String TAG = TabTwoMonthlyReports.class.getSimpleName();
@@ -82,7 +73,8 @@ public class TabTwoMonthlyReports extends Fragment {
 
         if (this.isVisible()) {
             if (isVisibleToUser) {
-                //todo wenn der Tab sichtbar wird soll die ParentActivity nach den aktuellsten ListDaten gefragt werden
+                updateExpandableListView();
+                //todo nur updaten wenn etwas passiert ist
             }
         }
     }

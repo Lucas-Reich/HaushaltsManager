@@ -743,7 +743,8 @@ public class TabOneBookings extends Fragment {
 
         if (this.isVisible()) {
             if (isVisibleToUser) {
-                //todo wenn der Tab sichtbar wird soll die ParentActivity nach den aktuellsten ListDaten gefragt werden
+                updateExpListView();
+                //todo nur updaten wenn etwas passiert ist
             }
         }
     }
