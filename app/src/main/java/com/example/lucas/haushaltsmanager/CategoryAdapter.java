@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
+import com.example.lucas.haushaltsmanager.Views.ViewUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -89,7 +90,12 @@ public class CategoryAdapter extends BaseExpandableListAdapter {
 
         String categoryName = groupCategory.getTitle();
 
-        groupViewHolder.roundedTextView.setTextColor(Color.WHITE);// todo variabel machen
+        if (ViewUtils.getColorBrightness(groupCategory.getColorString()) > 128) {
+            groupViewHolder.roundedTextView.setTextColor(mContext.getResources().getColor(R.color.primary_text_color_dark));
+        } else {
+            groupViewHolder.roundedTextView.setTextColor(mContext.getResources().getColor(R.color.primary_text_color_bright));
+        }
+
         groupViewHolder.roundedTextView.setCenterText(categoryName.substring(0, 1).toUpperCase());
         groupViewHolder.roundedTextView.setCircleColor(groupCategory.getColorString());
         groupViewHolder.roundedTextView.setCircleDiameter(33);
@@ -125,7 +131,11 @@ public class CategoryAdapter extends BaseExpandableListAdapter {
             convertView.setBackgroundColor(Color.WHITE);
         }
 
-        childViewHolder.roundedTextView.setTextColor(Color.WHITE);// todo variabel machen
+        if (ViewUtils.getColorBrightness(childCategory.getColorString()) > 128) {
+            childViewHolder.roundedTextView.setTextColor(mContext.getResources().getColor(R.color.primary_text_color_dark));
+        } else {
+            childViewHolder.roundedTextView.setTextColor(mContext.getResources().getColor(R.color.primary_text_color_bright));
+        }
         childViewHolder.roundedTextView.setCenterText(categoryName.substring(0, 1).toUpperCase());
         childViewHolder.roundedTextView.setCircleColor(childCategory.getColorString());
         childViewHolder.roundedTextView.setCircleDiameter(33);

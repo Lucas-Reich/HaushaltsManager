@@ -2,6 +2,7 @@ package com.example.lucas.haushaltsmanager.Views;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -29,7 +30,7 @@ public abstract class ViewUtils extends View {
         init(context, attrs, defStyleAttr);
     }
 
-   protected abstract void init(Context context, AttributeSet attrs, int defStyleAttr);
+    protected abstract void init(Context context, AttributeSet attrs, int defStyleAttr);
 
     /**
      * Methode um herauszufinden wie viel Platz maximal zur verfügung steht
@@ -75,6 +76,22 @@ public abstract class ViewUtils extends View {
      */
     public static int dpToPx(int dp) {
         return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
+    }
+
+    /**
+     * Methode um die Helligkeit einer Farbe zu ermitteln.
+     * Der Rückgabewert liegt zwischen 0 und 255, wobei alles unter 128 'dunkel' ist und alles darüber 'hell'.
+     * Quelle: http://www.fseitz.de/blog/index.php?/archives/112-Helligkeit-von-Farben-des-RGB-Farbraums-berechnen.html
+     *
+     * @param color Farbe
+     * @return Helligkeit der Farbe (dunkel <= 128 > hell)
+     */
+    public static double getColorBrightness(String color) {
+        int red = Color.red(Color.parseColor(color));
+        int green = Color.green(Color.parseColor(color));
+        int blue = Color.blue(Color.parseColor(color));
+
+        return Math.sqrt((0.299 * Math.pow(red, 2)) + (0.587 * Math.pow(green, 2)) + (0.114 * Math.pow(blue, 2)));
     }
 
     /**

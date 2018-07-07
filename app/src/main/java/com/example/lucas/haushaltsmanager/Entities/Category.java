@@ -9,7 +9,6 @@ import android.util.Log;
 
 import com.example.lucas.haushaltsmanager.R;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class Category implements Parcelable {

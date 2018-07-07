@@ -13,6 +13,7 @@ import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Views.PieChart.PieChart;
 import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
+import com.example.lucas.haushaltsmanager.Views.ViewUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -133,8 +134,13 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 TextView txtPaidPrice = (TextView) convertView.findViewById(R.id.exp_listview_group_price);
                 TextView txtPaidCurrency = (TextView) convertView.findViewById(R.id.exp_listview_group_currency_symbol);
 
+                if (ViewUtils.getColorBrightness(groupExpense.getCategory().getColorString()) > 128) {
+                    roundedTextView.setTextColor(mContext.getResources().getColor(R.color.primary_text_color_dark));
+                } else {
+                    roundedTextView.setTextColor(mContext.getResources().getColor(R.color.primary_text_color_bright));
+                }
+
                 String category = groupExpense.getCategory().getTitle();
-                roundedTextView.setTextColor(Color.WHITE);
                 roundedTextView.setCenterText(category.substring(0, 1).toUpperCase());
                 roundedTextView.setCircleColor(groupExpense.getCategory().getColorString());
                 txtTitle2.setText(groupExpense.getTitle());
