@@ -11,17 +11,20 @@ import android.widget.TextView;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CategoryAdapter extends BaseExpandableListAdapter {
 
     private List<Category> mCategoryData;
     private Context mContext;
+    private List<Category> mSelectedChildren;
 
     public CategoryAdapter(List<Category> categoryData, Context context) {
 
         mCategoryData = categoryData;
         mContext = context;
+        mSelectedChildren = new ArrayList<>();
     }
 
     @Override
@@ -116,6 +119,11 @@ public class CategoryAdapter extends BaseExpandableListAdapter {
         }
 
         String categoryName = childCategory.getTitle();
+        if (mSelectedChildren.contains(childCategory)) {
+            convertView.setBackgroundColor(mContext.getResources().getColor(R.color.highlighted_item_color));
+        } else {
+            convertView.setBackgroundColor(Color.WHITE);
+        }
 
         childViewHolder.roundedTextView.setTextColor(Color.WHITE);// todo variabel machen
         childViewHolder.roundedTextView.setCenterText(categoryName.substring(0, 1).toUpperCase());
@@ -129,5 +137,22 @@ public class CategoryAdapter extends BaseExpandableListAdapter {
     @Override
     public boolean isChildSelectable(int groupPosition, int childPosition) {
         return true;
+    }
+
+    public void deselectAll() {
+        mSelectedChildren.clear();
+    }
+
+    public void selectChild(Category category) {
+        // todo überprüfe ob die kategorie auch wirklich eine Kindkategorie ist
+        mSelectedChildren.add(category);
+    }
+
+    public List<Category> getSelectedChildData() {
+        return mSelectedChildren;
+    }
+
+    public int getSelectedChildItemCount() {
+        return mSelectedChildren.size();
     }
 }
