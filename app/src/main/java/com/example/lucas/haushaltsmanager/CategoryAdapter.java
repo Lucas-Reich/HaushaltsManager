@@ -2,60 +2,166 @@ package com.example.lucas.haushaltsmanager;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 
-import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
 import com.example.lucas.haushaltsmanager.Entities.Category;
+import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class CategoryAdapter extends ArrayAdapter<Category> implements View.OnClickListener {
+public class CategoryAdapter extends BaseExpandableListAdapter {
 
-    private static class ViewHolder {
-        RoundedTextView circTextView;
-        TextView txtCategoryName;
-    }
+    private List<Category> mCategoryData;
+    private Context mContext;
+    private List<Category> mSelectedChildren;
 
-    public CategoryAdapter(ArrayList<Category> data, Context context) {
-        super(context, R.layout.category_item, data);
+    public CategoryAdapter(List<Category> categoryData, Context context) {
+
+        mCategoryData = categoryData;
+        mContext = context;
+        mSelectedChildren = new ArrayList<>();
     }
 
     @Override
-    public void onClick(View v) {
-
+    public int getGroupCount() {
+        return mCategoryData.size();
     }
 
-    @NonNull
-    public View getView(int position, View convertView,@NonNull ViewGroup parent) {
+    @Override
+    public int getChildrenCount(int groupPosition) {
+        return mCategoryData.get(groupPosition).getChildren().size();
+    }
 
-        Category categoryObject = getItem(position);
-        ViewHolder viewHolder;
+    @Override
+    public Object getGroup(int groupPosition) {
+        return mCategoryData.get(groupPosition);
+    }
+
+    @Override
+    public Object getChild(int groupPosition, int childPosition) {
+        return mCategoryData.get(groupPosition).getChildren().get(childPosition);
+    }
+
+    @Override
+    public long getGroupId(int groupPosition) {
+        return groupPosition;
+    }
+
+    @Override
+    public long getChildId(int groupPosition, int childPosition) {
+        return childPosition;
+    }
+
+    @Override
+    public boolean hasStableIds() {
+        return false;
+    }
+
+    class ViewHolder {
+        RoundedTextView roundedTextView;
+        TextView txtCategoryName;
+    }
+
+    @Override
+    public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
+        Category groupCategory = (Category) getGroup(groupPosition);
+        ViewHolder groupViewHolder;
 
         if (convertView == null) {
 
-            viewHolder = new ViewHolder();
-            LayoutInflater inflater = LayoutInflater.from(getContext());
-            convertView = inflater.inflate(R.layout.category_item, parent, false);
+            groupViewHolder = new ViewHolder();
+            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = inflater.inflate(R.layout.category_group_item, null);
 
-            viewHolder.txtCategoryName = (TextView) convertView.findViewById(R.id.category_item_name);
-            viewHolder.circTextView = (RoundedTextView) convertView.findViewById(R.id.category_item_circ_textview);
+            groupViewHolder.roundedTextView = (RoundedTextView) convertView.findViewById(R.id.category_item_rounded_text_view);
+            groupViewHolder.txtCategoryName = (TextView) convertView.findViewById(R.id.category_item_name);
 
-            convertView.setTag(viewHolder);
+            convertView.setTag(groupViewHolder);
         } else {
 
-            viewHolder = (ViewHolder) convertView.getTag();
+            groupViewHolder = (ViewHolder) convertView.getTag();
         }
 
-        viewHolder.txtCategoryName.setText(String.format("%s", categoryObject.getTitle()));
-        viewHolder.circTextView.setCenterText(String.format("%s", categoryObject.getTitle().substring(0,1).toUpperCase()));
-        viewHolder.circTextView.setCircleColor(categoryObject.getColorString());
-        viewHolder.circTextView.setTextColor(Color.WHITE);
+        String categoryName = groupCategory.getTitle();
+
+        groupViewHolder.roundedTextView.setTextColor(Color.WHITE);// todo variabel machen
+        groupViewHolder.roundedTextView.setCenterText(categoryName.substring(0, 1).toUpperCase());
+        groupViewHolder.roundedTextView.setCircleColor(groupCategory.getColorString());
+        groupViewHolder.roundedTextView.setCircleDiameter(33);
+        groupViewHolder.txtCategoryName.setText(categoryName);
 
         return convertView;
+    }
+
+    @Override
+    public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
+        Category childCategory = (Category) getChild(groupPosition, childPosition);
+        ViewHolder childViewHolder;
+
+        if (convertView == null) {
+
+            childViewHolder = new ViewHolder();
+            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = inflater.inflate(R.layout.category_child_item, null);
+
+            childViewHolder.roundedTextView = (RoundedTextView) convertView.findViewById(R.id.category_item_rounded_text_view);
+            childViewHolder.txtCategoryName = (TextView) convertView.findViewById(R.id.category_item_name);
+
+            convertView.setTag(childViewHolder);
+        } else {
+
+            childViewHolder = (ViewHolder) convertView.getTag();
+        }
+
+        String categoryName = childCategory.getTitle();
+        if (mSelectedChildren.contains(childCategory)) {
+            convertView.setBackgroundColor(mContext.getResources().getColor(R.color.highlighted_item_color));
+        } else {
+            convertView.setBackgroundColor(Color.WHITE);
+        }
+
+        childViewHolder.roundedTextView.setTextColor(Color.WHITE);// todo variabel machen
+        childViewHolder.roundedTextView.setCenterText(categoryName.substring(0, 1).toUpperCase());
+        childViewHolder.roundedTextView.setCircleColor(childCategory.getColorString());
+        childViewHolder.roundedTextView.setCircleDiameter(33);
+        childViewHolder.txtCategoryName.setText(categoryName);
+
+        return convertView;
+    }
+
+    @Override
+    public boolean isChildSelectable(int groupPosition, int childPosition) {
+        return true;
+    }
+
+    public boolean isChildSelected(Category category) {
+        return mSelectedChildren.contains(category);
+    }
+
+    public void deselectChild(Category category) {
+        if (mSelectedChildren.contains(category))
+            mSelectedChildren.remove(category);
+    }
+
+    public void deselectAll() {
+        mSelectedChildren.clear();
+    }
+
+    public void selectChild(Category category) {
+        // todo überprüfe ob die kategorie auch wirklich eine Kindkategorie ist
+        mSelectedChildren.add(category);
+    }
+
+    public List<Category> getSelectedChildData() {
+        return mSelectedChildren;
+    }
+
+    public int getSelectedChildItemCount() {
+        return mSelectedChildren.size();
     }
 }

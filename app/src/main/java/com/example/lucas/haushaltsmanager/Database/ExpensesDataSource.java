@@ -168,6 +168,26 @@ public class ExpensesDataSource {
         String categoryColor = c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_COLOR));
         boolean defaultExpenseType = c.getInt(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE)) == 1;
 
+        Category category = new Category(categoryIndex, categoryName, categoryColor, defaultExpenseType);
+        category.addChildren(getAllChildCategories(category));
+
+        return category;
+    }
+
+    /**
+     * Methode um eine Untergordnete Kategorie aus einem Cursor zu erstellen.
+     *
+     * @param c Cursor
+     * @return Kategorie
+     */
+    @NonNull
+    private Category cursorToChildCategory(Cursor c) {
+
+        long categoryIndex = c.getLong(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_ID));
+        String categoryName = c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_NAME));
+        String categoryColor = c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_COLOR));
+        boolean defaultExpenseType = c.getInt(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE)) == 1;
+
         return new Category(categoryIndex, categoryName, categoryColor, defaultExpenseType);
     }
 
@@ -697,11 +717,11 @@ public class ExpensesDataSource {
                 + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME + ", "
                 + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SYMBOL + ", "
                 + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID + ", "
-                + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_NAME + ", "
-                + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_COLOR + ", "
-                + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE
+                + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_NAME + ", "
+                + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_COLOR + ", "
+                + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE
                 + " FROM " + ExpensesDbHelper.TABLE_BOOKINGS
-                + " LEFT JOIN " + ExpensesDbHelper.TABLE_CATEGORIES + " ON " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID + " = " + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_ID
+                + " LEFT JOIN " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + " ON " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID + " = " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_ID
                 + " LEFT JOIN " + ExpensesDbHelper.TABLE_ACCOUNTS + " ON " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID + " = " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_ID
                 + " LEFT JOIN " + ExpensesDbHelper.TABLE_CURRENCIES + " ON " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID + " = " + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_ID
                 + " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_ID + " = " + bookingId
@@ -752,11 +772,11 @@ public class ExpensesDataSource {
                 + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME + ", "
                 + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SYMBOL + ", "
                 + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID + ", "
-                + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_NAME + ", "
-                + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_COLOR + ", "
-                + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE
+                + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_NAME + ", "
+                + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_COLOR + ", "
+                + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE
                 + " FROM " + ExpensesDbHelper.TABLE_BOOKINGS
-                + " LEFT JOIN " + ExpensesDbHelper.TABLE_CATEGORIES + " ON " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID + " = " + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_ID
+                + " LEFT JOIN " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + " ON " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID + " = " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_ID
                 + " LEFT JOIN " + ExpensesDbHelper.TABLE_ACCOUNTS + " ON " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID + " = " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_ID
                 + " LEFT JOIN " + ExpensesDbHelper.TABLE_CURRENCIES + " ON " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID + " = " + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_ID
                 + " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_DATE + " BETWEEN " + startDateInMills + " AND " + endDateInMills;
@@ -1041,9 +1061,9 @@ public class ExpensesDataSource {
                 + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_NOTICE + ", "
                 + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_ACCOUNT_ID + ", "
                 + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_CATEGORY_ID + ", "
-                + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_NAME + ", "
-                + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_COLOR + ", "
-                + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE + ", "
+                + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_NAME + ", "
+                + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_COLOR + ", "
+                + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE + ", "
                 + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_NAME + ", "
                 + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_BALANCE + ", "
                 + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID + ", "
@@ -1051,7 +1071,7 @@ public class ExpensesDataSource {
                 + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME + ", "
                 + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SYMBOL
                 + " FROM " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS
-                + " LEFT JOIN " + ExpensesDbHelper.TABLE_CATEGORIES + " ON " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_CATEGORY_ID + " = " + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_ID
+                + " LEFT JOIN " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + " ON " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_CATEGORY_ID + " = " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_ID
                 + " LEFT JOIN " + ExpensesDbHelper.TABLE_ACCOUNTS + " ON " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_ACCOUNT_ID + " = " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_ID
                 + " LEFT JOIN " + ExpensesDbHelper.TABLE_CURRENCIES + " ON " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID + " = " + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_ID
                 + " WHERE " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_PARENT_BOOKING_ID + " = " + parentId
@@ -1092,16 +1112,16 @@ public class ExpensesDataSource {
                 + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_NOTICE + ", "
                 + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_CATEGORY_ID + ", "
                 + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_ACCOUNT_ID + ", "
-                + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_NAME + ", "
-                + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_COLOR + ", "
-                + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE + ", "
+                + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_NAME + ", "
+                + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_COLOR + ", "
+                + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE + ", "
                 + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_NAME + ", "
                 + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_BALANCE + ", "
                 + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_NAME + ", "
                 + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME + ", "
                 + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SYMBOL
                 + " FROM " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS
-                + " LEFT JOIN " + ExpensesDbHelper.TABLE_CATEGORIES + " ON " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_CATEGORY_ID + " = " + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_ID
+                + " LEFT JOIN " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + " ON " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_CATEGORY_ID + " = " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_ID
                 + " LEFT JOIN " + ExpensesDbHelper.TABLE_ACCOUNTS + " ON " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_ACCOUNT_ID + " = " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_ID
                 + " LEFT JOIN " + ExpensesDbHelper.TABLE_CURRENCIES + " ON " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID + " = " + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_ID
                 + " WHERE " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_ID + " = " + childId
@@ -1243,20 +1263,41 @@ public class ExpensesDataSource {
         return database.delete(ExpensesDbHelper.TABLE_CHILD_BOOKINGS, ExpensesDbHelper.CHILD_BOOKINGS_COL_PARENT_BOOKING_ID + " = ?", new String[]{"" + parentId});
     }
 
+    /**
+     * Methode um eine Übergerodnete Kategorie zu erstellen.
+     *
+     * @param parent ParentKategorie
+     * @return Erstellte Kategorie
+     */
+    public Category createCategory(Category parent) {
 
-    public Category createCategory(Category category) {
-
-        //TODO erstelle neue Kategorie wenn sie nicht bereits existiert
         ContentValues values = new ContentValues();
-        values.put(ExpensesDbHelper.CATEGORIES_COL_NAME, category.getTitle());
-        values.put(ExpensesDbHelper.CATEGORIES_COL_COLOR, category.getColorString());
-        values.put(ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE, category.getDefaultExpenseType() ? 1 : 0);
-        values.put(ExpensesDbHelper.CATEGORIES_COL_HIDDEN, 0);
-        Log.d(TAG, "created new CATEGORY");
-
+        values.put(ExpensesDbHelper.CATEGORIES_COL_NAME, parent.getTitle());
+        values.put(ExpensesDbHelper.CATEGORIES_COL_COLOR, parent.getColorString());
+        values.put(ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE, parent.getDefaultExpenseType() ? 1 : 0);
 
         long index = database.insert(ExpensesDbHelper.TABLE_CATEGORIES, null, values);
-        return new Category(index, category.getTitle(), category.getColorString(), category.getDefaultExpenseType());
+        return getParentCategoryById(index);
+    }
+
+    /**
+     * Methode um eine Kategorie zu einer übergeordneten Kategorie zuzuweisen.
+     *
+     * @param parent Übergeordnete Kategorie
+     * @param child  Untergeordnete Kategorie
+     * @return Erstellte Untergeordnete Kategorie
+     */
+    public Category addCategoryToParent(Category parent, Category child) {
+
+        ContentValues values = new ContentValues();
+        values.put(ExpensesDbHelper.CHILD_CATEGORIES_COL_NAME, child.getTitle());
+        values.put(ExpensesDbHelper.CHILD_CATEGORIES_COL_COLOR, child.getColorString());
+        values.put(ExpensesDbHelper.CHILD_CATEGORIES_COL_HIDDEN, 0);
+        values.put(ExpensesDbHelper.CHILD_CATEGORIES_COL_PARENT_ID, parent.getIndex());
+        values.put(ExpensesDbHelper.CHILD_CATEGORIES_COL_DEFAULT_EXPENSE_TYPE, child.getDefaultExpenseType() ? 1 : 0);
+
+        long index = database.insert(ExpensesDbHelper.TABLE_CHILD_CATEGORIES, null, values);
+        return getChildCategoryById(index);
     }
 
     public ArrayList<Category> getAllCategories() {
@@ -1265,33 +1306,55 @@ public class ExpensesDataSource {
                 + ExpensesDbHelper.CATEGORIES_COL_ID + ", "
                 + ExpensesDbHelper.CATEGORIES_COL_NAME + ", "
                 + ExpensesDbHelper.CATEGORIES_COL_COLOR + ", "
-                + ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE
-                + " FROM " + ExpensesDbHelper.TABLE_CATEGORIES
-                + " WHERE " + ExpensesDbHelper.CATEGORIES_COL_HIDDEN + " != '" + 1 + "';";
-        Log.d(TAG, selectQuery);
+                + ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE + " "
+                + "FROM " + ExpensesDbHelper.TABLE_CATEGORIES + ";";
 
         Cursor c = database.rawQuery(selectQuery, null);
         c.moveToFirst();
 
-        ArrayList<Category> allCategories = new ArrayList<>();
-        Log.d(TAG, "getAllCategories: " + DatabaseUtils.dumpCursorToString(c));
+        ArrayList<Category> categories = new ArrayList<>();
         while (!c.isAfterLast()) {
 
-            allCategories.add(cursorToCategory(c));
+            categories.add(cursorToCategory(c));
             c.moveToNext();
         }
+        c.close();
 
-        return allCategories;
+        return categories;
     }
 
     /**
-     * Convenience Method for getting a Category by its getTitle
+     * Methode um Untergeordnete Kategorien zu einer Übergeordneten zu bekommen.
      *
-     * @param categoryName Name of the CATEGORY
-     * @return Returns an Category object
+     * @param parent Übergeordnete Kategorie
+     * @return Alle untergeordneten Kategorien
      */
-    @Nullable
-    public Category getCategoryByName(String categoryName) {
+    private ArrayList<Category> getAllChildCategories(Category parent) {
+
+        String selectQuery = "SELECT "
+                + ExpensesDbHelper.CHILD_CATEGORIES_COL_ID + ", "
+                + ExpensesDbHelper.CHILD_CATEGORIES_COL_NAME + ", "
+                + ExpensesDbHelper.CHILD_CATEGORIES_COL_COLOR + ", "
+                + ExpensesDbHelper.CHILD_CATEGORIES_COL_DEFAULT_EXPENSE_TYPE + " "
+                + "FROM " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + " "
+                + "WHERE " + ExpensesDbHelper.CHILD_CATEGORIES_COL_PARENT_ID + " = '" + parent.getIndex() + "' "
+                + "AND " + ExpensesDbHelper.CHILD_CATEGORIES_COL_HIDDEN + " = '" + 0 + "';";
+
+        Cursor c = database.rawQuery(selectQuery, null);
+        c.moveToFirst();
+
+        ArrayList<Category> categories = new ArrayList<>();
+        while (!c.isAfterLast()) {
+
+            categories.add(cursorToChildCategory(c));
+            c.moveToNext();
+        }
+        c.close();
+
+        return categories;
+    }
+
+    public Category getParentCategoryById(long index) {
 
         String selectQuery = "SELECT "
                 + ExpensesDbHelper.CATEGORIES_COL_ID + ", "
@@ -1299,11 +1362,9 @@ public class ExpensesDataSource {
                 + ExpensesDbHelper.CATEGORIES_COL_COLOR + ", "
                 + ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE
                 + " FROM " + ExpensesDbHelper.TABLE_CATEGORIES
-                + " WHERE " + ExpensesDbHelper.CATEGORIES_COL_NAME + " = '" + categoryName + "';";
-        Log.d(TAG, selectQuery);
+                + " WHERE " + ExpensesDbHelper.CATEGORIES_COL_ID + " = " + index + ";";
 
         Cursor c = database.rawQuery(selectQuery, null);
-        Log.d(TAG, "getCategoryByName: " + DatabaseUtils.dumpCursorToString(c));
         c.moveToFirst();
 
         return c.isAfterLast() ? null : cursorToCategory(c);
@@ -1315,22 +1376,20 @@ public class ExpensesDataSource {
      * @param categoryId index of the desired Category
      * @return Returns an Category object
      */
-    public Category getCategoryById(long categoryId) {
+    public Category getChildCategoryById(long categoryId) {
 
         String selectQuery = "SELECT "
-                + ExpensesDbHelper.CATEGORIES_COL_ID + ", "
-                + ExpensesDbHelper.CATEGORIES_COL_NAME + ", "
-                + ExpensesDbHelper.CATEGORIES_COL_COLOR + ", "
-                + ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE
-                + " FROM " + ExpensesDbHelper.TABLE_CATEGORIES
-                + " WHERE " + ExpensesDbHelper.CATEGORIES_COL_ID + " = " + categoryId + ";";
-        Log.d(TAG, selectQuery);
+                + ExpensesDbHelper.CHILD_CATEGORIES_COL_ID + ", "
+                + ExpensesDbHelper.CHILD_CATEGORIES_COL_NAME + ", "
+                + ExpensesDbHelper.CHILD_CATEGORIES_COL_COLOR + ", "
+                + ExpensesDbHelper.CHILD_CATEGORIES_COL_DEFAULT_EXPENSE_TYPE
+                + " FROM " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES
+                + " WHERE " + ExpensesDbHelper.CHILD_CATEGORIES_COL_ID + " = " + categoryId + ";";
 
         Cursor c = database.rawQuery(selectQuery, null);
-        Log.d(TAG, "getCategoryById: " + DatabaseUtils.dumpCursorToString(c));
         c.moveToFirst();
 
-        return c.isAfterLast() ? null : cursorToCategory(c);
+        return c.isAfterLast() ? null : cursorToChildCategory(c);
     }
 
     /**
@@ -1339,15 +1398,52 @@ public class ExpensesDataSource {
      * @param category Kategorie mit geänderten Werten.
      * @return True bei erfolg, false bei Fehlschlag.
      */
-    public boolean updateCategoryName(Category category) {
+    public boolean updateCategory(Category category) {
 
         ContentValues updatedCategory = new ContentValues();
-        updatedCategory.put(ExpensesDbHelper.CATEGORIES_COL_NAME, category.getTitle());
-        updatedCategory.put(ExpensesDbHelper.CATEGORIES_COL_COLOR, category.getColorString());
-        updatedCategory.put(ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE, category.getDefaultExpenseType());
+        updatedCategory.put(ExpensesDbHelper.CHILD_CATEGORIES_COL_NAME, category.getTitle());
+        updatedCategory.put(ExpensesDbHelper.CHILD_CATEGORIES_COL_COLOR, category.getColorString());
+        updatedCategory.put(ExpensesDbHelper.CHILD_CATEGORIES_COL_DEFAULT_EXPENSE_TYPE, category.getDefaultExpenseType());
 
-        int affectedRRows = database.update(ExpensesDbHelper.TABLE_CATEGORIES, updatedCategory, ExpensesDbHelper.CATEGORIES_COL_ID + " = ?", new String[]{category.getIndex() + ""});
+        int affectedRRows = database.update(ExpensesDbHelper.TABLE_CHILD_CATEGORIES, updatedCategory, ExpensesDbHelper.CHILD_CATEGORIES_COL_ID + " = ?", new String[]{category.getIndex() + ""});
         return affectedRRows == 1;
+    }
+
+    /**
+     * Methode um mehrere untergeordnete Kategorien zu löschen.
+     *
+     * @param categories Zu löschende Kategorien
+     * @throws CannotDeleteCategoryException Gibt es noch Buchungen mit einer Kategorie, kann diese nicht gelöscht werden.
+     */
+    public void deleteChildCategories(List<Category> categories) throws CannotDeleteCategoryException {
+        //todo was passiert mit den restlichen Kategorien
+        for (Category category : categories) {
+            deleteChildCategory(category);
+        }
+    }
+
+    /**
+     * Methode um eine untergeordnete Kategorien zu löschen.
+     *
+     * @param category Zu löschende Kategorie
+     * @throws CannotDeleteCategoryException Wenn es noch Buchungen mit dieser Kategorie gibt kann sie nicht gelöscht werden
+     */
+    public void deleteChildCategory(Category category) throws CannotDeleteCategoryException {
+        if (hasChildCategoryBookings(category.getIndex()))
+            throw new CannotDeleteCategoryException(String.format("Category %s cannot be deleted due to existing bookings with this Category!", category.getTitle()));
+
+        database.delete(ExpensesDbHelper.TABLE_CHILD_CATEGORIES, ExpensesDbHelper.CHILD_BOOKINGS_COL_ID + " = ?", new String[]{"" + category.getIndex()});
+    }
+
+    /**
+     * Methode um herauszufinde ob es Buchungen mit dieser Kategorie gibt
+     *
+     * @param categoryId Id der zu checkenden Kategorie
+     * @return boolean
+     */
+    private boolean hasChildCategoryBookings(long categoryId) {
+
+        return isEntityAssignedToBooking(categoryId, ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID);
     }
 
     /**
@@ -1363,7 +1459,8 @@ public class ExpensesDataSource {
             throw new CannotDeleteCategoryException("Category with existing Bookings cannot be deleted");
 
         Log.d(TAG, "delete Category + " + categoryId);
-        return database.delete(ExpensesDbHelper.TABLE_CATEGORIES, ExpensesDbHelper.CATEGORIES_COL_ID + " = ?", new String[]{"" + categoryId});
+        // todo wenn keine Untergeordneten Kategorien mehr zu einer übergeordneten existieren soll diese gelöscht werden
+        return database.delete(ExpensesDbHelper.TABLE_CHILD_CATEGORIES, ExpensesDbHelper.CATEGORIES_COL_ID + " = ?", new String[]{"" + categoryId});
     }
 
     /**

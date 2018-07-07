@@ -145,4 +145,9 @@
     <string name="revert_action">Undo</string>
     <string name="revert_deletion">Undo deletion?</string>
     <string name="bookings_successfully_restored">Bookings have been successfully restored!</string>
+    <string name="create_category">Create Category</string>
+    <!-- todo besser übersetzung einfallen lassen -->
+    <string name="choose_category_parent">Choose the parent Category</string>
+    <string name="new_parent_category_name">Title of the new Parent Category</string>
+    <string name="choose_parent_category">Choose parent category</string>
 </resources>

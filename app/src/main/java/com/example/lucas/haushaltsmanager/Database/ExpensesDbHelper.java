@@ -145,23 +145,40 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
             + TAGS_COL_NAME + " TEXT NOT NULL"
             + ");";
 
-
-    // define table Categories
+    //define table parentCategories
     static final String TABLE_CATEGORIES = "CATEGORIES";
 
     static final String CATEGORIES_COL_ID = "_id";
-    static final String CATEGORIES_COL_NAME = "cat_name";
+    static final String CATEGORIES_COL_NAME = "name";
     static final String CATEGORIES_COL_COLOR = "color";
     static final String CATEGORIES_COL_DEFAULT_EXPENSE_TYPE = "default_expense_type";
-    static final String CATEGORIES_COL_HIDDEN = "hidden";
 
     private final static String CREATE_CATEGORIES = "CREATE TABLE " + TABLE_CATEGORIES
             + "("
             + CATEGORIES_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + CATEGORIES_COL_NAME + " TEXT NOT NULL, "
             + CATEGORIES_COL_COLOR + " TEXT NOT NULL, "
-            + CATEGORIES_COL_DEFAULT_EXPENSE_TYPE + " INTEGER NOT NULL, "
-            + CATEGORIES_COL_HIDDEN + " INTEGER NOT NULL"
+            + CATEGORIES_COL_DEFAULT_EXPENSE_TYPE + " INTEGER NOT NULL"
+            + ");";
+
+    // define table ChildCategories
+    static final String TABLE_CHILD_CATEGORIES = "CHILD_CATEGORIES";
+
+    static final String CHILD_CATEGORIES_COL_ID = "_id";
+    static final String CHILD_CATEGORIES_COL_NAME = "name";
+    static final String CHILD_CATEGORIES_COL_COLOR = "color";
+    static final String CHILD_CATEGORIES_COL_HIDDEN = "hidden";
+    static final String CHILD_CATEGORIES_COL_PARENT_ID = "parent_id";
+    static final String CHILD_CATEGORIES_COL_DEFAULT_EXPENSE_TYPE = "default_expense_type";
+
+    private final static String CREATE_CHILD_CATEGORIES = "CREATE TABLE " + TABLE_CHILD_CATEGORIES
+            + "("
+            + CHILD_CATEGORIES_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + CHILD_CATEGORIES_COL_NAME + " TEXT NOT NULL, "
+            + CHILD_CATEGORIES_COL_COLOR + " TEXT NOT NULL, "
+            + CHILD_CATEGORIES_COL_HIDDEN + " INTEGER NOT NULL, "
+            + CHILD_CATEGORIES_COL_PARENT_ID + " INTEGER NOT NULL, "
+            + CHILD_CATEGORIES_COL_DEFAULT_EXPENSE_TYPE + " INTEGER NOT NULL"
             + ");";
 
 
@@ -225,8 +242,11 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
             Log.d(TAG, "Die Tabelle Tags wird mit SQL-Befehl: " + CREATE_TAGS + " angelegt.");
             db.execSQL(CREATE_TAGS);
 
-            Log.d(TAG, "Die Tabelle Categories wird mit SQL-Befehl: " + CREATE_CATEGORIES + " angelegt.");
+            Log.d(TAG, "Die Tabelle Categories wird mit dem SQL-Befehl: " + CREATE_CATEGORIES + " angelegt.");
             db.execSQL(CREATE_CATEGORIES);
+
+            Log.d(TAG, "Die Tabelle ChildCategories wird mit SQL-Befehl: " + CREATE_CHILD_CATEGORIES + " angelegt.");
+            db.execSQL(CREATE_CHILD_CATEGORIES);
             insertHiddenCategories(db);
 
             Log.d(TAG, "Die Tabelle Bookings_Tags wird mit SQL-Befehl: " + CREATE_BOOKINGS_TAGS + " angelegt.");
@@ -256,6 +276,7 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_TAGS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_ACCOUNTS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORIES);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CHILD_CATEGORIES);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOKINGS_TAGS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_TEMPLATE_BOOKINGS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_RECURRING_BOOKINGS);
@@ -325,17 +346,23 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
     private void insertHiddenCategories(SQLiteDatabase db) {
 
         ArrayList<Category> categories = new ArrayList<>();
-        categories.add(new Category(mContext.getResources().getString(R.string.category_transfer), "#0033cc", true));
+        categories.add(new Category(
+                mContext.getResources().getString(R.string.category_transfer),
+                "#" + Integer.toHexString(mContext.getResources().getColor(R.color.transfer_booking_color)),
+                true
+        ));
+
 
         for (Category category : categories) {
 
             ContentValues values = new ContentValues();
-            values.put(CATEGORIES_COL_NAME, category.getTitle());
-            values.put(CATEGORIES_COL_COLOR, category.getColorString());
-            values.put(CATEGORIES_COL_DEFAULT_EXPENSE_TYPE, category.getDefaultExpenseType());
-            values.put(CATEGORIES_COL_HIDDEN, 1);
+            values.put(CHILD_CATEGORIES_COL_NAME, category.getTitle());
+            values.put(CHILD_CATEGORIES_COL_COLOR, category.getColorString());
+            values.put(CHILD_CATEGORIES_COL_HIDDEN, 1);
+            values.put(CHILD_CATEGORIES_COL_PARENT_ID, -1);
+            values.put(CHILD_CATEGORIES_COL_DEFAULT_EXPENSE_TYPE, category.getDefaultExpenseType());
 
-            db.insert(TABLE_CATEGORIES, null, values);
+            db.insert(TABLE_CHILD_CATEGORIES, null, values);
         }
     }
 }

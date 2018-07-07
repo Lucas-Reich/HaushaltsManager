@@ -137,4 +137,8 @@
     <string name="bookings_successfully_restored">Buchungen wurden erfolgreich wiederhergestellt!</string>
     <string name="revert_deletion">Löschen rückgängig machen?</string>
     <string name="revert_action">Rückgänig machen</string>
+    <string name="create_category">Erstelle Kategorie</string>
+    <string name="choose_category_parent">Wählen Sie die übergeordnete Kategorie aus</string>
+    <string name="new_parent_category_name">Geben Sie den Titel der neuen übergeordneten Kategorie ein</string>
+    <string name="choose_parent_category">Wählen Sie eine übergeordnete Kategorie aus</string>
 </resources>
