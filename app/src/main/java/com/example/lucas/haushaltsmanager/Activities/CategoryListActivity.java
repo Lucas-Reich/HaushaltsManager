@@ -51,6 +51,8 @@ public class CategoryListActivity extends AppCompatActivity {
         mExpListView = (ExpandableListView) findViewById(R.id.categories_exp_list_view);
 
         mFabMain = (FloatingActionButton) findViewById(R.id.categories_fab);
+
+        mFabDelete = (FloatingActionButton) findViewById(R.id.categories_fab_delete);
     }
 
     @Override
@@ -72,20 +74,34 @@ public class CategoryListActivity extends AppCompatActivity {
         mExpListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-
                 Category clickedCategory = (Category) mListAdapter.getChild(groupPosition, childPosition);
-                if (getCallingActivity() != null) {
 
-                    Intent returnCategoryIntent = new Intent();
-                    returnCategoryIntent.putExtra("categoryObj", clickedCategory);
-                    setResult(Activity.RESULT_OK, returnCategoryIntent);
-                    finish();
+                if (areChildrenSelected()) {
+
+                    if (mListAdapter.isChildSelected(clickedCategory)) {
+
+                        v.setBackgroundColor(Color.WHITE);
+                        mListAdapter.deselectChild(clickedCategory);
+                        animateFab(mListAdapter.getSelectedChildItemCount());
+                    } else {
+                        v.setBackgroundColor(getResources().getColor(R.color.highlighted_item_color));
+                        mListAdapter.selectChild(clickedCategory);
+                    }
                 } else {
 
-                    Intent updateCategoryIntent = new Intent(CategoryListActivity.this, CreateCategoryActivity.class);
-                    updateCategoryIntent.putExtra("mode", "updateCategory");
-                    updateCategoryIntent.putExtra("updateCategory", clickedCategory);
-                    CategoryListActivity.this.startActivity(updateCategoryIntent);
+                    if (getCallingActivity() != null) {
+
+                        Intent returnCategoryIntent = new Intent();
+                        returnCategoryIntent.putExtra("categoryObj", clickedCategory);
+                        setResult(Activity.RESULT_OK, returnCategoryIntent);
+                        finish();
+                    } else {
+
+                        Intent updateCategoryIntent = new Intent(CategoryListActivity.this, CreateCategoryActivity.class);
+                        updateCategoryIntent.putExtra("mode", "updateCategory");
+                        updateCategoryIntent.putExtra("updateCategory", clickedCategory);
+                        CategoryListActivity.this.startActivity(updateCategoryIntent);
+                    }
                 }
 
                 return true;
@@ -130,6 +146,8 @@ public class CategoryListActivity extends AppCompatActivity {
                 try {
 
                     mDatabase.deleteChildCategories(mListAdapter.getSelectedChildData());
+                    animateFab(mListAdapter.getSelectedChildItemCount());
+                    updateListView();
                 } catch (CannotDeleteCategoryException e) {
 
                     Toast.makeText(CategoryListActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();

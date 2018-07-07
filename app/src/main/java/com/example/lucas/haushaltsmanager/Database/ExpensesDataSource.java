@@ -1410,6 +1410,43 @@ public class ExpensesDataSource {
     }
 
     /**
+     * Methode um mehrere untergeordnete Kategorien zu löschen.
+     *
+     * @param categories Zu löschende Kategorien
+     * @throws CannotDeleteCategoryException Gibt es noch Buchungen mit einer Kategorie, kann diese nicht gelöscht werden.
+     */
+    public void deleteChildCategories(List<Category> categories) throws CannotDeleteCategoryException {
+        //todo was passiert mit den restlichen Kategorien
+        for (Category category : categories) {
+            deleteChildCategory(category);
+        }
+    }
+
+    /**
+     * Methode um eine untergeordnete Kategorien zu löschen.
+     *
+     * @param category Zu löschende Kategorie
+     * @throws CannotDeleteCategoryException Wenn es noch Buchungen mit dieser Kategorie gibt kann sie nicht gelöscht werden
+     */
+    public void deleteChildCategory(Category category) throws CannotDeleteCategoryException {
+        if (hasChildCategoryBookings(category.getIndex()))
+            throw new CannotDeleteCategoryException(String.format("Category %s cannot be deleted due to existing bookings with this Category!", category.getTitle()));
+
+        database.delete(ExpensesDbHelper.TABLE_CHILD_CATEGORIES, ExpensesDbHelper.CHILD_BOOKINGS_COL_ID + " = ?", new String[]{"" + category.getIndex()});
+    }
+
+    /**
+     * Methode um herauszufinde ob es Buchungen mit dieser Kategorie gibt
+     *
+     * @param categoryId Id der zu checkenden Kategorie
+     * @return boolean
+     */
+    private boolean hasChildCategoryBookings(long categoryId) {
+
+        return isEntityAssignedToBooking(categoryId, ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID);
+    }
+
+    /**
      * Convenience Method for deleting a Category by id
      *
      * @param categoryId Id der Kategorie die gelöscht werden soll

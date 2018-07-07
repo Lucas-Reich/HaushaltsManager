@@ -139,6 +139,15 @@ public class CategoryAdapter extends BaseExpandableListAdapter {
         return true;
     }
 
+    public boolean isChildSelected(Category category) {
+        return mSelectedChildren.contains(category);
+    }
+
+    public void deselectChild(Category category) {
+        if (mSelectedChildren.contains(category))
+            mSelectedChildren.remove(category);
+    }
+
     public void deselectAll() {
         mSelectedChildren.clear();
     }
