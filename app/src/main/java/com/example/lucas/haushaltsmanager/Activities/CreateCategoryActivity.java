@@ -9,21 +9,24 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
+import com.example.lucas.haushaltsmanager.Dialogs.ChooseCategoryDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ColorPickerDialog;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.R;
 
-public class CreateCategoryActivity extends AppCompatActivity {
+public class CreateCategoryActivity extends AppCompatActivity implements BasicTextInputDialog.BasicDialogCommunicator {
     private static final String TAG = CreateCategoryActivity.class.getSimpleName();
 
     private Category mCategory;
     private ImageButton mBackArrow;
-    private Button mCatNameBtn, mCatColorBtn, mCreateBtn;
+    private Button mCatNameBtn, mCatColorBtn, mSelectParentBtn, mCreateBtn;
     private RadioGroup mDefaultExpenseRadioGrp;
     private ExpensesDataSource mDatabase;
+    private Category mParentCategory;
 
     private creationModes CREATION_MODE;
 
@@ -42,6 +45,7 @@ public class CreateCategoryActivity extends AppCompatActivity {
 
         mCatNameBtn = (Button) findViewById(R.id.new_category_name);
         mCatColorBtn = (Button) findViewById(R.id.new_category_color);
+        mSelectParentBtn = (Button) findViewById(R.id.new_category_select_parent);
         mCreateBtn = (Button) findViewById(R.id.new_category_create);
         mBackArrow = (ImageButton) findViewById(R.id.back_arrow);
 
@@ -135,6 +139,43 @@ public class CreateCategoryActivity extends AppCompatActivity {
             }
         });
 
+        mSelectParentBtn.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                Bundle bundle = new Bundle();
+                bundle.putString("title", getString(R.string.choose_parent_category));
+
+                ChooseCategoryDialog chooseCategory = new ChooseCategoryDialog();
+                chooseCategory.setOnCategoryChosenListener(new ChooseCategoryDialog.OnCategoryChosenListener() {
+
+                    @Override
+                    public void onCategoryChosen(Category category) {
+
+                        if (category == null) {
+
+                            Bundle bundle1 = new Bundle();
+                            bundle1.putString("title", getString(R.string.new_parent_category_name));
+
+                            BasicTextInputDialog textInputDialog = new BasicTextInputDialog();
+                            textInputDialog.setOnTextInputListener(CreateCategoryActivity.this);
+                            textInputDialog.setArguments(bundle1);
+                            textInputDialog.show(getFragmentManager(), "categoryParentName");
+
+                        } else {
+
+                            mParentCategory = category;
+                            mSelectParentBtn.setText(mParentCategory.getTitle());
+                        }
+                    }
+                });
+
+                chooseCategory.setArguments(bundle);
+                chooseCategory.show(getFragmentManager(), "categoryParent");
+            }
+        });
+
         if (mCategory.getDefaultExpenseType())
             mDefaultExpenseRadioGrp.check(R.id.new_category_expense);
         else
@@ -164,18 +205,30 @@ public class CreateCategoryActivity extends AppCompatActivity {
                 switch (CREATION_MODE) {
                     case CREATE_CATEGORY:
 
-                        Category parent = mDatabase.createCategory(Category.createDummyCategory(CreateCategoryActivity.this));//todo dummy parent durch einen richtigen austauschen
-                        mDatabase.addCategoryToParent(parent, mCategory);
+                        if (mParentCategory == null) {
+
+                            Toast.makeText(CreateCategoryActivity.this, "Wähle zuerst die übergeordnete Kategorie aus", Toast.LENGTH_SHORT).show();
+                        } else {
+
+                            mDatabase.addCategoryToParent(mParentCategory, mCategory);
+                            finish();
+                        }
                         break;
                     case UPDATE_CATEGORY:
 
                         mDatabase.updateCategory(mCategory);
+                        finish();
                         break;
                 }
-
-                finish();
             }
         });
+    }
+
+    @Override
+    public void onTextInput(String textInput) {
+
+        mParentCategory = mDatabase.createCategory(new Category(textInput, "#000000", false));
+        mSelectParentBtn.setText(mParentCategory.getTitle());
     }
 
     @Override

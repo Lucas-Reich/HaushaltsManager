@@ -17,8 +17,6 @@ import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 public class CategoryListActivity extends AppCompatActivity {
     private static final String TAG = CategoryListActivity.class.getSimpleName();
@@ -30,13 +28,10 @@ public class CategoryListActivity extends AppCompatActivity {
     private ExpandableListView mExpListView;
     private CategoryAdapter mListAdapter;
 
-    private List<String> mListDataHeader;
-    private HashMap<String, Category> mListDataChild;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_categories_ver2);
+        setContentView(R.layout.activity_categories);
 
         mDatabase = new ExpensesDataSource(this);
         mDatabase.open();
@@ -49,9 +44,6 @@ public class CategoryListActivity extends AppCompatActivity {
         mExpListView = (ExpandableListView) findViewById(R.id.categories_exp_list_view);
 
         mAddCategoryFab = (FloatingActionButton) findViewById(R.id.categories_fab);
-
-        mListDataHeader = new ArrayList<>();
-        mListDataChild = new HashMap<>();
     }
 
     @Override
