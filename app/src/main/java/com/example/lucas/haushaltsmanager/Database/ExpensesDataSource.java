@@ -850,11 +850,13 @@ public class ExpensesDataSource {
      * @return TRUE bei Erfolg, FALSE bei Fehlschlag
      */
     private boolean deleteBooking(ExpenseObject expense) {
-        Log.d(TAG, "deleteBooking: deleting booking " + expense.getTitle());
 
         removeTagsFromBooking(expense.getIndex(), expense.getExpenseType());
         deleteChildrenFromParent(expense.getIndex());
-        updateAccountBalance(expense.getAccount(), expense.getSignedPrice());
+        if (expense.isExpenditure())
+            updateAccountBalance(expense.getAccount(), expense.getUnsignedPrice());
+        else
+            updateAccountBalance(expense.getAccount(), 0 - expense.getUnsignedPrice());
 
         int affectedRows = database.delete(ExpensesDbHelper.TABLE_BOOKINGS, ExpensesDbHelper.BOOKINGS_COL_ID + " = ?", new String[]{"" + expense.getIndex()});
         return affectedRows == 1;

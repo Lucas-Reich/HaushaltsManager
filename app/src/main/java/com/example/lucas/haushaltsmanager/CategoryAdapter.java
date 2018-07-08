@@ -90,7 +90,7 @@ public class CategoryAdapter extends BaseExpandableListAdapter {
 
         String categoryName = groupCategory.getTitle();
 
-        if (ViewUtils.getColorBrightness(groupCategory.getColorString()) > 128) {
+        if (ViewUtils.getColorBrightness(groupCategory.getColorString()) > 0.5) {
             groupViewHolder.roundedTextView.setTextColor(mContext.getResources().getColor(R.color.primary_text_color_dark));
         } else {
             groupViewHolder.roundedTextView.setTextColor(mContext.getResources().getColor(R.color.primary_text_color_bright));
@@ -131,9 +131,9 @@ public class CategoryAdapter extends BaseExpandableListAdapter {
             convertView.setBackgroundColor(Color.WHITE);
         }
 
-        if (ViewUtils.getColorBrightness(childCategory.getColorString()) > 128) {
+        if (ViewUtils.getColorBrightness(childCategory.getColorString()) > 0.5) {// Hintergrund ist hell
             childViewHolder.roundedTextView.setTextColor(mContext.getResources().getColor(R.color.primary_text_color_dark));
-        } else {
+        } else {// Hintegrund ist dunkel
             childViewHolder.roundedTextView.setTextColor(mContext.getResources().getColor(R.color.primary_text_color_bright));
         }
         childViewHolder.roundedTextView.setCenterText(categoryName.substring(0, 1).toUpperCase());

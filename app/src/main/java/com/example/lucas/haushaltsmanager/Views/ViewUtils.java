@@ -80,18 +80,18 @@ public abstract class ViewUtils extends View {
 
     /**
      * Methode um die Helligkeit einer Farbe zu ermitteln.
-     * Der Rückgabewert liegt zwischen 0 und 255, wobei alles unter 128 'dunkel' ist und alles darüber 'hell'.
-     * Quelle: http://www.fseitz.de/blog/index.php?/archives/112-Helligkeit-von-Farben-des-RGB-Farbraums-berechnen.html
+     * Der Rückgabewert liegt zwischen 0 und 1, wobei 1 für weiß steht und 0 für schwarz
+     * Quelle: https://www.w3.org/TR/2006/WD-WCAG20-20060427/appendixA.html#luminosity-contrastdef
      *
      * @param color Farbe
-     * @return Helligkeit der Farbe (dunkel <= 128 > hell)
+     * @return Helligkeit der Farbe (schwarz = 0, weiß = 1)
      */
     public static double getColorBrightness(String color) {
         int red = Color.red(Color.parseColor(color));
         int green = Color.green(Color.parseColor(color));
         int blue = Color.blue(Color.parseColor(color));
 
-        return Math.sqrt((0.299 * Math.pow(red, 2)) + (0.587 * Math.pow(green, 2)) + (0.114 * Math.pow(blue, 2)));
+        return (0.2126 * Math.pow((red / 255), 2.2)) + (0.7152 * Math.pow((green / 255), 2.2)) + (0.0722 * Math.pow((blue / 255), 2.2));
     }
 
     /**

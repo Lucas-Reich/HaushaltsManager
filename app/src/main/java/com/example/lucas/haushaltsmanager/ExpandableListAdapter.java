@@ -134,7 +134,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 TextView txtPaidPrice = (TextView) convertView.findViewById(R.id.exp_listview_group_price);
                 TextView txtPaidCurrency = (TextView) convertView.findViewById(R.id.exp_listview_group_currency_symbol);
 
-                if (ViewUtils.getColorBrightness(groupExpense.getCategory().getColorString()) > 128) {
+                if (ViewUtils.getColorBrightness(groupExpense.getCategory().getColorString()) > 0.5) {
                     roundedTextView.setTextColor(mContext.getResources().getColor(R.color.primary_text_color_dark));
                 } else {
                     roundedTextView.setTextColor(mContext.getResources().getColor(R.color.primary_text_color_bright));
