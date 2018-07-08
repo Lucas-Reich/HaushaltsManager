@@ -908,7 +908,7 @@ public class ExpensesDataSource {
     public ExpenseObject addChildToBooking(ExpenseObject childExpense, ExpenseObject parentBooking) {
 
         if (isChild(parentBooking))
-            throw new UnsupportedOperationException("Cannot add Booking to an child Booking");
+            throw new UnsupportedOperationException("Cannot add Booking to a child Booking");
 
         if (parentBooking.isParent()) {//wenn ich zu einer bestehenden Parent buchung ein weiteres kind hinzufügen möchte
 
