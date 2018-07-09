@@ -1,24 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:orientation="vertical">
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
     <android.support.v7.widget.CardView
         android:id="@+id/monthly_item_card_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        >
+        android:layout_margin="10dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal"
             android:paddingBottom="5dp"
+            android:paddingEnd="5dp"
             android:paddingLeft="10dp"
             android:paddingRight="5dp"
+            android:paddingStart="10dp"
             android:paddingTop="5dp">
 
             <LinearLayout
@@ -66,6 +68,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingLeft="5dp"
+                        android:paddingStart="5dp"
                         android:text="100"
                         android:textColor="@color/secondary_text_color"/>
 
@@ -81,8 +84,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingLeft="5dp"
+                        android:paddingStart="5dp"
                         android:text="100"
-                        android:textColor="@color/secondary_text_color"/>
+                        android:textColor="@color/secondary_text_color"
+                        tools:ignore="RtlSymmetry"/>
 
                     <TextView
                         android:id="@+id/monthly_item_account_currency"
@@ -126,6 +131,7 @@
                         android:id="@+id/monthly_item_category_color"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginEnd="10dp"
                         android:layout_marginRight="10dp"/>
 
                     <TextView
@@ -141,9 +147,11 @@
 
             <com.example.lucas.haushaltsmanager.Views.PieChart.PieChart
                 android:id="@+id/monthly_item_pie_chart"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
-                android:layout_gravity="center"/>
+                android:layout_width="90dp"
+                android:layout_height="90dp"
+                android:layout_gravity="center"
+                android:layout_marginEnd="20dp"
+                android:layout_marginRight="20dp"/>
         </LinearLayout>
     </android.support.v7.widget.CardView>
 </LinearLayout>

@@ -117,7 +117,6 @@
     <string name="set_Account_balance">Set account balance</string>
     <string name="transfer_from">Transfer from</string>
     <string name="transfer_to">Transfer to</string>
-    <!-- todo bessere übersetzung einfallen lassen -->
     <string name="error_parent_already_highlighted">Children of an already selected Parent cannot be selected!</string>
     <string name="confirmation_dialog_title">Confirm Selection</string>
     <string name="import_bookings_confirmation">Are you sure that you want to import this bookings?</string>
@@ -133,4 +132,8 @@
     <string name="revert_action">Undo</string>
     <string name="revert_deletion">Undo deletion?</string>
     <string name="bookings_successfully_restored">Bookings have been successfully restored!</string>
+    <string name="create_category">Create Category</string>
+    <string name="choose_category_parent">Choose the parent Category</string>
+    <string name="new_parent_category_name">Title of the new Parent Category</string>
+    <string name="choose_parent_category">Choose parent category</string>
 </resources>

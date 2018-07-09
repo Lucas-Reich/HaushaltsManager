@@ -57,33 +57,39 @@ public class MonthlyReportAdapter extends RecyclerView.Adapter<MonthlyReportAdap
         return new ViewHolder(itemView);
     }
 
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(final ViewHolder viewHolder, int position) {
         MonthlyReport report = mReports.get(position);
-        holder.month.setText(getMonth(Integer.parseInt(report.getMonth())));
-        holder.inbound.setText(formatMoney(report.countIncomingMoney()));
-        holder.outbound.setText(formatMoney(report.countOutgoingMoney()));
-        holder.total.setText(formatMoney(report.calcMonthlyTotal()));
+
+        viewHolder.month.setText(getMonth(Integer.parseInt(report.getMonth())));
+
+        viewHolder.inbound.setText(formatMoney(report.countIncomingMoney()));
+        viewHolder.inbound.setTextColor(mContext.getResources().getColor(R.color.booking_income));
+
+        viewHolder.outbound.setText(formatMoney(report.countOutgoingMoney()));
+        viewHolder.outbound.setTextColor(mContext.getResources().getColor(R.color.booking_expense));
+
+        viewHolder.total.setText(formatMoney(report.calcMonthlyTotal()));
         if (report.countBookings() == 1)
-            holder.totalBookings.setText(String.format("%s %s", report.countBookings(), mContext.getResources().getString(R.string.month_report_booking)));
+            viewHolder.totalBookings.setText(String.format("%s %s", report.countBookings(), mContext.getResources().getString(R.string.month_report_booking)));
         else
-            holder.totalBookings.setText(String.format("%s %s", report.countBookings(), mContext.getResources().getString(R.string.month_report_bookings)));
-        holder.accountCurrency.setText(report.getCurrency());
+            viewHolder.totalBookings.setText(String.format("%s %s", report.countBookings(), mContext.getResources().getString(R.string.month_report_bookings)));
+        viewHolder.accountCurrency.setText(report.getCurrency());
 
         if (report.countBookings() == 0) {
-            holder.categoryColor.setVisibility(View.GONE);
+            viewHolder.categoryColor.setVisibility(View.GONE);
 
-            holder.stressedCategory.setText(report.getMostStressedCategory().getTitle());
-            holder.stressedCategory.setTextColor(Color.RED);
+            viewHolder.stressedCategory.setText(report.getMostStressedCategory().getTitle());
+            viewHolder.stressedCategory.setTextColor(Color.RED);
         } else {
-            holder.categoryColor.setCircleDiameter(20);
-            holder.categoryColor.setCenterText("");
-            holder.categoryColor.setCircleColor(report.getMostStressedCategory().getColorString());
+            viewHolder.categoryColor.setCircleDiameter(20);
+            viewHolder.categoryColor.setCenterText("");
+            viewHolder.categoryColor.setCircleColor(report.getMostStressedCategory().getColorString());
 
-            holder.stressedCategory.setText(report.getMostStressedCategory().getTitle());
+            viewHolder.stressedCategory.setText(report.getMostStressedCategory().getTitle());
         }
 
-        holder.pieChart.setPieData(preparePieData(report));
-        holder.pieChart.setNoDataText(R.string.no_bookings_in_month);
+        viewHolder.pieChart.setPieData(preparePieData(report));
+        viewHolder.pieChart.setNoDataText(R.string.no_bookings_in_month);
     }
 
     @Override

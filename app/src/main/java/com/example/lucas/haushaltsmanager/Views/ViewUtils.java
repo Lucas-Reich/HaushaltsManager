@@ -2,6 +2,7 @@ package com.example.lucas.haushaltsmanager.Views;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -29,7 +30,7 @@ public abstract class ViewUtils extends View {
         init(context, attrs, defStyleAttr);
     }
 
-   protected abstract void init(Context context, AttributeSet attrs, int defStyleAttr);
+    protected abstract void init(Context context, AttributeSet attrs, int defStyleAttr);
 
     /**
      * Methode um herauszufinden wie viel Platz maximal zur verfügung steht
@@ -75,6 +76,22 @@ public abstract class ViewUtils extends View {
      */
     public static int dpToPx(int dp) {
         return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
+    }
+
+    /**
+     * Methode um die Helligkeit einer Farbe zu ermitteln.
+     * Der Rückgabewert liegt zwischen 0 und 1, wobei 1 für weiß steht und 0 für schwarz
+     * Quelle: https://www.w3.org/TR/2006/WD-WCAG20-20060427/appendixA.html#luminosity-contrastdef
+     *
+     * @param color Farbe
+     * @return Helligkeit der Farbe (schwarz = 0, weiß = 1)
+     */
+    public static double getColorBrightness(String color) {
+        int red = Color.red(Color.parseColor(color));
+        int green = Color.green(Color.parseColor(color));
+        int blue = Color.blue(Color.parseColor(color));
+
+        return (0.2126 * Math.pow((red / 255), 2.2)) + (0.7152 * Math.pow((green / 255), 2.2)) + (0.0722 * Math.pow((blue / 255), 2.2));
     }
 
     /**
