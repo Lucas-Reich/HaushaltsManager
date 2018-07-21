@@ -50,6 +50,7 @@ public class BackupCreatorService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        //todo falls der Name der Datenbank geändert werden sollte muss das hier auch angepasst werden
         mDatabaseFile = getDatabasePath("expenses.db");
 
         mBackupDirectory = getBackupDirectory();
