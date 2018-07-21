@@ -150,4 +150,7 @@
     <string name="choose_category_parent">Choose the parent Category</string>
     <string name="new_parent_category_name">Title of the new Parent Category</string>
     <string name="choose_parent_category">Choose parent category</string>
+    <string name="error_name_missing">Please enter a name</string>
+    <string name="empty_list">No Items found</string>
+    <string name="could_not_create_backup">Backup could not be created</string>
 </resources>

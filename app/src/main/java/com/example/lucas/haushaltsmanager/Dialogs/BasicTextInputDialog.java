@@ -4,15 +4,17 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.KeyEvent;
+import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Views.ViewUtils;
@@ -22,6 +24,8 @@ public class BasicTextInputDialog extends DialogFragment {
 
     BasicDialogCommunicator mCallback;
     Context mContext;
+    String mDialogHint;
+    EditText mTextInput;
 
     @Override
     public void onAttach(Context context) {
@@ -41,19 +45,55 @@ public class BasicTextInputDialog extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
         Bundle bundle = getArguments();
-        String dialogTitle = bundle.containsKey("title") ? bundle.getString("title") : "";
-        final EditText mTextInput = createInputView();
-        mTextInput.setMaxLines(1);
-        mTextInput.setInputType(InputType.TYPE_CLASS_TEXT);
-        mTextInput.setHint(bundle.containsKey("hint") ? bundle.getString("hint") : "");
-        mTextInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        String mDialogTitle = bundle != null && bundle.containsKey("title") ? bundle.getString("title") : "";
+        mDialogHint = bundle != null && bundle.containsKey("hint") ? bundle.getString("hint") : "";
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+
+        builder.setTitle(mDialogTitle);
+
+        builder.setView(prepareLayout());
+
+        builder.setPositiveButton(R.string.btn_ok, null);
+
+        builder.setNegativeButton(R.string.btn_cancel, null);
+
+        return builder.create();
+    }
+
+    /**
+     * Methode um das Layout des AlertDialogs zu erstellen.
+     * Dies wird gemacht, damit man dem TextInput Feld padding geben kann.
+     *
+     * @return vorbereitetes LinearLayout
+     */
+    private LinearLayout prepareLayout() {
+
+        LinearLayout linearLayout = new LinearLayout(mContext);
+        linearLayout.setPadding(ViewUtils.dpToPx(23), 0, 0, 0);
+        linearLayout.addView(prepareTextInput());
+
+        return linearLayout;
+    }
+
+    /**
+     * Methode um den EditText vorzubereiten.
+     *
+     * @return Vorbereiteter EditText
+     */
+    private EditText prepareTextInput() {
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+
+        EditText editText = new EditText(mContext);
+        editText.setLayoutParams(lp);
+        editText.setMaxLines(1);
+        editText.setHint(mDialogHint);
+        editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    mCallback.onTextInput(mTextInput.getText().toString());
-                    dismiss();
-
+                    performButtonClickOk();
                     return true;
                 }
 
@@ -61,53 +101,54 @@ public class BasicTextInputDialog extends DialogFragment {
             }
         });
 
-        //wrapper für die text eingabe, sodass dieser eine padding gegeben werden kann
-        //Quelle: http://android.pcsalt.com/create-alertdialog-with-custom-layout-programmatically/
-        LinearLayout layout = new LinearLayout(mContext);
-        layout.setPadding(ViewUtils.dpToPx(23), 0, 0, 0);
-        layout.addView(mTextInput);
+        //Wenn die Anfrage vom CreateAccountActivity kommt, dann müssen Zahlen anstatt Buchstaben im keyboard angezeigt werden
+        if (getTag().equals("accountBalance"))
+            editText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        else
+            editText.setInputType(InputType.TYPE_CLASS_TEXT);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-
-        builder.setTitle(dialogTitle);
-
-        builder.setView(layout);
-
-        builder.setPositiveButton(R.string.btn_ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-                mCallback.onTextInput(mTextInput.getText().toString());
-                dismiss();
-            }
-        });
-
-        builder.setNegativeButton(R.string.btn_cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-                dismiss();
-            }
-        });
-
-        return builder.create();
+        mTextInput = editText;
+        return editText;
     }
 
     /**
-     * Methode um den TextInput vorzubereiten
-     *
-     * @return EditText
+     * Methode um nach der Dialog erstellung den OK onClickListener zu setzen.
+     * Das geschieht hier, damit der Dialog nicht automatisch geschlossen wird, wenn der User auf den OK Button klickt.
+     * Quelle: https://stackoverflow.com/a/10661281
      */
-    private EditText createInputView() {
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+    @Override
+    public void onResume() {
+        super.onResume();
 
-        EditText input = new EditText(mContext);
-        input.setLayoutParams(lp);
+        AlertDialog d = (AlertDialog) getDialog();
+        Button okButton = d.getButton(AlertDialog.BUTTON_POSITIVE);
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                performButtonClickOk();
+            }
+        });
+    }
 
-        if (getTag().equals("accountBalance"))
-            input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+    /**
+     * Methode welche die Logik hinter dem OK klick des Users implementiert.
+     */
+    private void performButtonClickOk() {
+        if (mTextInput.getText().toString().length() == 0) {
 
-        return input;
+            if (mDialogHint.length() == 0) {
+
+                Toast.makeText(mContext, mContext.getResources().getString(R.string.error_name_missing), Toast.LENGTH_SHORT).show();
+            } else {
+
+                mCallback.onTextInput(mDialogHint);
+                dismiss();
+            }
+        } else {
+
+            mCallback.onTextInput(mTextInput.getText().toString());
+            dismiss();
+        }
     }
 
     /**
@@ -116,12 +157,10 @@ public class BasicTextInputDialog extends DialogFragment {
      * @param listener Listener, welcher aufgerufen werden soll
      */
     public void setOnTextInputListener(BasicTextInputDialog.BasicDialogCommunicator listener) {
-
         mCallback = listener;
     }
 
     public interface BasicDialogCommunicator {
-
         void onTextInput(String textInput);
     }
 }

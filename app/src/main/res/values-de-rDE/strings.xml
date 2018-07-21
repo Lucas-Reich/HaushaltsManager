@@ -141,4 +141,6 @@
     <string name="choose_category_parent">Wählen Sie die übergeordnete Kategorie aus</string>
     <string name="new_parent_category_name">Geben Sie den Titel der neuen übergeordneten Kategorie ein</string>
     <string name="choose_parent_category">Wählen Sie eine übergeordnete Kategorie aus</string>
+    <string name="error_name_missing">Bitte geben Sie einen Namen ein</string>
+    <string name="empty_list">"Nichts gefunden "</string>
 </resources>

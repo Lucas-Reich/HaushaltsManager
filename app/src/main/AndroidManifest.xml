@@ -69,7 +69,7 @@
             android:process=":remote"/>
 
         <service
-            android:name=".Services.BackupService"
+            android:name=".Services.BackupCreatorService"
             android:exported="false"
             android:label="BackupService"
             android:permission="android.permission.BIND_JOB_SERVICE"/>

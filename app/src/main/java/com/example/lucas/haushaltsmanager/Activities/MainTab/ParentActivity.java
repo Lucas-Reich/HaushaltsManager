@@ -167,6 +167,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
         SharedPreferences preferences = this.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
         preferences.edit().putLong("mainCurrencyIndex", mainCurrency.getIndex()).apply();
         preferences.edit().putString("mainCurrencySymbol", mainCurrency.getSymbol()).apply();
+        preferences.edit().putInt("maxBackupCount", 20).apply();
     }
 
     @Override
