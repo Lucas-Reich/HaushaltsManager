@@ -12,12 +12,12 @@ import java.util.List;
 public class MonthlyReportAdapterCreator {
     private static final String TAG = MonthlyReportAdapterCreator.class.getSimpleName();
 
-    private ArrayList<ExpenseObject> mExpenses;
+    private List<ExpenseObject> mExpenses;
     private Context mContext;
     private List<MonthlyReport> mReports;
-    private ArrayList<Long> mActiveAccounts;
+    private List<Long> mActiveAccounts;
 
-    public MonthlyReportAdapterCreator(ArrayList<ExpenseObject> expenses, Context context, ArrayList<Long> activeAccounts) {
+    public MonthlyReportAdapterCreator(List<ExpenseObject> expenses, Context context, List<Long> activeAccounts) {
 
         mActiveAccounts = activeAccounts;
         mContext = context;

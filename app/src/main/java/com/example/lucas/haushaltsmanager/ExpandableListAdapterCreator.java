@@ -13,13 +13,13 @@ import java.util.List;
 public class ExpandableListAdapterCreator {
     private static final String TAG = ExpandableListAdapterCreator.class.getSimpleName();
 
-    private ArrayList<ExpenseObject> mExpenses;
+    private List<ExpenseObject> mExpenses;
     private List<Long> mActiveAccounts;
-    private ArrayList<ExpenseObject> mListDataHeader;
+    private List<ExpenseObject> mListDataHeader;
     private HashMap<ExpenseObject, List<ExpenseObject>> mListDataChild;
     private Context mContext;
 
-    public ExpandableListAdapterCreator(ArrayList<ExpenseObject> expenses, ArrayList<Long> activeAccounts, Context context) {
+    public ExpandableListAdapterCreator(List<ExpenseObject> expenses, List<Long> activeAccounts, Context context) {
 
         //die liste der aktiven konten soll hier erstellt werden
         mExpenses = expenses;
@@ -79,7 +79,7 @@ public class ExpandableListAdapterCreator {
      */
     private ExpenseObject createDateSeparator(Calendar date) {
 
-        ExpenseObject dateSeparator = ExpenseObject.createDummyExpense(mContext);
+        ExpenseObject dateSeparator = ExpenseObject.createDummyExpense();
         dateSeparator.setExpenseType(ExpenseObject.EXPENSE_TYPES.DATE_PLACEHOLDER);
         dateSeparator.setDateTime(date);
 

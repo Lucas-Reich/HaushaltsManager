@@ -28,7 +28,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
-import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Tags.TagRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Templates.TemplateRepository;
 import com.example.lucas.haushaltsmanager.Dialogs.AccountPickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.DatePickerDialog;
@@ -68,22 +73,16 @@ public class ExpenseScreenActivity extends AppCompatActivity {
     private TextView mPriceTxt, mCurrencySymbolTxt;
     private RadioGroup mExpenseTypeRadio;
     private ExpenseObject mParentBooking;
-    private Toolbar mToolbar;
     private ImageButton mBackArrow;
     private List<Tag> mTags;
-
-    private ExpensesDataSource mDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_expense_screen);
 
-        mDatabase = new ExpensesDataSource(this);
-        mDatabase.open();
-
         //TODO implement the correct Toolbar functionality (back arrow, overflow menu which holds the load mTemplate button)
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         mBackArrow = (ImageButton) findViewById(R.id.back_arrow);
 
@@ -150,12 +149,19 @@ public class ExpenseScreenActivity extends AppCompatActivity {
             CREATION_MODE = creationModes.CREATE_EXPENSE_MODE;
         }
 
-
-        SharedPreferences preferences = getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
-        Account account = mDatabase.getAccountById(preferences.getLong("activeAccount", 0));
-        mExpense = ExpenseObject.createDummyExpense(this);
+        mExpense = ExpenseObject.createDummyExpense();
         mExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE);
-        setAccount(account);
+
+        try {
+            SharedPreferences preferences = getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
+            Account account = AccountRepository.get(preferences.getLong("activeAccount", 0));
+            setAccount(account);
+        } catch (AccountNotFoundException e) {
+
+            Toast.makeText(this, "Kein Hauptkonto ausgewählt", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+
         Log.d(TAG, "resolveIntent: Creating Expense " + mExpense.toString());
     }
 
@@ -200,7 +206,7 @@ public class ExpenseScreenActivity extends AppCompatActivity {
 
         mTitleBtn.setHint(mExpense.getTitle());
 
-        mTags = mDatabase.getAllTags();
+        mTags = TagRepository.getAll();
         initializeAutComTxtView(mTags);
         for (Tag tag : mExpense.getTags())//kann ich einfach alle tags einer buchung nehmen oder gibt es fälle, in denen die liste noch nicht initialisiert ist?
             showTagInMultiView(tag);
@@ -369,22 +375,22 @@ public class ExpenseScreenActivity extends AppCompatActivity {
 
                 case UPDATE_EXPENSE_MODE:
 
-                    mDatabase.updateBooking(mExpense);
+                    ExpenseRepository.update(mExpense);
                     Toast.makeText(ExpenseScreenActivity.this, "Updated Booking " + mExpense.getTitle(), Toast.LENGTH_SHORT).show();
                     break;
                 case UPDATE_CHILD_MODE:
 
-                    mDatabase.updateChildBooking(mExpense);
+                    ChildExpenseRepository.update(mExpense);
                     Toast.makeText(ExpenseScreenActivity.this, "Updated Booking " + mExpense.getTitle(), Toast.LENGTH_SHORT).show();
                     break;
                 case ADD_CHILD_MODE:
 
-                    mDatabase.addChildToBooking(mExpense, mParentBooking);
+                    ChildExpenseRepository.insert(mParentBooking, mExpense);
                     Toast.makeText(ExpenseScreenActivity.this, "Added Booking \"" + mExpense.getTitle() + "\" to parent Booking " + mParentBooking.getTitle(), Toast.LENGTH_SHORT).show();
                     break;
                 case CREATE_EXPENSE_MODE:
 
-                    mExpense = mDatabase.createBooking(mExpense);
+                    ExpenseRepository.insert(mExpense);
                     Toast.makeText(ExpenseScreenActivity.this, "Created Booking \"" + mExpense.getTitle() + "\"", Toast.LENGTH_SHORT).show();
                     break;
                 default:
@@ -399,22 +405,13 @@ public class ExpenseScreenActivity extends AppCompatActivity {
             }
 */
 
-            if (mTemplate) {
+            if (mTemplate)
+                TemplateRepository.insert(mExpense);
 
-                long index = mDatabase.createTemplateBooking(mExpense);
-                Log.d(TAG, "created mTemplate for bookings at index: " + index);
-            }
             Intent intent = new Intent(ExpenseScreenActivity.this, ParentActivity.class);
             ExpenseScreenActivity.this.startActivity(intent);
         }
     };
-
-    @Override
-    protected void onDestroy() {
-        mDatabase.close();
-
-        super.onDestroy();
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -1,16 +1,15 @@
 package com.example.lucas.haushaltsmanager.Entities;
 
-import android.content.Context;
+import android.content.res.Resources;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.text.DateFormat;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -83,6 +82,22 @@ public class ExpenseObject implements Parcelable {
      */
     private List<ExpenseObject> children = new ArrayList<>();
 
+    public ExpenseObject(long index, @NonNull String expenseName, double price, Calendar date, boolean expenditure, @NonNull Category category, String notice, @NonNull Account account, @NonNull EXPENSE_TYPES expenseType, List<Tag> tags, List<ExpenseObject> children) {
+
+        //todo als default constructor nutzen
+        setIndex(index);
+        setTitle(expenseName);
+        setPrice(price);
+        setDateTime(date != null ? date : Calendar.getInstance());
+        setExpenditure(expenditure);
+        setCategory(category);
+        setNotice(notice != null ? notice : "");
+        setAccount(account);
+        setExpenseType(expenseType);
+        setTags(tags);
+        addChildren(children);
+    }
+
     public ExpenseObject(long index, @NonNull String expenseName, double price, Calendar date, boolean expenditure, @NonNull Category category, String notice, @NonNull Account account, @NonNull EXPENSE_TYPES expenseType) {
 
         setIndex(index);
@@ -132,12 +147,11 @@ public class ExpenseObject implements Parcelable {
     /**
      * Methode um eine dummy Expense zu erstellen
      *
-     * @param context Context
      * @return dummy Expense
      */
-    public static ExpenseObject createDummyExpense(@NonNull Context context) {
+    public static ExpenseObject createDummyExpense() {
 
-        return new ExpenseObject(-1, context.getResources().getString(R.string.no_name), 0, Calendar.getInstance(), false, Category.createDummyCategory(context), null, Account.createDummyAccount(context), EXPENSE_TYPES.DUMMY_EXPENSE);
+        return new ExpenseObject(-1, app.getContext().getString(R.string.no_name), 0, Calendar.getInstance(), false, Category.createDummyCategory(), null, Account.createDummyAccount(), EXPENSE_TYPES.DUMMY_EXPENSE);
     }
 
     @NonNull
@@ -305,11 +319,13 @@ public class ExpenseObject implements Parcelable {
         this.account = account;
     }
 
-    public void addChild(@NonNull ExpenseObject child) {
+    public ExpenseObject addChild(@NonNull ExpenseObject child) {
 
         child.setExpenseType(EXPENSE_TYPES.CHILD_EXPENSE);
         children.add(child);
         setExpenseType(EXPENSE_TYPES.PARENT_EXPENSE);
+
+        return this;
     }
 
     /**
@@ -366,34 +382,43 @@ public class ExpenseObject implements Parcelable {
     }
 
     @Override
+    public boolean equals(Object obj) {
+
+        if (obj instanceof ExpenseObject) {
+
+            ExpenseObject otherExpense = (ExpenseObject) obj;
+
+            boolean result = getTitle().equals(otherExpense.getTitle());
+            result = result && (getUnsignedPrice() == otherExpense.getUnsignedPrice());
+            result = result && getAccount().equals(otherExpense.getAccount());
+            result = result && getExpenseType().equals(otherExpense.getExpenseType());
+            result = result && getDateTime().equals(otherExpense.getDateTime());
+            result = result && getNotice().equals(otherExpense.getNotice());
+            result = result && getCategory().equals(otherExpense.getCategory());
+
+            for (Tag tag : getTags()) {
+                for (Tag otherTag : otherExpense.getTags()) {
+                    result = result && tag.equals(otherTag);
+                }
+            }
+
+            for (ExpenseObject child : getChildren()) {
+                for (ExpenseObject otherChildren : otherExpense.getChildren()) {
+                    result = result && child.equals(otherChildren);
+                }
+            }
+
+            return result;
+        } else {
+
+            return false;
+        }
+    }
+
+    @Override
     public String toString() {
 
         return getIndex() + " " + getTitle() + " " + getUnsignedPrice();
-    }
-
-    public boolean equals(ExpenseObject otherExpense) {
-
-        boolean result = getTitle().equals(otherExpense.getTitle());
-        result = result && (getUnsignedPrice() == otherExpense.getUnsignedPrice());
-        result = result && getAccount().equals(otherExpense.getAccount());
-        result = result && getExpenseType().equals(otherExpense.getExpenseType());
-        result = result && getDateTime().equals(otherExpense.getDateTime());
-        result = result && getNotice().equals(otherExpense.getNotice());
-        result = result && getCategory().equals(otherExpense.getCategory());
-
-        for (Tag tag : getTags()) {
-            for (Tag otherTag : otherExpense.getTags()) {
-                result = result && tag.equals(otherTag);
-            }
-        }
-
-        for (ExpenseObject child : getChildren()) {
-            for (ExpenseObject otherChildren : otherExpense.getChildren()) {
-                result = result && child.equals(otherChildren);
-            }
-        }
-
-        return result;
     }
 
     /**

@@ -16,9 +16,15 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
-import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.Exceptions.ChildCategoryNotFoundException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
 import com.example.lucas.haushaltsmanager.Dialogs.AccountPickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.DatePickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
@@ -36,12 +42,10 @@ public class TransferActivity extends AppCompatActivity {
     private static final String TAG = TransferActivity.class.getSimpleName();
 
     private Button mDateBtn, mFromAccountBtn, mToAccountBtn, mCreateTransferBtn, mAmountBtn;
-    private ExpensesDataSource mDatabase;
     private Account mFromAccount, mToAccount;
     private Calendar mCalendar;
     private Toolbar mToolbar;
     private ImageButton mBackArrow;
-
     //Ausgabe
     private ExpenseObject mFromExpense;
     //Einnahme
@@ -53,22 +57,26 @@ public class TransferActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_transfers);
 
-        mDatabase = new ExpensesDataSource(this);
-        mDatabase.open();
-
         mCalendar = Calendar.getInstance();
 
-        mFromExpense = ExpenseObject.createDummyExpense(this);
-        mFromExpense.setPrice(0);
-        mFromExpense.setExpenditure(true);
-        mFromExpense.setCategory(getTransferCategory());
-        mFromExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.TRANSFER_EXPENSE);
+        try {
+            mFromExpense = ExpenseObject.createDummyExpense();
+            mFromExpense.setPrice(0);
+            mFromExpense.setExpenditure(true);
+            mFromExpense.setCategory(getTransferCategory());
+            mFromExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.TRANSFER_EXPENSE);
 
-        mToExpense = ExpenseObject.createDummyExpense(this);
-        mToExpense.setPrice(0);
-        mToExpense.setExpenditure(false);
-        mToExpense.setCategory(getTransferCategory());
-        mToExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.TRANSFER_EXPENSE);
+            mToExpense = ExpenseObject.createDummyExpense();
+            mToExpense.setPrice(0);
+            mToExpense.setExpenditure(false);
+            mToExpense.setCategory(getTransferCategory());
+            mToExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.TRANSFER_EXPENSE);
+        } catch (ChildCategoryNotFoundException e) {
+
+            //todo vor dem relase entfernen
+            Toast.makeText(this, "Überweisungskategorie wurde nicht gefunden", Toast.LENGTH_SHORT).show();
+            finish();
+        }
 
         mDateBtn = (Button) findViewById(R.id.transfer_date_btn);
         mFromAccountBtn = (Button) findViewById(R.id.transfer_from_account_btn);
@@ -136,7 +144,12 @@ public class TransferActivity extends AppCompatActivity {
 
                 Bundle bundle = new Bundle();
                 bundle.putString("title", getResources().getString(R.string.input_account));
-                bundle.putParcelable("active_account", getActiveAccount());
+                try {
+                    bundle.putParcelable("active_account", getActiveAccount());
+                } catch (AccountNotFoundException e) {
+
+                    //do nothing
+                }
                 if (mToAccount != null)
                     bundle.putLong("excluded_account", mToAccount.getIndex());
 
@@ -162,7 +175,12 @@ public class TransferActivity extends AppCompatActivity {
 
                 Bundle bundle = new Bundle();
                 bundle.putString("title", getResources().getString(R.string.input_account));
-                bundle.putParcelable("active_account", getActiveAccount());
+                try {
+                    bundle.putParcelable("active_account", getActiveAccount());
+                } catch (AccountNotFoundException e) {
+
+                    //do nothing
+                }
                 if (mFromAccount != null)
                     bundle.putLong("excluded_account", mFromAccount.getIndex());
 
@@ -219,9 +237,9 @@ public class TransferActivity extends AppCompatActivity {
                     bookings.add(mToExpense);
 
 
-                    ExpenseObject parent = mDatabase.combineAsChildBookings(bookings);
+                    ExpenseObject parent = ChildExpenseRepository.combineExpenses(bookings);
                     parent.setTitle(String.format("%s\n%s -> %s", getString(R.string.transfer), mFromAccount.getTitle(), mToAccount.getTitle()));
-                    mDatabase.updateBooking(parent);
+                    ExpenseRepository.update(parent);
 
                     Intent intent = new Intent(TransferActivity.this, ParentActivity.class);
                     TransferActivity.this.startActivity(intent);
@@ -238,16 +256,15 @@ public class TransferActivity extends AppCompatActivity {
      *
      * @return Default TransferKategorie
      */
-    private Category getTransferCategory() {
-
-        return mDatabase.getChildCategoryById(1);
+    private Category getTransferCategory() throws ChildCategoryNotFoundException {
+        return ChildCategoryRepository.get(1);
     }
 
     /**
      * Methode um einen Fehlerdialog anzeigen zu lassen, der den User informiert, dass noch eine Eingabe fehlt, oder die Konten gleich sind.
      *
      * @param message Message id
-     */
+     *///todo durch ErrorAlertDialog ersetzen
     private void showErrorDialog(@StringRes int message) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -275,12 +292,12 @@ public class TransferActivity extends AppCompatActivity {
      *
      * @return aktives Konto
      */
-    private Account getActiveAccount() {
+    private Account getActiveAccount() throws AccountNotFoundException {
 
         SharedPreferences preferences = getSharedPreferences("UserSettings", 0);
         long activeAccountId = preferences.getLong("activeAccount", 1);
 
-        return mDatabase.getAccountById(activeAccountId);
+        return AccountRepository.get(activeAccountId);
     }
 
     /**
@@ -333,19 +350,5 @@ public class TransferActivity extends AppCompatActivity {
 
         mToExpense.setPrice(newPrice);
         mToExpense.setExpenditure(false);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        mDatabase.close();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        mDatabase.close();
     }
 }

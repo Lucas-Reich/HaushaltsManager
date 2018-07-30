@@ -9,11 +9,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.example.lucas.haushaltsmanager.Database.Exceptions.CannotDeleteAccountException;
-import com.example.lucas.haushaltsmanager.Database.Exceptions.CannotDeleteCategoryException;
-import com.example.lucas.haushaltsmanager.Database.Exceptions.CannotDeleteCurrencyException;
-import com.example.lucas.haushaltsmanager.Database.Exceptions.CannotDeleteTagException;
 import com.example.lucas.haushaltsmanager.Database.Exceptions.EntityNotExistingException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.CannotDeleteAccountException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.Exceptions.CannotDeleteCategoryException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.Exceptions.CannotDeleteCurrencyException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Tags.Exceptions.CannotDeleteTagException;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
@@ -29,13 +29,11 @@ public class ExpensesDataSource {
 
     private SQLiteDatabase database;
     private ExpensesDbHelper dbHelper;
-    private Context mContext;
 
-    public ExpensesDataSource(Context context) {
+    public ExpensesDataSource() {
 
-        this.mContext = context;
         Log.d(TAG, "Unsere DataSource erzeugt jetzt den dbHelper.");
-        dbHelper = new ExpensesDbHelper(context);
+        dbHelper = new ExpensesDbHelper();
     }
 
     public void open() {
@@ -74,7 +72,7 @@ public class ExpensesDataSource {
         String categoryName = c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_NAME));
         String categoryColor = c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_COLOR));
         boolean defaultExpenseType = c.getInt(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE)) == 1;
-        Category category = new Category(categoryId, categoryName, categoryColor, defaultExpenseType);
+        Category category = new Category(categoryId, categoryName, categoryColor, defaultExpenseType, new ArrayList<Category>());
 
         //Hole alle Währungs Parameter
         long curId = c.getLong(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID));
@@ -123,7 +121,7 @@ public class ExpensesDataSource {
         String categoryName = c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_NAME));
         String categoryColor = c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_COLOR));
         boolean defaultExpenseType = c.getInt(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE)) == 1;
-        Category category = new Category(categoryId, categoryName, categoryColor, defaultExpenseType);
+        Category category = new Category(categoryId, categoryName, categoryColor, defaultExpenseType, new ArrayList<Category>());
 
         //Hole alle Währungs Parameter
         long curId = c.getLong(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID));
@@ -168,7 +166,7 @@ public class ExpensesDataSource {
         String categoryColor = c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_COLOR));
         boolean defaultExpenseType = c.getInt(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE)) == 1;
 
-        Category category = new Category(categoryIndex, categoryName, categoryColor, defaultExpenseType);
+        Category category = new Category(categoryIndex, categoryName, categoryColor, defaultExpenseType, new ArrayList<Category>());
         category.addChildren(getAllChildCategories(category));
 
         return category;
@@ -188,7 +186,7 @@ public class ExpensesDataSource {
         String categoryColor = c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_COLOR));
         boolean defaultExpenseType = c.getInt(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE)) == 1;
 
-        return new Category(categoryIndex, categoryName, categoryColor, defaultExpenseType);
+        return new Category(categoryIndex, categoryName, categoryColor, defaultExpenseType, new ArrayList<Category>());
     }
 
     /**
@@ -254,7 +252,7 @@ public class ExpensesDataSource {
      * @return Dummy Ausgabe
      */
     private ExpenseObject createDummyExpense() {
-        ExpenseObject dummyExpense = ExpenseObject.createDummyExpense(mContext);
+        ExpenseObject dummyExpense = ExpenseObject.createDummyExpense();
 
         return createBooking(dummyExpense);
     }
@@ -418,8 +416,8 @@ public class ExpensesDataSource {
     @SuppressWarnings("UnusedReturnValue")
     public int deleteAccount(long accountId) throws CannotDeleteAccountException {
 
-        if (hasAccountBookings(accountId))
-            throw new CannotDeleteAccountException("Account with existing bookings cannot be deleted!");
+//        if (hasAccountBookings(accountId))
+//            throw new CannotDeleteAccountException("Account with existing bookings cannot be deleted!");
 
         Log.d(TAG, "Deleting account at index: " + accountId);
         return database.delete(ExpensesDbHelper.TABLE_ACCOUNTS, ExpensesDbHelper.ACCOUNTS_COL_ID + " = ?", new String[]{"" + accountId});
@@ -528,8 +526,8 @@ public class ExpensesDataSource {
      */
     public int deleteTag(long tagId) throws CannotDeleteTagException {
 
-        if (hasTagBookings(tagId))
-            throw new CannotDeleteTagException("Cannot delete tag while there are still Bookings with this tag");
+//        if (hasTagBookings(tagId))
+//            throw new CannotDeleteTagException("Cannot deleteAll tag while there are still Bookings with this tag");
 
         Log.d(TAG, "deleted tag at index " + tagId);
         return database.delete(ExpensesDbHelper.TABLE_TAGS, ExpensesDbHelper.TAGS_COL_ID + " = ?", new String[]{"" + tagId});
@@ -1331,7 +1329,7 @@ public class ExpensesDataSource {
      * @param parent Übergeordnete Kategorie
      * @return Alle untergeordneten Kategorien
      */
-    private ArrayList<Category> getAllChildCategories(Category parent) {
+    private List<Category> getAllChildCategories(Category parent) {
 
         String selectQuery = "SELECT "
                 + ExpensesDbHelper.CHILD_CATEGORIES_COL_ID + ", "
@@ -1345,7 +1343,7 @@ public class ExpensesDataSource {
         Cursor c = database.rawQuery(selectQuery, null);
         c.moveToFirst();
 
-        ArrayList<Category> categories = new ArrayList<>();
+        List<Category> categories = new ArrayList<>();
         while (!c.isAfterLast()) {
 
             categories.add(cursorToChildCategory(c));
@@ -1431,8 +1429,8 @@ public class ExpensesDataSource {
      * @throws CannotDeleteCategoryException Wenn es noch Buchungen mit dieser Kategorie gibt kann sie nicht gelöscht werden
      */
     public void deleteChildCategory(Category category) throws CannotDeleteCategoryException {
-        if (hasChildCategoryBookings(category.getIndex()))
-            throw new CannotDeleteCategoryException(String.format("Category %s cannot be deleted due to existing bookings with this Category!", category.getTitle()));
+//        if (hasChildCategoryBookings(category.getIndex()))
+//            throw new CannotDeleteCategoryException(String.format("Category %s cannot be deleted due to existing bookings with this Category!", category.getTitle()));
 
         database.delete(ExpensesDbHelper.TABLE_CHILD_CATEGORIES, ExpensesDbHelper.CHILD_BOOKINGS_COL_ID + " = ?", new String[]{"" + category.getIndex()});
     }
@@ -1457,10 +1455,10 @@ public class ExpensesDataSource {
      */
     public int deleteCategory(long categoryId) throws CannotDeleteCategoryException {
 
-        if (hasCategoryBookings(categoryId))
-            throw new CannotDeleteCategoryException("Category with existing Bookings cannot be deleted");
+//        if (hasCategoryBookings(categoryId))
+//            throw new CannotDeleteCategoryException("Category with existing Bookings cannot be deleted");
 
-        Log.d(TAG, "delete Category + " + categoryId);
+        Log.d(TAG, "deleteAll Category + " + categoryId);
         // todo wenn keine Untergeordneten Kategorien mehr zu einer übergeordneten existieren soll diese gelöscht werden
         return database.delete(ExpensesDbHelper.TABLE_CHILD_CATEGORIES, ExpensesDbHelper.CATEGORIES_COL_ID + " = ?", new String[]{"" + categoryId});
     }
@@ -1828,8 +1826,8 @@ public class ExpensesDataSource {
      */
     public int deleteCurrency(long currencyId) throws CannotDeleteCurrencyException {
 
-        if (hasCurrencyAccounts(currencyId))
-            throw new CannotDeleteCurrencyException("Cannot delete Currency while there are still bookings or accounts with this currency");
+//        if (hasCurrencyAccounts(currencyId))
+//            throw new CannotDeleteCurrencyException("Cannot deleteAll Currency while there are still bookings or accounts with this currency");
 
         Log.d(TAG, "deleteCurrency at index: " + currencyId);
         return database.delete(ExpensesDbHelper.TABLE_CURRENCIES, ExpensesDbHelper.CURRENCIES_COL_ID + " = ?", new String[]{"" + currencyId});

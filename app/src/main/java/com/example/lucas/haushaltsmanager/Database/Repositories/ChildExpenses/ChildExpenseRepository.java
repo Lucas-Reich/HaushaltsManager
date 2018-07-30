@@ -1,0 +1,461 @@
+package com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses;
+
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+
+import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
+import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.BookingTags.BookingTagRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.CannotDeleteExpenseException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.AddChildToChildException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.ChildExpenseNotFoundException;
+import com.example.lucas.haushaltsmanager.Entities.Account;
+import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Tag;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+
+public class ChildExpenseRepository {
+
+    public static boolean exists(ExpenseObject childExpense) {
+        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        String selectQuery;
+
+        selectQuery = "SELECT"
+                + " *"
+                + " FROM " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS
+                + " WHERE " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_TITLE + " = " + childExpense.getTitle()
+                + " AND " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_PRICE + " = " + childExpense.getUnsignedPrice()
+                + " AND " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_EXPENSE_TYPE + " = " + childExpense.getExpenseType()
+                + " AND " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_CATEGORY_ID + " = " + childExpense.getCategory().getIndex()
+                + " AND " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_ACCOUNT_ID + " = " + childExpense.getAccount().getIndex()
+                + " AND " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_EXPENDITURE + " = " + childExpense.isExpenditure()
+                + " AND " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_DATE + " = " + childExpense.getDateTime().getTimeInMillis()
+                + " AND " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_NOTICE + " = " + childExpense.getNotice()
+                + " LIMIT 1;";
+
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        if (c.moveToFirst()) {
+
+            c.close();
+            DatabaseManager.getInstance().closeDatabase();
+            return true;
+        }
+
+        c.close();
+        DatabaseManager.getInstance().closeDatabase();
+        return false;
+    }
+
+    /**
+     * Diese Funktion stellt sicher dass keine Kind zu einer Kindbuchung hinzugefügt werden kann.
+     * Sie überprüft ebenfalls ob die Parentbuchung bereits Kindbuchugen hat oder nicht.
+     * Hat die Parentbuchung keine Kinder wird eine Dummy Ausgabe erstellt, zu der die Kinder hinzugefügt werden.
+     *
+     * @param childExpense  Buchung welche dem Parent als Kind hinzugefügt werden soll
+     * @param parentBooking Buchung der ein neues Kind hinzugefügt werden soll
+     * @return Kindbuchung, mit dem korrekten Index
+     */
+    @SuppressWarnings("UnusedReturnValue")
+    public static ExpenseObject addChildToBooking(ExpenseObject childExpense, ExpenseObject parentBooking) throws AddChildToChildException {
+        if (isChild(parentBooking))
+            throw new AddChildToChildException();
+
+        if (parentBooking.isParent()) {
+
+            return insert(parentBooking,childExpense);
+        } else {
+
+            try {
+                ExpenseRepository.delete(parentBooking);
+
+                ExpenseObject dummyParentExpense = ExpenseObject.createDummyExpense();
+                dummyParentExpense.addChild(parentBooking);
+                dummyParentExpense.addChild(childExpense);
+
+                return ExpenseRepository.insert(dummyParentExpense);
+            } catch (CannotDeleteExpenseException e) {
+                //Kann nicht passieren, da nur Buchung mit Kindern nicht gelöscht werden können und ich hier vorher übeprüft habe ob die Buchung Kinder hat oder nicht
+                return null;
+            }
+        }
+    }
+
+    /**
+     * Methode um mehrere Buchungen zusammenzufügen
+     *
+     * @param expenses Liste der Buchungen die zusammengefügt werden sollen
+     * @return Parent der zusammengefügten Buchungen, mit den hinzugefügten Kindbuchungen
+     */
+    public static ExpenseObject combineExpenses(ArrayList<ExpenseObject> expenses) {
+
+        ExpenseObject dummyParentExpense = ExpenseObject.createDummyExpense();
+        for (ExpenseObject expense : expenses) {
+            if (expense.isParent()) {
+
+                dummyParentExpense.addChildren(expense.getChildren());
+                for (ExpenseObject child : expense.getChildren())
+                    delete(child);
+            } else {
+
+                try {
+                    dummyParentExpense.addChild(expense);
+                    ExpenseRepository.delete(expense);
+                } catch (CannotDeleteExpenseException e) {
+
+                    //sammle alle Buchungen die nicht dem Parent hinzugefügt wurden konnten und werfe eine Exception (CouldNotAddChildToBookingException)
+                }
+            }
+        }
+
+        return ExpenseRepository.insert(dummyParentExpense);
+    }
+
+    public static ExpenseObject extractChildFromBooking(ExpenseObject expense) {
+
+        delete(expense);
+        expense.setExpenseType(ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE);
+        return ExpenseRepository.insert(expense);
+    }
+
+    public static ExpenseObject get(long expenseId) throws ChildExpenseNotFoundException {
+        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+
+        String selectQuery;
+        selectQuery = "SELECT "
+                + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_EXPENSE_TYPE + ", "
+                + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_ID + ", "
+                + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_PARENT_BOOKING_ID + ", "
+                + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_PRICE + ", "
+                + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_EXPENDITURE + ", "
+                + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_TITLE + ", "
+                + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_DATE + ", "
+                + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_NOTICE + ", "
+                + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_CATEGORY_ID + ", "
+                + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_ACCOUNT_ID + ", "
+                + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_NAME + ", "
+                + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_COLOR + ", "
+                + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE + ", "
+                + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_NAME + ", "
+                + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_BALANCE + ", "
+                + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_NAME + ", "
+                + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME + ", "
+                + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SYMBOL
+                + " FROM " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS
+                + " LEFT JOIN " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + " ON " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_CATEGORY_ID + " = " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_ID
+                + " LEFT JOIN " + ExpensesDbHelper.TABLE_ACCOUNTS + " ON " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_ACCOUNT_ID + " = " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_ID
+                + " LEFT JOIN " + ExpensesDbHelper.TABLE_CURRENCIES + " ON " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID + " = " + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_ID
+                + " WHERE " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_ID + " = " + expenseId
+                + " ORDER BY " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_DATE + " DESC;";
+
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        if (!c.moveToFirst()) {
+            throw new ChildExpenseNotFoundException(expenseId);
+        }
+
+        ExpenseObject expense = cursorToChildBooking(c);
+
+        c.close();
+        DatabaseManager.getInstance().closeDatabase();
+        return expense;
+    }
+
+    public static List<ExpenseObject> getAll(long parentId) {
+        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+
+        String selectQuery;
+        selectQuery = "SELECT "
+                + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_ID + ", "
+                + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_PARENT_BOOKING_ID + ", "
+                + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_EXPENSE_TYPE + ", "
+                + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_PRICE + ", "
+                + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_EXPENDITURE + ", "
+                + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_TITLE + ", "
+                + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_DATE + ", "
+                + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_NOTICE + ", "
+                + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_ACCOUNT_ID + ", "
+                + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_CATEGORY_ID + ", "
+                + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_NAME + ", "
+                + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_COLOR + ", "
+                + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE + ", "
+                + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_NAME + ", "
+                + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_BALANCE + ", "
+                + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID + ", "
+                + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_NAME + ", "
+                + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME + ", "
+                + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SYMBOL
+                + " FROM " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS
+                + " LEFT JOIN " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + " ON " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_CATEGORY_ID + " = " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CHILD_CATEGORIES_COL_ID
+                + " LEFT JOIN " + ExpensesDbHelper.TABLE_ACCOUNTS + " ON " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_ACCOUNT_ID + " = " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_ID
+                + " LEFT JOIN " + ExpensesDbHelper.TABLE_CURRENCIES + " ON " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID + " = " + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_ID
+                + " WHERE " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_PARENT_BOOKING_ID + " = " + parentId
+                + " ORDER BY " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_DATE + " DESC;";
+
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        c.moveToFirst();
+        ArrayList<ExpenseObject> childBookings = new ArrayList<>();
+        while (!c.isAfterLast()) {
+
+            childBookings.add(cursorToChildBooking(c));
+            c.moveToNext();
+        }
+
+        c.close();
+        DatabaseManager.getInstance().closeDatabase();
+
+        return childBookings;
+    }
+
+    public static ExpenseObject insert(ExpenseObject parentExpense, ExpenseObject childExpense) {
+        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_EXPENSE_TYPE, childExpense.getExpenseType().name());
+        values.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_PRICE, childExpense.getUnsignedPrice());
+        values.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_PARENT_BOOKING_ID, parentExpense.getIndex());
+        values.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_CATEGORY_ID, childExpense.getCategory().getIndex());
+        values.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_EXPENDITURE, childExpense.isExpenditure());
+        values.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_TITLE, childExpense.getTitle());
+        values.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_DATE, childExpense.getDateTime().getTimeInMillis());
+        values.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_NOTICE, childExpense.getNotice());
+        values.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_ACCOUNT_ID, childExpense.getAccount().getIndex());
+
+        long insertedChildId = db.insert(ExpensesDbHelper.TABLE_CHILD_BOOKINGS, null, values);
+        DatabaseManager.getInstance().closeDatabase();
+
+        try {
+            updateAccountBalance(childExpense.getAccount(), childExpense.getSignedPrice());
+        } catch (AccountNotFoundException e) {
+            //Kann nicht passieren, da der User bei der Buchungserstellung nur aus Konten auswählen kann die bereits existieren
+        }
+
+        for (Tag tag : childExpense.getTags())
+            BookingTagRepository.insert(insertedChildId, tag, childExpense.getExpenseType());
+
+        return new ExpenseObject(
+                insertedChildId,
+                childExpense.getTitle(),
+                childExpense.getUnsignedPrice(),
+                childExpense.getDateTime(),
+                childExpense.isExpenditure(),
+                childExpense.getCategory(),
+                childExpense.getNotice(),
+                childExpense.getAccount(),
+                childExpense.getExpenseType(),
+                childExpense.getTags(),
+                childExpense.getChildren()
+        );
+    }
+
+    public static boolean update(ExpenseObject childExpense) {
+        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+
+        ContentValues updatedChild = new ContentValues();
+        updatedChild.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_EXPENSE_TYPE, childExpense.getExpenseType().name());
+        updatedChild.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_PRICE, childExpense.getUnsignedPrice());
+        updatedChild.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_CATEGORY_ID, childExpense.getCategory().getIndex());
+        updatedChild.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_EXPENDITURE, childExpense.isExpenditure());
+        updatedChild.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_TITLE, childExpense.getTitle());
+        updatedChild.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_DATE, childExpense.getDateTime().getTimeInMillis());
+        updatedChild.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_NOTICE, childExpense.getNotice());
+        updatedChild.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_ACCOUNT_ID, childExpense.getAccount().getIndex());
+
+        BookingTagRepository.deleteAll(childExpense, childExpense.getExpenseType());
+        for (Tag tag : childExpense.getTags()) {
+            BookingTagRepository.insert(childExpense.getIndex(), tag, childExpense.getExpenseType());
+        }
+
+        try {
+            ExpenseObject oldExpense = get(childExpense.getIndex());
+
+            updateAccountBalance(
+                    childExpense.getAccount(),
+                    childExpense.getSignedPrice() - oldExpense.getSignedPrice()
+            );
+
+            int affectedRows = db.update(ExpensesDbHelper.TABLE_CHILD_BOOKINGS, updatedChild, ExpensesDbHelper.CHILD_BOOKINGS_COL_ID + " = ?", new String[]{childExpense.getIndex() + ""});
+            DatabaseManager.getInstance().closeDatabase();
+
+            return affectedRows == 1;
+        } catch (ChildExpenseNotFoundException e) {
+
+            DatabaseManager.getInstance().closeDatabase();
+            return false;
+        } catch (AccountNotFoundException e) {
+
+            DatabaseManager.getInstance().closeDatabase();
+            return false;
+        }
+    }
+
+    public static void delete(ExpenseObject childExpense) {
+        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+
+        if (isLastChildOfParent(childExpense)) {
+
+            try {
+                ExpenseObject parentExpense = getParent(childExpense);
+
+                db.delete(ExpensesDbHelper.TABLE_CHILD_BOOKINGS, ExpensesDbHelper.CHILD_BOOKINGS_COL_ID + " = ?", new String[]{"" + childExpense.getIndex()});
+                ExpenseRepository.delete(parentExpense);
+            } catch (CannotDeleteExpenseException e) {
+
+                //Kann nicht passieren, da ich die Kinder vorher vom Parent gelöscht habe
+            } catch (ExpenseNotFoundException e) {
+
+                //Kann nicht passieren
+            }
+        } else {
+
+            db.delete(ExpensesDbHelper.TABLE_CHILD_BOOKINGS, ExpensesDbHelper.CHILD_BOOKINGS_COL_ID + " = ?", new String[]{"" + childExpense.getIndex()});
+        }
+    }
+
+    private static boolean isLastChildOfParent(ExpenseObject childExpense) {
+        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+
+        String selectQuery;
+        selectQuery = "SELECT "
+                + " COUNT()"
+                + " FROM " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS
+                + " WHERE " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_PARENT_BOOKING_ID + " = " + childExpense.getIndex()
+                + ";";
+
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        if (c.getCount() == 1) {
+
+            c.close();
+            DatabaseManager.getInstance().closeDatabase();
+            return true;
+        }
+
+        c.close();
+        DatabaseManager.getInstance().closeDatabase();
+        return false;
+    }
+
+    private static boolean isChild(ExpenseObject expense) {
+        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+
+        String selectQuery = "SELECT"
+                + " COUNT(1) 'exists'"
+                + " FROM " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS
+                + " WHERE " + ExpensesDbHelper.CHILD_BOOKINGS_COL_ID + " = " + expense.getIndex()
+                + " AND " + ExpensesDbHelper.CHILD_BOOKINGS_COL_TITLE + " = '" + expense.getTitle() + "'"
+                + " LIMIT 1;";
+
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        if (c.moveToFirst()) {
+
+            c.close();
+            DatabaseManager.getInstance().closeDatabase();
+            return false;
+        }
+
+        c.close();
+        DatabaseManager.getInstance().closeDatabase();
+        return true;
+    }
+
+    public static ExpenseObject getParent(ExpenseObject childExpense) throws ExpenseNotFoundException {
+        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+
+        String subQuery;
+        subQuery = "(SELECT "
+                + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_CATEGORIES_COL_PARENT_ID
+                + " FROM " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS
+                + " WHERE " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_ID + " = '" + childExpense.getIndex() + "'"
+                + ")";
+
+        String selectQuery;
+        selectQuery = "SELECT "
+                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_ID + ", "
+                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_EXPENSE_TYPE + ", "
+                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_PRICE + ", "
+                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_EXPENDITURE + ", "
+                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_TITLE + ", "
+                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_DATE + ", "
+                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_NOTICE + ", "
+                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_IS_PARENT + ", "
+                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID + ", "
+                + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_NAME + ", "
+                + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_BALANCE + ", "
+                + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID + ", "
+                + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_NAME + ", "
+                + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME + ", "
+                + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SYMBOL + ", "
+                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID + ", "
+                + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_NAME + ", "
+                + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_COLOR + ", "
+                + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE
+                + " FROM " + ExpensesDbHelper.TABLE_BOOKINGS
+                + " LEFT JOIN " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + " ON " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID + " = " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_ID
+                + " LEFT JOIN " + ExpensesDbHelper.TABLE_ACCOUNTS + " ON " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID + " = " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_ID
+                + " LEFT JOIN " + ExpensesDbHelper.TABLE_CURRENCIES + " ON " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID + " = " + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_ID
+                + " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_ID + " = " + subQuery
+                + " ORDER BY " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_DATE + " DESC;";
+
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        if (!c.moveToFirst()) {
+            throw new ExpenseNotFoundException(childExpense.getIndex());
+        }
+
+        ExpenseObject expense = ExpenseRepository.cursorToExpense(c);
+
+        c.close();
+        DatabaseManager.getInstance().closeDatabase();
+        return expense;
+    }
+
+    /**
+     * Methode um den Kontostand anzupassen.
+     *
+     * @param account Konto welches angepasst werden soll
+     * @param amount  Betrag der angezogen oder hinzugefügt werden soll
+     */
+    private static void updateAccountBalance(Account account, double amount) throws AccountNotFoundException {
+
+        account.setBalance(amount);
+        AccountRepository.update(account);
+    }
+
+    private static ExpenseObject cursorToChildBooking(Cursor c) {
+
+        long expenseId = c.getLong(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_ID));
+        Calendar date = Calendar.getInstance();
+        String dateString = c.getString(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_DATE));
+        date.setTimeInMillis(Long.parseLong(dateString));
+        String title = c.getString(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_TITLE));
+        double price = c.getDouble(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_PRICE));
+        boolean expenditure = c.getInt(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_EXPENDITURE)) == 1;
+        String notice = c.getString(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_NOTICE));
+
+        return new ExpenseObject(
+                expenseId,
+                title,
+                price,
+                date,
+                expenditure,
+                CategoryRepository.cursorToCategory(c),
+                notice,
+                AccountRepository.cursorToAccount(c),
+                ExpenseObject.EXPENSE_TYPES.CHILD_EXPENSE,
+                BookingTagRepository.get(expenseId, ExpenseObject.EXPENSE_TYPES.CHILD_EXPENSE),
+                new ArrayList<ExpenseObject>()
+        );
+    }
+}

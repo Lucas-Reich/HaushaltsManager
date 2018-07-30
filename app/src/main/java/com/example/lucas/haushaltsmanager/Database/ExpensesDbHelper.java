@@ -2,29 +2,29 @@ package com.example.lucas.haushaltsmanager.Database;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.util.ArrayList;
 
-class ExpensesDbHelper extends SQLiteOpenHelper {
+public class ExpensesDbHelper extends SQLiteOpenHelper {
     private static final String TAG = ExpensesDbHelper.class.getSimpleName();
 
-    private Context mContext;
-
-    private static final String DB_NAME = "expenses.db";
+    public static final String DB_NAME = "expenses.db";
     private static final int DB_VERSION = 1;
 
     //define table Template_Bookings
-    static final String TABLE_TEMPLATE_BOOKINGS = "TEMPLATE_BOOKINGS";
+    public static final String TABLE_TEMPLATE_BOOKINGS = "TEMPLATE_BOOKINGS";
 
-    static final String TEMPLATE_COL_ID = "_id";
-    static final String TEMPLATE_COL_BOOKING_ID = "booking_id";
-    static final String TEMPLATE_COL_BOOKING_TYPE = "booking_type";
+    public static final String TEMPLATE_COL_ID = "template_id";
+    public static final String TEMPLATE_COL_BOOKING_ID = "booking_id";
+    public static final String TEMPLATE_COL_BOOKING_TYPE = "booking_type";
 
     private static final String CREATE_TEMPLATE_BOOKINGS = "CREATE TABLE " + TABLE_TEMPLATE_BOOKINGS
             + "("
@@ -34,14 +34,14 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
             + ");";
 
     //define table Recurring Bookings
-    static final String TABLE_RECURRING_BOOKINGS = "RECURRING_BOOKINGS";
+    public static final String TABLE_RECURRING_BOOKINGS = "RECURRING_BOOKINGS";
 
-    static final String RECURRING_BOOKINGS_COL_ID = "_id";
-    static final String RECURRING_BOOKINGS_COL_BOOKING_ID = "booking_id";
-    static final String RECURRING_BOOKINGS_COL_BOOKING_TYPE = "booking_type";
-    static final String RECURRING_BOOKINGS_COL_START = "start";
-    static final String RECURRING_BOOKINGS_COL_FREQUENCY = "frequency";
-    static final String RECURRING_BOOKINGS_COL_END = "end";
+    public static final String RECURRING_BOOKINGS_COL_ID = "recurring_booking__id";
+    public static final String RECURRING_BOOKINGS_COL_BOOKING_ID = "booking_id";
+    public static final String RECURRING_BOOKINGS_COL_BOOKING_TYPE = "booking_type";
+    public static final String RECURRING_BOOKINGS_COL_START = "start";
+    public static final String RECURRING_BOOKINGS_COL_FREQUENCY = "frequency";
+    public static final String RECURRING_BOOKINGS_COL_END = "end";
 
     private static final String CREATE_RECURRING_BOOKINGS = "CREATE TABLE " + TABLE_RECURRING_BOOKINGS
             + "("
@@ -55,19 +55,19 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
 
 
     // define table Bookings
-    static final String TABLE_BOOKINGS = "BOOKINGS";
+    public static final String TABLE_BOOKINGS = "BOOKINGS";
 
-    static final String BOOKINGS_COL_ID = "_id";
-    static final String BOOKINGS_COL_CREATED_AT = "created_at";
-    static final String BOOKINGS_COL_EXPENSE_TYPE = "expense_type";
-    static final String BOOKINGS_COL_PRICE = "price";
-    static final String BOOKINGS_COL_CATEGORY_ID = "category_id";
-    static final String BOOKINGS_COL_EXPENDITURE = "expenditure";
-    static final String BOOKINGS_COL_TITLE = "title";
-    static final String BOOKINGS_COL_DATE = "date";
-    static final String BOOKINGS_COL_NOTICE = "notice";
-    static final String BOOKINGS_COL_ACCOUNT_ID = "account_id";
-    static final String BOOKINGS_COL_IS_PARENT = "is_parent";//todo brauchen wir das flag noch, wenn der expense type mit gespeichert wird?
+    public static final String BOOKINGS_COL_ID = "booking_id";
+    public static final String BOOKINGS_COL_CREATED_AT = "created_at";
+    public static final String BOOKINGS_COL_EXPENSE_TYPE = "expense_type";
+    public static final String BOOKINGS_COL_PRICE = "price";
+    public static final String BOOKINGS_COL_CATEGORY_ID = "category_id";
+    public static final String BOOKINGS_COL_EXPENDITURE = "expenditure";
+    public static final String BOOKINGS_COL_TITLE = "title";
+    public static final String BOOKINGS_COL_DATE = "date";
+    public static final String BOOKINGS_COL_NOTICE = "notice";
+    public static final String BOOKINGS_COL_ACCOUNT_ID = "account_id";
+    public static final String BOOKINGS_COL_IS_PARENT = "is_parent";//todo brauchen wir das flag noch, wenn der expense type mit gespeichert wird?
 
     private static final String CREATE_BOOKINGS = "CREATE TABLE " + TABLE_BOOKINGS
             + "("
@@ -86,19 +86,19 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
 
 
     // define table Child_Bookings
-    static final String TABLE_CHILD_BOOKINGS = "CHILD_BOOKINGS";
+    public static final String TABLE_CHILD_BOOKINGS = "CHILD_BOOKINGS";
 
-    static final String CHILD_BOOKINGS_COL_ID = "_id";
-    static final String CHILD_BOOKINGS_COL_CREATED_AT = "created_at";
-    static final String CHILD_BOOKINGS_COL_EXPENSE_TYPE = "expense_type";
-    static final String CHILD_BOOKINGS_COL_PARENT_BOOKING_ID = "booking_id";
-    static final String CHILD_BOOKINGS_COL_PRICE = "price";
-    static final String CHILD_BOOKINGS_COL_CATEGORY_ID = "category_id";
-    static final String CHILD_BOOKINGS_COL_EXPENDITURE = "expenditure";
-    static final String CHILD_BOOKINGS_COL_TITLE = "title";
-    static final String CHILD_BOOKINGS_COL_DATE = "date";
-    static final String CHILD_BOOKINGS_COL_NOTICE = "notice";
-    static final String CHILD_BOOKINGS_COL_ACCOUNT_ID = "account_id";
+    public static final String CHILD_BOOKINGS_COL_ID = "child_booking_id";
+    public static final String CHILD_BOOKINGS_COL_CREATED_AT = "created_at";
+    public static final String CHILD_BOOKINGS_COL_EXPENSE_TYPE = "expense_type";
+    public static final String CHILD_BOOKINGS_COL_PARENT_BOOKING_ID = "booking_id";
+    public static final String CHILD_BOOKINGS_COL_PRICE = "price";
+    public static final String CHILD_BOOKINGS_COL_CATEGORY_ID = "category_id";
+    public static final String CHILD_BOOKINGS_COL_EXPENDITURE = "expenditure";
+    public static final String CHILD_BOOKINGS_COL_TITLE = "title";
+    public static final String CHILD_BOOKINGS_COL_DATE = "date";
+    public static final String CHILD_BOOKINGS_COL_NOTICE = "notice";
+    public static final String CHILD_BOOKINGS_COL_ACCOUNT_ID = "account_id";
 
     private static final String CREATE_CHILD_BOOKINGS = "CREATE TABLE " + TABLE_CHILD_BOOKINGS
             + "("
@@ -117,12 +117,12 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
 
 
     // define table Accounts
-    static final String TABLE_ACCOUNTS = "ACCOUNTS";
+    public static final String TABLE_ACCOUNTS = "ACCOUNTS";
 
-    static final String ACCOUNTS_COL_ID = "_id";
-    static final String ACCOUNTS_COL_NAME = "acc_name";
-    static final String ACCOUNTS_COL_BALANCE = "balance";
-    static final String ACCOUNTS_COL_CURRENCY_ID = "currency_id";
+    public static final String ACCOUNTS_COL_ID = "account_id";
+    public static final String ACCOUNTS_COL_NAME = "acc_name";
+    public static final String ACCOUNTS_COL_BALANCE = "balance";
+    public static final String ACCOUNTS_COL_CURRENCY_ID = "currency_id";
 
     private static final String CREATE_ACCOUNTS = "CREATE TABLE " + TABLE_ACCOUNTS
             + "("
@@ -134,10 +134,10 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
 
 
     // define table Tags
-    static final String TABLE_TAGS = "TAGS";
+    public static final String TABLE_TAGS = "TAGS";
 
-    static final String TAGS_COL_ID = "_id";
-    static final String TAGS_COL_NAME = "tag_name";
+    public static final String TAGS_COL_ID = "tag_id";
+    public static final String TAGS_COL_NAME = "tag_name";
 
     private static final String CREATE_TAGS = "CREATE TABLE " + TABLE_TAGS
             + "("
@@ -146,12 +146,12 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
             + ");";
 
     //define table parentCategories
-    static final String TABLE_CATEGORIES = "CATEGORIES";
+    public static final String TABLE_CATEGORIES = "CATEGORIES";
 
-    static final String CATEGORIES_COL_ID = "_id";
-    static final String CATEGORIES_COL_NAME = "name";
-    static final String CATEGORIES_COL_COLOR = "color";
-    static final String CATEGORIES_COL_DEFAULT_EXPENSE_TYPE = "default_expense_type";
+    public static final String CATEGORIES_COL_ID = "category_id";
+    public static final String CATEGORIES_COL_NAME = "name";
+    public static final String CATEGORIES_COL_COLOR = "color";
+    public static final String CATEGORIES_COL_DEFAULT_EXPENSE_TYPE = "default_expense_type";
 
     private final static String CREATE_CATEGORIES = "CREATE TABLE " + TABLE_CATEGORIES
             + "("
@@ -162,14 +162,14 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
             + ");";
 
     // define table ChildCategories
-    static final String TABLE_CHILD_CATEGORIES = "CHILD_CATEGORIES";
+    public static final String TABLE_CHILD_CATEGORIES = "CHILD_CATEGORIES";
 
-    static final String CHILD_CATEGORIES_COL_ID = "_id";
-    static final String CHILD_CATEGORIES_COL_NAME = "name";
-    static final String CHILD_CATEGORIES_COL_COLOR = "color";
-    static final String CHILD_CATEGORIES_COL_HIDDEN = "hidden";
-    static final String CHILD_CATEGORIES_COL_PARENT_ID = "parent_id";
-    static final String CHILD_CATEGORIES_COL_DEFAULT_EXPENSE_TYPE = "default_expense_type";
+    public static final String CHILD_CATEGORIES_COL_ID = "child_category_id";
+    public static final String CHILD_CATEGORIES_COL_NAME = "name";
+    public static final String CHILD_CATEGORIES_COL_COLOR = "color";
+    public static final String CHILD_CATEGORIES_COL_HIDDEN = "hidden";
+    public static final String CHILD_CATEGORIES_COL_PARENT_ID = "parent_id";
+    public static final String CHILD_CATEGORIES_COL_DEFAULT_EXPENSE_TYPE = "default_expense_type";
 
     private final static String CREATE_CHILD_CATEGORIES = "CREATE TABLE " + TABLE_CHILD_CATEGORIES
             + "("
@@ -183,12 +183,12 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
 
 
     // define table Booking_Tags
-    static final String TABLE_BOOKINGS_TAGS = "BOOKING_TAGS";
+    public static final String TABLE_BOOKINGS_TAGS = "BOOKING_TAGS";
 
-    static final String BOOKINGS_TAGS_COL_ID = "_id";
-    static final String BOOKINGS_TAGS_COL_TAG_ID = "tag_id";
-    static final String BOOKINGS_TAGS_COL_BOOKING_ID = "booking_id";
-    static final String BOOKINGS_TAGS_COL_BOOKING_TYPE = "booking_type";
+    public static final String BOOKINGS_TAGS_COL_ID = "booking_tag_id";
+    public static final String BOOKINGS_TAGS_COL_TAG_ID = "tag_id";
+    public static final String BOOKINGS_TAGS_COL_BOOKING_ID = "booking_id";
+    public static final String BOOKINGS_TAGS_COL_BOOKING_TYPE = "booking_type";
 
     private static final String CREATE_BOOKINGS_TAGS = "CREATE TABLE " + TABLE_BOOKINGS_TAGS
             + "("
@@ -200,13 +200,13 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
 
 
     //defining table Currencies
-    static final String TABLE_CURRENCIES = "CURRENCIES";
+    public static final String TABLE_CURRENCIES = "CURRENCIES";
 
-    static final String CURRENCIES_COL_ID = "_id";
-    static final String CURRENCIES_COL_CREATED_AT = "created_at";
-    static final String CURRENCIES_COL_SYMBOL = "symbol";
-    static final String CURRENCIES_COL_NAME = "cur_name";
-    static final String CURRENCIES_COL_SHORT_NAME = "short_name";
+    public static final String CURRENCIES_COL_ID = "currency_id";
+    public static final String CURRENCIES_COL_CREATED_AT = "created_at";
+    public static final String CURRENCIES_COL_SYMBOL = "symbol";
+    public static final String CURRENCIES_COL_NAME = "cur_name";
+    public static final String CURRENCIES_COL_SHORT_NAME = "short_name";
 
     private static final String CREATE_CURRENCIES = "CREATE TABLE " + TABLE_CURRENCIES
             + "("
@@ -218,11 +218,13 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
             + ");";
 
 
-    ExpensesDbHelper(Context context) {
-
-        super(context, DB_NAME, null, DB_VERSION);
-        mContext = context;
+    public ExpensesDbHelper() {
+        super(app.getContext(), DB_NAME, null, DB_VERSION);
         Log.d(TAG, "DbHelper hat die Datenbank " + getDatabaseName() + " erzeugt");
+    }
+
+    public ExpensesDbHelper(Context context) {
+        super(context, DB_NAME, null, DB_VERSION);
     }
 
     @Override
@@ -347,9 +349,10 @@ class ExpensesDbHelper extends SQLiteOpenHelper {
 
         ArrayList<Category> categories = new ArrayList<>();
         categories.add(new Category(
-                mContext.getResources().getString(R.string.category_transfer),
-                "#" + Integer.toHexString(mContext.getResources().getColor(R.color.transfer_booking_color)),
-                true
+                app.getContext().getString(R.string.category_transfer),
+                "#" + Integer.toHexString(app.getContext().getResources().getColor(R.color.transfer_booking_color)),
+                true,
+                new ArrayList<Category>()
         ));
 
 

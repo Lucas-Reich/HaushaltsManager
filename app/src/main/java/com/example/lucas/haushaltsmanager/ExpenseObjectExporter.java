@@ -9,6 +9,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 /**
  * Klasse um eine Liste von ExpenseObjects in einem CSV Datei zu schreiben und dieses dann abzuspeichern.
@@ -48,7 +49,7 @@ public class ExpenseObjectExporter {
      * @param expenses Buchungen die in eine Datei geschrieben werden sollen.
      * @return True bei Erfolg, False bei Misserfolg.
      */
-    public boolean convertAndExportExpenses(ArrayList<ExpenseObject> expenses) {
+    public boolean convertAndExportExpenses(List<ExpenseObject> expenses) {
         File file = createFile(mDirectory);
 
         return file != null && writeExpensesToFile(expenses, file);
@@ -61,7 +62,7 @@ public class ExpenseObjectExporter {
      * @param file     Datei in der die Buchungen gespeichert werden sollen.
      * @return True wenn die Buchungen erfolgreich in die Datei geschrieben werden konnten, False wenn nicht.
      */
-    private boolean writeExpensesToFile(ArrayList<ExpenseObject> expenses, File file) {
+    private boolean writeExpensesToFile(List<ExpenseObject> expenses, File file) {
         FileOutputStream fileOutput = null;
 
         try {

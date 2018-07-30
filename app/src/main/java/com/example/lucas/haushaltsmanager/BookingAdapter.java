@@ -12,6 +12,7 @@ import android.widget.Toast;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class BookingAdapter extends ArrayAdapter<ExpenseObject> implements View.OnClickListener {
 
@@ -23,7 +24,7 @@ public class BookingAdapter extends ArrayAdapter<ExpenseObject> implements View.
         TextView txtPerson;
     }
 
-    public BookingAdapter(ArrayList<ExpenseObject> data, Context context) {
+    public BookingAdapter(List<ExpenseObject> data, Context context) {
         super(context, R.layout.booking_item, data);
     }
 

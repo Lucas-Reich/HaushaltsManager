@@ -1,38 +1,38 @@
 package com.example.lucas.haushaltsmanager.Entities;
 
-import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Category implements Parcelable {
-
-    private String TAG = Category.class.getSimpleName();
+    private static final String TAG = Category.class.getSimpleName();
 
     private long mIndex;
     private String mName;
     private String mColor;
     private boolean mDefaultExpenseType;
-    private ArrayList<Category> mChildren;
+    private List<Category> mChildren;
 
-    public Category(long index, @NonNull String categoryName, @NonNull String color, boolean defaultExpenseType) {
+    public Category(long index, @NonNull String categoryName, @NonNull String color, boolean defaultExpenseType, List<Category> children) {
 
         setIndex(index);
         setName(categoryName);
         setColor(color);
         setDefaultExpenseType(defaultExpenseType);
-        mChildren = new ArrayList<>();
+        addChildren(children);
     }
 
-    public Category(@NonNull String categoryName, @NonNull String color, Boolean defaultExpenseType) {
+    public Category(@NonNull String categoryName, @NonNull String color, @NonNull Boolean defaultExpenseType, @NonNull List<Category> children) {
 
-        this(-1L, categoryName, color, defaultExpenseType != null ? defaultExpenseType : false);
+        this(-1L, categoryName, color, defaultExpenseType, children);
     }
 
     /**
@@ -56,9 +56,9 @@ public class Category implements Parcelable {
      *
      * @return Category dummy object
      */
-    public static Category createDummyCategory(Context context) {
+    public static Category createDummyCategory() {
 
-        return new Category(-1L, context.getResources().getString(R.string.no_name), "#000000", false);
+        return new Category(-1L, app.getContext().getString(R.string.no_name), "#000000", false, new ArrayList<Category>());
     }
 
     public long getIndex() {
@@ -133,11 +133,14 @@ public class Category implements Parcelable {
         mChildren.add(child);
     }
 
-    public void addChildren(ArrayList<Category> children) {
+    public void addChildren(List<Category> children) {
+        if (mChildren == null)
+            mChildren = new ArrayList<>();
+
         mChildren.addAll(children);
     }
 
-    public ArrayList<Category> getChildren() {
+    public List<Category> getChildren() {
         return mChildren;
     }
 
@@ -152,19 +155,25 @@ public class Category implements Parcelable {
         return getIndex() > -1;
     }
 
-    /**
-     * Methode die überprüft, ob die angegebene Kategorie die gleiche ist, wie diese.
-     *
-     * @param otherCategory Andere Kategorie
-     * @return boolean
-     */
-    public boolean equals(Category otherCategory) {
+    @Override
+    public boolean equals(Object obj) {
 
-        boolean result = getTitle().equals(otherCategory.getTitle());
-        result = result && getColorString().equals(otherCategory.getColorString());
-        result = result && (getDefaultExpenseType() == otherCategory.getDefaultExpenseType());
+        if (obj instanceof Category) {
+            Category otherCategory = (Category) obj;
 
-        return result;
+            boolean result = getTitle().equals(otherCategory.getTitle());
+            result = result && getColorString().equals(otherCategory.getColorString());
+            result = result && (getDefaultExpenseType() == otherCategory.getDefaultExpenseType());
+
+            for (int i = 0; i < mChildren.size(); i++) {
+                result = result && mChildren.get(i).equals(otherCategory.getChildren().get(i));
+            }
+
+            return result;
+        } else {
+
+            return false;
+        }
     }
 
     public String toString() {

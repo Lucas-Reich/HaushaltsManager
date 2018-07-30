@@ -12,7 +12,8 @@ import android.widget.ExpandableListView;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.ExpandableListAdapter;
@@ -25,29 +26,21 @@ import java.util.List;
 public class CourseActivity extends AppCompatActivity {
     private static final String TAG = CourseActivity.class.getSimpleName();
 
-    private ArrayList<ExpenseObject> mExpenses;
-    private ExpensesDataSource mDatabase;
-    private ArrayList<Long> mActiveAccounts;
-
+    private List<ExpenseObject> mExpenses;
+    private List<Long> mActiveAccounts;
     private ExpandableListView mExpListView;
-
     private ImageButton mBackArrow;
-    private Toolbar mToolbar;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_course);
 
-        mDatabase = new ExpensesDataSource(this);
-        mDatabase.open();
-
         mExpListView = (ExpandableListView) findViewById(R.id.lvExp);
-
         mExpenses = new ArrayList<>();
         mActiveAccounts = new ArrayList<>();
 
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         mBackArrow = (ImageButton) findViewById(R.id.back_arrow);
     }
@@ -88,7 +81,7 @@ public class CourseActivity extends AppCompatActivity {
     private void prepareDataSources() {
 
         Log.d(TAG, "prepareDataSources: Initialisiere die Buchungsliste");
-        mExpenses = mDatabase.getBookings();
+        mExpenses = ExpenseRepository.getAll();
 
         prepareAccountData();
     }
@@ -99,7 +92,7 @@ public class CourseActivity extends AppCompatActivity {
     private void prepareAccountData() {
 
         Log.d(TAG, "prepareAccountData: Initialisiere Kontenliste");
-        ArrayList<Account> accounts = mDatabase.getAllAccounts();
+        List<Account> accounts = AccountRepository.getAll();
         for (Account account : accounts) {
             mActiveAccounts.add(account.getIndex());
         }
@@ -137,19 +130,5 @@ public class CourseActivity extends AppCompatActivity {
         }
 
         return true;
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        mDatabase.close();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        mDatabase.close();
     }
 }

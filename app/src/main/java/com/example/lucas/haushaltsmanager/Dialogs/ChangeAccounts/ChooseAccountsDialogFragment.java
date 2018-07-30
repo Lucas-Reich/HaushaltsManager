@@ -15,8 +15,8 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Activities.CreateAccountActivity;
-import com.example.lucas.haushaltsmanager.Database.Exceptions.CannotDeleteAccountException;
-import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.CannotDeleteAccountException;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.R;
 
@@ -26,15 +26,11 @@ import java.util.List;
 public class ChooseAccountsDialogFragment extends DialogFragment implements AdapterView.OnItemClickListener, AccountAdapter.OnDeleteAccountSelected {
     private static final String TAG = ChooseAccountsDialogFragment.class.getSimpleName();
 
-    ExpensesDataSource mDatabase;
-    SharedPreferences mSettings;
-    OnSelectedAccount mCallback;
-    ListView mListView;
-    Context mContext;
-    List<Boolean> mCheckedAccounts;
-    SharedPreferences.Editor mSettingsEditor;
-    ArrayList<Account> mAccounts;
-    AlertDialog.Builder builder;
+    private OnSelectedAccount mCallback;
+    private ListView mListView;
+    private Context mContext;
+    private List<Boolean> mCheckedAccounts;
+    private List<Account> mAccounts;
 
     /**
      * Standart Fragment Methode die genutzt wird, um zu checken ob die aufrufende Activity auch das interface inplementiert.
@@ -58,19 +54,14 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Adap
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        mDatabase = new ExpensesDataSource(mContext);
-        mDatabase.open();
-
-        mSettings = getActivity().getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
-        mSettingsEditor = mSettings.edit();
+        SharedPreferences preferences = getActivity().getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
 
         mCheckedAccounts = new ArrayList<>();
 
-        mAccounts = mDatabase.getAllAccounts();
+        mAccounts = AccountRepository.getAll();
         for (Account account : mAccounts) {
 
-            mCheckedAccounts.add(mSettings.getBoolean(account.getTitle(), false));
+            mCheckedAccounts.add(preferences.getBoolean(account.getTitle(), false));
         }
     }
 
@@ -79,7 +70,7 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Adap
 
         setUpListView();
 
-        builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         builder.setTitle(R.string.choose_account);
 
@@ -89,7 +80,6 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Adap
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                mSettingsEditor.apply();
                 dismiss();
             }
         });
@@ -156,7 +146,9 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Adap
             accountChk.setChecked(true);
         }
 
-        mSettingsEditor.putBoolean(mAccounts.get(position).getTitle(), mCheckedAccounts.get(position));
+        SharedPreferences preferences = getActivity().getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
+        preferences.edit().putBoolean(mAccounts.get(position).getTitle(), mCheckedAccounts.get(position)).apply();
+
         mCallback.onAccountSelected(mAccounts.get(position).getIndex(), mCheckedAccounts.get(position));
     }
 
@@ -169,7 +161,7 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Adap
     public void onDeleteAccountSelected(Account account) {
 
         try {
-            mDatabase.deleteAccount(account.getIndex());
+            AccountRepository.delete(account);
 
             SharedPreferences accountPreferences = mContext.getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
             accountPreferences.edit().remove(account.getTitle()).apply();
@@ -180,7 +172,7 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Adap
             SharedPreferences userPreferences = mContext.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
             long activeAccountId = userPreferences.getLong("activeAccount", -1);
             if (activeAccountId == -1 || activeAccountId == account.getIndex()) {
-                long newActiveAccountIndex = mDatabase.getAllAccounts().get(0).getIndex();
+                long newActiveAccountIndex = AccountRepository.getAll().get(0).getIndex();
                 userPreferences.edit().putLong("activeAccount", newActiveAccountIndex).apply();
             }
 
@@ -218,7 +210,6 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Adap
         super.onStop();
 
         //todo Wenn Konten an oder abgewählt wurden und der User neben den Dialog tippt und sich das Fenster somit schließt müssen auch alle änderungen
-        // die der User gemacht hat wieder rückgängig gemacht werden (ausgenommen delete und set main account)
-        mDatabase.close();
+        // die der User gemacht hat wieder rückgängig gemacht werden (ausgenommen deleteAll und set main account)
     }
 }

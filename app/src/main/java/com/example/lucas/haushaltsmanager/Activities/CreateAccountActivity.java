@@ -11,9 +11,13 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
-import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.Exceptions.CurrencyNotFoundException;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
 import com.example.lucas.haushaltsmanager.Entities.Account;
@@ -23,10 +27,9 @@ import com.example.lucas.haushaltsmanager.R;
 public class CreateAccountActivity extends AppCompatActivity {
     private static final String TAG = CreateAccountActivity.class.getSimpleName();
 
-    Button mAccountNameBtn;
-    Button mAccountBalanceBtn, mCreateAccountBtn;
-    ExpensesDataSource mDatabase;
-    Account mAccount;
+    private Button mAccountNameBtn;
+    private Button mAccountBalanceBtn, mCreateAccountBtn;
+    private Account mAccount;
     private ImageButton mBackArrow;
 
     private enum CREATION_MODES {
@@ -42,9 +45,6 @@ public class CreateAccountActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_account);
 
-        mDatabase = new ExpensesDataSource(this);
-        mDatabase.open();
-
         final Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
 
@@ -53,14 +53,26 @@ public class CreateAccountActivity extends AppCompatActivity {
                 case "update":
                     mCreationMode = CREATION_MODES.UPDATE_ACCOUNT;
 
-                    long accountId = bundle.getLong("account_id");
-                    mAccount = mDatabase.getAccountById(accountId);
+                    try {
+                        long accountId = bundle.getLong("account_id");
+                        mAccount = AccountRepository.get(accountId);
+                    } catch (AccountNotFoundException e) {
+
+                        Toast.makeText(this, getString(R.string.account_not_found), Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
                     break;
                 case "create":
                     mCreationMode = CREATION_MODES.CREATE_ACCOUNT;
 
-                    mAccount = Account.createDummyAccount(this);
-                    mAccount.setCurrency(getDefaultCurrency());
+                    try {
+                        mAccount = Account.createDummyAccount();
+                        mAccount.setCurrency(getDefaultCurrency());
+                    } catch (CurrencyNotFoundException e) {
+
+                        Toast.makeText(this, getString(R.string.no_default_currency), Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
                     break;
                 default:
                     break;
@@ -170,7 +182,7 @@ public class CreateAccountActivity extends AppCompatActivity {
 
                 case CREATE_ACCOUNT:
 
-                    Account account = mDatabase.createAccount(mAccount);
+                    Account account = AccountRepository.insert(mAccount);
 
                     SharedPreferences userSettings = getSharedPreferences("UserSettings", ContextWrapper.MODE_PRIVATE);
                     SharedPreferences.Editor userSettingsEditor = userSettings.edit();
@@ -179,7 +191,14 @@ public class CreateAccountActivity extends AppCompatActivity {
                     break;
                 case UPDATE_ACCOUNT:
 
-                    mDatabase.updateAccount(mAccount);
+                    try {
+                        AccountRepository.update(mAccount);
+
+                    } catch (AccountNotFoundException e) {
+
+                        Toast.makeText(CreateAccountActivity.this, getString(R.string.cannot_update_account), Toast.LENGTH_SHORT).show();
+                        //todo Fehlermdelud verbessern
+                    }
                     break;
             }
 
@@ -188,10 +207,10 @@ public class CreateAccountActivity extends AppCompatActivity {
         }
     };
 
-    private Currency getDefaultCurrency() {
+    private Currency getDefaultCurrency() throws CurrencyNotFoundException {
         SharedPreferences preferences = this.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
 
         long mainCurrencyIndex = preferences.getLong("mainCurrencyIndex", 32);
-        return mDatabase.getCurrencyById(mainCurrencyIndex);
+        return CurrencyRepository.get(mainCurrencyIndex);
     }
 }

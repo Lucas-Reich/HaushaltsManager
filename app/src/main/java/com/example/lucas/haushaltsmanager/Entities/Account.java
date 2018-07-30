@@ -1,20 +1,20 @@
 package com.example.lucas.haushaltsmanager.Entities;
 
-import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.R;
 
 public class Account implements Parcelable {
     private static final String TAG = Account.class.getSimpleName();
 
-    private long index;
-    private String name;
-    private double balance;
-    private Currency currency;
+    private long mIndex;
+    private String mName;
+    private double mBalance;
+    private Currency mCurrency;
 
     public Account(long index, @NonNull String accountName, double balance, @NonNull Currency currency) {
 
@@ -49,54 +49,53 @@ public class Account implements Parcelable {
     /**
      * Methode um ein dummy Konto zu erstellen
      *
-     * @param context      Context
      * @return dummy Konto
      */
-    public static Account createDummyAccount(Context context) {
+    public static Account createDummyAccount() {
 
-        return new Account(-1, context.getResources().getString(R.string.no_name), 0, Currency.createDummyCurrency(context));
+        return new Account(-1, app.getContext().getString(R.string.no_name), 0, Currency.createDummyCurrency());
     }
 
     public long getIndex() {
 
-        return index;
+        return mIndex;
     }
 
     private void setIndex(long index) {
 
-        this.index = index;
+        this.mIndex = index;
     }
 
     @NonNull
     public String getTitle() {
 
-        return name;
+        return mName;
     }
 
     public void setName(@NonNull String accountName) {
 
-        this.name = accountName;
+        this.mName = accountName;
     }
 
     public double getBalance() {
 
-        return balance;
+        return mBalance;
     }
 
     public void setBalance(double balance) {
 
-        this.balance = balance;
+        this.mBalance = balance;
     }
 
     @NonNull
     public Currency getCurrency() {
 
-        return currency;
+        return mCurrency;
     }
 
     public void setCurrency(@NonNull Currency currency) {
 
-        this.currency = currency;
+        this.mCurrency = currency;
     }
 
     /**
@@ -107,11 +106,11 @@ public class Account implements Parcelable {
      */
     public boolean isSet() {
 
-        return !this.name.isEmpty() && this.currency.isSet();
+        return !this.mName.isEmpty() && this.mCurrency.isSet();
     }
 
     /**
-     * Wenn der index des Kontos größer als null ist, dann gibt es das Konto bereits in der Datenbank
+     * Wenn der mIndex des Kontos größer als null ist, dann gibt es das Konto bereits in der Datenbank
      * und man kann es sicher verwenden.
      *
      * @return boolean
@@ -121,20 +120,22 @@ public class Account implements Parcelable {
         return getIndex() > -1 && getCurrency().isValid();
     }
 
-    /**
-     * Methode die überprüft ob das angegebe Konto das gleiche ist wie dieses
-     *
-     * @param otherAccount Anderes Konot
-     * @return sind die Konten gleich
-     */
-    public boolean equals(Account otherAccount) {
+    @Override
+    public boolean equals(Object obj) {
 
-        boolean result;
+        if (obj instanceof Account) {
 
-        result = this.name.equals(otherAccount.getTitle());
-        result = result && (this.index == otherAccount.getIndex());
+            Account otherAccount = (Account) obj;
 
-        return result;
+            boolean result;
+            result = this.mName.equals(otherAccount.getTitle());
+            result = result && (this.mIndex == otherAccount.getIndex());
+
+            return result;
+        } else {
+
+            return false;
+        }
     }
 
     @Override
@@ -160,10 +161,10 @@ public class Account implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
 
         Log.v(TAG, "write to parcel..." + flags);
-        dest.writeLong(index);
-        dest.writeString(name);
-        dest.writeDouble(balance);
-        dest.writeParcelable(currency, flags);
+        dest.writeLong(mIndex);
+        dest.writeString(mName);
+        dest.writeDouble(mBalance);
+        dest.writeParcelable(mCurrency, flags);
     }
 
     /**

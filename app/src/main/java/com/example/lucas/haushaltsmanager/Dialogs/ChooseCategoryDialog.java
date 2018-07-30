@@ -3,12 +3,12 @@ package com.example.lucas.haushaltsmanager.Dialogs;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
-import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
+import com.example.lucas.haushaltsmanager.App.app;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepository;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.R;
 
@@ -17,18 +17,7 @@ import java.util.ArrayList;
 public class ChooseCategoryDialog extends DialogFragment {
     private static final String TAG = ChooseCategoryDialog.class.getSimpleName();
 
-    private ExpensesDataSource mDatabase;
     private OnCategoryChosenListener mCallback;
-    private Context mContext;
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-        mContext = context;
-        mDatabase = new ExpensesDataSource(mContext);
-        mDatabase.open();
-    }
 
     @NonNull
     @Override
@@ -36,7 +25,7 @@ public class ChooseCategoryDialog extends DialogFragment {
 
         Bundle args = getArguments();
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         builder.setTitle(args.getString("title"));
 
@@ -53,7 +42,6 @@ public class ChooseCategoryDialog extends DialogFragment {
                     mCallback.onCategoryChosen(categories.get(selectedCategoryIndex));
                 }
 
-                mDatabase.close();
                 dismiss();
             }
         });
@@ -62,7 +50,6 @@ public class ChooseCategoryDialog extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                mDatabase.close();
                 dismiss();
             }
         });
@@ -81,12 +68,12 @@ public class ChooseCategoryDialog extends DialogFragment {
     }
 
     private ArrayList<Category> getCategories() {
-        Category placeholder = Category.createDummyCategory(mContext);
-        placeholder.setName("Nicht Zugeordnet"); // todo
+        Category placeholder = Category.createDummyCategory();
+        placeholder.setName(app.getContext().getString(R.string.no_assignment));
 
         ArrayList<Category> categories = new ArrayList<>();
         categories.add(placeholder);
-        categories.addAll(mDatabase.getAllCategories());
+        categories.addAll(CategoryRepository.getAll());
 
         return categories;
     }
@@ -97,12 +84,5 @@ public class ChooseCategoryDialog extends DialogFragment {
 
     public interface OnCategoryChosenListener {
         void onCategoryChosen(Category category);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        mDatabase.close();
     }
 }

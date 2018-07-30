@@ -39,7 +39,7 @@ public class AccountAdapter extends ArrayAdapter<Account> {
 
     private List<Boolean> mCheckedItems = new ArrayList<>();
 
-    AccountAdapter(ArrayList<Account> data, Context context) {
+    AccountAdapter(List<Account> data, Context context) {
         super(context, R.layout.list_view_account_item, data);
     }
 
@@ -146,7 +146,7 @@ public class AccountAdapter extends ArrayAdapter<Account> {
                             //user wird nicht noch einmal um bestätigung gefragt!
                             mCallback.onDeleteAccountSelected(mAccount);
 
-                            Log.d(TAG, "onMenuItemClick: delete selected");
+                            Log.d(TAG, "onMenuItemClick: deleteAll selected");
                             return true;
                         case R.id.edit_account_edit:
 

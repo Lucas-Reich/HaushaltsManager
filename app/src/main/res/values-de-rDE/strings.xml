@@ -143,4 +143,8 @@
     <string name="choose_parent_category">Wählen Sie eine übergeordnete Kategorie aus</string>
     <string name="error_name_missing">Bitte geben Sie einen Namen ein</string>
     <string name="empty_list">"Nichts gefunden "</string>
+    <string name="no_assignment">Nicht zugeordnet</string>
+    <string name="could_not_create_backup">Backup konnte nicht erstellt werden</string>
+    <string name="account_not_found">Konto wurde nicht gefunden</string>
+    <string name="no_default_currency">Die StandartWährung wurde noch nicht ausgewählt</string>
 </resources>

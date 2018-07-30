@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.io.File;
@@ -50,8 +51,7 @@ public class BackupCreatorService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        //todo falls der Name der Datenbank geändert werden sollte muss das hier auch angepasst werden
-        mDatabaseFile = getDatabasePath("expenses.db");
+        mDatabaseFile = getDatabasePath(ExpensesDbHelper.DB_NAME);
 
         mBackupDirectory = getBackupDirectory();
 
