@@ -36,7 +36,7 @@ public class Category implements Parcelable {
     }
 
     /**
-     * this constructor converts our parcelable object back into an Category object
+     * constructor converts our parcelable object back into an Category object
      * see: http://prasanta-paul.blogspot.de/2010/06/android-parcelable-example.html (Parcelable ArrayList)
      * and: https://stackoverflow.com/questions/2139134/how-to-send-an-object-from-one-android-activity-to-another-using-intents for further explanations (Parcelable Object)
      *
@@ -68,7 +68,7 @@ public class Category implements Parcelable {
 
     private void setIndex(long index) {
 
-        this.mIndex = index;
+        mIndex = index;
     }
 
     @NonNull
@@ -79,7 +79,7 @@ public class Category implements Parcelable {
 
     public void setName(@NonNull String name) {
 
-        this.mName = name;
+        mName = name;
     }
 
     public String getColorString() {
@@ -100,22 +100,22 @@ public class Category implements Parcelable {
 
     public void setColor(@NonNull String color) {
 
-        this.mColor = color;
+        mColor = color;
     }
 
     public void setColor(@ColorInt int color) {
 
-        this.mColor = "#" + Integer.toHexString(color);
+        mColor = "#" + Integer.toHexString(color);
     }
 
     public boolean getDefaultExpenseType() {
 
-        return this.mDefaultExpenseType;
+        return mDefaultExpenseType;
     }
 
     public void setDefaultExpenseType(boolean expenseType) {
 
-        this.mDefaultExpenseType = expenseType;
+        mDefaultExpenseType = expenseType;
     }
 
     /**
@@ -126,7 +126,7 @@ public class Category implements Parcelable {
      */
     public boolean isSet() {
 
-        return !this.mName.isEmpty() && !this.mColor.isEmpty();
+        return !mName.isEmpty() && !mColor.isEmpty();
     }
 
     public void addChild(Category child) {

@@ -55,12 +55,12 @@ public class CurrencyRepositoryTest {
 
     @Test
     public void testGetWithExistingCurrencyShouldSucceed() {
-        Currency actualCurrency = new Currency("Euro", "EUR", "€");
-        actualCurrency = CurrencyRepository.insert(actualCurrency);
+        Currency expectedCurrency = new Currency("Euro", "EUR", "€");
+        expectedCurrency = CurrencyRepository.insert(expectedCurrency);
 
         try {
-            Currency fetchedCurrency = CurrencyRepository.get(actualCurrency.getIndex());
-            assertSameCurrencies(actualCurrency, fetchedCurrency);
+            Currency fetchedCurrency = CurrencyRepository.get(expectedCurrency.getIndex());
+            assertSameCurrencies(expectedCurrency, fetchedCurrency);
 
         } catch (CurrencyNotFoundException e) {
 
@@ -256,7 +256,6 @@ public class CurrencyRepositoryTest {
     }
 
     private void assertSameCurrencies(Currency expected, Currency actual) {
-
-        assertTrue(expected.equals(actual));
+        assertEquals(expected, actual);
     }
 }

@@ -1,10 +1,17 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.Categories;
 
 import android.content.Context;
+import android.database.CursorIndexOutOfBoundsException;
+import android.database.MatrixCursor;
 
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.Exceptions.CannotDeleteCategoryException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.Exceptions.CategoryNotFoundException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepository;
 import com.example.lucas.haushaltsmanager.Entities.Category;
+
+import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -14,6 +21,8 @@ import org.robolectric.RuntimeEnvironment;
 
 import java.util.ArrayList;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 
 @RunWith(RobolectricTestRunner.class)
@@ -38,22 +47,55 @@ public class CategoryRepositoryTest {
 
     @Test
     public void testExistsWithNotExistingCategoryShouldReturnFalse() {
+        Category category = new Category("Kategorie", "#121212", true, new ArrayList<Category>());
 
+        boolean exists = CategoryRepository.exists(category);
+        assertFalse("Nich existierende Kategorie wurde gefunden", exists);
     }
 
     @Test
     public void testGetWithExistingCategoryShouldSucceed() {
+        Category expectedCategory = new Category("Kategorie", "#121212", false, new ArrayList<Category>());
+        expectedCategory = CategoryRepository.insert(expectedCategory);
 
+        try {
+
+            Category fetchedCategory = CategoryRepository.get(expectedCategory.getIndex());
+            assertSameCategories(expectedCategory, fetchedCategory);
+
+        } catch (CategoryNotFoundException e) {
+
+            Assert.fail("Kategorie wurde nicht gefunden");
+        }
     }
 
     @Test
-    public void testGetWithNozExistingCategoryShouldThrowCategoryNotFoundException() {
+    public void testGetWithNotExistingCategoryShouldThrowCategoryNotFoundException() {
+        long notExistingCategoryId = 1337;
 
+        try {
+            CategoryRepository.get(notExistingCategoryId);
+            Assert.fail("Nicht existierende Kategorie wurde gefunden");
+
+        } catch (CategoryNotFoundException e) {
+
+            assertEquals(String.format("Could not find Category with index %s.", notExistingCategoryId), e.getMessage());
+        }
     }
 
     @Test
     public void testInsertWithValidCategoryShouldSucceed() {
+        Category expectedCategory = new Category("Kategorie", "#000000", false, new ArrayList<Category>());
+        expectedCategory = CategoryRepository.insert(expectedCategory);
 
+        try {
+            Category fetchedCategory = CategoryRepository.get(expectedCategory.getIndex());
+            assertSameCategories(expectedCategory, fetchedCategory);
+
+        } catch (CategoryNotFoundException e) {
+
+            Assert.fail("Gerade erstellte Kategorie wurde nicht gefunden");
+        }
     }
 
     @Test
@@ -63,40 +105,134 @@ public class CategoryRepositoryTest {
 
     @Test
     public void testDeleteWithWithExistingCurrencyShouldSucceed() {
+        Category category = new Category("Kategorie", "#000000", true, new ArrayList<Category>());
+        category = CategoryRepository.insert(category);
 
+        try {
+            CategoryRepository.delete(category);
+            assertFalse("Kategorie wurde nicht gelöscht", CategoryRepository.exists(category));
+
+        } catch (CannotDeleteCategoryException e) {
+
+            Assert.fail("Kategorie konnte nicht gelöscht werden");
+        }
     }
 
     @Test
     public void testDeleteWithNotExistingCategoryShouldSucceed() {
+        Category category = new Category("Kategorie", "#121212", true, new ArrayList<Category>());
 
+        try {
+            CategoryRepository.delete(category);
+            assertFalse("Nicht existierende Kategorie wurde in der Datenbank gefunden", CategoryRepository.exists(category));
+
+        } catch (CannotDeleteCategoryException e) {
+
+            Assert.fail("Nicht existierende Kategorie konnte nicht gelöscht werden");
+        }
     }
 
     @Test
-    public void testDeleteWithExistingCategoryAttachedToChildCategoriesSholdThrowCannotDeleteCategoryException() {
+    public void testDeleteWithExistingCategoryAttachedToChildCategoriesShouldThrowCannotDeleteCategoryException() {
+        Category parentCategory = new Category("ParenCategory", "#121212", true, new ArrayList<Category>());
+        parentCategory = CategoryRepository.insert(parentCategory);
 
+        Category childCategory = new Category("ChildCategory", "#121212", false, new ArrayList<Category>());
+        ChildCategoryRepository.insert(parentCategory, childCategory);
+
+        try {
+            CategoryRepository.delete(parentCategory);
+            Assert.fail("Kategorie konnte gelöscht werden, obwohl es noch Kinder zu dieser Kategorie gibt");
+
+        } catch (CannotDeleteCategoryException e) {
+
+            assertEquals(String.format("Category %s cannot be deleted.", parentCategory.getTitle()), e.getMessage());
+        }
     }
 
     @Test
     public void testUpdateWithWithExistingCategoryShouldSucceed() {
+        Category expectedCategory = new Category("Kategorie", "#123456", true, new ArrayList<Category>());
+        expectedCategory = CategoryRepository.insert(expectedCategory);
 
+        try {
+            expectedCategory.setName("New Category Name");
+            CategoryRepository.update(expectedCategory);
+
+            Category fetchedCategory = CategoryRepository.get(expectedCategory.getIndex());
+            assertSameCategories(expectedCategory, fetchedCategory);
+
+        } catch (CategoryNotFoundException e) {
+
+            Assert.fail("Gerade erstellte Kategorie konnte nicht gefunden werden");
+        }
     }
 
     @Test
     public void testUpdateWithNotExistingCategoryShouldThrowCategoryNotFoundException() {
+        Category category = new Category(1337, "Kategorie", "#098765", true, new ArrayList<Category>());
 
+        try {
+            CategoryRepository.update(category);
+            Assert.fail("Nicht existierende Kategorie konnte geupdated werden");
+
+        } catch (CategoryNotFoundException e) {
+
+            assertEquals(String.format("Could not find Category with index %s.", category.getIndex()), e.getMessage());
+        }
     }
 
     @Test
     public void testCursorToCategoryWithValidCursorShouldSucceed() {
+        Category expectedCategory = new Category(313, "Kategorie", "#321645", false, new ArrayList<Category>());
 
+        String[] columns = new String[]{
+                ExpensesDbHelper.CATEGORIES_COL_ID,
+                ExpensesDbHelper.CATEGORIES_COL_NAME,
+                ExpensesDbHelper.CATEGORIES_COL_COLOR,
+                ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE
+        };
+
+        MatrixCursor cursor = new MatrixCursor(columns);
+        cursor.addRow(new Object[]{expectedCategory.getIndex(), expectedCategory.getTitle(), expectedCategory.getColorString(), expectedCategory.getDefaultExpenseType() ? 1 : 0});
+        cursor.moveToFirst();
+
+        try {
+            Category fetchedCategory = CategoryRepository.cursorToCategory(cursor);
+            assertSameCategories(expectedCategory, fetchedCategory);
+
+        } catch (CursorIndexOutOfBoundsException e) {
+
+            Assert.fail("Kategorie konnte nicht aus einem vollständingen Cursor hergestellt werden");
+        }
     }
 
     @Test
     public void testCursorToCategoryWithInvalidCursorShouldThrowCursorIndexOutOfBoundsException() {
+        Category expectedCategory = new Category(313, "Kategorie", "#321645", false, new ArrayList<Category>());
 
+        String[] columns = new String[]{
+                ExpensesDbHelper.CATEGORIES_COL_ID,
+                ExpensesDbHelper.CATEGORIES_COL_NAME,
+                //Die Farbe ist nicht mit im Cursor
+                ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE
+        };
+
+        MatrixCursor cursor = new MatrixCursor(columns);
+        cursor.addRow(new Object[]{expectedCategory.getIndex(), expectedCategory.getTitle(), expectedCategory.getDefaultExpenseType()});
+        cursor.moveToFirst();
+
+        try {
+            CategoryRepository.cursorToCategory(cursor);
+            Assert.fail("Kategorie konnte aus einem unvollständigen Cursor wiederhergestellt werden");
+
+        } catch (CursorIndexOutOfBoundsException e) {
+
+            //do nothing
+        }
     }
 
     private void assertSameCategories(Category expected, Category actual) {
-        assertTrue(expected.equals(actual));
+        assertEquals(expected, actual);
     }
 }

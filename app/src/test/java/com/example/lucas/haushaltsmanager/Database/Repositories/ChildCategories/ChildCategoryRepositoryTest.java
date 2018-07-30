@@ -377,6 +377,6 @@ public class ChildCategoryRepositoryTest {
     }
 
     private void assertSameChildCategories(Category expected, Category actual) {
-        assertTrue(expected.equals(actual));
+        assertEquals(expected, actual);
     }
 }

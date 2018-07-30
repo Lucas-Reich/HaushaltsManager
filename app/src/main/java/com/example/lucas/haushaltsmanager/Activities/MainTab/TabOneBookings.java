@@ -114,12 +114,18 @@ public class TabOneBookings extends Fragment {
                         public void onTextInput(String title) {
 
                             ExpenseObject parentBooking = ChildExpenseRepository.combineExpenses(mListAdapter.getSelectedGroupData());
-                            parentBooking.setTitle(title);
-                            ExpenseRepository.update(parentBooking);
+                            try {
+                                parentBooking.setTitle(title);
+                                ExpenseRepository.update(parentBooking);
 
-                            mParent.deleteGroupBookings(mListAdapter.getSelectedGroupData());
-                            mParent.addGroupBooking(parentBooking);
+                                mParent.deleteGroupBookings(mListAdapter.getSelectedGroupData());
+                                mParent.addGroupBooking(parentBooking);
+                            } catch (ExpenseNotFoundException e) {
 
+                                Toast.makeText(mainTab, "Ausgabe konnte nicht geupdated werden", Toast.LENGTH_SHORT).show();
+                                //todo fehlerbehandlung
+                                //todo übersetzung
+                            }
                             resetActivityViewState();
                         }
                     });

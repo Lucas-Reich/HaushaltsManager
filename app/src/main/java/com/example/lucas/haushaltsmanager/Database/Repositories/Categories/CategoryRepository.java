@@ -93,6 +93,7 @@ public class CategoryRepository {
     }
 
     public static Category insert(Category category) {
+        //todo sollte ich auch die Kinder einer Kategorie in die Datenbank schreiben oder mache ich das irgendwie anders?
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
 
         ContentValues values = new ContentValues();
@@ -108,7 +109,7 @@ public class CategoryRepository {
                 category.getTitle(),
                 category.getColorString(),
                 category.getDefaultExpenseType(),
-                new ArrayList<Category>()
+                category.getChildren()
         );
     }
 
@@ -116,7 +117,7 @@ public class CategoryRepository {
         //todo sollte man Kategorien löschen können oder soll das automatisch dadurch passieren, dass alle Kinder gelöscht wurden
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
 
-        if (!isAttachedToChildCategories(category))
+        if (isAttachedToChildCategories(category))
             throw new CannotDeleteCategoryException(category);
 
         db.delete(ExpensesDbHelper.TABLE_CATEGORIES, ExpensesDbHelper.CATEGORIES_COL_ID + " = ?", new String[]{"" + category.getIndex()});
@@ -127,11 +128,11 @@ public class CategoryRepository {
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
 
         ContentValues updatedCategory = new ContentValues();
-        updatedCategory.put(ExpensesDbHelper.CHILD_CATEGORIES_COL_NAME, category.getTitle());
-        updatedCategory.put(ExpensesDbHelper.CHILD_CATEGORIES_COL_COLOR, category.getColorString());
-        updatedCategory.put(ExpensesDbHelper.CHILD_CATEGORIES_COL_DEFAULT_EXPENSE_TYPE, category.getDefaultExpenseType());
+        updatedCategory.put(ExpensesDbHelper.CATEGORIES_COL_NAME, category.getTitle());
+        updatedCategory.put(ExpensesDbHelper.CATEGORIES_COL_COLOR, category.getColorString());
+        updatedCategory.put(ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE, (category.getDefaultExpenseType() ? 1 : 0));
 
-        int affectedRows = db.update(ExpensesDbHelper.TABLE_CHILD_CATEGORIES, updatedCategory, ExpensesDbHelper.CHILD_CATEGORIES_COL_ID + " = ?", new String[]{category.getIndex() + ""});
+        int affectedRows = db.update(ExpensesDbHelper.TABLE_CATEGORIES, updatedCategory, ExpensesDbHelper.CATEGORIES_COL_ID + " = ?", new String[]{category.getIndex() + ""});
         DatabaseManager.getInstance().closeDatabase();
 
         if (affectedRows == 0)

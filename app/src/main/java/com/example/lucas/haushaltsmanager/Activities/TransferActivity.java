@@ -19,11 +19,12 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
-import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.Exceptions.ChildCategoryNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.Exceptions.ChildCategoryNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
 import com.example.lucas.haushaltsmanager.Dialogs.AccountPickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.DatePickerDialog;
@@ -239,7 +240,14 @@ public class TransferActivity extends AppCompatActivity {
 
                     ExpenseObject parent = ChildExpenseRepository.combineExpenses(bookings);
                     parent.setTitle(String.format("%s\n%s -> %s", getString(R.string.transfer), mFromAccount.getTitle(), mToAccount.getTitle()));
-                    ExpenseRepository.update(parent);
+                    try {
+                        ExpenseRepository.update(parent);
+                    } catch (ExpenseNotFoundException e) {
+
+                        Toast.makeText(TransferActivity.this, "Titel konnte nicht geupdated werden", Toast.LENGTH_SHORT).show();
+                        //todo fehlerbehandlung
+                        //todo übersetzung
+                    }
 
                     Intent intent = new Intent(TransferActivity.this, ParentActivity.class);
                     TransferActivity.this.startActivity(intent);

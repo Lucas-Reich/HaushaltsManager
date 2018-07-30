@@ -23,6 +23,8 @@ import org.robolectric.RuntimeEnvironment;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @RunWith(RobolectricTestRunner.class)
 public class TagRepositoryTest {
@@ -131,10 +133,14 @@ public class TagRepositoryTest {
 
     @Test
     public void testDeleteWithExistingTagAttachedToBookingShouldThrowCannotDeleteTagException() {
+        ExpenseObject expenseObjectMock = mock(ExpenseObject.class);
+        when(expenseObjectMock.getIndex()).thenReturn(100L);
+        when(expenseObjectMock.getExpenseType()).thenReturn(ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE);
+
         Tag tag = new Tag("Tag");
         tag = TagRepository.insert(tag);
 
-        BookingTagRepository.insert(100L, tag, ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE);
+        BookingTagRepository.insert(expenseObjectMock.getIndex(), tag, expenseObjectMock.getExpenseType());
 
         try {
             TagRepository.delete(tag);
@@ -152,9 +158,10 @@ public class TagRepositoryTest {
         expectedTag = TagRepository.insert(expectedTag);
 
         try {
+            expectedTag.setName("New Tag Name");
             TagRepository.update(expectedTag);
-            Tag fetchedTag = TagRepository.get(expectedTag.getIndex());
 
+            Tag fetchedTag = TagRepository.get(expectedTag.getIndex());
             assertSameTags(expectedTag, fetchedTag);
 
         } catch (TagNotFoundException e) {
@@ -224,7 +231,6 @@ public class TagRepositoryTest {
     }
 
     private void assertSameTags(Tag expected, Tag actual) {
-
-        assertTrue(expected.equals(actual));
+        assertEquals(expected, actual);
     }
 }

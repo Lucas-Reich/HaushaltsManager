@@ -298,6 +298,6 @@ public class AccountRepositoryTest {
     }
 
     private void assertSameAccounts(Account expected, Account actual) {
-        assertTrue(expected.equals(actual));
+        assertEquals(expected, actual);
     }
 }

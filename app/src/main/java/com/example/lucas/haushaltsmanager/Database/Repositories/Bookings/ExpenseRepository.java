@@ -34,15 +34,15 @@ public class ExpenseRepository {
         selectQuery = "SELECT"
                 + " *"
                 + " FROM " + ExpensesDbHelper.TABLE_BOOKINGS
-                + " WHERE " + ExpensesDbHelper.BOOKINGS_COL_TITLE + " = " + expense.getTitle()
+                + " WHERE " + ExpensesDbHelper.BOOKINGS_COL_TITLE + " = '" + expense.getTitle() + "'"
                 + " AND " + ExpensesDbHelper.BOOKINGS_COL_PRICE + " = " + expense.getUnsignedPrice()
-                + " AND " + ExpensesDbHelper.BOOKINGS_COL_EXPENSE_TYPE + " = " + expense.getExpenseType()
+                + " AND " + ExpensesDbHelper.BOOKINGS_COL_EXPENSE_TYPE + " = '" + expense.getExpenseType() + "'"
                 + " AND " + ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID + " = " + expense.getCategory().getIndex()
                 + " AND " + ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID + " = " + expense.getAccount().getIndex()
-                + " AND " + ExpensesDbHelper.BOOKINGS_COL_EXPENDITURE + " = " + expense.isExpenditure()
+                + " AND " + ExpensesDbHelper.BOOKINGS_COL_EXPENDITURE + " = " + (expense.isExpenditure() ? 1 : 0)
                 + " AND " + ExpensesDbHelper.BOOKINGS_COL_DATE + " = " + expense.getDateTime().getTimeInMillis()
-                + " AND " + ExpensesDbHelper.BOOKINGS_COL_IS_PARENT + " = " + expense.isParent()
-                + " AND " + ExpensesDbHelper.BOOKINGS_COL_NOTICE + " = " + expense.getNotice()
+                + " AND " + ExpensesDbHelper.BOOKINGS_COL_IS_PARENT + " = " + (expense.isParent() ? 1 : 0)
+                + " AND " + ExpensesDbHelper.BOOKINGS_COL_NOTICE + " = '" + expense.getNotice() + "'"
                 + " LIMIT 1;";
 
         Cursor c = db.rawQuery(selectQuery, null);
@@ -221,7 +221,7 @@ public class ExpenseRepository {
         }
 
         if (isAttachedToChildExpenses(expense))
-            throw new CannotDeleteExpenseException(expense);
+            throw CannotDeleteExpenseException.BookingAttachedToChildException(expense);
 
         try {
             if (expense.isExpenditure())
@@ -229,18 +229,18 @@ public class ExpenseRepository {
             else
                 updateAccountBalance(expense.getAccount(), 0 - expense.getUnsignedPrice());
 
-            BookingTagRepository.deleteAll(expense, expense.getExpenseType());
+            BookingTagRepository.deleteAll(expense);
             ChildExpenseRepository.delete(expense);
         } catch (AccountNotFoundException e) {
 
-            throw new CannotDeleteExpenseException(expense);
+            throw CannotDeleteExpenseException.RelatedAccountDoesNotExist(expense);
         }
 
         db.delete(ExpensesDbHelper.TABLE_BOOKINGS, ExpensesDbHelper.BOOKINGS_COL_ID + " = ?", new String[]{"" + expense.getIndex()});
         DatabaseManager.getInstance().closeDatabase();
     }
 
-    public static boolean update(ExpenseObject expense) {
+    public static void update(ExpenseObject expense) throws ExpenseNotFoundException {
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
 
         ContentValues updatedExpense = new ContentValues();
@@ -254,7 +254,7 @@ public class ExpenseRepository {
         updatedExpense.put(ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID, expense.getAccount().getIndex());
         updatedExpense.put(ExpensesDbHelper.BOOKINGS_COL_IS_PARENT, expense.isParent());
 
-        BookingTagRepository.deleteAll(expense, expense.getExpenseType());
+        BookingTagRepository.deleteAll(expense);
         for (Tag tag : expense.getTags()) {
             BookingTagRepository.insert(expense.getIndex(), tag, expense.getExpenseType());
         }
@@ -270,15 +270,12 @@ public class ExpenseRepository {
             int affectedRows = db.update(ExpensesDbHelper.TABLE_BOOKINGS, updatedExpense, ExpensesDbHelper.BOOKINGS_COL_ID + " = ?", new String[]{expense.getIndex() + ""});
             DatabaseManager.getInstance().closeDatabase();
 
-            return affectedRows == 1;
-        } catch (ExpenseNotFoundException e) {
+            if (affectedRows == 0)
+                throw new ExpenseNotFoundException(expense.getIndex());
 
-            DatabaseManager.getInstance().closeDatabase();
-            return false;
         } catch (AccountNotFoundException e) {
 
             DatabaseManager.getInstance().closeDatabase();
-            return false;
         }
     }
 
@@ -360,7 +357,7 @@ public class ExpenseRepository {
             case CHILD_EXPENSE:
                 break;
             case DATE_PLACEHOLDER:
-            case TRANSFER_EXPENSE:
+            case TRANSFER_EXPENSE://todo kann man transfer buchungen wirklich nicht speichern?
             case DUMMY_EXPENSE:
                 throw new UnsupportedOperationException("Booking type cannot be saved.");
         }

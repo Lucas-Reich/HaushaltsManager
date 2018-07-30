@@ -62,8 +62,13 @@ public class BookingTagRepository {
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
 
         ContentValues values = new ContentValues();
+        //todo ich muss überprüfen ob es das Tag auch wirklich gibt
         values.put(ExpensesDbHelper.BOOKINGS_TAGS_COL_TAG_ID, tag.getIndex());
+
+        //todo ich muss überprüfen ob es die Buchung auch wirklich gibt
         values.put(ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_ID, bookingId);
+
+        //todo ich muss
         values.put(ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_TYPE, expenseType.name());
 
         db.insert(ExpensesDbHelper.TABLE_BOOKINGS_TAGS, null, values);
@@ -96,15 +101,14 @@ public class BookingTagRepository {
     /**
      * Methode um alle Tags von einer Buchung zu entfernen.
      *
-     * @param expense     Buchung von der alle Tags entfernt werden sollen
-     * @param expenseType Ausgabentyp
+     * @param expense Buchung von der alle Tags entfernt werden sollen
      */
-    public static void deleteAll(ExpenseObject expense, ExpenseObject.EXPENSE_TYPES expenseType) {
+    public static void deleteAll(ExpenseObject expense) {
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
 
         String whereClause = ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_ID + " = ?"
                 + " AND " + ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_TYPE + " = ?";
-        String[] whereArgs = new String[]{expense.getIndex() + "", expenseType.name()};
+        String[] whereArgs = new String[]{expense.getIndex() + "", expense.getExpenseType().name()};
 
         db.delete(ExpensesDbHelper.TABLE_BOOKINGS_TAGS, whereClause, whereArgs);
         DatabaseManager.getInstance().closeDatabase();

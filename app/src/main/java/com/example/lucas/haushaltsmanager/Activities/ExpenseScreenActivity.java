@@ -30,6 +30,7 @@ import android.widget.Toast;
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Tags.TagRepository;
@@ -375,8 +376,15 @@ public class ExpenseScreenActivity extends AppCompatActivity {
 
                 case UPDATE_EXPENSE_MODE:
 
-                    ExpenseRepository.update(mExpense);
-                    Toast.makeText(ExpenseScreenActivity.this, "Updated Booking " + mExpense.getTitle(), Toast.LENGTH_SHORT).show();
+                    try {
+                        ExpenseRepository.update(mExpense);
+                        Toast.makeText(ExpenseScreenActivity.this, "Updated Booking " + mExpense.getTitle(), Toast.LENGTH_SHORT).show();
+                    } catch (ExpenseNotFoundException e) {
+
+                        Toast.makeText(ExpenseScreenActivity.this, "Buchung konnte nicht geupdated werden", Toast.LENGTH_SHORT).show();
+                        //todo fehlerbehandlung
+                        //todo übersetzung
+                    }
                     break;
                 case UPDATE_CHILD_MODE:
 

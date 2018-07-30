@@ -271,7 +271,7 @@ public class ChildExpenseRepository {
         updatedChild.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_NOTICE, childExpense.getNotice());
         updatedChild.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_ACCOUNT_ID, childExpense.getAccount().getIndex());
 
-        BookingTagRepository.deleteAll(childExpense, childExpense.getExpenseType());
+        BookingTagRepository.deleteAll(childExpense);
         for (Tag tag : childExpense.getTags()) {
             BookingTagRepository.insert(childExpense.getIndex(), tag, childExpense.getExpenseType());
         }
