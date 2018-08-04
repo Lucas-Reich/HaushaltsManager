@@ -15,6 +15,7 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Excepti
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.CannotDeleteChildExpenseException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.RecurringBookingRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Templates.TemplateRepository;
 import com.example.lucas.haushaltsmanager.Entities.Account;
@@ -34,7 +35,8 @@ public class ExpenseRepository {
         selectQuery = "SELECT"
                 + " *"
                 + " FROM " + ExpensesDbHelper.TABLE_BOOKINGS
-                + " WHERE " + ExpensesDbHelper.BOOKINGS_COL_TITLE + " = '" + expense.getTitle() + "'"
+                + " WHERE " + ExpensesDbHelper.BOOKINGS_COL_ID + " = " + expense.getIndex()
+                + " AND " + ExpensesDbHelper.BOOKINGS_COL_TITLE + " = '" + expense.getTitle() + "'"
                 + " AND " + ExpensesDbHelper.BOOKINGS_COL_PRICE + " = " + expense.getUnsignedPrice()
                 + " AND " + ExpensesDbHelper.BOOKINGS_COL_EXPENSE_TYPE + " = '" + expense.getExpenseType() + "'"
                 + " AND " + ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID + " = " + expense.getCategory().getIndex()
@@ -92,7 +94,7 @@ public class ExpenseRepository {
         Cursor c = db.rawQuery(selectQuery, null);
 
         if (!c.moveToFirst()) {
-            throw new ExpenseNotFoundException(expenseId);
+            throw ExpenseNotFoundException.expenseNotFoundException(expenseId);
         }
 
         ExpenseObject expense = cursorToExpense(c);
@@ -176,10 +178,10 @@ public class ExpenseRepository {
         values.put(ExpensesDbHelper.BOOKINGS_COL_IS_PARENT, expense.isParent());
 
         try {
-            if (expense.getExpenseType() != ExpenseObject.EXPENSE_TYPES.DUMMY_EXPENSE && expense.getExpenseType() != ExpenseObject.EXPENSE_TYPES.DATE_PLACEHOLDER) {
+            if (expense.getExpenseType() != ExpenseObject.EXPENSE_TYPES.DUMMY_EXPENSE && expense.getExpenseType() != ExpenseObject.EXPENSE_TYPES.DATE_PLACEHOLDER && expense.getExpenseType() != ExpenseObject.EXPENSE_TYPES.PARENT_EXPENSE) {
                 updateAccountBalance(
                         expense.getAccount(),
-                        expense.getAccount().getBalance() + expense.getSignedPrice()
+                        expense.getSignedPrice()
                 );
             }
         } catch (AccountNotFoundException e) {
@@ -198,15 +200,17 @@ public class ExpenseRepository {
                 expense.getCategory(),
                 expense.getNotice(),
                 expense.getAccount(),
-                expense.getExpenseType()
+                expense.getExpenseType(),
+                expense.getTags(),
+                new ArrayList<ExpenseObject>()
         );
 
         for (Tag tag : expense.getTags()) {
-            BookingTagRepository.insert(insertedExpenseId, tag, expense.getExpenseType());
+            BookingTagRepository.insert(insertedExpense.getIndex(), tag, insertedExpense.getExpenseType());//todo kann ich die Tags hier zur buchung zuordnen anstatt durch expense.getTags()
         }
 
         for (ExpenseObject child : expense.getChildren()) {
-            ChildExpenseRepository.insert(insertedExpense, child);
+            insertedExpense.addChild(ChildExpenseRepository.insert(insertedExpense, child));
         }
 
         return insertedExpense;
@@ -234,6 +238,9 @@ public class ExpenseRepository {
         } catch (AccountNotFoundException e) {
 
             throw CannotDeleteExpenseException.RelatedAccountDoesNotExist(expense);
+        } catch (CannotDeleteChildExpenseException e) {
+
+            throw CannotDeleteExpenseException.CannotDeleteChild(expense);
         }
 
         db.delete(ExpensesDbHelper.TABLE_BOOKINGS, ExpensesDbHelper.BOOKINGS_COL_ID + " = ?", new String[]{"" + expense.getIndex()});
@@ -264,14 +271,14 @@ public class ExpenseRepository {
 
             updateAccountBalance(
                     expense.getAccount(),
-                    expense.getSignedPrice() - oldExpense.getSignedPrice()
+                    expense.getSignedPrice() + oldExpense.getSignedPrice()
             );
 
             int affectedRows = db.update(ExpensesDbHelper.TABLE_BOOKINGS, updatedExpense, ExpensesDbHelper.BOOKINGS_COL_ID + " = ?", new String[]{expense.getIndex() + ""});
             DatabaseManager.getInstance().closeDatabase();
 
             if (affectedRows == 0)
-                throw new ExpenseNotFoundException(expense.getIndex());
+                throw ExpenseNotFoundException.expenseNotFoundException(expense.getIndex());
 
         } catch (AccountNotFoundException e) {
 
@@ -287,8 +294,9 @@ public class ExpenseRepository {
      */
     private static void updateAccountBalance(Account account, double amount) throws AccountNotFoundException {
 
-        account.setBalance(amount);
-        AccountRepository.update(account);
+        Account account1 = AccountRepository.get(account.getIndex());
+        account1.setBalance(account1.getBalance() + amount);
+        AccountRepository.update(account1);
     }
 
     private static boolean isAttachedToChildExpenses(ExpenseObject expense) {
@@ -296,7 +304,7 @@ public class ExpenseRepository {
 
         String selectQuery;
         selectQuery = "SELECT"
-                + " COUNT()"
+                + " *"
                 + " FROM " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS
                 + " WHERE " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_PARENT_BOOKING_ID + " = " + expense.getIndex()
                 + " LIMIT 1;";

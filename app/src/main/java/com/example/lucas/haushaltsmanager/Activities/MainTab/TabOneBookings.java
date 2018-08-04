@@ -27,6 +27,8 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Excepti
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.AddChildToChildException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.CannotDeleteChildExpenseException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.ChildExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.ExpandableListAdapter;
@@ -149,7 +151,12 @@ public class TabOneBookings extends Fragment {
                 if (extractChildMode()) {
 
                     for (ExpenseObject child : mListAdapter.getSelectedChildData()) {
-                        ChildExpenseRepository.extractChildFromBooking(child);
+                        try {
+                            ChildExpenseRepository.extractChildFromBooking(child);
+
+                        } catch (ChildExpenseNotFoundException e) {
+                            //todo was soll passieren wenn eine KindBuchung nicht in der Datenbank gefunden werden kann
+                        }
                     }
 
                     //todo die Änderung auch mParent mitteilen
@@ -172,7 +179,11 @@ public class TabOneBookings extends Fragment {
                 );
 
                 for (ExpenseObject child : mListAdapter.getSelectedChildData()) {
-                    ChildExpenseRepository.delete(child);
+                    try {
+                        ChildExpenseRepository.delete(child);
+                    } catch (CannotDeleteChildExpenseException e) {
+                        //todo was soll ich machen wenn eine Buchung nicht gelöscht werden kann
+                    }
                 }
                 mParent.deleteChildBookings(mListAdapter.getSelectedMappedChildData());
 

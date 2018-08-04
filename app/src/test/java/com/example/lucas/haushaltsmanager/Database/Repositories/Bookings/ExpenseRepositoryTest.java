@@ -140,7 +140,7 @@ public class ExpenseRepositoryTest {
     }
 
     @Test
-    public void testExistsWithBotExistingExpenseShouldFail() {
+    public void testExistsWithNotExistingExpenseShouldFail() {
         ExpenseObject expense = getSimpleValidExpense();
 
         boolean exists = ExpenseRepository.exists(expense);

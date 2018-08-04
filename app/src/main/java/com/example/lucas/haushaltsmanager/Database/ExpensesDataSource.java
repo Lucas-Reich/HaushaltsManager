@@ -1,7 +1,6 @@
 package com.example.lucas.haushaltsmanager.Database;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
@@ -87,11 +86,19 @@ public class ExpensesDataSource {
         double accountBalance = c.getDouble(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_BALANCE));
         Account account = new Account(accountId, accountName, accountBalance, currency);
 
-        ExpenseObject expense = new ExpenseObject(expenseId, title, price, date, expenditure, category, notice, account, ExpenseObject.EXPENSE_TYPES.CHILD_EXPENSE);
-
-        expense.setTags(getTagsToBooking(expense.getIndex(), expense.getExpenseType()));
-
-        return expense;
+        return new ExpenseObject(
+                expenseId,
+                title,
+                price,
+                date,
+                expenditure,
+                category,
+                notice,
+                account,
+                ExpenseObject.EXPENSE_TYPES.CHILD_EXPENSE,
+                getTagsToBooking(expenseId, ExpenseObject.EXPENSE_TYPES.CHILD_EXPENSE),
+                new ArrayList<ExpenseObject>()
+        );
     }
 
     /**
@@ -136,20 +143,19 @@ public class ExpensesDataSource {
         double accountBalance = c.getDouble(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_BALANCE));
         Account account = new Account(accountId, accountName, accountBalance, currency);
 
-
-        ExpenseObject expense = new ExpenseObject(expenseId, title, price, date, expenditure, category, notice, account, expense_type);
-
-        boolean isParent = c.getInt(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_IS_PARENT)) == 1;
-        if (isParent) {
-
-            //todo ist die spalte isParent noch notwendig, nachdem die spalte expense_type erstellt wurde?
-            Log.d(TAG, "cursorToExpense: " + expenseId);
-            expense.addChildren(getChildrenToParent(expenseId));
-        }
-
-        expense.setTags(getTagsToBooking(expense.getIndex(), expense.getExpenseType()));
-
-        return expense;
+        return new ExpenseObject(
+                expenseId,
+                title,
+                price,
+                date,
+                expenditure,
+                category,
+                notice,
+                account,
+                expense_type,
+                getTagsToBooking(expenseId, expense_type),
+                getChildrenToParent(expenseId)
+        );
     }
 
     /**
@@ -687,7 +693,19 @@ public class ExpensesDataSource {
         if (expense.getExpenseType() != ExpenseObject.EXPENSE_TYPES.DUMMY_EXPENSE && expense.getExpenseType() != ExpenseObject.EXPENSE_TYPES.DATE_PLACEHOLDER)
             updateAccountBalance(expense.getAccount(), expense.getSignedPrice());
 
-        return new ExpenseObject(index, expense.getTitle(), expense.getUnsignedPrice(), expense.getDateTime(), expense.isExpenditure(), expense.getCategory(), expense.getNotice(), expense.getAccount(), expense.getExpenseType());
+        return new ExpenseObject(
+                index,
+                expense.getTitle(),
+                expense.getUnsignedPrice(),
+                expense.getDateTime(),
+                expense.isExpenditure(),
+                expense.getCategory(),
+                expense.getNotice(),
+                expense.getAccount(),
+                expense.getExpenseType(),
+                expense.getTags(),
+                expense.getChildren()
+        );
     }
 
     /**

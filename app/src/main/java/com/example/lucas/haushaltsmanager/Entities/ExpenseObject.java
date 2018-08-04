@@ -82,9 +82,8 @@ public class ExpenseObject implements Parcelable {
      */
     private List<ExpenseObject> children = new ArrayList<>();
 
-    public ExpenseObject(long index, @NonNull String expenseName, double price, Calendar date, boolean expenditure, @NonNull Category category, String notice, @NonNull Account account, @NonNull EXPENSE_TYPES expenseType, List<Tag> tags, List<ExpenseObject> children) {
+    public ExpenseObject(long index, @NonNull String expenseName, double price, Calendar date, boolean expenditure, @NonNull Category category, String notice, @NonNull Account account, @NonNull EXPENSE_TYPES expenseType, @NonNull List<Tag> tags, @NonNull List<ExpenseObject> children) {
 
-        //todo als default constructor nutzen
         setIndex(index);
         setTitle(expenseName);
         setPrice(price);
@@ -98,22 +97,9 @@ public class ExpenseObject implements Parcelable {
         addChildren(children);
     }
 
-    public ExpenseObject(long index, @NonNull String expenseName, double price, Calendar date, boolean expenditure, @NonNull Category category, String notice, @NonNull Account account, @NonNull EXPENSE_TYPES expenseType) {
-
-        setIndex(index);
-        setTitle(expenseName);
-        setPrice(price);
-        setDateTime(date != null ? date : Calendar.getInstance());
-        setExpenditure(expenditure);
-        setCategory(category);
-        setNotice(notice != null ? notice : "");
-        setAccount(account);
-        setExpenseType(expenseType);
-    }
-
     public ExpenseObject(@NonNull String title, double price, boolean expenditure, @NonNull Category category, @NonNull Account account) {
 
-        this(-1, title, price, Calendar.getInstance(), expenditure, category, null, account, EXPENSE_TYPES.NORMAL_EXPENSE);
+        this(-1, title, price, Calendar.getInstance(), expenditure, category, null, account, EXPENSE_TYPES.NORMAL_EXPENSE, new ArrayList<Tag>(), new ArrayList<ExpenseObject>());
     }
 
     /**
@@ -151,7 +137,7 @@ public class ExpenseObject implements Parcelable {
      */
     public static ExpenseObject createDummyExpense() {
 
-        return new ExpenseObject(-1, app.getContext().getString(R.string.no_name), 0, Calendar.getInstance(), false, Category.createDummyCategory(), null, Account.createDummyAccount(), EXPENSE_TYPES.DUMMY_EXPENSE);
+        return new ExpenseObject(-1, app.getContext().getString(R.string.no_name), 0, Calendar.getInstance(), false, Category.createDummyCategory(), null, Account.createDummyAccount(), EXPENSE_TYPES.DUMMY_EXPENSE, new ArrayList<Tag>(), new ArrayList<ExpenseObject>());
     }
 
     @NonNull

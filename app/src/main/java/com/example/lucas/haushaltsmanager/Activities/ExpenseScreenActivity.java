@@ -33,6 +33,7 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Excepti
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.ChildExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Tags.TagRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Templates.TemplateRepository;
 import com.example.lucas.haushaltsmanager.Dialogs.AccountPickerDialog;
@@ -388,8 +389,15 @@ public class ExpenseScreenActivity extends AppCompatActivity {
                     break;
                 case UPDATE_CHILD_MODE:
 
-                    ChildExpenseRepository.update(mExpense);
-                    Toast.makeText(ExpenseScreenActivity.this, "Updated Booking " + mExpense.getTitle(), Toast.LENGTH_SHORT).show();
+                    try {
+                        ChildExpenseRepository.update(mExpense);
+                        Toast.makeText(ExpenseScreenActivity.this, "Updated Booking " + mExpense.getTitle(), Toast.LENGTH_SHORT).show();
+                    } catch (ChildExpenseNotFoundException e) {
+
+                        Toast.makeText(ExpenseScreenActivity.this, "KindBuchung konnte nicht geupdated werden", Toast.LENGTH_SHORT).show();
+                        //todo fehlerbehandlung
+                        //todo übersetzung
+                    }
                     break;
                 case ADD_CHILD_MODE:
 
