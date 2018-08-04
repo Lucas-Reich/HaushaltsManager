@@ -249,6 +249,9 @@ public class ChildExpenseRepository {
     public static ExpenseObject insert(ExpenseObject parentExpense, ExpenseObject childExpense) {
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
 
+//        if (!ExpenseRepository.exists(parentExpense))
+//            throw ExpenseNotFoundException.expenseNotFoundException(parentExpense.getIndex());
+
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_EXPENSE_TYPE, childExpense.getExpenseType().name());
         values.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_PRICE, childExpense.getUnsignedPrice());

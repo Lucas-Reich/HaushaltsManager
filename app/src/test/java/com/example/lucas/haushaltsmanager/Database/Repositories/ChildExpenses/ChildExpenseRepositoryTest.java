@@ -190,11 +190,14 @@ public class ChildExpenseRepositoryTest {
     public void testExtractChildFromBookingShouldSucceed() {
         ExpenseObject parentExpense = getParentExpenseWithChildren();
         parentExpense = ExpenseRepository.insert(parentExpense);
+        //todo wenn ein Kind extrahiert wird dann wird der falsche betrag dem Konto zugeschrieben
 
         try {
             ExpenseObject extractedChildExpense = ChildExpenseRepository.extractChildFromBooking(parentExpense.getChildren().get(0));
             assertTrue("Die KindBuchung wurde nicht zu einer ParentBuchung konvertiert", ExpenseRepository.exists(extractedChildExpense));
             assertFalse("Die extrahierte KindBuchung wurde nicht gelöscht", ChildExpenseRepository.exists(extractedChildExpense));
+
+            //todo noch ein assertEqualAccountBalance einfügen
 
         } catch (ChildExpenseNotFoundException e) {
 

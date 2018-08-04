@@ -14,6 +14,8 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.BookingTags.Book
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.CannotDeleteExpenseException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.Exceptions.ChildCategoryNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.CannotDeleteChildExpenseException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.RecurringBookingRepository;
@@ -166,6 +168,12 @@ public class ExpenseRepository {
     public static ExpenseObject insert(ExpenseObject expense) {
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
 
+//        if (!ChildCategoryRepository.exists(expense.getCategory()))
+//            throw new ChildCategoryNotFoundException(expense.getCategory().getIndex());
+//
+//        if (!AccountRepository.exists(expense.getAccount()))
+//            throw new AccountNotFoundException(expense.getAccount().getIndex());
+
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.BOOKINGS_COL_EXPENSE_TYPE, expense.getExpenseType().name());
         values.put(ExpensesDbHelper.BOOKINGS_COL_PRICE, expense.getUnsignedPrice());
@@ -228,10 +236,10 @@ public class ExpenseRepository {
             throw CannotDeleteExpenseException.BookingAttachedToChildException(expense);
 
         try {
-            if (expense.isExpenditure())
-                updateAccountBalance(expense.getAccount(), expense.getUnsignedPrice());
-            else
-                updateAccountBalance(expense.getAccount(), 0 - expense.getUnsignedPrice());
+            updateAccountBalance(
+                    expense.getAccount(),
+                    -expense.getSignedPrice()
+            );
 
             BookingTagRepository.deleteAll(expense);
             ChildExpenseRepository.delete(expense);
@@ -271,7 +279,7 @@ public class ExpenseRepository {
 
             updateAccountBalance(
                     expense.getAccount(),
-                    expense.getSignedPrice() + oldExpense.getSignedPrice()
+                    expense.getSignedPrice() - oldExpense.getSignedPrice()
             );
 
             int affectedRows = db.update(ExpensesDbHelper.TABLE_BOOKINGS, updatedExpense, ExpensesDbHelper.BOOKINGS_COL_ID + " = ?", new String[]{expense.getIndex() + ""});

@@ -39,26 +39,29 @@ import static org.mockito.Mockito.when;
 
 @RunWith(RobolectricTestRunner.class)
 public class ExpenseRepositoryTest {
+    private Account account;
+    private Category category;
 
     @Before
     public void setup() {
         Context context = RuntimeEnvironment.application;
         ExpensesDbHelper dbHelper = new ExpensesDbHelper(context);
         DatabaseManager.initializeInstance(dbHelper);
-    }
 
-    private ExpenseObject getSimpleValidExpense() {
         Category parentCategoryMock = mock(Category.class);
         when(parentCategoryMock.getIndex()).thenReturn(100L);
 
-        Category category = new Category("Kategorie", "#000000", false, new ArrayList<Category>());
+        category = new Category("Kategorie", "#000000", false, new ArrayList<Category>());
         category = ChildCategoryRepository.insert(parentCategoryMock, category);
 
         Currency currency = new Currency("Credits", "CRD", "C");
         currency = CurrencyRepository.insert(currency);
 
-        Account account = new Account("Konto", 100, currency);
+        account = new Account("Konto", 100, currency);
         account = AccountRepository.insert(account);
+    }
+
+    private ExpenseObject getSimpleValidExpense() {
 
         return new ExpenseObject(
                 "Ausgabe",
@@ -70,47 +73,22 @@ public class ExpenseRepositoryTest {
     }
 
     private ExpenseObject getValidExpenseWithChildren() {
-        Category parentCategoryMock = mock(Category.class);
-        when(parentCategoryMock.getIndex()).thenReturn(77L);
-
-        Category category = new Category("Kategorie", "#121212", false, new ArrayList<Category>());
-        category = ChildCategoryRepository.insert(parentCategoryMock, category);
-
-        Currency currency = new Currency("Zed", "ZED", "Z");
-        currency = CurrencyRepository.insert(currency);
-
-        Account account = new Account("Konto 1", 50, currency);
-        account = AccountRepository.insert(account);
-
-        ExpenseObject childExpense = new ExpenseObject(
-                "Ausgabe",
-                0,
-                true,
-                category,
-                account
-        );
-
-        ExpenseObject expenseWithChildren = new ExpenseObject(
-                "ParentAusgabe",
-                50,
-                false,
-                category,
-                account
-        );
+        ExpenseObject parentExpense = getSimpleValidExpense();
+        ExpenseObject childExpense = getSimpleValidExpense();
 
         childExpense.setExpenditure(false);
         childExpense.setPrice(33);
-        expenseWithChildren.addChild(childExpense);
+        parentExpense.addChild(childExpense);
+
+        childExpense.setExpenditure(false);
+        childExpense.setPrice(768);
+        parentExpense.addChild(childExpense);
 
         childExpense.setExpenditure(true);
-        childExpense.setPrice(67);
-        expenseWithChildren.addChild(childExpense);
+        childExpense.setPrice(324);
+        parentExpense.addChild(childExpense);
 
-        childExpense.setExpenditure(true);
-        childExpense.setPrice(13);
-        expenseWithChildren.addChild(childExpense);
-
-        return expenseWithChildren;
+        return parentExpense;
     }
 
     private ExpenseObject getValidExpenseWithTags() {
@@ -153,9 +131,8 @@ public class ExpenseRepositoryTest {
         expectedExpense = ExpenseRepository.insert(expectedExpense);
 
         try {
-
             ExpenseObject fetchedExpense = ExpenseRepository.get(expectedExpense.getIndex());
-            assertSameExpenses(expectedExpense, fetchedExpense);
+            assertEquals(expectedExpense, fetchedExpense);
 
         } catch (ExpenseNotFoundException e) {
 
@@ -222,8 +199,12 @@ public class ExpenseRepositoryTest {
         try {
             ExpenseObject fetchedExpense = ExpenseRepository.get(expectedExpense.getIndex());
 
-            assertSameExpenses(expectedExpense, fetchedExpense);
-            assertThatAccountBalanceWasUpdated(63, expectedExpense.getAccount().getIndex());
+            assertEquals(expectedExpense, fetchedExpense);
+            assertEqualAccountBalance(
+                    account.getBalance() + expectedExpense.getSignedPrice(),
+                    account
+            );
+
         } catch (ExpenseNotFoundException e) {
 
             Assert.fail("Gerade erstellte Ausgabe konnte nicht gefunden werden");
@@ -238,10 +219,12 @@ public class ExpenseRepositoryTest {
 
         try {
             ExpenseObject fetchedExpense = ExpenseRepository.get(expectedExpenseWithChildren.getIndex());
-            assertSameExpenses(expectedExpenseWithChildren, fetchedExpense);
 
-
-            assertThatAccountBalanceWasUpdated(3, fetchedExpense.getAccount().getIndex());
+            assertEquals(expectedExpenseWithChildren, fetchedExpense);
+            assertEqualAccountBalance(
+                    account.getBalance() + expectedExpenseWithChildren.getChildren().get(0).getSignedPrice() + expectedExpenseWithChildren.getChildren().get(1).getSignedPrice() + expectedExpenseWithChildren.getChildren().get(2).getSignedPrice(),
+                    account
+            );
 
         } catch (ExpenseNotFoundException e) {
 
@@ -269,9 +252,11 @@ public class ExpenseRepositoryTest {
 
         try {
             ExpenseRepository.delete(expense);
-            assertTrue("Buchung wurde nicht gelöscht", ExpenseRepository.exists(expense));
-
-            //Kontostand muss geupated werden
+            assertFalse("Buchung wurde nicht gelöscht", ExpenseRepository.exists(expense));
+            assertEqualAccountBalance(
+                    account.getBalance(),
+                    account
+            );
         } catch (CannotDeleteExpenseException e) {
 
             Assert.fail("Buchung konnte nicht gelöscht werden");
@@ -296,9 +281,8 @@ public class ExpenseRepositoryTest {
 
         try {
             ExpenseRepository.delete(expense);
-            assertTrue("Buchung wurde nicht gelöscht", ExpenseRepository.exists(expense));
+            assertFalse("Buchung wurde nicht gelöscht", ExpenseRepository.exists(expense));
 
-            //Kontostand muss geupated werden
         } catch (CannotDeleteExpenseException e) {
 
             Assert.fail("Nicht existierende Buchung konnte nicht geöscht werden");
@@ -307,14 +291,17 @@ public class ExpenseRepositoryTest {
 
     @Test
     public void testDeleteWithExistingBookingThatIsAttachedToChildBookingsShouldThrowCannotDeleteExpenseException() {
+        ExpenseObject parentExpense = getValidExpenseWithChildren();
+        parentExpense = ExpenseRepository.insert(parentExpense);
 
-        //Kontostand muss geupated werden
-    }
+        try {
+            ExpenseRepository.delete(parentExpense);
+            Assert.fail("Buchung mit Kindern konnte gelöscht werden");
 
-    @Test
-    public void testDeleteWithExistingBookingThatHasNotExistingAccountShouldThrowCannotDeleteExpenseException() {
+        } catch(CannotDeleteExpenseException e) {
 
-        //Kontostand muss geupated werden
+            assertEquals(String.format("Expense %s is attached to a child expense and cannot be deleted.", parentExpense.getTitle()), e.getMessage());
+        }
     }
 
     @Test
@@ -328,9 +315,12 @@ public class ExpenseRepositoryTest {
             ExpenseRepository.update(expectedExpense);
 
             ExpenseObject fetchedExpense = ExpenseRepository.get(expectedExpense.getIndex());
-            assertSameExpenses(expectedExpense, fetchedExpense);
 
-            assertThatAccountBalanceWasUpdated(70, expectedExpense.getAccount().getIndex());
+            assertEquals(expectedExpense, fetchedExpense);
+            assertEqualAccountBalance(
+                    account.getBalance() + expectedExpense.getSignedPrice(),
+                    account
+            );
 
         } catch (ExpenseNotFoundException e) {
 
@@ -402,7 +392,7 @@ public class ExpenseRepositoryTest {
 
         try {
             ExpenseObject actualExpense = ExpenseRepository.cursorToExpense(cursor);
-            assertSameExpenses(expectedExpense, actualExpense);
+            assertEquals(expectedExpense, actualExpense);
 
         } catch (CursorIndexOutOfBoundsException e) {
 
@@ -517,15 +507,11 @@ public class ExpenseRepositoryTest {
         }
     }
 
-    private void assertSameExpenses(ExpenseObject expected, ExpenseObject actual) {
-        assertEquals(expected, actual);
-    }
-
-    private void assertThatAccountBalanceWasUpdated(double newBalance, long accountId) {
+    private void assertEqualAccountBalance(double expectedAmount, Account account) {
 
         try {
-            Account account = AccountRepository.get(accountId);
-            assertEquals(newBalance, account.getBalance());
+            double actualBalance = AccountRepository.get(account.getIndex()).getBalance();
+            assertEquals("Konto wurde nicht geupdated", expectedAmount, actualBalance);
 
         } catch (AccountNotFoundException e) {
 
