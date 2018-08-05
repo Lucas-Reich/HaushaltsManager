@@ -121,7 +121,7 @@ public class ChildExpenseRepository {
                 } catch (CannotDeleteExpenseException e) {
 
                     //todo kann eine ParentExpense nicht gefunden werden muss der gesamte vorgang abgebrochen werden
-                    //sammle alle Buchungen die nicht dem Parent hinzugefügt wurden konnten und werfe eine Exception (CouldNotAddChildToBookingException)
+                    //Beispiel: https://stackoverflow.com/questions/6909221/android-sqlite-rollback
                 }
             }
         }

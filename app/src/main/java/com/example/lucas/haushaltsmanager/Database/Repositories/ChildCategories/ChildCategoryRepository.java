@@ -152,6 +152,34 @@ public class ChildCategoryRepository {
         DatabaseManager.getInstance().closeDatabase();
     }
 
+    public static void update(Category category) throws ChildCategoryNotFoundException {
+        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+
+        ContentValues updatedCategory = new ContentValues();
+        updatedCategory.put(ExpensesDbHelper.CHILD_CATEGORIES_COL_NAME, category.getTitle());
+        updatedCategory.put(ExpensesDbHelper.CHILD_CATEGORIES_COL_COLOR, category.getColorString());
+        updatedCategory.put(ExpensesDbHelper.CHILD_CATEGORIES_COL_DEFAULT_EXPENSE_TYPE, category.getDefaultExpenseType());
+
+        int affectedRows = db.update(ExpensesDbHelper.TABLE_CHILD_CATEGORIES, updatedCategory, ExpensesDbHelper.CHILD_CATEGORIES_COL_ID + " = ?", new String[]{"" + category.getIndex()});
+        DatabaseManager.getInstance().closeDatabase();
+
+        if (affectedRows == 0)
+            throw new ChildCategoryNotFoundException(category.getIndex());
+    }
+
+    public static void hide(Category category) throws ChildCategoryNotFoundException {
+        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+
+        ContentValues updatedCategory = new ContentValues();
+        updatedCategory.put(ExpensesDbHelper.CHILD_CATEGORIES_COL_HIDDEN, 1);
+
+        int affectedRows = db.update(ExpensesDbHelper.TABLE_CHILD_CATEGORIES, updatedCategory, ExpensesDbHelper.CHILD_CATEGORIES_COL_ID + " = ?", new String[]{"" + category.getIndex()});
+        DatabaseManager.getInstance().closeDatabase();
+
+        if (affectedRows == 0)
+            throw new ChildCategoryNotFoundException(category.getIndex());
+    }
+
     private static Category getParent(Category childCategory) throws CategoryNotFoundException {
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
 
@@ -183,35 +211,6 @@ public class ChildCategoryRepository {
         c.close();
         DatabaseManager.getInstance().closeDatabase();
         return category;
-    }
-
-    public static void update(Category category) throws ChildCategoryNotFoundException {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
-
-        ContentValues updatedCategory = new ContentValues();
-        updatedCategory.put(ExpensesDbHelper.CHILD_CATEGORIES_COL_NAME, category.getTitle());
-        updatedCategory.put(ExpensesDbHelper.CHILD_CATEGORIES_COL_COLOR, category.getColorString());
-        updatedCategory.put(ExpensesDbHelper.CHILD_CATEGORIES_COL_DEFAULT_EXPENSE_TYPE, category.getDefaultExpenseType());
-        //todo auch die parent id ändern?
-
-        int affectedRows = db.update(ExpensesDbHelper.TABLE_CHILD_CATEGORIES, updatedCategory, ExpensesDbHelper.CHILD_CATEGORIES_COL_ID + " = ?", new String[]{"" + category.getIndex()});
-        DatabaseManager.getInstance().closeDatabase();
-
-        if (affectedRows == 0)
-            throw new ChildCategoryNotFoundException(category.getIndex());
-    }
-
-    public static void hide(Category category) throws ChildCategoryNotFoundException {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
-
-        ContentValues updatedCategory = new ContentValues();
-        updatedCategory.put(ExpensesDbHelper.CHILD_CATEGORIES_COL_HIDDEN, 1);
-
-        int affectedRows = db.update(ExpensesDbHelper.TABLE_CHILD_CATEGORIES, updatedCategory, ExpensesDbHelper.CHILD_CATEGORIES_COL_ID + " = ?", new String[]{"" + category.getIndex()});
-        DatabaseManager.getInstance().closeDatabase();
-
-        if (affectedRows == 0)
-            throw new ChildCategoryNotFoundException(category.getIndex());
     }
 
     private static boolean isAttachedToParentBooking(Category category) {

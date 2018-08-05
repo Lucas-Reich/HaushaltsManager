@@ -221,7 +221,7 @@ public class CreateCategoryActivity extends AppCompatActivity implements BasicTe
                         } catch (CategoryNotFoundException e) {
 
                             Toast.makeText(CreateCategoryActivity.this, getString(R.string.category_not_found), Toast.LENGTH_SHORT).show();
-                            //todo Fehlberbehandlung wenn versucht wird eine nicht existierende Kategorie zu löschen
+                            //todo Fehlberbehandlung wenn versucht wird eine nicht existierende Kategorie zu updaten
                         }
                         finish();
                         break;
