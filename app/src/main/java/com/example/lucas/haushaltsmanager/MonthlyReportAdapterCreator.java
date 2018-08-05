@@ -43,7 +43,7 @@ public class MonthlyReportAdapterCreator {
     private void createMonthlyReports() {
 
         for (int i = getCurrentMonth(); i >= 1; i--) {
-            mReports.add(new MonthlyReport(i + "", new ArrayList<ExpenseObject>(), getMainCurrency(), mContext));
+            mReports.add(new MonthlyReport(i + "", new ArrayList<ExpenseObject>(), getMainCurrencySymbol(), mContext));
         }
 
         fillMonthlyReports();
@@ -65,7 +65,7 @@ public class MonthlyReportAdapterCreator {
      *
      * @return Währungssymbol der Hauptwährung
      */
-    private String getMainCurrency() {
+    private String getMainCurrencySymbol() {
         SharedPreferences preferences = mContext.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
 
         return preferences.getString("mainCurrencySymbol", "€");

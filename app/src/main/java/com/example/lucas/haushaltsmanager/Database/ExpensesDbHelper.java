@@ -2,7 +2,7 @@ package com.example.lucas.haushaltsmanager.Database;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.res.Resources;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
@@ -293,6 +293,7 @@ public class ExpensesDbHelper extends SQLiteOpenHelper {
      * @param db reference to editable mDatabase
      */
     private void insertCurrencies(SQLiteDatabase db) {
+        SharedPreferences preferences = app.getContext().getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
 
         //details from: https://developers.google.com/public-data/docs/canonical/currencies_csv
         ArrayList<String[]> currencies = new ArrayList<>();
@@ -336,7 +337,15 @@ public class ExpensesDbHelper extends SQLiteOpenHelper {
             values.put(CURRENCIES_COL_NAME, entry[1]);
             values.put(CURRENCIES_COL_SYMBOL, entry[2]);
 
-            db.insert(TABLE_CURRENCIES, null, values);
+            //todo das wählen der hauptwährung sollte auf dem Standort des Users passieren
+            //android.icu.util.Currency currency = android.icu.util.Currency.getInstance(getResources().getConfiguration().locale);
+            //Quelle: https://stackoverflow.com/questions/27228514/android-is-it-possible-to-get-the-currency-code-of-the-country-where-the-user-a
+            //todo wenn die Standartwährung nicht gesetzt werden kann, soll der User darauf hingewiesen werden und gefragt werden dies zu Tun
+            long index = db.insert(TABLE_CURRENCIES, null, values);
+            if (entry[1].equals("EUR") && index != -1) {
+                preferences.edit().putLong("mainCurrencyIndex", index).apply();
+                preferences.edit().putString("mainCurrencySymbol", entry[2]).apply();
+            }
         }
     }
 

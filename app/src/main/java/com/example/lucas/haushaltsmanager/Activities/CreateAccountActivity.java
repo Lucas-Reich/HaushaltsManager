@@ -197,7 +197,7 @@ public class CreateAccountActivity extends AppCompatActivity {
                     } catch (AccountNotFoundException e) {
 
                         Toast.makeText(CreateAccountActivity.this, getString(R.string.cannot_update_account), Toast.LENGTH_SHORT).show();
-                        //todo Fehlermdelud verbessern
+                        //todo Fehlermdeldung verbessern
                     }
                     break;
             }

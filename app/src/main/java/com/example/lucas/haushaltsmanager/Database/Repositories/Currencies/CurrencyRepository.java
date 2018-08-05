@@ -66,31 +66,6 @@ public class CurrencyRepository {
         return currency;
     }
 
-    public static Currency getByShortName(String currencyName) throws CurrencyNotFoundException {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
-
-        String selectQuery = "SELECT "
-                + ExpensesDbHelper.CURRENCIES_COL_ID + ", "
-                + ExpensesDbHelper.CURRENCIES_COL_NAME + ", "
-                + ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME + ", "
-                + ExpensesDbHelper.CURRENCIES_COL_SYMBOL
-                + " FROM " + ExpensesDbHelper.TABLE_CURRENCIES
-                + " WHERE " + ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME + " = '" + currencyName + "';";
-
-        Cursor c = db.rawQuery(selectQuery, null);
-
-        if (!c.moveToFirst()) {
-            throw new CurrencyNotFoundException(currencyName);
-        }
-
-        Currency currency = cursorToCurrency(c);
-
-        c.close();
-        DatabaseManager.getInstance().closeDatabase();
-
-        return currency;
-    } //todo ersetze die Funktion durch get()
-
     public static List<Currency> getAll() {
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
 

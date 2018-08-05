@@ -88,34 +88,6 @@ public class CurrencyRepositoryTest {
     }
 
     @Test
-    public void testGetByNameWithExistingCurrencyShouldSucceed() {
-        Currency expectedCurrency = CurrencyRepository.insert(getSimpleCurrency());
-
-        try {
-            Currency fetchedCurrency = CurrencyRepository.getByShortName(expectedCurrency.getShortName());
-            assertEquals(expectedCurrency, fetchedCurrency);
-
-        } catch (CurrencyNotFoundException e) {
-
-            Assert.fail("Währung wurde nicht gefunden");
-        }
-    }
-
-    @Test
-    public void testGetByNameWithNotExistingCurrencyShouldThrowCurrencyNotFoundException() {
-        String notExistingCurrencyShortName = "NEC";
-
-        try {
-            CurrencyRepository.getByShortName(notExistingCurrencyShortName);
-            Assert.fail("Nicht existierenden Wärhung wurde in der Datenbank gefunden");
-
-        } catch (CurrencyNotFoundException e) {
-
-            assertEquals(String.format("Could not find Currency with short name %s.", notExistingCurrencyShortName), e.getMessage());
-        }
-    }
-
-    @Test
     public void testInsertWithValidCurrencyShouldSucceed() {
         Currency expectedCurrency = CurrencyRepository.insert(getSimpleCurrency());
 

@@ -33,11 +33,8 @@ import com.example.lucas.haushaltsmanager.Activities.RecurringBookingsActivity;
 import com.example.lucas.haushaltsmanager.Activities.TestActivity;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.Exceptions.CurrencyNotFoundException;
 import com.example.lucas.haushaltsmanager.Dialogs.ChangeAccounts.ChooseAccountsDialogFragment;
 import com.example.lucas.haushaltsmanager.Entities.Account;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.MockDataCreator;
 import com.example.lucas.haushaltsmanager.MyAlarmReceiver;
@@ -162,22 +159,6 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
      */
     private void setSharedPreferencesProperties() {
         SharedPreferences preferences = this.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
-        //todo das setzen der Hauptwährung sollte in den einstellungen passieren
-
-        //todo das wählen der hauptwährung sollte dynamisch passieren
-        //android.icu.util.Currency currency = android.icu.util.Currency.getInstance(getResources().getConfiguration().locale);
-        //Quelle: https://stackoverflow.com/questions/27228514/android-is-it-possible-to-get-the-currency-code-of-the-country-where-the-user-a
-
-        try {
-            Currency mainCurrency = CurrencyRepository.getByShortName("EUR");
-            preferences.edit().putLong("mainCurrencyIndex", mainCurrency.getIndex()).apply();
-            preferences.edit().putString("mainCurrencySymbol", mainCurrency.getSymbol()).apply();
-        } catch (CurrencyNotFoundException e) {
-
-            //todo vor dem release entfernen
-            Toast.makeText(this, "Hauptwährung konnte nicht gesetzt werden!", Toast.LENGTH_SHORT).show();
-        }
-
         preferences.edit().putInt("maxBackupCount", 20).apply();
     }
 

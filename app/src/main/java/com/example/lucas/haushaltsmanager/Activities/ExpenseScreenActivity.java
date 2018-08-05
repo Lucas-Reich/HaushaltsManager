@@ -859,7 +859,6 @@ public class ExpenseScreenActivity extends AppCompatActivity {
     private void setExpenseCurrency() {
 
         SharedPreferences preferences = this.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
-
         mCurrencySymbolTxt.setText(preferences.getString("mainCurrencySymbol", "€"));
     }
 }
