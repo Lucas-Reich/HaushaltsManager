@@ -120,17 +120,6 @@ public class CategoryRepository {
         return parentCategory;
     }
 
-    public static void delete(Category category) throws CannotDeleteCategoryException {
-        //todo sollte man Kategorien löschen können oder soll das automatisch dadurch passieren, dass alle Kinder gelöscht wurden
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
-
-        if (isAttachedToChildCategories(category))
-            throw new CannotDeleteCategoryException(category);
-
-        db.delete(ExpensesDbHelper.TABLE_CATEGORIES, ExpensesDbHelper.CATEGORIES_COL_ID + " = ?", new String[]{"" + category.getIndex()});
-        DatabaseManager.getInstance().closeDatabase();
-    }
-
     public static void update(Category category) throws CategoryNotFoundException {
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
 
@@ -144,30 +133,6 @@ public class CategoryRepository {
 
         if (affectedRows == 0)
             throw new CategoryNotFoundException(category.getIndex());
-    }
-
-    private static boolean isAttachedToChildCategories(Category category) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
-
-        String selectQuery;
-        selectQuery = "SELECT"
-                + " *"
-                + " FROM " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES
-                + " WHERE " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CHILD_CATEGORIES_COL_PARENT_ID + " = " + category.getIndex()
-                + " LIMIT 1;";
-
-        Cursor c = db.rawQuery(selectQuery, null);
-
-        if (c.moveToFirst()) {
-
-            c.close();
-            DatabaseManager.getInstance().closeDatabase();
-            return true;
-        }
-
-        c.close();
-        DatabaseManager.getInstance().closeDatabase();
-        return false;
     }
 
     public static Category cursorToCategory(Cursor c) {

@@ -145,49 +145,6 @@ public class CategoryRepositoryTest {
     }
 
     @Test
-    public void testDeleteWithWithExistingCategoryShouldSucceed() {
-        Category category = CategoryRepository.insert(getSimpleCategory());
-
-        try {
-            CategoryRepository.delete(category);
-            assertFalse("Kategorie wurde nicht gelöscht", CategoryRepository.exists(category));
-
-        } catch (CannotDeleteCategoryException e) {
-
-            Assert.fail("Kategorie konnte nicht gelöscht werden");
-        }
-    }
-
-    @Test
-    public void testDeleteWithNotExistingCategoryShouldSucceed() {
-        Category category = getSimpleCategory();
-
-        try {
-            CategoryRepository.delete(category);
-            assertFalse("Nicht existierende Kategorie wurde in der Datenbank gefunden", CategoryRepository.exists(category));
-
-        } catch (CannotDeleteCategoryException e) {
-
-            Assert.fail("Nicht existierende Kategorie konnte nicht gelöscht werden");
-        }
-    }
-
-    @Test
-    public void testDeleteWithExistingCategoryAttachedToChildCategoriesShouldThrowCannotDeleteCategoryException() {
-        Category category = CategoryRepository.insert(getCategoryWithChild());
-
-        try {
-            CategoryRepository.delete(category);
-            Assert.fail("Kategorie konnte gelöscht werden, obwohl es noch Kinder zu dieser Kategorie gibt");
-
-        } catch (CannotDeleteCategoryException e) {
-
-            assertTrue("Kategorie wurde gelöscht, obwohl es Kinder gibt", CategoryRepository.exists(category));
-            assertEquals(String.format("Category %s cannot be deleted.", category.getTitle()), e.getMessage());
-        }
-    }
-
-    @Test
     public void testUpdateWithWithExistingCategoryShouldSucceed() {
         Category expectedCategory = CategoryRepository.insert(getSimpleCategory());
 

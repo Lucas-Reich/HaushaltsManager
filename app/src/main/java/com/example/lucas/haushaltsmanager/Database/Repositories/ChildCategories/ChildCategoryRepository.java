@@ -138,7 +138,7 @@ public class ChildCategoryRepository {
                 Category parentCategory = getParent(category);
 
                 db.delete(ExpensesDbHelper.TABLE_CHILD_CATEGORIES, ExpensesDbHelper.CHILD_CATEGORIES_COL_ID + " = ?", new String[]{"" + category.getIndex()});
-                CategoryRepository.delete(parentCategory);
+                deleteParentCategory(parentCategory);
 
             } catch (CannotDeleteCategoryException e) {
                 throw CannotDeleteChildCategoryException.childCategoryParentCannotBeDeleted(category);
@@ -291,6 +291,16 @@ public class ChildCategoryRepository {
         c.close();
         DatabaseManager.getInstance().closeDatabase();
         return false;
+    }
+
+    private static void deleteParentCategory(Category parentCategory) throws CannotDeleteCategoryException {
+        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+
+        if (!isLastChildOfParent(parentCategory))
+            throw new CannotDeleteCategoryException(parentCategory);
+
+        db.delete(ExpensesDbHelper.TABLE_CATEGORIES, ExpensesDbHelper.CATEGORIES_COL_ID + " = ?", new String[]{"" + parentCategory.getIndex()});
+        DatabaseManager.getInstance().closeDatabase();
     }
 
     public static Category cursorToChildCategory(Cursor c) {
