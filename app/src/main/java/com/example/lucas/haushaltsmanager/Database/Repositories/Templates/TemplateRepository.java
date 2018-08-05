@@ -138,10 +138,11 @@ public class TemplateRepository {
                 template.isExpenditure(),
                 template.getCategory(),
                 template.getNotice(),
-                template.getAccount(),
+                template.getAccountId(),
                 template.getExpenseType(),
                 template.getTags(),
-                template.getChildren()
+                template.getChildren(),
+                template.getCurrency()
         );
     }
 

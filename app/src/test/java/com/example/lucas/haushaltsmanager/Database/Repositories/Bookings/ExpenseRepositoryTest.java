@@ -65,12 +65,16 @@ public class ExpenseRepositoryTest {
     }
 
     private ExpenseObject getSimpleExpense() {
+        Currency currency = new Currency("Euro", "EUR", "€");
+        currency = CurrencyRepository.insert(currency);
+
         return new ExpenseObject(
                 "Ausgabe",
                 37,
                 true,
                 category,
-                account
+                account.getIndex(),
+                currency
         );
     }
 
@@ -416,17 +420,15 @@ public class ExpenseRepositoryTest {
                 ExpensesDbHelper.BOOKINGS_COL_EXPENDITURE,
                 ExpensesDbHelper.BOOKINGS_COL_NOTICE,
                 ExpensesDbHelper.BOOKINGS_COL_EXPENSE_TYPE,
-                ExpensesDbHelper.CATEGORIES_COL_ID,
-                ExpensesDbHelper.CATEGORIES_COL_NAME,
-                ExpensesDbHelper.CATEGORIES_COL_COLOR,
-                ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE,
-                ExpensesDbHelper.ACCOUNTS_COL_ID,
-                ExpensesDbHelper.ACCOUNTS_COL_NAME,
-                ExpensesDbHelper.ACCOUNTS_COL_BALANCE,
+                ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID,
                 ExpensesDbHelper.CURRENCIES_COL_ID,
                 ExpensesDbHelper.CURRENCIES_COL_NAME,
                 ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME,
-                ExpensesDbHelper.CURRENCIES_COL_SYMBOL
+                ExpensesDbHelper.CURRENCIES_COL_SYMBOL,
+                ExpensesDbHelper.CHILD_CATEGORIES_COL_ID,
+                ExpensesDbHelper.CHILD_CATEGORIES_COL_NAME,
+                ExpensesDbHelper.CHILD_CATEGORIES_COL_COLOR,
+                ExpensesDbHelper.CHILD_CATEGORIES_COL_DEFAULT_EXPENSE_TYPE
         };
 
         MatrixCursor cursor = new MatrixCursor(columns);
@@ -438,17 +440,15 @@ public class ExpenseRepositoryTest {
                 expectedExpense.isExpenditure() ? 1 : 0,
                 expectedExpense.getNotice(),
                 expectedExpense.getExpenseType().name(),
+                expectedExpense.getAccountId(),
+                expectedExpense.getCurrency().getIndex(),
+                expectedExpense.getCurrency().getName(),
+                expectedExpense.getCurrency().getShortName(),
+                expectedExpense.getCurrency().getSymbol(),
                 expectedExpense.getCategory().getIndex(),
                 expectedExpense.getCategory().getTitle(),
                 expectedExpense.getCategory().getColorString(),
-                expectedExpense.getCategory().getDefaultExpenseType() ? 1 : 0,
-                expectedExpense.getAccount().getIndex(),
-                expectedExpense.getAccount().getTitle(),
-                expectedExpense.getAccount().getBalance(),
-                expectedExpense.getAccount().getCurrency().getIndex(),
-                expectedExpense.getAccount().getCurrency().getName(),
-                expectedExpense.getAccount().getCurrency().getShortName(),
-                expectedExpense.getAccount().getCurrency().getSymbol()
+                expectedExpense.getCategory().getDefaultExpenseType() ? 1 : 0
         });
         cursor.moveToFirst();
 
@@ -474,17 +474,15 @@ public class ExpenseRepositoryTest {
                 ExpensesDbHelper.BOOKINGS_COL_EXPENDITURE,
                 ExpensesDbHelper.BOOKINGS_COL_NOTICE,
                 ExpensesDbHelper.BOOKINGS_COL_EXPENSE_TYPE,
-                ExpensesDbHelper.CATEGORIES_COL_ID,
-                ExpensesDbHelper.CATEGORIES_COL_NAME,
-                ExpensesDbHelper.CATEGORIES_COL_COLOR,
-                ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE,
-                ExpensesDbHelper.ACCOUNTS_COL_ID,
-                ExpensesDbHelper.ACCOUNTS_COL_NAME,
-                ExpensesDbHelper.ACCOUNTS_COL_BALANCE,
+                ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID,
                 ExpensesDbHelper.CURRENCIES_COL_ID,
                 ExpensesDbHelper.CURRENCIES_COL_NAME,
                 ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME,
-                ExpensesDbHelper.CURRENCIES_COL_SYMBOL
+                ExpensesDbHelper.CURRENCIES_COL_SYMBOL,
+                ExpensesDbHelper.CHILD_CATEGORIES_COL_ID,
+                ExpensesDbHelper.CHILD_CATEGORIES_COL_NAME,
+                ExpensesDbHelper.CHILD_CATEGORIES_COL_COLOR,
+                ExpensesDbHelper.CHILD_CATEGORIES_COL_DEFAULT_EXPENSE_TYPE
         };
 
         MatrixCursor cursor = new MatrixCursor(columns);
@@ -495,17 +493,15 @@ public class ExpenseRepositoryTest {
                 expectedExpense.isExpenditure() ? 1 : 0,
                 expectedExpense.getNotice(),
                 expectedExpense.getExpenseType().name(),
+                expectedExpense.getAccountId(),
+                expectedExpense.getCurrency().getIndex(),
+                expectedExpense.getCurrency().getName(),
+                expectedExpense.getCurrency().getShortName(),
+                expectedExpense.getCurrency().getSymbol(),
                 expectedExpense.getCategory().getIndex(),
                 expectedExpense.getCategory().getTitle(),
                 expectedExpense.getCategory().getColorString(),
-                expectedExpense.getCategory().getDefaultExpenseType() ? 1 : 0,
-                expectedExpense.getAccount().getIndex(),
-                expectedExpense.getAccount().getTitle(),
-                expectedExpense.getAccount().getBalance(),
-                expectedExpense.getAccount().getCurrency().getIndex(),
-                expectedExpense.getAccount().getCurrency().getName(),
-                expectedExpense.getAccount().getCurrency().getShortName(),
-                expectedExpense.getAccount().getCurrency().getSymbol()
+                expectedExpense.getCategory().getDefaultExpenseType() ? 1 : 0
         });
         cursor.moveToFirst();
 

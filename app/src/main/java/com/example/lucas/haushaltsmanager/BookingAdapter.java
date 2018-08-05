@@ -66,7 +66,7 @@ public class BookingAdapter extends ArrayAdapter<ExpenseObject> implements View.
         //TODO wenn es eine Multiuser funktionalität muss hier der benutzer eingetragen werden, der das Geld ausgegeben hat
         viewHolder.txtPerson.setText("");
         viewHolder.txtPrice.setText(String.format("%s", expenseObject.getUnsignedPrice()));
-        viewHolder.txtCurrencySymbol.setText(expenseObject.getAccount().getCurrency().getSymbol());
+        viewHolder.txtCurrencySymbol.setText(expenseObject.getCurrency().getSymbol());
 
         return convertView;
     }

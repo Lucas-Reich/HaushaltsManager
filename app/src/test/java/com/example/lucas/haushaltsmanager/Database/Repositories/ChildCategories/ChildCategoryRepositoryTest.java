@@ -11,7 +11,6 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.Categ
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.Exceptions.CannotDeleteChildCategoryException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.Exceptions.ChildCategoryNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
-import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
@@ -223,7 +222,7 @@ public class ChildCategoryRepositoryTest {
         Category parentCategory = getCategoryWithChild();
         Category childCategory = ChildCategoryRepository.insert(parentCategory, parentCategory.getChildren().get(0));
 
-        ExpenseObject expense = new ExpenseObject("Ausgabe", 100, true, childCategory, new Account("Konot 1", 100, new Currency("Währung", "WÄH", "W")));
+        ExpenseObject expense = new ExpenseObject("Ausgabe", 100, true, childCategory, -1, new Currency("Währung", "WÄH", "W"));
         ExpenseRepository.insert(expense);
 
         try {
@@ -245,7 +244,7 @@ public class ChildCategoryRepositoryTest {
         ExpenseObject parentExpense = mock(ExpenseObject.class);
         when(parentExpense.getIndex()).thenReturn(100L);
 
-        ExpenseObject childExpense = new ExpenseObject("Ausgabe", 100, false, childCategory, new Account("Konto 1", 100, new Currency("Währung", "WÄH", "W")));
+        ExpenseObject childExpense = new ExpenseObject("Ausgabe", 100, false, childCategory, -1, new Currency("Euro", "EUR", "€"));
         ChildExpenseRepository.insert(parentExpense, childExpense);
         try {
             ChildCategoryRepository.delete(childCategory);

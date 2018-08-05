@@ -28,14 +28,13 @@ public class AccountPickerDialog extends DialogFragment {
         final List<Account> accounts = AccountRepository.getAll();
         removeExcludedAccount(accounts);
 
-        final Account activeAccount = args.getParcelable("active_account");
+        final int activeAccountId = (int) args.getLong("active_account");
 
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         builder.setTitle(args.getString("title"));
 
-        int activeAccountId = activeAccount != null ? (int) activeAccount.getIndex() - 1 : -1;
         builder.setSingleChoiceItems(accountsToStrings(accounts), activeAccountId, new DialogInterface.OnClickListener() {
 
             @Override

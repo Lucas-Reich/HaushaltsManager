@@ -66,10 +66,11 @@ public class RecurringBookingRepository {
                 expense.isExpenditure(),
                 expense.getCategory(),
                 expense.getNotice(),
-                expense.getAccount(),
+                expense.getAccountId(),
                 expense.getExpenseType(),
                 expense.getTags(),
-                expense.getChildren()
+                expense.getChildren(),
+                expense.getCurrency()
         );
     }
 

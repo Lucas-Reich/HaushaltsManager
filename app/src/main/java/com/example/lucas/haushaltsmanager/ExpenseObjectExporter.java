@@ -2,12 +2,13 @@ package com.example.lucas.haushaltsmanager;
 
 import android.os.Environment;
 
+import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
+import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -22,6 +23,11 @@ public class ExpenseObjectExporter {
     private File mDirectory;
 
     /**
+     * Liste aller Konten
+     */
+    private List<Account> mAccounts;
+
+    /**
      * Constructor
      *
      * @param directory Verzeichniss in dem gespeichert werden soll.
@@ -30,6 +36,7 @@ public class ExpenseObjectExporter {
 
         assertDirectory(directory);
         mDirectory = directory;
+        initializeAccountList();
     }
 
     /**
@@ -97,16 +104,17 @@ public class ExpenseObjectExporter {
      */
     private String getCsvHeader() {
 
-        return "price" + "," +
-                "expenditure" + "," +
-                "title" + "," +
-                "date" + "," +
+        return "Price" + "," +
+                "is expenditure" + "," +
+                "Title" + "," +
+                "Date" + "," +
                 //todo tags hinzufügen
-                "notice" + "," +
+                "Notice" + "," +
                 //todo exchange rate hinzufügen
-                //todo Währung der Buchung hinzufügen
-                "cat_name" + "," +
-                "acc_name" + "," + "\r\n";
+                "Currency Name" + "," +
+                "Category Name" + "," +
+                "Account Name" + "," + "\r\n";
+        //todo Strings durch übersetzbare Strings ersetzen
     }
 
     /**
@@ -126,9 +134,10 @@ public class ExpenseObjectExporter {
         //todo tags hinzufügen
         expenseString.append(expense.getNotice()).append(",");
         //todo exchange ratehinzufügen
-        //todo Währung der Buchung hinzufügen
+        expenseString.append(expense.getCurrency().getName());
         expenseString.append(expense.getCategory().getTitle()).append(",");
-        expenseString.append(expense.getAccount().getTitle()).append("\r\n");
+        Account account = getAccount(expense.getAccountId());
+        expenseString.append(account != null ? account.getTitle() : "").append("\r\n");
 
         for (ExpenseObject child : expense.getChildren()) {
 
@@ -217,5 +226,28 @@ public class ExpenseObjectExporter {
                 + date.get(Calendar.SECOND);
 
         return prefix.concat(fileName).concat(suffix);
+    }
+
+    /**
+     * Methode um das Konto zu einer Konto id zu bekommen.
+     *
+     * @param accountId Id des Kontos
+     * @return Konto mit der angegebenen Id
+     */
+    private Account getAccount(long accountId) {
+        for (Account account : mAccounts) {
+            if (account.getIndex() == accountId) {
+                return account;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Methode alle Konten in einer lokalen Liste zu speichern
+     */
+    private void initializeAccountList() {
+        mAccounts = AccountRepository.getAll();
     }
 }

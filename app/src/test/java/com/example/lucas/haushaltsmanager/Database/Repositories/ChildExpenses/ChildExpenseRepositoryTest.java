@@ -61,13 +61,16 @@ public class ChildExpenseRepositoryTest {
     }
 
     private ExpenseObject getSimpleExpense() {
+        Currency currency = new Currency("Euro", "EUR", "€");
+        currency = CurrencyRepository.insert(currency);
 
         return new ExpenseObject(
                 "Ausgabe",
                 100,
                 false,
                 category,
-                account
+                account.getIndex(),
+                currency
         );
     }
 
@@ -115,13 +118,12 @@ public class ChildExpenseRepositoryTest {
             assertEquals(parentExpense.getChildren().get(2), actualExpense.getChildren().get(2));
             assertEqualAccountBalance(
                     account.getBalance() + parentExpense.getChildren().get(0).getSignedPrice() + parentExpense.getChildren().get(1).getSignedPrice() + childExpense.getSignedPrice(),
-                    account
+                    account.getIndex()
             );
         } catch (AddChildToChildException e) {
 
             Assert.fail("KindBuchung konnte nicht zu einem Parent hinzugefügt werden");
         }
-        //todo den kontostand überprüfen
     }
 
     @Test
@@ -142,7 +144,7 @@ public class ChildExpenseRepositoryTest {
             assertEquals(childExpense, actualParentExpense.getChildren().get(1));
             assertEqualAccountBalance(
                     account.getBalance() + parentExpense.getSignedPrice() + childExpense.getSignedPrice(),
-                    actualParentExpense.getChildren().get(0).getAccount()
+                    actualParentExpense.getChildren().get(0).getAccountId()
             );
 
         } catch (AddChildToChildException e) {
@@ -179,7 +181,7 @@ public class ChildExpenseRepositoryTest {
         assertTrue("ChildExpense 2 wurde nicht erstellt", ChildExpenseRepository.exists(parentExpense.getChildren().get(1)));
         assertEqualAccountBalance(
                 account.getBalance() + expenses.get(0).getSignedPrice() + expenses.get(1).getSignedPrice(),
-                account
+                account.getIndex()
         );
     }
 
@@ -194,7 +196,7 @@ public class ChildExpenseRepositoryTest {
             assertFalse("Die extrahierte KindBuchung wurde nicht gelöscht", ChildExpenseRepository.exists(extractedChildExpense));
             assertEqualAccountBalance(
                     account.getBalance() + parentExpense.getChildren().get(0).getSignedPrice() + parentExpense.getChildren().get(1).getSignedPrice(),
-                    account
+                    account.getIndex()
             );
 
         } catch (ChildExpenseNotFoundException e) {
@@ -216,7 +218,7 @@ public class ChildExpenseRepositoryTest {
             assertFalse("ParentBuchung ohne Kinder wurde nicht gelöscht", ExpenseRepository.exists(parentExpense));
             assertEqualAccountBalance(
                     account.getBalance() + parentExpense.getChildren().get(0).getSignedPrice(),
-                    account
+                    account.getIndex()
             );
 
         } catch (ChildExpenseNotFoundException e) {
@@ -238,7 +240,7 @@ public class ChildExpenseRepositoryTest {
             assertEquals(String.format("Could not find Child Expense with id %s.", childExpense.getIndex()), e.getMessage());
             assertEqualAccountBalance(
                     account.getBalance(),
-                    account
+                    account.getIndex()
             );
         }
     }
@@ -287,7 +289,7 @@ public class ChildExpenseRepositoryTest {
             assertEquals(expectedChildExpense, actualChildExpense);
             assertEqualAccountBalance(
                     account.getBalance() + expectedChildExpense.getSignedPrice(),
-                    account
+                    account.getIndex()
             );
 
         } catch (ChildExpenseNotFoundException e) {
@@ -321,7 +323,7 @@ public class ChildExpenseRepositoryTest {
             assertFalse("Buchung wurde nicht gelöscht", ChildExpenseRepository.exists(childExpense));
             assertEqualAccountBalance(
                     account.getBalance() + parentExpense.getChildren().get(1).getSignedPrice(),
-                    childExpense.getAccount()
+                    childExpense.getAccountId()
             );
 
         } catch (CannotDeleteChildExpenseException e) {
@@ -424,17 +426,15 @@ public class ChildExpenseRepositoryTest {
                 ExpensesDbHelper.CHILD_BOOKINGS_COL_PRICE,
                 ExpensesDbHelper.CHILD_BOOKINGS_COL_EXPENDITURE,
                 ExpensesDbHelper.CHILD_BOOKINGS_COL_NOTICE,
+                ExpensesDbHelper.CHILD_BOOKINGS_COL_CURRENCY_ID,
+                ExpensesDbHelper.CURRENCIES_COL_NAME,
+                ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME,
+                ExpensesDbHelper.CURRENCIES_COL_SYMBOL,
                 ExpensesDbHelper.CATEGORIES_COL_ID,
                 ExpensesDbHelper.CATEGORIES_COL_NAME,
                 ExpensesDbHelper.CATEGORIES_COL_COLOR,
                 ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE,
-                ExpensesDbHelper.ACCOUNTS_COL_ID,
-                ExpensesDbHelper.ACCOUNTS_COL_NAME,
-                ExpensesDbHelper.ACCOUNTS_COL_BALANCE,
-                ExpensesDbHelper.CURRENCIES_COL_ID,
-                ExpensesDbHelper.CURRENCIES_COL_NAME,
-                ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME,
-                ExpensesDbHelper.CURRENCIES_COL_SYMBOL
+                ExpensesDbHelper.ACCOUNTS_COL_ID
         };
 
         MatrixCursor cursor = new MatrixCursor(columns);
@@ -445,17 +445,15 @@ public class ChildExpenseRepositoryTest {
                 expectedChildExpense.getUnsignedPrice(),
                 expectedChildExpense.isExpenditure() ? 1 : 0,
                 expectedChildExpense.getNotice(),
+                expectedChildExpense.getCurrency().getIndex(),
+                expectedChildExpense.getCurrency().getName(),
+                expectedChildExpense.getCurrency().getShortName(),
+                expectedChildExpense.getCurrency().getSymbol(),
                 expectedChildExpense.getCategory().getIndex(),
                 expectedChildExpense.getCategory().getTitle(),
                 expectedChildExpense.getCategory().getColorString(),
                 expectedChildExpense.getCategory().getDefaultExpenseType() ? 1 : 0,
-                expectedChildExpense.getAccount().getIndex(),
-                expectedChildExpense.getAccount().getTitle(),
-                expectedChildExpense.getAccount().getBalance(),
-                expectedChildExpense.getAccount().getCurrency().getIndex(),
-                expectedChildExpense.getAccount().getCurrency().getName(),
-                expectedChildExpense.getAccount().getCurrency().getShortName(),
-                expectedChildExpense.getAccount().getCurrency().getSymbol()
+                expectedChildExpense.getAccountId()
         });
         cursor.moveToFirst();
 
@@ -481,17 +479,15 @@ public class ChildExpenseRepositoryTest {
                 //Der Preis der KindBuchung wurde nicht mit abgefragt
                 ExpensesDbHelper.CHILD_BOOKINGS_COL_EXPENDITURE,
                 ExpensesDbHelper.CHILD_BOOKINGS_COL_NOTICE,
+                ExpensesDbHelper.CHILD_BOOKINGS_COL_CURRENCY_ID,
+                ExpensesDbHelper.CURRENCIES_COL_NAME,
+                ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME,
+                ExpensesDbHelper.CURRENCIES_COL_SYMBOL,
                 ExpensesDbHelper.CATEGORIES_COL_ID,
                 ExpensesDbHelper.CATEGORIES_COL_NAME,
                 ExpensesDbHelper.CATEGORIES_COL_COLOR,
                 ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE,
-                ExpensesDbHelper.ACCOUNTS_COL_ID,
-                ExpensesDbHelper.ACCOUNTS_COL_NAME,
-                ExpensesDbHelper.ACCOUNTS_COL_BALANCE,
-                ExpensesDbHelper.CURRENCIES_COL_ID,
-                ExpensesDbHelper.CURRENCIES_COL_NAME,
-                ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME,
-                ExpensesDbHelper.CURRENCIES_COL_SYMBOL
+                ExpensesDbHelper.ACCOUNTS_COL_ID
         };
 
         MatrixCursor cursor = new MatrixCursor(columns);
@@ -501,17 +497,15 @@ public class ChildExpenseRepositoryTest {
                 expectedChildExpense.getTitle(),
                 expectedChildExpense.isExpenditure() ? 1 : 0,
                 expectedChildExpense.getNotice(),
+                expectedChildExpense.getCurrency().getIndex(),
+                expectedChildExpense.getCurrency().getName(),
+                expectedChildExpense.getCurrency().getShortName(),
+                expectedChildExpense.getCurrency().getSymbol(),
                 expectedChildExpense.getCategory().getIndex(),
                 expectedChildExpense.getCategory().getTitle(),
                 expectedChildExpense.getCategory().getColorString(),
                 expectedChildExpense.getCategory().getDefaultExpenseType() ? 1 : 0,
-                expectedChildExpense.getAccount().getIndex(),
-                expectedChildExpense.getAccount().getTitle(),
-                expectedChildExpense.getAccount().getBalance(),
-                expectedChildExpense.getAccount().getCurrency().getIndex(),
-                expectedChildExpense.getAccount().getCurrency().getName(),
-                expectedChildExpense.getAccount().getCurrency().getShortName(),
-                expectedChildExpense.getAccount().getCurrency().getSymbol()
+                expectedChildExpense.getAccountId()
         });
         cursor.moveToFirst();
 
@@ -525,10 +519,10 @@ public class ChildExpenseRepositoryTest {
         }
     }
 
-    private void assertEqualAccountBalance(double expectedAmount, Account account) {
+    private void assertEqualAccountBalance(double expectedAmount, long accountId) {
 
         try {
-            double actualBalance = AccountRepository.get(account.getIndex()).getBalance();
+            double actualBalance = AccountRepository.get(accountId).getBalance();
             assertEquals("Konto wurde nicht geupdated", expectedAmount, actualBalance);
 
         } catch (AccountNotFoundException e) {

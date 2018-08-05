@@ -67,6 +67,7 @@ public class ExpensesDbHelper extends SQLiteOpenHelper {
     public static final String BOOKINGS_COL_DATE = "date";
     public static final String BOOKINGS_COL_NOTICE = "notice";
     public static final String BOOKINGS_COL_ACCOUNT_ID = "account_id";
+    public static final String BOOKINGS_COL_CURRENCY_ID = "currency_id";
     public static final String BOOKINGS_COL_IS_PARENT = "is_parent";//todo brauchen wir das flag noch, wenn der expense type mit gespeichert wird?
 
     private static final String CREATE_BOOKINGS = "CREATE TABLE " + TABLE_BOOKINGS
@@ -81,6 +82,7 @@ public class ExpensesDbHelper extends SQLiteOpenHelper {
             + BOOKINGS_COL_DATE + " TEXT NOT NULL, "
             + BOOKINGS_COL_NOTICE + " TEXT, "
             + BOOKINGS_COL_ACCOUNT_ID + " INTEGER NOT NULL, "
+            + BOOKINGS_COL_CURRENCY_ID + " INTEGER NOT NULL, "
             + BOOKINGS_COL_IS_PARENT + " INTEGER NOT NULL"
             + ");";
 
@@ -99,12 +101,13 @@ public class ExpensesDbHelper extends SQLiteOpenHelper {
     public static final String CHILD_BOOKINGS_COL_DATE = "date";
     public static final String CHILD_BOOKINGS_COL_NOTICE = "notice";
     public static final String CHILD_BOOKINGS_COL_ACCOUNT_ID = "account_id";
+    public static final String CHILD_BOOKINGS_COL_CURRENCY_ID = "currency_id";
 
     private static final String CREATE_CHILD_BOOKINGS = "CREATE TABLE " + TABLE_CHILD_BOOKINGS
             + "("
             + CHILD_BOOKINGS_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + CHILD_BOOKINGS_COL_CREATED_AT + " DEFAULT CURRENT_TIMESTAMP, "
-            + CHILD_BOOKINGS_COL_EXPENSE_TYPE + " TEXT NOT NULL, "//hinzugefügt 17.5.18
+            + CHILD_BOOKINGS_COL_EXPENSE_TYPE + " TEXT NOT NULL, "
             + CHILD_BOOKINGS_COL_PARENT_BOOKING_ID + " INTEGER NOT NULL, "
             + CHILD_BOOKINGS_COL_PRICE + " REAL NOT NULL, "
             + CHILD_BOOKINGS_COL_CATEGORY_ID + " INTEGER NOT NULL, "
@@ -112,7 +115,8 @@ public class ExpensesDbHelper extends SQLiteOpenHelper {
             + CHILD_BOOKINGS_COL_TITLE + " TEXT NOT NULL, "
             + CHILD_BOOKINGS_COL_DATE + " TEXT NOT NULL, "
             + CHILD_BOOKINGS_COL_NOTICE + " TEXT, "
-            + CHILD_BOOKINGS_COL_ACCOUNT_ID + " INTEGER NOT NULL"
+            + CHILD_BOOKINGS_COL_ACCOUNT_ID + " INTEGER NOT NULL, "
+            + CHILD_BOOKINGS_COL_CURRENCY_ID + " INTEGER NOT NULL "
             + ");";
 
 

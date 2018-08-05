@@ -32,18 +32,19 @@ import static org.mockito.Mockito.when;
 
 @RunWith(RobolectricTestRunner.class)
 public class AccountRepositoryTest {
+    Currency currency;
 
     @Before
     public void setup() {
         Context context = RuntimeEnvironment.application;
         ExpensesDbHelper dbHelper = new ExpensesDbHelper(context);
         DatabaseManager.initializeInstance(dbHelper);
+
+        currency = new Currency("Euro", "EUR", "€");
+        currency = CurrencyRepository.insert(currency);
     }
 
     public Account getSimpleAccount() {
-        Currency currency = new Currency("Euro", "EUR", "€");
-        currency = CurrencyRepository.insert(currency);
-
         return new Account(
                 "Konto",
                 7653,
@@ -135,7 +136,7 @@ public class AccountRepositoryTest {
         Category category = mock(Category.class);
         when(category.getIndex()).thenReturn(100L);
 
-        ExpenseObject parentExpense = new ExpenseObject("Ausgabe", 100, false, category, account);
+        ExpenseObject parentExpense = new ExpenseObject("Ausgabe", 0, false, category, account.getIndex(), currency);
         ExpenseRepository.insert(parentExpense);
 
         try {
@@ -159,7 +160,7 @@ public class AccountRepositoryTest {
         Category category = mock(Category.class);
         when(category.getIndex()).thenReturn(100L);
 
-        ExpenseObject childExpense = new ExpenseObject("Ausgabe", 100, false, category, account);
+        ExpenseObject childExpense = new ExpenseObject("Ausgabe", 0, false, category, account.getIndex(), currency);
         ChildExpenseRepository.insert(parentExpense, childExpense);
 
         try {

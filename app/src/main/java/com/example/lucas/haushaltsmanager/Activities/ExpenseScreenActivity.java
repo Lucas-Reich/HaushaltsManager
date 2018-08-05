@@ -198,9 +198,16 @@ public class ExpenseScreenActivity extends AppCompatActivity {
             }
         });
 
-        mCurrencySymbolTxt.setText(mExpense.getAccount().getCurrency().getSymbol());
+        mCurrencySymbolTxt.setText(mExpense.getCurrency().getSymbol());
 
-        mAccountBtn.setText(mExpense.getAccount().getTitle());
+        try {
+            Account account = AccountRepository.get(mExpense.getAccountId());
+            mAccountBtn.setText(account.getTitle());
+
+        } catch (AccountNotFoundException e) {
+
+            //Kann das Konto nicht gefunden werden, wird der Button hint angezeigt
+        }
 
         mCategoryBtn.setHint(mExpense.getCategory().getTitle());
 
@@ -691,7 +698,7 @@ public class ExpenseScreenActivity extends AppCompatActivity {
             case R.id.expense_screen_account:
 
                 bundle.putString("title", getResources().getString(R.string.input_account));
-                bundle.putParcelable("active_account", mExpense.getAccount());
+                bundle.putLong("active_account", mExpense.getAccountId());
 
                 AccountPickerDialog accountPicker = new AccountPickerDialog();
                 accountPicker.setArguments(bundle);
@@ -752,7 +759,14 @@ public class ExpenseScreenActivity extends AppCompatActivity {
         setTags(expense.getTags());
         //funktion setzt das Datum der Buchung nicht neu, da bei einer Buchung immer das aktuellst Datum genommen werden sollte. Außer wenn es explizit vom user geändert wird.
         setNotice(expense.getNotice());
-        setAccount(expense.getAccount());
+        try {
+            Account account = AccountRepository.get(expense.getAccountId());
+            setAccount(account);
+
+        } catch (AccountNotFoundException e) {
+
+            //Wird das Konto nicht gefunden, wird der Button hint angezeigt.
+        }
         setExpenseCurrency();
     }
 
@@ -850,7 +864,7 @@ public class ExpenseScreenActivity extends AppCompatActivity {
     private void setAccount(Account account) {
 
         mAccountBtn.setText(account.getTitle());
-        mExpense.setAccount(account);
+        mExpense.setAccountId(account.getIndex());
     }
 
     /**

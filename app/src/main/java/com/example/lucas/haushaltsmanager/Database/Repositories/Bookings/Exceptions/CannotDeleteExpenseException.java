@@ -13,7 +13,7 @@ public class CannotDeleteExpenseException extends CouldNotDeleteEntityException 
     }
 
     public static CannotDeleteExpenseException RelatedAccountDoesNotExist(ExpenseObject expense) {
-        return new CannotDeleteExpenseException(String.format("Related account %s to expense %s does not exist.", expense.getAccount().getTitle(), expense.getTitle()));
+        return new CannotDeleteExpenseException(String.format("Related Account with index %s attached to expense %s does not exist.", expense.getAccountId(), expense.getTitle()));
     }
 
     public static CannotDeleteExpenseException CannotDeleteChild(ExpenseObject childExpense) {

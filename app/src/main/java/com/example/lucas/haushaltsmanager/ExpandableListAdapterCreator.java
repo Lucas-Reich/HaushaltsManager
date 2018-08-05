@@ -132,6 +132,6 @@ public class ExpandableListAdapterCreator {
             //hat eine Buchung kinder die angezeigt werden sollen, dann ist die Buchung sichtbar
             return getChildrenToDisplay(expense).size() > 0;
         } else
-            return mActiveAccounts.contains(expense.getAccount().getIndex());
+            return mActiveAccounts.contains(expense.getAccountId());
     }
 }

@@ -18,8 +18,8 @@ public class AccountRepository {
 
     public static boolean exists(Account account) {
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
-        String selectQuery;
 
+        String selectQuery;
         selectQuery = "SELECT"
                 + " *"
                 + " FROM " + ExpensesDbHelper.TABLE_ACCOUNTS

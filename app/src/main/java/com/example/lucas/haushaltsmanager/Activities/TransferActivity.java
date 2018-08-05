@@ -328,7 +328,7 @@ public class TransferActivity extends AppCompatActivity {
 
         mFromAccount = newAccount;
         mToExpense.setTitle(String.format("%s %s", getString(R.string.transfer_from), mFromAccount.getTitle()));
-        mFromExpense.setAccount(mFromAccount);
+        mFromExpense.setAccountId(mFromAccount.getIndex());
         mFromAccountBtn.setText(mFromAccount.getTitle());
 
         Log.d(TAG, "selected " + mFromAccount.getTitle() + " as from account");
@@ -343,7 +343,7 @@ public class TransferActivity extends AppCompatActivity {
 
         mToAccount = newAccount;
         mFromExpense.setTitle(String.format("%s %s", getString(R.string.transfer_to), mToAccount.getTitle()));
-        mToExpense.setAccount(mToAccount);
+        mToExpense.setAccountId(mToAccount.getIndex());
         mToAccountBtn.setText(mToAccount.getTitle());
 
         Log.d(TAG, "selected " + mToAccount.getTitle() + " as to account");

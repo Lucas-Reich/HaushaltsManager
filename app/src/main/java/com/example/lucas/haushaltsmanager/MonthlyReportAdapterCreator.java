@@ -121,6 +121,6 @@ public class MonthlyReportAdapterCreator {
      * @return Boolean
      */
     private Boolean isExpenseVisible(ExpenseObject expense) {
-        return mActiveAccounts.contains(expense.getAccount().getIndex());
+        return mActiveAccounts.contains(expense.getAccountId());
     }
 }
