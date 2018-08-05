@@ -22,9 +22,10 @@ public class CurrencyRepository {
         selectQuery = "SELECT"
                 + " *"
                 + " FROM " + ExpensesDbHelper.TABLE_CURRENCIES
-                + " WHERE " + ExpensesDbHelper.CURRENCIES_COL_NAME + " = '" + currency.getName() + "'"
-                + " AND " + ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME + " = '" + currency.getShortName() + "'"
-                + " AND " + ExpensesDbHelper.CURRENCIES_COL_SYMBOL + " = '" + currency.getSymbol() + "'"
+                + " WHERE " + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_ID + " = " + currency.getIndex()
+                + " AND " + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_NAME + " = '" + currency.getName() + "'"
+                + " AND " + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME + " = '" + currency.getShortName() + "'"
+                + " AND " + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SYMBOL + " = '" + currency.getSymbol() + "'"
                 + " LIMIT 1;";
 
         Cursor c = db.rawQuery(selectQuery, null);

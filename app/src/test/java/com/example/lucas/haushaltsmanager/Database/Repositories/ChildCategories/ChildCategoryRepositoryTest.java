@@ -43,21 +43,34 @@ public class ChildCategoryRepositoryTest {
         DatabaseManager.initializeInstance(dbHelper);
     }
 
+    private Category getSimpleCategory() {
+        return new Category(
+                "Kategorie",
+                "#000000",
+                true,
+                new ArrayList<Category>()
+        );
+    }
+
+    private Category getCategoryWithChild() {
+        Category parent = getSimpleCategory();
+        parent.addChild(getSimpleCategory());
+
+        return parent;
+    }
+
     @Test
     public void testExistsWithExistingChildCategoryShouldSucceed() {
-        Category parent = mock(Category.class);
-        when(parent.getIndex()).thenReturn(100L);
+        Category parent = getCategoryWithChild();
+        Category childCategory = ChildCategoryRepository.insert(parent, parent.getChildren().get(0));
 
-        Category childCategory1 = new Category("ChildCategory1", "#000000", false, new ArrayList<Category>());
-        childCategory1 = ChildCategoryRepository.insert(parent, childCategory1);
-
-        boolean exists = ChildCategoryRepository.exists(childCategory1);
+        boolean exists = ChildCategoryRepository.exists(childCategory);
         assertTrue("Die KindKategorie wurde nicht in der Datenbank gefunden", exists);
     }
 
     @Test
     public void testExistsWithNotExistingChildCategoryShouldFail() {
-        Category notExistingChildCategory = new Category("Kategorie", "#121212", true, new ArrayList<Category>());
+        Category notExistingChildCategory = getSimpleCategory();
 
         boolean exists = ChildCategoryRepository.exists(notExistingChildCategory);
         assertFalse("Die KindKategorie wurde in der Datenbank gefunden", exists);
@@ -65,15 +78,12 @@ public class ChildCategoryRepositoryTest {
 
     @Test
     public void testGetWithExistingChildCategoryShouldSucceed() {
-        Category parent = mock(Category.class);
-        when(parent.getIndex()).thenReturn(101L);
-
-        Category actualChildCategory = new Category("ChildCategory Get 1", "#121212", true, new ArrayList<Category>());
-        actualChildCategory = ChildCategoryRepository.insert(parent, actualChildCategory);
+        Category parentCategory = getCategoryWithChild();
+        Category expectedChildCategory = ChildCategoryRepository.insert(parentCategory, parentCategory.getChildren().get(0));
 
         try {
-            Category fetchedChildCategory = ChildCategoryRepository.get(actualChildCategory.getIndex());
-            assertSameChildCategories(actualChildCategory, fetchedChildCategory);
+            Category fetchedChildCategory = ChildCategoryRepository.get(expectedChildCategory.getIndex());
+            assertEquals(expectedChildCategory, fetchedChildCategory);
 
         } catch (ChildCategoryNotFoundException e) {
 
@@ -97,21 +107,21 @@ public class ChildCategoryRepositoryTest {
 
     @Test
     public void testGetAllShouldNotReturnHiddenCategory() {
-        Category parent = mock(Category.class);
-        when(parent.getIndex()).thenReturn(106L);
+        Category parentCategory = mock(Category.class);
+        when(parentCategory.getIndex()).thenReturn(106L);
 
         Category visibleChildCategory1 = new Category("Sichtbare Kategorie 1", "#000000", false, new ArrayList<Category>());
-        visibleChildCategory1 = ChildCategoryRepository.insert(parent, visibleChildCategory1);
+        visibleChildCategory1 = ChildCategoryRepository.insert(parentCategory, visibleChildCategory1);
 
         Category visibleChildCategory2 = new Category("Sichtbare Kategorie 2", "#000000", true, new ArrayList<Category>());
-        visibleChildCategory2 = ChildCategoryRepository.insert(parent, visibleChildCategory2);
+        visibleChildCategory2 = ChildCategoryRepository.insert(parentCategory, visibleChildCategory2);
 
         try {
             Category invisibleChildCategory1 = new Category("Unsichtbare Kategorie 1", "#000000", true, new ArrayList<Category>());
-            invisibleChildCategory1 = ChildCategoryRepository.insert(parent, invisibleChildCategory1);
+            invisibleChildCategory1 = ChildCategoryRepository.insert(parentCategory, invisibleChildCategory1);
             ChildCategoryRepository.hide(invisibleChildCategory1);
 
-            List<Category> children = ChildCategoryRepository.getAll(parent.getIndex());
+            List<Category> children = ChildCategoryRepository.getAll(parentCategory.getIndex());
 
             assertTrue("Sichtbare Kind Kategorie 1 wurde nicht aus der Datenbank geholt", children.contains(visibleChildCategory1));
             assertTrue("Sichtbare Kind Kategorie 2 wurde nicht aus der Datenbank geholt", children.contains(visibleChildCategory2));
@@ -124,15 +134,12 @@ public class ChildCategoryRepositoryTest {
 
     @Test
     public void testInsertWithValidInputShouldSucceed() {
-        Category parent = mock(Category.class);
-        when(parent.getIndex()).thenReturn(102L);
-
-        Category actualChildCategory = new Category("Kategorie", "#121212", false, new ArrayList<Category>());
-        actualChildCategory = ChildCategoryRepository.insert(parent, actualChildCategory);
+        Category parentCategory = getCategoryWithChild();
+        Category expectedChildCategory = ChildCategoryRepository.insert(parentCategory, parentCategory.getChildren().get(0));
 
         try {
-            Category fetchedChildCategory = ChildCategoryRepository.get(actualChildCategory.getIndex());
-            assertSameChildCategories(actualChildCategory, fetchedChildCategory);
+            Category fetchedChildCategory = ChildCategoryRepository.get(expectedChildCategory.getIndex());
+            assertEquals(expectedChildCategory, fetchedChildCategory);
 
         } catch (ChildCategoryNotFoundException e) {
 
@@ -147,22 +154,21 @@ public class ChildCategoryRepositoryTest {
 
     @Test
     public void testDeleteWithExistingChildCategoryShouldSucceed() {
-        Category parent = mock(Category.class);
-        when(parent.getIndex()).thenReturn(103L);
+        Category parentCategory = getCategoryWithChild();
+        parentCategory.addChild(getSimpleCategory());
 
-        //Es muss 2 Kinder mit dem Parent geben, sodass die letzte Kategorie nach dem Löschen nicht automatisch in eine ParentKategorie umgewandelt wird
-        Category childCategory1 = new Category("ChildCategory", "#121212", true, new ArrayList<Category>());
-        childCategory1 = ChildCategoryRepository.insert(parent, childCategory1);
-
-        Category childCategory2 = new Category("ChildCategory", "#121212", true, new ArrayList<Category>());
-        ChildCategoryRepository.insert(parent, childCategory2);
+        Category childCategory1 = ChildCategoryRepository.insert(parentCategory, parentCategory.getChildren().get(0));
+        Category childCategory2 = ChildCategoryRepository.insert(parentCategory, parentCategory.getChildren().get(1));
 
         try {
             ChildCategoryRepository.delete(childCategory1);
 
+            assertFalse("Kategorie 1 wurde nicht gelöscht", ChildCategoryRepository.exists(childCategory1));
+            assertTrue("Kategorie 2 wurde gelöscht", ChildCategoryRepository.exists(childCategory2));
+
         } catch (CannotDeleteChildCategoryException e) {
 
-            Assert.fail("ChildCategory die zu keiner Buchung zugeordnet ist kann nicht gelöscht werden");
+            Assert.fail("KindKategorie konnte nicht gelöscht werden");
         }
     }
 
@@ -197,17 +203,14 @@ public class ChildCategoryRepositoryTest {
 
     @Test
     public void testDeleteWithExistingChildCategoryThatIsLastChildOfParentShouldSucceedAndParentShouldBeDeleted() {
-        Category parentCategory = new Category("ParentKategorie", "#121212", true, new ArrayList<Category>());
-        parentCategory = CategoryRepository.insert(parentCategory);
-
-        Category childCategory = new Category("ChildCategory", "#121212", false, new ArrayList<Category>());
-        childCategory = ChildCategoryRepository.insert(parentCategory, childCategory);
+        Category parentCategory = CategoryRepository.insert(getCategoryWithChild());
+        Category childCategory = parentCategory.getChildren().get(0);
 
         try {
             ChildCategoryRepository.delete(childCategory);
 
-            boolean exists = CategoryRepository.exists(parentCategory);
-            assertFalse("ParentCategory wurde nicht gelöscht obwohl das gelöschte Kind das letzte des Parents war", exists);
+            assertFalse("KindKategorie wurde nicht gelöscht", ChildCategoryRepository.exists(childCategory));
+            assertFalse("ParentCategory wurde nicht gelöscht", CategoryRepository.exists(parentCategory));
 
         } catch (CannotDeleteChildCategoryException e) {
 
@@ -217,11 +220,8 @@ public class ChildCategoryRepositoryTest {
 
     @Test
     public void testDeleteWithExistingChildCategoryAttachedToBookingShouldThrowCannotDeleteChildCategoryException() {
-        Category parent = mock(Category.class);
-        when(parent.getIndex()).thenReturn(104L);
-
-        Category childCategory = new Category("ChildCategory", "#121212", false, new ArrayList<Category>());
-        childCategory = ChildCategoryRepository.insert(parent, childCategory);
+        Category parentCategory = getCategoryWithChild();
+        Category childCategory = ChildCategoryRepository.insert(parentCategory, parentCategory.getChildren().get(0));
 
         ExpenseObject expense = new ExpenseObject("Ausgabe", 100, true, childCategory, new Account("Konot 1", 100, new Currency("Währung", "WÄH", "W")));
         ExpenseRepository.insert(expense);
@@ -232,22 +232,20 @@ public class ChildCategoryRepositoryTest {
 
         } catch (CannotDeleteChildCategoryException e) {
 
+            assertTrue("Kategorie konnte gelöscht werden", ChildCategoryRepository.exists(childCategory));
             assertEquals(String.format("Child category %s is attached to a ParentExpense and cannot be deleted.", childCategory.getTitle()), e.getMessage());
         }
     }
 
     @Test
     public void testDeleteWithExistingChildCategoryAttachedToChildBookingShouldThrowCannotDeleteChildCategoryException() {
-        Category parentCategory = mock(Category.class);
-        when(parentCategory.getIndex()).thenReturn(104L);
-
-        Category childCategory = new Category("ChildCategory", "#121212", false, new ArrayList<Category>());
-        childCategory = ChildCategoryRepository.insert(parentCategory, childCategory);
+        Category parentCategory = getCategoryWithChild();
+        Category childCategory = ChildCategoryRepository.insert(parentCategory, parentCategory.getChildren().get(0));
 
         ExpenseObject parentExpense = mock(ExpenseObject.class);
         when(parentExpense.getIndex()).thenReturn(100L);
 
-        ExpenseObject childExpense = new ExpenseObject("Ausgabe", 100, false, childCategory, new Account("Konot 1", 100, new Currency("Währung", "WÄH", "W")));
+        ExpenseObject childExpense = new ExpenseObject("Ausgabe", 100, false, childCategory, new Account("Konto 1", 100, new Currency("Währung", "WÄH", "W")));
         ChildExpenseRepository.insert(parentExpense, childExpense);
         try {
             ChildCategoryRepository.delete(childCategory);
@@ -255,13 +253,14 @@ public class ChildCategoryRepositoryTest {
 
         } catch (CannotDeleteChildCategoryException e) {
 
+            assertTrue("Kategorie konnte gelöscht werden", ChildCategoryRepository.exists(childCategory));
             assertEquals(String.format("Child category %s is attached to a ChildExpense and cannot be deleted.", childCategory.getTitle()), e.getMessage());
         }
     }
 
     @Test
     public void testDeleteWithNotExistingChildCategoryShouldSucceed() {
-        Category childCategory = new Category("Kategorie", "#000000", false, new ArrayList<Category>());
+        Category childCategory = getSimpleCategory();
 
         try {
             ChildCategoryRepository.delete(childCategory);
@@ -274,34 +273,25 @@ public class ChildCategoryRepositoryTest {
 
     @Test
     public void testUpdateWithExistingChildCategoryShouldSucceed() {
-        Category parent = mock(Category.class);
-        when(parent.getIndex()).thenReturn(105L);
-
-        Category childCategory = new Category("Kategorie", "#000000", true, new ArrayList<Category>());
-        childCategory = ChildCategoryRepository.insert(parent, childCategory);
+        Category parent = getCategoryWithChild();
+        Category childCategory = ChildCategoryRepository.insert(parent, parent.getChildren().get(0));
 
         try {
             childCategory.setName("Updated Category Name");
             ChildCategoryRepository.update(childCategory);
-
             Category fetchedChildCategory = ChildCategoryRepository.get(childCategory.getIndex());
-            assertSameChildCategories(childCategory, fetchedChildCategory);
+
+            assertEquals(childCategory, fetchedChildCategory);
 
         } catch (ChildCategoryNotFoundException e) {
 
-            Assert.fail("Gerade erstellte KindKategorie konnte nicht geupdated werden");
+            Assert.fail("Kategorie wurde nicht gefunden");
         }
     }
 
     @Test
     public void testUpdateWithNotExistingChildCategoryShouldThrowChildCategoryNotFoundException() {
-        Category childCategory = new Category(
-                1337,
-                "Kategorie",
-                "#120012",
-                true,
-                new ArrayList<Category>()
-        );
+        Category childCategory = getSimpleCategory();
 
         try {
             ChildCategoryRepository.update(childCategory);
@@ -316,13 +306,7 @@ public class ChildCategoryRepositoryTest {
 
     @Test
     public void testCursorToChildCategoryWithValidCursorShouldSucceed() {
-        Category expectedChildCategory = new Category(
-                1337,
-                "Kategorie",
-                "#000012",
-                false,
-                new ArrayList<Category>()
-        );
+        Category expectedChildCategory = getSimpleCategory();
 
         String[] columns = new String[]{
                 ExpensesDbHelper.CHILD_CATEGORIES_COL_ID,
@@ -337,7 +321,7 @@ public class ChildCategoryRepositoryTest {
 
         try {
             Category actualChildCategory = ChildCategoryRepository.cursorToChildCategory(cursor);
-            assertSameChildCategories(expectedChildCategory, actualChildCategory);
+            assertEquals(expectedChildCategory, actualChildCategory);
 
         } catch (CursorIndexOutOfBoundsException e) {
 
@@ -347,13 +331,7 @@ public class ChildCategoryRepositoryTest {
 
     @Test
     public void testCursorToChildCategoryWithInvalidCursorShouldThrowCursorIndexOutOfBoundsException() {
-        Category expectedChildCategory = new Category(
-                1337,
-                "Kategorie",
-                "#000012",
-                false,
-                new ArrayList<Category>()
-        );
+        Category expectedChildCategory = getSimpleCategory();
 
         String[] columns = new String[]{
                 ExpensesDbHelper.CHILD_CATEGORIES_COL_ID,
@@ -374,9 +352,5 @@ public class ChildCategoryRepositoryTest {
 
             //do nothing
         }
-    }
-
-    private void assertSameChildCategories(Category expected, Category actual) {
-        assertEquals(expected, actual);
     }
 }

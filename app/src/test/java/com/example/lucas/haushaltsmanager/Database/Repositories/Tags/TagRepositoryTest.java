@@ -36,10 +36,15 @@ public class TagRepositoryTest {
         DatabaseManager.initializeInstance(dbHelper);
     }
 
+    private Tag getSimpleTag() {
+        return new Tag(
+                "Tag"
+        );
+    }
+
     @Test
     public void testExistsWithExistingTagShouldSucceed() {
-        Tag tag = new Tag("Tag");
-        tag = TagRepository.insert(tag);
+        Tag tag = TagRepository.insert(getSimpleTag());
 
         boolean exists = TagRepository.exists(tag);
         assertTrue("Das Tag wurde nicht in der Datenbank gefunden", exists);
@@ -47,7 +52,7 @@ public class TagRepositoryTest {
 
     @Test
     public void testExistsWithNotExistingTagShouldFail() {
-        Tag tag = new Tag("Tag");
+        Tag tag = getSimpleTag();
 
         boolean exists = TagRepository.exists(tag);
         assertFalse("Das Tag wurde in der Datenbank gefunden", exists);
@@ -55,12 +60,11 @@ public class TagRepositoryTest {
 
     @Test
     public void testGetWithExistingTagShouldSucceed() {
-        Tag expectedTag = new Tag("Tag");
-        expectedTag = TagRepository.insert(expectedTag);
+        Tag expectedTag = TagRepository.insert(getSimpleTag());
 
         try {
             Tag fetchedTag = TagRepository.get(expectedTag.getIndex());
-            assertSameTags(expectedTag, fetchedTag);
+            assertEquals(expectedTag, fetchedTag);
 
         } catch (TagNotFoundException e) {
 
@@ -76,6 +80,7 @@ public class TagRepositoryTest {
             TagRepository.get(notExistingTagId);
 
             Assert.fail("Nicht existierendes Tag wurde in der Datenbank gefunden.");
+
         } catch (TagNotFoundException e) {
 
             assertEquals(String.format("Could not find Tag with id %s.", notExistingTagId), e.getMessage());
@@ -84,12 +89,11 @@ public class TagRepositoryTest {
 
     @Test
     public void testInsertWithValidTagShouldSucceed() {
-        Tag expectedTag = new Tag("Existing Tag");
-        expectedTag = TagRepository.insert(expectedTag);
+        Tag expectedTag = TagRepository.insert(getSimpleTag());
 
         try {
             Tag fetchedTag = TagRepository.get(expectedTag.getIndex());
-            assertSameTags(expectedTag, fetchedTag);
+            assertEquals(expectedTag, fetchedTag);
 
         } catch (TagNotFoundException e) {
 
@@ -104,8 +108,7 @@ public class TagRepositoryTest {
 
     @Test
     public void testDeleteWithExistingTagShouldSucceed() {
-        Tag tag = new Tag("Tag");
-        tag = TagRepository.insert(tag);
+        Tag tag = TagRepository.insert(getSimpleTag());
 
         try {
             TagRepository.delete(tag);
@@ -113,13 +116,14 @@ public class TagRepositoryTest {
 
         } catch (CannotDeleteTagException e) {
 
+            assertTrue("Tag wurde nicht gelöscht", TagRepository.exists(tag));
             Assert.fail("Tag konnte nicht gelöscht werden");
         }
     }
 
     @Test
     public void testDeleteWithNotExistingTagShouldSucceed() {
-        Tag tag = new Tag(1337, "Tag");
+        Tag tag = getSimpleTag();
 
         try {
             TagRepository.delete(tag);
@@ -137,8 +141,7 @@ public class TagRepositoryTest {
         when(expenseObjectMock.getIndex()).thenReturn(100L);
         when(expenseObjectMock.getExpenseType()).thenReturn(ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE);
 
-        Tag tag = new Tag("Tag");
-        tag = TagRepository.insert(tag);
+        Tag tag = TagRepository.insert(getSimpleTag());
 
         BookingTagRepository.insert(expenseObjectMock.getIndex(), tag, expenseObjectMock.getExpenseType());
 
@@ -154,15 +157,14 @@ public class TagRepositoryTest {
 
     @Test
     public void testUpdateWithExistingTagShouldSucceed() {
-        Tag expectedTag = new Tag("Tag");
-        expectedTag = TagRepository.insert(expectedTag);
+        Tag expectedTag = TagRepository.insert(getSimpleTag());
 
         try {
             expectedTag.setName("New Tag Name");
             TagRepository.update(expectedTag);
-
             Tag fetchedTag = TagRepository.get(expectedTag.getIndex());
-            assertSameTags(expectedTag, fetchedTag);
+
+            assertEquals(expectedTag, fetchedTag);
 
         } catch (TagNotFoundException e) {
 
@@ -172,7 +174,7 @@ public class TagRepositoryTest {
 
     @Test
     public void testUpdateWithNotExistingTagShouldThrowTagNotFoundException() {
-        Tag tag = new Tag("Tag Name");
+        Tag tag = getSimpleTag();
 
         try {
             TagRepository.update(tag);
@@ -186,7 +188,7 @@ public class TagRepositoryTest {
 
     @Test
     public void testCursorToTagWithValidCursorShouldSucceed() {
-        Tag expectedTag = new Tag(1337, "Tag Name");
+        Tag expectedTag = getSimpleTag();
 
         String[] columns = new String[]{
                 ExpensesDbHelper.TAGS_COL_ID,
@@ -199,7 +201,7 @@ public class TagRepositoryTest {
 
         try {
             Tag fetchedTag = TagRepository.cursorToTag(cursor);
-            assertSameTags(expectedTag, fetchedTag);
+            assertEquals(expectedTag, fetchedTag);
 
         } catch (CursorIndexOutOfBoundsException e) {
 
@@ -209,7 +211,7 @@ public class TagRepositoryTest {
 
     @Test
     public void testCursorToTagWithInvalidCursorThrowCursorIndexOutOfBoundsException() {
-        Tag expectedTag = new Tag(1337, "Tag Name");
+        Tag expectedTag = getSimpleTag();
 
         String[] columns = new String[]{
                 ExpensesDbHelper.TAGS_COL_ID
@@ -228,9 +230,5 @@ public class TagRepositoryTest {
 
             //do nothing
         }
-    }
-
-    private void assertSameTags(Tag expected, Tag actual) {
-        assertEquals(expected, actual);
     }
 }

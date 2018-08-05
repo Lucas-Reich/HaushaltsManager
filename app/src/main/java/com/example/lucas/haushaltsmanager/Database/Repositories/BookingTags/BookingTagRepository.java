@@ -3,6 +3,7 @@ package com.example.lucas.haushaltsmanager.Database.Repositories.BookingTags;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.provider.ContactsContract;
 
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
@@ -14,6 +15,39 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BookingTagRepository {
+
+    /**
+     * Methode um zu überprüfen ob es die Relation zwischen Buchung und Tag existiert.
+     *
+     * @param expense Buchung, zu der das angegebene Tag zuegprdnet sein soll
+     * @param tag Tag, welches der Buchung zugeprdnet sein soll
+     * @return TRUE wenn das Tag der Buchung zugeordnet ist, FALSE wenn nicht
+     */
+    public static boolean exists(ExpenseObject expense, Tag tag) {
+        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+
+        String selectQuery;
+        selectQuery = "SELECT"
+                + " *"
+                + " FROM " + ExpensesDbHelper.TABLE_BOOKINGS_TAGS
+                + " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS_TAGS + "." + ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_ID + " = " + expense.getIndex()
+                + " AND " + ExpensesDbHelper.TABLE_BOOKINGS_TAGS + "." + ExpensesDbHelper.BOOKINGS_TAGS_COL_TAG_ID + " = " + tag.getIndex()
+                + " AND " + ExpensesDbHelper.TABLE_BOOKINGS_TAGS + "." + ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_TYPE + " = '" + expense.getExpenseType().name() + "'"
+                + " LIMIT 1;";
+
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        if (c.moveToFirst()) {
+
+            c.close();
+            DatabaseManager.getInstance().closeDatabase();
+            return true;
+        }
+
+        c.close();
+        DatabaseManager.getInstance().closeDatabase();
+        return false;
+    }
 
     /**
      * Methode um alle Tags zu einer Buchung zu bekommen.

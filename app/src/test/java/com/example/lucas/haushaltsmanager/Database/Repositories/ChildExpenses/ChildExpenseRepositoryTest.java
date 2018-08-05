@@ -73,6 +73,8 @@ public class ChildExpenseRepositoryTest {
 
     private ExpenseObject getParentExpenseWithChildren() {
         ExpenseObject parentExpense = getSimpleExpense();
+        parentExpense.setPrice(0);
+
         parentExpense.addChild(getSimpleExpense());
         parentExpense.addChild(getSimpleExpense());
 
@@ -81,9 +83,8 @@ public class ChildExpenseRepositoryTest {
 
     @Test
     public void testExistsWithValidChildExpenseShouldSucceed() {
-        ExpenseObject parentExpense = mock(ExpenseObject.class);
-        when(parentExpense.getIndex()).thenReturn(77L);
-        ExpenseObject childExpense = ChildExpenseRepository.insert(parentExpense, getSimpleExpense());
+        ExpenseObject parentExpense = getParentExpenseWithChildren();
+        ExpenseObject childExpense = ChildExpenseRepository.insert(parentExpense, parentExpense.getChildren().get(0));
 
         boolean exists = ChildExpenseRepository.exists(childExpense);
         assertTrue("Kindbuchung wurde nicht gefunden", exists);
@@ -100,8 +101,7 @@ public class ChildExpenseRepositoryTest {
 
     @Test
     public void testAddChildToBookingWithExistingParentThatHasChildrenShouldSucceed() {
-        ExpenseObject parentExpense = getParentExpenseWithChildren();
-        parentExpense = ExpenseRepository.insert(parentExpense);
+        ExpenseObject parentExpense = ExpenseRepository.insert(getParentExpenseWithChildren());
 
         ExpenseObject childExpense = getSimpleExpense();
         childExpense.setExpenditure(false);
@@ -109,10 +109,10 @@ public class ChildExpenseRepositoryTest {
 
         try {
             ExpenseObject actualExpense = ChildExpenseRepository.addChildToBooking(childExpense, parentExpense);
+
             assertEquals(parentExpense.getChildren().get(0), actualExpense.getChildren().get(0));
             assertEquals(parentExpense.getChildren().get(1), actualExpense.getChildren().get(1));
             assertEquals(parentExpense.getChildren().get(2), actualExpense.getChildren().get(2));
-
             assertEqualAccountBalance(
                     account.getBalance() + parentExpense.getChildren().get(0).getSignedPrice() + parentExpense.getChildren().get(1).getSignedPrice() + childExpense.getSignedPrice(),
                     account
@@ -137,9 +137,9 @@ public class ChildExpenseRepositoryTest {
 
         try {
             ExpenseObject actualParentExpense = ChildExpenseRepository.addChildToBooking(childExpense, parentExpense);
+
             assertEquals(parentExpense, actualParentExpense.getChildren().get(0));
             assertEquals(childExpense, actualParentExpense.getChildren().get(1));
-
             assertEqualAccountBalance(
                     account.getBalance() + parentExpense.getSignedPrice() + childExpense.getSignedPrice(),
                     actualParentExpense.getChildren().get(0).getAccount()
@@ -149,14 +149,11 @@ public class ChildExpenseRepositoryTest {
 
             Assert.fail("ParentBuchung ist keine KindBuchung");
         }
-        //todo den kontostand überprüfen
     }
 
     @Test
     public void testAddChildToBookingWithParentBookingIsChildShouldThrowAddChildToExpenseException() {
-        ExpenseObject parentExpense = getParentExpenseWithChildren();
-        parentExpense = ExpenseRepository.insert(parentExpense);
-
+        ExpenseObject parentExpense = ExpenseRepository.insert(getParentExpenseWithChildren());
         ExpenseObject childExpense = getSimpleExpense();
 
         try {
@@ -172,32 +169,33 @@ public class ChildExpenseRepositoryTest {
     @Test
     public void testCombineExpensesWithParentExpensesShouldSucceed() {
         ArrayList<ExpenseObject> expenses = new ArrayList<>();
+        expenses.add(ExpenseRepository.insert(getSimpleExpense()));
+        expenses.add(ExpenseRepository.insert(getSimpleExpense()));
 
-        ExpenseObject parentExpense1 = getSimpleExpense();
-        parentExpense1 = ExpenseRepository.insert(parentExpense1);
-        expenses.add(parentExpense1);
+        ExpenseObject parentExpense = ChildExpenseRepository.combineExpenses(expenses);
 
-        ExpenseObject parentExpense2 = getSimpleExpense();
-        parentExpense2 = ExpenseRepository.insert(parentExpense2);
-        expenses.add(parentExpense2);
-
-        ChildExpenseRepository.combineExpenses(expenses);
-        assertTrue("Erste Parent Expense wurde nicht als ChildExpense gespeichert", ChildExpenseRepository.exists(parentExpense1));
-        assertTrue("Zweite Parent Expense wurde nicht als ChildExpense gespeichert", ChildExpenseRepository.exists(parentExpense2));
+        assertTrue("ParentExpense wurde nicht erstellt", ExpenseRepository.exists(parentExpense));
+        assertTrue("ChildExpense 1 wurde nicht erstellt", ChildExpenseRepository.exists(parentExpense.getChildren().get(0)));
+        assertTrue("ChildExpense 2 wurde nicht erstellt", ChildExpenseRepository.exists(parentExpense.getChildren().get(1)));
+        assertEqualAccountBalance(
+                account.getBalance() + expenses.get(0).getSignedPrice() + expenses.get(1).getSignedPrice(),
+                account
+        );
     }
 
     @Test
     public void testExtractChildFromBookingShouldSucceed() {
-        ExpenseObject parentExpense = getParentExpenseWithChildren();
-        parentExpense = ExpenseRepository.insert(parentExpense);
-        //todo wenn ein Kind extrahiert wird dann wird der falsche betrag dem Konto zugeschrieben
+        ExpenseObject parentExpense = ExpenseRepository.insert(getParentExpenseWithChildren());
 
         try {
             ExpenseObject extractedChildExpense = ChildExpenseRepository.extractChildFromBooking(parentExpense.getChildren().get(0));
+
             assertTrue("Die KindBuchung wurde nicht zu einer ParentBuchung konvertiert", ExpenseRepository.exists(extractedChildExpense));
             assertFalse("Die extrahierte KindBuchung wurde nicht gelöscht", ChildExpenseRepository.exists(extractedChildExpense));
-
-            //todo noch ein assertEqualAccountBalance einfügen
+            assertEqualAccountBalance(
+                    account.getBalance() + parentExpense.getChildren().get(0).getSignedPrice() + parentExpense.getChildren().get(1).getSignedPrice(),
+                    account
+            );
 
         } catch (ChildExpenseNotFoundException e) {
 
@@ -207,8 +205,8 @@ public class ChildExpenseRepositoryTest {
 
     @Test
     public void testExtractLastChildFromBookingShouldSucceedAndParentBookingShouldBeRemoved() {
-        ExpenseObject parentExpense = getSimpleExpense();
-        parentExpense.addChild(getSimpleExpense());
+        ExpenseObject parentExpense = getParentExpenseWithChildren();
+        parentExpense.removeChild(parentExpense.getChildren().get(1));
         parentExpense = ExpenseRepository.insert(parentExpense);
 
         try {
@@ -216,24 +214,14 @@ public class ChildExpenseRepositoryTest {
 
             assertTrue("KindBuchung wurde nicht in eine ParentBuchung konvertiert", ExpenseRepository.exists(extractedChildExpense));
             assertFalse("ParentBuchung ohne Kinder wurde nicht gelöscht", ExpenseRepository.exists(parentExpense));
+            assertEqualAccountBalance(
+                    account.getBalance() + parentExpense.getChildren().get(0).getSignedPrice(),
+                    account
+            );
 
         } catch (ChildExpenseNotFoundException e) {
 
             Assert.fail("KindBuchung konnte nicht gelöscht werden");
-        }
-    }
-
-    @Test
-    public void testExtractChildFromBookingWithNotExistingChildExpenseShouldThrowChildExpenseNotFoundException() {
-        ExpenseObject childExpense = getSimpleExpense();
-
-        try {
-            ChildExpenseRepository.extractChildFromBooking(childExpense);
-            Assert.fail("Nicht existierende KindBuchung konnte extrahiert werden");
-
-        } catch (ChildExpenseNotFoundException e) {
-
-            assertEquals(String.format("Could not find Child Expense with id %s.", childExpense.getIndex()), e.getMessage());
         }
     }
 
@@ -248,17 +236,17 @@ public class ChildExpenseRepositoryTest {
         } catch (ChildExpenseNotFoundException e) {
 
             assertEquals(String.format("Could not find Child Expense with id %s.", childExpense.getIndex()), e.getMessage());
+            assertEqualAccountBalance(
+                    account.getBalance(),
+                    account
+            );
         }
     }
 
     @Test
     public void testGetWithExistingChildExpenseShouldSucceed() {
-        ExpenseObject parentExpense = mock(ExpenseObject.class);
-        when(parentExpense.getIndex()).thenReturn(876L);
-
-        ExpenseObject expectedChildExpense = getSimpleExpense();
-        expectedChildExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.CHILD_EXPENSE);
-        expectedChildExpense = ChildExpenseRepository.insert(parentExpense, expectedChildExpense);
+        ExpenseObject parentExpense = getParentExpenseWithChildren();
+        ExpenseObject expectedChildExpense = ChildExpenseRepository.insert(parentExpense, parentExpense.getChildren().get(0));
 
         try {
             ExpenseObject actualChildExpense = ChildExpenseRepository.get(expectedChildExpense.getIndex());
@@ -287,21 +275,21 @@ public class ChildExpenseRepositoryTest {
     @Test
     public void testUpdateWithExistingChildExpenseShouldSucceed() {
         ExpenseObject parentExpense = getParentExpenseWithChildren();
-        parentExpense = ExpenseRepository.insert(parentExpense);
+        ExpenseObject expectedChildExpense = ChildExpenseRepository.insert(parentExpense, parentExpense.getChildren().get(0));
 
         try {
-            ExpenseObject expectedChildExpense = parentExpense.getChildren().get(1);
             expectedChildExpense.setPrice(13);
             expectedChildExpense.setExpenditure(true);
 
             ChildExpenseRepository.update(expectedChildExpense);
             ExpenseObject actualChildExpense = ChildExpenseRepository.get(expectedChildExpense.getIndex());
-            assertEquals(expectedChildExpense, actualChildExpense);
 
+            assertEquals(expectedChildExpense, actualChildExpense);
             assertEqualAccountBalance(
-                    account.getBalance() + parentExpense.getChildren().get(0).getSignedPrice() + expectedChildExpense.getSignedPrice(),
+                    account.getBalance() + expectedChildExpense.getSignedPrice(),
                     account
             );
+
         } catch (ChildExpenseNotFoundException e) {
 
             Assert.fail("KindBuchung konnte nicht gefunden werden");
@@ -324,16 +312,15 @@ public class ChildExpenseRepositoryTest {
 
     @Test
     public void testDeleteWithExistingChildExpenseShouldSucceed() {
-        ExpenseObject parentExpense = getParentExpenseWithChildren();
-        parentExpense = ExpenseRepository.insert(parentExpense);
+        ExpenseObject parentExpense = ExpenseRepository.insert(getParentExpenseWithChildren());
+        ExpenseObject childExpense = parentExpense.getChildren().get(0);
 
         try {
-            ExpenseObject childExpense = parentExpense.getChildren().get(0);
             ChildExpenseRepository.delete(childExpense);
-            assertFalse("Buchung wurde nicht gelöscht", ChildExpenseRepository.exists(childExpense));
 
+            assertFalse("Buchung wurde nicht gelöscht", ChildExpenseRepository.exists(childExpense));
             assertEqualAccountBalance(
-                    account.getBalance() + parentExpense.getChildren().get(0).getSignedPrice() + parentExpense.getChildren().get(1).getSignedPrice(),
+                    account.getBalance() + parentExpense.getChildren().get(1).getSignedPrice(),
                     childExpense.getAccount()
             );
 
@@ -359,17 +346,15 @@ public class ChildExpenseRepositoryTest {
 
     @Test
     public void testDeleteWithChildExpenseIsLastOfParentShouldDeleteParentAsWell() {
-        ExpenseObject parentExpense = getSimpleExpense();
-        parentExpense.addChild(getSimpleExpense());
-
+        ExpenseObject parentExpense = getParentExpenseWithChildren();
+        parentExpense.getChildren().remove(parentExpense.getChildren().get(1));
         parentExpense = ExpenseRepository.insert(parentExpense);
         assertTrue("ParentExpense wurde nicht erstellt", ExpenseRepository.exists(parentExpense));
 
         try {
-            ExpenseObject childExpense = parentExpense.getChildren().get(0);
-            ChildExpenseRepository.delete(childExpense);
+            ChildExpenseRepository.delete(parentExpense.getChildren().get(0));
 
-            assertFalse("KindBuchung wurde nicht gelöscht", ChildExpenseRepository.exists(childExpense));
+            assertFalse("KindBuchung wurde nicht gelöscht", ChildExpenseRepository.exists(parentExpense.getChildren().get(0)));
             assertFalse("ParentBuchung wurde nicht gelöscht", ExpenseRepository.exists(parentExpense));
 
         } catch (Exception e) {
@@ -380,8 +365,7 @@ public class ChildExpenseRepositoryTest {
 
     @Test
     public void testGetParentWithExistingChildExpenseShouldSucceed() {
-        ExpenseObject expectedParentExpense = getParentExpenseWithChildren();
-        expectedParentExpense = ExpenseRepository.insert(expectedParentExpense);
+        ExpenseObject expectedParentExpense = ExpenseRepository.insert(getParentExpenseWithChildren());
 
         try {
             ExpenseObject actualParentExpense = ChildExpenseRepository.getParent(expectedParentExpense.getChildren().get(0));
@@ -412,11 +396,8 @@ public class ChildExpenseRepositoryTest {
 
     @Test
     public void testGetParentWithNotExistingParentExpenseShouldThrowExpenseNotFoundException() {
-        ExpenseObject parentExpense = mock(ExpenseObject.class);
-        when(parentExpense.getIndex()).thenReturn(777L);
-
-        ExpenseObject childExpense = getSimpleExpense();
-        childExpense = ChildExpenseRepository.insert(parentExpense, childExpense);
+        ExpenseObject parentExpense = getParentExpenseWithChildren();
+        ExpenseObject childExpense = ChildExpenseRepository.insert(parentExpense, parentExpense.getChildren().get(0));
 
         try {
             ChildExpenseRepository.getParent(childExpense);

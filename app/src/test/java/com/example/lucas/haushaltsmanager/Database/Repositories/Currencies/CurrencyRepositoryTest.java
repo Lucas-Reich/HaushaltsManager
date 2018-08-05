@@ -30,16 +30,22 @@ public class CurrencyRepositoryTest {
 
     @Before
     public void setup() {
-
         Context context = RuntimeEnvironment.application;
         ExpensesDbHelper dbHelper = new ExpensesDbHelper(context);
         DatabaseManager.initializeInstance(dbHelper);
     }
 
+    private Currency getSimpleCurrency() {
+        return new Currency(
+                "Euro",
+                "EUR",
+                "€"
+        );
+    }
+
     @Test
     public void testExistsWithExistingCurrency() {
-        Currency currency = new Currency("Euro", "EUR", "€");
-        currency = CurrencyRepository.insert(currency);
+        Currency currency = CurrencyRepository.insert(getSimpleCurrency());
 
         boolean exists = CurrencyRepository.exists(currency);
         assertTrue("Die Währung wurde nicht in der Datenbank gefunden", exists);
@@ -47,7 +53,7 @@ public class CurrencyRepositoryTest {
 
     @Test
     public void testExistsWithNotExistingCurrencyShouldFail() {
-        Currency notExistingCurrency = new Currency("Currency Name", "CSN", "C");
+        Currency notExistingCurrency = getSimpleCurrency();
 
         boolean exists = CurrencyRepository.exists(notExistingCurrency);
         assertFalse("Die Währung wurde in der Datenbank gefunden", exists);
@@ -55,12 +61,11 @@ public class CurrencyRepositoryTest {
 
     @Test
     public void testGetWithExistingCurrencyShouldSucceed() {
-        Currency expectedCurrency = new Currency("Euro", "EUR", "€");
-        expectedCurrency = CurrencyRepository.insert(expectedCurrency);
+        Currency expectedCurrency = CurrencyRepository.insert(getSimpleCurrency());
 
         try {
             Currency fetchedCurrency = CurrencyRepository.get(expectedCurrency.getIndex());
-            assertSameCurrencies(expectedCurrency, fetchedCurrency);
+            assertEquals(expectedCurrency, fetchedCurrency);
 
         } catch (CurrencyNotFoundException e) {
 
@@ -84,12 +89,11 @@ public class CurrencyRepositoryTest {
 
     @Test
     public void testGetByNameWithExistingCurrencyShouldSucceed() {
-        Currency expectedCurrency = new Currency("Euro", "EUR", "€");
-        expectedCurrency = CurrencyRepository.insert(expectedCurrency);
+        Currency expectedCurrency = CurrencyRepository.insert(getSimpleCurrency());
 
         try {
             Currency fetchedCurrency = CurrencyRepository.getByShortName(expectedCurrency.getShortName());
-            assertSameCurrencies(expectedCurrency, fetchedCurrency);
+            assertEquals(expectedCurrency, fetchedCurrency);
 
         } catch (CurrencyNotFoundException e) {
 
@@ -99,7 +103,7 @@ public class CurrencyRepositoryTest {
 
     @Test
     public void testGetByNameWithNotExistingCurrencyShouldThrowCurrencyNotFoundException() {
-        String notExistingCurrencyShortName = "NES";
+        String notExistingCurrencyShortName = "NEC";
 
         try {
             CurrencyRepository.getByShortName(notExistingCurrencyShortName);
@@ -113,12 +117,12 @@ public class CurrencyRepositoryTest {
 
     @Test
     public void testInsertWithValidCurrencyShouldSucceed() {
-        Currency expectedCurrency = new Currency("Hong Kong Dollar", "HKD", "$");
-        expectedCurrency = CurrencyRepository.insert(expectedCurrency);
+        Currency expectedCurrency = CurrencyRepository.insert(getSimpleCurrency());
 
         try {
             Currency fetchedCurrency = CurrencyRepository.get(expectedCurrency.getIndex());
-            assertSameCurrencies(expectedCurrency, fetchedCurrency);
+            assertEquals(expectedCurrency, fetchedCurrency);
+            assertTrue("Währung wurde nicht gefunden", CurrencyRepository.exists(expectedCurrency));
 
         } catch (CurrencyNotFoundException e) {
 
@@ -133,8 +137,7 @@ public class CurrencyRepositoryTest {
 
     @Test
     public void testDeleteWithExistingCurrencyShouldSucceed() {
-        Currency currency = new Currency("Schweizer Franke", "CHF", "Fr.");
-        currency = CurrencyRepository.insert(currency);
+        Currency currency = CurrencyRepository.insert(getSimpleCurrency());
 
         try {
             CurrencyRepository.delete(currency);
@@ -148,10 +151,11 @@ public class CurrencyRepositoryTest {
 
     @Test
     public void testDeleteWithNotExistingCurrencyShouldSucceed() {
-        Currency currency = new Currency(1337, "Currency Name", "CUN", "C");
+        Currency currency = getSimpleCurrency();
 
         try {
             CurrencyRepository.delete(currency);
+            assertFalse("Währung wurde in der Datenbank gefunden", CurrencyRepository.exists(currency));
 
         } catch (CannotDeleteCurrencyException e) {
 
@@ -161,8 +165,7 @@ public class CurrencyRepositoryTest {
 
     @Test
     public void testDeleteWithExistingCurrencyAttachedToAccountShouldFailThrowCannotDeleteCurrencyException() {
-        Currency currency = new Currency("Euro", "EUR", "€");
-        currency = CurrencyRepository.insert(currency);
+        Currency currency = CurrencyRepository.insert(getSimpleCurrency());
 
         Account account = new Account("Konto 1", 100, currency);
         AccountRepository.insert(account);
@@ -173,21 +176,21 @@ public class CurrencyRepositoryTest {
 
         } catch (CannotDeleteCurrencyException e) {
 
+            assertTrue("Währung konnte nicht in der Datenbank gefunden werden", CurrencyRepository.exists(currency));
             assertEquals(String.format("Currency %s cannot be deleted.", currency.getName()), e.getMessage());
         }
     }
 
     @Test
     public void testUpdateWithExistingCurrencyShouldSucceed() {
-        Currency expectedCurrency = new Currency("Euro", "EUR", "€");
-        expectedCurrency = CurrencyRepository.insert(expectedCurrency);
+        Currency expectedCurrency = CurrencyRepository.insert(getSimpleCurrency());
 
         try {
             expectedCurrency.setName("New Name");
             CurrencyRepository.update(expectedCurrency);
-
             Currency fetchedCurrency = CurrencyRepository.get(expectedCurrency.getIndex());
-            assertSameCurrencies(expectedCurrency, fetchedCurrency);
+
+            assertEquals(expectedCurrency, fetchedCurrency);
 
         } catch (CurrencyNotFoundException e) {
 
@@ -197,10 +200,12 @@ public class CurrencyRepositoryTest {
 
     @Test
     public void testUpdateWithNotExistingCurrencyShouldThrowCurrencyNotFoundException() {
-        Currency currency = new Currency(1337, "Not Existing Currency", "NEC", "N");
+        Currency currency = getSimpleCurrency();
 
         try {
+            currency.setName("Dollar");
             CurrencyRepository.update(currency);
+
             Assert.fail("Nicht existierende Währung konnte geupdated werden");
 
         } catch (CurrencyNotFoundException e) {
@@ -211,7 +216,7 @@ public class CurrencyRepositoryTest {
 
     @Test
     public void testCursorToCurrencyWithValidCursor() {
-        Currency expectedCurrency = new Currency(313, "Meine Currency", "CUR", "C");
+        Currency expectedCurrency = getSimpleCurrency();
 
         String[] columns = new String[]{
                 ExpensesDbHelper.CURRENCIES_COL_ID,
@@ -226,12 +231,12 @@ public class CurrencyRepositoryTest {
         cursor.moveToFirst();
 
         Currency cursorCurrency = CurrencyRepository.cursorToCurrency(cursor);
-        assertSameCurrencies(expectedCurrency, cursorCurrency);
+        assertEquals(expectedCurrency, cursorCurrency);
     }
 
     @Test
     public void testCursorToCurrencyWithInvalidCursorThrowCursorIndexOutOfBoundsException() {
-        Currency expectedCurrency = new Currency(1337, "Kanadische Dollar", "CAD", "$");
+        Currency expectedCurrency = getSimpleCurrency();
 
         String[] columns = new String[]{
                 ExpensesDbHelper.CURRENCIES_COL_ID,
@@ -253,9 +258,5 @@ public class CurrencyRepositoryTest {
 
             //do nothing
         }
-    }
-
-    private void assertSameCurrencies(Currency expected, Currency actual) {
-        assertEquals(expected, actual);
     }
 }

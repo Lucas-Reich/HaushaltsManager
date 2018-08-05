@@ -23,9 +23,10 @@ public class CategoryRepository {
         selectQuery = "SELECT"
                 + " *"
                 + " FROM " + ExpensesDbHelper.TABLE_CATEGORIES
-                + " WHERE " + ExpensesDbHelper.CATEGORIES_COL_NAME + " = '" + category.getTitle() + "'"
-                + " AND " + ExpensesDbHelper.CATEGORIES_COL_COLOR + " = '" + category.getColorString() + "'"
-                + " AND " + ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE + " = " + (category.getDefaultExpenseType() ? 1 : 0)
+                + " WHERE " + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_ID + " = " + category.getIndex()
+                + " AND " + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_NAME + " = '" + category.getTitle() + "'"
+                + " AND " + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_COLOR + " = '" + category.getColorString() + "'"
+                + " AND " + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE + " = " + (category.getDefaultExpenseType() ? 1 : 0)
                 + " LIMIT 1;";
 
         Cursor c = db.rawQuery(selectQuery, null);
@@ -60,6 +61,7 @@ public class CategoryRepository {
         }
 
         Category category = cursorToCategory(c);
+        category.addChildren(ChildCategoryRepository.getAll(category.getIndex()));
 
         c.close();
         DatabaseManager.getInstance().closeDatabase();
@@ -93,7 +95,6 @@ public class CategoryRepository {
     }
 
     public static Category insert(Category category) {
-        //todo sollte ich auch die Kinder einer Kategorie in die Datenbank schreiben oder mache ich das irgendwie anders?
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
 
         ContentValues values = new ContentValues();
@@ -104,13 +105,19 @@ public class CategoryRepository {
         long insertedCategoryId = db.insert(ExpensesDbHelper.TABLE_CATEGORIES, null, values);
         DatabaseManager.getInstance().closeDatabase();
 
-        return new Category(
+        Category parentCategory = new Category(
                 insertedCategoryId,
                 category.getTitle(),
                 category.getColorString(),
                 category.getDefaultExpenseType(),
-                category.getChildren()
+                new ArrayList<Category>()
         );
+
+        for (Category childCategory : category.getChildren()) {
+            parentCategory.addChild(ChildCategoryRepository.insert(parentCategory, childCategory));
+        }
+
+        return parentCategory;
     }
 
     public static void delete(Category category) throws CannotDeleteCategoryException {

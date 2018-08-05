@@ -378,7 +378,7 @@ public class ExpenseObject implements Parcelable {
             result = result && (getUnsignedPrice() == otherExpense.getUnsignedPrice());
             result = result && getAccount().equals(otherExpense.getAccount());
             result = result && getExpenseType().equals(otherExpense.getExpenseType());
-            result = result && getDateTime().equals(otherExpense.getDateTime());
+            result = result && getDate().equals(otherExpense.getDate());
             result = result && getNotice().equals(otherExpense.getNotice());
             result = result && getCategory().equals(otherExpense.getCategory());
 

@@ -8,11 +8,14 @@ import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.BookingTags.BookingTagRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.CannotDeleteExpenseException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.RecurringBookingRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Tags.TagRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Templates.TemplateRepository;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
@@ -61,8 +64,7 @@ public class ExpenseRepositoryTest {
         account = AccountRepository.insert(account);
     }
 
-    private ExpenseObject getSimpleValidExpense() {
-
+    private ExpenseObject getSimpleExpense() {
         return new ExpenseObject(
                 "Ausgabe",
                 37,
@@ -72,9 +74,9 @@ public class ExpenseRepositoryTest {
         );
     }
 
-    private ExpenseObject getValidExpenseWithChildren() {
-        ExpenseObject parentExpense = getSimpleValidExpense();
-        ExpenseObject childExpense = getSimpleValidExpense();
+    private ExpenseObject getExpenseWithChildren() {
+        ExpenseObject parentExpense = getSimpleExpense();
+        ExpenseObject childExpense = getSimpleExpense();
 
         childExpense.setExpenditure(false);
         childExpense.setPrice(33);
@@ -91,7 +93,7 @@ public class ExpenseRepositoryTest {
         return parentExpense;
     }
 
-    private ExpenseObject getValidExpenseWithTags() {
+    private ExpenseObject getExpenseWithTags() {
         Tag tag1 = new Tag("Tag 1");
         tag1 = TagRepository.insert(tag1);
         Tag tag2 = new Tag("Tag 2");
@@ -100,7 +102,7 @@ public class ExpenseRepositoryTest {
         tag3 = TagRepository.insert(tag3);
 
 
-        ExpenseObject expenseWithTags = getSimpleValidExpense();
+        ExpenseObject expenseWithTags = getSimpleExpense();
         expenseWithTags.addTag(tag1);
         expenseWithTags.addTag(tag2);
         expenseWithTags.addTag(tag3);
@@ -110,8 +112,7 @@ public class ExpenseRepositoryTest {
 
     @Test
     public void testExistsWithExistingExpenseShouldSucceed() {
-        ExpenseObject expense = getSimpleValidExpense();
-        expense = ExpenseRepository.insert(expense);
+        ExpenseObject expense = ExpenseRepository.insert(getSimpleExpense());
 
         boolean exists = ExpenseRepository.exists(expense);
         assertTrue("Buchung konnte nicht gefunden werden", exists);
@@ -119,7 +120,7 @@ public class ExpenseRepositoryTest {
 
     @Test
     public void testExistsWithNotExistingExpenseShouldFail() {
-        ExpenseObject expense = getSimpleValidExpense();
+        ExpenseObject expense = getSimpleExpense();
 
         boolean exists = ExpenseRepository.exists(expense);
         assertFalse("Nicht existierende Buchung wurde gefunden", exists);
@@ -127,8 +128,7 @@ public class ExpenseRepositoryTest {
 
     @Test
     public void testGetWithExistingExpenseShouldSucceed() {
-        ExpenseObject expectedExpense = getSimpleValidExpense();
-        expectedExpense = ExpenseRepository.insert(expectedExpense);
+        ExpenseObject expectedExpense = ExpenseRepository.insert(getSimpleExpense());
 
         try {
             ExpenseObject fetchedExpense = ExpenseRepository.get(expectedExpense.getIndex());
@@ -161,28 +161,29 @@ public class ExpenseRepositoryTest {
 
     @Test
     public void testGetAllInSpecifiedTimeFrameShouldReturnBookingsInThisTimeFrame() {
+        //Funktion funktioniert wie erwartet.
+        //todo den Test noch einmal ausführen, wenn es einen Test für ExpenseObject.setDateTime() und ExpenseObject.getDateTime() gibt
         Calendar date = Calendar.getInstance();
-        ExpenseObject expenseBeforeTimeFrame = getSimpleValidExpense();
+        ExpenseObject expenseBeforeTimeFrame = getSimpleExpense();
         date.setTimeInMillis(1527803999000L);//31.05.2018 23:59:59
         expenseBeforeTimeFrame.setDateTime(date);
-        ExpenseRepository.insert(expenseBeforeTimeFrame);
+        expenseBeforeTimeFrame = ExpenseRepository.insert(expenseBeforeTimeFrame);
 
-        ExpenseObject expenseWithinTimeFrame1 = getSimpleValidExpense();
+        ExpenseObject expenseWithinTimeFrame1 = getSimpleExpense();
         date.setTimeInMillis(1527804000000L);//01.06.2018 00:00:00
         expenseWithinTimeFrame1.setDateTime(date);
-        ExpenseRepository.insert(expenseWithinTimeFrame1);
+        expenseWithinTimeFrame1 = ExpenseRepository.insert(expenseWithinTimeFrame1);
 
-        ExpenseObject expenseWithinTimeFrame2 = getSimpleValidExpense();
+        ExpenseObject expenseWithinTimeFrame2 = getSimpleExpense();
         date.setTimeInMillis(1527867176000L);//01.06.2018 17:32:56
         expenseWithinTimeFrame2.setDateTime(date);
-        ExpenseRepository.insert(expenseWithinTimeFrame2);
+        expenseWithinTimeFrame2 = ExpenseRepository.insert(expenseWithinTimeFrame2);
 
-        ExpenseObject expenseAfterTimeFrame = getSimpleValidExpense();
+        ExpenseObject expenseAfterTimeFrame = getSimpleExpense();
         date.setTimeInMillis(1527890400000L);//02.06.2018 00:00:00
         expenseAfterTimeFrame.setDateTime(date);
-        ExpenseRepository.insert(expenseAfterTimeFrame);
+        expenseAfterTimeFrame = ExpenseRepository.insert(expenseAfterTimeFrame);
 
-        //Buchungen sind in der datenbank
         List<ExpenseObject> expenses = ExpenseRepository.getAll(1527804000000L, 1527890399000L);//01.06.2018 00:00:00 - 01.06.2018 23:59:59
 
         assertFalse("Buchung die vor dem angegebenen Zeitraum ist wurde aus der Datenbank geholt", expenses.contains(expenseBeforeTimeFrame));
@@ -193,8 +194,7 @@ public class ExpenseRepositoryTest {
 
     @Test
     public void testInsertWithValidBookingThatHasNoChildrenOrTagsShouldSucceed() {
-        ExpenseObject expectedExpense = getSimpleValidExpense();
-        expectedExpense = ExpenseRepository.insert(expectedExpense);
+        ExpenseObject expectedExpense = ExpenseRepository.insert(getSimpleExpense());
 
         try {
             ExpenseObject fetchedExpense = ExpenseRepository.get(expectedExpense.getIndex());
@@ -214,8 +214,7 @@ public class ExpenseRepositoryTest {
 
     @Test
     public void testInsertWithValidBookingThatHasChildrenShouldSucceedAndChildrenShouldExist() {
-        ExpenseObject expectedExpenseWithChildren = getValidExpenseWithChildren();
-        expectedExpenseWithChildren = ExpenseRepository.insert(expectedExpenseWithChildren);
+        ExpenseObject expectedExpenseWithChildren = ExpenseRepository.insert(getExpenseWithChildren());
 
         try {
             ExpenseObject fetchedExpense = ExpenseRepository.get(expectedExpenseWithChildren.getIndex());
@@ -235,28 +234,40 @@ public class ExpenseRepositoryTest {
 
     @Test
     public void testInsertWithValidBookingThatHasTagsShouldSucceedAndTagsShouldExists() {
+        //todo Test noch einmal ausführen, wenn das BookingTagRepository mit Tests versehen ist
+        ExpenseObject expectedExpenseWithTags = ExpenseRepository.insert(getExpenseWithTags());
 
-        //Kontostand muss geupated werden
-    }
+        try {
+            ExpenseObject fetchedExpenseWithTags = ExpenseRepository.get(expectedExpenseWithTags.getIndex());
 
-    @Test
-    public void testInsertWithValidBookingsThatHasChildrenAndTagsShouldSucceedAndTagAndChildrenShouldExists() {
+            assertEquals(expectedExpenseWithTags, fetchedExpenseWithTags);
+            assertTrue("Tag 1 wurde der Buchung nicht zugewiesen", BookingTagRepository.exists(expectedExpenseWithTags, expectedExpenseWithTags.getTags().get(0)));
+            assertTrue("Tag 2 wurde der Buchung nicht zugewiesen", BookingTagRepository.exists(expectedExpenseWithTags, expectedExpenseWithTags.getTags().get(1)));
+            assertTrue("Tag 3 wurde der Buchung nicht zugewiesen", BookingTagRepository.exists(expectedExpenseWithTags, expectedExpenseWithTags.getTags().get(2)));
+            assertEqualAccountBalance(
+                    account.getBalance() + expectedExpenseWithTags.getSignedPrice(),
+                    account
+            );
 
-        //Kontostand muss geupated werden
+        } catch (ExpenseNotFoundException e) {
+
+            Assert.fail("Ausgabe wurde nicht gefunden");
+        }
     }
 
     @Test
     public void testDeleteWithExistingBookingThatIsNotATemplateOrRecurringShouldSucceed() {
-        ExpenseObject expense = getSimpleValidExpense();
-        expense = ExpenseRepository.insert(expense);
+        ExpenseObject expense = ExpenseRepository.insert(getSimpleExpense());
 
         try {
             ExpenseRepository.delete(expense);
+
             assertFalse("Buchung wurde nicht gelöscht", ExpenseRepository.exists(expense));
             assertEqualAccountBalance(
                     account.getBalance(),
                     account
             );
+
         } catch (CannotDeleteExpenseException e) {
 
             Assert.fail("Buchung konnte nicht gelöscht werden");
@@ -265,19 +276,72 @@ public class ExpenseRepositoryTest {
 
     @Test
     public void testDeleteWithExistingBookingThatIsATemplateShouldSucceedAndChangeBookingVisibilityToHidden() {
+        //todo Test ausführen, wenn Buchungen als versteckt markiert werden wenn sie noch ein Template sind
+        ExpenseObject expense = ExpenseRepository.insert(getSimpleExpense());
+        TemplateRepository.insert(expense);
 
-        //Kontostand muss geupated werden
+        try {
+            ExpenseRepository.delete(expense);
+
+            assertFalse("Versteckte Buchung wurde aus der Datenbank geholt", ExpenseRepository.getAll().contains(expense));
+            assertTrue("Buchung wurde nicht als Versteckt markiert", ExpenseRepository.exists(expense));
+            assertEqualAccountBalance(
+                    account.getBalance(),
+                    account
+            );
+
+        } catch (CannotDeleteExpenseException e) {
+
+            Assert.fail("Buchung konnte nicht gelöscht werden");
+        }
     }
 
     @Test
     public void testDeleteWithExistingBookingThatIsARecurringShouldSucceedAndChangeBookingVisibilityToHidden() {
+        //todo Test ausführen, wenn Buchungen als versteckt markiert werden wenn sie noch einen Wiederkehrende Buchung sind
+        ExpenseObject expense = ExpenseRepository.insert(getSimpleExpense());
+        RecurringBookingRepository.insert(getSimpleExpense(), 0, 100, 77);
 
-        //Kontostand muss geupated werden
+        try {
+            ExpenseRepository.delete(expense);
+
+            assertFalse("Versteckte Buchung wurde aus der Datenbank geholt", ExpenseRepository.getAll().contains(expense));
+            assertTrue("Buchung wurde nicht als Versteckt markiert", ExpenseRepository.exists(expense));
+            assertEqualAccountBalance(
+                    account.getBalance(),
+                    account
+            );
+
+        } catch (CannotDeleteExpenseException e) {
+
+            Assert.fail("Buchung konnte nicht gelöscht werden");
+        }
+    }
+
+    @Test
+    public void testDeleteWithExistingBookingThatHasTagsAssignedShouldDeleteBookingAndTagRelations() {
+        //todo Test noch einmal ausführen, wenn das BookingTagRepository mit Tests versehen ist
+        ExpenseObject expenseWithTags = ExpenseRepository.insert(getExpenseWithTags());
+
+        try {
+            ExpenseRepository.delete(expenseWithTags);
+
+            assertTrue("Die Relation zu Tag 1 wurde nicht gelöscht", BookingTagRepository.exists(expenseWithTags, expenseWithTags.getTags().get(0)));
+            assertTrue("Die Relation zu Tag 2 wurde nicht gelöscht", BookingTagRepository.exists(expenseWithTags, expenseWithTags.getTags().get(1)));
+            assertTrue("Die Relation zu Tag 3 wurde nicht gelöscht", BookingTagRepository.exists(expenseWithTags, expenseWithTags.getTags().get(2)));
+            assertEqualAccountBalance(
+                    account.getBalance(),
+                    account
+            );
+        } catch (CannotDeleteExpenseException e) {
+
+            Assert.fail("Buchung kann nicht gelöscht werden");
+        }
     }
 
     @Test
     public void testDeleteWithNotExistingBookingShouldSucceed() {
-        ExpenseObject expense = getSimpleValidExpense();
+        ExpenseObject expense = getSimpleExpense();
 
         try {
             ExpenseRepository.delete(expense);
@@ -291,14 +355,13 @@ public class ExpenseRepositoryTest {
 
     @Test
     public void testDeleteWithExistingBookingThatIsAttachedToChildBookingsShouldThrowCannotDeleteExpenseException() {
-        ExpenseObject parentExpense = getValidExpenseWithChildren();
-        parentExpense = ExpenseRepository.insert(parentExpense);
+        ExpenseObject parentExpense = ExpenseRepository.insert(getExpenseWithChildren());
 
         try {
             ExpenseRepository.delete(parentExpense);
             Assert.fail("Buchung mit Kindern konnte gelöscht werden");
 
-        } catch(CannotDeleteExpenseException e) {
+        } catch (CannotDeleteExpenseException e) {
 
             assertEquals(String.format("Expense %s is attached to a child expense and cannot be deleted.", parentExpense.getTitle()), e.getMessage());
         }
@@ -306,8 +369,7 @@ public class ExpenseRepositoryTest {
 
     @Test
     public void testUpdateWithExistingBookingShouldSucceed() {
-        ExpenseObject expectedExpense = getSimpleValidExpense();
-        expectedExpense = ExpenseRepository.insert(expectedExpense);
+        ExpenseObject expectedExpense = ExpenseRepository.insert(getSimpleExpense());
 
         try {
             expectedExpense.setTitle("New Expense Name");
@@ -330,7 +392,7 @@ public class ExpenseRepositoryTest {
 
     @Test
     public void testUpdateWithNotExistingBookingShouldThrowExpenseNotFoundException() {
-        ExpenseObject expense = getSimpleValidExpense();
+        ExpenseObject expense = getSimpleExpense();
 
         try {
             ExpenseRepository.update(expense);
@@ -344,7 +406,7 @@ public class ExpenseRepositoryTest {
 
     @Test
     public void testCursorToExpenseWithValidCursorShouldSucceed() {
-        ExpenseObject expectedExpense = getSimpleValidExpense();
+        ExpenseObject expectedExpense = getSimpleExpense();
 
         String[] columns = new String[]{
                 ExpensesDbHelper.BOOKINGS_COL_ID,
@@ -402,7 +464,7 @@ public class ExpenseRepositoryTest {
 
     @Test
     public void testCursorToExpenseWithInvalidCursorShouldThrowCursorIndexOutOfBoundsException() {
-        ExpenseObject expectedExpense = getSimpleValidExpense();
+        ExpenseObject expectedExpense = getSimpleExpense();
 
         String[] columns = new String[]{
                 ExpensesDbHelper.BOOKINGS_COL_ID,
@@ -459,7 +521,7 @@ public class ExpenseRepositoryTest {
 
     @Test
     public void testAssertSavableExpenseWithSavableExpenseShouldSucceed() {
-        ExpenseObject savableExpense = getSimpleValidExpense();
+        ExpenseObject savableExpense = getSimpleExpense();
 
         savableExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.PARENT_EXPENSE);
         ExpenseRepository.assertSavableExpense(savableExpense);
@@ -474,7 +536,7 @@ public class ExpenseRepositoryTest {
 
     @Test
     public void testAssertSavableExpenseWithNotSavableExpenseShouldThrowUnsupportedOperationException() {
-        ExpenseObject savableExpense = getSimpleValidExpense();
+        ExpenseObject savableExpense = getSimpleExpense();
 
         savableExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.DATE_PLACEHOLDER);
         try {

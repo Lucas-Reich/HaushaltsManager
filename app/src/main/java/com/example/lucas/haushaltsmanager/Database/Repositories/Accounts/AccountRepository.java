@@ -23,9 +23,10 @@ public class AccountRepository {
         selectQuery = "SELECT"
                 + " *"
                 + " FROM " + ExpensesDbHelper.TABLE_ACCOUNTS
-                + " WHERE " + ExpensesDbHelper.ACCOUNTS_COL_NAME + " = '" + account.getTitle() + "'"
-                + " AND " + ExpensesDbHelper.ACCOUNTS_COL_BALANCE + " = " + account.getBalance()
-                + " AND " + ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID + " = " + account.getCurrency().getIndex()
+                + " WHERE " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_ID + " = " + account.getIndex()
+                + " AND " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_NAME + " = '" + account.getTitle() + "'"
+                + " AND " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_BALANCE + " = " + account.getBalance()
+                + " AND " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID + " = " + account.getCurrency().getIndex()
                 + " LIMIT 1;";
 
         Cursor c = db.rawQuery(selectQuery, null);
@@ -61,6 +62,9 @@ public class AccountRepository {
         Cursor c = db.rawQuery(selectQuery, null);
 
         if (!c.moveToFirst()) {
+
+            c.close();
+            DatabaseManager.getInstance().closeDatabase();
             throw new AccountNotFoundException(accountId);
         }
 

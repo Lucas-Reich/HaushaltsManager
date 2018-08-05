@@ -30,16 +30,30 @@ public class CategoryRepositoryTest {
 
     @Before
     public void setup() {
-
         Context context = RuntimeEnvironment.application;
         ExpensesDbHelper dbHelper = new ExpensesDbHelper(context);
         DatabaseManager.initializeInstance(dbHelper);
     }
 
+    private Category getSimpleCategory() {
+        return new Category(
+                "Kategorie",
+                "#000000",
+                false,
+                new ArrayList<Category>()
+        );
+    }
+
+    private Category getCategoryWithChild() {
+        Category parentCategory = getSimpleCategory();
+        parentCategory.addChild(getSimpleCategory());
+
+        return parentCategory;
+    }
+
     @Test
     public void testExistsWithExistingCategoryShouldReturnTrue() {
-        Category category = new Category("Kategorie", "#121212", false, new ArrayList<Category>());
-        category = CategoryRepository.insert(category);
+        Category category = CategoryRepository.insert(getSimpleCategory());
 
         boolean exists = CategoryRepository.exists(category);
         assertTrue("Kategorie wurde nicht gefunden", exists);
@@ -47,7 +61,7 @@ public class CategoryRepositoryTest {
 
     @Test
     public void testExistsWithNotExistingCategoryShouldReturnFalse() {
-        Category category = new Category("Kategorie", "#121212", true, new ArrayList<Category>());
+        Category category = getSimpleCategory();
 
         boolean exists = CategoryRepository.exists(category);
         assertFalse("Nich existierende Kategorie wurde gefunden", exists);
@@ -55,13 +69,25 @@ public class CategoryRepositoryTest {
 
     @Test
     public void testGetWithExistingCategoryShouldSucceed() {
-        Category expectedCategory = new Category("Kategorie", "#121212", false, new ArrayList<Category>());
-        expectedCategory = CategoryRepository.insert(expectedCategory);
+        Category expectedCategory = CategoryRepository.insert(getSimpleCategory());
 
         try {
-
             Category fetchedCategory = CategoryRepository.get(expectedCategory.getIndex());
-            assertSameCategories(expectedCategory, fetchedCategory);
+            assertEquals(expectedCategory, fetchedCategory);
+
+        } catch (CategoryNotFoundException e) {
+
+            Assert.fail("Kategorie wurde nicht gefunden");
+        }
+    }
+
+    @Test
+    public void testGetWithExistingCategoryThatHasChildrenShouldSucceed() {
+        Category expectedCategory = CategoryRepository.insert(getCategoryWithChild());
+
+        try {
+            Category fetchedCategory = CategoryRepository.get(expectedCategory.getIndex());
+            assertEquals(expectedCategory, fetchedCategory);
 
         } catch (CategoryNotFoundException e) {
 
@@ -85,16 +111,31 @@ public class CategoryRepositoryTest {
 
     @Test
     public void testInsertWithValidCategoryShouldSucceed() {
-        Category expectedCategory = new Category("Kategorie", "#000000", false, new ArrayList<Category>());
-        expectedCategory = CategoryRepository.insert(expectedCategory);
+        Category expectedCategory = CategoryRepository.insert(getSimpleCategory());
 
         try {
             Category fetchedCategory = CategoryRepository.get(expectedCategory.getIndex());
-            assertSameCategories(expectedCategory, fetchedCategory);
+            assertEquals(expectedCategory, fetchedCategory);
 
         } catch (CategoryNotFoundException e) {
 
             Assert.fail("Gerade erstellte Kategorie wurde nicht gefunden");
+        }
+    }
+
+    @Test
+    public void testInsertWithValidCategoryThatHasChildrenShouldSucceed() {
+        Category expectedCategory = CategoryRepository.insert(getCategoryWithChild());
+
+        try {
+            Category fetchedCategory = CategoryRepository.get(expectedCategory.getIndex());
+
+            assertEquals(expectedCategory, fetchedCategory);
+            assertTrue("Kind der Kategorie wurde nicht gefunden", ChildCategoryRepository.exists(expectedCategory.getChildren().get(0)));
+
+        } catch (CategoryNotFoundException e) {
+
+            Assert.fail("Kategorie wurde nicht gefunden");
         }
     }
 
@@ -104,9 +145,8 @@ public class CategoryRepositoryTest {
     }
 
     @Test
-    public void testDeleteWithWithExistingCurrencyShouldSucceed() {
-        Category category = new Category("Kategorie", "#000000", true, new ArrayList<Category>());
-        category = CategoryRepository.insert(category);
+    public void testDeleteWithWithExistingCategoryShouldSucceed() {
+        Category category = CategoryRepository.insert(getSimpleCategory());
 
         try {
             CategoryRepository.delete(category);
@@ -120,7 +160,7 @@ public class CategoryRepositoryTest {
 
     @Test
     public void testDeleteWithNotExistingCategoryShouldSucceed() {
-        Category category = new Category("Kategorie", "#121212", true, new ArrayList<Category>());
+        Category category = getSimpleCategory();
 
         try {
             CategoryRepository.delete(category);
@@ -134,33 +174,29 @@ public class CategoryRepositoryTest {
 
     @Test
     public void testDeleteWithExistingCategoryAttachedToChildCategoriesShouldThrowCannotDeleteCategoryException() {
-        Category parentCategory = new Category("ParenCategory", "#121212", true, new ArrayList<Category>());
-        parentCategory = CategoryRepository.insert(parentCategory);
-
-        Category childCategory = new Category("ChildCategory", "#121212", false, new ArrayList<Category>());
-        ChildCategoryRepository.insert(parentCategory, childCategory);
+        Category category = CategoryRepository.insert(getCategoryWithChild());
 
         try {
-            CategoryRepository.delete(parentCategory);
+            CategoryRepository.delete(category);
             Assert.fail("Kategorie konnte gelöscht werden, obwohl es noch Kinder zu dieser Kategorie gibt");
 
         } catch (CannotDeleteCategoryException e) {
 
-            assertEquals(String.format("Category %s cannot be deleted.", parentCategory.getTitle()), e.getMessage());
+            assertTrue("Kategorie wurde gelöscht, obwohl es Kinder gibt", CategoryRepository.exists(category));
+            assertEquals(String.format("Category %s cannot be deleted.", category.getTitle()), e.getMessage());
         }
     }
 
     @Test
     public void testUpdateWithWithExistingCategoryShouldSucceed() {
-        Category expectedCategory = new Category("Kategorie", "#123456", true, new ArrayList<Category>());
-        expectedCategory = CategoryRepository.insert(expectedCategory);
+        Category expectedCategory = CategoryRepository.insert(getSimpleCategory());
 
         try {
             expectedCategory.setName("New Category Name");
             CategoryRepository.update(expectedCategory);
-
             Category fetchedCategory = CategoryRepository.get(expectedCategory.getIndex());
-            assertSameCategories(expectedCategory, fetchedCategory);
+
+            assertEquals(expectedCategory, fetchedCategory);
 
         } catch (CategoryNotFoundException e) {
 
@@ -170,7 +206,7 @@ public class CategoryRepositoryTest {
 
     @Test
     public void testUpdateWithNotExistingCategoryShouldThrowCategoryNotFoundException() {
-        Category category = new Category(1337, "Kategorie", "#098765", true, new ArrayList<Category>());
+        Category category = getSimpleCategory();
 
         try {
             CategoryRepository.update(category);
@@ -184,7 +220,7 @@ public class CategoryRepositoryTest {
 
     @Test
     public void testCursorToCategoryWithValidCursorShouldSucceed() {
-        Category expectedCategory = new Category(313, "Kategorie", "#321645", false, new ArrayList<Category>());
+        Category expectedCategory = getSimpleCategory();
 
         String[] columns = new String[]{
                 ExpensesDbHelper.CATEGORIES_COL_ID,
@@ -199,7 +235,7 @@ public class CategoryRepositoryTest {
 
         try {
             Category fetchedCategory = CategoryRepository.cursorToCategory(cursor);
-            assertSameCategories(expectedCategory, fetchedCategory);
+            assertEquals(expectedCategory, fetchedCategory);
 
         } catch (CursorIndexOutOfBoundsException e) {
 
@@ -209,7 +245,7 @@ public class CategoryRepositoryTest {
 
     @Test
     public void testCursorToCategoryWithInvalidCursorShouldThrowCursorIndexOutOfBoundsException() {
-        Category expectedCategory = new Category(313, "Kategorie", "#321645", false, new ArrayList<Category>());
+        Category expectedCategory = getSimpleCategory();
 
         String[] columns = new String[]{
                 ExpensesDbHelper.CATEGORIES_COL_ID,
@@ -230,9 +266,5 @@ public class CategoryRepositoryTest {
 
             //do nothing
         }
-    }
-
-    private void assertSameCategories(Category expected, Category actual) {
-        assertEquals(expected, actual);
     }
 }

@@ -100,8 +100,8 @@ public class ChildExpenseRepository {
      * @return Parent der zusammengefügten Buchungen, mit den hinzugefügten Kindbuchungen
      */
     public static ExpenseObject combineExpenses(ArrayList<ExpenseObject> expenses) {
-
         ExpenseObject dummyParentExpense = ExpenseObject.createDummyExpense();
+
         for (ExpenseObject expense : expenses) {
             if (expense.isParent()) {
 
@@ -120,6 +120,7 @@ public class ChildExpenseRepository {
                     ExpenseRepository.delete(expense);
                 } catch (CannotDeleteExpenseException e) {
 
+                    //todo kann eine ParentExpense nicht gefunden werden muss der gesamte vorgang abgebrochen werden
                     //sammle alle Buchungen die nicht dem Parent hinzugefügt wurden konnten und werfe eine Exception (CouldNotAddChildToBookingException)
                 }
             }
@@ -137,6 +138,7 @@ public class ChildExpenseRepository {
                 ExpenseObject parentExpense = getParent(childExpense);
 
                 delete(childExpense);
+                parentExpense.removeChild(childExpense);
                 childExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE);
                 ExpenseRepository.delete(parentExpense);
             } else {
@@ -343,6 +345,11 @@ public class ChildExpenseRepository {
                 ExpenseObject parentExpense = getParent(childExpense);
 
                 db.delete(ExpensesDbHelper.TABLE_CHILD_BOOKINGS, ExpensesDbHelper.CHILD_BOOKINGS_COL_ID + " = ?", new String[]{"" + childExpense.getIndex()});
+                parentExpense.removeChild(childExpense);
+                updateAccountBalance(
+                        childExpense.getAccount(),
+                        -childExpense.getSignedPrice()
+                );
                 ExpenseRepository.delete(parentExpense);
             } catch (Exception e) {
 
@@ -350,7 +357,14 @@ public class ChildExpenseRepository {
             }
         } else {
 
-            db.delete(ExpensesDbHelper.TABLE_CHILD_BOOKINGS, ExpensesDbHelper.CHILD_BOOKINGS_COL_ID + " = ?", new String[]{"" + childExpense.getIndex()});
+            try {
+                db.delete(ExpensesDbHelper.TABLE_CHILD_BOOKINGS, ExpensesDbHelper.CHILD_BOOKINGS_COL_ID + " = ?", new String[]{"" + childExpense.getIndex()});
+                updateAccountBalance(childExpense.getAccount(), -childExpense.getSignedPrice());
+
+            } catch (AccountNotFoundException e) {
+
+                //todo was soll passieren wenn das Konto nicht gefunden werden konnte
+            }
         }
     }
 

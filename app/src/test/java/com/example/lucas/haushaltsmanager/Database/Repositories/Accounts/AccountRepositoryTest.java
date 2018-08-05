@@ -10,6 +10,7 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Excepti
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.CannotDeleteAccountException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepository;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
@@ -34,19 +35,25 @@ public class AccountRepositoryTest {
 
     @Before
     public void setup() {
-
         Context context = RuntimeEnvironment.application;
         ExpensesDbHelper dbHelper = new ExpensesDbHelper(context);
         DatabaseManager.initializeInstance(dbHelper);
     }
 
+    public Account getSimpleAccount() {
+        Currency currency = new Currency("Euro", "EUR", "€");
+        currency = CurrencyRepository.insert(currency);
+
+        return new Account(
+                "Konto",
+                7653,
+                currency
+        );
+    }
+
     @Test
     public void testExistsWithExistingAccountShouldSucceed() {
-        Currency currency = mock(Currency.class);
-        when(currency.getIndex()).thenReturn(100L);
-
-        Account account = new Account("Konto", 100, currency);
-        account = AccountRepository.insert(account);
+        Account account = AccountRepository.insert(getSimpleAccount());
 
         boolean exists = AccountRepository.exists(account);
         assertTrue("Das Konto konnte nicht in der Datenbank gefunden werrden", exists);
@@ -54,10 +61,7 @@ public class AccountRepositoryTest {
 
     @Test
     public void testExistsWithNotExistingAccountShouldSucceed() {
-        Currency currency = mock(Currency.class);
-        when(currency.getIndex()).thenReturn(100L);
-
-        Account account = new Account("Konto", 0, currency);
+        Account account = getSimpleAccount();
 
         boolean exists = AccountRepository.exists(account);
         assertFalse("Nicht existierendes Konto konnte in der Datenbank gefunden werden", exists);
@@ -65,15 +69,11 @@ public class AccountRepositoryTest {
 
     @Test
     public void testGetWithExistingAccountShouldSucceed() {
-        Currency currency = mock(Currency.class);
-        when(currency.getIndex()).thenReturn(100L);
-
-        Account expectedAccount = new Account("Konto", 0, currency);
-        expectedAccount = AccountRepository.insert(expectedAccount);
+        Account expectedAccount = AccountRepository.insert(getSimpleAccount());
 
         try {
             Account fetchedAccount = AccountRepository.get(expectedAccount.getIndex());
-            assertSameAccounts(expectedAccount, fetchedAccount);
+            assertEquals(expectedAccount, fetchedAccount);
 
         } catch (AccountNotFoundException e) {
 
@@ -97,15 +97,11 @@ public class AccountRepositoryTest {
 
     @Test
     public void testInsertWithValidAccountShouldSucceed() {
-        Currency currency = mock(Currency.class);
-        when(currency.getIndex()).thenReturn(100L);
-
-        Account expectedAccount = new Account("Konto", 0, currency);
-        expectedAccount = AccountRepository.insert(expectedAccount);
+        Account expectedAccount = AccountRepository.insert(getSimpleAccount());
 
         try {
             Account fetchedAccount = AccountRepository.get(expectedAccount.getIndex());
-            assertSameAccounts(expectedAccount, fetchedAccount);
+            assertEquals(expectedAccount, fetchedAccount);
 
         } catch (AccountNotFoundException e) {
 
@@ -120,11 +116,7 @@ public class AccountRepositoryTest {
 
     @Test
     public void testDeleteWithWithExistingAccountShouldSucceed() {
-        Currency currency = mock(Currency.class);
-        when(currency.getIndex()).thenReturn(100L);
-
-        Account account = new Account("Konto", 0, currency);
-        account = AccountRepository.insert(account);
+        Account account = AccountRepository.insert(getSimpleAccount());
 
         try {
             AccountRepository.delete(account);
@@ -138,14 +130,10 @@ public class AccountRepositoryTest {
 
     @Test
     public void testDeleteWithExistingAccountAttachedToParentExpenseShouldFailWithCannotDeleteAccountException() {
+        Account account = AccountRepository.insert(getSimpleAccount());
+
         Category category = mock(Category.class);
         when(category.getIndex()).thenReturn(100L);
-
-        Currency currency = mock(Currency.class);
-        when(currency.getIndex()).thenReturn(100L);
-
-        Account account = new Account("Konto", 100, currency);
-        account = AccountRepository.insert(account);
 
         ExpenseObject parentExpense = new ExpenseObject("Ausgabe", 100, false, category, account);
         ExpenseRepository.insert(parentExpense);
@@ -156,23 +144,20 @@ public class AccountRepositoryTest {
 
         } catch (CannotDeleteAccountException e) {
 
+            assertTrue("Konto wurde gelöscht", AccountRepository.exists(account));
             assertEquals(String.format("Account %s cannot be deleted.", account.getTitle()), e.getMessage());
         }
     }
 
     @Test
     public void testDeleteWithExistingAccountAttachedToChildExpenseShouldFailWithCannotDeleteAccountException() {
+        Account account = AccountRepository.insert(getSimpleAccount());
+
         ExpenseObject parentExpense = mock(ExpenseObject.class);
         when(parentExpense.getIndex()).thenReturn(100L);
 
         Category category = mock(Category.class);
         when(category.getIndex()).thenReturn(100L);
-
-        Currency currency = mock(Currency.class);
-        when(currency.getIndex()).thenReturn(100L);
-
-        Account account = new Account("Konto", 100, currency);
-        account = AccountRepository.insert(account);
 
         ExpenseObject childExpense = new ExpenseObject("Ausgabe", 100, false, category, account);
         ChildExpenseRepository.insert(parentExpense, childExpense);
@@ -183,16 +168,14 @@ public class AccountRepositoryTest {
 
         } catch (CannotDeleteAccountException e) {
 
+            assertTrue("Konto wurde gelöscht", AccountRepository.exists(account));
             assertEquals(String.format("Account %s cannot be deleted.", account.getTitle()), e.getMessage());
         }
     }
 
     @Test
     public void testDeleteWithNotExistingAccountShouldSucceed() {
-        Currency currency = mock(Currency.class);
-        when(currency.getIndex()).thenReturn(100L);
-
-        Account account = new Account("Konto", 0, currency);
+        Account account = getSimpleAccount();
 
         try {
             AccountRepository.delete(account);
@@ -207,18 +190,14 @@ public class AccountRepositoryTest {
 
     @Test
     public void testUpdateWithWithExistingAccountShouldSucceed() {
-        Currency currency = mock(Currency.class);
-        when(currency.getIndex()).thenReturn(100L);
-
-        Account expectedAccount = new Account("Konto", 0, currency);
-        expectedAccount = AccountRepository.insert(expectedAccount);
+        Account expectedAccount = AccountRepository.insert(getSimpleAccount());
 
         try {
             expectedAccount.setName("New Account Name");
             AccountRepository.update(expectedAccount);
-
             Account fetchedAccount = AccountRepository.get(expectedAccount.getIndex());
-            assertSameAccounts(expectedAccount, fetchedAccount);
+
+            assertEquals(expectedAccount, fetchedAccount);
 
         } catch (AccountNotFoundException e) {
 
@@ -228,10 +207,7 @@ public class AccountRepositoryTest {
 
     @Test
     public void testUpdateWithNotExistingAccountShouldThrowAccountNotFoundException() {
-        Currency currency = mock(Currency.class);
-        when(currency.getIndex()).thenReturn(100L);
-
-        Account account = new Account(1337, "Konto", 0, currency);
+        Account account = getSimpleAccount();
 
         try {
             AccountRepository.update(account);
@@ -245,7 +221,7 @@ public class AccountRepositoryTest {
 
     @Test
     public void testCursorToAccountWithValidCursorShouldSucceed() {
-        Account expectedAccount = new Account(1337, "Konto", 0, new Currency(1, "Währung", "WÄH", "W"));
+        Account expectedAccount = getSimpleAccount();
 
         String[] columns = new String[]{
                 ExpensesDbHelper.ACCOUNTS_COL_ID,
@@ -263,7 +239,7 @@ public class AccountRepositoryTest {
 
         try {
             Account fetchedAccount = AccountRepository.cursorToAccount(cursor);
-            assertSameAccounts(expectedAccount, fetchedAccount);
+            assertEquals(expectedAccount, fetchedAccount);
 
         } catch (CursorIndexOutOfBoundsException e) {
 
@@ -273,7 +249,7 @@ public class AccountRepositoryTest {
 
     @Test
     public void testCursorToAccountWithInvalidCursorShouldThrowCursorIndexOutOfBoundsException() {
-        Account expectedAccount = new Account(1337, "Konto", 0, new Currency("Währung", "WÄH", "W"));
+        Account expectedAccount = getSimpleAccount();
 
         String[] columns = new String[]{
                 ExpensesDbHelper.ACCOUNTS_COL_ID,
@@ -287,17 +263,12 @@ public class AccountRepositoryTest {
         cursor.moveToFirst();
 
         try {
-            Account fetchedAccount = AccountRepository.cursorToAccount(cursor);
-            assertSameAccounts(expectedAccount, fetchedAccount);
+            AccountRepository.cursorToAccount(cursor);
             Assert.fail("Konto konnte aus einem Fehlerhaften Cursor wiederhergestellt werden");
 
         } catch (CursorIndexOutOfBoundsException e) {
 
             //do nothing
         }
-    }
-
-    private void assertSameAccounts(Account expected, Account actual) {
-        assertEquals(expected, actual);
     }
 }

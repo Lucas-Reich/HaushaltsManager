@@ -22,7 +22,8 @@ public class TagRepository {
         selectQuery = "SELECT"
                 + " *"
                 + " FROM " + ExpensesDbHelper.TABLE_TAGS
-                + " WHERE " + ExpensesDbHelper.TAGS_COL_NAME + " = '" + tag.getName() + "'"
+                + " WHERE " + ExpensesDbHelper.TABLE_TAGS + "." + ExpensesDbHelper.TAGS_COL_ID + " = " + tag.getIndex()
+                + " AND " + ExpensesDbHelper.TABLE_TAGS + "." + ExpensesDbHelper.TAGS_COL_NAME + " = '" + tag.getName() + "'"
                 + " LIMIT 1;";
 
         Cursor c = db.rawQuery(selectQuery, null);
@@ -155,5 +156,4 @@ public class TagRepository {
 
         return new Tag(tagIndex, tagName);
     }
-
 }
