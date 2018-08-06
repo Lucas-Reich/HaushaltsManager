@@ -100,9 +100,6 @@ public class ChildCategoryRepository {
     public static Category insert(Category parentCategory, Category childCategory) {
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
 
-//        if (!CategoryRepository.exists(parentCategory))
-//            throw new CategoryNotFoundException(parentCategory.getIndex());
-
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.CHILD_CATEGORIES_COL_NAME, childCategory.getTitle());
         values.put(ExpensesDbHelper.CHILD_CATEGORIES_COL_COLOR, childCategory.getColorString());

@@ -162,12 +162,6 @@ public class ExpenseRepository {
     public static ExpenseObject insert(ExpenseObject expense) {
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
 
-//        if (!ChildCategoryRepository.exists(expense.getCategory()))
-//            throw new ChildCategoryNotFoundException(expense.getCategory().getIndex());
-//
-//        if (!AccountRepository.exists(expense.getAccountId()))
-//            throw new AccountNotFoundException(expense.getAccountId().getIndex());
-
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.BOOKINGS_COL_EXPENSE_TYPE, expense.getExpenseType().name());
         values.put(ExpensesDbHelper.BOOKINGS_COL_PRICE, expense.getUnsignedPrice());
@@ -224,7 +218,7 @@ public class ExpenseRepository {
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
 
         if (isRecurringBooking(expense) || isTemplateBooking(expense)) {
-            //todo wenn eine Buchung gelöscht werden soll die noch als Wiederkerhende- oder Template- Buchung hinterlegt ist, muss sie stattdessen als hidden makriert werden
+            //todo wenn eine Buchung gelöscht werden soll die noch als Wiederkerhende- oder Template- Buchung hinterlegt ist, muss sie stattdessen als hidden markiert werden
             Toast.makeText(app.getContext(), "Buchung ist eine Vorlagen oder eine Wiederkehrende Buchung", Toast.LENGTH_SHORT).show();
         }
 

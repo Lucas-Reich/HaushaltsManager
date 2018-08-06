@@ -69,7 +69,6 @@ public class ChildExpenseRepository {
      * @param parentBooking Buchung der ein neues Kind hinzugefügt werden soll
      * @return Kindbuchung, mit dem korrekten Index
      */
-    @SuppressWarnings("UnusedReturnValue")
     public static ExpenseObject addChildToBooking(ExpenseObject childExpense, ExpenseObject parentBooking) throws AddChildToChildException {
         if (exists(parentBooking))
             throw new AddChildToChildException();
@@ -247,9 +246,6 @@ public class ChildExpenseRepository {
     public static ExpenseObject insert(ExpenseObject parentExpense, ExpenseObject childExpense) {
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
 
-//        if (!ExpenseRepository.exists(parentExpense))
-//            throw ExpenseNotFoundException.expenseNotFoundException(parentExpense.getIndex());
-
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_EXPENSE_TYPE, childExpense.getExpenseType().name());
         values.put(ExpensesDbHelper.CHILD_BOOKINGS_COL_PRICE, childExpense.getUnsignedPrice());
@@ -352,7 +348,7 @@ public class ChildExpenseRepository {
                 ExpenseRepository.delete(parentExpense);
             } catch (Exception e) {
 
-                throw new CannotDeleteChildExpenseException(""); //todo message überlegen
+                throw CannotDeleteChildExpenseException.RelatedExpenseNotFound(childExpense);
             }
         } else {
 
@@ -365,7 +361,7 @@ public class ChildExpenseRepository {
 
             } catch (AccountNotFoundException e) {
 
-                //todo was soll passieren wenn das Konto nicht gefunden werden konnte
+                //sollte nicht passieren können, da Konten erst gelöscht werden können wenn es keine Buchungen mehr mit diesem Konto gibt
             }
         }
     }
