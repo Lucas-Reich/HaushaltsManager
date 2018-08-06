@@ -157,23 +157,20 @@ public class Category implements Parcelable {
 
     @Override
     public boolean equals(Object obj) {
-
-        if (obj instanceof Category) {
-            Category otherCategory = (Category) obj;
-
-            boolean result = getTitle().equals(otherCategory.getTitle());
-            result = result && getColorString().equals(otherCategory.getColorString());
-            result = result && (getDefaultExpenseType() == otherCategory.getDefaultExpenseType());
-
-            for (int i = 0; i < mChildren.size(); i++) {
-                result = result && mChildren.get(i).equals(otherCategory.getChildren().get(i));
-            }
-
-            return result;
-        } else {
-
+        if (!(obj instanceof Category))
             return false;
+
+        Category otherCategory = (Category) obj;
+
+        boolean result = getTitle().equals(otherCategory.getTitle());
+        result = result && getColorString().equals(otherCategory.getColorString());
+        result = result && (getDefaultExpenseType() == otherCategory.getDefaultExpenseType());
+
+        for (int i = 0; i < mChildren.size(); i++) {
+            result = result && mChildren.get(i).equals(otherCategory.getChildren().get(i));
         }
+
+        return result;
     }
 
     public String toString() {

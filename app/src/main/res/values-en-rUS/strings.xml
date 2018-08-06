@@ -144,4 +144,5 @@
     <string name="no_default_currency">Please choose a default currency first</string>
     <string name="cannot_update_account">Cannot update Account, Account not found!</string>
     <string name="category_not_found">Cannot update category. Category not found</string>
+    <string name="add_child_to_child_error">Error! You cannot adda child to a child booking.</string>
 </resources>

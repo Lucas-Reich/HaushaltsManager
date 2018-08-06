@@ -682,8 +682,7 @@ public class TabOneBookings extends Fragment {
     private void showSnackbar(ArrayList<ExpenseObject> groups, HashMap<Long, ExpenseObject> children, @StringRes int message, @StringRes int successMessage) {
 
         CoordinatorLayout coordinatorLayout = (CoordinatorLayout) getView().findViewById(R.id.tab_one_bookings_layout);
-        Snackbar
-                .make(coordinatorLayout, message, Snackbar.LENGTH_LONG)
+        Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG)
                 .setAction(R.string.revert_action, new UndoDeletionClickListener(groups, children, successMessage))
                 .show();
     }
@@ -725,8 +724,7 @@ public class TabOneBookings extends Fragment {
                     }});
                 } catch (AddChildToChildException e) {
 
-                    //todo übersetzung
-                    Toast.makeText(mParent, "Du kannst keine Kindbuchung zu Kindbuchungen hinzufügen!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mParent, getString(R.string.add_child_to_child_error), Toast.LENGTH_SHORT).show();
                 }
 
             }

@@ -147,4 +147,7 @@
     <string name="could_not_create_backup">Backup konnte nicht erstellt werden</string>
     <string name="account_not_found">Konto wurde nicht gefunden</string>
     <string name="no_default_currency">Die StandartWährung wurde noch nicht ausgewählt</string>
+    <string name="cannot_update_account">Konto konnte nicht geupdated werden! Konto wurde nicht gefunden.</string>
+    <string name="category_not_found">Kategorie konnte nicht geupdated werden! Kategorie wurde nicht gefunden.</string>
+    <string name="add_child_to_child_error">Fehler! Du kannst keine untergeordnete Buchung zu einer untergeordneten Buchung hinzufügen.</string>
 </resources>
