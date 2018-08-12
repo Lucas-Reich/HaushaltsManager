@@ -19,4 +19,8 @@ public class CannotDeleteExpenseException extends CouldNotDeleteEntityException 
     public static CannotDeleteExpenseException CannotDeleteChild(ExpenseObject childExpense) {
         return new CannotDeleteExpenseException(String.format("Child %s attached to account could not be deleted.", childExpense.getTitle()));
     }
+
+    public static CannotDeleteExpenseException BookingNotFound(ExpenseObject expense) {
+        return new CannotDeleteExpenseException(String.format("Could not find Booking %s.", expense.getTitle()));
+    }
 }

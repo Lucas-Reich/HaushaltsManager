@@ -34,6 +34,7 @@ import org.robolectric.RuntimeEnvironment;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Random;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
@@ -69,7 +70,7 @@ public class ExpenseRepositoryTest {
     private ExpenseObject getSimpleExpense() {
         return new ExpenseObject(
                 "Ausgabe",
-                Math.random(),
+                new Random().nextInt(1000),
                 true,
                 category,
                 account.getIndex(),
@@ -318,14 +319,13 @@ public class ExpenseRepositoryTest {
 
     @Test
     public void testDeleteWithExistingBookingThatIsATemplateShouldSucceedAndChangeBookingVisibilityToHidden() {
-        //todo Test ausführen, wenn Buchungen als versteckt markiert werden wenn sie noch ein Template sind
         ExpenseObject expense = ExpenseRepository.insert(getSimpleExpense());
         TemplateRepository.insert(new Template(expense));
 
         try {
             ExpenseRepository.delete(expense);
 
-            assertFalse("Versteckte Buchung wurde aus der Datenbank geholt", ExpenseRepository.getAll().contains(expense));
+            assertTrue("Versteckte Buchung wurde aus der Datenbank geholt", ExpenseRepository.isHidden(expense));
             assertTrue("Buchung wurde nicht als Versteckt markiert", ExpenseRepository.exists(expense));
             assertEqualAccountBalance(
                     account.getBalance(),
@@ -335,6 +335,9 @@ public class ExpenseRepositoryTest {
         } catch (CannotDeleteExpenseException e) {
 
             Assert.fail("Buchung konnte nicht gelöscht werden");
+        } catch (ExpenseNotFoundException e) {
+
+            Assert.fail("Buchung wurde nicht gefunden");
         }
     }
 
@@ -600,6 +603,75 @@ public class ExpenseRepositoryTest {
         } catch (UnsupportedOperationException e) {
 
             assertEquals("Booking type cannot be saved.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testHideWithValidExpenseShouldSucceed() {
+        ExpenseObject expense = ExpenseRepository.insert(getSimpleExpense());
+
+        try {
+            ExpenseRepository.hide(expense);
+            assertTrue("Buchung wurde gelöscht", ExpenseRepository.exists(expense));
+            assertFalse("Versteckte Buchung wurde aus der Datenbank geholt", ExpenseRepository.getAll().contains(expense));
+            assertEqualAccountBalance(
+                    account.getBalance(),
+                    account
+            );
+
+        } catch (ExpenseNotFoundException e) {
+
+            Assert.fail("Buchung wurde nicht gefunden");
+        }
+    }
+
+    @Test
+    public void testHideWithNotExistingExpenseShouldThrowExpenseNotFoundException() {
+        ExpenseObject expense = getSimpleExpense();
+
+        try {
+            ExpenseRepository.hide(expense);
+            Assert.fail("Nicht existierende Ausgabe konnte versteckt werden");
+
+        } catch (ExpenseNotFoundException e) {
+
+            assertEquals(String.format("Could not find Expense with id %s.", expense.getIndex()), e.getMessage());
+            assertEqualAccountBalance(
+                    account.getBalance(),
+                    account
+            );
+        }
+    }
+
+    @Test
+    public void testIsHiddenWithExistingExpenseShouldSucceed() {
+        ExpenseObject expense = ExpenseRepository.insert(getSimpleExpense());
+
+        try {
+            boolean isHidden = ExpenseRepository.isHidden(expense);
+            assertFalse("Buchung ist versteckt", isHidden);
+
+            ExpenseRepository.hide(expense);
+            isHidden = ExpenseRepository.isHidden(expense);
+            assertTrue("Buchung is nich versteckt", isHidden);
+
+        } catch (ExpenseNotFoundException e) {
+
+            Assert.fail("Buchung wurde nicht gefunden");
+        }
+    }
+
+    @Test
+    public void testIsHiddenWithNotExistingExpenseShouldThrowExpenseNotFoundException() {
+        ExpenseObject expense = getSimpleExpense();
+
+        try {
+            ExpenseRepository.isHidden(expense);
+            Assert.fail("Buchung wurde gefunden");
+
+        } catch (ExpenseNotFoundException e) {
+
+            assertEquals(String.format("Could not find Expense with id %s.", expense.getIndex()), e.getMessage());
         }
     }
 

@@ -16,6 +16,8 @@ import java.util.Calendar;
 import java.util.List;
 
 public class RecurringBookingRepository {
+    //todo ein neues Objekt erstellen RecurringBooking
+    //dieses Objekt hat index, start, end, häufigkeit und ExpenseObject als felder
 
     public static boolean exists(ExpenseObject recurringBooking) {
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();

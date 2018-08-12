@@ -377,8 +377,20 @@ public class ChildExpenseRepository {
         int affectedRows = db.update(ExpensesDbHelper.TABLE_BOOKINGS, values, ExpensesDbHelper.BOOKINGS_COL_ID + " = ?", new String[]{"" + expense.getIndex()});
         DatabaseManager.getInstance().closeDatabase();
 
+        //todo wenn das kind das letzte sichtbare kind des Parents war muss die sichtbarkeit des parents auch auf hidden gesetzt werden
+
         if (affectedRows == 0)
             throw new ChildExpenseNotFoundException(expense.getIndex());
+
+        try {
+            updateAccountBalance(
+                    expense.getAccountId(),
+                    -expense.getSignedPrice()
+            );
+        } catch (AccountNotFoundException e) {
+
+            //todo wenn der Kontostand nicht geupdated werden kann muss die gesamte transaktion zurückgenommen werden
+        }
     }
 
     public static boolean isHidden(ExpenseObject childExpense) throws ChildExpenseNotFoundException {
@@ -419,6 +431,32 @@ public class ChildExpenseRepository {
                 + " *"
                 + " FROM " + ExpensesDbHelper.TABLE_BOOKINGS
                 + " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_PARENT_ID + " = " + subSelect
+                + ";";
+
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        if (c.getCount() == 1) {
+
+            c.close();
+            DatabaseManager.getInstance().closeDatabase();
+            return true;
+        }
+
+        c.close();
+        DatabaseManager.getInstance().closeDatabase();
+        return false;
+    }
+
+    private static boolean isLastVisibleChildOfParent(ExpenseObject childExpense) {
+        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+
+        ExpenseObject parentExpense = getParent(childExpense);
+        String selectQuery;
+        selectQuery = "SELECT "
+                + " *"
+                + " FROM " + ExpensesDbHelper.TABLE_BOOKINGS
+                + " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_PARENT_ID + " = " + parentExpense.getIndex()
+                + " AND " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_HIDDEN + " != 1"
                 + ";";
 
         Cursor c = db.rawQuery(selectQuery, null);

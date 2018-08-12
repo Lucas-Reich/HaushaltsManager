@@ -3,9 +3,7 @@ package com.example.lucas.haushaltsmanager.Database.Repositories.Bookings;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.widget.Toast;
 
-import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
@@ -218,33 +216,46 @@ public class ExpenseRepository {
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
 
         if (isRecurringBooking(expense) || isTemplateBooking(expense)) {
-            //todo wenn eine Buchung gelöscht werden soll die noch als Wiederkerhende- oder Template- Buchung hinterlegt ist, muss sie stattdessen als hidden markiert werden
-            Toast.makeText(app.getContext(), "Buchung ist eine Vorlagen oder eine Wiederkehrende Buchung", Toast.LENGTH_SHORT).show();
-        }
 
-        if (isAttachedToChildExpenses(expense))
-            throw CannotDeleteExpenseException.BookingAttachedToChildException(expense);
+            try {
 
-        try {
-            updateAccountBalance(
-                    expense.getAccountId(),
-                    -expense.getSignedPrice()
-            );
+                if (isAttachedToChildExpenses(expense)) {
+                    throw CannotDeleteExpenseException.BookingAttachedToChildException(expense);
+                }
 
-            BookingTagRepository.deleteAll(expense);
-            for (ExpenseObject childExpense : expense.getChildren()) {
-                ChildExpenseRepository.delete(childExpense);
+                hide(expense);
+            } catch (ExpenseNotFoundException e) {
+
+                //todo was soll passieren wenn eine buchugn nicht gefunden werden kann die als template buchung hinterlegt ist?
+                // --> eintrag aus der template tabelle löschen
+                // -->
             }
-        } catch (AccountNotFoundException e) {
+        } else {
 
-            throw CannotDeleteExpenseException.RelatedAccountDoesNotExist(expense);
-        } catch (CannotDeleteChildExpenseException e) {
+            if (isAttachedToChildExpenses(expense))
+                throw CannotDeleteExpenseException.BookingAttachedToChildException(expense);
 
-            throw CannotDeleteExpenseException.CannotDeleteChild(expense);
+            try {
+                updateAccountBalance(
+                        expense.getAccountId(),
+                        -expense.getSignedPrice()
+                );
+
+                BookingTagRepository.deleteAll(expense);
+                for (ExpenseObject childExpense : expense.getChildren()) {
+                    ChildExpenseRepository.delete(childExpense);
+                }
+            } catch (AccountNotFoundException e) {
+
+                throw CannotDeleteExpenseException.RelatedAccountDoesNotExist(expense);
+            } catch (CannotDeleteChildExpenseException e) {
+
+                throw CannotDeleteExpenseException.CannotDeleteChild(expense);
+            }
+
+            db.delete(ExpensesDbHelper.TABLE_BOOKINGS, ExpensesDbHelper.BOOKINGS_COL_ID + " = ?", new String[]{"" + expense.getIndex()});
+            DatabaseManager.getInstance().closeDatabase();
         }
-
-        db.delete(ExpensesDbHelper.TABLE_BOOKINGS, ExpensesDbHelper.BOOKINGS_COL_ID + " = ?", new String[]{"" + expense.getIndex()});
-        DatabaseManager.getInstance().closeDatabase();
     }
 
     public static void update(ExpenseObject expense) throws ExpenseNotFoundException {
@@ -297,6 +308,16 @@ public class ExpenseRepository {
 
         if (affectedRows == 0)
             throw ExpenseNotFoundException.expenseNotFoundException(expense.getIndex());
+
+        try {
+            updateAccountBalance(
+                    expense.getAccountId(),
+                    -expense.getSignedPrice()
+            );
+        } catch (AccountNotFoundException e) {
+
+            //todo die gesamte transaktion muss zurückgenommen werden und eine CannotDeleteExpenseException muss ausgelösct werden
+        }
     }
 
     public static boolean isHidden(ExpenseObject expense) throws ExpenseNotFoundException {
