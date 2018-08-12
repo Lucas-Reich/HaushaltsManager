@@ -1,9 +1,12 @@
 package com.example.lucas.haushaltsmanager;
 
-import android.content.Context;
 import android.util.Log;
 
-import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Tags.TagRepository;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
@@ -18,17 +21,10 @@ public class MockDataCreator {
 
     private String TAG = MockDataCreator.class.getSimpleName();
 
-    private ExpensesDataSource mDatabase;
     private int accountCount, bookingCount, categoryCount, tagCount;
     private List<Account> mAccounts;
     private List<Category> mCategories;
     private Currency mMainCurrency;
-
-    public MockDataCreator(Context context) {
-
-        mDatabase = new ExpensesDataSource(context);
-        mDatabase.open();
-    }
 
     public void createBookings(int amount) {
 
@@ -51,7 +47,7 @@ public class MockDataCreator {
         for (; counter < count; counter++) {
 
             Account account = new Account(baseAccountName + counter, mRnd.nextInt(50000), mMainCurrency);
-            account = mDatabase.createAccount(account);
+            account = AccountRepository.insert(account);
             Log.d(TAG, "createAccounts: " + account.toString());
             accounts.add(account);
         }
@@ -63,7 +59,7 @@ public class MockDataCreator {
 
     private Currency createCurrency() {
 
-        return mDatabase.createCurrency(new Currency(-1, "Euro", "EUR", "€"));
+        return CurrencyRepository.insert(new Currency(-1, "Euro", "EUR", "€"));
     }
 
     private List<Category> createCategories(int count) {
@@ -79,8 +75,8 @@ public class MockDataCreator {
 
             String categoryColor = "#" + String.format("%06d", mRnd.nextInt(999999));
 
-            Category category = new Category(baseCategoryName + counter, categoryColor, false);
-            category = mDatabase.createCategory(category);
+            Category category = new Category(baseCategoryName + counter, categoryColor, false, new ArrayList<Category>());
+            category = CategoryRepository.insert(category);
             Log.d(TAG, "createCategories: " + category.toString());
             categories.add(category);
         }
@@ -99,7 +95,7 @@ public class MockDataCreator {
         for (; counter < count; counter++) {
 
             Tag tag = new Tag(baseTagName + counter);
-            tag = mDatabase.createTag(tag);
+            tag = TagRepository.insert(tag);
             Log.d(TAG, "createTags: " + tag.toString());
         }
         Log.d(TAG, "createTags: Created " + counter + " new Tags");
@@ -115,12 +111,12 @@ public class MockDataCreator {
         int counter = 0;
         for (; counter < count; counter++) {
 
-            ExpenseObject expense = new ExpenseObject(baseExpenseName + counter, 10d, mRnd.nextBoolean(),mCategories.get(mRnd.nextInt(categoryCount - 1)), mAccounts.get(mRnd.nextInt(accountCount - 1)));
+            ExpenseObject expense = new ExpenseObject(baseExpenseName + counter, 10d, mRnd.nextBoolean(), mCategories.get(mRnd.nextInt(categoryCount - 1)), mAccounts.get(mRnd.nextInt(accountCount - 1)).getIndex(), mMainCurrency);
 
             if (mRnd.nextInt(7) == 5)
                 expense.addChildren(createChildBookings(3));
 
-            mDatabase.createBooking(expense);
+            ExpenseRepository.insert(expense);
             Log.d(TAG, "createBookings: " + expense.toString());
         }
         Log.d(TAG, "createBookings: Created " + counter + " Bookings");
@@ -136,7 +132,7 @@ public class MockDataCreator {
         Log.d(TAG, "createChildBookings: creating child expenses");
         for (int i = 0; i < count; i++) {
 
-            ExpenseObject expense = new ExpenseObject(baseChildExpenseName + i, 10d, mRnd.nextBoolean(),mCategories.get(mRnd.nextInt(categoryCount - 1)), mAccounts.get(mRnd.nextInt(accountCount - 1)));
+            ExpenseObject expense = new ExpenseObject(baseChildExpenseName + i, 10d, mRnd.nextBoolean(), mCategories.get(mRnd.nextInt(categoryCount - 1)), mAccounts.get(mRnd.nextInt(accountCount - 1)).getIndex(), mMainCurrency);
             children.add(expense);
         }
         return children;

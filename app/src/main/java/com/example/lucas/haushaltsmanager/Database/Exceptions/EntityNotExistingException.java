@@ -12,29 +12,4 @@ public class EntityNotExistingException extends Exception {
 
         super(message);
     }
-
-    public EntityNotExistingException(Account account) {
-
-        super("Account " + account.getTitle() + " does not exist in the database");
-    }
-
-    public EntityNotExistingException(Category category) {
-
-        super("Category " + category.getTitle() + " does not exist in the database");
-    }
-
-    public EntityNotExistingException(ExpenseObject expense) {
-
-        super("Expense " + expense.getTitle() + " does not exist in the database");
-    }
-
-    public EntityNotExistingException(Tag tag) {
-
-        super("Tag " + tag.getName() + " does not exist int the database");
-    }
-
-    public EntityNotExistingException(Currency currency) {
-
-        super("Currency " + currency.getName() + " does not exist in the database");
-    }
 }

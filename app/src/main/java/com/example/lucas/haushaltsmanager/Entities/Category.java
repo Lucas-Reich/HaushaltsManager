@@ -1,42 +1,42 @@
 package com.example.lucas.haushaltsmanager.Entities;
 
-import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Category implements Parcelable {
-
-    private String TAG = Category.class.getSimpleName();
+    private static final String TAG = Category.class.getSimpleName();
 
     private long mIndex;
     private String mName;
     private String mColor;
     private boolean mDefaultExpenseType;
-    private ArrayList<Category> mChildren;
+    private List<Category> mChildren;
 
-    public Category(long index, @NonNull String categoryName, @NonNull String color, boolean defaultExpenseType) {
+    public Category(long index, @NonNull String categoryName, @NonNull String color, boolean defaultExpenseType, List<Category> children) {
 
         setIndex(index);
         setName(categoryName);
         setColor(color);
         setDefaultExpenseType(defaultExpenseType);
-        mChildren = new ArrayList<>();
+        addChildren(children);
     }
 
-    public Category(@NonNull String categoryName, @NonNull String color, Boolean defaultExpenseType) {
+    public Category(@NonNull String categoryName, @NonNull String color, @NonNull Boolean defaultExpenseType, @NonNull List<Category> children) {
 
-        this(-1L, categoryName, color, defaultExpenseType != null ? defaultExpenseType : false);
+        this(-1L, categoryName, color, defaultExpenseType, children);
     }
 
     /**
-     * this constructor converts our parcelable object back into an Category object
+     * constructor converts our parcelable object back into an Category object
      * see: http://prasanta-paul.blogspot.de/2010/06/android-parcelable-example.html (Parcelable ArrayList)
      * and: https://stackoverflow.com/questions/2139134/how-to-send-an-object-from-one-android-activity-to-another-using-intents for further explanations (Parcelable Object)
      *
@@ -56,9 +56,9 @@ public class Category implements Parcelable {
      *
      * @return Category dummy object
      */
-    public static Category createDummyCategory(Context context) {
+    public static Category createDummyCategory() {
 
-        return new Category(-1L, context.getResources().getString(R.string.no_name), "#000000", false);
+        return new Category(-1L, app.getContext().getString(R.string.no_name), "#000000", false, new ArrayList<Category>());
     }
 
     public long getIndex() {
@@ -68,7 +68,7 @@ public class Category implements Parcelable {
 
     private void setIndex(long index) {
 
-        this.mIndex = index;
+        mIndex = index;
     }
 
     @NonNull
@@ -79,7 +79,7 @@ public class Category implements Parcelable {
 
     public void setName(@NonNull String name) {
 
-        this.mName = name;
+        mName = name;
     }
 
     public String getColorString() {
@@ -100,22 +100,22 @@ public class Category implements Parcelable {
 
     public void setColor(@NonNull String color) {
 
-        this.mColor = color;
+        mColor = color;
     }
 
     public void setColor(@ColorInt int color) {
 
-        this.mColor = "#" + Integer.toHexString(color);
+        mColor = "#" + Integer.toHexString(color);
     }
 
     public boolean getDefaultExpenseType() {
 
-        return this.mDefaultExpenseType;
+        return mDefaultExpenseType;
     }
 
     public void setDefaultExpenseType(boolean expenseType) {
 
-        this.mDefaultExpenseType = expenseType;
+        mDefaultExpenseType = expenseType;
     }
 
     /**
@@ -126,18 +126,21 @@ public class Category implements Parcelable {
      */
     public boolean isSet() {
 
-        return !this.mName.isEmpty() && !this.mColor.isEmpty();
+        return !mName.isEmpty() && !mColor.isEmpty();
     }
 
     public void addChild(Category child) {
         mChildren.add(child);
     }
 
-    public void addChildren(ArrayList<Category> children) {
+    public void addChildren(List<Category> children) {
+        if (mChildren == null)
+            mChildren = new ArrayList<>();
+
         mChildren.addAll(children);
     }
 
-    public ArrayList<Category> getChildren() {
+    public List<Category> getChildren() {
         return mChildren;
     }
 
@@ -152,17 +155,20 @@ public class Category implements Parcelable {
         return getIndex() > -1;
     }
 
-    /**
-     * Methode die überprüft, ob die angegebene Kategorie die gleiche ist, wie diese.
-     *
-     * @param otherCategory Andere Kategorie
-     * @return boolean
-     */
-    public boolean equals(Category otherCategory) {
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Category))
+            return false;
+
+        Category otherCategory = (Category) obj;
 
         boolean result = getTitle().equals(otherCategory.getTitle());
         result = result && getColorString().equals(otherCategory.getColorString());
         result = result && (getDefaultExpenseType() == otherCategory.getDefaultExpenseType());
+
+        for (int i = 0; i < mChildren.size(); i++) {
+            result = result && mChildren.get(i).equals(otherCategory.getChildren().get(i));
+        }
 
         return result;
     }

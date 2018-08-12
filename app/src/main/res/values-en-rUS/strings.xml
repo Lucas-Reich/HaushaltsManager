@@ -136,4 +136,13 @@
     <string name="choose_category_parent">Choose the parent Category</string>
     <string name="new_parent_category_name">Title of the new Parent Category</string>
     <string name="choose_parent_category">Choose parent category</string>
+    <string name="error_name_missing">Please enter a name</string>
+    <string name="empty_list">No Items found</string>
+    <string name="could_not_create_backup">Backup could not be created</string>
+    <string name="no_assignment">Not assigned</string>
+    <string name="account_not_found">Could not find account</string>
+    <string name="no_default_currency">Please choose a default currency first</string>
+    <string name="cannot_update_account">Cannot update Account, Account not found!</string>
+    <string name="category_not_found">Cannot update category. Category not found</string>
+    <string name="add_child_to_child_error">Error! You cannot adda child to a child booking.</string>
 </resources>

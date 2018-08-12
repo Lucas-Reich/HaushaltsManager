@@ -1,12 +1,11 @@
 package com.example.lucas.haushaltsmanager.Entities;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.R;
 
 public class Currency implements Parcelable {
@@ -23,6 +22,13 @@ public class Currency implements Parcelable {
         setName(currencyName);
         setShortName(currencyShortName);
         setSymbol(currencySymbol);
+    }
+
+    public Currency(@NonNull String currencyName, @NonNull String shortName, @NonNull String symbol) {
+
+        setName(currencyName);
+        setShortName(shortName);
+        setSymbol(symbol);
     }
 
     /**
@@ -44,9 +50,9 @@ public class Currency implements Parcelable {
      *
      * @return dummy Category
      */
-    public static Currency createDummyCurrency(Context context) {
+    public static Currency createDummyCurrency() {
 
-        return new Currency(-1, context.getResources().getString(R.string.no_name), "NON", "");
+        return new Currency(-1, app.getContext().getString(R.string.no_name), "NON", "");
     }
 
     public long getIndex() {
@@ -65,7 +71,7 @@ public class Currency implements Parcelable {
         return name;
     }
 
-    private void setName(@NonNull String name) {
+    public void setName(@NonNull String name) {
 
         this.name = name;
     }
@@ -76,17 +82,18 @@ public class Currency implements Parcelable {
         return shortName;
     }
 
-    private void setShortName(@NonNull String shortName) {
+    public void setShortName(@NonNull String shortName) {
 
         this.shortName = shortName;
     }
 
-    public @NonNull String getSymbol() {
+    public @NonNull
+    String getSymbol() {
 
         return symbol != null ? symbol : shortName;
     }
 
-    private void setSymbol(@NonNull String symbol) {
+    public void setSymbol(@NonNull String symbol) {
 
         this.symbol = symbol;
     }
@@ -112,24 +119,28 @@ public class Currency implements Parcelable {
 
         return getIndex() > -1;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (obj instanceof Currency) {
+
+            Currency otherCurrency = (Currency) obj;
+
+            boolean result = getName().equals(otherCurrency.getName());
+            result = result && getShortName().equals(otherCurrency.getShortName());
+            result = result && getSymbol().equals(otherCurrency.getSymbol());
+
+            return result;
+        } else {
+
+            return false;
+        }
+    }
+
     public String toString() {
 
         return getIndex() + " " + getName();
-    }
-
-    /**
-     * Methode um zu überprüfen, ob die angegebene Währung die gleiche ist wie diese.
-     *
-     * @param otherCurrency Andere Währung
-     * @return boolean
-     */
-    public boolean equals(Currency otherCurrency) {
-
-        boolean result = getName().equals(otherCurrency.getName());
-        result = result && getShortName().equals(otherCurrency.getShortName());
-        result = result && getSymbol().equals(otherCurrency.getSymbol());
-
-        return result;
     }
 
 

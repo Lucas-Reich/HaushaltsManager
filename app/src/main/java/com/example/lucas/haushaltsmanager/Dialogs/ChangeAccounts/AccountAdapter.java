@@ -21,13 +21,15 @@ import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AccountAdapter extends ArrayAdapter<Account> {
     @SuppressWarnings("unused")
     private static final String TAG = AccountAdapter.class.getSimpleName();
 
     private OnDeleteAccountSelected mCallback;
+    private Map<Account, Boolean> mAccountStates;
 
     private static class ViewHolder {
         LinearLayout layout;
@@ -37,10 +39,9 @@ public class AccountAdapter extends ArrayAdapter<Account> {
         ImageView account_overflow_menu;
     }
 
-    private List<Boolean> mCheckedItems = new ArrayList<>();
-
-    AccountAdapter(ArrayList<Account> data, Context context) {
-        super(context, R.layout.list_view_account_item, data);
+    AccountAdapter(Map<Account, Boolean> data, Context context) {
+        super(context, R.layout.list_view_account_item, new ArrayList<>(data.keySet()));
+        mAccountStates = data;
     }
 
     @Override
@@ -68,25 +69,12 @@ public class AccountAdapter extends ArrayAdapter<Account> {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        viewHolder.account_chk.setChecked(mCheckedItems.get(position));
+        viewHolder.account_chk.setChecked(mAccountStates.get(account));
         viewHolder.account_name.setText(account.getTitle());
         viewHolder.account_balance.setText(String.format(getContext().getResources().getConfiguration().locale, "%.2f", account.getBalance()));
         viewHolder.account_overflow_menu.setOnClickListener(new OnAccountOverflowSelectedListener(getContext(), account));
 
         return convertView;
-    }
-
-    /**
-     * Methode um den Status der Konten zu setzen
-     *
-     * @param checkedItems Welche Konten sind aktiv und welche nicht
-     */
-    void setCheckedItems(List<Boolean> checkedItems) {
-
-        if (checkedItems.size() != getCount())
-            throw new ArrayIndexOutOfBoundsException("Not enough checkedItems!");
-
-        mCheckedItems = checkedItems;
     }
 
     /**
@@ -146,7 +134,7 @@ public class AccountAdapter extends ArrayAdapter<Account> {
                             //user wird nicht noch einmal um bestätigung gefragt!
                             mCallback.onDeleteAccountSelected(mAccount);
 
-                            Log.d(TAG, "onMenuItemClick: delete selected");
+                            Log.d(TAG, "onMenuItemClick: deleteAll selected");
                             return true;
                         case R.id.edit_account_edit:
 

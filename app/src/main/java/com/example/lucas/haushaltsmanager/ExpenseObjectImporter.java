@@ -2,7 +2,7 @@ package com.example.lucas.haushaltsmanager;
 
 import android.content.Context;
 
-import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 
 import java.io.BufferedReader;
@@ -15,15 +15,12 @@ import java.util.List;
 
 public class ExpenseObjectImporter {
 
-    private ExpensesDataSource mDatabase;
     private File mFile;
 
     public ExpenseObjectImporter(File file, Context context) {
 
         assertFile(file);
         mFile = file;
-
-        mDatabase = new ExpensesDataSource(context);
     }
 
     /**
@@ -96,9 +93,7 @@ public class ExpenseObjectImporter {
      * @param expenses Buchungen die in der Datenbank gespeichert werden sollen.
      */
     private void saveExpenseObjects(List<ExpenseObject> expenses) {
-
-        mDatabase.open();
-        mDatabase.createBookings(expenses);
-        mDatabase.close();
+        for (ExpenseObject expense : expenses)
+            ExpenseRepository.insert(expense);
     }
 }

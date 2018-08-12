@@ -1,26 +1,31 @@
 package com.example.lucas.haushaltsmanager.Activities;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
-import android.support.annotation.StringRes;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
-import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.Exceptions.ChildCategoryNotFoundException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
 import com.example.lucas.haushaltsmanager.Dialogs.AccountPickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.DatePickerDialog;
+import com.example.lucas.haushaltsmanager.Dialogs.ErrorAlertDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
@@ -36,12 +41,10 @@ public class TransferActivity extends AppCompatActivity {
     private static final String TAG = TransferActivity.class.getSimpleName();
 
     private Button mDateBtn, mFromAccountBtn, mToAccountBtn, mCreateTransferBtn, mAmountBtn;
-    private ExpensesDataSource mDatabase;
     private Account mFromAccount, mToAccount;
     private Calendar mCalendar;
     private Toolbar mToolbar;
     private ImageButton mBackArrow;
-
     //Ausgabe
     private ExpenseObject mFromExpense;
     //Einnahme
@@ -53,22 +56,26 @@ public class TransferActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_transfers);
 
-        mDatabase = new ExpensesDataSource(this);
-        mDatabase.open();
-
         mCalendar = Calendar.getInstance();
 
-        mFromExpense = ExpenseObject.createDummyExpense(this);
-        mFromExpense.setPrice(0);
-        mFromExpense.setExpenditure(true);
-        mFromExpense.setCategory(getTransferCategory());
-        mFromExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.TRANSFER_EXPENSE);
+        try {
+            mFromExpense = ExpenseObject.createDummyExpense();
+            mFromExpense.setPrice(0);
+            mFromExpense.setExpenditure(true);
+            mFromExpense.setCategory(getTransferCategory());
+            mFromExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.TRANSFER_EXPENSE);
 
-        mToExpense = ExpenseObject.createDummyExpense(this);
-        mToExpense.setPrice(0);
-        mToExpense.setExpenditure(false);
-        mToExpense.setCategory(getTransferCategory());
-        mToExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.TRANSFER_EXPENSE);
+            mToExpense = ExpenseObject.createDummyExpense();
+            mToExpense.setPrice(0);
+            mToExpense.setExpenditure(false);
+            mToExpense.setCategory(getTransferCategory());
+            mToExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.TRANSFER_EXPENSE);
+        } catch (ChildCategoryNotFoundException e) {
+
+            //todo vor dem relase entfernen
+            Toast.makeText(this, "Überweisungskategorie wurde nicht gefunden", Toast.LENGTH_SHORT).show();
+            finish();
+        }
 
         mDateBtn = (Button) findViewById(R.id.transfer_date_btn);
         mFromAccountBtn = (Button) findViewById(R.id.transfer_from_account_btn);
@@ -136,7 +143,12 @@ public class TransferActivity extends AppCompatActivity {
 
                 Bundle bundle = new Bundle();
                 bundle.putString("title", getResources().getString(R.string.input_account));
-                bundle.putParcelable("active_account", getActiveAccount());
+                try {
+                    bundle.putParcelable("active_account", getActiveAccount());
+                } catch (AccountNotFoundException e) {
+
+                    //do nothing
+                }
                 if (mToAccount != null)
                     bundle.putLong("excluded_account", mToAccount.getIndex());
 
@@ -162,7 +174,12 @@ public class TransferActivity extends AppCompatActivity {
 
                 Bundle bundle = new Bundle();
                 bundle.putString("title", getResources().getString(R.string.input_account));
-                bundle.putParcelable("active_account", getActiveAccount());
+                try {
+                    bundle.putParcelable("active_account", getActiveAccount());
+                } catch (AccountNotFoundException e) {
+
+                    //do nothing
+                }
                 if (mFromAccount != null)
                     bundle.putLong("excluded_account", mFromAccount.getIndex());
 
@@ -219,15 +236,29 @@ public class TransferActivity extends AppCompatActivity {
                     bookings.add(mToExpense);
 
 
-                    ExpenseObject parent = mDatabase.combineAsChildBookings(bookings);
+                    ExpenseObject parent = ChildExpenseRepository.combineExpenses(bookings);
                     parent.setTitle(String.format("%s\n%s -> %s", getString(R.string.transfer), mFromAccount.getTitle(), mToAccount.getTitle()));
-                    mDatabase.updateBooking(parent);
+                    try {
+                        ExpenseRepository.update(parent);
+                    } catch (ExpenseNotFoundException e) {
+
+                        Toast.makeText(TransferActivity.this, "Titel konnte nicht geupdated werden", Toast.LENGTH_SHORT).show();
+                        //todo fehlerbehandlung
+                        //todo übersetzung
+                    }
 
                     Intent intent = new Intent(TransferActivity.this, ParentActivity.class);
                     TransferActivity.this.startActivity(intent);
                 } else {
 
-                    showErrorDialog(R.string.error_missing_content);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("title", getString(R.string.error));
+                    bundle.putString("message", getString(R.string.error_missing_content));
+
+                    ErrorAlertDialog errorAlert = new ErrorAlertDialog();
+                    errorAlert.setArguments(bundle);
+
+                    errorAlert.show(getFragmentManager(), "transfer_activity_error");
                 }
             }
         });
@@ -238,36 +269,8 @@ public class TransferActivity extends AppCompatActivity {
      *
      * @return Default TransferKategorie
      */
-    private Category getTransferCategory() {
-
-        return mDatabase.getChildCategoryById(1);
-    }
-
-    /**
-     * Methode um einen Fehlerdialog anzeigen zu lassen, der den User informiert, dass noch eine Eingabe fehlt, oder die Konten gleich sind.
-     *
-     * @param message Message id
-     */
-    private void showErrorDialog(@StringRes int message) {
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-        builder.setTitle(R.string.error);
-
-        builder.setMessage(message);
-
-        builder.setPositiveButton(R.string.btn_ok, new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-                //do nothing
-            }
-        });
-
-        builder.create();
-
-        builder.show();
+    private Category getTransferCategory() throws ChildCategoryNotFoundException {
+        return ChildCategoryRepository.get(1);
     }
 
     /**
@@ -275,12 +278,12 @@ public class TransferActivity extends AppCompatActivity {
      *
      * @return aktives Konto
      */
-    private Account getActiveAccount() {
+    private Account getActiveAccount() throws AccountNotFoundException {
 
         SharedPreferences preferences = getSharedPreferences("UserSettings", 0);
         long activeAccountId = preferences.getLong("activeAccount", 1);
 
-        return mDatabase.getAccountById(activeAccountId);
+        return AccountRepository.get(activeAccountId);
     }
 
     /**
@@ -303,7 +306,7 @@ public class TransferActivity extends AppCompatActivity {
 
         mFromAccount = newAccount;
         mToExpense.setTitle(String.format("%s %s", getString(R.string.transfer_from), mFromAccount.getTitle()));
-        mFromExpense.setAccount(mFromAccount);
+        mFromExpense.setAccountId(mFromAccount.getIndex());
         mFromAccountBtn.setText(mFromAccount.getTitle());
 
         Log.d(TAG, "selected " + mFromAccount.getTitle() + " as from account");
@@ -318,7 +321,7 @@ public class TransferActivity extends AppCompatActivity {
 
         mToAccount = newAccount;
         mFromExpense.setTitle(String.format("%s %s", getString(R.string.transfer_to), mToAccount.getTitle()));
-        mToExpense.setAccount(mToAccount);
+        mToExpense.setAccountId(mToAccount.getIndex());
         mToAccountBtn.setText(mToAccount.getTitle());
 
         Log.d(TAG, "selected " + mToAccount.getTitle() + " as to account");
@@ -333,19 +336,5 @@ public class TransferActivity extends AppCompatActivity {
 
         mToExpense.setPrice(newPrice);
         mToExpense.setExpenditure(false);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        mDatabase.close();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        mDatabase.close();
     }
 }

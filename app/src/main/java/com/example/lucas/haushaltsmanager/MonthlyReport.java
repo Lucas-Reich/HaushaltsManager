@@ -135,7 +135,7 @@ public class MonthlyReport {
         HashMap<Category, Double> categories = sumExpensesByCategory();
 
         if (categories.isEmpty())
-            return new Category(mContext.getResources().getString(R.string.no_expenses), "#FFFFFF", false);
+            return new Category(mContext.getResources().getString(R.string.no_expenses), "#FFFFFF", false, new ArrayList<Category>());
 
         Map.Entry<Category, Double> minCategory = null;
         for (Map.Entry<Category, Double> entry : categories.entrySet()) {

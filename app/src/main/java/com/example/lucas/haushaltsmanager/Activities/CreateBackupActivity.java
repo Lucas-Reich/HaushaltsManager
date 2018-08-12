@@ -15,29 +15,28 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.codekidlabs.storagechooser.StorageChooser;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
-import com.example.lucas.haushaltsmanager.Dialogs.DirectoryPickerDialog;
 import com.example.lucas.haushaltsmanager.R;
-import com.example.lucas.haushaltsmanager.Services.BackupService;
+import com.example.lucas.haushaltsmanager.Services.BackupCreatorService;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 public class CreateBackupActivity extends AppCompatActivity {
     private static final String TAG = CreateBackupActivity.class.getSimpleName();
 
     private FloatingActionButton mCreateBackupFab;
     private Button mChooseDirectoryBtn;
-    private File mBackupDirectory;
+    private File mBackupDirectory = BackupCreatorService.getBackupDirectory();
     private ListView mListView;
-    private ArrayAdapter<String> mListViewAdapter;
-    private List<String> mOldBackups;
-    private Toolbar mToolbar;
     private ImageButton mBackArrow;
 
     //.SavedDataFile
@@ -48,19 +47,15 @@ public class CreateBackupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_backup);
 
-        //Initialisierung des Backup Ordners
-        mBackupDirectory = new File(getFilesDir().toString() + "/Backups");
-        if (!mBackupDirectory.exists())
-            mBackupDirectory.mkdir();
-
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
         mBackArrow = (ImageButton) findViewById(R.id.back_arrow);
 
         mChooseDirectoryBtn = (Button) findViewById(R.id.create_backup_directory_btn);
         mListView = (ListView) findViewById(R.id.create_backup_list_view);
-        //mListView.setEmptyView(); todo wenn keine alten Backups vorhanden sind soll "Keine Existierenden Backups vorhanden" angezeigt werden
+        TextView emptyText = (TextView) findViewById(R.id.empty_list_view);
+        mListView.setEmptyView(emptyText);
         //todo die backups sollen so sortiert sein, dass der aktuellste eintrag an erster stelle steht
-
 
         mCreateBackupFab = (FloatingActionButton) findViewById(R.id.create_backup_create_backup_btn);
     }
@@ -71,6 +66,7 @@ public class CreateBackupActivity extends AppCompatActivity {
 
         updateListView();
 
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
         mBackArrow.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -80,7 +76,7 @@ public class CreateBackupActivity extends AppCompatActivity {
             }
         });
 
-        mChooseDirectoryBtn.setText(mBackupDirectory.getName());
+        mChooseDirectoryBtn.setHint(mBackupDirectory.getName());
         mChooseDirectoryBtn.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -126,6 +122,7 @@ public class CreateBackupActivity extends AppCompatActivity {
 
                 Bundle bundle = new Bundle();
                 bundle.putString("title", getResources().getString(R.string.choose_new_backup_name));
+                bundle.putString("hint", getDefaultBackupName());
 
                 BasicTextInputDialog basicDialog = new BasicTextInputDialog();
                 basicDialog.setOnTextInputListener(new BasicTextInputDialog.BasicDialogCommunicator() {
@@ -140,8 +137,6 @@ public class CreateBackupActivity extends AppCompatActivity {
                 basicDialog.show(getFragmentManager(), "create_backup_name");
             }
         });
-
-        //ab einer bestimmten anzahl an Backups ist der FAB nicht mehr zu sehen
     }
 
     /**
@@ -149,9 +144,9 @@ public class CreateBackupActivity extends AppCompatActivity {
      */
     private void updateListView() {
 
-        mOldBackups = getBackupsInDirectory(mBackupDirectory);
+        List<String> mOldBackups = getBackupsInDirectory(mBackupDirectory);
 
-        mListViewAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, mOldBackups);
+        ArrayAdapter<String> mListViewAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, mOldBackups);
 
         mListView.setAdapter(mListViewAdapter);
 
@@ -163,7 +158,7 @@ public class CreateBackupActivity extends AppCompatActivity {
      */
     private void createBackup(@Nullable String backupName) {
 
-        Intent backupServiceIntent = new Intent(this, BackupService.class);
+        Intent backupServiceIntent = new Intent(this, BackupCreatorService.class);
         backupServiceIntent.putExtra("user_triggered", true);
         backupServiceIntent.putExtra("backup_directory", mBackupDirectory.toString());
         if (backupName != null)
@@ -171,28 +166,8 @@ public class CreateBackupActivity extends AppCompatActivity {
 
         startService(backupServiceIntent);
 
-        Toast.makeText(this, R.string.creating_backup, Toast.LENGTH_SHORT).show();
-
         updateListView();
     }
-
-    /**
-     * Methode die das angegeben Verzeichniss prüft
-     *
-     * @param directory Verzeichniss
-     * @return Ist das Verzeichniss benutzbar
-     */
-    private boolean validateDirectory(File directory) {
-
-        //gucke ob das verzeichniss benutzbar ist
-        if (!directory.exists())
-            return false;
-
-        if (directory.isFile())
-            return false;
-
-        return true;
-    }//todo überprüfen ob der user für das gewählte verzeichnis auch die nötigen rechte besitzt (schreiben)
 
     /**
      * Methode um das vom User ausgewählte Backup wiederherzustellen
@@ -203,7 +178,7 @@ public class CreateBackupActivity extends AppCompatActivity {
 
         try {
 
-            BackupService.copy(fileName, getDatabasePath("expenses.db"));
+            BackupCreatorService.copyFile(fileName, getDatabasePath("expenses.db"));
         } catch (IOException e) {
 
             Log.e(TAG, "restoreDatabaseState: Fehler beim kopieren der Backupdatei", e);
@@ -217,6 +192,7 @@ public class CreateBackupActivity extends AppCompatActivity {
      */
     private void showConfirmationDialog(final File file) {
 
+        //todo durch confirmationDialog ersetzen
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         builder.setTitle(R.string.restoreBackup);
@@ -258,13 +234,22 @@ public class CreateBackupActivity extends AppCompatActivity {
 
         if (files != null && files.length != 0) {
 
-            for (File file : files) {
-
-                if (file.getName().contains(mBackupExtension))
-                    backups.add(file.getName());
+            for (int i = files.length - 1; i >= 0; i--) {
+                if (files[i].getName().contains(mBackupExtension)) {
+                    backups.add(files[i].getName());
+                }
             }
         }
 
         return backups;
+    }
+
+    /**
+     * Methode um den default Namen eines Backups zu bekommen.
+     *
+     * @return Default Backupname
+     */
+    private String getDefaultBackupName() {
+        return new SimpleDateFormat("YYYYMMdd", Locale.US).format(Calendar.getInstance().getTime()).concat("_Backup");
     }
 }

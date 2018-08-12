@@ -16,7 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.codekidlabs.storagechooser.StorageChooser;
-import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ErrorAlertDialog;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
@@ -231,12 +231,7 @@ public class ImportExportActivity extends AppCompatActivity {
      *
      * @return Alle Buchungen
      */
-    private ArrayList<ExpenseObject> getAllExpenses() {
-        ExpensesDataSource database = new ExpensesDataSource(this);
-        database.open();
-        ArrayList<ExpenseObject> expenses = database.getBookings();
-        database.close();
-
-        return expenses;
+    private List<ExpenseObject> getAllExpenses() {
+        return ExpenseRepository.getAll();
     }
 }

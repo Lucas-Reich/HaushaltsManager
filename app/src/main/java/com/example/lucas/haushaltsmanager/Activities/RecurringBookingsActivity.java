@@ -8,35 +8,29 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 
 import com.example.lucas.haushaltsmanager.BookingAdapter;
-import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
+import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.RecurringBookingRepository;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.R;
 
-import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class RecurringBookingsActivity extends AppCompatActivity {
     private static final String TAG = RecurringBookingsActivity.class.getSimpleName();
 
-    ArrayList<ExpenseObject> mExpenses;
-    ListView mListView;
-    Calendar mStartDate = Calendar.getInstance();
-    Calendar mEndDate = Calendar.getInstance();
-
-    ExpensesDataSource mDatabase;
-
-    Toolbar mToolbar;
-    ImageButton mBackArrow;
+    private List<ExpenseObject> mRecurringBookings;
+    private ListView mListView;
+    private Calendar mStartDate = Calendar.getInstance();
+    private Calendar mEndDate = Calendar.getInstance();
+    private ImageButton mBackArrow;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recurring_bookings);
 
-        mDatabase = new ExpensesDataSource(this);
-        mDatabase.open();
-
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
         mBackArrow = (ImageButton) findViewById(R.id.back_arrow);
 
         mListView = (ListView) findViewById(R.id.booking_listview);
@@ -48,6 +42,7 @@ public class RecurringBookingsActivity extends AppCompatActivity {
 
         updateListView();
 
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
         mBackArrow.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -62,7 +57,7 @@ public class RecurringBookingsActivity extends AppCompatActivity {
 
         prepareListData();
 
-        BookingAdapter bookingAdapter = new BookingAdapter(mExpenses, this);
+        BookingAdapter bookingAdapter = new BookingAdapter(mRecurringBookings, this);
 
         mListView.setAdapter(bookingAdapter);
 
@@ -74,7 +69,7 @@ public class RecurringBookingsActivity extends AppCompatActivity {
         mStartDate.set(mStartDate.get(Calendar.YEAR), mStartDate.get(Calendar.MONTH), 1);
         mEndDate.set(mEndDate.get(Calendar.YEAR), mEndDate.get(Calendar.MONTH), mEndDate.getActualMaximum(Calendar.DAY_OF_MONTH));
 
-        mExpenses = mDatabase.getRecurringBookings(mStartDate, mEndDate);
+        mRecurringBookings = RecurringBookingRepository.getAll(mStartDate, mEndDate);
     }
 
     public void setStartDate(long startInMills) {
@@ -85,19 +80,5 @@ public class RecurringBookingsActivity extends AppCompatActivity {
     public void setEndDate(long endInMills) {
 
         this.mEndDate.setTimeInMillis(endInMills);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        mDatabase.close();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        mDatabase.close();
     }
 }

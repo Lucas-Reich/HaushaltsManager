@@ -11,12 +11,16 @@ import android.widget.ImageButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
-import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.Exceptions.CategoryNotFoundException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepository;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ChooseCategoryDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ColorPickerDialog;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.R;
+
+import java.util.ArrayList;
 
 public class CreateCategoryActivity extends AppCompatActivity implements BasicTextInputDialog.BasicDialogCommunicator {
     private static final String TAG = CreateCategoryActivity.class.getSimpleName();
@@ -25,7 +29,6 @@ public class CreateCategoryActivity extends AppCompatActivity implements BasicTe
     private ImageButton mBackArrow;
     private Button mCatNameBtn, mCatColorBtn, mSelectParentBtn, mCreateBtn;
     private RadioGroup mDefaultExpenseRadioGrp;
-    private ExpensesDataSource mDatabase;
     private Category mParentCategory;
 
     private creationModes CREATION_MODE;
@@ -39,9 +42,6 @@ public class CreateCategoryActivity extends AppCompatActivity implements BasicTe
     protected void onCreate(Bundle savedInstances) {
         super.onCreate(savedInstances);
         setContentView(R.layout.activity_new_category);
-
-        mDatabase = new ExpensesDataSource(this);
-        mDatabase.open();
 
         mCatNameBtn = (Button) findViewById(R.id.new_category_name);
         mCatColorBtn = (Button) findViewById(R.id.new_category_color);
@@ -73,7 +73,7 @@ public class CreateCategoryActivity extends AppCompatActivity implements BasicTe
             case "createCategory":
 
                 CREATION_MODE = creationModes.CREATE_CATEGORY;
-                mCategory = Category.createDummyCategory(this);
+                mCategory = Category.createDummyCategory();
 
                 mCreateBtn.setText(R.string.create_category);
                 break;
@@ -210,13 +210,19 @@ public class CreateCategoryActivity extends AppCompatActivity implements BasicTe
                             Toast.makeText(CreateCategoryActivity.this, "Wähle zuerst die übergeordnete Kategorie aus", Toast.LENGTH_SHORT).show();
                         } else {
 
-                            mDatabase.addCategoryToParent(mParentCategory, mCategory);
+                            ChildCategoryRepository.insert(mParentCategory, mCategory);
                             finish();
                         }
                         break;
                     case UPDATE_CATEGORY:
 
-                        mDatabase.updateCategory(mCategory);
+                        try {
+                            CategoryRepository.update(mCategory);
+                        } catch (CategoryNotFoundException e) {
+
+                            Toast.makeText(CreateCategoryActivity.this, getString(R.string.category_not_found), Toast.LENGTH_SHORT).show();
+                            //todo Fehlberbehandlung wenn versucht wird eine nicht existierende Kategorie zu updaten
+                        }
                         finish();
                         break;
                 }
@@ -227,21 +233,7 @@ public class CreateCategoryActivity extends AppCompatActivity implements BasicTe
     @Override
     public void onTextInput(String textInput) {
 
-        mParentCategory = mDatabase.createCategory(new Category(textInput, "#000000", false));
+        mParentCategory = CategoryRepository.insert(new Category(textInput, "#000000", false, new ArrayList<Category>()));
         mSelectParentBtn.setText(mParentCategory.getTitle());
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        mDatabase.close();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        mDatabase.close();
     }
 }

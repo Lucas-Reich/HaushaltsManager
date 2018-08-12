@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
+        android:name=".App.app"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -69,7 +70,7 @@
             android:process=":remote"/>
 
         <service
-            android:name=".Services.BackupService"
+            android:name=".Services.BackupCreatorService"
             android:exported="false"
             android:label="BackupService"
             android:permission="android.permission.BIND_JOB_SERVICE"/>

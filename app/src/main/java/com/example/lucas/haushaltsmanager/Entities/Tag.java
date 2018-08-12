@@ -1,11 +1,11 @@
 package com.example.lucas.haushaltsmanager.Entities;
 
-import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.R;
 
 public class Tag implements Parcelable {
@@ -35,12 +35,11 @@ public class Tag implements Parcelable {
     /**
      * Methode um einen dummy Tag zu erstellen
      *
-     * @param context context
      * @return dummy tag
      */
-    public static Tag createDummyTag(Context context) {
+    public static Tag createDummyTag() {
 
-        return new Tag(-1, context.getResources().getString(R.string.no_name));
+        return new Tag(-1, app.getContext().getString(R.string.no_name));
     }
 
     /**
@@ -91,15 +90,18 @@ public class Tag implements Parcelable {
         return getIndex() > -1;
     }
 
-    /**
-     * Methode um zu überprüfen, ob das angegebene Tag das gleiche ist wie dieses.
-     *
-     * @param otherTag Anderes Tag
-     * @return boolean
-     */
-    public boolean equals(Tag otherTag) {
+    @Override
+    public boolean equals(Object obj) {
 
-        return getName().equals(otherTag.getName());
+        if (obj instanceof Tag) {
+
+            Tag otherTag = (Tag) obj;
+
+            return getName().equals(otherTag.getName());
+        } else {
+
+            return false;
+        }
     }
 
     public String toString() {

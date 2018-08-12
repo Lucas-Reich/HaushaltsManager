@@ -12,12 +12,12 @@ import java.util.List;
 public class MonthlyReportAdapterCreator {
     private static final String TAG = MonthlyReportAdapterCreator.class.getSimpleName();
 
-    private ArrayList<ExpenseObject> mExpenses;
+    private List<ExpenseObject> mExpenses;
     private Context mContext;
     private List<MonthlyReport> mReports;
-    private ArrayList<Long> mActiveAccounts;
+    private List<Long> mActiveAccounts;
 
-    public MonthlyReportAdapterCreator(ArrayList<ExpenseObject> expenses, Context context, ArrayList<Long> activeAccounts) {
+    public MonthlyReportAdapterCreator(List<ExpenseObject> expenses, Context context, List<Long> activeAccounts) {
 
         mActiveAccounts = activeAccounts;
         mContext = context;
@@ -43,7 +43,7 @@ public class MonthlyReportAdapterCreator {
     private void createMonthlyReports() {
 
         for (int i = getCurrentMonth(); i >= 1; i--) {
-            mReports.add(new MonthlyReport(i + "", new ArrayList<ExpenseObject>(), getMainCurrency(), mContext));
+            mReports.add(new MonthlyReport(i + "", new ArrayList<ExpenseObject>(), getMainCurrencySymbol(), mContext));
         }
 
         fillMonthlyReports();
@@ -65,7 +65,7 @@ public class MonthlyReportAdapterCreator {
      *
      * @return Währungssymbol der Hauptwährung
      */
-    private String getMainCurrency() {
+    private String getMainCurrencySymbol() {
         SharedPreferences preferences = mContext.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
 
         return preferences.getString("mainCurrencySymbol", "€");
@@ -121,6 +121,6 @@ public class MonthlyReportAdapterCreator {
      * @return Boolean
      */
     private Boolean isExpenseVisible(ExpenseObject expense) {
-        return mActiveAccounts.contains(expense.getAccount().getIndex());
+        return mActiveAccounts.contains(expense.getAccountId());
     }
 }

@@ -31,10 +31,10 @@ import com.example.lucas.haushaltsmanager.Activities.CreateBackupActivity;
 import com.example.lucas.haushaltsmanager.Activities.ImportExportActivity;
 import com.example.lucas.haushaltsmanager.Activities.RecurringBookingsActivity;
 import com.example.lucas.haushaltsmanager.Activities.TestActivity;
-import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Dialogs.ChangeAccounts.ChooseAccountsDialogFragment;
 import com.example.lucas.haushaltsmanager.Entities.Account;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.MockDataCreator;
 import com.example.lucas.haushaltsmanager.MyAlarmReceiver;
@@ -43,6 +43,7 @@ import com.example.lucas.haushaltsmanager.R;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ParentActivity extends AppCompatActivity implements ChooseAccountsDialogFragment.OnSelectedAccount {
@@ -50,8 +51,8 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
 
     private TabLayout mTabLayout;
     private ViewPager mViewPager;
-    private ArrayList<ExpenseObject> mExpenses = new ArrayList<>();
-    private ArrayList<Long> mActiveAccounts = new ArrayList<>();
+    private List<ExpenseObject> mExpenses = new ArrayList<>();
+    private List<Long> mActiveAccounts = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +74,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
             @Override
             public void onClick(View v) {
 
-                MockDataCreator test = new MockDataCreator(ParentActivity.this);
+                MockDataCreator test = new MockDataCreator();
                 test.createBookings(100);
             }
         });
@@ -157,16 +158,8 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
      * Methode um die Hauptwährung und das Symbol der Hauptwährung in die SharedPreferences zu schreiben.
      */
     private void setSharedPreferencesProperties() {
-        //todo das setzen der Hauptwährung sollte in den einstellungen passieren
-
-        ExpensesDataSource database = new ExpensesDataSource(this);
-        database.open();
-        Currency mainCurrency = database.getCurrencyByShortName("EUR");
-        database.close();
-
         SharedPreferences preferences = this.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
-        preferences.edit().putLong("mainCurrencyIndex", mainCurrency.getIndex()).apply();
-        preferences.edit().putString("mainCurrencySymbol", mainCurrency.getSymbol()).apply();
+        preferences.edit().putInt("maxBackupCount", 20).apply();
     }
 
     @Override
@@ -262,7 +255,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
     }
 
     /**
-    /**
+     * /**
      * Methode um die Daten des aktuell sichtbaren Tabs upzudaten.
      * Quelle: https://stackoverflow.com/a/27211004
      */
@@ -317,7 +310,6 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
         SharedPreferences preferences = getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
 
         for (Account account : getAllAccounts()) {
-
             if (preferences.getBoolean(account.getTitle(), false))
                 mActiveAccounts.add(account.getIndex());
         }
@@ -328,19 +320,11 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
      *
      * @return Liste alles verfügbaren Konten
      */
-    private ArrayList<Account> getAllAccounts() {
-
-        ExpensesDataSource database = new ExpensesDataSource(this);
-        database.open();
-
-        ArrayList<Account> accounts = database.getAllAccounts();
-        database.close();
-
-        return accounts;
+    private List<Account> getAllAccounts() {
+        return AccountRepository.getAll();
     }
 
-    ArrayList<Long> getActiveAccounts() {
-
+    List<Long> getActiveAccounts() {
         return mActiveAccounts;
     }
 
@@ -370,12 +354,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
      * Methode um die Liste der Buchungen zu erneuern.
      */
     void updateExpenses() {
-
-        ExpensesDataSource database = new ExpensesDataSource(this);
-        database.open();
-
-        mExpenses = database.getBookings();
-        database.close();
+        mExpenses = ExpenseRepository.getAll();
     }
 
     /**
@@ -383,8 +362,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
      *
      * @return Anzuzeigende Buchungen
      */
-    ArrayList<ExpenseObject> getExpenses() {
-
+    List<ExpenseObject> getExpenses() {
         return mExpenses;
     }
 

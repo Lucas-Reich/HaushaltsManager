@@ -16,18 +16,18 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.CategoryAdapter;
-import com.example.lucas.haushaltsmanager.Database.Exceptions.CannotDeleteCategoryException;
-import com.example.lucas.haushaltsmanager.Database.ExpensesDataSource;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.Exceptions.CannotDeleteChildCategoryException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepository;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.R;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class CategoryListActivity extends AppCompatActivity {
     private static final String TAG = CategoryListActivity.class.getSimpleName();
 
-    private ExpensesDataSource mDatabase;
-    private ArrayList<Category> mCategories;
+    private List<Category> mCategories;
     private FloatingActionButton mFabMain, mFabDelete;
     private ImageButton mBackArrow;
     private ExpandableListView mExpListView;
@@ -39,9 +39,6 @@ public class CategoryListActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_categories);
-
-        mDatabase = new ExpensesDataSource(this);
-        mDatabase.open();
 
         Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
@@ -145,11 +142,14 @@ public class CategoryListActivity extends AppCompatActivity {
 
                 try {
 
-                    mDatabase.deleteChildCategories(mListAdapter.getSelectedChildData());
+                    for (Category childCategory : mListAdapter.getSelectedChildData())
+                        ChildCategoryRepository.delete(childCategory);
+
                     animateFab(mListAdapter.getSelectedChildItemCount());
                     updateListView();
-                } catch (CannotDeleteCategoryException e) {
+                } catch (CannotDeleteChildCategoryException e) {
 
+                    //todo ich sollte den try catch nur um die for schleife machen und die categorien die nicht gelöscht werden konnten speichern und etwas mit ihnen machen
                     Toast.makeText(CategoryListActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
@@ -225,15 +225,8 @@ public class CategoryListActivity extends AppCompatActivity {
      * Methode um die Liste der Kategorien zu initilisieren.
      */
     private void prepareDataSources() {
-        mCategories = mDatabase.getAllCategories();
+        mCategories = CategoryRepository.getAll();
 
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        mDatabase.close();
     }
 
     private void animateFab(int selectedChildrenCount) {
