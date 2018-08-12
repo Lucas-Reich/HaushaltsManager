@@ -20,17 +20,16 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Excepti
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.R;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-public class ChooseAccountsDialogFragment extends DialogFragment implements AdapterView.OnItemClickListener, AccountAdapter.OnDeleteAccountSelected {
+public class ChooseAccountsDialogFragment extends DialogFragment implements AccountAdapter.OnDeleteAccountSelected {
     private static final String TAG = ChooseAccountsDialogFragment.class.getSimpleName();
 
     private OnSelectedAccount mCallback;
     private ListView mListView;
     private Context mContext;
-    private List<Boolean> mCheckedAccounts;
-    private List<Account> mAccounts;
+    private Map<Account, Boolean> mInitialAccountState;
 
     /**
      * Standart Fragment Methode die genutzt wird, um zu checken ob die aufrufende Activity auch das interface inplementiert.
@@ -56,19 +55,18 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Adap
         super.onCreate(savedInstanceState);
         SharedPreferences preferences = getActivity().getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
 
-        mCheckedAccounts = new ArrayList<>();
+        mInitialAccountState = new HashMap<>();
 
-        mAccounts = AccountRepository.getAll();
-        for (Account account : mAccounts) {
+        for (Account account : AccountRepository.getAll()) {
 
-            mCheckedAccounts.add(preferences.getBoolean(account.getTitle(), false));
+            mInitialAccountState.put(account, preferences.getBoolean(account.getTitle(), false));
         }
     }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-        setUpListView();
+        prepareListView();
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
@@ -88,6 +86,7 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Adap
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
+                revertUserInteractions();
                 dismiss();
             }
         });
@@ -103,16 +102,22 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Adap
             }
         });
 
+        builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                revertUserInteractions();
+            }
+        });
+
         return builder.create();
     }
 
     /**
      * Methode um die ListView zu erzeugen und mit Funktionalität zu versorgen.
      */
-    private void setUpListView() {
+    private void prepareListView() {
 
-        AccountAdapter adapter = new AccountAdapter(mAccounts, mContext);
-        adapter.setCheckedItems(mCheckedAccounts);
+        AccountAdapter adapter = new AccountAdapter(mInitialAccountState, mContext);
         adapter.setOnDeleteAccountListener(this);
 
         mListView = new ListView(mContext);
@@ -121,35 +126,26 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Adap
         mListView.setDividerHeight(0);
         mListView.setItemsCanFocus(false);
         mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-        mListView.setOnItemClickListener(this);
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                CheckBox accountChk = (CheckBox) view.findViewById(R.id.listview_account_item_chkbox);
+                boolean newVisibilityState = !accountChk.isChecked();
+
+                accountChk.setChecked(newVisibilityState);
+                setAccountVisibility(getAccountAtPosition(position), newVisibilityState);
+            }
+        });
     }
 
     /**
-     * Wenn in der ListView ein Konto ausgewählt wurde wird hier die Checkbox manipuliert und der callback ausgelöst
+     * Methode um das Konto an dieser Position der ListView zu bekommen.
      *
-     * @param parent   parent
-     * @param view     view
-     * @param position position
-     * @param id       id
+     * @param position Position des Kontos
+     * @return Konto an dieser Position
      */
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-        CheckBox accountChk = (CheckBox) view.findViewById(R.id.listview_account_item_chkbox);
-        if (accountChk.isChecked()) {
-
-            mCheckedAccounts.set(position, false);
-            accountChk.setChecked(false);
-        } else {
-
-            mCheckedAccounts.set(position, true);
-            accountChk.setChecked(true);
-        }
-
-        SharedPreferences preferences = getActivity().getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
-        preferences.edit().putBoolean(mAccounts.get(position).getTitle(), mCheckedAccounts.get(position)).apply();
-
-        mCallback.onAccountSelected(mAccounts.get(position).getIndex(), mCheckedAccounts.get(position));
+    private Account getAccountAtPosition(int position) {
+        return (Account) mListView.getItemAtPosition(position);
     }
 
     /**
@@ -161,19 +157,13 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Adap
     public void onDeleteAccountSelected(Account account) {
 
         try {
-            AccountRepository.delete(account);
+            if (isCurrentMainAccount(account)) {
 
-            SharedPreferences accountPreferences = mContext.getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
-            accountPreferences.edit().remove(account.getTitle()).apply();
+                deleteAccount(account);
+                makeAccountMain((Account) mInitialAccountState.keySet().toArray()[0]);
+            } else {
 
-
-            //Checke ob das aktuelle Haupkonto das gerade gelöschte ist.
-            //Ist dem so wird das erste Konto als ersatz in den SharedSpreferences hinterlegt.
-            SharedPreferences userPreferences = mContext.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
-            long activeAccountId = userPreferences.getLong("activeAccount", -1);
-            if (activeAccountId == -1 || activeAccountId == account.getIndex()) {
-                long newActiveAccountIndex = AccountRepository.getAll().get(0).getIndex();
-                userPreferences.edit().putLong("activeAccount", newActiveAccountIndex).apply();
+                deleteAccount(account);
             }
 
             Toast.makeText(mContext, mContext.getResources().getString(R.string.deleted_account), Toast.LENGTH_SHORT).show();
@@ -186,30 +176,75 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Adap
     }
 
     /**
+     * Methode um herauszufinden ob das angegebene Konto das aktuelle Hauptkonto ist.
+     *
+     * @param account Konto, welches überprüft werden soll
+     * @return TRUE wenn es das Hautpkonto ist, FALSE wenn nicht
+     */
+    private boolean isCurrentMainAccount(Account account) {
+        SharedPreferences preferences = mContext.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
+
+        return account.getIndex() == preferences.getLong("activeAccount", -1);
+    }
+
+    /**
+     * Methode um ein Konto zu löschen.
+     *
+     * @param account Konto, welches gelöscht werden soll
+     */
+    private void deleteAccount(Account account) throws CannotDeleteAccountException {
+        AccountRepository.delete(account);
+
+        SharedPreferences accountPreferences = mContext.getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
+        accountPreferences.edit().remove(account.getTitle()).apply();
+
+        mInitialAccountState.remove(account);
+    }
+
+    /**
      * Methode die den Callback des AccountsAdapters implementiert, wenn ein Konto als Hauptkonto ausgewählt wurde
      *
      * @param account Konto das nun das Hautpkonto sein soll
      */
     @Override
     public void onAccountSetMain(Account account) {
-
-        SharedPreferences preferences = mContext.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putLong("activeAccount", account.getIndex());
-        editor.apply();
-
+        makeAccountMain(account);
         Toast.makeText(mContext, account.getTitle() + mContext.getResources().getString(R.string.changed_main_account), Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * Methode um das gewählte Konto zum Hauptkonto zu machen.
+     *
+     * @param account Neues Hauptkonto
+     */
+    private void makeAccountMain(Account account) {
+        SharedPreferences preferences = mContext.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
+        preferences.edit().putLong("activeAccount", account.getIndex()).apply();
+    }
+
+    /**
+     * Methode um die Auswahl der einzelnen Konten rückgängig zu machen, und so den ursprügnlichen Zustand wieder her zustellen.
+     */
+    private void revertUserInteractions() {
+        for (Map.Entry<Account, Boolean> entry : mInitialAccountState.entrySet()) {
+            setAccountVisibility(entry.getKey(), entry.getValue());
+        }
+    }
+
+    /**
+     * Methode um die Sichtbarkeit eines Kontos (im TabOne) zu verändern.
+     *
+     * @param account   Konto von dem die Sichtbarkeit angepasst werden soll
+     * @param isVisible Sichtabkeit. TRUE für sichtbar, FALSE für nicht sichtbar
+     */
+    private void setAccountVisibility(Account account, boolean isVisible) {
+        SharedPreferences preferences = getActivity().getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
+
+        preferences.edit().putBoolean(account.getTitle(), isVisible).apply();
+        mCallback.onAccountSelected(account.getIndex(), isVisible);
     }
 
     public interface OnSelectedAccount {
         void onAccountSelected(long accountId, boolean isChecked);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        //todo Wenn Konten an oder abgewählt wurden und der User neben den Dialog tippt und sich das Fenster somit schließt müssen auch alle änderungen
-        // die der User gemacht hat wieder rückgängig gemacht werden (ausgenommen deleteAll und set main account)
     }
 }
