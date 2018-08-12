@@ -102,13 +102,6 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Acco
             }
         });
 
-        builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                revertUserInteractions();
-            }
-        });
-
         return builder.create();
     }
 
@@ -242,6 +235,12 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Acco
 
         preferences.edit().putBoolean(account.getTitle(), isVisible).apply();
         mCallback.onAccountSelected(account.getIndex(), isVisible);
+    }
+
+    @Override
+    public void onCancel(DialogInterface dialog) {
+        super.onCancel(dialog);
+        revertUserInteractions();
     }
 
     public interface OnSelectedAccount {

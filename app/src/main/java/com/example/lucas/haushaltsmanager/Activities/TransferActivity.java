@@ -1,15 +1,12 @@
 package com.example.lucas.haushaltsmanager.Activities;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
-import android.support.annotation.StringRes;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -28,6 +25,7 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
 import com.example.lucas.haushaltsmanager.Dialogs.AccountPickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.DatePickerDialog;
+import com.example.lucas.haushaltsmanager.Dialogs.ErrorAlertDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
@@ -253,7 +251,14 @@ public class TransferActivity extends AppCompatActivity {
                     TransferActivity.this.startActivity(intent);
                 } else {
 
-                    showErrorDialog(R.string.error_missing_content);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("title", getString(R.string.error));
+                    bundle.putString("message", getString(R.string.error_missing_content));
+
+                    ErrorAlertDialog errorAlert = new ErrorAlertDialog();
+                    errorAlert.setArguments(bundle);
+
+                    errorAlert.show(getFragmentManager(), "transfer_activity_error");
                 }
             }
         });
@@ -266,33 +271,6 @@ public class TransferActivity extends AppCompatActivity {
      */
     private Category getTransferCategory() throws ChildCategoryNotFoundException {
         return ChildCategoryRepository.get(1);
-    }
-
-    /**
-     * Methode um einen Fehlerdialog anzeigen zu lassen, der den User informiert, dass noch eine Eingabe fehlt, oder die Konten gleich sind.
-     *
-     * @param message Message id
-     *///todo durch ErrorAlertDialog ersetzen
-    private void showErrorDialog(@StringRes int message) {
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-        builder.setTitle(R.string.error);
-
-        builder.setMessage(message);
-
-        builder.setPositiveButton(R.string.btn_ok, new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-                //do nothing
-            }
-        });
-
-        builder.create();
-
-        builder.show();
     }
 
     /**
