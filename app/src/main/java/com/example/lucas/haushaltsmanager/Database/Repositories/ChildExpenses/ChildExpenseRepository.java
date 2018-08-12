@@ -367,29 +367,38 @@ public class ChildExpenseRepository {
         }
     }
 
-    public static void hide(ExpenseObject expense) throws ChildExpenseNotFoundException {
+    public static void hide(ExpenseObject childExpense) throws ChildExpenseNotFoundException {
         //todo kann auch durch die Methode des parents ersetzt werden
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
 
-        ContentValues values = new ContentValues();
-        values.put(ExpensesDbHelper.BOOKINGS_COL_HIDDEN, 1);
-
-        int affectedRows = db.update(ExpensesDbHelper.TABLE_BOOKINGS, values, ExpensesDbHelper.BOOKINGS_COL_ID + " = ?", new String[]{"" + expense.getIndex()});
-        DatabaseManager.getInstance().closeDatabase();
-
-        //todo wenn das kind das letzte sichtbare kind des Parents war muss die sichtbarkeit des parents auch auf hidden gesetzt werden
-
-        if (affectedRows == 0)
-            throw new ChildExpenseNotFoundException(expense.getIndex());
-
         try {
-            updateAccountBalance(
-                    expense.getAccountId(),
-                    -expense.getSignedPrice()
-            );
-        } catch (AccountNotFoundException e) {
+            if (isLastVisibleChildOfParent(childExpense)) {
 
-            //todo wenn der Kontostand nicht geupdated werden kann muss die gesamte transaktion zurückgenommen werden
+                ExpenseObject parentExpense = getParent(childExpense);
+                ExpenseRepository.hide(parentExpense);
+            }
+
+            ContentValues values = new ContentValues();
+            values.put(ExpensesDbHelper.BOOKINGS_COL_HIDDEN, 1);
+
+            int affectedRows = db.update(ExpensesDbHelper.TABLE_BOOKINGS, values, ExpensesDbHelper.BOOKINGS_COL_ID + " = ?", new String[]{"" + childExpense.getIndex()});
+            DatabaseManager.getInstance().closeDatabase();
+
+            if (affectedRows == 0)
+                throw new ChildExpenseNotFoundException(childExpense.getIndex());
+
+            try {
+                updateAccountBalance(
+                        childExpense.getAccountId(),
+                        -childExpense.getSignedPrice()
+                );
+            } catch (AccountNotFoundException e) {
+
+                //todo wenn der Kontostand nicht geupdated werden kann muss die gesamte transaktion zurückgenommen werden
+            }
+        } catch (ExpenseNotFoundException e) {
+
+            //todo dem aufrufenden code mitteilen dass die buchung nicht versteckt werden konnte
         }
     }
 
@@ -447,10 +456,11 @@ public class ChildExpenseRepository {
         return false;
     }
 
-    private static boolean isLastVisibleChildOfParent(ExpenseObject childExpense) {
+    private static boolean isLastVisibleChildOfParent(ExpenseObject childExpense) throws ChildExpenseNotFoundException, ExpenseNotFoundException {
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
 
         ExpenseObject parentExpense = getParent(childExpense);
+
         String selectQuery;
         selectQuery = "SELECT "
                 + " *"

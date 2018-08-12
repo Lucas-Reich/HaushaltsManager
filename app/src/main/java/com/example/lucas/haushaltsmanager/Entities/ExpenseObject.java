@@ -401,9 +401,7 @@ public class ExpenseObject implements Parcelable {
             }
 
             for (ExpenseObject child : getChildren()) {
-                for (ExpenseObject otherChildren : otherExpense.getChildren()) {
-                    result = result && child.equals(otherChildren);
-                }
+                result = result && otherExpense.getChildren().contains(child);
             }
 
             return result;

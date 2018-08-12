@@ -30,6 +30,7 @@ import org.robolectric.RuntimeEnvironment;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
@@ -67,7 +68,7 @@ public class ChildExpenseRepositoryTest {
 
         return new ExpenseObject(
                 "Ausgabe",
-                Math.random(),
+                new Random().nextInt(1000),
                 false,
                 category,
                 account.getIndex(),
@@ -539,71 +540,107 @@ public class ChildExpenseRepositoryTest {
     }
 
     @Test
-    public void testHideWithValidExpenseShouldSucceed() {
-        ExpenseObject expense = ExpenseRepository.insert(getSimpleExpense());
+    public void testHideWithExistingChildExpenseShouldSucceed() {
+        ExpenseObject parentExpense = ExpenseRepository.insert(getParentExpenseWithChildren());
 
         try {
-            ExpenseRepository.hide(expense);
-            assertTrue("Buchung wurde gelöscht", ExpenseRepository.exists(expense));
-            assertFalse("Versteckte Buchung wurde aus der Datenbank geholt", ExpenseRepository.getAll().contains(expense));
+            ExpenseObject hiddenChild = parentExpense.getChildren().get(0);
+            ChildExpenseRepository.hide(hiddenChild);
+
+            assertTrue("KindBuchung wurde gelöscht", ChildExpenseRepository.exists(hiddenChild));
+            assertFalse("Versteckte Buchung wurde aus der Datenbank geholt", ChildExpenseRepository.getAll(parentExpense.getIndex()).contains(hiddenChild));
             assertEqualAccountBalance(
-                    account.getBalance(),
-                    account
+                    account.getBalance() + parentExpense.getChildren().get(1).getSignedPrice(),
+                    account.getIndex()
             );
-
-        } catch (ExpenseNotFoundException e) {
-
-            Assert.fail("Buchung wurde nicht gefunden");
-        }
-    }
-
-    @Test
-    public void testHideWithNotExistingExpenseShouldThrowExpenseNotFoundException() {
-        ExpenseObject expense = getSimpleExpense();
-
-        try {
-            ExpenseRepository.hide(expense);
-            Assert.fail("Nicht existierende Ausgabe konnte versteckt werden");
-
-        } catch (ExpenseNotFoundException e) {
-
-            assertEquals(String.format("Could not find Expense with id %s.", expense.getIndex()), e.getMessage());
-            assertEqualAccountBalance(
-                    account.getBalance(),
-                    account
-            );
-        }
-    }
-
-    @Test
-    public void testIsHiddenWithExistingExpenseShouldSucceed() {
-        ExpenseObject expense = ExpenseRepository.insert(getSimpleExpense());
-
-        try {
-            boolean isHidden = ExpenseRepository.isHidden(expense);
-            assertFalse("Buchung ist versteckt", isHidden);
-
-            ExpenseRepository.hide(expense);
-            isHidden = ExpenseRepository.isHidden(expense);
-            assertTrue("Buchung is nich versteckt", isHidden);
-
-        } catch (ExpenseNotFoundException e) {
-
-            Assert.fail("Buchung wurde nicht gefunden");
-        }
-    }
-
-    @Test
-    public void testIsHiddenWithNotExistingExpenseShouldThrowExpenseNotFoundException() {
-        ExpenseObject expense = get
-
-        try {
-            ChildExpenseRepository.isHidden(expense);
-            Assert.fail("Buchung wurde gefunden");
 
         } catch (ChildExpenseNotFoundException e) {
 
-            assertEquals(String.format("Could not find Child Expense with id %s.", expense.getIndex()), e.getMessage());
+            Assert.fail("Kind Buchung wurde nicht gefunden");
+        }
+    }
+
+    @Test
+    public void testHideLastChildOfParentShouldHideParentAsWell() {
+        ExpenseObject parentExpense = getParentExpenseWithChildren();
+        parentExpense.getChildren().remove(1);
+        parentExpense = ExpenseRepository.insert(parentExpense);
+
+        try {
+            ExpenseObject hiddenChildExpense = parentExpense.getChildren().get(0);
+            ChildExpenseRepository.hide(hiddenChildExpense);
+
+            assertTrue("ParentBuchung wurde nicht versteckt", ExpenseRepository.isHidden(parentExpense));
+            assertFalse("KindBuchung wurde nicht versteckt", ChildExpenseRepository.getAll(parentExpense.getIndex()).contains(hiddenChildExpense));
+            assertEqualAccountBalance(
+                    account.getBalance(),
+                    account.getIndex()
+            );
+        } catch (ChildExpenseNotFoundException e) {
+
+            Assert.fail("KindBuchung wurde nicht gefunden");
+        } catch (ExpenseNotFoundException e) {
+
+            Assert.fail("ParetnBuchung wurde nicht gefunden");
+        }
+    }
+
+    @Test
+    public void testHideWithNotExistingChildExpenseShouldThrowChildExpenseNotFoundException() {
+        ExpenseObject childExpense = getSimpleExpense();
+
+        try {
+            ChildExpenseRepository.hide(childExpense);
+            Assert.fail("Nicht existierende ChildExpense konnte versteckt werden");
+
+        } catch (ChildExpenseNotFoundException e) {
+
+            assertEquals(String.format("Could not find Child Expense with id %s.", childExpense.getIndex()), e.getMessage());
+            assertEqualAccountBalance(
+                    account.getBalance(),
+                    account.getIndex()
+            );
+        }
+    }
+
+    @Test
+    public void testIsHiddenWithExistingChildExpenseShouldSucceed() {
+        ExpenseObject parentExpense = ExpenseRepository.insert(getParentExpenseWithChildren());
+
+        try {
+            ExpenseObject hiddenChildExpense = parentExpense.getChildren().get(0);
+
+            boolean isHidden = ExpenseRepository.isHidden(hiddenChildExpense);
+            assertFalse("ChildExpense ist versteckt", isHidden);
+
+            ChildExpenseRepository.hide(hiddenChildExpense);
+            isHidden = ExpenseRepository.isHidden(hiddenChildExpense);
+            assertTrue("ChildExpense ist nicht versteckt", isHidden);
+
+        } catch (ChildExpenseNotFoundException e) {
+
+            Assert.fail("ChildExpense wurde nicht gefunden");
+        } catch (ExpenseNotFoundException e) {
+
+            Assert.fail("ParentExpense wurde nicht gefunden");
+        }
+    }
+
+    @Test
+    public void testIsHiddenWithNotExistingChildExpenseShouldThrowExpenseNotFoundException() {
+        ExpenseObject childExpense = getSimpleExpense();
+
+        try {
+            ChildExpenseRepository.isHidden(childExpense);
+            Assert.fail("ChildExpense wurde gefunden");
+
+        } catch (ChildExpenseNotFoundException e) {
+
+            assertEquals(String.format("Could not find Child Expense with id %s.", childExpense.getIndex()), e.getMessage());
+            assertEqualAccountBalance(
+                    account.getBalance(),
+                    account.getIndex()
+            );
         }
     }
 

@@ -309,14 +309,16 @@ public class ExpenseRepository {
         if (affectedRows == 0)
             throw ExpenseNotFoundException.expenseNotFoundException(expense.getIndex());
 
-        try {
-            updateAccountBalance(
-                    expense.getAccountId(),
-                    -expense.getSignedPrice()
-            );
-        } catch (AccountNotFoundException e) {
+        if (!expense.isParent()) {
+            try {
+                updateAccountBalance(
+                        expense.getAccountId(),
+                        -expense.getSignedPrice()
+                );
+            } catch (AccountNotFoundException e) {
 
-            //todo die gesamte transaktion muss zurückgenommen werden und eine CannotDeleteExpenseException muss ausgelösct werden
+                //todo die gesamte transaktion muss zurückgenommen werden und eine CannotDeleteExpenseException muss ausgelösct werden
+            }
         }
     }
 
@@ -419,6 +421,7 @@ public class ExpenseRepository {
     }
 
     public static void assertSavableExpense(ExpenseObject expense) {
+        //todo funktion nicht mehr benutzen
         switch (expense.getExpenseType()) {
             case PARENT_EXPENSE:
             case NORMAL_EXPENSE:
