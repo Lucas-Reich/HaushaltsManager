@@ -24,13 +24,13 @@ public class ExpensesDbHelper extends SQLiteOpenHelper {
 
     public static final String TEMPLATE_COL_ID = "template_id";
     public static final String TEMPLATE_COL_BOOKING_ID = "booking_id";
-    public static final String TEMPLATE_COL_BOOKING_TYPE = "booking_type";
+//    public static final String TEMPLATE_COL_BOOKING_TYPE = "booking_type"; // entfernt
 
     private static final String CREATE_TEMPLATE_BOOKINGS = "CREATE TABLE " + TABLE_TEMPLATE_BOOKINGS
             + "("
             + TEMPLATE_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + TEMPLATE_COL_BOOKING_ID + " INTEGER NOT NULL, "
-            + TEMPLATE_COL_BOOKING_TYPE + " TEXT NOT NULL"
+            + TEMPLATE_COL_BOOKING_ID + " INTEGER NOT NULL "
+//            + TEMPLATE_COL_BOOKING_TYPE + " TEXT NOT NULL" // entfernt
             + ");";
 
     //define table Recurring Bookings
@@ -38,7 +38,7 @@ public class ExpensesDbHelper extends SQLiteOpenHelper {
 
     public static final String RECURRING_BOOKINGS_COL_ID = "recurring_booking__id";
     public static final String RECURRING_BOOKINGS_COL_BOOKING_ID = "booking_id";
-    public static final String RECURRING_BOOKINGS_COL_BOOKING_TYPE = "booking_type";
+    //    public static final String RECURRING_BOOKINGS_COL_BOOKING_TYPE = "booking_type"; // entfernt
     public static final String RECURRING_BOOKINGS_COL_START = "start";
     public static final String RECURRING_BOOKINGS_COL_FREQUENCY = "frequency";
     public static final String RECURRING_BOOKINGS_COL_END = "end";
@@ -47,7 +47,7 @@ public class ExpensesDbHelper extends SQLiteOpenHelper {
             + "("
             + RECURRING_BOOKINGS_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + RECURRING_BOOKINGS_COL_BOOKING_ID + " INTEGER NOT NULL, "
-            + RECURRING_BOOKINGS_COL_BOOKING_TYPE + " TEXT NOT NULL, "
+//            + RECURRING_BOOKINGS_COL_BOOKING_TYPE + " TEXT NOT NULL, " // entfernt
             + RECURRING_BOOKINGS_COL_START + " TEXT NOT NULL, "
             + RECURRING_BOOKINGS_COL_FREQUENCY + " INTEGER NOT NULL, "
             + RECURRING_BOOKINGS_COL_END + " TEXT NOT NULL"
@@ -68,7 +68,9 @@ public class ExpensesDbHelper extends SQLiteOpenHelper {
     public static final String BOOKINGS_COL_NOTICE = "notice";
     public static final String BOOKINGS_COL_ACCOUNT_ID = "account_id";
     public static final String BOOKINGS_COL_CURRENCY_ID = "currency_id";
-    public static final String BOOKINGS_COL_IS_PARENT = "is_parent";//todo brauchen wir das flag noch, wenn der expense type mit gespeichert wird?
+    public static final String BOOKINGS_COL_HIDDEN = "hidden";
+    public static final String BOOKINGS_COL_PARENT_ID = "parent_id";
+//    public static final String BOOKINGS_COL_IS_PARENT = "is_parent";//entfernt
 
     private static final String CREATE_BOOKINGS = "CREATE TABLE " + TABLE_BOOKINGS
             + "("
@@ -83,41 +85,43 @@ public class ExpensesDbHelper extends SQLiteOpenHelper {
             + BOOKINGS_COL_NOTICE + " TEXT, "
             + BOOKINGS_COL_ACCOUNT_ID + " INTEGER NOT NULL, "
             + BOOKINGS_COL_CURRENCY_ID + " INTEGER NOT NULL, "
-            + BOOKINGS_COL_IS_PARENT + " INTEGER NOT NULL"
+            + BOOKINGS_COL_HIDDEN + " INTEGER NOT NULL, "
+            + BOOKINGS_COL_PARENT_ID + " INTEGER "
+//            + BOOKINGS_COL_IS_PARENT + " INTEGER NOT NULL" // entfernt
             + ");";
 
 
     // define table Child_Bookings
-    public static final String TABLE_CHILD_BOOKINGS = "CHILD_BOOKINGS";
-
-    public static final String CHILD_BOOKINGS_COL_ID = "child_booking_id";
-    public static final String CHILD_BOOKINGS_COL_CREATED_AT = "created_at";
-    public static final String CHILD_BOOKINGS_COL_EXPENSE_TYPE = "expense_type";
-    public static final String CHILD_BOOKINGS_COL_PARENT_BOOKING_ID = "booking_id";
-    public static final String CHILD_BOOKINGS_COL_PRICE = "price";
-    public static final String CHILD_BOOKINGS_COL_CATEGORY_ID = "category_id";
-    public static final String CHILD_BOOKINGS_COL_EXPENDITURE = "expenditure";
-    public static final String CHILD_BOOKINGS_COL_TITLE = "title";
-    public static final String CHILD_BOOKINGS_COL_DATE = "date";
-    public static final String CHILD_BOOKINGS_COL_NOTICE = "notice";
-    public static final String CHILD_BOOKINGS_COL_ACCOUNT_ID = "account_id";
-    public static final String CHILD_BOOKINGS_COL_CURRENCY_ID = "currency_id";
-
-    private static final String CREATE_CHILD_BOOKINGS = "CREATE TABLE " + TABLE_CHILD_BOOKINGS
-            + "("
-            + CHILD_BOOKINGS_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + CHILD_BOOKINGS_COL_CREATED_AT + " DEFAULT CURRENT_TIMESTAMP, "
-            + CHILD_BOOKINGS_COL_EXPENSE_TYPE + " TEXT NOT NULL, "
-            + CHILD_BOOKINGS_COL_PARENT_BOOKING_ID + " INTEGER NOT NULL, "
-            + CHILD_BOOKINGS_COL_PRICE + " REAL NOT NULL, "
-            + CHILD_BOOKINGS_COL_CATEGORY_ID + " INTEGER NOT NULL, "
-            + CHILD_BOOKINGS_COL_EXPENDITURE + " INTEGER NOT NULL, "
-            + CHILD_BOOKINGS_COL_TITLE + " TEXT NOT NULL, "
-            + CHILD_BOOKINGS_COL_DATE + " TEXT NOT NULL, "
-            + CHILD_BOOKINGS_COL_NOTICE + " TEXT, "
-            + CHILD_BOOKINGS_COL_ACCOUNT_ID + " INTEGER NOT NULL, "
-            + CHILD_BOOKINGS_COL_CURRENCY_ID + " INTEGER NOT NULL "
-            + ");";
+//    public static final String TABLE_CHILD_BOOKINGS = "CHILD_BOOKINGS"; //entfernt
+//
+//    public static final String CHILD_BOOKINGS_COL_ID = "child_booking_id";
+//    public static final String CHILD_BOOKINGS_COL_CREATED_AT = "created_at";
+//    public static final String CHILD_BOOKINGS_COL_EXPENSE_TYPE = "expense_type";
+//    public static final String CHILD_BOOKINGS_COL_PARENT_BOOKING_ID = "booking_id";
+//    public static final String CHILD_BOOKINGS_COL_PRICE = "price";
+//    public static final String CHILD_BOOKINGS_COL_CATEGORY_ID = "category_id";
+//    public static final String CHILD_BOOKINGS_COL_EXPENDITURE = "expenditure";
+//    public static final String CHILD_BOOKINGS_COL_TITLE = "title";
+//    public static final String CHILD_BOOKINGS_COL_DATE = "date";
+//    public static final String CHILD_BOOKINGS_COL_NOTICE = "notice";
+//    public static final String CHILD_BOOKINGS_COL_ACCOUNT_ID = "account_id";
+//    public static final String CHILD_BOOKINGS_COL_CURRENCY_ID = "currency_id";
+//
+//    private static final String CREATE_CHILD_BOOKINGS = "CREATE TABLE " + TABLE_CHILD_BOOKINGS // entfernt
+//            + "("
+//            + CHILD_BOOKINGS_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+//            + CHILD_BOOKINGS_COL_CREATED_AT + " DEFAULT CURRENT_TIMESTAMP, "
+//            + CHILD_BOOKINGS_COL_EXPENSE_TYPE + " TEXT NOT NULL, "
+//            + CHILD_BOOKINGS_COL_PARENT_BOOKING_ID + " INTEGER NOT NULL, "
+//            + CHILD_BOOKINGS_COL_PRICE + " REAL NOT NULL, "
+//            + CHILD_BOOKINGS_COL_CATEGORY_ID + " INTEGER NOT NULL, "
+//            + CHILD_BOOKINGS_COL_EXPENDITURE + " INTEGER NOT NULL, "
+//            + CHILD_BOOKINGS_COL_TITLE + " TEXT NOT NULL, "
+//            + CHILD_BOOKINGS_COL_DATE + " TEXT NOT NULL, "
+//            + CHILD_BOOKINGS_COL_NOTICE + " TEXT, "
+//            + CHILD_BOOKINGS_COL_ACCOUNT_ID + " INTEGER NOT NULL, "
+//            + CHILD_BOOKINGS_COL_CURRENCY_ID + " INTEGER NOT NULL "
+//            + ");";
 
 
     // define table Accounts
@@ -192,14 +196,14 @@ public class ExpensesDbHelper extends SQLiteOpenHelper {
     public static final String BOOKINGS_TAGS_COL_ID = "booking_tag_id";
     public static final String BOOKINGS_TAGS_COL_TAG_ID = "tag_id";
     public static final String BOOKINGS_TAGS_COL_BOOKING_ID = "booking_id";
-    public static final String BOOKINGS_TAGS_COL_BOOKING_TYPE = "booking_type";
+//    public static final String BOOKINGS_TAGS_COL_BOOKING_TYPE = "booking_type"; //entfernt
 
     private static final String CREATE_BOOKINGS_TAGS = "CREATE TABLE " + TABLE_BOOKINGS_TAGS
             + "("
             + BOOKINGS_TAGS_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + BOOKINGS_TAGS_COL_TAG_ID + " INTEGER NOT NULL, "
-            + BOOKINGS_TAGS_COL_BOOKING_ID + " INTEGER NOT NULL, "
-            + BOOKINGS_TAGS_COL_BOOKING_TYPE + " TEXT NOT NULL"
+            + BOOKINGS_TAGS_COL_BOOKING_ID + " INTEGER NOT NULL "
+//            + BOOKINGS_TAGS_COL_BOOKING_TYPE + " TEXT NOT NULL" // entfernt
             + ");";
 
 
@@ -239,8 +243,8 @@ public class ExpensesDbHelper extends SQLiteOpenHelper {
             Log.d(TAG, "Die Tabelle Bookings wird mit SQL-Befehl: " + CREATE_BOOKINGS + " angelegt.");
             db.execSQL(CREATE_BOOKINGS);
 
-            Log.d(TAG, "Die Tabelle Child_Bookings wird mit dem SQL-Befehl: " + CREATE_CHILD_BOOKINGS + " angelegt.");
-            db.execSQL(CREATE_CHILD_BOOKINGS);
+//            Log.d(TAG, "Die Tabelle Child_Bookings wird mit dem SQL-Befehl: " + CREATE_CHILD_BOOKINGS + " angelegt."); // entfernt
+//            db.execSQL(CREATE_CHILD_BOOKINGS);
 
             Log.d(TAG, "Die Tabelle Accounts wird mit SQL-Befehl: " + CREATE_ACCOUNTS + " angelegt.");
             db.execSQL(CREATE_ACCOUNTS);
@@ -278,7 +282,7 @@ public class ExpensesDbHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOKINGS);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CHILD_BOOKINGS);
+//        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CHILD_BOOKINGS); // entfernt
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_TAGS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_ACCOUNTS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORIES);

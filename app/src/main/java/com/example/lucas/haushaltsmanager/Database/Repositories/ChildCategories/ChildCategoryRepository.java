@@ -240,8 +240,8 @@ public class ChildCategoryRepository {
 
         selectQuery = "SELECT"
                 + " *"
-                + " FROM " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS
-                + " WHERE " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_CATEGORY_ID + " = " + category.getIndex()
+                + " FROM " + ExpensesDbHelper.TABLE_BOOKINGS
+                + " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID + " = " + category.getIndex()
                 + " LIMIT 1;";
 
         Cursor c = db.rawQuery(selectQuery, null);

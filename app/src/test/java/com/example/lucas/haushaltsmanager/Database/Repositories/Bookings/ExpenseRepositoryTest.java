@@ -70,7 +70,7 @@ public class ExpenseRepositoryTest {
 
         return new ExpenseObject(
                 "Ausgabe",
-                37,
+                Math.random(),
                 true,
                 category,
                 account.getIndex(),
@@ -160,13 +160,52 @@ public class ExpenseRepositoryTest {
 
     @Test
     public void testGetAllShouldNotIncludeHiddenBookings() {
-        //todo erstelle den test wenn Ausgaben auch einen Hidden status haben können
+        ExpenseObject visibleExpense1 = getSimpleExpense();
+        visibleExpense1 = ExpenseRepository.insert(visibleExpense1);
+        assertTrue("Ausgabe 1 wurde nicht gefunden", ExpenseRepository.exists(visibleExpense1));
+
+        ExpenseObject visibleExpense2 = getSimpleExpense();
+        visibleExpense2 = ExpenseRepository.insert(visibleExpense2);
+        assertTrue("Ausgabe 2 wurde nicht gefunden", ExpenseRepository.exists(visibleExpense2));
+
+        ExpenseObject hiddenExpense = getSimpleExpense();
+        hiddenExpense = ExpenseRepository.insert(hiddenExpense);
+        assertTrue("Ausgabe 3 wurde nicht gefunden", ExpenseRepository.exists(hiddenExpense));
+
+        try {
+            ExpenseRepository.hide(hiddenExpense);
+            List<ExpenseObject> expenses = ExpenseRepository.getAll();
+
+            assertEquals("Es wurde zu viele Buchungen aus der Datenbank geholt", 2, expenses.size());
+            assertFalse("Die vesteckte Buchung wurde aus der Datenbank geholt", expenses.contains(hiddenExpense));
+            assertTrue("Die erste sichtbare Buchung wurde nicht aus der Datenbank geholt", expenses.contains(visibleExpense1));
+            assertTrue("Die zweite sichtbare Buchung wurde nicht aus der Datenbank geholt", expenses.contains(visibleExpense2));
+        } catch (ExpenseNotFoundException e) {
+
+            Assert.fail("Buchung konnte nicht versteckt werden");
+        }
+    }
+
+    @Test
+    public void testGetAllShouldNotReturnChildBookings() {
+        ExpenseObject parentExpense = getExpenseWithChildren();
+        parentExpense = ExpenseRepository.insert(parentExpense);
+
+        ExpenseObject expense = getSimpleExpense();
+        expense = ExpenseRepository.insert(expense);
+
+        List<ExpenseObject> expenses = ExpenseRepository.getAll();
+
+        assertEquals("Es wurden zu viele Ausgaben aus der Datenbank geholt", 2, expenses.size());
+        assertTrue("Die ParentExpense wurde nicht aus der Datenbank geholt", expenses.contains(parentExpense));
+        assertTrue("Die Ausgabe wurde nicht aus der Datenbank geholt", expenses.contains(expense));
     }
 
     @Test
     public void testGetAllInSpecifiedTimeFrameShouldReturnBookingsInThisTimeFrame() {
         //Funktion funktioniert wie erwartet.
         //todo den Test noch einmal ausführen, wenn es einen Test für ExpenseObject.setDateTime() und ExpenseObject.getDateTime() gibt
+        //das Verhalten vom Calendar ist unerwartet
         Calendar date = Calendar.getInstance();
         ExpenseObject expenseBeforeTimeFrame = getSimpleExpense();
         date.setTimeInMillis(1527803999000L);//31.05.2018 23:59:59

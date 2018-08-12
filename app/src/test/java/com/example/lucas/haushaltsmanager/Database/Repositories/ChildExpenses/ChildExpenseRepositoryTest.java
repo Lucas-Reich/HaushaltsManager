@@ -29,6 +29,7 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
@@ -66,7 +67,7 @@ public class ChildExpenseRepositoryTest {
 
         return new ExpenseObject(
                 "Ausgabe",
-                100,
+                Math.random(),
                 false,
                 category,
                 account.getIndex(),
@@ -275,6 +276,24 @@ public class ChildExpenseRepositoryTest {
     }
 
     @Test
+    public void testGetAllShouldOnlyReturnChildrenThatAreNotHidden() {
+        ExpenseObject parentExpense = getParentExpenseWithChildren();
+        parentExpense = ExpenseRepository.insert(parentExpense);
+
+        try {
+            ChildExpenseRepository.hide(parentExpense.getChildren().get(0));
+            List<ExpenseObject> fetchedChildren = ChildExpenseRepository.getAll(parentExpense.getIndex());
+
+            assertEquals("Es wurden zu viele Kinder aus der Datenbank geholt", 1, fetchedChildren.size());
+            assertFalse("Ein verstecktes Kind wurde aus der Datenbank geholt", fetchedChildren.contains(parentExpense.getChildren().get(0)));
+            assertTrue("Ein nicht verstecktes Kind wurde aus der Datenbank geholt", fetchedChildren.contains(parentExpense.getChildren().get(1)));
+        } catch (ChildExpenseNotFoundException e) {
+
+            Assert.fail("Ausgabe konnte nicht gefunden werden");
+        }
+    }
+
+    @Test
     public void testUpdateWithExistingChildExpenseShouldSucceed() {
         ExpenseObject parentExpense = getParentExpenseWithChildren();
         ExpenseObject expectedChildExpense = ChildExpenseRepository.insert(parentExpense, parentExpense.getChildren().get(0));
@@ -420,21 +439,21 @@ public class ChildExpenseRepositoryTest {
         expectedChildExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.CHILD_EXPENSE);
 
         String[] columns = new String[]{
-                ExpensesDbHelper.CHILD_BOOKINGS_COL_ID,
-                ExpensesDbHelper.CHILD_BOOKINGS_COL_DATE,
-                ExpensesDbHelper.CHILD_BOOKINGS_COL_TITLE,
-                ExpensesDbHelper.CHILD_BOOKINGS_COL_PRICE,
-                ExpensesDbHelper.CHILD_BOOKINGS_COL_EXPENDITURE,
-                ExpensesDbHelper.CHILD_BOOKINGS_COL_NOTICE,
-                ExpensesDbHelper.CHILD_BOOKINGS_COL_CURRENCY_ID,
+                ExpensesDbHelper.BOOKINGS_COL_ID,
+                ExpensesDbHelper.BOOKINGS_COL_DATE,
+                ExpensesDbHelper.BOOKINGS_COL_TITLE,
+                ExpensesDbHelper.BOOKINGS_COL_PRICE,
+                ExpensesDbHelper.BOOKINGS_COL_EXPENDITURE,
+                ExpensesDbHelper.BOOKINGS_COL_NOTICE,
+                ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID,
+                ExpensesDbHelper.BOOKINGS_COL_CURRENCY_ID,
                 ExpensesDbHelper.CURRENCIES_COL_NAME,
                 ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME,
                 ExpensesDbHelper.CURRENCIES_COL_SYMBOL,
                 ExpensesDbHelper.CATEGORIES_COL_ID,
                 ExpensesDbHelper.CATEGORIES_COL_NAME,
                 ExpensesDbHelper.CATEGORIES_COL_COLOR,
-                ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE,
-                ExpensesDbHelper.ACCOUNTS_COL_ID
+                ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE
         };
 
         MatrixCursor cursor = new MatrixCursor(columns);
@@ -445,6 +464,7 @@ public class ChildExpenseRepositoryTest {
                 expectedChildExpense.getUnsignedPrice(),
                 expectedChildExpense.isExpenditure() ? 1 : 0,
                 expectedChildExpense.getNotice(),
+                expectedChildExpense.getAccountId(),
                 expectedChildExpense.getCurrency().getIndex(),
                 expectedChildExpense.getCurrency().getName(),
                 expectedChildExpense.getCurrency().getShortName(),
@@ -452,8 +472,7 @@ public class ChildExpenseRepositoryTest {
                 expectedChildExpense.getCategory().getIndex(),
                 expectedChildExpense.getCategory().getTitle(),
                 expectedChildExpense.getCategory().getColorString(),
-                expectedChildExpense.getCategory().getDefaultExpenseType() ? 1 : 0,
-                expectedChildExpense.getAccountId()
+                expectedChildExpense.getCategory().getDefaultExpenseType() ? 1 : 0
         });
         cursor.moveToFirst();
 
@@ -473,21 +492,21 @@ public class ChildExpenseRepositoryTest {
         expectedChildExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.CHILD_EXPENSE);
 
         String[] columns = new String[]{
-                ExpensesDbHelper.CHILD_BOOKINGS_COL_ID,
-                ExpensesDbHelper.CHILD_BOOKINGS_COL_DATE,
-                ExpensesDbHelper.CHILD_BOOKINGS_COL_TITLE,
+                ExpensesDbHelper.BOOKINGS_COL_ID,
+                ExpensesDbHelper.BOOKINGS_COL_DATE,
+                ExpensesDbHelper.BOOKINGS_COL_TITLE,
                 //Der Preis der KindBuchung wurde nicht mit abgefragt
-                ExpensesDbHelper.CHILD_BOOKINGS_COL_EXPENDITURE,
-                ExpensesDbHelper.CHILD_BOOKINGS_COL_NOTICE,
-                ExpensesDbHelper.CHILD_BOOKINGS_COL_CURRENCY_ID,
+                ExpensesDbHelper.BOOKINGS_COL_EXPENDITURE,
+                ExpensesDbHelper.BOOKINGS_COL_NOTICE,
+                ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID,
+                ExpensesDbHelper.BOOKINGS_COL_CURRENCY_ID,
                 ExpensesDbHelper.CURRENCIES_COL_NAME,
                 ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME,
                 ExpensesDbHelper.CURRENCIES_COL_SYMBOL,
                 ExpensesDbHelper.CATEGORIES_COL_ID,
                 ExpensesDbHelper.CATEGORIES_COL_NAME,
                 ExpensesDbHelper.CATEGORIES_COL_COLOR,
-                ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE,
-                ExpensesDbHelper.ACCOUNTS_COL_ID
+                ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE
         };
 
         MatrixCursor cursor = new MatrixCursor(columns);
@@ -497,6 +516,7 @@ public class ChildExpenseRepositoryTest {
                 expectedChildExpense.getTitle(),
                 expectedChildExpense.isExpenditure() ? 1 : 0,
                 expectedChildExpense.getNotice(),
+                expectedChildExpense.getAccountId(),
                 expectedChildExpense.getCurrency().getIndex(),
                 expectedChildExpense.getCurrency().getName(),
                 expectedChildExpense.getCurrency().getShortName(),
@@ -504,8 +524,7 @@ public class ChildExpenseRepositoryTest {
                 expectedChildExpense.getCategory().getIndex(),
                 expectedChildExpense.getCategory().getTitle(),
                 expectedChildExpense.getCategory().getColorString(),
-                expectedChildExpense.getCategory().getDefaultExpenseType() ? 1 : 0,
-                expectedChildExpense.getAccountId()
+                expectedChildExpense.getCategory().getDefaultExpenseType() ? 1 : 0
         });
         cursor.moveToFirst();
 

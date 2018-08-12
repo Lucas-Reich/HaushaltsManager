@@ -184,8 +184,8 @@ public class AccountRepository {
         String selectQuery;
         selectQuery = "SELECT"
                 + " *"
-                + " FROM " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS
-                + " WHERE " + ExpensesDbHelper.TABLE_CHILD_BOOKINGS + "." + ExpensesDbHelper.CHILD_BOOKINGS_COL_ACCOUNT_ID + " = " + account.getIndex()
+                + " FROM " + ExpensesDbHelper.TABLE_BOOKINGS
+                + " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID + " = " + account.getIndex()
                 + " LIMIT 1;";
 
         Cursor c = db.rawQuery(selectQuery, null);

@@ -8,7 +8,6 @@ import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.Exceptions.EntityNotExistingException;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.Exceptions.RecurringBookingNotFoundException;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 
@@ -26,7 +25,6 @@ public class RecurringBookingRepository {
                 + " *"
                 + " FROM " + ExpensesDbHelper.TABLE_RECURRING_BOOKINGS
                 + " WHERE " + ExpensesDbHelper.TABLE_RECURRING_BOOKINGS + "." + ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID + " = " + recurringBooking.getIndex()
-                + " AND " + ExpensesDbHelper.TABLE_RECURRING_BOOKINGS + "." + ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_TYPE + " = '" + recurringBooking.getExpenseType().name() + "'"
                 + " LIMIT 1;";
 
         Cursor c = db.rawQuery(selectQuery, null);
@@ -50,7 +48,6 @@ public class RecurringBookingRepository {
 
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID, expense.getIndex());
-        values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_TYPE, expense.getExpenseType().name());
         values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_START, startTimeInMillis);
         values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_FREQUENCY, frequency);
         values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_END, endTimeInMillis);
@@ -78,8 +75,7 @@ public class RecurringBookingRepository {
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
 
         String selectQuery = "SELECT "
-                + ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID + ", "
-                + ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_TYPE
+                + ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID
                 + " FROM " + ExpensesDbHelper.TABLE_RECURRING_BOOKINGS
                 + " WHERE " + ExpensesDbHelper.RECURRING_BOOKINGS_COL_ID + " = " + recurringBookingId;
 
@@ -175,7 +171,6 @@ public class RecurringBookingRepository {
 
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID, newRecurringBooking.getIndex());
-        values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_TYPE, newRecurringBooking.getExpenseType().name());
         values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_START, startDateInMills);
         values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_FREQUENCY, frequency);
         values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_END, endDateInMills);
@@ -194,11 +189,9 @@ public class RecurringBookingRepository {
     }
 
     private static ExpenseObject getExpense(Cursor c) throws EntityNotExistingException {
-        if (c.getString(c.getColumnIndex(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_TYPE)).equals(ExpenseObject.EXPENSE_TYPES.CHILD_EXPENSE.name()))
-            return ChildExpenseRepository.get(c.getLong(c.getColumnIndex(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID)));
-        else if (c.getString(c.getColumnIndex(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_TYPE)).equals(ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE.name()))
-            return ExpenseRepository.get(c.getLong(c.getColumnIndex(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID)));
-        else
-            throw new UnsupportedOperationException("Buchungstyp " + c.getString(c.getColumnIndex(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_TYPE)) + " wird nicht unterstützt");
+        //ich kann nun nicht mehr unterscheiden welchen typ von ausgabe ich genau habe
+        //an sich nicht schlimm da ich auch Kinder aus dem ExpensesRepo bekomme, aber nicht der schönste weg
+        //todo gibt es einen anderen Weg die Expense zu bekommen
+        return ExpenseRepository.get(c.getLong(c.getColumnIndex(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID)));
     }
 }

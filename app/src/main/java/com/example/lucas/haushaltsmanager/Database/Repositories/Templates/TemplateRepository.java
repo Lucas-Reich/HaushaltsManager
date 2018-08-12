@@ -27,7 +27,6 @@ public class TemplateRepository {
                 + " *"
                 + " FROM " + ExpensesDbHelper.TABLE_TEMPLATE_BOOKINGS
                 + " WHERE " + ExpensesDbHelper.TABLE_TEMPLATE_BOOKINGS + "." + ExpensesDbHelper.TEMPLATE_COL_BOOKING_ID + " = " + template.getIndex()
-                + " AND " + ExpensesDbHelper.TABLE_TEMPLATE_BOOKINGS + "." + ExpensesDbHelper.TEMPLATE_COL_BOOKING_TYPE + " = '" + template.getExpenseType().name() + "'"
                 + " LIMIT 1;";
 
         Cursor c = db.rawQuery(selectQuery, null);
@@ -49,7 +48,6 @@ public class TemplateRepository {
 
         String selectQuery = "SELECT "
                 + ExpensesDbHelper.TEMPLATE_COL_BOOKING_ID + ","
-                + ExpensesDbHelper.TEMPLATE_COL_BOOKING_TYPE
                 + " FROM " + ExpensesDbHelper.TABLE_TEMPLATE_BOOKINGS
                 + " WHERE " + ExpensesDbHelper.TEMPLATE_COL_BOOKING_ID + " = " + templateId;
 
@@ -59,15 +57,7 @@ public class TemplateRepository {
 
         ExpenseObject template;
         try {
-            if (c.getString(c.getColumnIndex(ExpensesDbHelper.TEMPLATE_COL_BOOKING_TYPE)).equals(ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE.name())) {
-                template = ExpenseRepository.get(c.getLong(c.getColumnIndex(ExpensesDbHelper.TEMPLATE_COL_BOOKING_ID)));
-            } else if (c.getString(c.getColumnIndex(ExpensesDbHelper.TEMPLATE_COL_BOOKING_TYPE)).equals(ExpenseObject.EXPENSE_TYPES.CHILD_EXPENSE.name())) {
-                template = ChildExpenseRepository.get(c.getLong(c.getColumnIndex(ExpensesDbHelper.TEMPLATE_COL_BOOKING_ID)));
-            } else {
-                throw new UnsupportedOperationException("Fehler beim auslesen des Booking_type feldes. Angegebener Booking_type wird nicht unterstützt");
-            }
-        } catch (ExpenseNotFoundException e) {
-            throw new TemplateNotExistingException(templateId);
+            template = ChildExpenseRepository.get(c.getLong(c.getColumnIndex(ExpensesDbHelper.TEMPLATE_COL_BOOKING_ID)));
         } catch (ChildExpenseNotFoundException e) {
             throw new TemplateNotExistingException(templateId);
         } finally {
@@ -83,8 +73,7 @@ public class TemplateRepository {
 
         String selectQuery;
         selectQuery = "SELECT "
-                + ExpensesDbHelper.TEMPLATE_COL_BOOKING_ID + ","
-                + ExpensesDbHelper.TEMPLATE_COL_BOOKING_TYPE
+                + ExpensesDbHelper.TEMPLATE_COL_BOOKING_ID
                 + " FROM " + ExpensesDbHelper.TABLE_TEMPLATE_BOOKINGS + ";";
 
         Cursor c = db.rawQuery(selectQuery, null);
@@ -93,14 +82,7 @@ public class TemplateRepository {
         ArrayList<ExpenseObject> templateBookings = new ArrayList<>();
         while (!c.isAfterLast()) {
 
-            long index;
-            if (c.getString(c.getColumnIndex(ExpensesDbHelper.TEMPLATE_COL_BOOKING_TYPE)).equals(ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE.name())) {
-                index = c.getLong(c.getColumnIndex(ExpensesDbHelper.TEMPLATE_COL_BOOKING_ID));
-            } else if (c.getString(c.getColumnIndex(ExpensesDbHelper.TEMPLATE_COL_BOOKING_TYPE)).equals(ExpenseObject.EXPENSE_TYPES.CHILD_EXPENSE.name())) {
-                index = c.getLong(c.getColumnIndex(ExpensesDbHelper.TEMPLATE_COL_BOOKING_ID));
-            } else {
-                throw new UnsupportedOperationException("Fehler beim auslesen des Booking_type feldes. Angegebener Booking_type wird nicht unterstützt");
-            }
+            long index = c.getLong(c.getColumnIndex(ExpensesDbHelper.TEMPLATE_COL_BOOKING_ID));
 
             try {
                 templateBookings.add(ExpenseRepository.get(index));
@@ -125,7 +107,6 @@ public class TemplateRepository {
 
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.TEMPLATE_COL_BOOKING_ID, template.getIndex());
-        values.put(ExpensesDbHelper.TEMPLATE_COL_BOOKING_TYPE, template.getExpenseType().name());
 
         long insertedTemplateId = db.insert(ExpensesDbHelper.TABLE_TEMPLATE_BOOKINGS, null, values);
         DatabaseManager.getInstance().closeDatabase();
@@ -152,12 +133,7 @@ public class TemplateRepository {
         if (!exists(template))
             throw new CannotDeleteTemplateException(template);
 
-        String whereClause;
-        whereClause = ExpensesDbHelper.TEMPLATE_COL_BOOKING_ID + " = ?"
-                + " AND " + ExpensesDbHelper.TEMPLATE_COL_BOOKING_TYPE + " = ?";
-        String[] whereArguments = new String[]{"" + template.getIndex(), template.getExpenseType().name()};
-
-        db.delete(ExpensesDbHelper.TABLE_TEMPLATE_BOOKINGS, whereClause, whereArguments);
+        db.delete(ExpensesDbHelper.TABLE_TEMPLATE_BOOKINGS, ExpensesDbHelper.TEMPLATE_COL_BOOKING_ID + " = ?", new String[]{"" + template.getIndex()});
         DatabaseManager.getInstance().closeDatabase();
     }
 
@@ -166,7 +142,6 @@ public class TemplateRepository {
 
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.TEMPLATE_COL_BOOKING_ID, newTemplate.getIndex());
-        values.put(ExpensesDbHelper.TEMPLATE_COL_BOOKING_TYPE, newTemplate.getExpenseType().name());
 
         int affectedRows = db.update(ExpensesDbHelper.TABLE_TEMPLATE_BOOKINGS, values, ExpensesDbHelper.TEMPLATE_COL_ID + " = ?", new String[]{"" + templateId});
         DatabaseManager.getInstance().closeDatabase();

@@ -3,7 +3,6 @@ package com.example.lucas.haushaltsmanager.Database.Repositories.BookingTags;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.provider.ContactsContract;
 
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
@@ -20,7 +19,7 @@ public class BookingTagRepository {
      * Methode um zu überprüfen ob es die Relation zwischen Buchung und Tag existiert.
      *
      * @param expense Buchung, zu der das angegebene Tag zuegprdnet sein soll
-     * @param tag Tag, welches der Buchung zugeprdnet sein soll
+     * @param tag     Tag, welches der Buchung zugeprdnet sein soll
      * @return TRUE wenn das Tag der Buchung zugeordnet ist, FALSE wenn nicht
      */
     public static boolean exists(ExpenseObject expense, Tag tag) {
@@ -32,7 +31,6 @@ public class BookingTagRepository {
                 + " FROM " + ExpensesDbHelper.TABLE_BOOKINGS_TAGS
                 + " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS_TAGS + "." + ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_ID + " = " + expense.getIndex()
                 + " AND " + ExpensesDbHelper.TABLE_BOOKINGS_TAGS + "." + ExpensesDbHelper.BOOKINGS_TAGS_COL_TAG_ID + " = " + tag.getIndex()
-                + " AND " + ExpensesDbHelper.TABLE_BOOKINGS_TAGS + "." + ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_TYPE + " = '" + expense.getExpenseType().name() + "'"
                 + " LIMIT 1;";
 
         Cursor c = db.rawQuery(selectQuery, null);
@@ -66,7 +64,7 @@ public class BookingTagRepository {
                 + " FROM " + ExpensesDbHelper.TABLE_BOOKINGS_TAGS
                 + " JOIN " + ExpensesDbHelper.TABLE_TAGS + " ON " + ExpensesDbHelper.TABLE_BOOKINGS_TAGS + "." + ExpensesDbHelper.BOOKINGS_TAGS_COL_TAG_ID + " = " + ExpensesDbHelper.TABLE_TAGS + "." + ExpensesDbHelper.TAGS_COL_ID
                 + " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS_TAGS + "." + ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_ID + " = " + expenseId
-                + " AND " + ExpensesDbHelper.TABLE_BOOKINGS_TAGS + "." + ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_TYPE + " = '" + expenseType + "';";
+                + ";";
 
         Cursor c = db.rawQuery(selectQuery, null);
 
@@ -102,9 +100,6 @@ public class BookingTagRepository {
         //todo ich muss überprüfen ob es die Buchung auch wirklich gibt
         values.put(ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_ID, bookingId);
 
-        //todo ich muss
-        values.put(ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_TYPE, expenseType.name());
-
         db.insert(ExpensesDbHelper.TABLE_BOOKINGS_TAGS, null, values);
         DatabaseManager.getInstance().closeDatabase();
     }
@@ -120,11 +115,9 @@ public class BookingTagRepository {
 
         String whereClause;
         whereClause = ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_ID + " = ?"
-                + " AND " + ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_TYPE + " = ?"
                 + " AND " + ExpensesDbHelper.BOOKINGS_TAGS_COL_TAG_ID + " = ?";
         String[] whereArgs = new String[]{
                 "" + expense.getIndex(),
-                expense.getExpenseType().name(),
                 "" + tag.getIndex()
         };
 
@@ -140,11 +133,7 @@ public class BookingTagRepository {
     public static void deleteAll(ExpenseObject expense) {
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
 
-        String whereClause = ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_ID + " = ?"
-                + " AND " + ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_TYPE + " = ?";
-        String[] whereArgs = new String[]{expense.getIndex() + "", expense.getExpenseType().name()};
-
-        db.delete(ExpensesDbHelper.TABLE_BOOKINGS_TAGS, whereClause, whereArgs);
+        db.delete(ExpensesDbHelper.TABLE_BOOKINGS_TAGS, ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_ID + " = ?", new String[]{expense.getIndex() + ""});
         DatabaseManager.getInstance().closeDatabase();
     }
 }
