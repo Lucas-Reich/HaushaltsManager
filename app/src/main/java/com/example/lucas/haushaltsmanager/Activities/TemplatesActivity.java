@@ -13,14 +13,16 @@ import android.widget.ListView;
 import com.example.lucas.haushaltsmanager.BookingAdapter;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Templates.TemplateRepository;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Template;
 import com.example.lucas.haushaltsmanager.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TemplatesActivity extends AppCompatActivity {
     private static final String TAG = TemplatesActivity.class.getSimpleName();
 
-    private List<ExpenseObject> mExpenses;
+    private List<ExpenseObject> mTemplates = new ArrayList<>();
     private ListView mListView;
     private ImageButton mBackArrow;
 
@@ -58,7 +60,7 @@ public class TemplatesActivity extends AppCompatActivity {
                 if (getCallingActivity() != null) {
 
                     Intent returnTemplateIntent = new Intent();
-                    returnTemplateIntent.putExtra("templateObj", mExpenses.get(position));
+                    returnTemplateIntent.putExtra("templateObj", mTemplates.get(position));
                     setResult(Activity.RESULT_OK, returnTemplateIntent);
                     finish();
                 } else {
@@ -73,7 +75,7 @@ public class TemplatesActivity extends AppCompatActivity {
     private void updateListView() {
         prepareListData();
 
-        BookingAdapter bookingAdapter = new BookingAdapter(mExpenses, this);
+        BookingAdapter bookingAdapter = new BookingAdapter(mTemplates, this);
 
         mListView.setAdapter(bookingAdapter);
 
@@ -81,6 +83,9 @@ public class TemplatesActivity extends AppCompatActivity {
     }
 
     private void prepareListData() {
-        mExpenses = TemplateRepository.getAll();
+        List<Template> templates = TemplateRepository.getAll();
+        for (Template template : templates) {
+            mTemplates.add(template.getTemplate());
+        }
     }
 }

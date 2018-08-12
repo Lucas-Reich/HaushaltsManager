@@ -45,6 +45,7 @@ import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Tag;
+import com.example.lucas.haushaltsmanager.Entities.Template;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.text.DateFormat;
@@ -429,7 +430,7 @@ public class ExpenseScreenActivity extends AppCompatActivity {
 */
 
             if (mTemplate)
-                TemplateRepository.insert(mExpense);
+                TemplateRepository.insert(new Template(mExpense));
 
             Intent intent = new Intent(ExpenseScreenActivity.this, ParentActivity.class);
             ExpenseScreenActivity.this.startActivity(intent);

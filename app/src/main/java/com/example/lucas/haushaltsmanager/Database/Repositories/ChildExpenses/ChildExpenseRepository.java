@@ -381,6 +381,29 @@ public class ChildExpenseRepository {
             throw new ChildExpenseNotFoundException(expense.getIndex());
     }
 
+    public static boolean isHidden(ExpenseObject childExpense) throws ChildExpenseNotFoundException {
+        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+
+        String selectQuery;
+        selectQuery = "SELECT"
+                + " " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_HIDDEN
+                + " FROM " + ExpensesDbHelper.TABLE_BOOKINGS
+                + " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_ID + " = " + childExpense.getIndex()
+                + ";";
+
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        if (!c.moveToFirst()) {
+            throw new ChildExpenseNotFoundException(childExpense.getIndex());
+        }
+
+        boolean isHidden = c.getInt(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_HIDDEN)) == 1;
+        c.close();
+        DatabaseManager.getInstance().closeDatabase();
+
+        return isHidden;
+    }
+
     private static boolean isLastChildOfParent(ExpenseObject childExpense) {
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
 

@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
 
 @RunWith(RobolectricTestRunner.class)
 public class AccountRepositoryTest {
-    Currency currency;
+    private Currency currency;
 
     @Before
     public void setup() {

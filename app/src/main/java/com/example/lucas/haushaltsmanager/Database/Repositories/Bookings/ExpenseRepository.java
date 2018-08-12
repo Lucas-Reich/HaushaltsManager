@@ -222,7 +222,7 @@ public class ExpenseRepository {
             Toast.makeText(app.getContext(), "Buchung ist eine Vorlagen oder eine Wiederkehrende Buchung", Toast.LENGTH_SHORT).show();
         }
 
-        if (ChildExpenseRepository.exists(expense))
+        if (isAttachedToChildExpenses(expense))
             throw CannotDeleteExpenseException.BookingAttachedToChildException(expense);
 
         try {
@@ -299,6 +299,29 @@ public class ExpenseRepository {
             throw ExpenseNotFoundException.expenseNotFoundException(expense.getIndex());
     }
 
+    public static boolean isHidden(ExpenseObject expense) throws ExpenseNotFoundException {
+        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+
+        String selectQuery;
+        selectQuery = "SELECT"
+                + " " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_HIDDEN
+                + " FROM " + ExpensesDbHelper.TABLE_BOOKINGS
+                + " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_ID + " = " + expense.getIndex()
+                + ";";
+
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        if (!c.moveToFirst()) {
+            throw ExpenseNotFoundException.expenseNotFoundException(expense.getIndex());
+        }
+
+        boolean isHidden = c.getInt(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_HIDDEN)) == 1;
+        c.close();
+        DatabaseManager.getInstance().closeDatabase();
+
+        return isHidden;
+    }
+
     /**
      * Methode um den Kontostand anzupassen.
      *
@@ -338,7 +361,7 @@ public class ExpenseRepository {
     }
 
     private static boolean isTemplateBooking(ExpenseObject expense) {
-        return TemplateRepository.exists(expense);
+        return TemplateRepository.existsWithoutIndex(expense);
     }
 
     private static boolean isRecurringBooking(ExpenseObject expense) {

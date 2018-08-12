@@ -21,6 +21,7 @@ import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Tag;
+import com.example.lucas.haushaltsmanager.Entities.Template;
 
 import junit.framework.Assert;
 
@@ -44,6 +45,7 @@ import static org.mockito.Mockito.when;
 public class ExpenseRepositoryTest {
     private Account account;
     private Category category;
+    private Currency currency;
 
     @Before
     public void setup() {
@@ -57,7 +59,7 @@ public class ExpenseRepositoryTest {
         category = new Category("Kategorie", "#000000", false, new ArrayList<Category>());
         category = ChildCategoryRepository.insert(parentCategoryMock, category);
 
-        Currency currency = new Currency("Credits", "CRD", "C");
+        currency = new Currency("Credits", "CRD", "C");
         currency = CurrencyRepository.insert(currency);
 
         account = new Account("Konto", 100, currency);
@@ -65,9 +67,6 @@ public class ExpenseRepositoryTest {
     }
 
     private ExpenseObject getSimpleExpense() {
-        Currency currency = new Currency("Euro", "EUR", "€");
-        currency = CurrencyRepository.insert(currency);
-
         return new ExpenseObject(
                 "Ausgabe",
                 Math.random(),
@@ -321,7 +320,7 @@ public class ExpenseRepositoryTest {
     public void testDeleteWithExistingBookingThatIsATemplateShouldSucceedAndChangeBookingVisibilityToHidden() {
         //todo Test ausführen, wenn Buchungen als versteckt markiert werden wenn sie noch ein Template sind
         ExpenseObject expense = ExpenseRepository.insert(getSimpleExpense());
-        TemplateRepository.insert(expense);
+        TemplateRepository.insert(new Template(expense));
 
         try {
             ExpenseRepository.delete(expense);
