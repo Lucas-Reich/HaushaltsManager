@@ -285,6 +285,9 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     }
 
     private HashMap<ExpenseObject, List<ExpenseObject>> mSelectedBookings = new HashMap<>();
+    private int selectedGroups = 0;
+    private int selectedChildren = 0;
+    private int selectedParents = 0;
 
     /**
      * Methode um die angegebenen Buchung in die Liste der ausgwählten Buchungenzu schreiben.
@@ -294,7 +297,8 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
      */
     public void selectBooking(int groupPosition, @Nullable Integer childPosition) {
         ExpenseObject group = (ExpenseObject) getGroup(groupPosition);
-        group = removeChildren(group);
+        List<ExpenseObject> existingChildren = mChildData.get(group);
+//        group = removeChildren(group);
 
         if (childPosition != null) {
             ExpenseObject child = (ExpenseObject) getChild(groupPosition, childPosition);
@@ -309,8 +313,16 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             } else {
                 mSelectedBookings.put(group, children);
             }
+            selectedChildren++;
         } else {
-            mSelectedBookings.put(group, new ArrayList<ExpenseObject>());
+            if (group.isParent()) {
+                mSelectedBookings.put(group, existingChildren);
+                selectedParents++;
+            } else {
+
+                mSelectedBookings.put(group, new ArrayList<ExpenseObject>());
+                selectedGroups++;
+            }
         }
     }
 
@@ -322,7 +334,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
      */
     public void deselectBooking(int groupPosition, @Nullable Integer childPosition) {
         ExpenseObject group = (ExpenseObject) getGroup(groupPosition);
-        group = removeChildren(group);
+//        group = removeChildren(group);
 
         if (childPosition != null) {
 
@@ -334,8 +346,15 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             } else {
                 mSelectedBookings.put(group, children);
             }
+            selectedChildren--;
         } else {
             mSelectedBookings.remove(group);
+
+            if (mChildData.get(group).size() != 0) {
+                selectedParents--;
+            } else {
+                selectedGroups--;
+            }
         }
     }
 
@@ -348,7 +367,11 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
      */
     public boolean isBookingSelected(int groupPosition, @Nullable Integer childPosition) {
         ExpenseObject group = (ExpenseObject) getGroup(groupPosition);
-        group = removeChildren(group);
+//        group = removeChildren(group);
+
+        if (!mSelectedBookings.containsKey(group)) {
+            return false;
+        }
 
         if (childPosition != null) {
             ExpenseObject child = (ExpenseObject) getChild(groupPosition, childPosition);
@@ -356,7 +379,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             return mSelectedBookings.get(group).contains(child);
         } else {
 
-            return mSelectedBookings.containsKey(group);
+            return true;
         }
     }
 
@@ -367,10 +390,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
      * @return Buchung ohne Kinder
      */
     private ExpenseObject removeChildren(ExpenseObject expense) {
-        for (ExpenseObject child : expense.getChildren()) {
-            expense.removeChild(child);
-        }
-
+        expense.removeChildren();
         return expense;
     }
 
@@ -386,42 +406,26 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     /**
      * Methode um alle ausgewählten Buchugen abzuwählen
      */
-    public void deselectAll2() {
+    public void deselectAll() {
+        selectedGroups = 0;
+        selectedChildren = 0;
+        selectedParents = 0;
         mSelectedBookings.clear();
     }
 
     public int getSelectedBookingsCount() {
-        return getSelectedChildCount2() + getSelectedGroupCount2();
+        return selectedGroups + selectedChildren + selectedParents;
     }
 
-    public int getSelectedGroupCount2() {
-        int counter = 0;
-        for (Map.Entry<ExpenseObject, List<ExpenseObject>> selectedBooking : mSelectedBookings.entrySet()) {
-            if (selectedBooking.getValue().size() == 0) {
-                counter++;
-            }
-        }
-
-        return counter;
+    public int getSelectedGroupCount() {
+        return selectedGroups;
     }
 
-    public int getSelectedChildCount2() {
-        int counter = 0;
-        for (Map.Entry<ExpenseObject, List<ExpenseObject>> selectedBooking : mSelectedBookings.entrySet()) {
-            counter += selectedBooking.getValue().size();
-        }
-
-        return counter;
+    public int getSelectedChildCount() {
+        return selectedChildren;
     }
 
-    public int getSelectedParentCount2() {
-        int counter = 0;
-        for (Map.Entry<ExpenseObject, List<ExpenseObject>> booking : mSelectedBookings.entrySet()) {
-            if (booking.getValue().size() != 0) {
-                counter++;
-            }
-        }
-
-        return counter;
+    public int getSelectedParentCount() {
+        return selectedParents;
     }
 }

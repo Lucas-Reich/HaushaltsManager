@@ -251,23 +251,19 @@ public class TabOneBookings extends Fragment {
                     return true;
                 }
 
-                if (!mListAdapter.isBookingSelected(groupPosition, null)) {//todo kann man hier den check noch ein wenig einfacher gestalten
-                    if (mListAdapter.isBookingSelected(groupPosition, childPosition)) {
+                if (mListAdapter.isBookingSelected(groupPosition, childPosition)) {
 
-                        mListAdapter.deselectBooking(groupPosition, childPosition);
-                        view.setBackgroundColor(Color.WHITE);
+                    mListAdapter.deselectBooking(groupPosition, childPosition);
+                    view.setBackgroundColor(Color.WHITE);
 
-                        if (mListAdapter.getSelectedBookingsCount() == 0)
-                            enableLongClick();
-                    } else {
-
-                        mListAdapter.selectBooking(groupPosition, childPosition);
-                        view.setBackgroundColor(getResources().getColor(R.color.highlighted_item_color));
-                    }
+                    if (mListAdapter.getSelectedBookingsCount() == 0)
+                        enableLongClick();
                 } else {
 
-                    Toast.makeText(getActivity(), R.string.error_parent_already_highlighted, Toast.LENGTH_LONG).show();
+                    mListAdapter.selectBooking(groupPosition, childPosition);
+                    view.setBackgroundColor(getResources().getColor(R.color.highlighted_item_color));
                 }
+
                 return true;
             }
         });
@@ -306,10 +302,10 @@ public class TabOneBookings extends Fragment {
                         if (!mListAdapter.isBookingSelected(groupPosition, null)) {
                             if (hasUserSelectedItems())
                                 mListAdapter.selectBooking(groupPosition, null);
-                            animateFabs(mListAdapter.getSelectedGroupCount2(), mListAdapter.getSelectedChildCount2(), mListAdapter.getSelectedParentCount2());
+                            animateFabs(mListAdapter.getSelectedGroupCount(), mListAdapter.getSelectedChildCount(), mListAdapter.getSelectedParentCount());
                         } else {
                             mListAdapter.deselectBooking(groupPosition, null);
-                            animateFabs(mListAdapter.getSelectedGroupCount2(), mListAdapter.getSelectedChildCount2(), mListAdapter.getSelectedParentCount2());
+                            animateFabs(mListAdapter.getSelectedGroupCount(), mListAdapter.getSelectedChildCount(), mListAdapter.getSelectedParentCount());
 
                             if (mListAdapter.getSelectedBookingsCount() == 0)
                                 enableLongClick();
@@ -330,7 +326,7 @@ public class TabOneBookings extends Fragment {
                             mListAdapter.selectBooking(groupPosition, null);
                             view.setBackgroundColor(getResources().getColor(R.color.highlighted_item_color));
                         }
-                        animateFabs(mListAdapter.getSelectedGroupCount2(), mListAdapter.getSelectedChildCount2(), mListAdapter.getSelectedParentCount2());
+                        animateFabs(mListAdapter.getSelectedGroupCount(), mListAdapter.getSelectedChildCount(), mListAdapter.getSelectedParentCount());
                         return true;
                     default:
                         return true;
@@ -346,9 +342,9 @@ public class TabOneBookings extends Fragment {
      */
     private boolean extractChildMode() {
 
-        return mListAdapter.getSelectedChildCount2() > 0
-                && mListAdapter.getSelectedParentCount2() == 0
-                && mListAdapter.getSelectedGroupCount2() == 0;
+        return mListAdapter.getSelectedChildCount() > 0
+                && mListAdapter.getSelectedParentCount() == 0
+                && mListAdapter.getSelectedGroupCount() == 0;
     }
 
     /**
@@ -358,17 +354,17 @@ public class TabOneBookings extends Fragment {
      */
     private boolean combineBookingsMode() {
 
-        boolean areGroupsSelected = mListAdapter.getSelectedChildCount2() == 0
-                && mListAdapter.getSelectedParentCount2() == 0
-                && mListAdapter.getSelectedGroupCount2() > 1;
+        boolean areGroupsSelected = mListAdapter.getSelectedChildCount() == 0
+                && mListAdapter.getSelectedParentCount() == 0
+                && mListAdapter.getSelectedGroupCount() > 1;
 
-        boolean areParentsSelected = mListAdapter.getSelectedChildCount2() == 0
-                && mListAdapter.getSelectedParentCount2() > 1
-                && mListAdapter.getSelectedGroupCount2() == 0;
+        boolean areParentsSelected = mListAdapter.getSelectedChildCount() == 0
+                && mListAdapter.getSelectedParentCount() > 1
+                && mListAdapter.getSelectedGroupCount() == 0;
 
-        boolean areParentAndGroupsSelected = mListAdapter.getSelectedChildCount2() == 0
-                && mListAdapter.getSelectedParentCount2() >= 1
-                && mListAdapter.getSelectedGroupCount2() >= 1;
+        boolean areParentAndGroupsSelected = mListAdapter.getSelectedChildCount() == 0
+                && mListAdapter.getSelectedParentCount() >= 1
+                && mListAdapter.getSelectedGroupCount() >= 1;
 
         return areGroupsSelected || areParentsSelected || areParentAndGroupsSelected;
     }
@@ -380,13 +376,13 @@ public class TabOneBookings extends Fragment {
      */
     private boolean addChildMode() {
 
-        boolean isGroupSelected = mListAdapter.getSelectedChildCount2() == 0
-                && mListAdapter.getSelectedParentCount2() == 0
-                && mListAdapter.getSelectedGroupCount2() == 1;
+        boolean isGroupSelected = mListAdapter.getSelectedChildCount() == 0
+                && mListAdapter.getSelectedParentCount() == 0
+                && mListAdapter.getSelectedGroupCount() == 1;
 
-        boolean isParentSelected = mListAdapter.getSelectedChildCount2() == 0
-                && mListAdapter.getSelectedParentCount2() == 1
-                && mListAdapter.getSelectedGroupCount2() == 0;
+        boolean isParentSelected = mListAdapter.getSelectedChildCount() == 0
+                && mListAdapter.getSelectedParentCount() == 1
+                && mListAdapter.getSelectedGroupCount() == 0;
 
         return isGroupSelected ^ isParentSelected;
     }
@@ -423,7 +419,7 @@ public class TabOneBookings extends Fragment {
                             view.setBackgroundColor(getResources().getColor(R.color.highlighted_item_color));
 
                             disableLongClick();
-                            animateFabs(mListAdapter.getSelectedGroupCount2(), mListAdapter.getSelectedChildCount2(), mListAdapter.getSelectedParentCount2());
+                            animateFabs(mListAdapter.getSelectedGroupCount(), mListAdapter.getSelectedChildCount(), mListAdapter.getSelectedParentCount());
                             return true;
                         }
 
@@ -437,7 +433,7 @@ public class TabOneBookings extends Fragment {
                             view.setBackgroundColor(getResources().getColor(R.color.highlighted_item_color));
 
                             disableLongClick();
-                            animateFabs(mListAdapter.getSelectedGroupCount2(), mListAdapter.getSelectedChildCount2(), mListAdapter.getSelectedParentCount2());
+                            animateFabs(mListAdapter.getSelectedGroupCount(), mListAdapter.getSelectedChildCount(), mListAdapter.getSelectedParentCount());
 
                             return true;
                         }
@@ -478,7 +474,7 @@ public class TabOneBookings extends Fragment {
      */
     private void resetExpandableListView() {
 
-        mListAdapter.deselectAll2();
+        mListAdapter.deselectAll();
         updateView();
         enableLongClick();
     }
@@ -552,7 +548,7 @@ public class TabOneBookings extends Fragment {
             resetButtonAnimations();
         }
 
-        //wenn eine Group ausgewählt ist sollen die Buttons add child und Delete angezeigt werden
+        //wenn eine Buchung ausgewählt ist sollen die Buttons add child und Delete angezeigt werden
         if (selectedChildren == 0 && selectedParents == 0 && selectedGroups == 1) {
 
             openFabSmallTop();
@@ -562,7 +558,7 @@ public class TabOneBookings extends Fragment {
             animatePlusOpen();
         }
 
-        //wenn zwei Groups ausgewählt sind sollen die Buttons Combine und Delete angezeigt werden
+        //wenn zwei oder mehr Buchungen ausgewählt sind sollen die Buttons Combine und Delete angezeigt werden
         if (selectedChildren == 0 && selectedParents == 0 && selectedGroups > 1) {
 
             openFabSmallTop();
@@ -572,7 +568,7 @@ public class TabOneBookings extends Fragment {
             animatePlusOpen();
         }
 
-        //wenn eine Group und ein Parent ausgewählt sind sollen der Button AddToParent angezezeigt werden
+        //wenn eine Buchung und ein Parent ausgewählt sind sollen der Button AddToParent angezezeigt werden
         if (selectedChildren == 0 && selectedParents == 1 && selectedGroups > 0) {
 
             openFabSmallLeft();
@@ -738,14 +734,16 @@ public class TabOneBookings extends Fragment {
                         }
                     }
                 } else {
-                    parent.addChildren(bookings.getValue());
 
+                    parent.removeChildren();
+                    parent.addChildren(bookings.getValue());
                     ExpenseRepository.insert(parent);
                 }
             }
 
             // todo überprüfen ob die buchung wirklich wiederhergestellt wurde
             Toast.makeText(getContext(), mSuccessMessage, Toast.LENGTH_SHORT).show();
+            mParent.updateExpenses();
             updateView();
         }
     }
