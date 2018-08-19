@@ -32,7 +32,10 @@ import com.example.lucas.haushaltsmanager.Activities.ImportExportActivity;
 import com.example.lucas.haushaltsmanager.Activities.RecurringBookingsActivity;
 import com.example.lucas.haushaltsmanager.Activities.TestActivity;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.CannotDeleteExpenseException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.CannotDeleteChildExpenseException;
 import com.example.lucas.haushaltsmanager.Dialogs.ChangeAccounts.ChooseAccountsDialogFragment;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
@@ -144,6 +147,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
                         break;
                     default:
 
+                        //todo übersetzung
                         Toast.makeText(ParentActivity.this, "Ups, da hast du wohl etwas entdeckt was du eigentlich noch gar nicht sehen solltest.", Toast.LENGTH_SHORT).show();
                 }
 
@@ -160,6 +164,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
     private void setSharedPreferencesProperties() {
         SharedPreferences preferences = this.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
         preferences.edit().putInt("maxBackupCount", 20).apply();
+        preferences.edit().putLong("mainCurrencyIndex", 32L).apply();
     }
 
     @Override
@@ -392,8 +397,33 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
      * @param expense Zu löschende Buchung.
      */
     void deleteGroupBooking(ExpenseObject expense) {
-
         mExpenses.remove(expense);
+    }
+
+    void deleteBookings(List<ExpenseObject> expenses) {
+        for (ExpenseObject expense : expenses) {
+            if (expense.isParent()) {
+                deleteChildren(expense.getChildren());
+            } else {
+                try {
+                    ExpenseRepository.delete(expense);
+                } catch (CannotDeleteExpenseException e) {
+                    //do nothing
+                }
+            }
+        }
+
+        updateExpenses();
+    }
+
+    private void deleteChildren(List<ExpenseObject> children) {
+        for (ExpenseObject child : children) {
+            try {
+                ChildExpenseRepository.delete(child);
+            } catch (CannotDeleteChildExpenseException e) {
+                //do nothing
+            }
+        }
     }
 
     /**
@@ -402,7 +432,6 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
      * @param expenses Zu löschende Buchungen
      */
     void deleteGroupBookings(ArrayList<ExpenseObject> expenses) {
-
         for (ExpenseObject expense : expenses) {
             deleteGroupBooking(expense);
         }

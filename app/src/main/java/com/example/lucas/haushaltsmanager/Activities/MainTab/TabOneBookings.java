@@ -38,6 +38,7 @@ import com.example.lucas.haushaltsmanager.R;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class TabOneBookings extends Fragment {
@@ -115,19 +116,19 @@ public class TabOneBookings extends Fragment {
                         @Override
                         public void onTextInput(String title) {
 
-                            ExpenseObject parentBooking = ChildExpenseRepository.combineExpenses(mListAdapter.getSelectedGroupData());
+                            ExpenseObject parentBooking = ChildExpenseRepository.combineExpenses(getSelectedBookings(mListAdapter.getSelectedBookings()));
                             try {
                                 parentBooking.setTitle(title);
                                 ExpenseRepository.update(parentBooking);
 
-                                mParent.deleteGroupBookings(mListAdapter.getSelectedGroupData());
-                                mParent.addGroupBooking(parentBooking);
+                                mParent.updateExpenses();// die Liste der Buchungen wird neu geladen
                             } catch (ExpenseNotFoundException e) {
 
                                 Toast.makeText(mainTab, "Ausgabe konnte nicht geupdated werden", Toast.LENGTH_SHORT).show();
                                 //todo fehlerbehandlung
                                 //todo übersetzung
                             }
+                            mParent.updateExpenses();
                             resetActivityViewState();
                         }
                     });
@@ -137,7 +138,7 @@ public class TabOneBookings extends Fragment {
 
                 if (addChildMode()) {
 
-                    ExpenseObject parentExpense = mListAdapter.getSelectedGroupData().get(0);
+                    ExpenseObject parentExpense = (ExpenseObject) mListAdapter.getSelectedBookings().keySet().toArray()[0];
 
                     Intent createChildToBookingIntent = new Intent(mainTab, ExpenseScreenActivity.class);
                     createChildToBookingIntent.putExtra("mode", "addChild");
@@ -150,16 +151,17 @@ public class TabOneBookings extends Fragment {
 
                 if (extractChildMode()) {
 
-                    for (ExpenseObject child : mListAdapter.getSelectedChildData()) {
-                        try {
-                            ChildExpenseRepository.extractChildFromBooking(child);
-
-                        } catch (ChildExpenseNotFoundException e) {
-                            //todo was soll passieren wenn eine KindBuchung nicht in der Datenbank gefunden werden kann
+                    for (Map.Entry<ExpenseObject, List<ExpenseObject>> bookings : mListAdapter.getSelectedBookings().entrySet()) {
+                        for (ExpenseObject child : bookings.getValue()) {
+                            try {
+                                ChildExpenseRepository.extractChildFromBooking(child);
+                            } catch (ChildExpenseNotFoundException e) {
+                                //todo was soll passieren wenn eine KindBuchung nicht in der Datenbank gefunden werden konnte
+                            }
                         }
                     }
 
-                    //todo die Änderung auch mParent mitteilen
+                    mParent.updateExpenses();
                     resetActivityViewState();
                 }
             }
@@ -172,29 +174,14 @@ public class TabOneBookings extends Fragment {
             public void onClick(View v) {
 
                 showSnackbar(
-                        mListAdapter.getSelectedGroupData(),
-                        mListAdapter.getSelectedMappedChildData(),
+                        mListAdapter.getSelectedBookings(),
                         R.string.revert_deletion,
                         R.string.bookings_successfully_restored
                 );
 
-                for (ExpenseObject child : mListAdapter.getSelectedChildData()) {
-                    try {
-                        ChildExpenseRepository.delete(child);
-                    } catch (CannotDeleteChildExpenseException e) {
-                        //todo was soll ich machen wenn eine Buchung nicht gelöscht werden kann
-                    }
-                }
-                mParent.deleteChildBookings(mListAdapter.getSelectedMappedChildData());
 
-                for (ExpenseObject parent : mListAdapter.getSelectedGroupData()) {
-                    try {
-                        ExpenseRepository.delete(parent);
-                    } catch (CannotDeleteExpenseException e) {
-                        //todo was soll passieren wenn eine Buchung nicht gelöscht werden kann?
-                    }
-                }
-                mParent.deleteGroupBookings(mListAdapter.getSelectedGroupData());
+                deleteBookings(mListAdapter.getSelectedBookings());
+                mParent.updateExpenses();
 
                 resetActivityViewState();
             }
@@ -208,6 +195,39 @@ public class TabOneBookings extends Fragment {
         rotateBackwardAnim = AnimationUtils.loadAnimation(mainTab, R.anim.rotate_backward);
 
         return rootView;
+    }
+
+    private List<ExpenseObject> getSelectedBookings(HashMap<ExpenseObject, List<ExpenseObject>> bookings) {
+        List<ExpenseObject> selectedBookings = new ArrayList<>();
+        for (Map.Entry<ExpenseObject, List<ExpenseObject>> booking : bookings.entrySet()) {
+            if (booking.getValue().size() != 0) {
+                selectedBookings.addAll(booking.getValue());
+            } else {
+                selectedBookings.add(booking.getKey());
+            }
+        }
+
+        return selectedBookings;
+    }
+
+    private void deleteBookings(HashMap<ExpenseObject, List<ExpenseObject>> bookings) {
+        for (Map.Entry<ExpenseObject, List<ExpenseObject>> booking : bookings.entrySet()) {
+            if (booking.getValue().size() != 0) {
+                for (ExpenseObject child : booking.getValue()) {
+                    try {
+                        ChildExpenseRepository.delete(child);
+                    } catch (CannotDeleteChildExpenseException e) {
+                        //todo was soll ich machen wenn ein kind nicht gelöscht werden konnte
+                    }
+                }
+            } else {
+                try {
+                    ExpenseRepository.delete(booking.getKey());
+                } catch (CannotDeleteExpenseException e) {
+                    //todo was soll ich machen wenn ich eine group buchung nicht gelöscht werden konnte
+                }
+            }
+        }
     }
 
     /**
@@ -231,18 +251,17 @@ public class TabOneBookings extends Fragment {
                     return true;
                 }
 
-                ExpenseObject parentExpense = (ExpenseObject) mListAdapter.getGroup(groupPosition);
-                if (!mListAdapter.isGroupSelected(parentExpense)) {
-                    if (mListAdapter.isChildSelected(childExpense)) {
+                if (!mListAdapter.isBookingSelected(groupPosition, null)) {//todo kann man hier den check noch ein wenig einfacher gestalten
+                    if (mListAdapter.isBookingSelected(groupPosition, childPosition)) {
 
-                        mListAdapter.removeChildFromList(childExpense);
+                        mListAdapter.deselectBooking(groupPosition, childPosition);
                         view.setBackgroundColor(Color.WHITE);
 
-                        if (mListAdapter.getSelectedItemsCount() == 0)
+                        if (mListAdapter.getSelectedBookingsCount() == 0)
                             enableLongClick();
                     } else {
 
-                        mListAdapter.selectChild(childExpense);
+                        mListAdapter.selectBooking(groupPosition, childPosition);
                         view.setBackgroundColor(getResources().getColor(R.color.highlighted_item_color));
                     }
                 } else {
@@ -264,7 +283,7 @@ public class TabOneBookings extends Fragment {
             public boolean onGroupClick(ExpandableListView parent, View view, int groupPosition, long id) {
                 ExpenseObject groupExpense = (ExpenseObject) mListAdapter.getGroup(groupPosition);
 
-                if (mListAdapter.getSelectedItemsCount() == 0 && groupExpense.getExpenseType() != ExpenseObject.EXPENSE_TYPES.PARENT_EXPENSE && groupExpense.getExpenseType() != ExpenseObject.EXPENSE_TYPES.DATE_PLACEHOLDER) {
+                if (mListAdapter.getSelectedBookingsCount() == 0 && groupExpense.getExpenseType() != ExpenseObject.EXPENSE_TYPES.PARENT_EXPENSE && groupExpense.getExpenseType() != ExpenseObject.EXPENSE_TYPES.DATE_PLACEHOLDER) {
 
                     //falls keine Buchung markiert ist soll die Buchung im ExpenseScreen aufgerufen werden
                     Intent updateParentExpenseIntent = new Intent(getContext(), ExpenseScreenActivity.class);
@@ -284,34 +303,34 @@ public class TabOneBookings extends Fragment {
                         //ignoriere Datumstrenner
                         return true;
                     case PARENT_EXPENSE:
-                        if (!mListAdapter.isGroupSelected(groupExpense)) {
+                        if (!mListAdapter.isBookingSelected(groupPosition, null)) {
                             if (hasUserSelectedItems())
-                                mListAdapter.selectGroup(groupExpense);
-                            animateFabs(mListAdapter.getSelectedGroupCount(), mListAdapter.getSelectedChildCount(), mListAdapter.getSelectedParentCount());
+                                mListAdapter.selectBooking(groupPosition, null);
+                            animateFabs(mListAdapter.getSelectedGroupCount2(), mListAdapter.getSelectedChildCount2(), mListAdapter.getSelectedParentCount2());
                         } else {
-                            mListAdapter.removeGroupFromList(groupExpense);
-                            animateFabs(mListAdapter.getSelectedGroupCount(), mListAdapter.getSelectedChildCount(), mListAdapter.getSelectedParentCount());
+                            mListAdapter.deselectBooking(groupPosition, null);
+                            animateFabs(mListAdapter.getSelectedGroupCount2(), mListAdapter.getSelectedChildCount2(), mListAdapter.getSelectedParentCount2());
 
-                            if (mListAdapter.getSelectedItemsCount() == 0)
+                            if (mListAdapter.getSelectedBookingsCount() == 0)
                                 enableLongClick();
                         }
                         return false;
                     case NORMAL_EXPENSE:
                     case CHILD_EXPENSE:
 
-                        if (mListAdapter.isGroupSelected(groupExpense)) {
+                        if (mListAdapter.isBookingSelected(groupPosition, null)) {
 
-                            mListAdapter.removeGroupFromList(groupExpense);
+                            mListAdapter.deselectBooking(groupPosition, null);
                             view.setBackgroundColor(Color.WHITE);
 
-                            if (mListAdapter.getSelectedItemsCount() == 0)
+                            if (mListAdapter.getSelectedBookingsCount() == 0)
                                 enableLongClick();
                         } else {
 
-                            mListAdapter.selectGroup(groupExpense);
+                            mListAdapter.selectBooking(groupPosition, null);
                             view.setBackgroundColor(getResources().getColor(R.color.highlighted_item_color));
                         }
-                        animateFabs(mListAdapter.getSelectedGroupCount(), mListAdapter.getSelectedChildCount(), mListAdapter.getSelectedParentCount());
+                        animateFabs(mListAdapter.getSelectedGroupCount2(), mListAdapter.getSelectedChildCount2(), mListAdapter.getSelectedParentCount2());
                         return true;
                     default:
                         return true;
@@ -327,9 +346,9 @@ public class TabOneBookings extends Fragment {
      */
     private boolean extractChildMode() {
 
-        return mListAdapter.getSelectedChildCount() > 0
-                && mListAdapter.getSelectedParentCount() == 0
-                && mListAdapter.getSelectedGroupCount() == 0;
+        return mListAdapter.getSelectedChildCount2() > 0
+                && mListAdapter.getSelectedParentCount2() == 0
+                && mListAdapter.getSelectedGroupCount2() == 0;
     }
 
     /**
@@ -339,17 +358,17 @@ public class TabOneBookings extends Fragment {
      */
     private boolean combineBookingsMode() {
 
-        boolean areGroupsSelected = mListAdapter.getSelectedChildCount() == 0
-                && mListAdapter.getSelectedParentCount() == 0
-                && mListAdapter.getSelectedGroupCount() > 1;
+        boolean areGroupsSelected = mListAdapter.getSelectedChildCount2() == 0
+                && mListAdapter.getSelectedParentCount2() == 0
+                && mListAdapter.getSelectedGroupCount2() > 1;
 
-        boolean areParentsSelected = mListAdapter.getSelectedChildCount() == 0
-                && mListAdapter.getSelectedParentCount() > 1
-                && mListAdapter.getSelectedGroupCount() == 0;
+        boolean areParentsSelected = mListAdapter.getSelectedChildCount2() == 0
+                && mListAdapter.getSelectedParentCount2() > 1
+                && mListAdapter.getSelectedGroupCount2() == 0;
 
-        boolean areParentAndGroupsSelected = mListAdapter.getSelectedChildCount() == 0
-                && mListAdapter.getSelectedParentCount() >= 1
-                && mListAdapter.getSelectedGroupCount() >= 1;
+        boolean areParentAndGroupsSelected = mListAdapter.getSelectedChildCount2() == 0
+                && mListAdapter.getSelectedParentCount2() >= 1
+                && mListAdapter.getSelectedGroupCount2() >= 1;
 
         return areGroupsSelected || areParentsSelected || areParentAndGroupsSelected;
     }
@@ -361,13 +380,13 @@ public class TabOneBookings extends Fragment {
      */
     private boolean addChildMode() {
 
-        boolean isGroupSelected = mListAdapter.getSelectedChildCount() == 0
-                && mListAdapter.getSelectedParentCount() == 0
-                && mListAdapter.getSelectedGroupCount() == 1;
+        boolean isGroupSelected = mListAdapter.getSelectedChildCount2() == 0
+                && mListAdapter.getSelectedParentCount2() == 0
+                && mListAdapter.getSelectedGroupCount2() == 1;
 
-        boolean isParentSelected = mListAdapter.getSelectedChildCount() == 0
-                && mListAdapter.getSelectedParentCount() == 1
-                && mListAdapter.getSelectedGroupCount() == 0;
+        boolean isParentSelected = mListAdapter.getSelectedChildCount2() == 0
+                && mListAdapter.getSelectedParentCount2() == 1
+                && mListAdapter.getSelectedGroupCount2() == 0;
 
         return isGroupSelected ^ isParentSelected;
     }
@@ -378,7 +397,7 @@ public class TabOneBookings extends Fragment {
      * @return True wenn Elemente ausgewählt sind, False wenn nicht
      */
     private boolean hasUserSelectedItems() {
-        return mListAdapter.getSelectedItemsCount() != 0;
+        return mListAdapter.getSelectedBookingsCount() != 0;
     }
 
     /**
@@ -400,11 +419,11 @@ public class TabOneBookings extends Fragment {
 
                         if (groupExpense.isValidExpense()) {
 
-                            mListAdapter.selectGroup(groupExpense);
+                            mListAdapter.selectBooking(groupPosition, null);
                             view.setBackgroundColor(getResources().getColor(R.color.highlighted_item_color));
 
                             disableLongClick();
-                            animateFabs(mListAdapter.getSelectedGroupCount(), mListAdapter.getSelectedChildCount(), mListAdapter.getSelectedParentCount());
+                            animateFabs(mListAdapter.getSelectedGroupCount2(), mListAdapter.getSelectedChildCount2(), mListAdapter.getSelectedParentCount2());
                             return true;
                         }
 
@@ -414,11 +433,11 @@ public class TabOneBookings extends Fragment {
 
                         if (childExpense.isValidExpense()) {
 
-                            mListAdapter.selectChild(childExpense);
+                            mListAdapter.selectBooking(groupPosition, childPosition);
                             view.setBackgroundColor(getResources().getColor(R.color.highlighted_item_color));
 
                             disableLongClick();
-                            animateFabs(mListAdapter.getSelectedGroupCount(), mListAdapter.getSelectedChildCount(), mListAdapter.getSelectedParentCount());
+                            animateFabs(mListAdapter.getSelectedGroupCount2(), mListAdapter.getSelectedChildCount2(), mListAdapter.getSelectedParentCount2());
 
                             return true;
                         }
@@ -459,7 +478,7 @@ public class TabOneBookings extends Fragment {
      */
     private void resetExpandableListView() {
 
-        mListAdapter.deselectAll();
+        mListAdapter.deselectAll2();
         updateView();
         enableLongClick();
     }
@@ -674,16 +693,15 @@ public class TabOneBookings extends Fragment {
     /**
      * Methode um eine Snackbar anzuzeigen.
      *
-     * @param groups         Gruppen die gelöscht wurden
-     * @param children       Kinder die gelöscht wurden
+     * @param bookings       Buchungen die gelöscht wurden
      * @param message        Nachricht die in der Snackbar angezeigt werden soll
      * @param successMessage Nachricht die angezeigt wird wenn alles erfolgreich bearbeitet wurde
      */
-    private void showSnackbar(ArrayList<ExpenseObject> groups, HashMap<Long, ExpenseObject> children, @StringRes int message, @StringRes int successMessage) {
+    private void showSnackbar(HashMap<ExpenseObject, List<ExpenseObject>> bookings, @StringRes int message, @StringRes int successMessage) {
 
         CoordinatorLayout coordinatorLayout = (CoordinatorLayout) getView().findViewById(R.id.tab_one_bookings_layout);
         Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG)
-                .setAction(R.string.revert_action, new UndoDeletionClickListener(groups, children, successMessage))
+                .setAction(R.string.revert_action, new UndoDeletionClickListener(bookings, successMessage))
                 .show();
     }
 
@@ -691,42 +709,39 @@ public class TabOneBookings extends Fragment {
      * Klasse die einen ClickListener für gelöschte Buchungen implementiert, welcher die gelöschten GroupBuchungen und ChildBuchungen als Argumente übernimmt.
      */
     class UndoDeletionClickListener implements View.OnClickListener {
+        //todo in eigene Klasse extrahieren
 
-        private ArrayList<ExpenseObject> mDeletedGroups;
-        private HashMap<Long, ExpenseObject> mDeletedChildren;
+        private HashMap<ExpenseObject, List<ExpenseObject>> mDeletedBookings;
         private String mSuccessMessage;
 
         @SuppressLint("UseSparseArrays")
-        UndoDeletionClickListener(ArrayList<ExpenseObject> deletedGroups, HashMap<Long, ExpenseObject> deletedChildren, @StringRes int successMessage) {
+        UndoDeletionClickListener(HashMap<ExpenseObject, List<ExpenseObject>> deletedBookings, @StringRes int successMessage) {
 
-            mDeletedGroups = new ArrayList<>(deletedGroups);
-            mDeletedChildren = new HashMap<>(deletedChildren);
+            mDeletedBookings = new HashMap<>(deletedBookings);
             mSuccessMessage = getString(successMessage);
         }
 
         @Override
         public void onClick(View v) {
+            for (Map.Entry<ExpenseObject, List<ExpenseObject>> bookings : mDeletedBookings.entrySet()) {
+                ExpenseObject parent = bookings.getKey();
 
-            for (ExpenseObject group : mDeletedGroups) {
-                ExpenseRepository.insert(group);
-            }
+                if (ExpenseRepository.exists(bookings.getKey())) {
 
-            for (final Map.Entry<Long, ExpenseObject> deletedChild : mDeletedChildren.entrySet()) {
-                try {
+                    for (ExpenseObject child : bookings.getValue()) {
+                        try {
+                            ChildExpenseRepository.addChildToBooking(parent, child);
+                        } catch (AddChildToChildException e) {
 
-                    ExpenseObject parentExpense = ExpenseRepository.get(deletedChild.getKey());
-                    ChildExpenseRepository.addChildToBooking(deletedChild.getValue(), parentExpense);
-                    mParent.addChildBooking(deletedChild.getKey().intValue(), deletedChild.getValue());
-                } catch (ExpenseNotFoundException e) {
+                            //todo was soll passieren wenn ich versuche ein Kind zu einer Kindbuchung hinzuzufügen
+                            Toast.makeText(mParent, getString(R.string.add_child_to_child_error), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                } else {
+                    parent.addChildren(bookings.getValue());
 
-                    ChildExpenseRepository.combineExpenses(new ArrayList<ExpenseObject>() {{
-                        deletedChild.getKey();
-                    }});
-                } catch (AddChildToChildException e) {
-
-                    Toast.makeText(mParent, getString(R.string.add_child_to_child_error), Toast.LENGTH_SHORT).show();
+                    ExpenseRepository.insert(parent);
                 }
-
             }
 
             // todo überprüfen ob die buchung wirklich wiederhergestellt wurde

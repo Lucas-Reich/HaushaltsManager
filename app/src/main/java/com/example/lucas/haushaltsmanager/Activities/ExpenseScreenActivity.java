@@ -34,6 +34,8 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Excepti
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.ChildExpenseNotFoundException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.Exceptions.CurrencyNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Tags.TagRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Templates.TemplateRepository;
 import com.example.lucas.haushaltsmanager.Dialogs.AccountPickerDialog;
@@ -43,6 +45,7 @@ import com.example.lucas.haushaltsmanager.Dialogs.FrequencyInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
+import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Tag;
 import com.example.lucas.haushaltsmanager.Entities.Template;
@@ -154,6 +157,7 @@ public class ExpenseScreenActivity extends AppCompatActivity {
 
         mExpense = ExpenseObject.createDummyExpense();
         mExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE);
+        setExpenseCurrency();
 
         try {
             SharedPreferences preferences = getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
@@ -414,7 +418,7 @@ public class ExpenseScreenActivity extends AppCompatActivity {
                     break;
                 case CREATE_EXPENSE_MODE:
 
-                    ExpenseRepository.insert(mExpense);
+                    mExpense = ExpenseRepository.insert(mExpense);
                     Toast.makeText(ExpenseScreenActivity.this, "Created Booking \"" + mExpense.getTitle() + "\"", Toast.LENGTH_SHORT).show();
                     break;
                 default:
@@ -460,6 +464,11 @@ public class ExpenseScreenActivity extends AppCompatActivity {
 
         return true;
     }
+
+
+    //ab hier wird die view mit den Tags manipuliert
+    //todo tag view in eigene view kapseln
+
 
     /**
      * Methode um die MultiAutocompleteTextView mit der die Tags angezeigt werden zu initialisieren.
@@ -627,6 +636,10 @@ public class ExpenseScreenActivity extends AppCompatActivity {
         mTagAutoCompTxt.setText(String.format("%s%s", input, tag.getName()));
         appendTokenizer();
     }
+
+
+    //Sektion ende
+
 
     /**
      * Methode die aufgerufen wird, wenn der user auf ein TextInput feld klickt.
@@ -872,8 +885,17 @@ public class ExpenseScreenActivity extends AppCompatActivity {
      * Methode, welche die angezeigte Währung und die Währung der zu speichernden Ausgabe anpasst.
      */
     private void setExpenseCurrency() {
+        try {
+            SharedPreferences preferences = this.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
+            Currency currency = CurrencyRepository.get(preferences.getLong("mainCurrencyIndex", 1L));
 
-        SharedPreferences preferences = this.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
-        mCurrencySymbolTxt.setText(preferences.getString("mainCurrencySymbol", "€"));
+            mCurrencySymbolTxt.setText(currency.getSymbol());
+            mExpense.setCurrency(currency);
+        } catch (CurrencyNotFoundException e) {
+
+            Toast.makeText(this, "Währung wurde nicht gefunden", Toast.LENGTH_SHORT).show();
+            //todo übersetzung
+            //todo fehlerbehandlung
+        }
     }
 }

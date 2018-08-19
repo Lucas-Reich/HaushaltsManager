@@ -143,7 +143,20 @@ public class ExpenseObject implements Parcelable {
      */
     public static ExpenseObject createDummyExpense() {
 
-        return new ExpenseObject(-1, app.getContext().getString(R.string.no_name), 0, Calendar.getInstance(), false, Category.createDummyCategory(), null, -1, EXPENSE_TYPES.DUMMY_EXPENSE, new ArrayList<Tag>(), new ArrayList<ExpenseObject>(), Currency.createDummyCurrency());
+        return new ExpenseObject(
+                -1,
+                app.getContext().getString(R.string.no_name),
+                0,
+                Calendar.getInstance(),
+                false,
+                Category.createDummyCategory(),
+                null,
+                -1,
+                EXPENSE_TYPES.DUMMY_EXPENSE,
+                new ArrayList<Tag>(),
+                new ArrayList<ExpenseObject>(),
+                Currency.createDummyCurrency()
+        );
     }
 
     @NonNull
@@ -390,9 +403,10 @@ public class ExpenseObject implements Parcelable {
             result = result && (getUnsignedPrice() == otherExpense.getUnsignedPrice());
             result = result && getAccountId() == otherExpense.getAccountId();
             result = result && getExpenseType().equals(otherExpense.getExpenseType());
-            result = result && getDate().equals(otherExpense.getDate());
+            result = result && getDateTime().getTimeInMillis() == otherExpense.getDateTime().getTimeInMillis();
             result = result && getNotice().equals(otherExpense.getNotice());
-            result = result && getCategory().equals(otherExpense.getCategory());
+            result = result && getCategory().getIndex() == otherExpense.getCategory().getIndex();//ich kann die objekte nicht vergleichen da parent buchungen nur dummies bekommen
+            result = result && getCurrency().getIndex() == otherExpense.getCurrency().getIndex();//ich kann die objekte nicht vergleichen da parent buchungen nur dummies bekommen
 
             for (Tag tag : getTags()) {
                 for (Tag otherTag : otherExpense.getTags()) {
