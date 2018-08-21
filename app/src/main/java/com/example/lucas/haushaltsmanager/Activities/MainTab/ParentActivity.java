@@ -30,6 +30,7 @@ import com.example.lucas.haushaltsmanager.Activities.CourseActivity;
 import com.example.lucas.haushaltsmanager.Activities.CreateBackupActivity;
 import com.example.lucas.haushaltsmanager.Activities.ImportExportActivity;
 import com.example.lucas.haushaltsmanager.Activities.RecurringBookingsActivity;
+import com.example.lucas.haushaltsmanager.Activities.SettingsActivity;
 import com.example.lucas.haushaltsmanager.Activities.TestActivity;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.CannotDeleteExpenseException;
@@ -138,7 +139,8 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
                         break;
                     case R.id.preferences:
 
-                        //todo show preferences activity
+                        Intent settingsIntent = new Intent(ParentActivity.this, SettingsActivity.class);
+                        ParentActivity.this.startActivity(settingsIntent);
                         break;
                     case R.id.about:
 
@@ -147,8 +149,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
                         break;
                     default:
 
-                        //todo übersetzung
-                        Toast.makeText(ParentActivity.this, "Ups, da hast du wohl etwas entdeckt was du eigentlich noch gar nicht sehen solltest.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ParentActivity.this, R.string.not_implemented, Toast.LENGTH_SHORT).show();
                 }
 
                 DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_2);
