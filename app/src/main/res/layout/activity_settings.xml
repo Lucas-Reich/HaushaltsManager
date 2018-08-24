@@ -124,7 +124,7 @@
                     android:textSize="16sp"/>
 
                 <LinearLayout
-                    android:id="@+id/settings_enable_backups_wrapper"
+                    android:id="@+id/settings_backups_enable_wrapper"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="?attr/selectableItemBackground"
@@ -132,20 +132,16 @@
                     android:focusable="true"
                     android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/settings_backups_atomatic_chk"
+                    <CheckBox
+                        android:id="@+id/settings_backups_enable_chk"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Automatische Backups erstellen"
-                        android:textSize="15sp"/>
-
-                    <TextView
-                        android:id="@+id/textView23"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="-> Ja"
-                        android:textSize="11sp"
-                        tools:ignore="SmallSp"/>
+                        android:background="@android:color/transparent"
+                        android:button="@null"
+                        android:drawableRight="?android:attr/listChoiceIndicatorMultiple"
+                        android:focusable="false"
+                        android:text="Automatische Backups erstellen?"
+                        tools:ignore="RtlHardcoded"/>
 
                     <View
                         android:id="@+id/divider11"
@@ -300,20 +296,17 @@
                     android:focusable="true"
                     android:orientation="vertical">
 
-                    <TextView
+                    <CheckBox
                         android:id="@+id/settings_notifications_notificate_chk"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:background="@android:color/transparent"
+                        android:button="@null"
+                        android:clickable="false"
+                        android:drawableRight="?android:attr/listChoiceIndicatorMultiple"
+                        android:focusable="false"
                         android:text="Sollen wir dich erinnern"
-                        android:textSize="15sp"/>
-
-                    <TextView
-                        android:id="@+id/textView21"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="-> Ja"
-                        android:textSize="11sp"
-                        tools:ignore="SmallSp"/>
+                        tools:ignore="RtlHardcoded"/>
 
                     <View
                         android:id="@+id/divider15"
