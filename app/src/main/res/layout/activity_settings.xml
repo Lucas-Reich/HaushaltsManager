@@ -39,39 +39,6 @@
                     android:textSize="16sp"/>
 
                 <LinearLayout
-                    android:id="@+id/settings_language_wrapper"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/textView6"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:text="Sprache"
-                        android:textSize="15sp"/>
-
-                    <TextView
-                        android:id="@+id/settings_general_language"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="-> Deutsch"
-                        android:textSize="11sp"
-                        tools:ignore="SmallSp"/>
-
-                    <View
-                        android:id="@+id/divider13"
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="?android:attr/listDivider"/>
-
-                </LinearLayout>
-
-                <LinearLayout
                     android:id="@+id/settings_first_day_wrapper"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -85,6 +52,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Erster Tag der Woche"
+                        android:textColor="@color/primary_text_color"
                         android:textSize="15sp"/>
 
                     <TextView
@@ -92,6 +60,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="-> Montag"
+                        android:textColor="@color/primary_text_color"
                         android:textSize="11sp"
                         tools:ignore="SmallSp"/>
 
@@ -138,6 +107,7 @@
                         android:layout_height="wrap_content"
                         android:background="@android:color/transparent"
                         android:button="@null"
+                        android:clickable="false"
                         android:drawableRight="?android:attr/listChoiceIndicatorMultiple"
                         android:focusable="false"
                         android:text="Automatische Backups erstellen?"
@@ -145,38 +115,6 @@
 
                     <View
                         android:id="@+id/divider11"
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="?android:attr/listDivider"/>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/settings_backup_frequency_wrapper"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/settings_backups_frequency"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Wie häufig soll ein Backup erstellt werden"
-                        android:textSize="15sp"/>
-
-                    <TextView
-                        android:id="@+id/textView24"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="-> Jeden Tag"
-                        android:textSize="11sp"
-                        tools:ignore="SmallSp"/>
-
-                    <View
-                        android:id="@+id/divider7"
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:background="?android:attr/listDivider"/>
@@ -193,17 +131,19 @@
                     android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/settings_backups_concurrent_backups_count"
+                        android:id="@+id/settings_backups_concurrent_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Wie viele Backups sollen gleichzeitig existieren"
+                        android:textColor="@color/primary_text_color"
                         android:textSize="15sp"/>
 
                     <TextView
-                        android:id="@+id/textView25"
+                        android:id="@+id/settings_backups_concurrent_count"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="-> 10"
+                        android:textColor="@color/primary_text_color"
                         android:textSize="11sp"
                         tools:ignore="SmallSp"/>
 
@@ -218,7 +158,7 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/settings_currency_wrapper"
+                android:id="@+id/settings_currency_main_wrapper"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
@@ -236,7 +176,7 @@
                     android:textSize="16sp"/>
 
                 <LinearLayout
-                    android:id="@+id/settings_currency_main_wrapper"
+                    android:id="@+id/settings_currency_wrapper"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?attr/selectableItemBackground"
@@ -249,13 +189,15 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Was ist die Hauptwährung"
+                        android:textColor="@color/primary_text_color"
                         android:textSize="15sp"/>
 
                     <TextView
-                        android:id="@+id/textView22"
+                        android:id="@+id/settings_currency_name"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="-> Euro"
+                        android:textColor="@color/primary_text_color"
                         android:textSize="11sp"
                         tools:ignore="SmallSp"/>
 
@@ -326,17 +268,19 @@
                     android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/settings_notifications_time"
+                        android:id="@+id/settings_notification_time_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Wann sollen wir dich erinnern"
+                        android:textColor="@color/primary_text_color"
                         android:textSize="15sp"/>
 
                     <TextView
-                        android:id="@+id/textView20"
+                        android:id="@+id/settings_notifications_time"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="-> 18:00"
+                        android:textColor="@color/primary_text_color"
                         android:textSize="11sp"
                         tools:ignore="SmallSp"/>
 

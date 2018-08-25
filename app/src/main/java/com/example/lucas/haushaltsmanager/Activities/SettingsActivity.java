@@ -5,56 +5,112 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.text.format.Time;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepository;
+import com.example.lucas.haushaltsmanager.Dialogs.CurrencyPicker;
+import com.example.lucas.haushaltsmanager.Dialogs.StringSingleChoiceDialog;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.R;
+import com.example.lucas.haushaltsmanager.UserSettingsPreferences;
+import com.example.lucas.haushaltsmanager.WeekdayUtils;
 
-import java.util.Calendar;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class SettingsActivity extends AppCompatActivity {
 
-    private LinearLayout languageLayout, firstDayLayout, createBkpLayout, backupFrequencyLayout, concurrentBackupsLayout, currencyLayout, notificationsAllowLayout, notificationTimeLayout;
+    /**
+     * Maximale Anzahl von gleichzeitig existierenden Backups.
+     * Die Höhe dieser Zahl hat keinen Grund und könnte genauso gut 1 oder 100 sein.
+     */
+    public static final int MAX_BACKUP_COUNT = 20;
+
+    private LinearLayout firstDayLayout, createBkpLayout, concurrentBackupsLayout, currencyLayout, notificationsAllowLayout, notificationTimeLayout;
     private Button resetSettingsBtn;
     private SharedPreferences preferences;
-    private CheckBox createBackupsChk;
+    private CheckBox createBackupsChk, allowReminderChk;
+    private TextView currencyNameTxt, firstDayOfWeekTxt, maxBackupCountTxt, backupCountTextTxt, notificationTimeTxt, notificationTimeTextTxt;
+    private ImageButton mBackArrow;
+    private UserSettingsPreferences mUserSettings;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        //https://proandroiddev.com/change-language-programmatically-at-runtime-on-android-5e6bc15c758
-        languageLayout = findViewById(R.id.settings_language_wrapper); //todo die sprache sollte nicht mehr vom user änderbar sein, da er auch einfach die sprache des smartphones ändern kann
         firstDayLayout = findViewById(R.id.settings_first_day_wrapper);
         createBkpLayout = findViewById(R.id.settings_backups_enable_wrapper);
-        backupFrequencyLayout = findViewById(R.id.settings_backup_frequency_wrapper);
         concurrentBackupsLayout = findViewById(R.id.settings_backups_concurrent_wrapper);
         currencyLayout = findViewById(R.id.settings_currency_wrapper);
         notificationsAllowLayout = findViewById(R.id.settings_notifications_allow_wrapper);
         notificationTimeLayout = findViewById(R.id.settings_notifications_time_wrapper);
 
+        currencyNameTxt = findViewById(R.id.settings_currency_name);
+        firstDayOfWeekTxt = findViewById(R.id.settings_general_first_of_week);
+        backupCountTextTxt = findViewById(R.id.settings_backups_concurrent_text);
+        maxBackupCountTxt = findViewById(R.id.settings_backups_concurrent_count);
+        notificationTimeTextTxt = findViewById(R.id.settings_notification_time_text);
+        notificationTimeTxt = findViewById(R.id.settings_notifications_time);
+
         createBackupsChk = findViewById(R.id.settings_backups_enable_chk);
+        allowReminderChk = findViewById(R.id.settings_notifications_notificate_chk);
 
         resetSettingsBtn = findViewById(R.id.settings_reset_btn);
 
         preferences = getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
+        mUserSettings = new UserSettingsPreferences(this);
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        mBackArrow = findViewById(R.id.back_arrow);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
 
+        //todo initialien status der einzelnen checkboxen und textviews so anpassen, dass sie ihren status aus den sharedpreferences bekommen
+
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        mBackArrow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+
         firstDayLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                //todo zeige einen AlertDialog an in dem man die Zahlen zwischen den Wochentagen auswählen kann
-                int day = 0;//todo rückgabewert vom AlertDialog
-                setFirstDayOfWeek(day);
+                Bundle bundle = new Bundle();
+                bundle.putString("title", getString(R.string.choose_weekday));
+                bundle.putStringArray("content", WeekdayUtils.getWeekdays());
+
+                StringSingleChoiceDialog weekdayDialog = new StringSingleChoiceDialog();
+                weekdayDialog.setArguments(bundle);
+                weekdayDialog.setOnEntrySelectedListener(new StringSingleChoiceDialog.OnEntrySelected() {
+
+                    @Override
+                    public void onEntrySelected(String weekday) {
+
+                        setFirstDayOfWeek(weekday);
+                    }
+                });
+
+                weekdayDialog.show(getFragmentManager(), "settings_choose_weekday");
             }
         });
 
@@ -66,34 +122,131 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
-        backupFrequencyLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                //todo AlertDialog anzeigen mit dem man die Häufigkeit der backuperstellung auswählen kann
-                int days = 1;//todo Rückgabewet vom AlertDialog
-                setBackupCreationFrequency(days);
-            }
-        });
-
         concurrentBackupsLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                //todo AlertDialog anzeigen mit dem man die Anzahl der gleichzeitigen Backups aussuchen kann
-                int maxBackupCount = 10;//todo rückgabewert vom AlertDialog
-                setMaxBackupCount(maxBackupCount);
+                Bundle bundle = new Bundle();
+                bundle.putString("title", getString(R.string.choose_backup_amount));
+                bundle.putStringArray("content", getConcurrentBackupCountOptions());
+
+                StringSingleChoiceDialog concurrentBackupDialog = new StringSingleChoiceDialog();
+                concurrentBackupDialog.setArguments(bundle);
+                concurrentBackupDialog.setOnEntrySelectedListener(new StringSingleChoiceDialog.OnEntrySelected() {
+                    @Override
+                    public void onEntrySelected(String entry) {
+
+                        setMaxBackupCount(Integer.parseInt(entry));
+                    }
+                });
+
+                concurrentBackupDialog.show(getFragmentManager(), "settings_concurrent_backups");
             }
         });
 
         currencyLayout.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                Bundle bundle = new Bundle();
+                bundle.putString("title", getString(R.string.select_currency));
+
+                CurrencyPicker currencyPicker = new CurrencyPicker();
+                currencyPicker.setArguments(bundle);
+                currencyPicker.setCurrencies(CurrencyRepository.getAll());
+                currencyPicker.setOnCurrencySelectedListener(new CurrencyPicker.OnCurrencySelected() {
+                    @Override
+                    public void onCurrencySelected(Currency currency) {
+
+                        setMainCurrency(currency);
+                    }
+                });
+                currencyPicker.show(getFragmentManager(), "settings_main_currency");
+            }
+        });
+
+        notificationsAllowLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                CurrencyPicker currencyPicker = new CurrencyPicker();
-                currencyPicker.show();
+                setReminderStatus(!allowReminderChk.isChecked());
             }
         });
+
+        notificationTimeLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Bundle bundle = new Bundle();
+                bundle.putString("title", getString(R.string.choose_time));
+                bundle.putStringArray("content", getTimeArray());
+
+                StringSingleChoiceDialog timePickerDialog = new StringSingleChoiceDialog();
+                timePickerDialog.setArguments(bundle);
+                timePickerDialog.setOnEntrySelectedListener(new StringSingleChoiceDialog.OnEntrySelected() {
+                    @Override
+                    public void onEntrySelected(String entry) {
+
+                        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm", Locale.US);
+
+                        try {
+                            Date test = sdf.parse(entry);
+                            Time time = new Time();
+                            time.set(test.getTime());
+                            setReminderTime(time.hour, time.minute);
+                        } catch (ParseException e) {
+
+                            //do nothing
+                        }
+                    }
+                });
+
+                timePickerDialog.show(getFragmentManager(), "settings_choose_notification_time");
+            }
+        });
+
+        resetSettingsBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                //todo showConfirmationDialog and ask for consent
+                //if user clicks yes then reset all settings to default value
+                Toast.makeText(SettingsActivity.this, R.string.not_implemented, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    /**
+     * Methode um ein String Array mit Zahlen zwischen 1 und MAX_BACKUP_COUNT zu füllen
+     *
+     * @return Stringarray
+     */
+    private String[] getConcurrentBackupCountOptions() {
+        String[] options = new String[MAX_BACKUP_COUNT];
+
+        for (int i = 0; i < MAX_BACKUP_COUNT; i++) {
+            options[i] = Integer.toString(i + 1);
+        }
+
+        return options;
+    }
+
+    /**
+     * Methode um ein Stringarray mit Uhrzeiten zu bekommen.
+     *
+     * @return Stringarray
+     */
+    private String[] getTimeArray() {
+        String[] timeArray = new String[24];
+
+        for (int i = 0; i < 24; i++) {
+            String time = (i + 1) < 10 ? "0" + (i + 1) : "" + (i + 1);
+            time = time.concat(":00");
+
+            timeArray[i] = time;
+        }
+
+        return timeArray;
     }
 
     /**
@@ -102,8 +255,10 @@ public class SettingsActivity extends AppCompatActivity {
      *
      * @param weekday Tag, welcher der neue erste Tag des Monats sein soll
      */
-    private void setFirstDayOfWeek(int weekday) {
-        preferences.edit().putInt("firstDayOfWeek", weekday).apply();
+    private void setFirstDayOfWeek(String weekday) {
+
+        mUserSettings.setFirstDayOfWeek(weekday);
+        firstDayOfWeekTxt.setText(weekday);
     }
 
     /**
@@ -113,23 +268,31 @@ public class SettingsActivity extends AppCompatActivity {
      * @param backupAutomatically Neuer Backup status
      */
     private void setAutomaticBackupStatus(boolean backupAutomatically) {
-        preferences.edit().putBoolean("automaticBackups", backupAutomatically).apply();
+
+        mUserSettings.setAutomaticBackupStatus(backupAutomatically);
         createBackupsChk.setChecked(backupAutomatically);
 
         setBackupSettingsClickable(backupAutomatically);
     }
 
-    private void setBackupSettingsClickable(boolean clickableStatus) {
-        //todo die Layouts (backupCount, backupFrequency) ausgrauen und den Click disablend
-    }
-
     /**
-     * Methode um die Häufigkeit der Backup erstellung anzupassen.
+     * Methode um die Sichtbarkeit der Einträge im Backup bereich anzupassen.
      *
-     * @param days Anzahl in Tage
+     * @param clickable Sichtbarkeitsstaus
      */
-    private void setBackupCreationFrequency(int days) {
-        preferences.edit().putInt("backupFrequency", days).apply();
+    private void setBackupSettingsClickable(boolean clickable) {
+
+        if (clickable) {
+
+            concurrentBackupsLayout.setClickable(true);
+            backupCountTextTxt.setTextColor(getResources().getColor(R.color.primary_text_color));
+            maxBackupCountTxt.setTextColor(getResources().getColor(R.color.primary_text_color));
+        } else {
+
+            concurrentBackupsLayout.setClickable(false);
+            backupCountTextTxt.setTextColor(getResources().getColor(R.color.text_color_disabled));
+            maxBackupCountTxt.setTextColor(getResources().getColor(R.color.text_color_disabled));
+        }
     }
 
     /**
@@ -138,7 +301,9 @@ public class SettingsActivity extends AppCompatActivity {
      * @param maxBackupCount Wie viele Backups soll es gleichzeitig geben
      */
     private void setMaxBackupCount(int maxBackupCount) {
-        preferences.edit().putInt("maxBackupCount", maxBackupCount).apply();
+
+        mUserSettings.setMaxBackupCount(maxBackupCount);
+        maxBackupCountTxt.setText(String.format("%s", maxBackupCount));
     }
 
     /**
@@ -147,17 +312,20 @@ public class SettingsActivity extends AppCompatActivity {
      * @param mainCurrency Neue Hauptwährung
      */
     private void setMainCurrency(Currency mainCurrency) {
-        preferences.edit().putLong("mainCurrencyIndex", mainCurrency.getIndex()).apply();
+
+        mUserSettings.setMainCurrency(mainCurrency);
+        currencyNameTxt.setText(mainCurrency.getName());
     }
 
     /**
      * Methode zum anpassen des Notification status.
      * TRUE wenn der User keine Push Benachrichtigungen mehr bekommen soll, FALSE wenn nicht.
      *
-     * @param notificationsDisabled Neuer Notification status
+     * @param notificationStatus Neuer Notification status
      */
-    private void disableNotifications(boolean notificationsDisabled) {
-        preferences.edit().putBoolean("notificationsEnabled", notificationsDisabled).apply();
+    private void disableNotifications(boolean notificationStatus) {
+
+        mUserSettings.setNotificationStatus(notificationStatus);
     }
 
     /**
@@ -166,15 +334,44 @@ public class SettingsActivity extends AppCompatActivity {
      * @param remindUser TRUE wenn der User erinnert werden soll, FALSE wenn nicht
      */
     private void setReminderStatus(boolean remindUser) {
-        preferences.edit().putBoolean("sendReminderNotification", remindUser).apply();
+
+        mUserSettings.setReminderStatus(remindUser);
+        allowReminderChk.setChecked(remindUser);
+
+        setNotificationStatusClickable(remindUser);
+    }
+
+    /**
+     * Methode um die Sichtbarkeit der Einträge im Notificationbereich anzupassen.
+     *
+     * @param clickable Sind die Einträge anwählbra oder nicht
+     */
+    private void setNotificationStatusClickable(boolean clickable) {
+
+        if (clickable) {
+
+            notificationTimeTextTxt.setTextColor(getResources().getColor(R.color.primary_text_color));
+            notificationTimeTxt.setTextColor(getResources().getColor(R.color.primary_text_color));
+            notificationTimeLayout.setClickable(true);
+        } else {
+
+            notificationTimeTextTxt.setTextColor(getResources().getColor(R.color.text_color_disabled));
+            notificationTimeTxt.setTextColor(getResources().getColor(R.color.text_color_disabled));
+            notificationTimeLayout.setClickable(false);
+        }
     }
 
     /**
      * Methode um die Zeit anzupassen wenn der User die "Buchungen eintragen" Benachrichtigunge bekommen soll.
-     *
-     * @param reminderTime Zeit zu der Der User Benachrichtigt werden soll
      */
-    private void setRemiderTime(Calendar reminderTime) {
-        preferences.edit().putLong("notificationReminderTime", reminderTime.getTimeInMillis()).apply();
+    private void setReminderTime(int one, int two) {
+
+        Date date = new Date();
+        date.setHours(one);
+        date.setMinutes(two);
+
+//        preferences.edit().putLong("notificationReminderTime", reminderTime).apply();
+        //todo wenn die stunde kleiner als 10 ist muss auch noch eine 0 vor der zahl erscheinen
+        notificationTimeTxt.setText(String.format("%s:00", date.getHours()));//todo long in time convertieren
     }
 }

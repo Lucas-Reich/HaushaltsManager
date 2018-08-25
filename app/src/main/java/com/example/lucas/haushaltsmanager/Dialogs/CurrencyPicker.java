@@ -20,13 +20,6 @@ public class CurrencyPicker extends DialogFragment {
     private Currency mSelectedCurrency;
     private List<Currency> mCurrencies = new ArrayList<>();
 
-//    @Override todo überlegen ob ich so die Währungsliste initialisieren kann
-//    public void setArguments(Bundle args) {
-//        super.setArguments(args);
-//
-//        args.getParcelableArrayList()
-//    }
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -42,26 +35,26 @@ public class CurrencyPicker extends DialogFragment {
 
         builder.setTitle(args.getString("title", ""));
 
-        builder.setSingleChoiceItems(convertToString(mCurrencies), 0, new DialogInterface.OnClickListener() {
+        builder.setSingleChoiceItems(convertToString(mCurrencies), -1, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 mSelectedCurrency = mCurrencies.get(i);
             }
         });
 
-        builder.setPositiveButton(R.string.btn_yes, new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.btn_choose, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                mCallback.onCurrencySelected(mSelectedCurrency);
+                if (mCallback != null)
+                    mCallback.onCurrencySelected(mSelectedCurrency);
             }
         });
 
-        builder.setNegativeButton(R.string.btn_no, new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.btn_cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                mCallback.onCurrencySelected(mSelectedCurrency);
             }
         });
 
@@ -72,7 +65,6 @@ public class CurrencyPicker extends DialogFragment {
      * Methode um dem AlertDialog die Anzuzeigenden Währungen zu übergeben
      *
      * @param currencies Anzuzeigende Währungen
-     *                   todo sollte ich vielleicht die währungen schon in dem Konstruktor requiren?
      */
     public void setCurrencies(List<Currency> currencies) {
         mCurrencies = currencies;

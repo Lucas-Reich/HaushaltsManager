@@ -145,4 +145,9 @@
     <string name="cannot_update_account">Cannot update Account, Account not found!</string>
     <string name="category_not_found">Cannot update category. Category not found</string>
     <string name="add_child_to_child_error">Error! You cannot adda child to a child booking.</string>
+    <string name="btn_choose">Choose</string>
+    <string name="select_currency">Choose a currency</string>
+    <string name="choose_weekday">Select a Weekday</string>
+    <string name="choose_backup_amount">Choose the amount of concurrent Backups</string>
+    <string name="choose_time">Choose a time</string>
 </resources>
