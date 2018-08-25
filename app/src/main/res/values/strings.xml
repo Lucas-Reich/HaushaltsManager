@@ -165,4 +165,6 @@
     <string name="choose_weekday">Select a Weekday</string>
     <string name="choose_backup_amount">Choose the amount of concurrent Backups</string>
     <string name="choose_time">Choose a time</string>
+    <string name="attention">Attention</string>
+    <string name="reset_settings_alert_message">Your are about to reset all changes to default value! Are you sure you want to contiue?</string>
 </resources>

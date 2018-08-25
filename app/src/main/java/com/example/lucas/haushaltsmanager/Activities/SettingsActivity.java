@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepository;
+import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.CurrencyPicker;
 import com.example.lucas.haushaltsmanager.Dialogs.StringSingleChoiceDialog;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
@@ -208,10 +209,25 @@ public class SettingsActivity extends AppCompatActivity {
         resetSettingsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Bundle bundle = new Bundle();
+                bundle.putString(ConfirmationDialog.TITLE, getString(R.string.attention));
+                bundle.putString(ConfirmationDialog.CONTENT, getString(R.string.reset_settings_alert_message));
 
-                //todo showConfirmationDialog and ask for consent
-                //if user clicks yes then reset all settings to default value
-                Toast.makeText(SettingsActivity.this, R.string.not_implemented, Toast.LENGTH_SHORT).show();
+                ConfirmationDialog confirmationDialog = new ConfirmationDialog();
+                confirmationDialog.setArguments(bundle);
+                confirmationDialog.setOnConfirmationListener(new ConfirmationDialog.OnConfirmationResult() {
+                    @Override
+                    public void onConfirmationResult(boolean reset) {
+
+                        if (reset) {
+
+                            //todo einstellungen auf dern standart zurücksetzen
+                            Toast.makeText(SettingsActivity.this, R.string.not_implemented, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+
+                confirmationDialog.show(getFragmentManager(), "settings_confirm_reset");
             }
         });
     }
