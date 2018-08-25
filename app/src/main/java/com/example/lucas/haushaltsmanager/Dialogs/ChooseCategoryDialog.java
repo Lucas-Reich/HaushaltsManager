@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 
 import com.example.lucas.haushaltsmanager.App.app;
+import com.example.lucas.haushaltsmanager.BundleUtils;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepository;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.R;
@@ -16,18 +17,19 @@ import java.util.ArrayList;
 
 public class ChooseCategoryDialog extends DialogFragment {
     private static final String TAG = ChooseCategoryDialog.class.getSimpleName();
+    public static final String TITLE = "title";
 
     private OnCategoryChosenListener mCallback;
 
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-
-        Bundle args = getArguments();
+        //todo kann eventuelle durch StringSingleChoiceDialog ersetzt werden
+        BundleUtils args = new BundleUtils(getArguments());
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-        builder.setTitle(args.getString("title"));
+        builder.setTitle(args.getString(TITLE, ""));
 
         final ArrayList<Category> categories = getCategories();
 
@@ -37,9 +39,11 @@ public class ChooseCategoryDialog extends DialogFragment {
             public void onClick(DialogInterface dialog, int selectedCategoryIndex) {
 
                 if (selectedCategoryIndex == 0) {
-                    mCallback.onCategoryChosen(null);
+                    if (mCallback != null)//todo kann ich das weglassen?
+                        mCallback.onCategoryChosen(null);
                 } else {
-                    mCallback.onCategoryChosen(categories.get(selectedCategoryIndex));
+                    if (mCallback != null)
+                        mCallback.onCategoryChosen(categories.get(selectedCategoryIndex));
                 }
 
                 dismiss();

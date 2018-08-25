@@ -100,7 +100,7 @@ public class TabOneBookings extends Fragment {
             }
         });
 
-        fabSmallLeft = (FloatingActionButton) rootView.findViewById(R.id.fab_small_left);
+        fabSmallLeft = rootView.findViewById(R.id.fab_small_left);
         fabSmallLeft.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -109,10 +109,11 @@ public class TabOneBookings extends Fragment {
                 if (combineBookingsMode()) {
 
                     Bundle bundle = new Bundle();
-                    bundle.putString("title", getResources().getString(R.string.input_title));
+                    bundle.putString(BasicTextInputDialog.TITLE, getResources().getString(R.string.input_title));
 
                     BasicTextInputDialog textInputDialog = new BasicTextInputDialog();
-                    textInputDialog.setOnTextInputListener(new BasicTextInputDialog.BasicDialogCommunicator() {
+                    textInputDialog.setArguments(bundle);
+                    textInputDialog.setOnTextInputListener(new BasicTextInputDialog.OnTextInput() {
                         @Override
                         public void onTextInput(String title) {
 
@@ -132,7 +133,6 @@ public class TabOneBookings extends Fragment {
                             resetActivityViewState();
                         }
                     });
-                    textInputDialog.setArguments(bundle);
                     textInputDialog.show(getActivity().getFragmentManager(), "");
                 }
 
@@ -695,7 +695,7 @@ public class TabOneBookings extends Fragment {
      */
     private void showSnackbar(HashMap<ExpenseObject, List<ExpenseObject>> bookings, @StringRes int message, @StringRes int successMessage) {
 
-        CoordinatorLayout coordinatorLayout = (CoordinatorLayout) getView().findViewById(R.id.tab_one_bookings_layout);
+        CoordinatorLayout coordinatorLayout = getView().findViewById(R.id.tab_one_bookings_layout);
         Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG)
                 .setAction(R.string.revert_action, new UndoDeletionClickListener(bookings, successMessage))
                 .show();

@@ -10,9 +10,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 
+import com.example.lucas.haushaltsmanager.BundleUtils;
 import com.example.lucas.haushaltsmanager.R;
 
 public class FrequencyInputDialog extends DialogFragment {
+    private static final String TAG = FrequencyInputDialog.class.getSimpleName();
+    public static final String TITLE = "title";
 
     private OnFrequencySet mCallback;
     private Context mContext;
@@ -26,15 +29,14 @@ public class FrequencyInputDialog extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-
-        Bundle args = getArguments();
+        BundleUtils args = new BundleUtils(getArguments());
 
         LayoutInflater inflater = getActivity().getLayoutInflater();
         final View frequencyInput = inflater.inflate(R.layout.frequency_input, null);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 
-        builder.setTitle(args.getString("title"));
+        builder.setTitle(args.getString("title", ""));
 
         builder.setView(frequencyInput);
 
@@ -42,7 +44,9 @@ public class FrequencyInputDialog extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                mCallback.onFrequencySet(getFrequencyFromInput(frequencyInput));
+                if (mCallback != null)
+                    mCallback.onFrequencySet(getFrequencyFromInput(frequencyInput));
+
                 dismiss();
             }
         });
@@ -66,7 +70,7 @@ public class FrequencyInputDialog extends DialogFragment {
      */
     private int getFrequencyFromInput(View view) {
 
-        EditText numberInput = (EditText) view.findViewById(R.id.input_number);
+        EditText numberInput = view.findViewById(R.id.input_number);
         String frequency = numberInput.getText().toString();
 
         return Integer.parseInt(frequency) * 24;

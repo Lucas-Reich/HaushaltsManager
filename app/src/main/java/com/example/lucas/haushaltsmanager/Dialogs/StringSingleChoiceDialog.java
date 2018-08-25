@@ -11,6 +11,11 @@ import com.example.lucas.haushaltsmanager.BundleUtils;
 import com.example.lucas.haushaltsmanager.R;
 
 public class StringSingleChoiceDialog extends DialogFragment {
+    private static final String TAG = StringSingleChoiceDialog.class.getSimpleName();
+    public static final String TITLE = "title";
+    public static final String CONTENT = "content";
+    public static final String SELECTED_ENTRY = "selected_entry";
+
     private OnEntrySelected mCallback;
     private Context mContext;
     private String[] mEntrySet;
@@ -27,13 +32,13 @@ public class StringSingleChoiceDialog extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         //todo kann ich den dialog so schreiben dass er alles anzeigen kann (also nicht nur strings)
         BundleUtils args = new BundleUtils(getArguments());
-        mEntrySet = args.getStringArray("content", new String[]{ });
+        mEntrySet = args.getStringArray(CONTENT, new String[]{ });
 
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 
-        builder.setTitle(args.getString("title", ""));
+        builder.setTitle(args.getString(TITLE, ""));
 
-        builder.setSingleChoiceItems(mEntrySet, args.getInt("selected_entry", -1), new DialogInterface.OnClickListener() {
+        builder.setSingleChoiceItems(mEntrySet, args.getInt(SELECTED_ENTRY, -1), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
 

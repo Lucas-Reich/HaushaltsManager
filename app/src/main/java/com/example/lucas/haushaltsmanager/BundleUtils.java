@@ -47,4 +47,9 @@ public class BundleUtils {
 
         return mBundle.containsKey(key) ? mBundle.getStringArray(key) : def;
     }
+
+    public long getLong(String key, long def) {
+
+        return mBundle.containsKey(key) ? mBundle.getLong(key) : def;
+    }
 }

@@ -7,10 +7,13 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
+import com.example.lucas.haushaltsmanager.BundleUtils;
 import com.example.lucas.haushaltsmanager.R;
 
 public class ErrorAlertDialog extends DialogFragment {
     private static final String TAG = ErrorAlertDialog.class.getSimpleName();
+    public static final String TITLE = "title";
+    public static final String CONTENT = "content";
 
     private Context mContext;
 
@@ -23,16 +26,13 @@ public class ErrorAlertDialog extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-
-        Bundle args = getArguments();
-        String title = args.containsKey("title") ? args.getString("title") : "Error";
-        String message = args.containsKey("message") ? args.getString("message") : "Error";
+        BundleUtils args = new BundleUtils(getArguments());
 
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 
-        builder.setTitle(title);
+        builder.setTitle(args.getString(TITLE, "Error"));
 
-        builder.setMessage(message);
+        builder.setMessage(args.getString(CONTENT, "Error"));
 
         builder.setPositiveButton(R.string.btn_ok, new DialogInterface.OnClickListener() {
             @Override

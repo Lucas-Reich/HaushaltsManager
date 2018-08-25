@@ -115,7 +115,7 @@ public class TransferActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 Bundle bundle = new Bundle();
-                bundle.putString("title", getResources().getString(R.string.input_price));
+                bundle.putString(PriceInputDialog.TITLE, getResources().getString(R.string.input_price));
 
                 PriceInputDialog expenseInput = new PriceInputDialog();
                 expenseInput.setArguments(bundle);
@@ -142,15 +142,15 @@ public class TransferActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 Bundle bundle = new Bundle();
-                bundle.putString("title", getResources().getString(R.string.input_account));
+                bundle.putString(AccountPickerDialog.TITLE, getResources().getString(R.string.input_account));
                 try {
-                    bundle.putParcelable("active_account", getActiveAccount());
+                    bundle.putParcelable(AccountPickerDialog.ACTIVE_ACCOUNT, getActiveAccount());
                 } catch (AccountNotFoundException e) {
 
                     //do nothing
                 }
                 if (mToAccount != null)
-                    bundle.putLong("excluded_account", mToAccount.getIndex());
+                    bundle.putLong(AccountPickerDialog.EXCLUDED_ACCOUNT, mToAccount.getIndex());
 
                 AccountPickerDialog accountPicker = new AccountPickerDialog();
                 accountPicker.setArguments(bundle);
@@ -173,15 +173,15 @@ public class TransferActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 Bundle bundle = new Bundle();
-                bundle.putString("title", getResources().getString(R.string.input_account));
+                bundle.putString(AccountPickerDialog.TITLE, getResources().getString(R.string.input_account));
                 try {
-                    bundle.putParcelable("active_account", getActiveAccount());
+                    bundle.putParcelable(AccountPickerDialog.ACTIVE_ACCOUNT, getActiveAccount());
                 } catch (AccountNotFoundException e) {
 
                     //do nothing
                 }
                 if (mFromAccount != null)
-                    bundle.putLong("excluded_account", mFromAccount.getIndex());
+                    bundle.putLong(AccountPickerDialog.EXCLUDED_ACCOUNT, mFromAccount.getIndex());
 
                 AccountPickerDialog accountPicker = new AccountPickerDialog();
                 accountPicker.setArguments(bundle);
@@ -204,8 +204,7 @@ public class TransferActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 Bundle bundle = new Bundle();
-                Log.d(TAG, "onClick: " + transformCalendarToReadableDate(mCalendar));
-                bundle.putLong("current_day", mCalendar.getTimeInMillis());
+                bundle.putLong(DatePickerDialog.CURRENT_DAY, mCalendar.getTimeInMillis());
 
                 DatePickerDialog datePicker = new DatePickerDialog();
                 datePicker.setArguments(bundle);
@@ -252,12 +251,11 @@ public class TransferActivity extends AppCompatActivity {
                 } else {
 
                     Bundle bundle = new Bundle();
-                    bundle.putString("title", getString(R.string.error));
-                    bundle.putString("message", getString(R.string.error_missing_content));
+                    bundle.putString(ErrorAlertDialog.TITLE, getString(R.string.error));
+                    bundle.putString(ErrorAlertDialog.CONTENT, getString(R.string.error_missing_content));
 
                     ErrorAlertDialog errorAlert = new ErrorAlertDialog();
                     errorAlert.setArguments(bundle);
-
                     errorAlert.show(getFragmentManager(), "transfer_activity_error");
                 }
             }

@@ -234,7 +234,7 @@ public class ExpenseScreenActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 Bundle bundle = new Bundle();
-                bundle.putString("title", getString(R.string.input_price));
+                bundle.putString(PriceInputDialog.TITLE, getString(R.string.input_price));
 
                 PriceInputDialog priceDialog = new PriceInputDialog();
                 priceDialog.setArguments(bundle);
@@ -266,15 +266,15 @@ public class ExpenseScreenActivity extends AppCompatActivity {
 
                 //TODO ist kaputt
 
-                ImageView imgFrequency = (ImageView) findViewById(R.id.img_frequency);
-                mRecurringFrequency = (Button) findViewById(R.id.expense_screen_recurring_frequency);
+                ImageView imgFrequency = findViewById(R.id.img_frequency);
+                mRecurringFrequency = findViewById(R.id.expense_screen_recurring_frequency);
                 mRecurringFrequency.setOnClickListener(new View.OnClickListener() {
 
                     @Override
                     public void onClick(View v) {
 
                         Bundle bundle = new Bundle();
-                        bundle.putString("title", getString(R.string.input_frequency));
+                        bundle.putString(FrequencyInputDialog.TITLE, getString(R.string.input_frequency));
 
                         FrequencyInputDialog frequencyDialog = new FrequencyInputDialog();
                         frequencyDialog.setArguments(bundle);
@@ -289,18 +289,18 @@ public class ExpenseScreenActivity extends AppCompatActivity {
                     }
                 });
 
-                ImageView imgEnd = (ImageView) findViewById(R.id.img_end);
-                mRecurringEndBtn = (Button) findViewById(R.id.expense_screen_recurring_end);
+                ImageView imgEnd = findViewById(R.id.img_end);
+                mRecurringEndBtn = findViewById(R.id.expense_screen_recurring_end);
                 mRecurringEndBtn.setOnClickListener(new View.OnClickListener() {
 
                     @Override
                     public void onClick(View v) {
 
-                        Bundle dateBundle = new Bundle();
-                        dateBundle.putString("title", "");
+                        Bundle bundle = new Bundle();
+                        bundle.putString(DatePickerDialog.TITLE, "");
 
                         DatePickerDialog datePicker = new DatePickerDialog();
-                        datePicker.setArguments(dateBundle);
+                        datePicker.setArguments(bundle);
                         datePicker.setOnDateSelectedListener(new DatePickerDialog.OnDateSelected() {
                             @Override
                             public void onDateSelected(Calendar date) {
@@ -650,7 +650,7 @@ public class ExpenseScreenActivity extends AppCompatActivity {
     public void expensePopUp(View view) {
 
         Bundle bundle = new Bundle();
-        Button btn = (Button) findViewById(view.getId());
+        Button btn = findViewById(view.getId());
         BasicTextInputDialog basicDialog = new BasicTextInputDialog();
 
         switch (btn.getId()) {
@@ -663,10 +663,10 @@ public class ExpenseScreenActivity extends AppCompatActivity {
 
             case R.id.expense_screen_title:
 
-                bundle.putString("title", getResources().getString(R.string.input_title));
+                bundle.putString(BasicTextInputDialog.TITLE, getResources().getString(R.string.input_title));
 
                 basicDialog.setArguments(bundle);
-                basicDialog.setOnTextInputListener(new BasicTextInputDialog.BasicDialogCommunicator() {
+                basicDialog.setOnTextInputListener(new BasicTextInputDialog.OnTextInput() {
 
                     @Override
                     public void onTextInput(String textInput) {
@@ -679,10 +679,7 @@ public class ExpenseScreenActivity extends AppCompatActivity {
 
             case R.id.expense_screen_date:
 
-                bundle.putString("title", "");
-
                 DatePickerDialog datePicker = new DatePickerDialog();
-                datePicker.setArguments(bundle);
                 datePicker.setOnDateSelectedListener(new DatePickerDialog.OnDateSelected() {
                     @Override
                     public void onDateSelected(Calendar date) {
@@ -695,10 +692,10 @@ public class ExpenseScreenActivity extends AppCompatActivity {
 
             case R.id.expense_screen_notice:
 
-                bundle.putString("title", getResources().getString(R.string.input_notice));
+                bundle.putString(BasicTextInputDialog.TITLE, getResources().getString(R.string.input_notice));
 
                 basicDialog.setArguments(bundle);
-                basicDialog.setOnTextInputListener(new BasicTextInputDialog.BasicDialogCommunicator() {
+                basicDialog.setOnTextInputListener(new BasicTextInputDialog.OnTextInput() {
 
                     @Override
                     public void onTextInput(String textInput) {
@@ -711,8 +708,8 @@ public class ExpenseScreenActivity extends AppCompatActivity {
 
             case R.id.expense_screen_account:
 
-                bundle.putString("title", getResources().getString(R.string.input_account));
-                bundle.putLong("active_account", mExpense.getAccountId());
+                bundle.putString(AccountPickerDialog.TITLE, getResources().getString(R.string.input_account));
+                bundle.putLong(AccountPickerDialog.ACTIVE_ACCOUNT, mExpense.getAccountId());
 
                 AccountPickerDialog accountPicker = new AccountPickerDialog();
                 accountPicker.setArguments(bundle);

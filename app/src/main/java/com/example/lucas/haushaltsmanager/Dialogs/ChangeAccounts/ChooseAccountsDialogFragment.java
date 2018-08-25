@@ -122,7 +122,7 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Acco
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                CheckBox accountChk = (CheckBox) view.findViewById(R.id.listview_account_item_chkbox);
+                CheckBox accountChk = view.findViewById(R.id.listview_account_item_chkbox);
                 boolean newVisibilityState = !accountChk.isChecked();
 
                 accountChk.setChecked(newVisibilityState);

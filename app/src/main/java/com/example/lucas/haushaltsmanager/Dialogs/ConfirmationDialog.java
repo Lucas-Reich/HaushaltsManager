@@ -39,7 +39,8 @@ public class ConfirmationDialog extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                mCallback.onConfirmationResult(true);
+                if (mCallback != null)
+                    mCallback.onConfirmationResult(true);
             }
         });
 
@@ -47,7 +48,8 @@ public class ConfirmationDialog extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                mCallback.onConfirmationResult(false);
+                if (mCallback != null)
+                    mCallback.onConfirmationResult(false);
             }
         });
 

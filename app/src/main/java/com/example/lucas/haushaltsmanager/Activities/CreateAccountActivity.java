@@ -109,11 +109,12 @@ public class CreateAccountActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 Bundle args = new Bundle();
-                args.putString("title", getResources().getString(R.string.set_account_title));
-                args.putString("hint", mAccount.getTitle());
+                args.putString(BasicTextInputDialog.TITLE, getResources().getString(R.string.set_account_title));
+                args.putString(BasicTextInputDialog.HINT, mAccount.getTitle());
 
                 BasicTextInputDialog basicDialog = new BasicTextInputDialog();
-                basicDialog.setOnTextInputListener(new BasicTextInputDialog.BasicDialogCommunicator() {
+                basicDialog.setArguments(args);
+                basicDialog.setOnTextInputListener(new BasicTextInputDialog.OnTextInput() {
 
                     @Override
                     public void onTextInput(String textInput) {
@@ -124,7 +125,6 @@ public class CreateAccountActivity extends AppCompatActivity {
                         Log.d(TAG, "set Account name to" + mAccount.getTitle());
                     }
                 });
-                basicDialog.setArguments(args);
                 basicDialog.show(getFragmentManager(), "create_account_name");
             }
         });
@@ -136,7 +136,7 @@ public class CreateAccountActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 Bundle args = new Bundle();
-                args.putString("title", getResources().getString(R.string.set_Account_balance));
+                args.putString(PriceInputDialog.TITLE, getResources().getString(R.string.set_Account_balance));
 
                 PriceInputDialog priceInputDialog = new PriceInputDialog();
                 priceInputDialog.setArguments(args);

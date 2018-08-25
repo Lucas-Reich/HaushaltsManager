@@ -14,11 +14,14 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.lucas.haushaltsmanager.BundleUtils;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Views.ViewUtils;
 
 public class PriceInputDialog extends DialogFragment {
     private static final String TAG = PriceInputDialog.class.getSimpleName();
+    public static final String TITLE = "title";
+    public static final String HINT = "hint";
 
     private Context mContext;
     private OnPriceSelected mCallback;
@@ -39,13 +42,10 @@ public class PriceInputDialog extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-
-        final Bundle args = getArguments();
-        String title = args.containsKey("title") ? args.getString("title") : "";
+        BundleUtils args = new BundleUtils(getArguments());
 
         final EditText input = createInputView();
-        String hint = args.containsKey("hint") ? args.getString("hint") : getString(R.string.placeholder_amount);
-        input.setHint(hint);
+        input.setHint(args.getString(HINT, ""));
 
         //wrapper für die text eingabe, sodass dieser eine padding gegeben werden kann
         //Quelle: http://android.pcsalt.com/create-alertdialog-with-custom-layout-programmatically/
@@ -56,7 +56,7 @@ public class PriceInputDialog extends DialogFragment {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 
-        builder.setTitle(title);
+        builder.setTitle(args.getString(TITLE, ""));
 
         builder.setView(layout);
 

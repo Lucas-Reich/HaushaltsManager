@@ -97,8 +97,8 @@ public class SettingsActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 Bundle bundle = new Bundle();
-                bundle.putString("title", getString(R.string.choose_weekday));
-                bundle.putStringArray("content", WeekdayUtils.getWeekdays());
+                bundle.putString(StringSingleChoiceDialog.TITLE, getString(R.string.choose_weekday));
+                bundle.putStringArray(StringSingleChoiceDialog.CONTENT, WeekdayUtils.getWeekdays());
 
                 StringSingleChoiceDialog weekdayDialog = new StringSingleChoiceDialog();
                 weekdayDialog.setArguments(bundle);
@@ -128,8 +128,8 @@ public class SettingsActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 Bundle bundle = new Bundle();
-                bundle.putString("title", getString(R.string.choose_backup_amount));
-                bundle.putStringArray("content", getConcurrentBackupCountOptions());
+                bundle.putString(StringSingleChoiceDialog.TITLE, getString(R.string.choose_backup_amount));
+                bundle.putStringArray(StringSingleChoiceDialog.CONTENT, getConcurrentBackupCountOptions());
 
                 StringSingleChoiceDialog concurrentBackupDialog = new StringSingleChoiceDialog();
                 concurrentBackupDialog.setArguments(bundle);
@@ -150,7 +150,7 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Bundle bundle = new Bundle();
-                bundle.putString("title", getString(R.string.select_currency));
+                bundle.putString(CurrencyPicker.TITLE, getString(R.string.select_currency));
 
                 CurrencyPicker currencyPicker = new CurrencyPicker();
                 currencyPicker.setArguments(bundle);
@@ -179,8 +179,8 @@ public class SettingsActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 Bundle bundle = new Bundle();
-                bundle.putString("title", getString(R.string.choose_time));
-                bundle.putStringArray("content", getTimeArray());
+                bundle.putString(StringSingleChoiceDialog.TITLE, getString(R.string.choose_time));
+                bundle.putStringArray(StringSingleChoiceDialog.CONTENT, getTimeArray());
 
                 StringSingleChoiceDialog timePickerDialog = new StringSingleChoiceDialog();
                 timePickerDialog.setArguments(bundle);

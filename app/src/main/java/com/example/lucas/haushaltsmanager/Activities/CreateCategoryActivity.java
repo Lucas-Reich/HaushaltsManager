@@ -22,7 +22,7 @@ import com.example.lucas.haushaltsmanager.R;
 
 import java.util.ArrayList;
 
-public class CreateCategoryActivity extends AppCompatActivity implements BasicTextInputDialog.BasicDialogCommunicator {
+public class CreateCategoryActivity extends AppCompatActivity {
     private static final String TAG = CreateCategoryActivity.class.getSimpleName();
 
     private Category mCategory;
@@ -43,16 +43,16 @@ public class CreateCategoryActivity extends AppCompatActivity implements BasicTe
         super.onCreate(savedInstances);
         setContentView(R.layout.activity_new_category);
 
-        mCatNameBtn = (Button) findViewById(R.id.new_category_name);
-        mCatColorBtn = (Button) findViewById(R.id.new_category_color);
-        mSelectParentBtn = (Button) findViewById(R.id.new_category_select_parent);
-        mCreateBtn = (Button) findViewById(R.id.new_category_create);
-        mBackArrow = (ImageButton) findViewById(R.id.back_arrow);
+        mCatNameBtn = findViewById(R.id.new_category_name);
+        mCatColorBtn = findViewById(R.id.new_category_color);
+        mSelectParentBtn = findViewById(R.id.new_category_select_parent);
+        mCreateBtn = findViewById(R.id.new_category_create);
+        mBackArrow = findViewById(R.id.back_arrow);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mDefaultExpenseRadioGrp = (RadioGroup) findViewById(R.id.new_category_expense_type);
+        mDefaultExpenseRadioGrp = findViewById(R.id.new_category_expense_type);
 
         resolveIntent(getIntent().getExtras());
     }
@@ -105,7 +105,7 @@ public class CreateCategoryActivity extends AppCompatActivity implements BasicTe
                 args.putString("title", getResources().getString(R.string.category_name));
 
                 BasicTextInputDialog basicDialog = new BasicTextInputDialog();
-                basicDialog.setOnTextInputListener(new BasicTextInputDialog.BasicDialogCommunicator() {
+                basicDialog.setOnTextInputListener(new BasicTextInputDialog.OnTextInput() {
 
                     @Override
                     public void onTextInput(String textInput) {
@@ -126,7 +126,8 @@ public class CreateCategoryActivity extends AppCompatActivity implements BasicTe
             @Override
             public void onClick(View v) {
 
-                ColorPickerDialog dialog = new ColorPickerDialog(CreateCategoryActivity.this, Color.WHITE, new ColorPickerDialog.OnColorSelectedListener() {
+                ColorPickerDialog colorPickerDialog = new ColorPickerDialog(CreateCategoryActivity.this, Color.WHITE);
+                colorPickerDialog.setOnColorSelectedListener(new ColorPickerDialog.OnColorSelectedListener() {
 
                     @Override
                     public void onColorSelected(int color) {
@@ -135,7 +136,7 @@ public class CreateCategoryActivity extends AppCompatActivity implements BasicTe
                         Log.d(TAG, "set category color to: " + Integer.toHexString(color));
                     }
                 });
-                dialog.show();
+                colorPickerDialog.show();
             }
         });
 
@@ -145,9 +146,10 @@ public class CreateCategoryActivity extends AppCompatActivity implements BasicTe
             public void onClick(View v) {
 
                 Bundle bundle = new Bundle();
-                bundle.putString("title", getString(R.string.choose_parent_category));
+                bundle.putString(ChooseCategoryDialog.TITLE, getString(R.string.choose_parent_category));
 
                 ChooseCategoryDialog chooseCategory = new ChooseCategoryDialog();
+                chooseCategory.setArguments(bundle);
                 chooseCategory.setOnCategoryChosenListener(new ChooseCategoryDialog.OnCategoryChosenListener() {
 
                     @Override
@@ -156,11 +158,19 @@ public class CreateCategoryActivity extends AppCompatActivity implements BasicTe
                         if (category == null) {
 
                             Bundle bundle1 = new Bundle();
-                            bundle1.putString("title", getString(R.string.new_parent_category_name));
+                            bundle1.putString(BasicTextInputDialog.TITLE, getString(R.string.new_parent_category_name));
 
                             BasicTextInputDialog textInputDialog = new BasicTextInputDialog();
-                            textInputDialog.setOnTextInputListener(CreateCategoryActivity.this);
                             textInputDialog.setArguments(bundle1);
+                            textInputDialog.setOnTextInputListener(new BasicTextInputDialog.OnTextInput() {
+
+                                @Override
+                                public void onTextInput(String textInput) {
+
+                                    mParentCategory = CategoryRepository.insert(new Category(textInput, "#000000", false, new ArrayList<Category>()));
+                                    mSelectParentBtn.setText(mParentCategory.getTitle());
+                                }
+                            });
                             textInputDialog.show(getFragmentManager(), "categoryParentName");
 
                         } else {
@@ -170,8 +180,6 @@ public class CreateCategoryActivity extends AppCompatActivity implements BasicTe
                         }
                     }
                 });
-
-                chooseCategory.setArguments(bundle);
                 chooseCategory.show(getFragmentManager(), "categoryParent");
             }
         });
@@ -228,12 +236,5 @@ public class CreateCategoryActivity extends AppCompatActivity implements BasicTe
                 }
             }
         });
-    }
-
-    @Override
-    public void onTextInput(String textInput) {
-
-        mParentCategory = CategoryRepository.insert(new Category(textInput, "#000000", false, new ArrayList<Category>()));
-        mSelectParentBtn.setText(mParentCategory.getTitle());
     }
 }

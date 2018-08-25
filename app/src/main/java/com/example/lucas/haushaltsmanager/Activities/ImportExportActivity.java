@@ -147,8 +147,8 @@ public class ImportExportActivity extends AppCompatActivity {
                 if (mSelectedDirectory == null) {
 
                     Bundle bundle = new Bundle();
-                    bundle.putString("title", getString(R.string.error));
-                    bundle.putString("message", getString(R.string.error_no_directory_selected));
+                    bundle.putString(ErrorAlertDialog.TITLE, getString(R.string.error));
+                    bundle.putString(ErrorAlertDialog.CONTENT, getString(R.string.error_no_directory_selected));
 
                     ErrorAlertDialog errorDialog = new ErrorAlertDialog();
                     errorDialog.setArguments(bundle);

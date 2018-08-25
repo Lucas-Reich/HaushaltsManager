@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 
+import com.example.lucas.haushaltsmanager.BundleUtils;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.R;
@@ -14,33 +15,35 @@ import java.util.List;
 
 public class AccountPickerDialog extends DialogFragment {
     private static final String TAG = AccountPickerDialog.class.getSimpleName();
+    public static final String TITLE = "title";
+    public static final String ACTIVE_ACCOUNT = "active_account";
+    public static final String EXCLUDED_ACCOUNT = "excluded_account";
 
     private OnAccountSelected mCallback;
-    private long excludedAccountId = -1;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        final Bundle args = getArguments();
-        if (args.containsKey("excluded_account")) {
-            excludedAccountId = args.getLong("excluded_account");
-        }
+        //todo kann eventuell durch StringSingleChoiceDialog ersetzt werden
+        BundleUtils args = new BundleUtils(getArguments());
 
         final List<Account> accounts = AccountRepository.getAll();
-        removeExcludedAccount(accounts);
+        removeExcludedAccount(accounts, args.getLong(EXCLUDED_ACCOUNT, -1));
 
-        final int activeAccountId = (int) args.getLong("active_account");
+        final int activeAccountId = (int) args.getLong(ACTIVE_ACCOUNT, -1);
 
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-        builder.setTitle(args.getString("title"));
+        builder.setTitle(args.getString(TITLE, ""));
 
         builder.setSingleChoiceItems(accountsToStrings(accounts), activeAccountId, new DialogInterface.OnClickListener() {
 
             @Override
             public void onClick(DialogInterface dialog, int selectedAccount) {
 
-                mCallback.onAccountSelected(accounts.get(selectedAccount));
+                if (mCallback != null)
+                    mCallback.onAccountSelected(accounts.get(selectedAccount));
+
                 dismiss();
             }
         });
@@ -73,7 +76,7 @@ public class AccountPickerDialog extends DialogFragment {
      *
      * @param accounts Liste der verfügbaren Konten.
      */
-    private void removeExcludedAccount(List<Account> accounts) {
+    private void removeExcludedAccount(List<Account> accounts, long excludedAccountId) {
 
         for (Account account : accounts) {
             if (account.getIndex() == excludedAccountId) {

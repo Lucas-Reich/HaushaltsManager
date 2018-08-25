@@ -15,6 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CurrencyPicker extends DialogFragment {
+    private static final String TAG = CurrencyPicker.class.getSimpleName();
+    public static final String TITLE = "title";
+
     private Context mContext;
     private OnCurrencySelected mCallback;
     private Currency mSelectedCurrency;
@@ -29,11 +32,12 @@ public class CurrencyPicker extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        //todo kann eventuell durch StringSingleChoiceDialog ersetzt werden
         BundleUtils args = new BundleUtils(getArguments());
 
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 
-        builder.setTitle(args.getString("title", ""));
+        builder.setTitle(args.getString(TITLE, ""));
 
         builder.setSingleChoiceItems(convertToString(mCurrencies), -1, new DialogInterface.OnClickListener() {
             @Override
