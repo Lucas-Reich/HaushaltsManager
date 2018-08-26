@@ -65,6 +65,7 @@
             android:name=".Activities.ImportExportActivity"
             android:label="ImportExportActivityVer3"/>
         <activity android:name=".Activities.SettingsActivity"/>
+        <activity android:name=".Activities.AboutUsActivity"/>
 
         <receiver
             android:name=".MyAlarmReceiver"
