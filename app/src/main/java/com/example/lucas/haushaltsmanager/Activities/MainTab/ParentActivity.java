@@ -69,11 +69,11 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
         updateExpenses();
 
         //Methode die jeden Tag einmal den BackupService laufen lässt
-        scheduleBackupServiceAlarm();
+//        scheduleBackupServiceAlarm(); todo
 
 
         //TODO den test button entfernen
-        FloatingActionButton testService = (FloatingActionButton) findViewById(R.id.service_fab);
+        FloatingActionButton testService = findViewById(R.id.service_fab);
         testService.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
