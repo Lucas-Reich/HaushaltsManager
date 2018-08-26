@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.format.Time;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -18,14 +17,11 @@ import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.SingleChoiceDialog;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.R;
+import com.example.lucas.haushaltsmanager.Time;
 import com.example.lucas.haushaltsmanager.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.WeekdayUtils;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Date;
-import java.util.Locale;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -188,18 +184,9 @@ public class SettingsActivity extends AppCompatActivity {
                 timePicker.setContent(Arrays.asList(getTimeArray()), -1);
                 timePicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
                     @Override
-                    public void onPositiveClick(Object entry) {
-                        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm", Locale.US);
+                    public void onPositiveClick(Object time) {
 
-                        try {
-                            Date test = sdf.parse((String) entry);
-                            Time time = new Time();
-                            time.set(test.getTime());
-                            setReminderTime(time.hour, time.minute);
-                        } catch (ParseException e) {
-
-                            //do nothing
-                        }
+                        setReminderTime(Time.fromString((String) time));
                     }
 
                     @Override
@@ -227,7 +214,7 @@ public class SettingsActivity extends AppCompatActivity {
 
                         if (reset) {
 
-                            //todo einstellungen auf dern standart zurücksetzen
+                            //todo einstellungen auf den standart zurücksetzen
                             Toast.makeText(SettingsActivity.this, R.string.not_implemented, Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -340,17 +327,6 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     /**
-     * Methode zum anpassen des Notification status.
-     * TRUE wenn der User keine Push Benachrichtigungen mehr bekommen soll, FALSE wenn nicht.
-     *
-     * @param notificationStatus Neuer Notification status
-     */
-    private void disableNotifications(boolean notificationStatus) {
-
-        mUserSettings.setNotificationStatus(notificationStatus);
-    }
-
-    /**
      * Methode um den Status der Erinnerungs Push Notifications anzupassen.
      *
      * @param remindUser TRUE wenn der User erinnert werden soll, FALSE wenn nicht
@@ -386,14 +362,9 @@ public class SettingsActivity extends AppCompatActivity {
     /**
      * Methode um die Zeit anzupassen wenn der User die "Buchungen eintragen" Benachrichtigunge bekommen soll.
      */
-    private void setReminderTime(int one, int two) {
+    private void setReminderTime(Time time) {
 
-        Date date = new Date();
-        date.setHours(one);
-        date.setMinutes(two);
-
-//        preferences.edit().putLong("notificationReminderTime", reminderTime).apply();
-        //todo wenn die stunde kleiner als 10 ist muss auch noch eine 0 vor der zahl erscheinen
-        notificationTimeTxt.setText(String.format("%s:00", date.getHours()));//todo long in time convertieren
+        mUserSettings.setReminderTime(time);
+        notificationTimeTxt.setText(time.getTime());
     }
 }

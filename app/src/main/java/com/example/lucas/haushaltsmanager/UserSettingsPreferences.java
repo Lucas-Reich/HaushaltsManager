@@ -99,14 +99,14 @@ public class UserSettingsPreferences {
         mPreferences.edit().putBoolean(AUTOMATIC_BACKUPS, automaticBackupStatus).apply();
     }
 
-    public long getReminderTime() {
+    public String getReminderTime() {
 
-        return mPreferences.getLong(REMINDER_TIME, 1L);//todo default wert sollte 18:00 repräsentieren
+        return mPreferences.getString(REMINDER_TIME, "18:00");
     }
 
-    public void setReminderTime(long reminderTime) {
+    public void setReminderTime(Time reminderTime) {
 
-        mPreferences.edit().putLong(REMINDER_TIME, reminderTime).apply();
+        mPreferences.edit().putString(REMINDER_TIME, reminderTime.getTime()).apply();
     }
 
     public boolean getNotificationStatus() {
