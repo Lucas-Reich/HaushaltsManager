@@ -25,13 +25,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.lucas.haushaltsmanager.Activities.AboutUsActivity;
 import com.example.lucas.haushaltsmanager.Activities.CategoryListActivity;
 import com.example.lucas.haushaltsmanager.Activities.CourseActivity;
 import com.example.lucas.haushaltsmanager.Activities.CreateBackupActivity;
 import com.example.lucas.haushaltsmanager.Activities.ImportExportActivity;
 import com.example.lucas.haushaltsmanager.Activities.RecurringBookingsActivity;
 import com.example.lucas.haushaltsmanager.Activities.SettingsActivity;
-import com.example.lucas.haushaltsmanager.Activities.TestActivity;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.CannotDeleteExpenseException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
@@ -84,27 +84,27 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
         });
 
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         // Create the mReportAdapter that will return a fragment for each of the three
         // primary sections of the activity.
         SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections mReportAdapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager = findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        mTabLayout = (TabLayout) findViewById(R.id.tabs);
+        mTabLayout = findViewById(R.id.tabs);
         mTabLayout.setupWithViewPager(mViewPager);
 
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_2);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout_2);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_2);
+        NavigationView navigationView = findViewById(R.id.nav_view_2);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -144,15 +144,15 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
                         break;
                     case R.id.about:
 
-                        Intent testPieIntent = new Intent(ParentActivity.this, TestActivity.class);//todo zeige die AboutActivity
-                        ParentActivity.this.startActivity(testPieIntent);
+                        Intent aboutUsIntent = new Intent(ParentActivity.this, AboutUsActivity.class);
+                        ParentActivity.this.startActivity(aboutUsIntent);
                         break;
                     default:
 
                         Toast.makeText(ParentActivity.this, R.string.not_implemented, Toast.LENGTH_SHORT).show();
                 }
 
-                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_2);
+                DrawerLayout drawer = findViewById(R.id.drawer_layout_2);
                 drawer.closeDrawer(GravityCompat.START);
                 return true;
             }
@@ -171,7 +171,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
     @Override
     public void onBackPressed() {
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_2);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout_2);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
 
             drawer.closeDrawer(GravityCompat.START);

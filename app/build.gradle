@@ -37,8 +37,11 @@ dependencies {
     implementation 'com.android.support:cardview-v7:26.1.0'
     implementation 'com.android.support:design:26.1.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+    //AlertDialog zum anzeigen der von mir genutzten OpenSource Pakete
+    implementation 'de.psdev.licensesdialog:licensesdialog:1.7.0'
     //AlertDialog um den User ein Verzeichniss auswählen zu lassen
     implementation 'com.github.codekidX:storage-chooser:2.0.3'
+    //todo replace ColorPicker with one of https://android-arsenal.com/tag/18?sort=created
     //Robolectric wird benötigt um einen Context zu erstellen, ohne dass die Tests auf einem Emulator ausgeführt werden müssen
     testImplementation 'org.robolectric:robolectric:3.8'
     //Mockito siehe PowerMockito

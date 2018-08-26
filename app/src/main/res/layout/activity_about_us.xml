@@ -197,22 +197,6 @@
                     />
             </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/about_us_donate_wrapper"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/textView8"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Gibt uns einen Kaffee aus"
-                    android:textColor="@color/primary_text_color"/>
-            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

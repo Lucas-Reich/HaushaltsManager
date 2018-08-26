@@ -153,4 +153,7 @@
     <string name="attention">Attention</string>
     <string name="reset_settings_alert_message">Your are about to reset all changes to default value! Are you sure you want to contiue?</string>
     <string name="create_new">Create New</string>
+    <string name="btn_dismiss">Dismiss</string>
+    <string name="changelog_title">Changelog</string>
+    <string name="error_no_mail_clients">There are no email clients installed.</string>
 </resources>
