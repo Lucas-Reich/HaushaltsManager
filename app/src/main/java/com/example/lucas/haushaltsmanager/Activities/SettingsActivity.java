@@ -3,7 +3,6 @@ package com.example.lucas.haushaltsmanager.Activities;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -67,16 +66,12 @@ public class SettingsActivity extends AppCompatActivity {
 
         mUserSettings = new UserSettingsPreferences(this);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
         mBackArrow = findViewById(R.id.back_arrow);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         mBackArrow.setOnClickListener(new View.OnClickListener() {
             @Override
