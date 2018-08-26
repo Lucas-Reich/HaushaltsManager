@@ -141,7 +141,7 @@ public class Account implements Parcelable {
     @Override
     public String toString() {
 
-        return getIndex() + " " + getTitle() + " " + getBalance();
+        return getTitle();
     }
 
 

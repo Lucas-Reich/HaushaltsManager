@@ -3,6 +3,7 @@ package com.example.lucas.haushaltsmanager.Activities;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -17,7 +18,7 @@ import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepository;
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
-import com.example.lucas.haushaltsmanager.Dialogs.CurrencyPicker;
+import com.example.lucas.haushaltsmanager.Dialogs.SingleChoiceDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.StringSingleChoiceDialog;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.R;
@@ -26,6 +27,7 @@ import com.example.lucas.haushaltsmanager.WeekdayUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
@@ -150,16 +152,16 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Bundle bundle = new Bundle();
-                bundle.putString(CurrencyPicker.TITLE, getString(R.string.select_currency));
+                bundle.putString(SingleChoiceDialog.TITLE, getString(R.string.select_currency));
+                bundle.putParcelableArrayList(SingleChoiceDialog.CONTENT, new ArrayList<Parcelable>(CurrencyRepository.getAll()));
 
-                CurrencyPicker currencyPicker = new CurrencyPicker();
+                SingleChoiceDialog<Currency> currencyPicker = new SingleChoiceDialog<>();
                 currencyPicker.setArguments(bundle);
-                currencyPicker.setCurrencies(CurrencyRepository.getAll());
-                currencyPicker.setOnCurrencySelectedListener(new CurrencyPicker.OnCurrencySelected() {
+                currencyPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
                     @Override
-                    public void onCurrencySelected(Currency currency) {
+                    public void onEntrySelected(Object entry) {
 
-                        setMainCurrency(currency);
+                        setMainCurrency((Currency) entry);
                     }
                 });
                 currencyPicker.show(getFragmentManager(), "settings_main_currency");

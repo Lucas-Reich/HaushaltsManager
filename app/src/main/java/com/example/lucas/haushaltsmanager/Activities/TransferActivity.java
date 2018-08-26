@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
@@ -17,20 +18,20 @@ import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.Exceptions.ChildCategoryNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
-import com.example.lucas.haushaltsmanager.Dialogs.AccountPickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.DatePickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ErrorAlertDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
+import com.example.lucas.haushaltsmanager.Dialogs.SingleChoiceDialog;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.R;
+import com.example.lucas.haushaltsmanager.UserSettingsPreferences;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -142,23 +143,21 @@ public class TransferActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 Bundle bundle = new Bundle();
-                bundle.putString(AccountPickerDialog.TITLE, getResources().getString(R.string.input_account));
-                try {
-                    bundle.putParcelable(AccountPickerDialog.ACTIVE_ACCOUNT, getActiveAccount());
-                } catch (AccountNotFoundException e) {
-
-                    //do nothing
-                }
+                bundle.putString(SingleChoiceDialog.TITLE, getString(R.string.input_account));
+                bundle.putLong(SingleChoiceDialog.SELECTED_ENTRY, getActiveAccount().getIndex());
+                bundle.putParcelableArrayList(SingleChoiceDialog.CONTENT, new ArrayList<Parcelable>(AccountRepository.getAll()));
                 if (mToAccount != null)
-                    bundle.putLong(AccountPickerDialog.EXCLUDED_ACCOUNT, mToAccount.getIndex());
+                    bundle.putParcelableArrayList(SingleChoiceDialog.EXCLUDED_ENTRIES, new ArrayList<Parcelable>() {{
+                        add(mToAccount);
+                    }});
 
-                AccountPickerDialog accountPicker = new AccountPickerDialog();
+                SingleChoiceDialog<Account> accountPicker = new SingleChoiceDialog<>();
                 accountPicker.setArguments(bundle);
-                accountPicker.setOnAccountSelectedListener(new AccountPickerDialog.OnAccountSelected() {
+                accountPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
                     @Override
-                    public void onAccountSelected(Account account) {
+                    public void onEntrySelected(Object fromAccount) {
 
-                        setFromAccount(account);
+                        setFromAccount((Account) fromAccount);
                         setToExpense(mFromExpense.getUnsignedPrice());
                     }
                 });
@@ -173,23 +172,21 @@ public class TransferActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 Bundle bundle = new Bundle();
-                bundle.putString(AccountPickerDialog.TITLE, getResources().getString(R.string.input_account));
-                try {
-                    bundle.putParcelable(AccountPickerDialog.ACTIVE_ACCOUNT, getActiveAccount());
-                } catch (AccountNotFoundException e) {
-
-                    //do nothing
-                }
+                bundle.putString(SingleChoiceDialog.TITLE, getString(R.string.choose_account));
+                bundle.putLong(SingleChoiceDialog.SELECTED_ENTRY, getActiveAccount().getIndex());
+                bundle.putParcelableArrayList(SingleChoiceDialog.CONTENT, new ArrayList<Parcelable>(AccountRepository.getAll()));
                 if (mFromAccount != null)
-                    bundle.putLong(AccountPickerDialog.EXCLUDED_ACCOUNT, mFromAccount.getIndex());
+                    bundle.putParcelableArrayList(SingleChoiceDialog.EXCLUDED_ENTRIES, new ArrayList<Parcelable>() {{
+                        add(mFromAccount);
+                    }});
 
-                AccountPickerDialog accountPicker = new AccountPickerDialog();
+                SingleChoiceDialog<Account> accountPicker = new SingleChoiceDialog<>();
                 accountPicker.setArguments(bundle);
-                accountPicker.setOnAccountSelectedListener(new AccountPickerDialog.OnAccountSelected() {
+                accountPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
                     @Override
-                    public void onAccountSelected(Account account) {
+                    public void onEntrySelected(Object toAccount) {
 
-                        setToAccount(account);
+                        setToAccount((Account) toAccount);
                         setToExpense(mFromExpense.getUnsignedPrice());
                     }
                 });
@@ -276,12 +273,10 @@ public class TransferActivity extends AppCompatActivity {
      *
      * @return aktives Konto
      */
-    private Account getActiveAccount() throws AccountNotFoundException {
+    private Account getActiveAccount() {
 
-        SharedPreferences preferences = getSharedPreferences("UserSettings", 0);
-        long activeAccountId = preferences.getLong("activeAccount", 1);
-
-        return AccountRepository.get(activeAccountId);
+        UserSettingsPreferences preferences = new UserSettingsPreferences(this);
+        return preferences.getActiveAccount();
     }
 
     /**

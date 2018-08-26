@@ -175,7 +175,7 @@ public class Category implements Parcelable {
 
     public String toString() {
 
-        return getIndex() + " " + getTitle() + " " + getColorString();
+        return getTitle();
     }
 
     /**

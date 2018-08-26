@@ -1,5 +1,8 @@
 package com.example.lucas.haushaltsmanager;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class WeekdayUtils {
     public static final String MONDAY = "Monday";
     public static final String TUESDAY = "Tuesday";

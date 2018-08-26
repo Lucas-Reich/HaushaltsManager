@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -38,11 +39,11 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.Curre
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.Exceptions.CurrencyNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Tags.TagRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Templates.TemplateRepository;
-import com.example.lucas.haushaltsmanager.Dialogs.AccountPickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.DatePickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.FrequencyInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
+import com.example.lucas.haushaltsmanager.Dialogs.SingleChoiceDialog;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
@@ -52,6 +53,7 @@ import com.example.lucas.haushaltsmanager.Entities.Template;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -708,16 +710,17 @@ public class ExpenseScreenActivity extends AppCompatActivity {
 
             case R.id.expense_screen_account:
 
-                bundle.putString(AccountPickerDialog.TITLE, getResources().getString(R.string.input_account));
-                bundle.putLong(AccountPickerDialog.ACTIVE_ACCOUNT, mExpense.getAccountId());
+                bundle.putString(SingleChoiceDialog.TITLE, getString(R.string.input_account));
+                bundle.putLong(SingleChoiceDialog.SELECTED_ENTRY, mExpense.getAccountId());
+                bundle.putParcelableArrayList(SingleChoiceDialog.CONTENT, new ArrayList<Parcelable>(AccountRepository.getAll()));
 
-                AccountPickerDialog accountPicker = new AccountPickerDialog();
+                SingleChoiceDialog<Account> accountPicker = new SingleChoiceDialog<>();
                 accountPicker.setArguments(bundle);
-                accountPicker.setOnAccountSelectedListener(new AccountPickerDialog.OnAccountSelected() {
+                accountPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
                     @Override
-                    public void onAccountSelected(Account account) {
+                    public void onEntrySelected(Object account) {
 
-                        setAccount(account);
+                        setAccount((Account) account);
                     }
                 });
                 accountPicker.show(getFragmentManager(), "expense_screen_account");

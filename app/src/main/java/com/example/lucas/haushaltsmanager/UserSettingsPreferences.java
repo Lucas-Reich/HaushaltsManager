@@ -4,8 +4,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.example.lucas.haushaltsmanager.Activities.SettingsActivity;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.Exceptions.CurrencyNotFoundException;
+import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 
 public class UserSettingsPreferences {
@@ -19,6 +22,7 @@ public class UserSettingsPreferences {
     private static final String AUTOMATIC_BACKUPS = "automaticBackups";
     private static final String REMINDER_TIME = "reminderTime";
     private static final String ALLOW_NOTIFICATIONS = "allowNotifications";
+    private static final String ACTIVE_ACCOUNT = "activeAccount";
 
     private SharedPreferences mPreferences;
 
@@ -113,5 +117,19 @@ public class UserSettingsPreferences {
     public void setNotificationStatus(boolean notificationStatus) {
 
         mPreferences.edit().putBoolean(ALLOW_NOTIFICATIONS, notificationStatus).apply();
+    }
+
+    public Account getActiveAccount() {
+
+        long accountId = mPreferences.getLong(ACTIVE_ACCOUNT, -1);
+
+        try {
+
+            return AccountRepository.get(accountId);
+        } catch (AccountNotFoundException e) {
+
+            //todo sollte eigentlich nicht passieren
+            return null;
+        }
     }
 }

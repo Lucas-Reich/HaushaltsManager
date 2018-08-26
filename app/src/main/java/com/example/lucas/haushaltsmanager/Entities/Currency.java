@@ -140,7 +140,7 @@ public class Currency implements Parcelable {
 
     public String toString() {
 
-        return getIndex() + " " + getName();
+        return getName();
     }
 
 

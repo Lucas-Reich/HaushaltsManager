@@ -2,6 +2,7 @@ package com.example.lucas.haushaltsmanager.Activities;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -15,8 +16,8 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.Categ
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.Exceptions.CategoryNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepository;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
-import com.example.lucas.haushaltsmanager.Dialogs.ChooseCategoryDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ColorPickerDialog;
+import com.example.lucas.haushaltsmanager.Dialogs.SingleChoiceDialog;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.R;
 
@@ -144,18 +145,21 @@ public class CreateCategoryActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-
                 Bundle bundle = new Bundle();
-                bundle.putString(ChooseCategoryDialog.TITLE, getString(R.string.choose_parent_category));
+                bundle.putString(SingleChoiceDialog.TITLE, getString(R.string.choose_parent_category));
+                bundle.putParcelableArrayList(SingleChoiceDialog.CONTENT, new ArrayList<Parcelable>(CategoryRepository.getAll()));
+                bundle.putString(SingleChoiceDialog.ON_EMPTY_LIST_MESSAGE, "Clicke einfach auf auswählen um einen Neue Parent Kategorie zu erstellen");//todo übersetzung
+                //todo wenn eine neue Parent Kategorie erstellt werden soll dann sollte ich den Parent einfach leer lassen
+                //der parent bekommt dann einfach den gleichen namen wie die neu erstellte KindKategorie
 
-                ChooseCategoryDialog chooseCategory = new ChooseCategoryDialog();
-                chooseCategory.setArguments(bundle);
-                chooseCategory.setOnCategoryChosenListener(new ChooseCategoryDialog.OnCategoryChosenListener() {
-
+                SingleChoiceDialog<Category> categoryPicker = new SingleChoiceDialog<>();
+                categoryPicker.setArguments(bundle);
+                categoryPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
                     @Override
-                    public void onCategoryChosen(Category category) {
+                    public void onEntrySelected(Object entry) {
+                        Category parentCategory = (Category) entry;
 
-                        if (category == null) {
+                        if (parentCategory == null) {//todo kann man das vereinfachen
 
                             Bundle bundle1 = new Bundle();
                             bundle1.putString(BasicTextInputDialog.TITLE, getString(R.string.new_parent_category_name));
@@ -175,12 +179,12 @@ public class CreateCategoryActivity extends AppCompatActivity {
 
                         } else {
 
-                            mParentCategory = category;
+                            mParentCategory = parentCategory;
                             mSelectParentBtn.setText(mParentCategory.getTitle());
                         }
                     }
                 });
-                chooseCategory.show(getFragmentManager(), "categoryParent");
+                categoryPicker.show(getFragmentManager(), "create_category_parent");
             }
         });
 
