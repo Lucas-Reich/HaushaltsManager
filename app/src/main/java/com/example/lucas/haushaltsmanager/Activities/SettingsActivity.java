@@ -95,7 +95,7 @@ public class SettingsActivity extends AppCompatActivity {
                 SingleChoiceDialog<String> weekdayPicker = new SingleChoiceDialog<>();
                 weekdayPicker.createBuilder(SettingsActivity.this);
                 weekdayPicker.setTitle(getString(R.string.choose_weekday));
-                weekdayPicker.setContent(Arrays.asList(WeekdayUtils.getWeekdays()));
+                weekdayPicker.setContent(Arrays.asList(WeekdayUtils.getWeekdays()), -1);
                 weekdayPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
                     @Override
                     public void onPositiveClick(Object weekday) {
@@ -128,7 +128,7 @@ public class SettingsActivity extends AppCompatActivity {
                 SingleChoiceDialog<String> concurrentBackupCount = new SingleChoiceDialog<>();
                 concurrentBackupCount.createBuilder(SettingsActivity.this);
                 concurrentBackupCount.setTitle(getString(R.string.choose_backup_amount));
-                concurrentBackupCount.setContent(Arrays.asList(getConcurrentBackupCountOptions()));
+                concurrentBackupCount.setContent(Arrays.asList(getConcurrentBackupCountOptions()), -1);
                 concurrentBackupCount.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
                     @Override
                     public void onPositiveClick(Object count) {
@@ -152,7 +152,7 @@ public class SettingsActivity extends AppCompatActivity {
             public void onClick(View view) {
                 SingleChoiceDialog<Currency> currencyPicker = new SingleChoiceDialog<>();
                 currencyPicker.setTitle(getString(R.string.select_currency));
-                currencyPicker.setContent(CurrencyRepository.getAll());
+                currencyPicker.setContent(CurrencyRepository.getAll(), -1);
                 currencyPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
                     @Override
                     public void onPositiveClick(Object entry) {
@@ -185,7 +185,7 @@ public class SettingsActivity extends AppCompatActivity {
                 SingleChoiceDialog<String> timePicker = new SingleChoiceDialog<>();
                 timePicker.createBuilder(SettingsActivity.this);
                 timePicker.setTitle(getString(R.string.choose_time));
-                timePicker.setContent(Arrays.asList(getTimeArray()));
+                timePicker.setContent(Arrays.asList(getTimeArray()), -1);
                 timePicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
                     @Override
                     public void onPositiveClick(Object entry) {

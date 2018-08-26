@@ -167,4 +167,5 @@
     <string name="choose_time">Choose a time</string>
     <string name="attention">Attention</string>
     <string name="reset_settings_alert_message">Your are about to reset all changes to default value! Are you sure you want to contiue?</string>
+    <string name="create_new">Create New</string>
 </resources>

@@ -36,6 +36,7 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class TransferActivity extends AppCompatActivity {
     private static final String TAG = TransferActivity.class.getSimpleName();
@@ -141,17 +142,13 @@ public class TransferActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                Bundle bundle = new Bundle();
-                bundle.putLong(SingleChoiceDialog.SELECTED_ENTRY, getActiveAccount().getIndex());
-
                 SingleChoiceDialog<Account> accountPicker = new SingleChoiceDialog<>();
-                accountPicker.setArguments(bundle);
+                accountPicker.createBuilder(TransferActivity.this);
                 accountPicker.setTitle(getString(R.string.input_account));
-                accountPicker.setContent(AccountRepository.getAll());
-                if (mToAccount != null)
-                    accountPicker.excludeEntries(new ArrayList<Account>() {{
-                        add(mToAccount);
-                    }});
+
+                List<Account> accounts = AccountRepository.getAll();
+                accounts.remove(mToAccount);
+                accountPicker.setContent(accounts, -1);
                 accountPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
                     @Override
                     public void onPositiveClick(Object fromAccount) {
@@ -176,17 +173,13 @@ public class TransferActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                Bundle bundle = new Bundle();
-                bundle.putLong(SingleChoiceDialog.SELECTED_ENTRY, getActiveAccount().getIndex());
-
                 SingleChoiceDialog<Account> accountPicker = new SingleChoiceDialog<>();
-                accountPicker.setArguments(bundle);
+                accountPicker.createBuilder(TransferActivity.this);
                 accountPicker.setTitle(getString(R.string.choose_account));
-                accountPicker.setContent(AccountRepository.getAll());
-                if (mFromAccount != null)
-                    accountPicker.excludeEntries(new ArrayList<Account>() {{
-                        add(mFromAccount);
-                    }});
+
+                List<Account> accounts = AccountRepository.getAll();
+                accounts.remove(mFromAccount);
+                accountPicker.setContent(accounts, -1);
                 accountPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
                     @Override
                     public void onPositiveClick(Object toAccount) {

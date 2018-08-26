@@ -146,9 +146,10 @@ public class CreateCategoryActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 SingleChoiceDialog<Category> categoryPicker = new SingleChoiceDialog<>();
+                categoryPicker.createBuilder(CreateCategoryActivity.this);
                 categoryPicker.setTitle(getString(R.string.choose_parent_category));
-                categoryPicker.setContent(CategoryRepository.getAll());
-                categoryPicker.setNeutralButton("Create New");//todo übersetzung
+                categoryPicker.setContent(CategoryRepository.getAll(), -1);
+                categoryPicker.setNeutralButton(getString(R.string.create_new));
                 categoryPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
                     @Override
                     public void onPositiveClick(Object entry) {

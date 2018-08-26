@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -53,7 +52,6 @@ import com.example.lucas.haushaltsmanager.Entities.Template;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -710,12 +708,10 @@ public class ExpenseScreenActivity extends AppCompatActivity {
 
             case R.id.expense_screen_account:
 
-                bundle.putLong(SingleChoiceDialog.SELECTED_ENTRY, mExpense.getAccountId());
-
                 SingleChoiceDialog<Account> accountPicker = new SingleChoiceDialog<>();
-                accountPicker.setArguments(bundle);
+                accountPicker.createBuilder(ExpenseScreenActivity.this);
                 accountPicker.setTitle(getString(R.string.input_account));
-                accountPicker.setContent(AccountRepository.getAll());
+                accountPicker.setContent(AccountRepository.getAll(), (int) mExpense.getAccountId());
                 accountPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
                     @Override
                     public void onPositiveClick(Object account) {
