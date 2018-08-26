@@ -166,6 +166,13 @@
     <string name="choose_backup_amount">Choose the amount of concurrent Backups</string>
     <string name="choose_time">Choose a time</string>
     <string name="attention">Attention</string>
-    <string name="reset_settings_alert_message">Your are about to reset all changes to default value! Are you sure you want to contiue?</string>
+    <string name="reset_settings_alert_message">Your are about to reset all changes to default value! Are you sure you want to continue?</string>
     <string name="create_new">Create New</string>
+    <string name="first_day_of_week">First day of the week</string>
+    <string name="automatic_backups">Automatically create Backups?</string>
+    <string name="concurrent_backup_count">Max backup count</string>
+    <string name="main_currency">Select your main currency</string>
+    <string name="reminder_status">Remind me to create Bookings</string>
+    <string name="reminder_time">Set reminder time</string>
+    <string name="btn_reset">Restore default settings</string>
 </resources>

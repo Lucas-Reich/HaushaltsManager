@@ -51,7 +51,7 @@
                         android:id="@+id/textView17"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Erster Tag der Woche"
+                        android:text="@string/first_day_of_week"
                         android:textColor="@color/primary_text_color"
                         android:textSize="15sp"/>
 
@@ -110,7 +110,7 @@
                         android:clickable="false"
                         android:drawableRight="?android:attr/listChoiceIndicatorMultiple"
                         android:focusable="false"
-                        android:text="Automatische Backups erstellen?"
+                        android:text="@string/automatic_backups"
                         tools:ignore="RtlHardcoded"/>
 
                     <View
@@ -134,7 +134,7 @@
                         android:id="@+id/settings_backups_concurrent_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Wie viele Backups sollen gleichzeitig existieren"
+                        android:text="@string/concurrent_backup_count"
                         android:textColor="@color/primary_text_color"
                         android:textSize="15sp"/>
 
@@ -188,7 +188,7 @@
                         android:id="@+id/settings_currency_main"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Was ist die Hauptwährung"
+                        android:text="@string/main_currency"
                         android:textColor="@color/primary_text_color"
                         android:textSize="15sp"/>
 
@@ -247,7 +247,7 @@
                         android:clickable="false"
                         android:drawableRight="?android:attr/listChoiceIndicatorMultiple"
                         android:focusable="false"
-                        android:text="Sollen wir dich erinnern"
+                        android:text="@string/reminder_status"
                         tools:ignore="RtlHardcoded"/>
 
                     <View
@@ -271,7 +271,7 @@
                         android:id="@+id/settings_notification_time_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Wann sollen wir dich erinnern"
+                        android:text="@string/reminder_time"
                         android:textColor="@color/primary_text_color"
                         android:textSize="15sp"/>
 
@@ -298,7 +298,7 @@
                 android:id="@+id/settings_reset_btn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Standarteinstellungen wiederherstellen"/>
+                android:text="@string/btn_reset"/>
         </LinearLayout>
     </ScrollView>
 
