@@ -4,11 +4,11 @@ android {
     compileSdkVersion 26
     buildToolsVersion '27.0.3'
     defaultConfig {
-        applicationId "com.example.lucas.haushaltsmanager"
+        applicationId "com.lucas.haushaltsmanager"
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 1
-        versionName "1.0"
+        versionCode 3
+        versionName "3.0"
         testInstrumentationRunner "android.support.dialog_popup_edittext.runner.AndroidJUnitRunner"
     }
     testOptions {
@@ -21,6 +21,9 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+    lintOptions {
+        abortOnError false//todo remove
     }
 }
 
