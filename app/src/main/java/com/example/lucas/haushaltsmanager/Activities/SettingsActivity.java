@@ -1,9 +1,6 @@
 package com.example.lucas.haushaltsmanager.Activities;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -19,7 +16,6 @@ import android.widget.Toast;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepository;
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.SingleChoiceDialog;
-import com.example.lucas.haushaltsmanager.Dialogs.StringSingleChoiceDialog;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.UserSettingsPreferences;
@@ -27,7 +23,7 @@ import com.example.lucas.haushaltsmanager.WeekdayUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 
@@ -41,7 +37,6 @@ public class SettingsActivity extends AppCompatActivity {
 
     private LinearLayout firstDayLayout, createBkpLayout, concurrentBackupsLayout, currencyLayout, notificationsAllowLayout, notificationTimeLayout;
     private Button resetSettingsBtn;
-    private SharedPreferences preferences;
     private CheckBox createBackupsChk, allowReminderChk;
     private TextView currencyNameTxt, firstDayOfWeekTxt, maxBackupCountTxt, backupCountTextTxt, notificationTimeTxt, notificationTimeTextTxt;
     private ImageButton mBackArrow;
@@ -71,7 +66,6 @@ public class SettingsActivity extends AppCompatActivity {
 
         resetSettingsBtn = findViewById(R.id.settings_reset_btn);
 
-        preferences = getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
         mUserSettings = new UserSettingsPreferences(this);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -98,22 +92,24 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                Bundle bundle = new Bundle();
-                bundle.putString(StringSingleChoiceDialog.TITLE, getString(R.string.choose_weekday));
-                bundle.putStringArray(StringSingleChoiceDialog.CONTENT, WeekdayUtils.getWeekdays());
+                SingleChoiceDialog<String> weekdayPicker = new SingleChoiceDialog<>();
+                weekdayPicker.createBuilder(SettingsActivity.this);
+                weekdayPicker.setTitle(getString(R.string.choose_weekday));
+                weekdayPicker.setContent(Arrays.asList(WeekdayUtils.getWeekdays()));
+                weekdayPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
+                    @Override
+                    public void onPositiveClick(Object weekday) {
 
-                StringSingleChoiceDialog weekdayDialog = new StringSingleChoiceDialog();
-                weekdayDialog.setArguments(bundle);
-                weekdayDialog.setOnEntrySelectedListener(new StringSingleChoiceDialog.OnEntrySelected() {
+                        setFirstDayOfWeek((String) weekday);
+                    }
 
                     @Override
-                    public void onEntrySelected(String weekday) {
+                    public void onNeutralClick() {
 
-                        setFirstDayOfWeek(weekday);
+                        //do nothing
                     }
                 });
-
-                weekdayDialog.show(getFragmentManager(), "settings_choose_weekday");
+                weekdayPicker.show(getFragmentManager(), "settings_choose_weekday");
             }
         });
 
@@ -129,21 +125,24 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                Bundle bundle = new Bundle();
-                bundle.putString(StringSingleChoiceDialog.TITLE, getString(R.string.choose_backup_amount));
-                bundle.putStringArray(StringSingleChoiceDialog.CONTENT, getConcurrentBackupCountOptions());
-
-                StringSingleChoiceDialog concurrentBackupDialog = new StringSingleChoiceDialog();
-                concurrentBackupDialog.setArguments(bundle);
-                concurrentBackupDialog.setOnEntrySelectedListener(new StringSingleChoiceDialog.OnEntrySelected() {
+                SingleChoiceDialog<String> concurrentBackupCount = new SingleChoiceDialog<>();
+                concurrentBackupCount.createBuilder(SettingsActivity.this);
+                concurrentBackupCount.setTitle(getString(R.string.choose_backup_amount));
+                concurrentBackupCount.setContent(Arrays.asList(getConcurrentBackupCountOptions()));
+                concurrentBackupCount.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
                     @Override
-                    public void onEntrySelected(String entry) {
+                    public void onPositiveClick(Object count) {
 
-                        setMaxBackupCount(Integer.parseInt(entry));
+                        setMaxBackupCount(Integer.parseInt((String) count));
+                    }
+
+                    @Override
+                    public void onNeutralClick() {
+
+                        //do nothing
                     }
                 });
-
-                concurrentBackupDialog.show(getFragmentManager(), "settings_concurrent_backups");
+                concurrentBackupCount.show(getFragmentManager(), "settings_concurrent_backups");
             }
         });
 
@@ -151,17 +150,20 @@ public class SettingsActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                Bundle bundle = new Bundle();
-                bundle.putString(SingleChoiceDialog.TITLE, getString(R.string.select_currency));
-                bundle.putParcelableArrayList(SingleChoiceDialog.CONTENT, new ArrayList<Parcelable>(CurrencyRepository.getAll()));
-
                 SingleChoiceDialog<Currency> currencyPicker = new SingleChoiceDialog<>();
-                currencyPicker.setArguments(bundle);
+                currencyPicker.setTitle(getString(R.string.select_currency));
+                currencyPicker.setContent(CurrencyRepository.getAll());
                 currencyPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
                     @Override
-                    public void onEntrySelected(Object entry) {
+                    public void onPositiveClick(Object entry) {
 
                         setMainCurrency((Currency) entry);
+                    }
+
+                    @Override
+                    public void onNeutralClick() {
+
+                        //do nothing
                     }
                 });
                 currencyPicker.show(getFragmentManager(), "settings_main_currency");
@@ -180,20 +182,17 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                Bundle bundle = new Bundle();
-                bundle.putString(StringSingleChoiceDialog.TITLE, getString(R.string.choose_time));
-                bundle.putStringArray(StringSingleChoiceDialog.CONTENT, getTimeArray());
-
-                StringSingleChoiceDialog timePickerDialog = new StringSingleChoiceDialog();
-                timePickerDialog.setArguments(bundle);
-                timePickerDialog.setOnEntrySelectedListener(new StringSingleChoiceDialog.OnEntrySelected() {
+                SingleChoiceDialog<String> timePicker = new SingleChoiceDialog<>();
+                timePicker.createBuilder(SettingsActivity.this);
+                timePicker.setTitle(getString(R.string.choose_time));
+                timePicker.setContent(Arrays.asList(getTimeArray()));
+                timePicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
                     @Override
-                    public void onEntrySelected(String entry) {
-
+                    public void onPositiveClick(Object entry) {
                         SimpleDateFormat sdf = new SimpleDateFormat("hh:mm", Locale.US);
 
                         try {
-                            Date test = sdf.parse(entry);
+                            Date test = sdf.parse((String) entry);
                             Time time = new Time();
                             time.set(test.getTime());
                             setReminderTime(time.hour, time.minute);
@@ -202,9 +201,14 @@ public class SettingsActivity extends AppCompatActivity {
                             //do nothing
                         }
                     }
-                });
 
-                timePickerDialog.show(getFragmentManager(), "settings_choose_notification_time");
+                    @Override
+                    public void onNeutralClick() {
+
+                        //do nothing
+                    }
+                });
+                timePicker.show(getFragmentManager(), "settings_choose_notification_time");
             }
         });
 

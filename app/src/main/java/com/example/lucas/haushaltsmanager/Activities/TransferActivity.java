@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
@@ -78,14 +77,14 @@ public class TransferActivity extends AppCompatActivity {
             finish();
         }
 
-        mDateBtn = (Button) findViewById(R.id.transfer_date_btn);
-        mFromAccountBtn = (Button) findViewById(R.id.transfer_from_account_btn);
-        mToAccountBtn = (Button) findViewById(R.id.transfer_to_account_btn);
-        mCreateTransferBtn = (Button) findViewById(R.id.transfer_create_btn);
-        mAmountBtn = (Button) findViewById(R.id.transfer_amount_btn);
+        mDateBtn = findViewById(R.id.transfer_date_btn);
+        mFromAccountBtn = findViewById(R.id.transfer_from_account_btn);
+        mToAccountBtn = findViewById(R.id.transfer_to_account_btn);
+        mCreateTransferBtn = findViewById(R.id.transfer_create_btn);
+        mAmountBtn = findViewById(R.id.transfer_amount_btn);
 
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        mBackArrow = (ImageButton) findViewById(R.id.back_arrow);
+        mToolbar = findViewById(R.id.toolbar);
+        mBackArrow = findViewById(R.id.back_arrow);
 
         Bundle bundle = getIntent().getExtras();
         if (bundle != null && bundle.containsKey("from_account"))
@@ -143,22 +142,28 @@ public class TransferActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 Bundle bundle = new Bundle();
-                bundle.putString(SingleChoiceDialog.TITLE, getString(R.string.input_account));
                 bundle.putLong(SingleChoiceDialog.SELECTED_ENTRY, getActiveAccount().getIndex());
-                bundle.putParcelableArrayList(SingleChoiceDialog.CONTENT, new ArrayList<Parcelable>(AccountRepository.getAll()));
-                if (mToAccount != null)
-                    bundle.putParcelableArrayList(SingleChoiceDialog.EXCLUDED_ENTRIES, new ArrayList<Parcelable>() {{
-                        add(mToAccount);
-                    }});
 
                 SingleChoiceDialog<Account> accountPicker = new SingleChoiceDialog<>();
                 accountPicker.setArguments(bundle);
+                accountPicker.setTitle(getString(R.string.input_account));
+                accountPicker.setContent(AccountRepository.getAll());
+                if (mToAccount != null)
+                    accountPicker.excludeEntries(new ArrayList<Account>() {{
+                        add(mToAccount);
+                    }});
                 accountPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
                     @Override
-                    public void onEntrySelected(Object fromAccount) {
+                    public void onPositiveClick(Object fromAccount) {
 
                         setFromAccount((Account) fromAccount);
                         setToExpense(mFromExpense.getUnsignedPrice());
+                    }
+
+                    @Override
+                    public void onNeutralClick() {
+
+                        //do nothing
                     }
                 });
                 accountPicker.show(getFragmentManager(), "transfers_from_account");
@@ -172,22 +177,28 @@ public class TransferActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 Bundle bundle = new Bundle();
-                bundle.putString(SingleChoiceDialog.TITLE, getString(R.string.choose_account));
                 bundle.putLong(SingleChoiceDialog.SELECTED_ENTRY, getActiveAccount().getIndex());
-                bundle.putParcelableArrayList(SingleChoiceDialog.CONTENT, new ArrayList<Parcelable>(AccountRepository.getAll()));
-                if (mFromAccount != null)
-                    bundle.putParcelableArrayList(SingleChoiceDialog.EXCLUDED_ENTRIES, new ArrayList<Parcelable>() {{
-                        add(mFromAccount);
-                    }});
 
                 SingleChoiceDialog<Account> accountPicker = new SingleChoiceDialog<>();
                 accountPicker.setArguments(bundle);
+                accountPicker.setTitle(getString(R.string.choose_account));
+                accountPicker.setContent(AccountRepository.getAll());
+                if (mFromAccount != null)
+                    accountPicker.excludeEntries(new ArrayList<Account>() {{
+                        add(mFromAccount);
+                    }});
                 accountPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
                     @Override
-                    public void onEntrySelected(Object toAccount) {
+                    public void onPositiveClick(Object toAccount) {
 
                         setToAccount((Account) toAccount);
                         setToExpense(mFromExpense.getUnsignedPrice());
+                    }
+
+                    @Override
+                    public void onNeutralClick() {
+
+                        //do nothing
                     }
                 });
                 accountPicker.show(getFragmentManager(), "transfers_to_account");

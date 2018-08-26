@@ -710,17 +710,23 @@ public class ExpenseScreenActivity extends AppCompatActivity {
 
             case R.id.expense_screen_account:
 
-                bundle.putString(SingleChoiceDialog.TITLE, getString(R.string.input_account));
                 bundle.putLong(SingleChoiceDialog.SELECTED_ENTRY, mExpense.getAccountId());
-                bundle.putParcelableArrayList(SingleChoiceDialog.CONTENT, new ArrayList<Parcelable>(AccountRepository.getAll()));
 
                 SingleChoiceDialog<Account> accountPicker = new SingleChoiceDialog<>();
                 accountPicker.setArguments(bundle);
+                accountPicker.setTitle(getString(R.string.input_account));
+                accountPicker.setContent(AccountRepository.getAll());
                 accountPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
                     @Override
-                    public void onEntrySelected(Object account) {
+                    public void onPositiveClick(Object account) {
 
                         setAccount((Account) account);
+                    }
+
+                    @Override
+                    public void onNeutralClick() {
+
+                        //do nothing
                     }
                 });
                 accountPicker.show(getFragmentManager(), "expense_screen_account");

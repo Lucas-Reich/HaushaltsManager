@@ -2,7 +2,6 @@ package com.example.lucas.haushaltsmanager.Activities;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -145,43 +144,38 @@ public class CreateCategoryActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                Bundle bundle = new Bundle();
-                bundle.putString(SingleChoiceDialog.TITLE, getString(R.string.choose_parent_category));
-                bundle.putParcelableArrayList(SingleChoiceDialog.CONTENT, new ArrayList<Parcelable>(CategoryRepository.getAll()));
-                bundle.putString(SingleChoiceDialog.ON_EMPTY_LIST_MESSAGE, "Clicke einfach auf auswählen um einen Neue Parent Kategorie zu erstellen");//todo übersetzung
-                //todo wenn eine neue Parent Kategorie erstellt werden soll dann sollte ich den Parent einfach leer lassen
-                //der parent bekommt dann einfach den gleichen namen wie die neu erstellte KindKategorie
 
                 SingleChoiceDialog<Category> categoryPicker = new SingleChoiceDialog<>();
-                categoryPicker.setArguments(bundle);
+                categoryPicker.setTitle(getString(R.string.choose_parent_category));
+                categoryPicker.setContent(CategoryRepository.getAll());
+                categoryPicker.setNeutralButton("Create New");//todo übersetzung
                 categoryPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
                     @Override
-                    public void onEntrySelected(Object entry) {
-                        Category parentCategory = (Category) entry;
+                    public void onPositiveClick(Object entry) {
 
-                        if (parentCategory == null) {//todo kann man das vereinfachen
+                        mParentCategory = (Category) entry;
+                        mSelectParentBtn.setText(mParentCategory.getTitle());
 
-                            Bundle bundle1 = new Bundle();
-                            bundle1.putString(BasicTextInputDialog.TITLE, getString(R.string.new_parent_category_name));
+                    }
 
-                            BasicTextInputDialog textInputDialog = new BasicTextInputDialog();
-                            textInputDialog.setArguments(bundle1);
-                            textInputDialog.setOnTextInputListener(new BasicTextInputDialog.OnTextInput() {
+                    @Override
+                    public void onNeutralClick() {
 
-                                @Override
-                                public void onTextInput(String textInput) {
+                        Bundle bundle1 = new Bundle();
+                        bundle1.putString(BasicTextInputDialog.TITLE, getString(R.string.new_parent_category_name));
 
-                                    mParentCategory = CategoryRepository.insert(new Category(textInput, "#000000", false, new ArrayList<Category>()));
-                                    mSelectParentBtn.setText(mParentCategory.getTitle());
-                                }
-                            });
-                            textInputDialog.show(getFragmentManager(), "categoryParentName");
+                        BasicTextInputDialog textInputDialog = new BasicTextInputDialog();
+                        textInputDialog.setArguments(bundle1);
+                        textInputDialog.setOnTextInputListener(new BasicTextInputDialog.OnTextInput() {
 
-                        } else {
+                            @Override
+                            public void onTextInput(String textInput) {
 
-                            mParentCategory = parentCategory;
-                            mSelectParentBtn.setText(mParentCategory.getTitle());
-                        }
+                                mParentCategory = CategoryRepository.insert(new Category(textInput, "#000000", false, new ArrayList<Category>()));
+                                mSelectParentBtn.setText(mParentCategory.getTitle());
+                            }
+                        });
+                        textInputDialog.show(getFragmentManager(), "categoryParentName");
                     }
                 });
                 categoryPicker.show(getFragmentManager(), "create_category_parent");

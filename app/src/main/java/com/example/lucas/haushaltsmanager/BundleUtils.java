@@ -2,13 +2,9 @@ package com.example.lucas.haushaltsmanager;
 
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.StringRes;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class BundleUtils<T extends Parcelable> {
+public class BundleUtils {
     private Bundle mBundle;
 
     public BundleUtils(Bundle bundle) {
@@ -57,13 +53,8 @@ public class BundleUtils<T extends Parcelable> {
         return mBundle.containsKey(key) ? mBundle.getLong(key) : def;
     }
 
-    public List<T> getParcelableArrayList(String key, List<T> def) {
+    public boolean getBoolean(String key, boolean def) {
 
-        if (mBundle.containsKey(key)) {
-            return mBundle.getParcelableArrayList(key);
-        } else {
-            return def;
-        }
-//        return mBundle.containsKey(key) ? mBundle.getParcelableArrayList(key) : def;
+        return mBundle.containsKey(key) ? mBundle.getBoolean(key) : def;
     }
 }
