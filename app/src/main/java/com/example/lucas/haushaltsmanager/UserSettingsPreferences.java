@@ -61,7 +61,7 @@ public class UserSettingsPreferences {
 
     public int getMaxBackupCount() {
 
-        return mPreferences.getInt(MAX_BACKUP_COUNT, SettingsActivity.MAX_BACKUP_COUNT);
+        return mPreferences.getInt(MAX_BACKUP_COUNT, SettingsActivity.DEFAULT_BACKUP_CAP);
     }
 
     public void setMaxBackupCount(int maxBackupCount) {
@@ -71,7 +71,7 @@ public class UserSettingsPreferences {
 
     public boolean getReminderStatus() {
 
-        return mPreferences.getBoolean(SEND_REMINDER_NOTIFICATIONS, false);
+        return mPreferences.getBoolean(SEND_REMINDER_NOTIFICATIONS, SettingsActivity.DEFAULT_REMINDER_STATUS);
     }
 
     public void setReminderStatus(boolean reminderStatus) {
@@ -81,7 +81,7 @@ public class UserSettingsPreferences {
 
     public int getFirstDayOfWeek() {
 
-        return mPreferences.getInt(FIRST_DAY_OF_WEEK, WeekdayUtils.WEEKDAYS.MONDAY.ordinal());
+        return mPreferences.getInt(FIRST_DAY_OF_WEEK, WeekdayUtils.getWeekday(SettingsActivity.DEFAULT_WEEKDAY));
     }
 
     public void setFirstDayOfWeek(String firstDayOfWeek) {
@@ -91,7 +91,7 @@ public class UserSettingsPreferences {
 
     public boolean getAutomaticBackupStatus() {
 
-        return mPreferences.getBoolean(AUTOMATIC_BACKUPS, true);
+        return mPreferences.getBoolean(AUTOMATIC_BACKUPS, SettingsActivity.DEFAULT_BACKUP_STATUS);
     }
 
     public void setAutomaticBackupStatus(boolean automaticBackupStatus) {
@@ -99,9 +99,10 @@ public class UserSettingsPreferences {
         mPreferences.edit().putBoolean(AUTOMATIC_BACKUPS, automaticBackupStatus).apply();
     }
 
-    public String getReminderTime() {
+    public Time getReminderTime() {
 
-        return mPreferences.getString(REMINDER_TIME, "18:00");
+        String reminderTime = mPreferences.getString(REMINDER_TIME, SettingsActivity.DEFAULT_REMINDER_TIME.getTime());
+        return Time.fromString(reminderTime);
     }
 
     public void setReminderTime(Time reminderTime) {
@@ -111,7 +112,7 @@ public class UserSettingsPreferences {
 
     public boolean getNotificationStatus() {
 
-        return mPreferences.getBoolean(ALLOW_NOTIFICATIONS, false);
+        return mPreferences.getBoolean(ALLOW_NOTIFICATIONS, SettingsActivity.DEFAULT_REMINDER_STATUS);
     }
 
     public void setNotificationStatus(boolean notificationStatus) {

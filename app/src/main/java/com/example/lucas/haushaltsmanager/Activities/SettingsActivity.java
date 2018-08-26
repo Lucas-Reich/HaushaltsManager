@@ -10,7 +10,6 @@ import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepository;
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
@@ -29,7 +28,11 @@ public class SettingsActivity extends AppCompatActivity {
      * Maximale Anzahl von gleichzeitig existierenden Backups.
      * Die Höhe dieser Zahl hat keinen Grund und könnte genauso gut 1 oder 100 sein.
      */
-    public static final int MAX_BACKUP_COUNT = 20;
+    public static final int DEFAULT_BACKUP_CAP = 20;
+    public static final String DEFAULT_WEEKDAY = WeekdayUtils.MONDAY;
+    public static final boolean DEFAULT_BACKUP_STATUS = true;
+    public static final boolean DEFAULT_REMINDER_STATUS = false;
+    public static final Time DEFAULT_REMINDER_TIME = new Time(10, 0);
 
     private LinearLayout firstDayLayout, createBkpLayout, concurrentBackupsLayout, currencyLayout, notificationsAllowLayout, notificationTimeLayout;
     private Button resetSettingsBtn;
@@ -73,8 +76,6 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        //todo initialien status der einzelnen checkboxen und textviews so anpassen, dass sie ihren status aus den sharedpreferences bekommen
-
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         mBackArrow.setOnClickListener(new View.OnClickListener() {
@@ -84,6 +85,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
+        setFirstDayOfWeek(WeekdayUtils.getWeekday(mUserSettings.getFirstDayOfWeek()));
         firstDayLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -109,6 +111,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
+        setAutomaticBackupStatus(mUserSettings.getAutomaticBackupStatus());
         createBkpLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -117,6 +120,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
+        setMaxBackupCount(mUserSettings.getMaxBackupCount());
         concurrentBackupsLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -142,11 +146,13 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
+        setMainCurrency(mUserSettings.getMainCurrency());
         currencyLayout.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
                 SingleChoiceDialog<Currency> currencyPicker = new SingleChoiceDialog<>();
+                currencyPicker.createBuilder(SettingsActivity.this);
                 currencyPicker.setTitle(getString(R.string.select_currency));
                 currencyPicker.setContent(CurrencyRepository.getAll(), -1);
                 currencyPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
@@ -166,6 +172,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
+        setReminderStatus(mUserSettings.getReminderStatus());
         notificationsAllowLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -174,6 +181,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
+        setReminderTime(mUserSettings.getReminderTime());
         notificationTimeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -214,8 +222,12 @@ public class SettingsActivity extends AppCompatActivity {
 
                         if (reset) {
 
-                            //todo einstellungen auf den standart zurücksetzen
-                            Toast.makeText(SettingsActivity.this, R.string.not_implemented, Toast.LENGTH_SHORT).show();
+                            setFirstDayOfWeek(DEFAULT_WEEKDAY);
+                            setAutomaticBackupStatus(DEFAULT_BACKUP_STATUS);
+                            setMaxBackupCount(DEFAULT_BACKUP_CAP);
+                            setReminderStatus(DEFAULT_REMINDER_STATUS);
+                            setReminderTime(DEFAULT_REMINDER_TIME);
+                            //die Hauptwährung auch zurücksetzen?
                         }
                     }
                 });
@@ -226,14 +238,14 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     /**
-     * Methode um ein String Array mit Zahlen zwischen 1 und MAX_BACKUP_COUNT zu füllen
+     * Methode um ein String Array mit Zahlen zwischen 1 und DEFAULT_BACKUP_CAP zu füllen
      *
      * @return Stringarray
      */
     private String[] getConcurrentBackupCountOptions() {
-        String[] options = new String[MAX_BACKUP_COUNT];
+        String[] options = new String[DEFAULT_BACKUP_CAP];
 
-        for (int i = 0; i < MAX_BACKUP_COUNT; i++) {
+        for (int i = 0; i < DEFAULT_BACKUP_CAP; i++) {
             options[i] = Integer.toString(i + 1);
         }
 
