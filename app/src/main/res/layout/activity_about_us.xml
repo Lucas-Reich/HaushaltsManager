@@ -26,7 +26,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingBottom="10dp"
-                android:text="Über uns"
+                android:text="@string/about_us"
                 android:textColor="@color/primary_text_color"/>
 
             <View
@@ -47,7 +47,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingBottom="10dp"
-                    android:text="Kontaktiere Uns"
+                    android:text="@string/contact"
                     android:textColor="@color/colorPrimary"/>
 
                 <LinearLayout
@@ -68,7 +68,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="5dp"
                         android:layout_marginRight="5dp"
-                        android:text="Support"
+                        android:text="@string/support"
                         android:textColor="@color/primary_text_color"/>
 
                     <View
@@ -97,7 +97,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="5dp"
                         android:layout_marginRight="5dp"
-                        android:text="Help Improving the app"
+                        android:text="@string/help_improve"
                         android:textColor="@color/primary_text_color"/>
 
                     <View
@@ -124,7 +124,7 @@
                         android:id="@+id/textveiw"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Suggest new Feature"
+                        android:text="@string/suggest_feature"
                         android:textColor="@color/primary_text_color"/>
 
                     <View
@@ -151,7 +151,7 @@
                     android:id="@+id/textView13"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="App Version"
+                    android:text="@string/app_version"
                     android:textColor="@color/primary_text_color"/>
 
                 <TextView
@@ -182,7 +182,7 @@
                     android:id="@+id/textView11"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Bewerte die App"
+                    android:text="@string/left_slider_rate_the_app"
                     android:textColor="@color/primary_text_color"/>
 
                 <View
@@ -207,7 +207,7 @@
                     android:id="@+id/textView10"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Lizenzen"
+                    android:text="@string/licenses"
                     android:textColor="@color/primary_text_color"/>
 
                 <View

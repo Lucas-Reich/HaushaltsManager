@@ -156,4 +156,18 @@
     <string name="btn_dismiss">Dismiss</string>
     <string name="changelog_title">Changelog</string>
     <string name="error_no_mail_clients">There are no email clients installed.</string>
+    <string name="about_us">About Us</string>
+    <string name="contact">Contact</string>
+    <string name="help_improve">Help inproving the app</string>
+    <string name="suggest_feature">Suggest new feature</string>
+    <string name="app_version">App Version</string>
+    <string name="first_day_of_week">First day of week</string>
+    <string name="automatic_backups">Automatically create Backups?</string>
+    <string name="concurrent_backup_count">Max backup count</string>
+    <string name="main_currency">Select your main currency</string>
+    <string name="reminder_status">Remind me to create bookings</string>
+    <string name="reminder_time">Set reminder time</string>
+    <string name="btn_reset">Restore default settings</string>
+    <string name="support">Support</string>
+    <string name="licenses">Licenses</string>
 </resources>

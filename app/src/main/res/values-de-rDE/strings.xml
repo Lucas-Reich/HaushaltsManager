@@ -13,7 +13,7 @@
     <string name="left_slider_store">Store</string>
     <string name="left_slider_preferences">Einstellungen</string>
     <string name="left_slider_follow_us">Folge uns</string>
-    <string name="left_slider_rate_the_app">Bewerten Sie unsere App</string>
+    <string name="left_slider_rate_the_app">Bewerte die App</string>
     <string name="left_slider_about">Über</string>
 
 
@@ -164,5 +164,15 @@
     <string name="main_currency">Wähle deine Hauptwährung aus</string>
     <string name="reminder_status">Erinnere mich die Buchungen einzutragen</string>
     <string name="reminder_time">Erinnere mich um</string>
-    <string name="btn_reset">Standarteinstellungen Wiederherstellem</string>
+    <string name="btn_reset">Standarteinstellungen Wiederherstellen</string>
+    <string name="changelog_title">Changelog</string>
+    <string name="error_no_mail_clients">Es sind keine E-Mail Apps installiert</string>
+    <string name="about_us">Über uns</string>
+    <string name="contact">Kontakt</string>
+    <string name="support">Support</string>
+    <string name="help_improve">Helfe die App zu verbessern</string>
+    <string name="suggest_feature">Schlage ein neues Feature vor</string>
+    <string name="app_version">Appversion</string>
+    <string name="btn_dismiss">Verwerfen</string>
+    <string name="licenses">Lizenzen</string>
 </resources>
