@@ -1,21 +1,21 @@
 package com.example.lucas.haushaltsmanager.Dialogs.ChangelogDialog;
 
-import android.support.annotation.Nullable;
+public class Bug implements ChangelogItem {
+    private static final String BUG = "Bug";
 
-public class Bug {
-    private String mIdentifier;
-    private String mAdditionalInformation;
+    private String mDescription;
 
-    public Bug(String identifier, @Nullable String additionalInformation) {
-        mIdentifier = identifier;
-        mAdditionalInformation = additionalInformation != null ? additionalInformation : "";
+    public Bug(String additionalInformation) {
+        mDescription = additionalInformation != null ? additionalInformation : "";
     }
 
-    public String getIdentifier() {
-        return mIdentifier;
+    @Override
+    public String getDescription() {
+        return mDescription;
     }
 
-    public String getAdditionalInformation() {
-        return mAdditionalInformation;
+    @Override
+    public String getType() {
+        return BUG;
     }
 }

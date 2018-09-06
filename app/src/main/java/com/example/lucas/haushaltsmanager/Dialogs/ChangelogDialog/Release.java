@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -12,12 +13,11 @@ public class Release {
     private int mVersionMajor;
     private int mVersionMinor;
     private int mVersionPatch;
-    private String mReleaseInformation;
-    private List<Bug> mBugs;
-    private List<Feature> mFeatures;
+    private String mReleaseDescription;
+    private List<ChangelogItem> mItems; //todo umbenennen
     private Calendar mReleaseDate;
 
-    public Release(int major, @Nullable Integer minor, @Nullable Integer patch, @NonNull Calendar releaseDate, List<Feature> features, List<Bug> bugs, String releaseInformation) {
+    public Release(int major, @Nullable Integer minor, @Nullable Integer patch, @NonNull Calendar releaseDate, String releaseInformation, List<ChangelogItem> items) {
 
         mVersionMajor = major;
         mVersionMinor = minor != null ? minor : 0;
@@ -25,34 +25,30 @@ public class Release {
 
         mReleaseDate = releaseDate;
 
-        mReleaseInformation = releaseInformation;
+        mReleaseDescription = releaseInformation;
 
-        mFeatures = features;
-        mBugs = bugs;
+        mItems = items;
     }
 
-    public void setReleaseInformation(String releaseInformation) {
-        mReleaseInformation = releaseInformation;
+    public void setReleaseDescription(String releaseInformation) {
+        mReleaseDescription = releaseInformation;
     }
 
-    public String getReleaseInformation() {
-        return mReleaseInformation;
+    public String getReleaseDescription() {
+        return mReleaseDescription;
     }
 
-    public void addBugs(List<Bug> bugs) {
-        mBugs.addAll(bugs);
+    public void addChangelogItem(ChangelogItem item) {
+        mItems.add(item);
     }
 
-    public void addBug(Bug bug) {
-        mBugs.add(bug);
+    public void addChangelogItems(List<ChangelogItem> items) {
+
+        mItems.addAll(items);
     }
 
-    public void addFeatures(List<Feature> features) {
-        mFeatures.addAll(features);
-    }
-
-    public void addFeature(Feature feature) {
-        mFeatures.add(feature);
+    public List<ChangelogItem> getItems() {
+        return mItems;
     }
 
     public String getReleaseVersion() {
@@ -63,13 +59,5 @@ public class Release {
     public String getReleaseDate() {
 
         return DateFormat.getDateInstance(DateFormat.SHORT).format(mReleaseDate.getTimeInMillis());
-    }
-
-    public List<Bug> getFixedBugs() {
-        return mBugs;
-    }
-
-    public List<Feature> getAddedFeatures() {
-        return mFeatures;
     }
 }

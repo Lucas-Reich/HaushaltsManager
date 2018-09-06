@@ -15,4 +15,5 @@
     <color name="secondary_text_color">#323232</color>
     <color name="alert_text_color">#ff0000</color>
     <color name="transfer_booking_color">#0033cc</color>
+    <color name="changelog_dialog_information_background">#eeeeee</color>
 </resources>

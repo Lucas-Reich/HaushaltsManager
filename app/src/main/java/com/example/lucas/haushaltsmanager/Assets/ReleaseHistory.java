@@ -1,7 +1,9 @@
 package com.example.lucas.haushaltsmanager.Assets;
 
 import com.example.lucas.haushaltsmanager.Dialogs.ChangelogDialog.Bug;
+import com.example.lucas.haushaltsmanager.Dialogs.ChangelogDialog.ChangelogItem;
 import com.example.lucas.haushaltsmanager.Dialogs.ChangelogDialog.Feature;
+import com.example.lucas.haushaltsmanager.Dialogs.ChangelogDialog.Improvement;
 import com.example.lucas.haushaltsmanager.Dialogs.ChangelogDialog.Release;
 
 import java.util.ArrayList;
@@ -35,6 +37,7 @@ public class ReleaseHistory {
     public List<Release> getReleaseHistory() {
         List<Release> releases = new ArrayList<>();
         releases.add(getRelease100());
+        releases.add(getRelease200());
 
         return releases;
     }
@@ -45,22 +48,32 @@ public class ReleaseHistory {
      * @return Version 1.0.0
      */
     private Release getRelease100() {
-        List<Bug> bugs = new ArrayList<>();
-
-        List<Feature> features = new ArrayList<>();
-        features.add(new Feature(
-                "Created About Us Page",
-                "You can now find further Information about us under the 'About Us' Entry in the Drawer Menu"
-        ));
+        List<ChangelogItem> items = new ArrayList<>();
+        items.add(new Feature("Gibt nun eine Changelog"));
 
         return new Release(
                 1,
                 null,
                 null,
                 Calendar.getInstance(),
-                features,
-                bugs,
-                "Hier stehen Information die als Eigenständiger Text vor den ganzen Änderungen angezeigt werden sollen, diese Information werden auch in einer Seperaten Box angezeigt"
+                "Hier stehen Information die als Eigenständiger Text vor den ganzen Änderungen angezeigt werden sollen, diese Information werden auch in einer Seperaten Box angezeigt",
+                items
+        );
+    }
+
+    private Release getRelease200() {
+        List<ChangelogItem> items = new ArrayList<>();
+        items.add(new Bug("Zwischen identifier und desc war kein leerezeichen"));
+        items.add(new Feature("Man kann nun seinen Penis verlängern"));
+        items.add(new Improvement("Lange Penisse sind toll"));
+
+        return new Release(
+                2,
+                null,
+                null,
+                Calendar.getInstance(),
+                "",
+                items
         );
     }
 }

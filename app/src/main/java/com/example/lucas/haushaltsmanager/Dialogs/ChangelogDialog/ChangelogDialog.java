@@ -6,8 +6,8 @@ import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.ListView;
 
 import com.example.lucas.haushaltsmanager.Assets.ReleaseHistory;
 import com.example.lucas.haushaltsmanager.R;
@@ -15,6 +15,14 @@ import com.example.lucas.haushaltsmanager.R;
 public class ChangelogDialog extends DialogFragment {
     //todo Klasse in eine Bibliothek extrahieren
     private AlertDialog.Builder mBuilder;
+    private Context mContext;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        mContext = context;
+    }
 
     public void createBuilder(Context context) {
 
@@ -23,10 +31,10 @@ public class ChangelogDialog extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        ReleaseHistory releaseHistory = new ReleaseHistory();
 
         View view = getActivity().getLayoutInflater().inflate(R.layout.changelog_dialog, null, false);
-        RecyclerView recyclerView = view.findViewById(R.id.changelog_recycler_view);
+        ListView releaseListView = view.findViewById(R.id.changelog_list);
+        releaseListView.setAdapter(getReleaseAdapter());
 
         mBuilder.setView(view);
 
@@ -49,5 +57,11 @@ public class ChangelogDialog extends DialogFragment {
     public void setTitle(String title) {
 
         mBuilder.setTitle(title);
+    }
+
+    private ChangelogAdapter getReleaseAdapter() {
+        ReleaseHistory releaseHistory = new ReleaseHistory();
+
+        return new ChangelogAdapter(releaseHistory.getReleaseHistory(), mContext);
     }
 }
