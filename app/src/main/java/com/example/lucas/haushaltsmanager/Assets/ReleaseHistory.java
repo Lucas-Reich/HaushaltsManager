@@ -38,6 +38,8 @@ public class ReleaseHistory {
         List<Release> releases = new ArrayList<>();
         releases.add(getRelease100());
         releases.add(getRelease200());
+        releases.add(getRelease201());
+        releases.add(getRelease202());
 
         return releases;
     }
@@ -74,6 +76,32 @@ public class ReleaseHistory {
                 Calendar.getInstance(),
                 "",
                 items
+        );
+    }
+
+    private Release getRelease201() {
+        List<ChangelogItem> items = new ArrayList<>();
+        items.add(new Bug("Wenn es keine Beschreibung für einen Release gibt wird nun der graue Bereich nicht mehr angezeigt."));
+
+        return new Release(
+                2,
+                null,
+                1,
+                Calendar.getInstance(),
+                "",
+                items
+        );
+    }
+
+    private Release getRelease202() {
+
+        return new Release(
+                2,
+                null,
+                2,
+                Calendar.getInstance(),
+                "Für diesen Release gibt es keinen Changelog",
+                new ArrayList<ChangelogItem>()
         );
     }
 }

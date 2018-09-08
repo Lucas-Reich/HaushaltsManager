@@ -7,7 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.lucas.haushaltsmanager.R;
@@ -19,7 +19,7 @@ public class ChangelogAdapter extends ArrayAdapter<Release> {
     private static class ViewHolder {
         TextView releaseVersion;
         TextView releaseDescription;
-        ListView releaseItems;
+        LinearLayout releaseItems;
     }
 
     public ChangelogAdapter(List<Release> data, Context context) {
@@ -46,23 +46,35 @@ public class ChangelogAdapter extends ArrayAdapter<Release> {
         } else {
 
             viewHolder = (ViewHolder) convertView.getTag();
+            viewHolder.releaseDescription.setVisibility(View.VISIBLE);
+            viewHolder.releaseItems.removeAllViews();
         }
 
         viewHolder.releaseVersion.setText(release.getReleaseVersion());
-        viewHolder.releaseDescription.setText(release.getReleaseDescription());// wenn keine desc angegeben ist soll auch der graue hintergrund nicht sichtbar sein
-        viewHolder.releaseItems.setAdapter(getRowAdapter(release));
+        if (release.getReleaseDescription().equals("")) {
+
+            viewHolder.releaseDescription.setVisibility(View.GONE);
+        } else {
+
+            viewHolder.releaseDescription.setText(release.getReleaseDescription());
+        }
+
+        for (ChangelogItem item : release.getItems()) {
+            viewHolder.releaseItems.addView(getRow(item));
+        }
 
         return convertView;
     }
 
-    /**
-     * Methode um den ListAdapter für die Lister der Änderungen zu erzeugen.
-     *
-     * @param release Release
-     * @return ListAdapter
-     */
-    private ChangelogRowAdapter getRowAdapter(Release release) {
+    private View getRow(ChangelogItem rowItem) {
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.changelog_row, null);
 
-        return new ChangelogRowAdapter(release.getItems(), getContext());
+        TextView rowType = view.findViewById(R.id.changelog_row_type);
+        rowType.setText(String.format("- %s: ", rowItem.getType()));
+
+        TextView rowDescription = view.findViewById(R.id.changelog_row_description);
+        rowDescription.setText(rowItem.getDescription());
+
+        return view;
     }
 }

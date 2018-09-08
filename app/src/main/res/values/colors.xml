@@ -9,7 +9,7 @@
     <color name="highlighted_item_color">#5CE675</color>
     <color name="separator_color">#dcdbdb</color>
     <color name="text_color_disabled">#808080</color>
-    <color name="primary_text_color">#000000</color>
+    <color name="primary_text_color">#222222</color>
     <color name="primary_text_color_dark">#bcbcbc</color>
     <color name="primary_text_color_bright">#ffffff</color>
     <color name="secondary_text_color">#323232</color>
