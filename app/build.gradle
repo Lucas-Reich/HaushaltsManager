@@ -37,6 +37,7 @@ dependencies {
     implementation 'com.android.support:cardview-v7:26.1.0'
     implementation 'com.android.support:design:26.1.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+    implementation project(':changelogdialog')
     //AlertDialog zum anzeigen der von mir genutzten OpenSource Pakete
     implementation 'de.psdev.licensesdialog:licensesdialog:1.7.0'
     //AlertDialog um den User ein Verzeichniss auswählen zu lassen

@@ -1,10 +1,10 @@
 package com.example.lucas.haushaltsmanager.Assets;
 
-import com.example.lucas.haushaltsmanager.Dialogs.ChangelogDialog.Bug;
-import com.example.lucas.haushaltsmanager.Dialogs.ChangelogDialog.ChangelogItem;
-import com.example.lucas.haushaltsmanager.Dialogs.ChangelogDialog.Feature;
-import com.example.lucas.haushaltsmanager.Dialogs.ChangelogDialog.Improvement;
-import com.example.lucas.haushaltsmanager.Dialogs.ChangelogDialog.Release;
+import com.lucas.changelogdialog.Bug;
+import com.lucas.changelogdialog.ChangelogItem;
+import com.lucas.changelogdialog.Feature;
+import com.lucas.changelogdialog.Improvement;
+import com.lucas.changelogdialog.Release;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -32,9 +32,10 @@ import java.util.List;
 //
 //        </changelog>
 //        Last, if you would like a multi language changelog, you just have to put the translated files changelog.xml in the appropriate folders res/raw-xx/.
-public class ReleaseHistory {
+public class ReleaseHistory implements com.lucas.changelogdialog.ReleaseHistory {
 
-    public List<Release> getReleaseHistory() {
+    @Override
+    public List<com.lucas.changelogdialog.Release> getHistory() {
         List<Release> releases = new ArrayList<>();
         releases.add(getRelease100());
         releases.add(getRelease200());
