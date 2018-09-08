@@ -4,13 +4,33 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
-    <include
-        layout="@layout/changelog_header"
+    <TextView
+        android:id="@+id/changelog_header_version"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:text="v 1.0.0"/>
 
-    <ListView
-        android:id="@+id/changelog_item_row_container"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/changelog_header_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:background="@color/changelog_dialog_information_background"
+            android:padding="7dp"
+            android:text="Mit diesem Update sind neue Funktionen wie zum Beispiel .. dazugekommen erfahren in den Details mehr darüber"
+            android:textColor="@color/primary_text_color"/>
+
+        <ListView
+            android:id="@+id/changelog_item_row_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </LinearLayout>
+
 </LinearLayout>

@@ -4,18 +4,4 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/changelog_header_version"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="hier kommt die app version hin"/>
-
-    <TextView
-        android:id="@+id/changelog_header_description"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/changelog_dialog_information_background"
-        android:text="Mit diesem Update sind neue Funktionen wie zum Beispiel .. dazugekommen erfahren in den Details mehr darüber"
-        android:textColor="@color/primary_text_color"/>
-
 </LinearLayout>
