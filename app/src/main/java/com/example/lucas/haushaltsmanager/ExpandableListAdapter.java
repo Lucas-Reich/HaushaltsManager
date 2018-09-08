@@ -3,6 +3,7 @@ package com.example.lucas.haushaltsmanager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -89,7 +90,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
         ExpenseObject groupExpense = (ExpenseObject) getGroup(groupPosition);
         LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        boolean isSelected = isGroupSelected(groupExpense);
+        boolean isSelected = isBookingSelected(groupPosition, null);
 
         switch (groupExpense.getExpenseType()) {
 
@@ -107,7 +108,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 TextView txtCurrencySymbol = (TextView) convertView.findViewById(R.id.exp_listview_parent_currency_symbol);
                 TextView txtPerson2 = (TextView) convertView.findViewById(R.id.exp_listview_parent_person);
 
-                pieChart.setPieData(preparePieData(getAllChildrenToParent(groupExpense)));
+                pieChart.setPieData(preparePieData(mChildData.get(groupExpense)));
                 txtTitle22.setText(groupExpense.getTitle());
                 txtPrice.setText(String.format(mContext.getResources().getConfiguration().locale, "%.2f", groupExpense.getSignedPrice()));
                 txtPrice.setTextColor(groupExpense.getSignedPrice() < 0 ? mRed : mGreen);
@@ -283,168 +284,148 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         return true;
     }
 
+    private HashMap<ExpenseObject, List<ExpenseObject>> mSelectedBookings = new HashMap<>();
+    private int selectedGroups = 0;
+    private int selectedChildren = 0;
+    private int selectedParents = 0;
+
     /**
-     * Methode um ein Group in die Liste der ausgewählten Buchungen zu packen.
+     * Methode um die angegebenen Buchung in die Liste der ausgwählten Buchungenzu schreiben.
      *
-     * @param groupExpense Ausgewählte Buchung
+     * @param groupPosition Position der Gruppe
+     * @param childPosition Position des Kindes oder NULL, wenn eine Groupbuchung ausgewählt wurde
      */
-    public void selectGroup(ExpenseObject groupExpense) {
-        mSelectedGroups.add(groupExpense);
+    public void selectBooking(int groupPosition, @Nullable Integer childPosition) {
+        ExpenseObject group = (ExpenseObject) getGroup(groupPosition);
+        List<ExpenseObject> existingChildren = mChildData.get(group);
+//        group = removeChildren(group);
+
+        if (childPosition != null) {
+            ExpenseObject child = (ExpenseObject) getChild(groupPosition, childPosition);
+            List<ExpenseObject> children = new ArrayList<>();
+            children.add(child);
+
+            if (mSelectedBookings.containsKey(group)) {
+
+                List<ExpenseObject> children2 = mSelectedBookings.get(group);
+                children2.add(child);
+                mSelectedBookings.put(group, children2);
+            } else {
+                mSelectedBookings.put(group, children);
+            }
+            selectedChildren++;
+        } else {
+            if (group.isParent()) {
+                mSelectedBookings.put(group, existingChildren);
+                selectedParents++;
+            } else {
+
+                mSelectedBookings.put(group, new ArrayList<ExpenseObject>());
+                selectedGroups++;
+            }
+        }
     }
 
     /**
-     * Methode um eine Kindbuchung in die Liste der ausgewählten Buchungen zu packen.
+     * Methode um eine Buchung aus der Liste der ausgewählten Buchungen zu entfernen.
      *
-     * @param childExpense Ausgewählte KindBuchung
+     * @param groupPosition Position der Gruppe
+     * @param childPosition Position des Kindes oder NULL, wenn eine Groupbuchung ausgewählt wurde
      */
-    public void selectChild(ExpenseObject childExpense) {
-        mSelectedChildren.add(childExpense);
+    public void deselectBooking(int groupPosition, @Nullable Integer childPosition) {
+        ExpenseObject group = (ExpenseObject) getGroup(groupPosition);
+//        group = removeChildren(group);
+
+        if (childPosition != null) {
+
+            ExpenseObject child = (ExpenseObject) getChild(groupPosition, childPosition);
+            List<ExpenseObject> children = mSelectedBookings.get(group);
+            children.remove(child);
+            if (children.size() == 0) {
+                mSelectedBookings.remove(group);
+            } else {
+                mSelectedBookings.put(group, children);
+            }
+            selectedChildren--;
+        } else {
+            mSelectedBookings.remove(group);
+
+            if (mChildData.get(group).size() != 0) {
+                selectedParents--;
+            } else {
+                selectedGroups--;
+            }
+        }
     }
 
     /**
-     * Methode um eine überprüfen ob eine Buchung ausgewählt ist oder nicht.
+     * Methode um herauszufinden ob die angegebene Buchung bereits ausgewählt ist.
      *
-     * @param groupExpense Id der zu überprüfenden GroupBuchung
-     * @return True wenn sie ausgewählt ist, False andernfalls
+     * @param groupPosition Position der Gruppe
+     * @param childPosition Position des Kindes oder NULL, wenn eine Groupbuchung ausgewählt wuerde
+     * @return TRUE wenn die Buchung ausgewählt ist, FALSE wenn nicht
      */
-    public boolean isGroupSelected(ExpenseObject groupExpense) {
-        return mSelectedGroups.contains(groupExpense);
-    }
+    public boolean isBookingSelected(int groupPosition, @Nullable Integer childPosition) {
+        ExpenseObject group = (ExpenseObject) getGroup(groupPosition);
+//        group = removeChildren(group);
 
-    /**
-     * Methode um eine überprüfen ob eine KindBuchung ausgewählt ist oder nicht.
-     *
-     * @param childExpense Id der zu überprüfenden KindBuchung
-     * @return True wenn sie ausgewählt ist, False andernfalls
-     */
-    public boolean isChildSelected(ExpenseObject childExpense) {
-        return mSelectedChildren.contains(childExpense);
-    }
-
-    /**
-     * Methode um eine GroupBuchung aus der Liste der ausgewählten Buchungen zu löschen.
-     *
-     * @param groupExpense Id der zu entfernenden Buchung
-     */
-    public void removeGroupFromList(ExpenseObject groupExpense) {
-        mSelectedGroups.remove(groupExpense);
-    }
-
-    /**
-     * Methode um eine ChildBuchung aus der Liste der ausgewählten Buchungen zu löschen.
-     *
-     * @param childExpense Id der zu entfernenden Buchung
-     */
-    public void removeChildFromList(ExpenseObject childExpense) {
-        mSelectedChildren.remove(childExpense);
-    }
-
-    /**
-     * Methode um die List der ausgewählte Buchungen zu löschen.
-     */
-    public void deselectAll() {
-        mSelectedGroups.clear();
-        mSelectedChildren.clear();
-    }
-
-    /**
-     * Methode um die Anzahl der ausgewählten GroupBuchungen in erfahrung zu bringen.
-     *
-     * @return Anzahl der ausgewählten GroupBuchungen
-     */
-    public int getSelectedGroupCount() {
-        int count = 0;
-        for (ExpenseObject expense : mSelectedGroups) {
-            if (!expense.isParent())
-                count++;
+        if (!mSelectedBookings.containsKey(group)) {
+            return false;
         }
 
-        return count;
+        if (childPosition != null) {
+            ExpenseObject child = (ExpenseObject) getChild(groupPosition, childPosition);
+
+            return mSelectedBookings.get(group).contains(child);
+        } else {
+
+            return true;
+        }
+    }
+
+    /**
+     * Methode um alle Kinder von einer Buchung zu löschen.
+     *
+     * @param expense Buchung, welche keine Kinder mehr haben soll
+     * @return Buchung ohne Kinder
+     */
+    private ExpenseObject removeChildren(ExpenseObject expense) {
+        expense.removeChildren();
+        return expense;
+    }
+
+    /**
+     * Methode um alle ausgewählten Buchungen abzufragen.
+     *
+     * @return Ausgewählte Buchugen
+     */
+    public HashMap<ExpenseObject, List<ExpenseObject>> getSelectedBookings() {
+        return mSelectedBookings;
+    }
+
+    /**
+     * Methode um alle ausgewählten Buchugen abzuwählen
+     */
+    public void deselectAll() {
+        selectedGroups = 0;
+        selectedChildren = 0;
+        selectedParents = 0;
+        mSelectedBookings.clear();
+    }
+
+    public int getSelectedBookingsCount() {
+        return selectedGroups + selectedChildren + selectedParents;
+    }
+
+    public int getSelectedGroupCount() {
+        return selectedGroups;
+    }
+
+    public int getSelectedChildCount() {
+        return selectedChildren;
     }
 
     public int getSelectedParentCount() {
-        int count = 0;
-        for (ExpenseObject expense : mSelectedGroups) {
-            if (expense.isParent())
-                count++;
-        }
-
-        return count;
-    }
-
-    /**
-     * Methode um die Anzahl der ausgewählten KindBuchungen in erfahrung zu bringen.
-     *
-     * @return Anzahl der ausgewählten KindBuchungen
-     */
-    public int getSelectedChildCount() {
-        return mSelectedChildren.size();
-    }
-
-    /**
-     * Methode um die Anzahl der ausgewählten Buchungen in erfahrung zu bringen.
-     *
-     * @return Anzahl der ausgewählten Buchungen
-     */
-    public int getSelectedItemsCount() {
-        return mSelectedChildren.size() + mSelectedGroups.size();
-    }
-
-    /**
-     * Methode um alle ausgewählten GroupBuchungen als ExpenseObject zu erhalten
-     *
-     * @return Liste der GroupBuchungen
-     */
-    public ArrayList<ExpenseObject> getSelectedGroupData() {
-        return mSelectedGroups;
-    }
-
-    /**
-     * Methode um alle ausgewählten KindBuchungen als ExpenseObject zu erhalten
-     *
-     * @return Liste der GroupBuchungen
-     */
-    public ArrayList<ExpenseObject> getSelectedChildData() {
-        return mSelectedChildren;
-    }
-
-    /**
-     * Methode um alle ausgewählten KindBuchungen inklusive ihres Parents zu bekommen.
-     */
-    public HashMap<Long, ExpenseObject> getSelectedMappedChildData() {
-
-        HashMap<Long, ExpenseObject> mappedSelectedChildren = new HashMap<>();
-        for (ExpenseObject child : mSelectedChildren) {
-
-            mappedSelectedChildren.put(getParentForChildBooking(child).getIndex(), child);
-        }
-
-        return mappedSelectedChildren;
-    }
-
-    /**
-     * Methode um alle Kindbuchungen zu einer ParentBuchung zu bekommen.
-     *
-     * @param parentExpense ParentBuchung
-     * @return Liste aller KindBuchungen
-     */
-    public List<ExpenseObject> getAllChildrenToParent(ExpenseObject parentExpense) {
-        return mChildData.get(parentExpense);
-    }
-
-    /**
-     * Methode um die ParentBuchung einer KindBuchung zu erhalten.
-     *
-     * @param childBooking KinDBuchung
-     * @return Parent der KindBuchung oder NULL
-     */
-    public ExpenseObject getParentForChildBooking(ExpenseObject childBooking) {
-
-        for (Map.Entry<ExpenseObject, List<ExpenseObject>> entry : mChildData.entrySet()) {
-            if (entry.getValue().contains(childBooking))
-                return entry.getKey();
-        }
-
-        return null;
+        return selectedParents;
     }
 }

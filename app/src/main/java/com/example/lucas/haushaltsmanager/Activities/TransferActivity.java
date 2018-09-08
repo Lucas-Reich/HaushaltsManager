@@ -17,25 +17,26 @@ import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.Exceptions.ChildCategoryNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
-import com.example.lucas.haushaltsmanager.Dialogs.AccountPickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.DatePickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ErrorAlertDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
+import com.example.lucas.haushaltsmanager.Dialogs.SingleChoiceDialog;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.R;
+import com.example.lucas.haushaltsmanager.UserSettingsPreferences;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class TransferActivity extends AppCompatActivity {
     private static final String TAG = TransferActivity.class.getSimpleName();
@@ -77,14 +78,14 @@ public class TransferActivity extends AppCompatActivity {
             finish();
         }
 
-        mDateBtn = (Button) findViewById(R.id.transfer_date_btn);
-        mFromAccountBtn = (Button) findViewById(R.id.transfer_from_account_btn);
-        mToAccountBtn = (Button) findViewById(R.id.transfer_to_account_btn);
-        mCreateTransferBtn = (Button) findViewById(R.id.transfer_create_btn);
-        mAmountBtn = (Button) findViewById(R.id.transfer_amount_btn);
+        mDateBtn = findViewById(R.id.transfer_date_btn);
+        mFromAccountBtn = findViewById(R.id.transfer_from_account_btn);
+        mToAccountBtn = findViewById(R.id.transfer_to_account_btn);
+        mCreateTransferBtn = findViewById(R.id.transfer_create_btn);
+        mAmountBtn = findViewById(R.id.transfer_amount_btn);
 
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        mBackArrow = (ImageButton) findViewById(R.id.back_arrow);
+        mToolbar = findViewById(R.id.toolbar);
+        mBackArrow = findViewById(R.id.back_arrow);
 
         Bundle bundle = getIntent().getExtras();
         if (bundle != null && bundle.containsKey("from_account"))
@@ -115,7 +116,7 @@ public class TransferActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 Bundle bundle = new Bundle();
-                bundle.putString("title", getResources().getString(R.string.input_price));
+                bundle.putString(PriceInputDialog.TITLE, getResources().getString(R.string.input_price));
 
                 PriceInputDialog expenseInput = new PriceInputDialog();
                 expenseInput.setArguments(bundle);
@@ -141,25 +142,25 @@ public class TransferActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                Bundle bundle = new Bundle();
-                bundle.putString("title", getResources().getString(R.string.input_account));
-                try {
-                    bundle.putParcelable("active_account", getActiveAccount());
-                } catch (AccountNotFoundException e) {
+                SingleChoiceDialog<Account> accountPicker = new SingleChoiceDialog<>();
+                accountPicker.createBuilder(TransferActivity.this);
+                accountPicker.setTitle(getString(R.string.input_account));
 
-                    //do nothing
-                }
-                if (mToAccount != null)
-                    bundle.putLong("excluded_account", mToAccount.getIndex());
-
-                AccountPickerDialog accountPicker = new AccountPickerDialog();
-                accountPicker.setArguments(bundle);
-                accountPicker.setOnAccountSelectedListener(new AccountPickerDialog.OnAccountSelected() {
+                List<Account> accounts = AccountRepository.getAll();
+                accounts.remove(mToAccount);
+                accountPicker.setContent(accounts, -1);
+                accountPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
                     @Override
-                    public void onAccountSelected(Account account) {
+                    public void onPositiveClick(Object fromAccount) {
 
-                        setFromAccount(account);
+                        setFromAccount((Account) fromAccount);
                         setToExpense(mFromExpense.getUnsignedPrice());
+                    }
+
+                    @Override
+                    public void onNeutralClick() {
+
+                        //do nothing
                     }
                 });
                 accountPicker.show(getFragmentManager(), "transfers_from_account");
@@ -172,25 +173,25 @@ public class TransferActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                Bundle bundle = new Bundle();
-                bundle.putString("title", getResources().getString(R.string.input_account));
-                try {
-                    bundle.putParcelable("active_account", getActiveAccount());
-                } catch (AccountNotFoundException e) {
+                SingleChoiceDialog<Account> accountPicker = new SingleChoiceDialog<>();
+                accountPicker.createBuilder(TransferActivity.this);
+                accountPicker.setTitle(getString(R.string.choose_account));
 
-                    //do nothing
-                }
-                if (mFromAccount != null)
-                    bundle.putLong("excluded_account", mFromAccount.getIndex());
-
-                AccountPickerDialog accountPicker = new AccountPickerDialog();
-                accountPicker.setArguments(bundle);
-                accountPicker.setOnAccountSelectedListener(new AccountPickerDialog.OnAccountSelected() {
+                List<Account> accounts = AccountRepository.getAll();
+                accounts.remove(mFromAccount);
+                accountPicker.setContent(accounts, -1);
+                accountPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
                     @Override
-                    public void onAccountSelected(Account account) {
+                    public void onPositiveClick(Object toAccount) {
 
-                        setToAccount(account);
+                        setToAccount((Account) toAccount);
                         setToExpense(mFromExpense.getUnsignedPrice());
+                    }
+
+                    @Override
+                    public void onNeutralClick() {
+
+                        //do nothing
                     }
                 });
                 accountPicker.show(getFragmentManager(), "transfers_to_account");
@@ -204,8 +205,7 @@ public class TransferActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 Bundle bundle = new Bundle();
-                Log.d(TAG, "onClick: " + transformCalendarToReadableDate(mCalendar));
-                bundle.putLong("current_day", mCalendar.getTimeInMillis());
+                bundle.putLong(DatePickerDialog.CURRENT_DAY, mCalendar.getTimeInMillis());
 
                 DatePickerDialog datePicker = new DatePickerDialog();
                 datePicker.setArguments(bundle);
@@ -252,12 +252,11 @@ public class TransferActivity extends AppCompatActivity {
                 } else {
 
                     Bundle bundle = new Bundle();
-                    bundle.putString("title", getString(R.string.error));
-                    bundle.putString("message", getString(R.string.error_missing_content));
+                    bundle.putString(ErrorAlertDialog.TITLE, getString(R.string.error));
+                    bundle.putString(ErrorAlertDialog.CONTENT, getString(R.string.error_missing_content));
 
                     ErrorAlertDialog errorAlert = new ErrorAlertDialog();
                     errorAlert.setArguments(bundle);
-
                     errorAlert.show(getFragmentManager(), "transfer_activity_error");
                 }
             }
@@ -278,12 +277,10 @@ public class TransferActivity extends AppCompatActivity {
      *
      * @return aktives Konto
      */
-    private Account getActiveAccount() throws AccountNotFoundException {
+    private Account getActiveAccount() {
 
-        SharedPreferences preferences = getSharedPreferences("UserSettings", 0);
-        long activeAccountId = preferences.getLong("activeAccount", 1);
-
-        return AccountRepository.get(activeAccountId);
+        UserSettingsPreferences preferences = new UserSettingsPreferences(this);
+        return preferences.getActiveAccount();
     }
 
     /**

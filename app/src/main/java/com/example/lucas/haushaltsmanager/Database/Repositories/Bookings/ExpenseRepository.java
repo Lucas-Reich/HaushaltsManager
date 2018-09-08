@@ -3,6 +3,7 @@ package com.example.lucas.haushaltsmanager.Database.Repositories.Bookings;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
@@ -26,6 +27,7 @@ import java.util.Calendar;
 import java.util.List;
 
 public class ExpenseRepository {
+    private static final String TAG = ExpenseRepository.class.getSimpleName();
 
     public static boolean exists(ExpenseObject expense) {
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
@@ -229,6 +231,7 @@ public class ExpenseRepository {
                 //todo was soll passieren wenn eine buchugn nicht gefunden werden kann die als template buchung hinterlegt ist?
                 // --> eintrag aus der template tabelle löschen
                 // -->
+                Log.e(TAG, "Could not find Expense " + expense);
             }
         } else {
 
@@ -247,9 +250,12 @@ public class ExpenseRepository {
                 }
             } catch (AccountNotFoundException e) {
 
-                throw CannotDeleteExpenseException.RelatedAccountDoesNotExist(expense);
+                //sollte das Konto aus irgendeinem Grund nicht mehr existieren, muss der Kontostand auch nicht mehr angepasst werden
+//                throw CannotDeleteExpenseException.RelatedAccountDoesNotExist(expense);
+                Log.e(TAG, "Could not find Account with id " + expense.getAccountId());
             } catch (CannotDeleteChildExpenseException e) {
 
+                Log.e(TAG, e.getMessage());
                 throw CannotDeleteExpenseException.CannotDeleteChild(expense);
             }
 

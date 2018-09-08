@@ -121,11 +121,11 @@ public class CreateBackupActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 Bundle bundle = new Bundle();
-                bundle.putString("title", getResources().getString(R.string.choose_new_backup_name));
-                bundle.putString("hint", getDefaultBackupName());
+                bundle.putString(BasicTextInputDialog.TITLE, getResources().getString(R.string.choose_new_backup_name));
+                bundle.putString(BasicTextInputDialog.HINT, getDefaultBackupName());
 
                 BasicTextInputDialog basicDialog = new BasicTextInputDialog();
-                basicDialog.setOnTextInputListener(new BasicTextInputDialog.BasicDialogCommunicator() {
+                basicDialog.setOnTextInputListener(new BasicTextInputDialog.OnTextInput() {
 
                     @Override
                     public void onTextInput(String textInput) {

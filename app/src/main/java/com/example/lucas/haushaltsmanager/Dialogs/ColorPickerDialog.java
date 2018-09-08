@@ -13,12 +13,10 @@ import com.example.lucas.haushaltsmanager.Views.ColorPicker;
 public class ColorPickerDialog extends AlertDialog {
 
     private ColorPicker colorPickerView;
-    private final OnColorSelectedListener onColorSelectedListener;
+    private OnColorSelectedListener mCallback;
 
-    public ColorPickerDialog(Context context, int initialColor, OnColorSelectedListener onColorSelectedListener) {
+    public ColorPickerDialog(Context context, int initialColor) {
         super(context);
-
-        this.onColorSelectedListener = onColorSelectedListener;
 
         RelativeLayout relativeLayout = new RelativeLayout(context);
         LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
@@ -41,15 +39,21 @@ public class ColorPickerDialog extends AlertDialog {
 
             switch (which) {
                 case BUTTON_POSITIVE:
-                    int selectedColor = colorPickerView.getColor();
-                    onColorSelectedListener.onColorSelected(selectedColor);
+
+                    if (mCallback != null)
+                        mCallback.onColorSelected(colorPickerView.getColor());
                     break;
                 case BUTTON_NEGATIVE:
+
                     dialog.dismiss();
                     break;
             }
         }
     };
+
+    public void setOnColorSelectedListener(ColorPickerDialog.OnColorSelectedListener listener) {
+        mCallback = listener;
+    }
 
     public interface OnColorSelectedListener {
         void onColorSelected(int color);

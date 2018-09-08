@@ -16,16 +16,19 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.lucas.haushaltsmanager.BundleUtils;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Views.ViewUtils;
 
 public class BasicTextInputDialog extends DialogFragment {
     private static final String TAG = BasicTextInputDialog.class.getSimpleName();
+    public static final String TITLE = "title";
+    public static final String HINT = "hint";
 
-    BasicDialogCommunicator mCallback;
-    Context mContext;
-    String mDialogHint;
-    EditText mTextInput;
+    private OnTextInput mCallback;
+    private Context mContext;
+    private String mDialogHint;
+    private EditText mTextInput;
 
     @Override
     public void onAttach(Context context) {
@@ -43,14 +46,13 @@ public class BasicTextInputDialog extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        BundleUtils args = new BundleUtils(getArguments());
 
-        Bundle bundle = getArguments();
-        String mDialogTitle = bundle != null && bundle.containsKey("title") ? bundle.getString("title") : "";
-        mDialogHint = bundle != null && bundle.containsKey("hint") ? bundle.getString("hint") : "";
+        mDialogHint = args.getString(HINT, "");
 
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 
-        builder.setTitle(mDialogTitle);
+        builder.setTitle(args.getString(TITLE, ""));
 
         builder.setView(prepareLayout());
 
@@ -141,12 +143,16 @@ public class BasicTextInputDialog extends DialogFragment {
                 Toast.makeText(mContext, mContext.getResources().getString(R.string.error_name_missing), Toast.LENGTH_SHORT).show();
             } else {
 
-                mCallback.onTextInput(mDialogHint);
+                if (mCallback != null)
+                    mCallback.onTextInput(mDialogHint);
+
                 dismiss();
             }
         } else {
 
-            mCallback.onTextInput(mTextInput.getText().toString());
+            if (mCallback != null)
+                mCallback.onTextInput(mTextInput.getText().toString());
+
             dismiss();
         }
     }
@@ -156,11 +162,11 @@ public class BasicTextInputDialog extends DialogFragment {
      *
      * @param listener Listener, welcher aufgerufen werden soll
      */
-    public void setOnTextInputListener(BasicTextInputDialog.BasicDialogCommunicator listener) {
+    public void setOnTextInputListener(OnTextInput listener) {
         mCallback = listener;
     }
 
-    public interface BasicDialogCommunicator {
+    public interface OnTextInput {
         void onTextInput(String textInput);
     }
 }

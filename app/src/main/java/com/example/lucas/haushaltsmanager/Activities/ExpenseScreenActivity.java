@@ -34,15 +34,18 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Excepti
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.ChildExpenseNotFoundException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.Exceptions.CurrencyNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Tags.TagRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Templates.TemplateRepository;
-import com.example.lucas.haushaltsmanager.Dialogs.AccountPickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.DatePickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.FrequencyInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
+import com.example.lucas.haushaltsmanager.Dialogs.SingleChoiceDialog;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
+import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Tag;
 import com.example.lucas.haushaltsmanager.Entities.Template;
@@ -154,6 +157,7 @@ public class ExpenseScreenActivity extends AppCompatActivity {
 
         mExpense = ExpenseObject.createDummyExpense();
         mExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE);
+        setExpenseCurrency();
 
         try {
             SharedPreferences preferences = getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
@@ -230,7 +234,7 @@ public class ExpenseScreenActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 Bundle bundle = new Bundle();
-                bundle.putString("title", getString(R.string.input_price));
+                bundle.putString(PriceInputDialog.TITLE, getString(R.string.input_price));
 
                 PriceInputDialog priceDialog = new PriceInputDialog();
                 priceDialog.setArguments(bundle);
@@ -262,15 +266,15 @@ public class ExpenseScreenActivity extends AppCompatActivity {
 
                 //TODO ist kaputt
 
-                ImageView imgFrequency = (ImageView) findViewById(R.id.img_frequency);
-                mRecurringFrequency = (Button) findViewById(R.id.expense_screen_recurring_frequency);
+                ImageView imgFrequency = findViewById(R.id.img_frequency);
+                mRecurringFrequency = findViewById(R.id.expense_screen_recurring_frequency);
                 mRecurringFrequency.setOnClickListener(new View.OnClickListener() {
 
                     @Override
                     public void onClick(View v) {
 
                         Bundle bundle = new Bundle();
-                        bundle.putString("title", getString(R.string.input_frequency));
+                        bundle.putString(FrequencyInputDialog.TITLE, getString(R.string.input_frequency));
 
                         FrequencyInputDialog frequencyDialog = new FrequencyInputDialog();
                         frequencyDialog.setArguments(bundle);
@@ -285,18 +289,18 @@ public class ExpenseScreenActivity extends AppCompatActivity {
                     }
                 });
 
-                ImageView imgEnd = (ImageView) findViewById(R.id.img_end);
-                mRecurringEndBtn = (Button) findViewById(R.id.expense_screen_recurring_end);
+                ImageView imgEnd = findViewById(R.id.img_end);
+                mRecurringEndBtn = findViewById(R.id.expense_screen_recurring_end);
                 mRecurringEndBtn.setOnClickListener(new View.OnClickListener() {
 
                     @Override
                     public void onClick(View v) {
 
-                        Bundle dateBundle = new Bundle();
-                        dateBundle.putString("title", "");
+                        Bundle bundle = new Bundle();
+                        bundle.putString(DatePickerDialog.TITLE, "");
 
                         DatePickerDialog datePicker = new DatePickerDialog();
-                        datePicker.setArguments(dateBundle);
+                        datePicker.setArguments(bundle);
                         datePicker.setOnDateSelectedListener(new DatePickerDialog.OnDateSelected() {
                             @Override
                             public void onDateSelected(Calendar date) {
@@ -414,7 +418,7 @@ public class ExpenseScreenActivity extends AppCompatActivity {
                     break;
                 case CREATE_EXPENSE_MODE:
 
-                    ExpenseRepository.insert(mExpense);
+                    mExpense = ExpenseRepository.insert(mExpense);
                     Toast.makeText(ExpenseScreenActivity.this, "Created Booking \"" + mExpense.getTitle() + "\"", Toast.LENGTH_SHORT).show();
                     break;
                 default:
@@ -460,6 +464,11 @@ public class ExpenseScreenActivity extends AppCompatActivity {
 
         return true;
     }
+
+
+    //ab hier wird die view mit den Tags manipuliert
+    //todo tag view in eigene view kapseln
+
 
     /**
      * Methode um die MultiAutocompleteTextView mit der die Tags angezeigt werden zu initialisieren.
@@ -628,6 +637,10 @@ public class ExpenseScreenActivity extends AppCompatActivity {
         appendTokenizer();
     }
 
+
+    //Sektion ende
+
+
     /**
      * Methode die aufgerufen wird, wenn der user auf ein TextInput feld klickt.
      * Je nachdem welches Feld angeklickt wird muss ein anderer AlertDialog aufgerufen werden.
@@ -637,7 +650,7 @@ public class ExpenseScreenActivity extends AppCompatActivity {
     public void expensePopUp(View view) {
 
         Bundle bundle = new Bundle();
-        Button btn = (Button) findViewById(view.getId());
+        Button btn = findViewById(view.getId());
         BasicTextInputDialog basicDialog = new BasicTextInputDialog();
 
         switch (btn.getId()) {
@@ -650,10 +663,10 @@ public class ExpenseScreenActivity extends AppCompatActivity {
 
             case R.id.expense_screen_title:
 
-                bundle.putString("title", getResources().getString(R.string.input_title));
+                bundle.putString(BasicTextInputDialog.TITLE, getResources().getString(R.string.input_title));
 
                 basicDialog.setArguments(bundle);
-                basicDialog.setOnTextInputListener(new BasicTextInputDialog.BasicDialogCommunicator() {
+                basicDialog.setOnTextInputListener(new BasicTextInputDialog.OnTextInput() {
 
                     @Override
                     public void onTextInput(String textInput) {
@@ -666,10 +679,7 @@ public class ExpenseScreenActivity extends AppCompatActivity {
 
             case R.id.expense_screen_date:
 
-                bundle.putString("title", "");
-
                 DatePickerDialog datePicker = new DatePickerDialog();
-                datePicker.setArguments(bundle);
                 datePicker.setOnDateSelectedListener(new DatePickerDialog.OnDateSelected() {
                     @Override
                     public void onDateSelected(Calendar date) {
@@ -682,10 +692,10 @@ public class ExpenseScreenActivity extends AppCompatActivity {
 
             case R.id.expense_screen_notice:
 
-                bundle.putString("title", getResources().getString(R.string.input_notice));
+                bundle.putString(BasicTextInputDialog.TITLE, getResources().getString(R.string.input_notice));
 
                 basicDialog.setArguments(bundle);
-                basicDialog.setOnTextInputListener(new BasicTextInputDialog.BasicDialogCommunicator() {
+                basicDialog.setOnTextInputListener(new BasicTextInputDialog.OnTextInput() {
 
                     @Override
                     public void onTextInput(String textInput) {
@@ -698,16 +708,21 @@ public class ExpenseScreenActivity extends AppCompatActivity {
 
             case R.id.expense_screen_account:
 
-                bundle.putString("title", getResources().getString(R.string.input_account));
-                bundle.putLong("active_account", mExpense.getAccountId());
-
-                AccountPickerDialog accountPicker = new AccountPickerDialog();
-                accountPicker.setArguments(bundle);
-                accountPicker.setOnAccountSelectedListener(new AccountPickerDialog.OnAccountSelected() {
+                SingleChoiceDialog<Account> accountPicker = new SingleChoiceDialog<>();
+                accountPicker.createBuilder(ExpenseScreenActivity.this);
+                accountPicker.setTitle(getString(R.string.input_account));
+                accountPicker.setContent(AccountRepository.getAll(), (int) mExpense.getAccountId());
+                accountPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
                     @Override
-                    public void onAccountSelected(Account account) {
+                    public void onPositiveClick(Object account) {
 
-                        setAccount(account);
+                        setAccount((Account) account);
+                    }
+
+                    @Override
+                    public void onNeutralClick() {
+
+                        //do nothing
                     }
                 });
                 accountPicker.show(getFragmentManager(), "expense_screen_account");
@@ -872,8 +887,17 @@ public class ExpenseScreenActivity extends AppCompatActivity {
      * Methode, welche die angezeigte Währung und die Währung der zu speichernden Ausgabe anpasst.
      */
     private void setExpenseCurrency() {
+        try {
+            SharedPreferences preferences = this.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
+            Currency currency = CurrencyRepository.get(preferences.getLong("mainCurrencyIndex", 1L));
 
-        SharedPreferences preferences = this.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
-        mCurrencySymbolTxt.setText(preferences.getString("mainCurrencySymbol", "€"));
+            mCurrencySymbolTxt.setText(currency.getSymbol());
+            mExpense.setCurrency(currency);
+        } catch (CurrencyNotFoundException e) {
+
+            Toast.makeText(this, "Währung wurde nicht gefunden", Toast.LENGTH_SHORT).show();
+            //todo übersetzung
+            //todo fehlerbehandlung
+        }
     }
 }

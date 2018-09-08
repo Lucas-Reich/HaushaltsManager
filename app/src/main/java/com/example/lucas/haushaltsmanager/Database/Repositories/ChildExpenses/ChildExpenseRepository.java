@@ -101,7 +101,7 @@ public class ChildExpenseRepository {
      * @param expenses Liste der Buchungen die zusammengefügt werden sollen
      * @return Parent der zusammengefügten Buchungen, mit den hinzugefügten Kindbuchungen
      */
-    public static ExpenseObject combineExpenses(ArrayList<ExpenseObject> expenses) {
+    public static ExpenseObject combineExpenses(List<ExpenseObject> expenses) {
         ExpenseObject dummyParentExpense = ExpenseObject.createDummyExpense();
 
         for (ExpenseObject expense : expenses) {

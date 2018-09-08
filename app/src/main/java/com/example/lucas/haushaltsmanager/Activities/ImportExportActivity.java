@@ -120,8 +120,8 @@ public class ImportExportActivity extends AppCompatActivity {
                 mSelectedFile = mSelectableFileList.get(position);
 
                 Bundle bundle = new Bundle();
-                bundle.putString("title", getString(R.string.confirmation_dialog_title));
-                bundle.putString("message", getString(R.string.import_bookings_confirmation));
+                bundle.putString(ConfirmationDialog.TITLE, getString(R.string.confirmation_dialog_title));
+                bundle.putString(ConfirmationDialog.CONTENT, getString(R.string.import_bookings_confirmation));
 
                 ConfirmationDialog confirmationDialog = new ConfirmationDialog();
                 confirmationDialog.setArguments(bundle);
@@ -147,8 +147,8 @@ public class ImportExportActivity extends AppCompatActivity {
                 if (mSelectedDirectory == null) {
 
                     Bundle bundle = new Bundle();
-                    bundle.putString("title", getString(R.string.error));
-                    bundle.putString("message", getString(R.string.error_no_directory_selected));
+                    bundle.putString(ErrorAlertDialog.TITLE, getString(R.string.error));
+                    bundle.putString(ErrorAlertDialog.CONTENT, getString(R.string.error_no_directory_selected));
 
                     ErrorAlertDialog errorDialog = new ErrorAlertDialog();
                     errorDialog.setArguments(bundle);
@@ -157,8 +157,8 @@ public class ImportExportActivity extends AppCompatActivity {
                 }
 
                 Bundle bundle = new Bundle();
-                bundle.putString("title", getString(R.string.create_export));
-                bundle.putString("message", getString(R.string.export_directory_confirmation));
+                bundle.putString(ConfirmationDialog.TITLE, getString(R.string.create_export));
+                bundle.putString(ConfirmationDialog.CONTENT, getString(R.string.export_directory_confirmation));
 
                 ConfirmationDialog confirmationDialog = new ConfirmationDialog();
                 confirmationDialog.setArguments(bundle);

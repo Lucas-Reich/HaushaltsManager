@@ -15,14 +15,14 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.Categ
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.Exceptions.CategoryNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepository;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
-import com.example.lucas.haushaltsmanager.Dialogs.ChooseCategoryDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ColorPickerDialog;
+import com.example.lucas.haushaltsmanager.Dialogs.SingleChoiceDialog;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.util.ArrayList;
 
-public class CreateCategoryActivity extends AppCompatActivity implements BasicTextInputDialog.BasicDialogCommunicator {
+public class CreateCategoryActivity extends AppCompatActivity {
     private static final String TAG = CreateCategoryActivity.class.getSimpleName();
 
     private Category mCategory;
@@ -43,16 +43,16 @@ public class CreateCategoryActivity extends AppCompatActivity implements BasicTe
         super.onCreate(savedInstances);
         setContentView(R.layout.activity_new_category);
 
-        mCatNameBtn = (Button) findViewById(R.id.new_category_name);
-        mCatColorBtn = (Button) findViewById(R.id.new_category_color);
-        mSelectParentBtn = (Button) findViewById(R.id.new_category_select_parent);
-        mCreateBtn = (Button) findViewById(R.id.new_category_create);
-        mBackArrow = (ImageButton) findViewById(R.id.back_arrow);
+        mCatNameBtn = findViewById(R.id.new_category_name);
+        mCatColorBtn = findViewById(R.id.new_category_color);
+        mSelectParentBtn = findViewById(R.id.new_category_select_parent);
+        mCreateBtn = findViewById(R.id.new_category_create);
+        mBackArrow = findViewById(R.id.back_arrow);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mDefaultExpenseRadioGrp = (RadioGroup) findViewById(R.id.new_category_expense_type);
+        mDefaultExpenseRadioGrp = findViewById(R.id.new_category_expense_type);
 
         resolveIntent(getIntent().getExtras());
     }
@@ -105,7 +105,7 @@ public class CreateCategoryActivity extends AppCompatActivity implements BasicTe
                 args.putString("title", getResources().getString(R.string.category_name));
 
                 BasicTextInputDialog basicDialog = new BasicTextInputDialog();
-                basicDialog.setOnTextInputListener(new BasicTextInputDialog.BasicDialogCommunicator() {
+                basicDialog.setOnTextInputListener(new BasicTextInputDialog.OnTextInput() {
 
                     @Override
                     public void onTextInput(String textInput) {
@@ -126,7 +126,8 @@ public class CreateCategoryActivity extends AppCompatActivity implements BasicTe
             @Override
             public void onClick(View v) {
 
-                ColorPickerDialog dialog = new ColorPickerDialog(CreateCategoryActivity.this, Color.WHITE, new ColorPickerDialog.OnColorSelectedListener() {
+                ColorPickerDialog colorPickerDialog = new ColorPickerDialog(CreateCategoryActivity.this, Color.WHITE);
+                colorPickerDialog.setOnColorSelectedListener(new ColorPickerDialog.OnColorSelectedListener() {
 
                     @Override
                     public void onColorSelected(int color) {
@@ -135,7 +136,7 @@ public class CreateCategoryActivity extends AppCompatActivity implements BasicTe
                         Log.d(TAG, "set category color to: " + Integer.toHexString(color));
                     }
                 });
-                dialog.show();
+                colorPickerDialog.show();
             }
         });
 
@@ -144,35 +145,41 @@ public class CreateCategoryActivity extends AppCompatActivity implements BasicTe
             @Override
             public void onClick(View v) {
 
-                Bundle bundle = new Bundle();
-                bundle.putString("title", getString(R.string.choose_parent_category));
+                SingleChoiceDialog<Category> categoryPicker = new SingleChoiceDialog<>();
+                categoryPicker.createBuilder(CreateCategoryActivity.this);
+                categoryPicker.setTitle(getString(R.string.choose_parent_category));
+                categoryPicker.setContent(CategoryRepository.getAll(), -1);
+                categoryPicker.setNeutralButton(getString(R.string.create_new));
+                categoryPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
+                    @Override
+                    public void onPositiveClick(Object entry) {
 
-                ChooseCategoryDialog chooseCategory = new ChooseCategoryDialog();
-                chooseCategory.setOnCategoryChosenListener(new ChooseCategoryDialog.OnCategoryChosenListener() {
+                        mParentCategory = (Category) entry;
+                        mSelectParentBtn.setText(mParentCategory.getTitle());
+
+                    }
 
                     @Override
-                    public void onCategoryChosen(Category category) {
+                    public void onNeutralClick() {
 
-                        if (category == null) {
+                        Bundle bundle1 = new Bundle();
+                        bundle1.putString(BasicTextInputDialog.TITLE, getString(R.string.new_parent_category_name));
 
-                            Bundle bundle1 = new Bundle();
-                            bundle1.putString("title", getString(R.string.new_parent_category_name));
+                        BasicTextInputDialog textInputDialog = new BasicTextInputDialog();
+                        textInputDialog.setArguments(bundle1);
+                        textInputDialog.setOnTextInputListener(new BasicTextInputDialog.OnTextInput() {
 
-                            BasicTextInputDialog textInputDialog = new BasicTextInputDialog();
-                            textInputDialog.setOnTextInputListener(CreateCategoryActivity.this);
-                            textInputDialog.setArguments(bundle1);
-                            textInputDialog.show(getFragmentManager(), "categoryParentName");
+                            @Override
+                            public void onTextInput(String textInput) {
 
-                        } else {
-
-                            mParentCategory = category;
-                            mSelectParentBtn.setText(mParentCategory.getTitle());
-                        }
+                                mParentCategory = CategoryRepository.insert(new Category(textInput, "#000000", false, new ArrayList<Category>()));
+                                mSelectParentBtn.setText(mParentCategory.getTitle());
+                            }
+                        });
+                        textInputDialog.show(getFragmentManager(), "categoryParentName");
                     }
                 });
-
-                chooseCategory.setArguments(bundle);
-                chooseCategory.show(getFragmentManager(), "categoryParent");
+                categoryPicker.show(getFragmentManager(), "create_category_parent");
             }
         });
 
@@ -228,12 +235,5 @@ public class CreateCategoryActivity extends AppCompatActivity implements BasicTe
                 }
             }
         });
-    }
-
-    @Override
-    public void onTextInput(String textInput) {
-
-        mParentCategory = CategoryRepository.insert(new Category(textInput, "#000000", false, new ArrayList<Category>()));
-        mSelectParentBtn.setText(mParentCategory.getTitle());
     }
 }

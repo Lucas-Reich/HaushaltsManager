@@ -150,4 +150,19 @@
     <string name="cannot_update_account">Konto konnte nicht geupdated werden! Konto wurde nicht gefunden.</string>
     <string name="category_not_found">Kategorie konnte nicht geupdated werden! Kategorie wurde nicht gefunden.</string>
     <string name="add_child_to_child_error">Fehler! Du kannst keine untergeordnete Buchung zu einer untergeordneten Buchung hinzufügen.</string>
+    <string name="btn_choose">Auswählen</string>
+    <string name="select_currency">Wähle eine Währung aus</string>
+    <string name="choose_weekday">Wähle einen Wochentag aus</string>
+    <string name="choose_backup_amount">Wähle die Anzahl der gleichzeitig existierenden Backups aus</string>
+    <string name="choose_time">Wähle eine Zeit aus</string>
+    <string name="attention">Achtung!</string>
+    <string name="reset_settings_alert_message">Du bist gerade dabei alle Änderungen auf den Default wert zurückzusetzen! Bist du sicher, dass du fortfahren möchtest?</string>
+    <string name="create_new">Erstelle neu</string>
+    <string name="first_day_of_week">Erster Tag der Woche</string>
+    <string name="automatic_backups">Automatische Backups erstellen?</string>
+    <string name="concurrent_backup_count">Maximale Anzahl an gleichzeitig existierenden Backups</string>
+    <string name="main_currency">Wähle deine Hauptwährung aus</string>
+    <string name="reminder_status">Erinnere mich die Buchungen einzutragen</string>
+    <string name="reminder_time">Erinnere mich um</string>
+    <string name="btn_reset">Standarteinstellungen Wiederherstellem</string>
 </resources>

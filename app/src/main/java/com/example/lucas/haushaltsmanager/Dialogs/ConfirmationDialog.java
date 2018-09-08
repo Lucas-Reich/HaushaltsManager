@@ -7,10 +7,13 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
+import com.example.lucas.haushaltsmanager.BundleUtils;
 import com.example.lucas.haushaltsmanager.R;
 
 public class ConfirmationDialog extends DialogFragment {
     private static final String TAG = ConfirmationDialog.class.getSimpleName();
+    public static final String TITLE = "title";
+    public static final String CONTENT = "content";
 
     private Context mContext;
     private OnConfirmationResult mCallback;
@@ -24,20 +27,20 @@ public class ConfirmationDialog extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        final Bundle args = getArguments();
-        String message = args.getString("message");
+        BundleUtils args = new BundleUtils(getArguments());
 
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 
-        builder.setTitle(args.getString("title"));
+        builder.setTitle(args.getString(TITLE, ""));
 
-        builder.setMessage(message);
+        builder.setMessage(args.getString(CONTENT, ""));
 
         builder.setPositiveButton(R.string.btn_yes, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                mCallback.onConfirmationResult(true);
+                if (mCallback != null)
+                    mCallback.onConfirmationResult(true);
             }
         });
 
@@ -45,7 +48,8 @@ public class ConfirmationDialog extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                mCallback.onConfirmationResult(false);
+                if (mCallback != null)
+                    mCallback.onConfirmationResult(false);
             }
         });
 

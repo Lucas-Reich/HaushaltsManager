@@ -1,7 +1,6 @@
 package com.example.lucas.haushaltsmanager.Services;
 
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Environment;
 import android.os.IBinder;
@@ -11,6 +10,7 @@ import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.R;
+import com.example.lucas.haushaltsmanager.UserSettingsPreferences;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,6 +28,7 @@ public class BackupCreatorService extends Service {
     private static final String TAG = BackupCreatorService.class.getSimpleName();
 
     // todo Wenn die App nicht mehr Haushaltsmanager heißen sollte dann muss hier der Name des externen Verzeichnisses angepasst werden.
+    //todo was soll passieren wenn es das datenbank file gar nicht gibt?
     public static final String APP_EXTERNAL_STORAGE_DIR = "/Haushaltsmanager";
     public static final String BACKUP_DIR = "/Backups";
 
@@ -137,10 +138,10 @@ public class BackupCreatorService extends Service {
      * Methode um die ältesten Backups zu löschen, wenn die Anzahl der Backups die Mmaximal zulässige Anzahl (vom User eingestellt) überschreitet.
      */
     private void deleteBackup() {
-        int maxBackupCount = getSharedPreferences("UserSettings", Context.MODE_PRIVATE).getInt("maxBackupCount", 20);
+        UserSettingsPreferences userSettings = new UserSettingsPreferences(getApplication());
 
         List<File> backups = getBackupsInDirectory(getBackupDirectory());
-        for (int i = maxBackupCount; i < backups.size(); i++) {
+        for (int i = userSettings.getMaxBackupCount(); i < backups.size(); i++) {
             backups.get(i).delete();
         }
     }

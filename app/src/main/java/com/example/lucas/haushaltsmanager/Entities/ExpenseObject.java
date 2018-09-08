@@ -79,7 +79,7 @@ public class ExpenseObject implements Parcelable {
     /**
      * Children of expense
      */
-    private List<ExpenseObject> children = new ArrayList<>();
+    private List<ExpenseObject> mChildren = new ArrayList<>();
 
     /**
      * Die Währung der Buchung
@@ -131,7 +131,7 @@ public class ExpenseObject implements Parcelable {
         source.readList(this.tags, Tag.class.getClassLoader());
         setNotice(source.readString());
         setAccountId(source.readLong());
-        source.readList(this.children, ExpenseObject.class.getClassLoader());
+        source.readList(this.mChildren, ExpenseObject.class.getClassLoader());
         setExpenseType(EXPENSE_TYPES.valueOf(source.readString()));
         setCurrency((Currency) source.readParcelable(Currency.class.getClassLoader()));
     }
@@ -143,7 +143,20 @@ public class ExpenseObject implements Parcelable {
      */
     public static ExpenseObject createDummyExpense() {
 
-        return new ExpenseObject(-1, app.getContext().getString(R.string.no_name), 0, Calendar.getInstance(), false, Category.createDummyCategory(), null, -1, EXPENSE_TYPES.DUMMY_EXPENSE, new ArrayList<Tag>(), new ArrayList<ExpenseObject>(), Currency.createDummyCurrency());
+        return new ExpenseObject(
+                -1,
+                app.getContext().getString(R.string.no_name),
+                0,
+                Calendar.getInstance(),
+                false,
+                Category.createDummyCategory(),
+                null,
+                -1,
+                EXPENSE_TYPES.DUMMY_EXPENSE,
+                new ArrayList<Tag>(),
+                new ArrayList<ExpenseObject>(),
+                Currency.createDummyCurrency()
+        );
     }
 
     @NonNull
@@ -197,7 +210,7 @@ public class ExpenseObject implements Parcelable {
 
             double calcPrice = 0;
 
-            for (ExpenseObject child : this.children) {
+            for (ExpenseObject child : this.mChildren) {
 
                 calcPrice += child.getSignedPrice();
             }
@@ -312,15 +325,19 @@ public class ExpenseObject implements Parcelable {
 
     public void removeChild(ExpenseObject child) {
 
-        this.children.remove(child);
-        if (children.size() == 0)
+        this.mChildren.remove(child);
+        if (mChildren.size() == 0)
             setExpenseType(EXPENSE_TYPES.NORMAL_EXPENSE);
+    }
+
+    public void removeChildren() {
+        mChildren.clear();
     }
 
     public ExpenseObject addChild(@NonNull ExpenseObject child) {
 
         child.setExpenseType(EXPENSE_TYPES.CHILD_EXPENSE);
-        children.add(child);
+        mChildren.add(child);
         setExpenseType(EXPENSE_TYPES.PARENT_EXPENSE);
 
         return this;
@@ -339,7 +356,7 @@ public class ExpenseObject implements Parcelable {
     @NonNull
     public List<ExpenseObject> getChildren() {
 
-        return this.children;
+        return this.mChildren;
     }
 
     public boolean isParent() {
@@ -390,9 +407,10 @@ public class ExpenseObject implements Parcelable {
             result = result && (getUnsignedPrice() == otherExpense.getUnsignedPrice());
             result = result && getAccountId() == otherExpense.getAccountId();
             result = result && getExpenseType().equals(otherExpense.getExpenseType());
-            result = result && getDate().equals(otherExpense.getDate());
+            result = result && getDateTime().getTimeInMillis() == otherExpense.getDateTime().getTimeInMillis();
             result = result && getNotice().equals(otherExpense.getNotice());
-            result = result && getCategory().equals(otherExpense.getCategory());
+            result = result && getCategory().getIndex() == otherExpense.getCategory().getIndex();//ich kann die objekte nicht vergleichen da parent buchungen nur dummies bekommen
+            result = result && getCurrency().getIndex() == otherExpense.getCurrency().getIndex();//ich kann die objekte nicht vergleichen da parent buchungen nur dummies bekommen
 
             for (Tag tag : getTags()) {
                 for (Tag otherTag : otherExpense.getTags()) {
@@ -468,7 +486,7 @@ public class ExpenseObject implements Parcelable {
         dest.writeList(tags);
         dest.writeString(notice);
         dest.writeLong(mAccountId);
-        dest.writeList(children);
+        dest.writeList(mChildren);
         dest.writeString(expenseType.name());
         dest.writeParcelable(mCurrency, flags);
     }
