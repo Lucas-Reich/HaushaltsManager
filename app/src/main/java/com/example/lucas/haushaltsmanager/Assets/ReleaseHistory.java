@@ -125,7 +125,7 @@ public class ReleaseHistory implements com.lucas.changelogdialog.ReleaseHistory 
         items.add(new Feature("Über Uns Activity hinzugefügt"));
 
         return new Release(
-                4,
+                5,
                 null,
                 null,
                 Calendar.getInstance(),
