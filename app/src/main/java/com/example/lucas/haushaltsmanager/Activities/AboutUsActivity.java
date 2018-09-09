@@ -15,6 +15,7 @@ import com.example.lucas.haushaltsmanager.Assets.ReleaseHistory;
 import com.example.lucas.haushaltsmanager.BuildConfig;
 import com.example.lucas.haushaltsmanager.Dialogs.LicensesWrapperDialog;
 import com.example.lucas.haushaltsmanager.R;
+import com.lucas.changelogdialog.ChangelogDialog;
 
 public class AboutUsActivity extends AppCompatActivity {
     private static final String SUPPORT_MAIL = "support@Haushaltsmanager.de";
@@ -71,7 +72,7 @@ public class AboutUsActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                com.lucas.changelogdialog.ChangelogDialog changelogDialog = new com.lucas.changelogdialog.ChangelogDialog();
+                ChangelogDialog changelogDialog = new com.lucas.changelogdialog.ChangelogDialog();
                 changelogDialog.createBuilder(AboutUsActivity.this);
                 changelogDialog.setTitle(getString(R.string.changelog_title));
                 changelogDialog.setReleaseHistory2(new ReleaseHistory());
