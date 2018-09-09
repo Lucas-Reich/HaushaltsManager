@@ -23,8 +23,8 @@ public class AboutUsActivity extends AppCompatActivity {
     private static final String SUPPORT_MAIL = "support@Haushaltsmanager.de";
     private static final String FEATURE_MAIL = "feature@Haushaltsmanager.de";
 
-    private LinearLayout supportLayout, improveLayout, featureLayout, versionLayout, rateLayout, licenseLayout;
-    private TextView appVersionTxt;
+    private LinearLayout mSupportLayout, mImproveLayout, mFeatureLayout, mVersionLayout, mRateLayout, mLicenseLayout;
+    private TextView mAppVersionTxt;
     private ImageButton mBackArrow;
 
     @Override
@@ -32,14 +32,14 @@ public class AboutUsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about_us);
 
-        supportLayout = findViewById(R.id.about_us_contact_support_wrapper);
-        improveLayout = findViewById(R.id.about_us_contact_improve_wrapper);
-        featureLayout = findViewById(R.id.about_us_contact_feature_wrapper);
-        versionLayout = findViewById(R.id.about_us_version_wrapper);
-        rateLayout = findViewById(R.id.about_us_rating_wrapper);
-        licenseLayout = findViewById(R.id.about_us_licenses_wrapper);
+        mSupportLayout = findViewById(R.id.about_us_contact_support_wrapper);
+        mImproveLayout = findViewById(R.id.about_us_contact_improve_wrapper);
+        mFeatureLayout = findViewById(R.id.about_us_contact_feature_wrapper);
+        mVersionLayout = findViewById(R.id.about_us_version_wrapper);
+        mRateLayout = findViewById(R.id.about_us_rating_wrapper);
+        mLicenseLayout = findViewById(R.id.about_us_licenses_wrapper);
 
-        appVersionTxt = findViewById(R.id.about_us_version_number_txt);
+        mAppVersionTxt = findViewById(R.id.about_us_version_number_txt);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -59,7 +59,7 @@ public class AboutUsActivity extends AppCompatActivity {
             }
         });
 
-        supportLayout.setOnClickListener(new View.OnClickListener() {
+        mSupportLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -67,7 +67,7 @@ public class AboutUsActivity extends AppCompatActivity {
             }
         });
 
-        improveLayout.setOnClickListener(new View.OnClickListener() {
+        mImproveLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -75,7 +75,7 @@ public class AboutUsActivity extends AppCompatActivity {
             }
         });
 
-        featureLayout.setOnClickListener(new View.OnClickListener() {
+        mFeatureLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -83,8 +83,8 @@ public class AboutUsActivity extends AppCompatActivity {
             }
         });
 
-        appVersionTxt.setText(getAppVersion());
-        versionLayout.setOnClickListener(new View.OnClickListener() {
+        mAppVersionTxt.setText(getAppVersion());
+        mVersionLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -96,7 +96,7 @@ public class AboutUsActivity extends AppCompatActivity {
             }
         });
 
-        rateLayout.setOnClickListener(new View.OnClickListener() {
+        mRateLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -104,7 +104,7 @@ public class AboutUsActivity extends AppCompatActivity {
             }
         });
 
-        licenseLayout.setOnClickListener(new View.OnClickListener() {
+        mLicenseLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
