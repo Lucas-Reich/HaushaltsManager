@@ -1,6 +1,8 @@
-package com.example.lucas.haushaltsmanager;
+package com.example.lucas.haushaltsmanager.Assets;
 
 import android.content.Context;
+
+import com.example.lucas.haushaltsmanager.R;
 
 import de.psdev.licensesdialog.licenses.License;
 

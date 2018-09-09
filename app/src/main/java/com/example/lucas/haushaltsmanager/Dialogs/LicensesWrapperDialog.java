@@ -2,10 +2,11 @@ package com.example.lucas.haushaltsmanager.Dialogs;
 
 import android.content.Context;
 
-import com.example.lucas.haushaltsmanager.MozillaPublicLicenseV2;
+import com.example.lucas.haushaltsmanager.Assets.MozillaPublicLicenseV2;
 
 import de.psdev.licensesdialog.LicensesDialog;
 import de.psdev.licensesdialog.licenses.ApacheSoftwareLicense20;
+import de.psdev.licensesdialog.licenses.MITLicense;
 import de.psdev.licensesdialog.model.Notice;
 import de.psdev.licensesdialog.model.Notices;
 
@@ -30,6 +31,7 @@ public class LicensesWrapperDialog {
         notices.addNotice(getLicensesDialogNotice());
         notices.addNotice(getStorageChooserNotice());
         notices.addNotice(getAndroidColorPickerNotice());
+        notices.addNotice(getAndroidChangelogDialogNotice());
 
         return notices;
     }
@@ -76,6 +78,21 @@ public class LicensesWrapperDialog {
                 "https://github.com/chiralcode/Android-Color-Picker",
                 "Copyright 2013 Piotr Adamus",
                 new ApacheSoftwareLicense20()
+        );
+    }
+
+    /**
+     * Methode um den Lizenzeintrag für das OpenSource Projekt Android-ChangelogDialog zu bekommen.
+     * Quelle: https://github.com/LabberToasT/Android-ChangelogDialog
+     *
+     * @return Android-ChangelogDialog Notiz Eintrag
+     */
+    private Notice getAndroidChangelogDialogNotice() {
+        return new Notice(
+                "Android-ChangelogDialog",
+                "https://github.com/LabberToasT/Android-ChangelogDialog",
+                "Copyright 2018 Lucas Reich",
+                new MITLicense()
         );
     }
 }
