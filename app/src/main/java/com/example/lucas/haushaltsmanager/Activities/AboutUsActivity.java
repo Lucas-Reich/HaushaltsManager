@@ -6,7 +6,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,6 +25,7 @@ public class AboutUsActivity extends AppCompatActivity {
 
     private LinearLayout supportLayout, improveLayout, featureLayout, versionLayout, rateLayout, licenseLayout;
     private TextView appVersionTxt;
+    private ImageButton mBackArrow;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -37,11 +40,24 @@ public class AboutUsActivity extends AppCompatActivity {
         licenseLayout = findViewById(R.id.about_us_licenses_wrapper);
 
         appVersionTxt = findViewById(R.id.about_us_version_number_txt);
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        mBackArrow = findViewById(R.id.back_arrow);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        mBackArrow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                finish();
+            }
+        });
 
         supportLayout.setOnClickListener(new View.OnClickListener() {
             @Override
