@@ -129,7 +129,7 @@ public class ReleaseHistory implements com.lucas.changelogdialog.ReleaseHistory 
                 null,
                 null,
                 Calendar.getInstance(),
-                "Tolle neuigkeiten. Du kannst dir nun Information über uns und die App angucken. Besuche dafür einfach die \"Über Uns\" Seite in den Einstellungen.",
+                "Tolle Neuigkeiten. Du kannst dir nun Information über uns und die App angucken. Besuche dafür einfach die \"Über Uns\" Seite in den Einstellungen.",
                 items
         );
     }
