@@ -1,15 +1,12 @@
 package com.example.lucas.haushaltsmanager.Assets;
 
-import com.lucas.changelogdialog.Bug;
 import com.lucas.changelogdialog.ChangelogItem;
 import com.lucas.changelogdialog.Feature;
-import com.lucas.changelogdialog.Improvement;
 import com.lucas.changelogdialog.Release;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-
 
 // Ich kann die History auch in einem XML file speichert
 // Quelle: https://android-arsenal.com/details/1/81
@@ -39,8 +36,9 @@ public class ReleaseHistory implements com.lucas.changelogdialog.ReleaseHistory 
         List<Release> releases = new ArrayList<>();
         releases.add(getRelease100());
         releases.add(getRelease200());
-        releases.add(getRelease201());
-        releases.add(getRelease202());
+        releases.add(getRelease300());
+        releases.add(getRelease400());
+        releases.add(getRelease500());
 
         return releases;
     }
@@ -51,58 +49,88 @@ public class ReleaseHistory implements com.lucas.changelogdialog.ReleaseHistory 
      * @return Version 1.0.0
      */
     private Release getRelease100() {
-        List<ChangelogItem> items = new ArrayList<>();
-        items.add(new Feature("Gibt nun eine Changelog"));
+        //zu diesem Release gibt es keine Information, da dieser geschah, bevor ich den ChangelogDialog implementiert habe
 
         return new Release(
                 1,
                 null,
                 null,
                 Calendar.getInstance(),
-                "Hier stehen Information die als Eigenständiger Text vor den ganzen Änderungen angezeigt werden sollen, diese Information werden auch in einer Seperaten Box angezeigt",
-                items
-        );
-    }
-
-    private Release getRelease200() {
-        List<ChangelogItem> items = new ArrayList<>();
-        items.add(new Bug("Zwischen identifier und desc war kein leerezeichen"));
-        items.add(new Feature("Man kann nun seinen Penis verlängern"));
-        items.add(new Improvement("Lange Penisse sind toll"));
-
-        return new Release(
-                2,
-                null,
-                null,
-                Calendar.getInstance(),
                 "",
-                items
-        );
-    }
-
-    private Release getRelease201() {
-        List<ChangelogItem> items = new ArrayList<>();
-        items.add(new Bug("Wenn es keine Beschreibung für einen Release gibt wird nun der graue Bereich nicht mehr angezeigt."));
-
-        return new Release(
-                2,
-                null,
-                1,
-                Calendar.getInstance(),
-                "",
-                items
-        );
-    }
-
-    private Release getRelease202() {
-
-        return new Release(
-                2,
-                null,
-                2,
-                Calendar.getInstance(),
-                "Für diesen Release gibt es keinen Changelog",
                 new ArrayList<ChangelogItem>()
+        );
+    }
+
+    /**
+     * Methode welche die Änderungen der Version 2.0.0 zurückgibt.
+     *
+     * @return Version 2.0.0
+     */
+    private Release getRelease200() {
+        //zu diesem Release gibt es keine Information, da dieser geschah, bevor ich den ChangelogDialog implementiert habe
+
+        return new Release(
+                2,
+                null,
+                null,
+                Calendar.getInstance(),
+                "",
+                new ArrayList<ChangelogItem>()
+        );
+    }
+
+    /**
+     * Methode welche die Änderungen der Version 3.0.0 zurückgibt.
+     *
+     * @return Version 3.0.0
+     */
+    private Release getRelease300() {
+        //zu diesem Release gibt es keine Information, da dieser geschah, bevor ich den ChangelogDialog implementiert habe
+
+        return new Release(
+                3,
+                null,
+                null,
+                Calendar.getInstance(),
+                "",
+                new ArrayList<ChangelogItem>()
+        );
+    }
+
+    /**
+     * Methode welche die Änderungen der Version 4.0.0 zurückgibt.
+     *
+     * @return Version 4.0.0
+     */
+    private Release getRelease400() {
+        //zu diesem Release gibt es keine Information, da dieser geschah, bevor ich den ChangelogDialog implementiert habe
+
+        return new Release(
+                4,
+                null,
+                null,
+                Calendar.getInstance(),
+                "",
+                new ArrayList<ChangelogItem>()
+        );
+    }
+
+    /**
+     * Methode welche die Änderungen der Version 5.0.0 zurückgibt.
+     *
+     * @return Version 5.0.0
+     */
+    private Release getRelease500() {
+        List<ChangelogItem> items = new ArrayList<>();
+        items.add(new Feature("Über Uns Activity hinzugefügt"));
+
+        return new Release(
+                4,
+                null,
+                null,
+                Calendar.getInstance(),
+                "Tolle neuigkeiten. Du kannst dir nun Information über uns und die App angucken. Besuche dafür einfach die \"Über Uns\" Seite in den Einstellungen.",
+                items
         );
     }
 }

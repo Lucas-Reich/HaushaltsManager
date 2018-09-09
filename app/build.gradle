@@ -7,8 +7,8 @@ android {
         applicationId "com.lucas.haushaltsmanager"
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 4
-        versionName "4.0"
+        versionCode 5
+        versionName "5.0"
         testInstrumentationRunner "android.support.dialog_popup_edittext.runner.AndroidJUnitRunner"
     }
     testOptions {
