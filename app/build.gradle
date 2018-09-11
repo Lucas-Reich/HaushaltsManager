@@ -37,6 +37,8 @@ dependencies {
     implementation 'com.android.support:cardview-v7:26.1.0'
     implementation 'com.android.support:design:26.1.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+    //Chart Views
+    implementation 'com.github.LabberToasT:Android-Charts:1.0.1'
     //AlertDialog zum anzeigen von eines Changelogs
     implementation 'com.github.LabberToasT:Android-ChangelogDialog:1.0.1'
     //AlertDialog zum anzeigen der von mir genutzten OpenSource Pakete

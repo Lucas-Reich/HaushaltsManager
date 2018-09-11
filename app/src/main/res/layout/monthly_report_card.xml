@@ -145,7 +145,7 @@
                 </TableRow>
             </LinearLayout>
 
-            <com.example.lucas.haushaltsmanager.Views.PieChart.PieChart
+            <com.lucas.androidcharts.PieChart
                 android:id="@+id/monthly_item_pie_chart"
                 android:layout_width="90dp"
                 android:layout_height="90dp"

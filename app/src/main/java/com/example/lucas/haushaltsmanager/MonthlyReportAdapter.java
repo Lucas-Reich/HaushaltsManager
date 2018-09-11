@@ -8,8 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.lucas.haushaltsmanager.Views.PieChart.PieChart;
 import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
+import com.lucas.androidcharts.DataSet;
+import com.lucas.androidcharts.PieChart;
 
 import java.text.DateFormatSymbols;
 import java.util.ArrayList;
@@ -31,17 +32,17 @@ public class MonthlyReportAdapter extends RecyclerView.Adapter<MonthlyReportAdap
 
         ViewHolder(View view) {
             super(view);
-            month = (TextView) view.findViewById(R.id.monthly_item_month);
-            inbound = (TextView) view.findViewById(R.id.monthly_item_inbound);
-            outbound = (TextView) view.findViewById(R.id.monthly_item_outbound);
-            total = (TextView) view.findViewById(R.id.monthly_item_total);
-            totalBookings = (TextView) view.findViewById(R.id.monthly_item_total_bookings);
-            accountCurrency = (TextView) view.findViewById(R.id.monthly_item_account_currency);
-            stressedCategory = (TextView) view.findViewById(R.id.monthly_item_most_stressed_category);
+            month = view.findViewById(R.id.monthly_item_month);
+            inbound = view.findViewById(R.id.monthly_item_inbound);
+            outbound = view.findViewById(R.id.monthly_item_outbound);
+            total = view.findViewById(R.id.monthly_item_total);
+            totalBookings = view.findViewById(R.id.monthly_item_total_bookings);
+            accountCurrency = view.findViewById(R.id.monthly_item_account_currency);
+            stressedCategory = view.findViewById(R.id.monthly_item_most_stressed_category);
 
-            categoryColor = (RoundedTextView) view.findViewById(R.id.monthly_item_category_color);
+            categoryColor = view.findViewById(R.id.monthly_item_category_color);
 
-            pieChart = (PieChart) view.findViewById(R.id.monthly_item_pie_chart);
+            pieChart = view.findViewById(R.id.monthly_item_pie_chart);
         }
     }
 

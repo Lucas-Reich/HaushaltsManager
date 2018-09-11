@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal">
 
-    <com.example.lucas.haushaltsmanager.Views.PieChart.PieChart
+    <com.lucas.androidcharts.PieChart
         android:id="@+id/exp_listview_parent_pie_chart"
         android:layout_width="42dp"
         android:layout_height="42dp"
