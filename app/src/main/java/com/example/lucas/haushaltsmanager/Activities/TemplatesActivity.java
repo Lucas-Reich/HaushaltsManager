@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.example.lucas.haushaltsmanager.BookingAdapter;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Templates.TemplateRepository;
@@ -40,7 +41,10 @@ public class TemplatesActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        mListView.setEmptyView(findViewById(R.id.template_emtpy_list_view));
+        TextView emptyText = findViewById(R.id.template_emtpy_list_view);
+        emptyText.setText(R.string.template_empty_list);
+        mListView.setEmptyView(emptyText);
+
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
