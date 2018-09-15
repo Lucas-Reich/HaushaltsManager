@@ -40,6 +40,7 @@ public class TemplatesActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
+        mListView.setEmptyView(findViewById(R.id.template_emtpy_list_view));
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
@@ -64,7 +65,6 @@ public class TemplatesActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        //Zurück Button welcher in der Toolbar angezeigt wird
         if (id == android.R.id.home) {
             finish();
         }

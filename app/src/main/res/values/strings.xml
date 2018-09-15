@@ -573,4 +573,5 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
     <string name="activity_import_export_name">Import/ Export</string>
     <string name="activity_settings_name">Settings</string>
     <string name="activity_about_name">About</string>
+    <string name="template_empty_list">No templates created</string>
 </resources>
