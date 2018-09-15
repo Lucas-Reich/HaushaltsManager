@@ -1,10 +1,10 @@
 package com.example.lucas.haushaltsmanager.Activities;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
-import android.widget.ImageButton;
+import android.view.MenuItem;
 import android.widget.ListView;
 
 import com.example.lucas.haushaltsmanager.BookingAdapter;
@@ -22,16 +22,13 @@ public class RecurringBookingsActivity extends AppCompatActivity {
     private ListView mListView;
     private Calendar mStartDate = Calendar.getInstance();
     private Calendar mEndDate = Calendar.getInstance();
-    private ImageButton mBackArrow;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recurring_bookings);
 
-        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(mToolbar);
-        mBackArrow = (ImageButton) findViewById(R.id.back_arrow);
+        initializeToolbar();
 
         mListView = (ListView) findViewById(R.id.booking_listview);
     }
@@ -41,16 +38,32 @@ public class RecurringBookingsActivity extends AppCompatActivity {
         super.onStart();
 
         updateListView();
+    }
 
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-        mBackArrow.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
 
-            @Override
-            public void onClick(View v) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
 
-                finish();
-            }
-        });
+                onBackPressed();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Methode um eine Toolbar anzuzeigen die den Titel und einen Zurückbutton enthält.
+     */
+    private void initializeToolbar() {
+        Toolbar toolbar = findViewById(R.id.toolbar);
+
+        //schatten der toolbar
+        if (Build.VERSION.SDK_INT >= 21)
+            toolbar.setElevation(10.f);
+
+        setSupportActionBar(toolbar);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     private void updateListView() {

@@ -7,10 +7,10 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,7 +35,6 @@ public class ImportExportActivity extends AppCompatActivity {
     private File mSelectedFile;
     private FloatingActionButton mAddExportFab;
     private Button mSelectDirectoryBtn;
-    private ImageButton mBackArrow;
     private File mSelectedDirectory;
 
     private enum SupportedFileExtensions {
@@ -59,24 +58,12 @@ public class ImportExportActivity extends AppCompatActivity {
         mAddExportFab = (FloatingActionButton) findViewById(R.id.activity_import_add_export_btn);
         mSelectDirectoryBtn = (Button) findViewById(R.id.activity_import_directory_picker);
 
-        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(mToolbar);
-        mBackArrow = (ImageButton) findViewById(R.id.back_arrow);
+        initializeToolbar();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-        mBackArrow.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-
-                finish();
-            }
-        });
 
         mSelectDirectoryBtn.setHint(R.string.hint_choose_directory);
         mSelectDirectoryBtn.setOnClickListener(new View.OnClickListener() {
@@ -179,6 +166,31 @@ public class ImportExportActivity extends AppCompatActivity {
 
         getImportableFilesInDirectory(new File(getFilesDir().toString()));
         updateListView();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+
+                onBackPressed();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Methode um eine Toolbar anzuzeigen die den Titel und einen Zurückbutton enthält.
+     */
+    private void initializeToolbar() {
+        Toolbar toolbar = findViewById(R.id.toolbar);
+
+        //schatten der toolbar
+        if (Build.VERSION.SDK_INT >= 21)
+            toolbar.setElevation(10.f);
+
+        setSupportActionBar(toolbar);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     /**

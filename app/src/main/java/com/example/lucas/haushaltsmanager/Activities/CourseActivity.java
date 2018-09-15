@@ -1,5 +1,6 @@
 package com.example.lucas.haushaltsmanager.Activities;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -7,9 +8,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ExpandableListView;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
@@ -29,7 +28,6 @@ public class CourseActivity extends AppCompatActivity {
     private List<ExpenseObject> mExpenses;
     private List<Long> mActiveAccounts;
     private ExpandableListView mExpListView;
-    private ImageButton mBackArrow;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -40,9 +38,7 @@ public class CourseActivity extends AppCompatActivity {
         mExpenses = new ArrayList<>();
         mActiveAccounts = new ArrayList<>();
 
-        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(mToolbar);
-        mBackArrow = (ImageButton) findViewById(R.id.back_arrow);
+        initializeToolbar();
     }
 
 
@@ -50,18 +46,22 @@ public class CourseActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        mBackArrow.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-
-                finish();
-            }
-        });
-
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-
         updateExpListView();
+    }
+
+    /**
+     * Methode um eine Toolbar anzuzeigen die den Titel und einen Zurückbutton enthält.
+     */
+    private void initializeToolbar() {
+        Toolbar toolbar = findViewById(R.id.toolbar);
+
+        //schatten der toolbar
+        if (Build.VERSION.SDK_INT >= 21)
+            toolbar.setElevation(10.f);
+
+        setSupportActionBar(toolbar);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     private void updateExpListView() {
@@ -125,6 +125,8 @@ public class CourseActivity extends AppCompatActivity {
                 //todo zeige einen alertdialog in dem filteroptionen (Ausgabe, Einnahme, Datum, ...) angezeigt werden
                 Toast.makeText(this, "Huch das wurde wohl noch nicht implementiert", Toast.LENGTH_SHORT).show();
                 break;
+            case android.R.id.home:
+                onBackPressed();
             default:
                 throw new UnsupportedOperationException("Die Menüoption " + item.getItemId() + " wird nicht unterstützt!");
         }

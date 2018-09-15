@@ -3,22 +3,23 @@ package com.example.lucas.haushaltsmanager.Activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ExpandableListView;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.CategoryAdapter;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.Exceptions.CannotDeleteChildCategoryException;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepository;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.R;
 
@@ -29,7 +30,6 @@ public class CategoryListActivity extends AppCompatActivity {
 
     private List<Category> mCategories;
     private FloatingActionButton mFabMain, mFabDelete;
-    private ImageButton mBackArrow;
     private ExpandableListView mExpListView;
     private CategoryAdapter mListAdapter;
     private Animation openFabAnim, closeFabAnim, rotateForwardAnim, rotateBackwardAnim;
@@ -40,10 +40,7 @@ public class CategoryListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_categories);
 
-        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(mToolbar);
-
-        mBackArrow = (ImageButton) findViewById(R.id.back_arrow);
+        initializeToolbar();
 
         mExpListView = (ExpandableListView) findViewById(R.id.categories_exp_list_view);
 
@@ -56,16 +53,6 @@ public class CategoryListActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         updateListView();
-
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-        mBackArrow.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-
-                finish();
-            }
-        });
 
         mExpListView.setBackgroundColor(Color.WHITE);
         mExpListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
@@ -178,6 +165,31 @@ public class CategoryListActivity extends AppCompatActivity {
 
         rotateForwardAnim = AnimationUtils.loadAnimation(this, R.anim.rotate_forward);
         rotateBackwardAnim = AnimationUtils.loadAnimation(this, R.anim.rotate_backward);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+
+                onBackPressed();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Methode um eine Toolbar anzuzeigen die den Titel und einen Zurückbutton enthält.
+     */
+    private void initializeToolbar() {
+        Toolbar toolbar = findViewById(R.id.toolbar);
+
+        //schatten der toolbar
+        if (Build.VERSION.SDK_INT >= 21)
+            toolbar.setElevation(10.f);
+
+        setSupportActionBar(toolbar);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     private void resetActivityViewState() {

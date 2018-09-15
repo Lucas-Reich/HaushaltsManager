@@ -1,12 +1,14 @@
 package com.example.lucas.haushaltsmanager.Activities;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -37,7 +39,6 @@ public class SettingsActivity extends AppCompatActivity {
     private Button resetSettingsBtn;
     private CheckBox createBackupsChk, allowReminderChk;
     private TextView currencyNameTxt, firstDayOfWeekTxt, maxBackupCountTxt, backupCountTextTxt, notificationTimeTxt, notificationTimeTextTxt;
-    private ImageButton mBackArrow;
     private UserSettingsPreferences mUserSettings;
 
     @Override
@@ -65,20 +66,11 @@ public class SettingsActivity extends AppCompatActivity {
         resetSettingsBtn = findViewById(R.id.settings_reset_btn);
 
         mUserSettings = new UserSettingsPreferences(this);
-
-        mBackArrow = findViewById(R.id.back_arrow);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-
-        mBackArrow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
 
         setFirstDayOfWeek(WeekdayUtils.getWeekday(mUserSettings.getFirstDayOfWeek()));
         firstDayLayout.setOnClickListener(new View.OnClickListener() {
@@ -230,6 +222,32 @@ public class SettingsActivity extends AppCompatActivity {
                 confirmationDialog.show(getFragmentManager(), "settings_confirm_reset");
             }
         });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+
+                onBackPressed();
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Methode um eine Toolbar anzuzeigen die den Titel und einen Zurückbutton enthält.
+     */
+    private void initializeToolbar() {
+        Toolbar toolbar = findViewById(R.id.toolbar);
+
+        //schatten der toolbar
+        if (Build.VERSION.SDK_INT >= 21)
+            toolbar.setElevation(10.f);
+
+        setSupportActionBar(toolbar);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     /**

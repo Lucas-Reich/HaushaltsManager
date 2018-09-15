@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
@@ -20,7 +21,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.MultiAutoCompleteTextView;
 import android.widget.RadioGroup;
@@ -79,7 +79,6 @@ public class ExpenseScreenActivity extends AppCompatActivity {
     private TextView mPriceTxt, mCurrencySymbolTxt;
     private RadioGroup mExpenseTypeRadio;
     private ExpenseObject mParentBooking;
-    private ImageButton mBackArrow;
     private List<Tag> mTags;
 
     @Override
@@ -87,10 +86,7 @@ public class ExpenseScreenActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_expense_screen);
 
-        //TODO implement the correct Toolbar functionality (back arrow, overflow menu which holds the load mTemplate button)
-        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(mToolbar);
-        mBackArrow = (ImageButton) findViewById(R.id.back_arrow);
+        initializeToolbar();
 
         mPriceTxt = (TextView) findViewById(R.id.expense_screen_amount);
         mCurrencySymbolTxt = (TextView) findViewById(R.id.expense_screen_currency_symbol);
@@ -175,16 +171,6 @@ public class ExpenseScreenActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-        mBackArrow.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-
-                finish();
-            }
-        });
 
         setExpenseType(mExpense.isExpenditure());
         mExpenseTypeRadio.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -339,6 +325,21 @@ public class ExpenseScreenActivity extends AppCompatActivity {
     }
 
     /**
+     * Methode um eine Toolbar anzuzeigen die den Titel und einen Zurückbutton enthält.
+     */
+    private void initializeToolbar() {
+        Toolbar toolbar = findViewById(R.id.toolbar);
+
+        //schatten der toolbar
+        if (Build.VERSION.SDK_INT >= 21)
+            toolbar.setElevation(10.f);
+
+        setSupportActionBar(toolbar);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    /**
      * Methode um die in der MultiAutoCompleteTextView gespeicherten Tags an die Buchung zu hängen
      */
     private void addTagsToBooking() {
@@ -458,6 +459,9 @@ public class ExpenseScreenActivity extends AppCompatActivity {
                 Intent chooseTemplateIntent = new Intent(ExpenseScreenActivity.this, TemplatesActivity.class);
                 ExpenseScreenActivity.this.startActivityForResult(chooseTemplateIntent, 2);
                 break;
+            case android.R.id.home:
+
+                onBackPressed();
             default:
                 throw new UnsupportedOperationException("Du hast auf einen Menüpunkt geklickt, welcher nicht unterstützt wird");
         }

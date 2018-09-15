@@ -24,49 +24,53 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".Activities.TemplatesActivity"
+            android:label="@string/activity_template_name"
+            android:parentActivityName=".Activities.MainTab.ParentActivity"/>
+        <activity
             android:name=".Activities.ExpenseScreenActivity"
-            android:label="HaushaltsManager"
+            android:label="@string/activity_expense_screen_name"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
         <activity
             android:name=".Activities.CategoryListActivity"
-            android:label="Categories"
+            android:label="@string/activity_category_name"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
         <activity
-            android:name=".Activities.TemplatesActivity"
-            android:label="@string/activity_template_name"
-            android:parentActivityName=".Activities.MainTab.ParentActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
-        <activity
             android:name=".Activities.RecurringBookingsActivity"
-            android:label="RecurringBookings"
+            android:label="@string/activity_recurring_bookings_name"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
         <activity
             android:name=".Activities.CreateAccountActivity"
-            android:label="CreateNewAccount"
+            android:label="@string/activity_new_account_name"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
         <activity
             android:name=".Activities.CreateCategoryActivity"
-            android:label="CreateNewCategory"
-            android:parentActivityName=".Activities.MainTab.ParentActivity"/>
-        <activity
-            android:name=".Activities.TestActivity"
-            android:label="TestPieChart"
+            android:label="@string/activity_new_category_name"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
         <activity
             android:name=".Activities.CreateBackupActivity"
-            android:label="CreateBackupActivity"
+            android:label="@string/activity_backups_name"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
         <activity
             android:name=".Activities.TransferActivity"
-            android:label="TransfersActivity"/>
+            android:label="@string/activity_transfers_name"
+            android:parentActivityName=".Activities.MainTab.ParentActivity"/>
         <activity
             android:name=".Activities.CourseActivity"
-            android:label="CourseActivity"/>
+            android:label="@string/activity_course_name"
+            android:parentActivityName=".Activities.MainTab.ParentActivity"/>
         <activity
             android:name=".Activities.ImportExportActivity"
-            android:label="ImportExportActivityVer3"/>
-        <activity android:name=".Activities.SettingsActivity"/>
-        <activity android:name=".Activities.AboutUsActivity"/>
+            android:label="@string/activity_import_export_name"
+            android:parentActivityName=".Activities.MainTab.ParentActivity"/>
+        <activity
+            android:name=".Activities.SettingsActivity"
+            android:label="@string/activity_settings_name"
+            android:parentActivityName=".Activities.MainTab.ParentActivity"/>
+        <activity
+            android:name=".Activities.AboutUsActivity"
+            android:label="@string/activity_about_name"
+            android:parentActivityName=".Activities.MainTab.ParentActivity"/>
 
         <receiver
             android:name=".MyAlarmReceiver"

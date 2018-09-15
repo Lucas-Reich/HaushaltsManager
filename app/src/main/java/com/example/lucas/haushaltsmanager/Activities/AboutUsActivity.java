@@ -3,12 +3,13 @@ package com.example.lucas.haushaltsmanager.Activities;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,7 +26,6 @@ public class AboutUsActivity extends AppCompatActivity {
 
     private LinearLayout mSupportLayout, mImproveLayout, mFeatureLayout, mVersionLayout, mRateLayout, mLicenseLayout;
     private TextView mAppVersionTxt;
-    private ImageButton mBackArrow;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -41,23 +41,12 @@ public class AboutUsActivity extends AppCompatActivity {
 
         mAppVersionTxt = findViewById(R.id.about_us_version_number_txt);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        mBackArrow = findViewById(R.id.back_arrow);
+        initializeToolbar();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-        mBackArrow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                finish();
-            }
-        });
 
         mSupportLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -112,6 +101,32 @@ public class AboutUsActivity extends AppCompatActivity {
                 licenseDialog.create().show();
             }
         });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+
+                onBackPressed();
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Methode um eine Toolbar anzuzeigen die den Titel und einen Zurückbutton enthält.
+     */
+    private void initializeToolbar() {
+        Toolbar toolbar = findViewById(R.id.toolbar);
+
+        //schatten der toolbar
+        if (Build.VERSION.SDK_INT >= 21)
+            toolbar.setElevation(10.f);
+
+        setSupportActionBar(toolbar);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     /**

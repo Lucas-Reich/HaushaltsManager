@@ -2,6 +2,7 @@ package com.example.lucas.haushaltsmanager.Activities;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -9,11 +10,11 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -37,7 +38,6 @@ public class CreateBackupActivity extends AppCompatActivity {
     private Button mChooseDirectoryBtn;
     private File mBackupDirectory = BackupCreatorService.getBackupDirectory();
     private ListView mListView;
-    private ImageButton mBackArrow;
 
     //.SavedDataFile
     final String mBackupExtension = ".sdf";
@@ -47,9 +47,7 @@ public class CreateBackupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_backup);
 
-        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(mToolbar);
-        mBackArrow = (ImageButton) findViewById(R.id.back_arrow);
+        initializeToolbar();
 
         mChooseDirectoryBtn = (Button) findViewById(R.id.create_backup_directory_btn);
         mListView = (ListView) findViewById(R.id.create_backup_list_view);
@@ -65,16 +63,6 @@ public class CreateBackupActivity extends AppCompatActivity {
         super.onStart();
 
         updateListView();
-
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-        mBackArrow.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-
-                finish();
-            }
-        });
 
         mChooseDirectoryBtn.setHint(mBackupDirectory.getName());
         mChooseDirectoryBtn.setOnClickListener(new View.OnClickListener() {
@@ -137,6 +125,32 @@ public class CreateBackupActivity extends AppCompatActivity {
                 basicDialog.show(getFragmentManager(), "create_backup_name");
             }
         });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case android.R.id.home:
+
+                onBackPressed();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Methode um eine Toolbar anzuzeigen die den Titel und einen Zurückbutton enthält.
+     */
+    private void initializeToolbar() {
+        Toolbar toolbar = findViewById(R.id.toolbar);
+
+        //schatten der toolbar
+        if (Build.VERSION.SDK_INT >= 21)
+            toolbar.setElevation(10.f);
+
+        setSupportActionBar(toolbar);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     /**

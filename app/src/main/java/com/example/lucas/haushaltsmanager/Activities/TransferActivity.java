@@ -10,9 +10,9 @@ import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
@@ -44,8 +44,6 @@ public class TransferActivity extends AppCompatActivity {
     private Button mDateBtn, mFromAccountBtn, mToAccountBtn, mCreateTransferBtn, mAmountBtn;
     private Account mFromAccount, mToAccount;
     private Calendar mCalendar;
-    private Toolbar mToolbar;
-    private ImageButton mBackArrow;
     //Ausgabe
     private ExpenseObject mFromExpense;
     //Einnahme
@@ -84,8 +82,7 @@ public class TransferActivity extends AppCompatActivity {
         mCreateTransferBtn = findViewById(R.id.transfer_create_btn);
         mAmountBtn = findViewById(R.id.transfer_amount_btn);
 
-        mToolbar = findViewById(R.id.toolbar);
-        mBackArrow = findViewById(R.id.back_arrow);
+        initializeToolbar();
 
         Bundle bundle = getIntent().getExtras();
         if (bundle != null && bundle.containsKey("from_account"))
@@ -96,18 +93,6 @@ public class TransferActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-
-        mBackArrow.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-
-                finish();
-            }
-        });
-
-        mToolbar.setTitle("");
-        setSupportActionBar(mToolbar);
 
         mAmountBtn.setHint(R.string.placeholder_amount);
         mAmountBtn.setOnClickListener(new View.OnClickListener() {
@@ -261,6 +246,32 @@ public class TransferActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case android.R.id.home:
+
+                onBackPressed();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Methode um eine Toolbar anzuzeigen die den Titel und einen Zurückbutton enthält.
+     */
+    private void initializeToolbar() {
+        Toolbar toolbar = findViewById(R.id.toolbar);
+
+        //schatten der toolbar
+        if (Build.VERSION.SDK_INT >= 21)
+            toolbar.setElevation(10.f);
+
+        setSupportActionBar(toolbar);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     /**

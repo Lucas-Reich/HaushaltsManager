@@ -1,13 +1,14 @@
 package com.example.lucas.haushaltsmanager.Activities;
 
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
@@ -26,7 +27,6 @@ public class CreateCategoryActivity extends AppCompatActivity {
     private static final String TAG = CreateCategoryActivity.class.getSimpleName();
 
     private Category mCategory;
-    private ImageButton mBackArrow;
     private Button mCatNameBtn, mCatColorBtn, mSelectParentBtn, mCreateBtn;
     private RadioGroup mDefaultExpenseRadioGrp;
     private Category mParentCategory;
@@ -47,14 +47,12 @@ public class CreateCategoryActivity extends AppCompatActivity {
         mCatColorBtn = findViewById(R.id.new_category_color);
         mSelectParentBtn = findViewById(R.id.new_category_select_parent);
         mCreateBtn = findViewById(R.id.new_category_create);
-        mBackArrow = findViewById(R.id.back_arrow);
-
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
         mDefaultExpenseRadioGrp = findViewById(R.id.new_category_expense_type);
 
         resolveIntent(getIntent().getExtras());
+
+        initializeToolbar();
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -85,15 +83,6 @@ public class CreateCategoryActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-        mBackArrow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                finish();
-            }
-        });
 
         mCatNameBtn.setHint(mCategory.getTitle());
         mCatNameBtn.setOnClickListener(new View.OnClickListener() {
@@ -235,5 +224,30 @@ public class CreateCategoryActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    /**
+     * Methode um eine Toolbar anzuzeigen die den Titel und einen Zurückbutton enthält.
+     */
+    private void initializeToolbar() {
+        Toolbar toolbar = findViewById(R.id.toolbar);
+
+        //schatten der toolbar
+        if (Build.VERSION.SDK_INT >= 21)
+            toolbar.setElevation(10.f);
+
+        setSupportActionBar(toolbar);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }
