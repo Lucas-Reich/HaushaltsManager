@@ -20,8 +20,8 @@ import com.example.lucas.haushaltsmanager.R;
 import com.lucas.changelogdialog.ChangelogDialog;
 
 public class AboutUsActivity extends AppCompatActivity {
-    private static final String SUPPORT_MAIL = "support@Haushaltsmanager.de";
-    private static final String FEATURE_MAIL = "feature@Haushaltsmanager.de";
+    private static final String SUPPORT_MAIL = "ausgabenmanager@web.de";
+    private static final String FEATURE_MAIL = "ausgabenmanager@web.de";
 
     private LinearLayout mSupportLayout, mImproveLayout, mFeatureLayout, mVersionLayout, mRateLayout, mLicenseLayout;
     private TextView mAppVersionTxt;
