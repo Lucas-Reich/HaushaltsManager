@@ -170,4 +170,5 @@
     <string name="btn_reset">Restore default settings</string>
     <string name="support">Support</string>
     <string name="licenses">Licenses</string>
+    <string name="activity_template_name">Templates</string>
 </resources>

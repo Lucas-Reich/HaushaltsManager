@@ -561,4 +561,5 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
     <string name="suggest_feature">Suggest new feature</string>
     <string name="app_version">App Version</string>
     <string name="licenses">Licenses</string>
+    <string name="activity_template_name">Templates</string>
 </resources>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.example.lucas.haushaltsmanager">
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.lucas.haushaltsmanager">
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
@@ -19,7 +20,6 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
@@ -33,8 +33,9 @@
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
         <activity
             android:name=".Activities.TemplatesActivity"
-            android:label="BookingTemplate"
-            android:parentActivityName=".Activities.MainTab.ParentActivity"/>
+            android:label="@string/activity_template_name"
+            android:parentActivityName=".Activities.MainTab.ParentActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".Activities.RecurringBookingsActivity"
             android:label="RecurringBookings"
