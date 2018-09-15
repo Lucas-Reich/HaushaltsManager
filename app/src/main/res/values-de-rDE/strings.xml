@@ -175,4 +175,18 @@
     <string name="app_version">Appversion</string>
     <string name="btn_dismiss">Verwerfen</string>
     <string name="licenses">Lizenzen</string>
+    <string name="activity_template_name">Schablonen</string>
+    <string name="activity_category_name">Kategoriem</string>
+    <string name="activity_expense_screen_name">Erstelle eine Buchung</string>
+    <string name="activity_recurring_bookings_name">Wiederkehrende Buchungen</string>
+    <string name="activity_new_account_name">Erstelle ein neues Konto</string>
+    <string name="activity_new_category_name">Erstelle eine neue Kategorie</string>
+    <string name="activity_backups_name">Backups</string>
+    <string name="activity_transfers_name">Überweisung</string>
+    <string name="activity_course_name">Verlauf</string>
+    <string name="activity_import_export_name">Import/ Export</string>
+    <string name="activity_settings_name">Einstellungen</string>
+    <string name="activity_about_name">Über</string>
+    <string name="template_empty_list">Keine Schablonen erstellt</string>
+    <string name="course_empty_list">Keine Buchungen erstellt</string>
 </resources>

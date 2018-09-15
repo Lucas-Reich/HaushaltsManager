@@ -65,7 +65,7 @@ public class TabOneBookings extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstances) {
         View rootView = inflater.inflate(R.layout.tab_one_bookings, container, false);
 
-        mExpListView = (ExpandableListView) rootView.findViewById(R.id.lvExp);
+        mExpListView = (ExpandableListView) rootView.findViewById(R.id.expandable_list_view);
         mExpListView.setBackgroundColor(Color.WHITE);
         setOnGroupClickListener();
         setOnChildClickListener();

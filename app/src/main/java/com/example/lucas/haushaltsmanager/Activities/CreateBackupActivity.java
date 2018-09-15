@@ -51,7 +51,7 @@ public class CreateBackupActivity extends AppCompatActivity {
 
         mChooseDirectoryBtn = (Button) findViewById(R.id.create_backup_directory_btn);
         mListView = (ListView) findViewById(R.id.create_backup_list_view);
-        TextView emptyText = (TextView) findViewById(R.id.empty_list_view);
+        TextView emptyText = findViewById(R.id.empty_list_view);
         mListView.setEmptyView(emptyText);
         //todo die backups sollen so sortiert sein, dass der aktuellste eintrag an erster stelle steht
 

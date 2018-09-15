@@ -7,7 +7,7 @@
     android:layout_height="match_parent">
 
     <include
-        layout="@layout/activity_test_exp_listview"
+        layout="@layout/exp_list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 

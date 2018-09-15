@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ExpandableListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
@@ -27,14 +28,14 @@ public class CourseActivity extends AppCompatActivity {
 
     private List<ExpenseObject> mExpenses;
     private List<Long> mActiveAccounts;
-    private ExpandableListView mExpListView;
+    private ExpandableListView mListView;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_course);
 
-        mExpListView = (ExpandableListView) findViewById(R.id.lvExp);
+        mListView = findViewById(R.id.expandable_list_view);
         mExpenses = new ArrayList<>();
         mActiveAccounts = new ArrayList<>();
 
@@ -45,6 +46,11 @@ public class CourseActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+
+        TextView emptyText = findViewById(R.id.empty_list_view);
+        emptyText.setText(R.string.course_empty_list);
+
+        mListView.setEmptyView(emptyText);
 
         updateExpListView();
     }
@@ -70,7 +76,7 @@ public class CourseActivity extends AppCompatActivity {
 
         ExpandableListAdapter expandableListAdapter = new ExpandableListAdapterCreator(mExpenses, mActiveAccounts, this).getExpandableListAdapter();
 
-        mExpListView.setAdapter(expandableListAdapter);
+        mListView.setAdapter(expandableListAdapter);
 
         expandableListAdapter.notifyDataSetChanged();
     }
