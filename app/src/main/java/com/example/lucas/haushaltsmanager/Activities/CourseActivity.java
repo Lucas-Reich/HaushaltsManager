@@ -126,7 +126,9 @@ public class CourseActivity extends AppCompatActivity {
                 Toast.makeText(this, "Huch das wurde wohl noch nicht implementiert", Toast.LENGTH_SHORT).show();
                 break;
             case android.R.id.home:
+
                 onBackPressed();
+                break;
             default:
                 throw new UnsupportedOperationException("Die Menüoption " + item.getItemId() + " wird nicht unterstützt!");
         }

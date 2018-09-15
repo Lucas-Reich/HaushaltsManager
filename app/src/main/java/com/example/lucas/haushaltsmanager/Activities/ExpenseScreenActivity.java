@@ -462,6 +462,7 @@ public class ExpenseScreenActivity extends AppCompatActivity {
             case android.R.id.home:
 
                 onBackPressed();
+                break;
             default:
                 throw new UnsupportedOperationException("Du hast auf einen Menüpunkt geklickt, welcher nicht unterstützt wird");
         }

@@ -66,6 +66,8 @@ public class SettingsActivity extends AppCompatActivity {
         resetSettingsBtn = findViewById(R.id.settings_reset_btn);
 
         mUserSettings = new UserSettingsPreferences(this);
+
+        initializeToolbar();
     }
 
     @Override
