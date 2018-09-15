@@ -41,7 +41,7 @@ public class TemplatesActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        TextView emptyText = findViewById(R.id.template_emtpy_list_view);
+        TextView emptyText = findViewById(R.id.empty_list_view);
         emptyText.setText(R.string.template_empty_list);
         mListView.setEmptyView(emptyText);
 

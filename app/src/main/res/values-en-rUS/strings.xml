@@ -184,4 +184,5 @@
     <string name="activity_about_name">About</string>
     <string name="template_empty_list">No templates created</string>
     <string name="course_empty_list">No bookings created</string>
+    <string name="licenses_title">Licenses</string>
 </resources>

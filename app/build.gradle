@@ -40,7 +40,7 @@ dependencies {
     //Chart Views
     implementation 'com.github.LabberToasT:Android-Charts:1.0.1'
     //AlertDialog zum anzeigen von eines Changelogs
-    implementation 'com.github.LabberToasT:Android-ChangelogDialog:1.0.1'
+    implementation 'com.github.LabberToasT:Android-ChangelogDialog:1.0.3'
     //AlertDialog zum anzeigen der von mir genutzten OpenSource Pakete
     implementation 'de.psdev.licensesdialog:licensesdialog:1.7.0'
     //AlertDialog um den User ein Verzeichniss auswählen zu lassen

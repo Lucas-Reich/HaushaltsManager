@@ -77,10 +77,10 @@ public class AboutUsActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                ChangelogDialog changelogDialog = new com.lucas.changelogdialog.ChangelogDialog();
+                ChangelogDialog changelogDialog = new ChangelogDialog();
                 changelogDialog.createBuilder(AboutUsActivity.this);
                 changelogDialog.setTitle(getString(R.string.changelog_title));
-                changelogDialog.setReleaseHistory2(new ReleaseHistory());
+                changelogDialog.setReleaseHistory(new ReleaseHistory());
                 changelogDialog.show(getFragmentManager(), "about_us_changelog");
             }
         });

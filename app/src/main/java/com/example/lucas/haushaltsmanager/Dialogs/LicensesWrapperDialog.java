@@ -3,6 +3,7 @@ package com.example.lucas.haushaltsmanager.Dialogs;
 import android.content.Context;
 
 import com.example.lucas.haushaltsmanager.Assets.MozillaPublicLicenseV2;
+import com.example.lucas.haushaltsmanager.R;
 
 import de.psdev.licensesdialog.LicensesDialog;
 import de.psdev.licensesdialog.licenses.ApacheSoftwareLicense20;
@@ -22,6 +23,7 @@ public class LicensesWrapperDialog {
     public LicensesDialog create() {
         LicensesDialog.Builder builder = new LicensesDialog.Builder(mContext);
         builder.setNotices(getNotices());
+        builder.setTitle(R.string.licenses_title);
 
         return builder.build();
     }
