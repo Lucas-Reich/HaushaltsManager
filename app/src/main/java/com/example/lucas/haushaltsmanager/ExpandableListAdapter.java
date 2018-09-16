@@ -156,7 +156,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
             case TRANSFER_EXPENSE:
 
-                //todo eigenes layout für tramsfer expenses definieren
+                //todo eigenes layout für tramsfer mExpenses definieren
                 convertView = inflater.inflate(R.layout.activity_exp_listview_group, null);
                 if (isSelected)
                     convertView.setBackgroundColor(mContext.getResources().getColor(R.color.highlighted_item_color));

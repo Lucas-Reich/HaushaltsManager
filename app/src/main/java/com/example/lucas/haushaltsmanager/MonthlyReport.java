@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.example.lucas.haushaltsmanager.Entities.Category;
+import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 
 import java.util.ArrayList;
@@ -11,16 +12,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MonthlyReport {
+public class MonthlyReport implements IPieChartCardView {
 
-    private String mMonth;
+    private String mCardTitle;
     private List<ExpenseObject> mExpenses;
-    private String mCurrency;
+    private Currency mCurrency;
     private Context mContext;
 
-    public MonthlyReport(@NonNull String month, @NonNull ArrayList<ExpenseObject> expense, @NonNull String currency, Context context) {
+    public MonthlyReport(@NonNull String cardTitle, @NonNull ArrayList<ExpenseObject> expense, @NonNull Currency currency, Context context) {
 
-        mMonth = month;
+        mCardTitle = cardTitle;
         mExpenses = expense;
         mCurrency = currency;
         mContext = context;
@@ -41,8 +42,9 @@ public class MonthlyReport {
      * @return Monat
      */
     @NonNull
-    public String getMonth() {
-        return mMonth;
+    @Override
+    public String getCardTitle() {
+        return mCardTitle;
     }
 
     /**
@@ -51,7 +53,7 @@ public class MonthlyReport {
      * @param month Monat
      */
     public void setMonth(String month) {
-        mMonth = month;
+        mCardTitle = month;
     }
 
     /**
@@ -69,8 +71,8 @@ public class MonthlyReport {
      *
      * @return Währung als String
      */
-    @NonNull
-    String getCurrency() {
+    @Override
+    public Currency getCurrency() {
         return mCurrency;
     }
 
@@ -79,7 +81,8 @@ public class MonthlyReport {
      *
      * @return Anzahl an Buchungen
      */
-    public int countBookings() {
+    @Override
+    public int getBookingCount() {
         return mExpenses.size();
     }
 
@@ -88,7 +91,8 @@ public class MonthlyReport {
      *
      * @return Einnahmen des Monats
      */
-    public double countIncomingMoney() {
+    @Override
+    public double getIncoming() {
 
         double incomingMoney = 0;
         for (ExpenseObject expense : mExpenses) {
@@ -105,7 +109,8 @@ public class MonthlyReport {
      *
      * @return Monatliche Ausgaben
      */
-    public double countOutgoingMoney() {
+    @Override
+    public double getOutgoing() {
 
         double outgoingMoney = 0;
         for (ExpenseObject expense : mExpenses) {
@@ -122,8 +127,9 @@ public class MonthlyReport {
      *
      * @return Ausgaben total
      */
-    public double calcMonthlyTotal() {
-        return (countIncomingMoney() - countOutgoingMoney());
+    @Override
+    public double getTotal() {
+        return (getIncoming() - getOutgoing());
     }
 
     /**
@@ -131,6 +137,7 @@ public class MonthlyReport {
      *
      * @return Category
      */
+    @Override
     public Category getMostStressedCategory() {
         HashMap<Category, Double> categories = sumExpensesByCategory();
 

@@ -129,7 +129,7 @@ public class MockDataCreator {
         String baseChildExpenseName = "ChildExpense_";
         Random mRnd = new Random();
 
-        Log.d(TAG, "createChildBookings: creating child expenses");
+        Log.d(TAG, "createChildBookings: creating child mExpenses");
         for (int i = 0; i < count; i++) {
 
             ExpenseObject expense = new ExpenseObject(baseChildExpenseName + i, 10d, mRnd.nextBoolean(), mCategories.get(mRnd.nextInt(categoryCount - 1)), mAccounts.get(mRnd.nextInt(accountCount - 1)).getIndex(), mMainCurrency);

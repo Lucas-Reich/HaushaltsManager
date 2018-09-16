@@ -1,8 +1,8 @@
 package com.example.lucas.haushaltsmanager;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 
+import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 
 import java.util.ArrayList;
@@ -43,7 +43,7 @@ public class MonthlyReportAdapterCreator {
     private void createMonthlyReports() {
 
         for (int i = getCurrentMonth(); i >= 1; i--) {
-            mReports.add(new MonthlyReport(i + "", new ArrayList<ExpenseObject>(), getMainCurrencySymbol(), mContext));
+            mReports.add(new MonthlyReport(i + "", new ArrayList<ExpenseObject>(), getMainCurrency(), mContext));
         }
 
         fillMonthlyReports();
@@ -65,10 +65,10 @@ public class MonthlyReportAdapterCreator {
      *
      * @return Währungssymbol der Hauptwährung
      */
-    private String getMainCurrencySymbol() {
-        SharedPreferences preferences = mContext.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
+    private Currency getMainCurrency() {
+        UserSettingsPreferences preferences = new UserSettingsPreferences(mContext);
 
-        return preferences.getString("mainCurrencySymbol", "€");
+        return preferences.getMainCurrency();
     }
 
     /**

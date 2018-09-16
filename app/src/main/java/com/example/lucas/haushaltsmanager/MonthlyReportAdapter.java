@@ -61,22 +61,22 @@ public class MonthlyReportAdapter extends RecyclerView.Adapter<MonthlyReportAdap
     public void onBindViewHolder(final ViewHolder viewHolder, int position) {
         MonthlyReport report = mReports.get(position);
 
-        viewHolder.month.setText(getMonth(Integer.parseInt(report.getMonth())));
+        viewHolder.month.setText(getMonth(Integer.parseInt(report.getCardTitle())));
 
-        viewHolder.inbound.setText(formatMoney(report.countIncomingMoney()));
+        viewHolder.inbound.setText(formatMoney(report.getIncoming()));
         viewHolder.inbound.setTextColor(mContext.getResources().getColor(R.color.booking_income));
 
-        viewHolder.outbound.setText(formatMoney(report.countOutgoingMoney()));
+        viewHolder.outbound.setText(formatMoney(report.getOutgoing()));
         viewHolder.outbound.setTextColor(mContext.getResources().getColor(R.color.booking_expense));
 
-        viewHolder.total.setText(formatMoney(report.calcMonthlyTotal()));
-        if (report.countBookings() == 1)
-            viewHolder.totalBookings.setText(String.format("%s %s", report.countBookings(), mContext.getResources().getString(R.string.month_report_booking)));
+        viewHolder.total.setText(formatMoney(report.getTotal()));
+        if (report.getBookingCount() == 1)
+            viewHolder.totalBookings.setText(String.format("%s %s", report.getBookingCount(), mContext.getResources().getString(R.string.month_report_booking)));
         else
-            viewHolder.totalBookings.setText(String.format("%s %s", report.countBookings(), mContext.getResources().getString(R.string.month_report_bookings)));
-        viewHolder.accountCurrency.setText(report.getCurrency());
+            viewHolder.totalBookings.setText(String.format("%s %s", report.getBookingCount(), mContext.getResources().getString(R.string.month_report_bookings)));
+        viewHolder.accountCurrency.setText(report.getCurrency().getSymbol());
 
-        if (report.countBookings() == 0) {
+        if (report.getBookingCount() == 0) {
             viewHolder.categoryColor.setVisibility(View.GONE);
 
             viewHolder.stressedCategory.setText(report.getMostStressedCategory().getTitle());
@@ -105,12 +105,12 @@ public class MonthlyReportAdapter extends RecyclerView.Adapter<MonthlyReportAdap
      * @return DataSet's
      */
     private List<DataSet> preparePieData(MonthlyReport monthlyReport) {
-        if (monthlyReport.countBookings() == 0)
+        if (monthlyReport.getBookingCount() == 0)
             return new ArrayList<>();
 
         List<DataSet> pieData = new ArrayList<>();
-        pieData.add(new DataSet((float) monthlyReport.countIncomingMoney(), mContext.getResources().getColor(R.color.booking_income), mContext.getResources().getString(R.string.incoming)));
-        pieData.add(new DataSet((float) monthlyReport.countOutgoingMoney(), mContext.getResources().getColor(R.color.booking_expense), mContext.getResources().getString(R.string.outgoing)));
+        pieData.add(new DataSet((float) monthlyReport.getIncoming(), mContext.getResources().getColor(R.color.booking_income), mContext.getResources().getString(R.string.incoming)));
+        pieData.add(new DataSet((float) monthlyReport.getOutgoing(), mContext.getResources().getColor(R.color.booking_expense), mContext.getResources().getString(R.string.outgoing)));
 
         return pieData;
     }
