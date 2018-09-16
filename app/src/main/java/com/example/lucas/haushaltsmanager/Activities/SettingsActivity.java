@@ -11,7 +11,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.AppInternalPreferences;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepository;
@@ -25,7 +24,6 @@ import com.example.lucas.haushaltsmanager.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.WeekdayUtils;
 
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -384,15 +382,11 @@ public class SettingsActivity extends AppCompatActivity {
 
         setNotificationStatusClickable(remindUser);
 
-        if (remindUser && !internalPreferences.getNotificationStatus()) {
-
+        if (remindUser && !internalPreferences.getNotificationStatus())
             startNotificationWorker();
-            Toast.makeText(this, "Starting Worker", Toast.LENGTH_SHORT).show();
-        } else if (!remindUser && internalPreferences.getNotificationStatus()) {
 
+        if (!remindUser && internalPreferences.getNotificationStatus())
             stopNotificationWorker(internalPreferences.getNotificationJobId());
-            Toast.makeText(this, "Stopping Worker", Toast.LENGTH_SHORT).show();
-        }
     }
 
     /**
@@ -410,10 +404,18 @@ public class SettingsActivity extends AppCompatActivity {
      * Methode um den NotificationWorker zu starten
      */
     private void startNotificationWorker() {
+        long startInMillis;
+        if (System.currentTimeMillis() > mUserSettings.getReminderTime().inMillis()) {
+
+            startInMillis = mUserSettings.getReminderTime().inMillis() + TimeUnit.MILLISECONDS.convert(24, TimeUnit.HOURS) + System.currentTimeMillis();
+        } else {
+
+            startInMillis = mUserSettings.getReminderTime().inMillis() - System.currentTimeMillis();
+        }
 
         OneTimeWorkRequest workRequest = new OneTimeWorkRequest
                 .Builder(NotificationWorker.class)
-                .setInitialDelay(mUserSettings.getReminderTime().inMillis() - Calendar.getInstance().getTimeInMillis(), TimeUnit.MILLISECONDS)
+                .setInitialDelay(startInMillis, TimeUnit.MILLISECONDS)
                 .build();
 
         saveWorkerId(workRequest.getId().toString());
@@ -466,8 +468,6 @@ public class SettingsActivity extends AppCompatActivity {
         if (mInternalPreferences.getNotificationStatus()) {
             stopNotificationWorker(mInternalPreferences.getNotificationJobId());
             startNotificationWorker();
-
-            Toast.makeText(this, "Rescheduling Worker", Toast.LENGTH_SHORT).show();
         }
     }
 }

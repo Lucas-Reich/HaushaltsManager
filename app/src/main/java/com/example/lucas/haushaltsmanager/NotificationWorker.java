@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationManagerCompat;
+import android.util.Log;
 
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 
@@ -53,6 +54,8 @@ public class NotificationWorker extends Worker {
         saveWorkerId(workRequest.getId().toString());
 
         WorkManager.getInstance().enqueue(workRequest);
+
+        Log.i(NotificationWorker.class.getSimpleName(), "Scheduling next worker");
     }
 
     private void saveWorkerId(String id) {
