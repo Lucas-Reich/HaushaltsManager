@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <string name="monday">Monday</string>
+    <string name="tuesday">Tuesday</string>
+    <string name="wednesday">Wednesday</string>
+    <string name="thursday">Thursday</string>
+    <string name="friday">Friday</string>
+    <string name="saturday">Saturday</string>
+    <string name="sunday">Sunday</string>
+
+    <string-array name="weekdays">
+        <item name="mon">@string/monday</item>
+        <item name="tue">@string/tuesday</item>
+        <item name="wed">@string/wednesday</item>
+        <item name="thu">@string/thursday</item>
+        <item name="fri">@string/friday</item>
+        <item name="sat">@string/saturday</item>
+        <item name="sun">@string/sunday</item>
+    </string-array>
+</resources>

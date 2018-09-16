@@ -29,7 +29,6 @@
                 android:paddingRight="5dp">
 
                 <TextView
-                    android:id="@+id/textView12"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
@@ -48,24 +47,23 @@
                     android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/textView17"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/first_day_of_week"
                         android:textColor="@color/primary_text_color"
-                        android:textSize="15sp"/>
+                        android:textSize="16sp"/>
 
                     <TextView
                         android:id="@+id/settings_general_first_of_week"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:paddingBottom="4dp"
                         android:text="-> Montag"
                         android:textColor="@color/primary_text_color"
-                        android:textSize="11sp"
+                        android:textSize="14sp"
                         tools:ignore="SmallSp"/>
 
                     <View
-                        android:id="@+id/divider3"
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:background="?android:attr/listDivider"/>
@@ -83,7 +81,6 @@
                 android:paddingRight="5dp">
 
                 <TextView
-                    android:id="@+id/textView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
@@ -110,11 +107,12 @@
                         android:clickable="false"
                         android:drawableRight="?android:attr/listChoiceIndicatorMultiple"
                         android:focusable="false"
+                        android:paddingBottom="4dp"
                         android:text="@string/automatic_backups"
+                        android:textSize="16sp"
                         tools:ignore="RtlHardcoded"/>
 
                     <View
-                        android:id="@+id/divider11"
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:background="?android:attr/listDivider"/>
@@ -136,19 +134,19 @@
                         android:layout_height="wrap_content"
                         android:text="@string/concurrent_backup_count"
                         android:textColor="@color/primary_text_color"
-                        android:textSize="15sp"/>
+                        android:textSize="16sp"/>
 
                     <TextView
                         android:id="@+id/settings_backups_concurrent_count"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:paddingBottom="4dp"
                         android:text="-> 10"
                         android:textColor="@color/primary_text_color"
-                        android:textSize="11sp"
+                        android:textSize="14sp"
                         tools:ignore="SmallSp"/>
 
                     <View
-                        android:id="@+id/divider10"
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:background="?android:attr/listDivider"/>
@@ -166,7 +164,6 @@
                 android:paddingRight="5dp">
 
                 <TextView
-                    android:id="@+id/textView5"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
@@ -190,19 +187,19 @@
                         android:layout_height="wrap_content"
                         android:text="@string/main_currency"
                         android:textColor="@color/primary_text_color"
-                        android:textSize="15sp"/>
+                        android:textSize="16sp"/>
 
                     <TextView
                         android:id="@+id/settings_currency_name"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:paddingBottom="4dp"
                         android:text="-> Euro"
                         android:textColor="@color/primary_text_color"
-                        android:textSize="11sp"
+                        android:textSize="14sp"
                         tools:ignore="SmallSp"/>
 
                     <View
-                        android:id="@+id/divider12"
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:background="?android:attr/listDivider"/>
@@ -220,7 +217,6 @@
                 android:paddingRight="5dp">
 
                 <TextView
-                    android:id="@+id/textView15"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
@@ -247,11 +243,12 @@
                         android:clickable="false"
                         android:drawableRight="?android:attr/listChoiceIndicatorMultiple"
                         android:focusable="false"
+                        android:paddingBottom="4dp"
                         android:text="@string/reminder_status"
+                        android:textSize="16sp"
                         tools:ignore="RtlHardcoded"/>
 
                     <View
-                        android:id="@+id/divider15"
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:background="?android:attr/listDivider"/>
@@ -273,19 +270,19 @@
                         android:layout_height="wrap_content"
                         android:text="@string/reminder_time"
                         android:textColor="@color/primary_text_color"
-                        android:textSize="15sp"/>
+                        android:textSize="16sp"/>
 
                     <TextView
                         android:id="@+id/settings_notifications_time"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:paddingBottom="4dp"
                         android:text="-> 18:00"
                         android:textColor="@color/primary_text_color"
-                        android:textSize="11sp"
+                        android:textSize="14sp"
                         tools:ignore="SmallSp"/>
 
                     <View
-                        android:id="@+id/divider14"
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:background="?android:attr/listDivider"/>
@@ -298,7 +295,8 @@
                 android:id="@+id/settings_reset_btn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/btn_reset"/>
+                android:text="@string/btn_reset"
+                android:textSize="16sp"/>
         </LinearLayout>
     </ScrollView>
 

@@ -75,7 +75,6 @@
         <receiver
             android:name=".MyAlarmReceiver"
             android:process=":remote"/>
-
         <service
             android:name=".Services.BackupCreatorService"
             android:exported="false"

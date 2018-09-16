@@ -1,5 +1,6 @@
 package com.example.lucas.haushaltsmanager;
 
+import java.util.Calendar;
 import java.util.Locale;
 
 public class Time {
@@ -30,5 +31,14 @@ public class Time {
 
     public int getMinute() {
         return mMinute;
+    }
+
+    public long inMillis() {
+        Calendar time = Calendar.getInstance();
+        time.set(Calendar.HOUR_OF_DAY, mHour);
+        time.set(Calendar.MINUTE, mMinute);
+        time.set(Calendar.SECOND, 0);
+
+        return time.getTimeInMillis();
     }
 }

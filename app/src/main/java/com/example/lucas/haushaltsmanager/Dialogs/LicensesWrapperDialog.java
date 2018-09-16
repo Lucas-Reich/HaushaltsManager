@@ -34,8 +34,24 @@ public class LicensesWrapperDialog {
         notices.addNotice(getStorageChooserNotice());
         notices.addNotice(getAndroidColorPickerNotice());
         notices.addNotice(getAndroidChangelogDialogNotice());
+        notices.addNotice(getWorkManagerNotice());
 
         return notices;
+    }
+
+    /**
+     * Methode um den Lizenzen Eintrag für das OpenSource Projekt Andorid-WorkManager zu bekommen.
+     * Quelle: https://github.com/googlecodelabs/android-workmanager
+     *
+     * @return Android-WorkManager Notiz Eintrag
+     */
+    private Notice getWorkManagerNotice() {
+        return new Notice(
+                "Android-WorkManager",
+                "https://github.com/googlecodelabs/android-workmanager",
+                "Copyright 2018 Google, Inc.",
+                new ApacheSoftwareLicense20()
+        );
     }
 
     /**

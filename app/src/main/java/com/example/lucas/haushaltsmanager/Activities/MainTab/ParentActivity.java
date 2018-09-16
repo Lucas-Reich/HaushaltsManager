@@ -32,6 +32,7 @@ import com.example.lucas.haushaltsmanager.Activities.CreateBackupActivity;
 import com.example.lucas.haushaltsmanager.Activities.ImportExportActivity;
 import com.example.lucas.haushaltsmanager.Activities.RecurringBookingsActivity;
 import com.example.lucas.haushaltsmanager.Activities.SettingsActivity;
+import com.example.lucas.haushaltsmanager.AppInternalPreferences;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.CannotDeleteExpenseException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
@@ -293,16 +294,23 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
      * Anleitung siehe: https://guides.codepath.com/android/Starting-Background-Services#using-with-alarmmanager-for-periodic-tasks
      *///todo es sollte nicht jedes mal ein backup erstellt werden wenn die app aufgerufen wird
     private void scheduleBackupServiceAlarm() {
+        AppInternalPreferences preferences = new AppInternalPreferences(this);
 
-        Intent backupServiceIntent = new Intent(getApplicationContext(), MyAlarmReceiver.class);
+        //nur wenn noch kein BackupCreator service läuft soll einer gestartet werden
+        if (preferences.getBackupJobExecutionStatus()) {
 
-        final PendingIntent pendingIntent = PendingIntent.getBroadcast(this, MyAlarmReceiver.REQUEST_CODE, backupServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+            Intent backupServiceIntent = new Intent(getApplicationContext(), MyAlarmReceiver.class);
 
-        long startInMillis = System.currentTimeMillis();
+            final PendingIntent pendingIntent = PendingIntent.getBroadcast(this, MyAlarmReceiver.REQUEST_CODE, backupServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-        AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+            long startInMillis = System.currentTimeMillis();
 
-        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, startInMillis, AlarmManager.INTERVAL_DAY, pendingIntent);
+            AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+
+            alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, startInMillis, AlarmManager.INTERVAL_DAY, pendingIntent);
+
+            preferences.setBackupJobExecutionStatus(true);
+        }
     }
 
     //ab hier werden die aktiven konten gesetzt

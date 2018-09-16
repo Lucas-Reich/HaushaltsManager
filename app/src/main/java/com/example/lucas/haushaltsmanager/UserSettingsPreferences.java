@@ -25,10 +25,12 @@ public class UserSettingsPreferences {
     private static final String ACTIVE_ACCOUNT = "activeAccount";
 
     private SharedPreferences mPreferences;
+    private Context mContext;
 
     public UserSettingsPreferences(Context context) {
 
         mPreferences = context.getSharedPreferences(USER_SETTINGS, Context.MODE_PRIVATE);
+        mContext = context;
     }
 
     public Currency getMainCurrency() {
@@ -81,12 +83,13 @@ public class UserSettingsPreferences {
 
     public int getFirstDayOfWeek() {
 
-        return mPreferences.getInt(FIRST_DAY_OF_WEEK, WeekdayUtils.getWeekday(SettingsActivity.DEFAULT_WEEKDAY));
+        return mPreferences.getInt(FIRST_DAY_OF_WEEK, SettingsActivity.DEFAULT_WEEKDAY);
     }
 
     public void setFirstDayOfWeek(String firstDayOfWeek) {
+        WeekdayUtils weekdayUtils = new WeekdayUtils(mContext);
 
-        mPreferences.edit().putInt(FIRST_DAY_OF_WEEK, WeekdayUtils.getWeekday(firstDayOfWeek)).apply();
+        mPreferences.edit().putInt(FIRST_DAY_OF_WEEK, weekdayUtils.getWeekdayIndex(firstDayOfWeek)).apply();
     }
 
     public boolean getAutomaticBackupStatus() {

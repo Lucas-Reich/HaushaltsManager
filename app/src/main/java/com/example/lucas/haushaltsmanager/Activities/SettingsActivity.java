@@ -11,17 +11,27 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.lucas.haushaltsmanager.AppInternalPreferences;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepository;
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.SingleChoiceDialog;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
+import com.example.lucas.haushaltsmanager.NotificationWorker;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Time;
 import com.example.lucas.haushaltsmanager.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.WeekdayUtils;
 
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -30,7 +40,7 @@ public class SettingsActivity extends AppCompatActivity {
      * Die Höhe dieser Zahl hat keinen Grund und könnte genauso gut 1 oder 100 sein.
      */
     public static final int DEFAULT_BACKUP_CAP = 20;
-    public static final String DEFAULT_WEEKDAY = WeekdayUtils.MONDAY;
+    public static final int DEFAULT_WEEKDAY = WeekdayUtils.MONDAY;
     public static final boolean DEFAULT_BACKUP_STATUS = true;
     public static final boolean DEFAULT_REMINDER_STATUS = false;
     public static final Time DEFAULT_REMINDER_TIME = new Time(10, 0);
@@ -40,6 +50,8 @@ public class SettingsActivity extends AppCompatActivity {
     private CheckBox createBackupsChk, allowReminderChk;
     private TextView currencyNameTxt, firstDayOfWeekTxt, maxBackupCountTxt, backupCountTextTxt, notificationTimeTxt, notificationTimeTextTxt;
     private UserSettingsPreferences mUserSettings;
+    private WeekdayUtils mWeekdayUtils;
+    private AppInternalPreferences mInternalPreferences;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -73,8 +85,11 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        mWeekdayUtils = new WeekdayUtils(this);
 
-        setFirstDayOfWeek(WeekdayUtils.getWeekday(mUserSettings.getFirstDayOfWeek()));
+        mInternalPreferences = new AppInternalPreferences(this);
+
+        setFirstDayOfWeek(mWeekdayUtils.getWeekday(mUserSettings.getFirstDayOfWeek()));
         firstDayLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -82,7 +97,7 @@ public class SettingsActivity extends AppCompatActivity {
                 SingleChoiceDialog<String> weekdayPicker = new SingleChoiceDialog<>();
                 weekdayPicker.createBuilder(SettingsActivity.this);
                 weekdayPicker.setTitle(getString(R.string.choose_weekday));
-                weekdayPicker.setContent(Arrays.asList(WeekdayUtils.getWeekdays()), -1);
+                weekdayPicker.setContent(Arrays.asList(mWeekdayUtils.getWeekdays()), mUserSettings.getFirstDayOfWeek());
                 weekdayPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
                     @Override
                     public void onPositiveClick(Object weekday) {
@@ -140,10 +155,13 @@ public class SettingsActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
+                List<Currency> currencies = CurrencyRepository.getAll();
+                int mainCurrencyIndex = currencies.indexOf(mUserSettings.getMainCurrency());
+
                 SingleChoiceDialog<Currency> currencyPicker = new SingleChoiceDialog<>();
                 currencyPicker.createBuilder(SettingsActivity.this);
                 currencyPicker.setTitle(getString(R.string.select_currency));
-                currencyPicker.setContent(CurrencyRepository.getAll(), -1);
+                currencyPicker.setContent(currencies, mainCurrencyIndex);
                 currencyPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
                     @Override
                     public void onPositiveClick(Object entry) {
@@ -162,11 +180,11 @@ public class SettingsActivity extends AppCompatActivity {
         });
 
         setReminderStatus(mUserSettings.getReminderStatus());
-        notificationsAllowLayout.setOnClickListener(new View.OnClickListener() {
+        allowReminderChk.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View v) {
 
-                setReminderStatus(!allowReminderChk.isChecked());
+                setReminderStatus(allowReminderChk.isChecked());
             }
         });
 
@@ -211,7 +229,7 @@ public class SettingsActivity extends AppCompatActivity {
 
                         if (reset) {
 
-                            setFirstDayOfWeek(DEFAULT_WEEKDAY);
+                            setFirstDayOfWeek(mWeekdayUtils.getWeekday(DEFAULT_WEEKDAY));
                             setAutomaticBackupStatus(DEFAULT_BACKUP_STATUS);
                             setMaxBackupCount(DEFAULT_BACKUP_CAP);
                             setReminderStatus(DEFAULT_REMINDER_STATUS);
@@ -359,11 +377,62 @@ public class SettingsActivity extends AppCompatActivity {
      * @param remindUser TRUE wenn der User erinnert werden soll, FALSE wenn nicht
      */
     private void setReminderStatus(boolean remindUser) {
+        AppInternalPreferences internalPreferences = new AppInternalPreferences(this);
 
         mUserSettings.setReminderStatus(remindUser);
         allowReminderChk.setChecked(remindUser);
 
         setNotificationStatusClickable(remindUser);
+
+        if (remindUser && !internalPreferences.getNotificationStatus()) {
+
+            startNotificationWorker();
+            Toast.makeText(this, "Starting Worker", Toast.LENGTH_SHORT).show();
+        } else if (!remindUser && internalPreferences.getNotificationStatus()) {
+
+            stopNotificationWorker(internalPreferences.getNotificationJobId());
+            Toast.makeText(this, "Stopping Worker", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * Methode welche die WorkerId des NotificationWorkers in den InternalPreferences speichert.
+     *
+     * @param id Zu speichernde Id
+     */
+    private void saveWorkerId(String id) {
+
+        mInternalPreferences = new AppInternalPreferences(getApplicationContext());
+        mInternalPreferences.setNotificationJobId(id);
+    }
+
+    /**
+     * Methode um den NotificationWorker zu starten
+     */
+    private void startNotificationWorker() {
+
+        OneTimeWorkRequest workRequest = new OneTimeWorkRequest
+                .Builder(NotificationWorker.class)
+                .setInitialDelay(mUserSettings.getReminderTime().inMillis() - Calendar.getInstance().getTimeInMillis(), TimeUnit.MILLISECONDS)
+                .build();
+
+        saveWorkerId(workRequest.getId().toString());
+        WorkManager.getInstance().enqueue(workRequest);
+
+        mInternalPreferences.setNotificationStatus(true);
+    }
+
+    /**
+     * Methode um ein bestimmten Worker zu stoppen
+     *
+     * @param id ID des Workers
+     */
+    private void stopNotificationWorker(String id) {
+
+        WorkManager.getInstance().cancelWorkById(UUID.fromString(id));
+        saveWorkerId("");
+
+        mInternalPreferences.setNotificationStatus(false);
     }
 
     /**
@@ -393,5 +462,12 @@ public class SettingsActivity extends AppCompatActivity {
 
         mUserSettings.setReminderTime(time);
         notificationTimeTxt.setText(time.getTime());
+
+        if (mInternalPreferences.getNotificationStatus()) {
+            stopNotificationWorker(mInternalPreferences.getNotificationJobId());
+            startNotificationWorker();
+
+            Toast.makeText(this, "Rescheduling Worker", Toast.LENGTH_SHORT).show();
+        }
     }
 }
