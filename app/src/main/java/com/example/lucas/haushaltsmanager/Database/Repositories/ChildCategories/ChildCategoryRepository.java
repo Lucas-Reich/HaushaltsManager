@@ -1,6 +1,7 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -17,9 +18,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ChildCategoryRepository {
+    private SQLiteDatabase mDatabase;
 
-    public static boolean exists(Category category) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public ChildCategoryRepository(Context context) {
+        DatabaseManager.initializeInstance(new ExpensesDbHelper(context));
+
+        mDatabase = DatabaseManager.getInstance().openDatabase();
+    }
+
+    public boolean exists(Category category) {
 
         String selectQuery;
         selectQuery = "SELECT"
@@ -31,22 +38,19 @@ public class ChildCategoryRepository {
                 + " AND " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CHILD_CATEGORIES_COL_DEFAULT_EXPENSE_TYPE + " = " + (category.getDefaultExpenseType() ? 1 : 0)
                 + " LIMIT 1;";
 
-        Cursor c = db.rawQuery(selectQuery, null);
+        Cursor c = mDatabase.rawQuery(selectQuery, null);
 
         if (c.moveToFirst()) {
 
             c.close();
-            DatabaseManager.getInstance().closeDatabase();
             return true;
         }
 
         c.close();
-        DatabaseManager.getInstance().closeDatabase();
         return false;
     }
 
-    public static Category get(long categoryId) throws ChildCategoryNotFoundException {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public Category get(long categoryId) throws ChildCategoryNotFoundException {
 
         String selectQuery = "SELECT "
                 + ExpensesDbHelper.CHILD_CATEGORIES_COL_ID + ", "
@@ -56,7 +60,7 @@ public class ChildCategoryRepository {
                 + " FROM " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES
                 + " WHERE " + ExpensesDbHelper.CHILD_CATEGORIES_COL_ID + " = " + categoryId + ";";
 
-        Cursor c = db.rawQuery(selectQuery, null);
+        Cursor c = mDatabase.rawQuery(selectQuery, null);
 
         if (!c.moveToFirst()) {
             throw new ChildCategoryNotFoundException(categoryId);
@@ -65,12 +69,10 @@ public class ChildCategoryRepository {
         Category category = cursorToChildCategory(c);
 
         c.close();
-        DatabaseManager.getInstance().closeDatabase();
         return category;
     }
 
-    public static List<Category> getAll(long parentId) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public List<Category> getAll(long parentId) {
 
         String selectQuery = "SELECT "
                 + ExpensesDbHelper.CHILD_CATEGORIES_COL_ID + ", "
@@ -81,7 +83,7 @@ public class ChildCategoryRepository {
                 + "WHERE " + ExpensesDbHelper.CHILD_CATEGORIES_COL_PARENT_ID + " = '" + parentId + "' "
                 + "AND " + ExpensesDbHelper.CHILD_CATEGORIES_COL_HIDDEN + " = '" + 0 + "';";
 
-        Cursor c = db.rawQuery(selectQuery, null);
+        Cursor c = mDatabase.rawQuery(selectQuery, null);
 
         c.moveToFirst();
         ArrayList<Category> categories = new ArrayList<>();
@@ -91,14 +93,12 @@ public class ChildCategoryRepository {
             c.moveToNext();
         }
 
-        DatabaseManager.getInstance().closeDatabase();
         c.close();
 
         return categories;
     }
 
-    public static Category insert(Category parentCategory, Category childCategory) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public Category insert(Category parentCategory, Category childCategory) {
 
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.CHILD_CATEGORIES_COL_NAME, childCategory.getTitle());
@@ -107,8 +107,7 @@ public class ChildCategoryRepository {
         values.put(ExpensesDbHelper.CHILD_CATEGORIES_COL_PARENT_ID, parentCategory.getIndex());
         values.put(ExpensesDbHelper.CHILD_CATEGORIES_COL_DEFAULT_EXPENSE_TYPE, childCategory.getDefaultExpenseType() ? 1 : 0);
 
-        long insertedCategoryId = db.insert(ExpensesDbHelper.TABLE_CHILD_CATEGORIES, null, values);
-        DatabaseManager.getInstance().closeDatabase();
+        long insertedCategoryId = mDatabase.insert(ExpensesDbHelper.TABLE_CHILD_CATEGORIES, null, values);
 
         return new Category(
                 insertedCategoryId,
@@ -119,8 +118,7 @@ public class ChildCategoryRepository {
         );
     }
 
-    public static void delete(Category category) throws CannotDeleteChildCategoryException {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public void delete(Category category) throws CannotDeleteChildCategoryException {
 
         if (isAttachedToParentBooking(category))
             throw CannotDeleteChildCategoryException.childCategoryAttachedToParentExpenseException(category);
@@ -134,7 +132,7 @@ public class ChildCategoryRepository {
 
                 Category parentCategory = getParent(category);
 
-                db.delete(ExpensesDbHelper.TABLE_CHILD_CATEGORIES, ExpensesDbHelper.CHILD_CATEGORIES_COL_ID + " = ?", new String[]{"" + category.getIndex()});
+                mDatabase.delete(ExpensesDbHelper.TABLE_CHILD_CATEGORIES, ExpensesDbHelper.CHILD_CATEGORIES_COL_ID + " = ?", new String[]{"" + category.getIndex()});
                 deleteParentCategory(parentCategory);
 
             } catch (CannotDeleteCategoryException e) {
@@ -144,41 +142,34 @@ public class ChildCategoryRepository {
             }
         }
 
-        db.delete(ExpensesDbHelper.TABLE_CHILD_CATEGORIES, ExpensesDbHelper.CHILD_CATEGORIES_COL_ID + " = ?", new String[]{"" + category.getIndex()});
-
-        DatabaseManager.getInstance().closeDatabase();
+        mDatabase.delete(ExpensesDbHelper.TABLE_CHILD_CATEGORIES, ExpensesDbHelper.CHILD_CATEGORIES_COL_ID + " = ?", new String[]{"" + category.getIndex()});
     }
 
-    public static void update(Category category) throws ChildCategoryNotFoundException {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public void update(Category category) throws ChildCategoryNotFoundException {
 
         ContentValues updatedCategory = new ContentValues();
         updatedCategory.put(ExpensesDbHelper.CHILD_CATEGORIES_COL_NAME, category.getTitle());
         updatedCategory.put(ExpensesDbHelper.CHILD_CATEGORIES_COL_COLOR, category.getColorString());
         updatedCategory.put(ExpensesDbHelper.CHILD_CATEGORIES_COL_DEFAULT_EXPENSE_TYPE, category.getDefaultExpenseType());
 
-        int affectedRows = db.update(ExpensesDbHelper.TABLE_CHILD_CATEGORIES, updatedCategory, ExpensesDbHelper.CHILD_CATEGORIES_COL_ID + " = ?", new String[]{"" + category.getIndex()});
-        DatabaseManager.getInstance().closeDatabase();
+        int affectedRows = mDatabase.update(ExpensesDbHelper.TABLE_CHILD_CATEGORIES, updatedCategory, ExpensesDbHelper.CHILD_CATEGORIES_COL_ID + " = ?", new String[]{"" + category.getIndex()});
 
         if (affectedRows == 0)
             throw new ChildCategoryNotFoundException(category.getIndex());
     }
 
-    public static void hide(Category category) throws ChildCategoryNotFoundException {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public void hide(Category category) throws ChildCategoryNotFoundException {
 
         ContentValues updatedCategory = new ContentValues();
         updatedCategory.put(ExpensesDbHelper.CHILD_CATEGORIES_COL_HIDDEN, 1);
 
-        int affectedRows = db.update(ExpensesDbHelper.TABLE_CHILD_CATEGORIES, updatedCategory, ExpensesDbHelper.CHILD_CATEGORIES_COL_ID + " = ?", new String[]{"" + category.getIndex()});
-        DatabaseManager.getInstance().closeDatabase();
+        int affectedRows = mDatabase.update(ExpensesDbHelper.TABLE_CHILD_CATEGORIES, updatedCategory, ExpensesDbHelper.CHILD_CATEGORIES_COL_ID + " = ?", new String[]{"" + category.getIndex()});
 
         if (affectedRows == 0)
             throw new ChildCategoryNotFoundException(category.getIndex());
     }
 
-    private static Category getParent(Category childCategory) throws CategoryNotFoundException {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    private Category getParent(Category childCategory) throws CategoryNotFoundException {
 
         String subQuery;
         subQuery = "(SELECT "
@@ -197,7 +188,7 @@ public class ChildCategoryRepository {
                 + " FROM " + ExpensesDbHelper.TABLE_CATEGORIES
                 + " WHERE " + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_ID + " = " + subQuery + ";";
 
-        Cursor c = db.rawQuery(selectQuery, null);
+        Cursor c = mDatabase.rawQuery(selectQuery, null);
 
         if (!c.moveToFirst()) {
             throw new CategoryNotFoundException(childCategory.getIndex());
@@ -206,12 +197,10 @@ public class ChildCategoryRepository {
         Category category = CategoryRepository.cursorToCategory(c);
 
         c.close();
-        DatabaseManager.getInstance().closeDatabase();
         return category;
     }
 
-    private static boolean isAttachedToParentBooking(Category category) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    private boolean isAttachedToParentBooking(Category category) {
         String selectQuery;
 
         selectQuery = "SELECT"
@@ -220,22 +209,19 @@ public class ChildCategoryRepository {
                 + " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID + " = " + category.getIndex()
                 + " LIMIT 1;";
 
-        Cursor c = db.rawQuery(selectQuery, null);
+        Cursor c = mDatabase.rawQuery(selectQuery, null);
 
         if (c.moveToFirst()) {
 
             c.close();
-            DatabaseManager.getInstance().closeDatabase();
             return true;
         }
 
         c.close();
-        DatabaseManager.getInstance().closeDatabase();
         return false;
     }
 
-    private static boolean isAttachedToChildBooking(Category category) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    private boolean isAttachedToChildBooking(Category category) {
         String selectQuery;
 
         selectQuery = "SELECT"
@@ -244,22 +230,19 @@ public class ChildCategoryRepository {
                 + " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID + " = " + category.getIndex()
                 + " LIMIT 1;";
 
-        Cursor c = db.rawQuery(selectQuery, null);
+        Cursor c = mDatabase.rawQuery(selectQuery, null);
 
         if (c.moveToFirst()) {
 
             c.close();
-            DatabaseManager.getInstance().closeDatabase();
             return true;
         }
 
         c.close();
-        DatabaseManager.getInstance().closeDatabase();
         return false;
     }
 
-    private static boolean isLastChildOfParent(Category category) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    private boolean isLastChildOfParent(Category category) {
 
         String subSelectQuery;
         subSelectQuery = "(SELECT"
@@ -275,27 +258,24 @@ public class ChildCategoryRepository {
                 + " WHERE " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CHILD_CATEGORIES_COL_PARENT_ID + " = " + subSelectQuery
                 + ";";
 
-        Cursor c = db.rawQuery(selectQuery, null);
+        Cursor c = mDatabase.rawQuery(selectQuery, null);
 
         if (c.getCount() == 1) {
 
             c.close();
-            DatabaseManager.getInstance().closeDatabase();
             return true;
         }
 
         c.close();
-        DatabaseManager.getInstance().closeDatabase();
         return false;
     }
 
-    private static void deleteParentCategory(Category parentCategory) throws CannotDeleteCategoryException {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    private void deleteParentCategory(Category parentCategory) throws CannotDeleteCategoryException {
 
         if (!isLastChildOfParent(parentCategory))
             throw new CannotDeleteCategoryException(parentCategory);
 
-        db.delete(ExpensesDbHelper.TABLE_CATEGORIES, ExpensesDbHelper.CATEGORIES_COL_ID + " = ?", new String[]{"" + parentCategory.getIndex()});
+        mDatabase.delete(ExpensesDbHelper.TABLE_CATEGORIES, ExpensesDbHelper.CATEGORIES_COL_ID + " = ?", new String[]{"" + parentCategory.getIndex()});
         DatabaseManager.getInstance().closeDatabase();
     }
 

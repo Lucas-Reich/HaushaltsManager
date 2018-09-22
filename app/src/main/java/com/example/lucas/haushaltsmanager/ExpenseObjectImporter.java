@@ -2,6 +2,7 @@ package com.example.lucas.haushaltsmanager;
 
 import android.content.Context;
 
+import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 
@@ -94,6 +95,6 @@ public class ExpenseObjectImporter {
      */
     private void saveExpenseObjects(List<ExpenseObject> expenses) {
         for (ExpenseObject expense : expenses)
-            ExpenseRepository.insert(expense);
+            new ExpenseRepository(app.getContext()).insert(expense);//todo
     }
 }

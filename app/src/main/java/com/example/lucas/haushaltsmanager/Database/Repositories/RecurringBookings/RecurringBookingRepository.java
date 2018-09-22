@@ -1,9 +1,11 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.Exceptions.EntityNotExistingException;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
@@ -18,9 +20,17 @@ import java.util.List;
 public class RecurringBookingRepository {
     //todo ein neues Objekt erstellen RecurringBooking
     //dieses Objekt hat index, start, end, häufigkeit und ExpenseObject als felder
+    private SQLiteDatabase mDatabase;
+    private ExpenseRepository mBookingRepo;
 
-    public static boolean exists(ExpenseObject recurringBooking) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public RecurringBookingRepository(Context context) {
+        DatabaseManager.initializeInstance(new ExpensesDbHelper(context));
+
+        mDatabase = DatabaseManager.getInstance().openDatabase();
+        mBookingRepo = new ExpenseRepository(context);
+    }
+
+    public boolean exists(ExpenseObject recurringBooking) {
 
         String selectQuery;
         selectQuery = "SELECT"
@@ -29,12 +39,11 @@ public class RecurringBookingRepository {
                 + " WHERE " + ExpensesDbHelper.TABLE_RECURRING_BOOKINGS + "." + ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID + " = " + recurringBooking.getIndex()
                 + " LIMIT 1;";
 
-        Cursor c = db.rawQuery(selectQuery, null);
+        Cursor c = mDatabase.rawQuery(selectQuery, null);
 
         if (c.moveToFirst()) {
 
             c.close();
-            DatabaseManager.getInstance().closeDatabase();
             return true;
         }
 
@@ -43,10 +52,9 @@ public class RecurringBookingRepository {
         return false;
     }
 
-    public static ExpenseObject insert(ExpenseObject expense, long startTimeInMillis, int frequency, long endTimeInMillis) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public ExpenseObject insert(ExpenseObject expense, long startTimeInMillis, int frequency, long endTimeInMillis) {
 
-        ExpenseRepository.assertSavableExpense(expense);
+        mBookingRepo.assertSavableExpense(expense);
 
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID, expense.getIndex());
@@ -54,8 +62,7 @@ public class RecurringBookingRepository {
         values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_FREQUENCY, frequency);
         values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_END, endTimeInMillis);
 
-        long insertedRecurringBookingId = db.insert(ExpensesDbHelper.TABLE_RECURRING_BOOKINGS, null, values);
-        DatabaseManager.getInstance().closeDatabase();
+        long insertedRecurringBookingId = mDatabase.insert(ExpensesDbHelper.TABLE_RECURRING_BOOKINGS, null, values);
 
         return new ExpenseObject(
                 insertedRecurringBookingId,
@@ -73,15 +80,14 @@ public class RecurringBookingRepository {
         );
     }
 
-    public static ExpenseObject get(long recurringBookingId) throws RecurringBookingNotFoundException {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public ExpenseObject get(long recurringBookingId) throws RecurringBookingNotFoundException {
 
         String selectQuery = "SELECT "
                 + ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID
                 + " FROM " + ExpensesDbHelper.TABLE_RECURRING_BOOKINGS
                 + " WHERE " + ExpensesDbHelper.RECURRING_BOOKINGS_COL_ID + " = " + recurringBookingId;
 
-        Cursor c = db.rawQuery(selectQuery, null);
+        Cursor c = mDatabase.rawQuery(selectQuery, null);
 
         if (!c.moveToFirst()) {
             throw new RecurringBookingNotFoundException(recurringBookingId);
@@ -94,17 +100,15 @@ public class RecurringBookingRepository {
 
             //Kann keine Buchung zu einer Wiederkehrenden Buchung gefunden werden so wird diese aus der Datenbank gelöcht.
             //Buchungen die einmal gelöscht wurden können nachträglicg nicht mehr wiederhergestellt werden.
-            db.delete(ExpensesDbHelper.TABLE_RECURRING_BOOKINGS, ExpensesDbHelper.RECURRING_BOOKINGS_COL_ID + " = ?", new String[]{"" + recurringBookingId});
+            mDatabase.delete(ExpensesDbHelper.TABLE_RECURRING_BOOKINGS, ExpensesDbHelper.RECURRING_BOOKINGS_COL_ID + " = ?", new String[]{"" + recurringBookingId});
             throw new RecurringBookingNotFoundException(recurringBookingId);
         }
 
         c.close();
-        DatabaseManager.getInstance().closeDatabase();
         return expense;
     }
 
-    public static List<ExpenseObject> getAll(Calendar dateRangeStart, Calendar dateRangeEnd) {//TODO nicht ganz zufrieden mit der funktion, bitte überdenken
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public List<ExpenseObject> getAll(Calendar dateRangeStart, Calendar dateRangeEnd) {//TODO nicht ganz zufrieden mit der funktion, bitte überdenken
 
         //exclude all events which end before the given date range
         String selectQuery = "SELECT "
@@ -113,7 +117,7 @@ public class RecurringBookingRepository {
                 + " FROM " + ExpensesDbHelper.TABLE_RECURRING_BOOKINGS
                 + " WHERE " + ExpensesDbHelper.RECURRING_BOOKINGS_COL_END + " > " + dateRangeEnd.getTimeInMillis() + ";";
 
-        Cursor c = db.rawQuery(selectQuery, null);
+        Cursor c = mDatabase.rawQuery(selectQuery, null);
 
         c.moveToFirst();
 
@@ -163,13 +167,11 @@ public class RecurringBookingRepository {
             c.moveToNext();
         }
 
-        DatabaseManager.getInstance().closeDatabase();
         c.close();
         return allRecurringBookings;
     }
 
-    public static boolean update(ExpenseObject newRecurringBooking, long startDateInMills, int frequency, long endDateInMills, long recurringId) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public boolean update(ExpenseObject newRecurringBooking, long startDateInMills, int frequency, long endDateInMills, long recurringId) {
 
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID, newRecurringBooking.getIndex());
@@ -177,23 +179,20 @@ public class RecurringBookingRepository {
         values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_FREQUENCY, frequency);
         values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_END, endDateInMills);
 
-        int affectedRows = db.update(ExpensesDbHelper.TABLE_RECURRING_BOOKINGS, values, ExpensesDbHelper.RECURRING_BOOKINGS_COL_ID + " = ?", new String[]{"" + recurringId});
-        DatabaseManager.getInstance().closeDatabase();
+        int affectedRows = mDatabase.update(ExpensesDbHelper.TABLE_RECURRING_BOOKINGS, values, ExpensesDbHelper.RECURRING_BOOKINGS_COL_ID + " = ?", new String[]{"" + recurringId});
 
         return affectedRows == 1;
     }
 
-    public static void delete(long recurringBookingId) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public void delete(long recurringBookingId) {
 
-        db.delete(ExpensesDbHelper.TABLE_RECURRING_BOOKINGS, ExpensesDbHelper.RECURRING_BOOKINGS_COL_ID + "= ?", new String[]{"" + recurringBookingId});
-        DatabaseManager.getInstance().closeDatabase();
+        mDatabase.delete(ExpensesDbHelper.TABLE_RECURRING_BOOKINGS, ExpensesDbHelper.RECURRING_BOOKINGS_COL_ID + "= ?", new String[]{"" + recurringBookingId});
     }
 
     private static ExpenseObject getExpense(Cursor c) throws EntityNotExistingException {
         //ich kann nun nicht mehr unterscheiden welchen typ von ausgabe ich genau habe
         //an sich nicht schlimm da ich auch Kinder aus dem ExpensesRepo bekomme, aber nicht der schönste weg
         //todo gibt es einen anderen Weg die Expense zu bekommen
-        return ExpenseRepository.get(c.getLong(c.getColumnIndex(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID)));
+        return new ExpenseRepository(app.getContext()).get(c.getLong(c.getColumnIndex(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID)));//todo
     }
 }

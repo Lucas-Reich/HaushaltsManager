@@ -22,6 +22,7 @@ public class RecurringBookingsActivity extends AppCompatActivity {
     private ListView mListView;
     private Calendar mStartDate = Calendar.getInstance();
     private Calendar mEndDate = Calendar.getInstance();
+    private RecurringBookingRepository mRecurrintBookingRepo;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -31,6 +32,8 @@ public class RecurringBookingsActivity extends AppCompatActivity {
         initializeToolbar();
 
         mListView = (ListView) findViewById(R.id.booking_listview);
+
+        mRecurrintBookingRepo = new RecurringBookingRepository(this);
     }
 
     @Override
@@ -82,7 +85,7 @@ public class RecurringBookingsActivity extends AppCompatActivity {
         mStartDate.set(mStartDate.get(Calendar.YEAR), mStartDate.get(Calendar.MONTH), 1);
         mEndDate.set(mEndDate.get(Calendar.YEAR), mEndDate.get(Calendar.MONTH), mEndDate.getActualMaximum(Calendar.DAY_OF_MONTH));
 
-        mRecurringBookings = RecurringBookingRepository.getAll(mStartDate, mEndDate);
+        mRecurringBookings = mRecurrintBookingRepo.getAll(mStartDate, mEndDate);
     }
 
     public void setStartDate(long startInMills) {

@@ -1,6 +1,5 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.Tags;
 
-import android.content.Context;
 import android.database.CursorIndexOutOfBoundsException;
 import android.database.MatrixCursor;
 
@@ -14,6 +13,7 @@ import com.example.lucas.haushaltsmanager.Entities.Tag;
 
 import junit.framework.Assert;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,12 +28,22 @@ import static org.mockito.Mockito.when;
 
 @RunWith(RobolectricTestRunner.class)
 public class TagRepositoryTest {
+    private TagRepository mTagRepo;
+    private BookingTagRepository mBookingTagRepo;
 
     @Before
     public void setup() {
-        Context context = RuntimeEnvironment.application;
-        ExpensesDbHelper dbHelper = new ExpensesDbHelper(context);
+        ExpensesDbHelper dbHelper = new ExpensesDbHelper(RuntimeEnvironment.application);
         DatabaseManager.initializeInstance(dbHelper);
+
+        mTagRepo = new TagRepository(RuntimeEnvironment.application);
+        mBookingTagRepo = new BookingTagRepository(RuntimeEnvironment.application);
+    }
+
+    @After
+    public void teardown() {
+
+        DatabaseManager.getInstance().closeDatabase();
     }
 
     private Tag getSimpleTag() {
@@ -44,9 +54,9 @@ public class TagRepositoryTest {
 
     @Test
     public void testExistsWithExistingTagShouldSucceed() {
-        Tag tag = TagRepository.insert(getSimpleTag());
+        Tag tag = mTagRepo.insert(getSimpleTag());
 
-        boolean exists = TagRepository.exists(tag);
+        boolean exists = mTagRepo.exists(tag);
         assertTrue("Das Tag wurde nicht in der Datenbank gefunden", exists);
     }
 
@@ -54,16 +64,16 @@ public class TagRepositoryTest {
     public void testExistsWithNotExistingTagShouldFail() {
         Tag tag = getSimpleTag();
 
-        boolean exists = TagRepository.exists(tag);
+        boolean exists = mTagRepo.exists(tag);
         assertFalse("Das Tag wurde in der Datenbank gefunden", exists);
     }
 
     @Test
     public void testGetWithExistingTagShouldSucceed() {
-        Tag expectedTag = TagRepository.insert(getSimpleTag());
+        Tag expectedTag = mTagRepo.insert(getSimpleTag());
 
         try {
-            Tag fetchedTag = TagRepository.get(expectedTag.getIndex());
+            Tag fetchedTag = mTagRepo.get(expectedTag.getIndex());
             assertEquals(expectedTag, fetchedTag);
 
         } catch (TagNotFoundException e) {
@@ -77,7 +87,7 @@ public class TagRepositoryTest {
         long notExistingTagId = 313;
 
         try {
-            TagRepository.get(notExistingTagId);
+            mTagRepo.get(notExistingTagId);
 
             Assert.fail("Nicht existierendes Tag wurde in der Datenbank gefunden.");
 
@@ -89,10 +99,10 @@ public class TagRepositoryTest {
 
     @Test
     public void testInsertWithValidTagShouldSucceed() {
-        Tag expectedTag = TagRepository.insert(getSimpleTag());
+        Tag expectedTag = mTagRepo.insert(getSimpleTag());
 
         try {
-            Tag fetchedTag = TagRepository.get(expectedTag.getIndex());
+            Tag fetchedTag = mTagRepo.get(expectedTag.getIndex());
             assertEquals(expectedTag, fetchedTag);
 
         } catch (TagNotFoundException e) {
@@ -108,15 +118,15 @@ public class TagRepositoryTest {
 
     @Test
     public void testDeleteWithExistingTagShouldSucceed() {
-        Tag tag = TagRepository.insert(getSimpleTag());
+        Tag tag = mTagRepo.insert(getSimpleTag());
 
         try {
-            TagRepository.delete(tag);
-            assertFalse("Tag wurde nicht aus der Datenbank gelöscht", TagRepository.exists(tag));
+            mTagRepo.delete(tag);
+            assertFalse("Tag wurde nicht aus der Datenbank gelöscht", mTagRepo.exists(tag));
 
         } catch (CannotDeleteTagException e) {
 
-            assertTrue("Tag wurde nicht gelöscht", TagRepository.exists(tag));
+            assertTrue("Tag wurde nicht gelöscht", mTagRepo.exists(tag));
             Assert.fail("Tag konnte nicht gelöscht werden");
         }
     }
@@ -126,8 +136,8 @@ public class TagRepositoryTest {
         Tag tag = getSimpleTag();
 
         try {
-            TagRepository.delete(tag);
-            assertFalse("Tag wurde nicht as der Datenbank gelöscht", TagRepository.exists(tag));
+            mTagRepo.delete(tag);
+            assertFalse("Tag wurde nicht as der Datenbank gelöscht", mTagRepo.exists(tag));
 
         } catch (CannotDeleteTagException e) {
 
@@ -141,12 +151,12 @@ public class TagRepositoryTest {
         when(expenseObjectMock.getIndex()).thenReturn(100L);
         when(expenseObjectMock.getExpenseType()).thenReturn(ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE);
 
-        Tag tag = TagRepository.insert(getSimpleTag());
+        Tag tag = mTagRepo.insert(getSimpleTag());
 
-        BookingTagRepository.insert(expenseObjectMock.getIndex(), tag, expenseObjectMock.getExpenseType());
+        mBookingTagRepo.insert(expenseObjectMock.getIndex(), tag);
 
         try {
-            TagRepository.delete(tag);
+            mTagRepo.delete(tag);
             Assert.fail("Tag konnte gelöscht werden obwohl es noch einer Buchung zugeordnet ist.");
 
         } catch (CannotDeleteTagException e) {
@@ -157,12 +167,12 @@ public class TagRepositoryTest {
 
     @Test
     public void testUpdateWithExistingTagShouldSucceed() {
-        Tag expectedTag = TagRepository.insert(getSimpleTag());
+        Tag expectedTag = mTagRepo.insert(getSimpleTag());
 
         try {
             expectedTag.setName("New Tag Name");
-            TagRepository.update(expectedTag);
-            Tag fetchedTag = TagRepository.get(expectedTag.getIndex());
+            mTagRepo.update(expectedTag);
+            Tag fetchedTag = mTagRepo.get(expectedTag.getIndex());
 
             assertEquals(expectedTag, fetchedTag);
 
@@ -177,7 +187,7 @@ public class TagRepositoryTest {
         Tag tag = getSimpleTag();
 
         try {
-            TagRepository.update(tag);
+            mTagRepo.update(tag);
             Assert.fail("Nicht existierendes Tag gefunden");
 
         } catch (TagNotFoundException e) {
@@ -200,7 +210,7 @@ public class TagRepositoryTest {
         cursor.moveToFirst();
 
         try {
-            Tag fetchedTag = TagRepository.cursorToTag(cursor);
+            Tag fetchedTag = mTagRepo.cursorToTag(cursor);
             assertEquals(expectedTag, fetchedTag);
 
         } catch (CursorIndexOutOfBoundsException e) {
@@ -223,7 +233,7 @@ public class TagRepositoryTest {
         cursor.moveToFirst();
 
         try {
-            TagRepository.cursorToTag(cursor);
+            mTagRepo.cursorToTag(cursor);
             Assert.fail("Tag konnte trotz fehlender attribute erstellt werden");
 
         } catch (CursorIndexOutOfBoundsException e) {

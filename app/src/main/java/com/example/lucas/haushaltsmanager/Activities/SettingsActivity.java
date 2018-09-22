@@ -50,11 +50,14 @@ public class SettingsActivity extends AppCompatActivity {
     private UserSettingsPreferences mUserSettings;
     private WeekdayUtils mWeekdayUtils;
     private AppInternalPreferences mInternalPreferences;
+    private CurrencyRepository mCurrencyRepo;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+
+        mCurrencyRepo = new CurrencyRepository(this);
 
         firstDayLayout = findViewById(R.id.settings_first_day_wrapper);
         createBkpLayout = findViewById(R.id.settings_backups_enable_wrapper);
@@ -153,7 +156,7 @@ public class SettingsActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                List<Currency> currencies = CurrencyRepository.getAll();
+                List<Currency> currencies = mCurrencyRepo.getAll();
                 int mainCurrencyIndex = currencies.indexOf(mUserSettings.getMainCurrency());
 
                 SingleChoiceDialog<Currency> currencyPicker = new SingleChoiceDialog<>();

@@ -26,24 +26,21 @@ public class UserSettingsPreferences {
 
     private SharedPreferences mPreferences;
     private Context mContext;
+    private AccountRepository mAccountRepo;
+    private CurrencyRepository mCurrencyRepo;
 
     public UserSettingsPreferences(Context context) {
 
         mPreferences = context.getSharedPreferences(USER_SETTINGS, Context.MODE_PRIVATE);
         mContext = context;
+        mAccountRepo = new AccountRepository(context);
+        mCurrencyRepo = new CurrencyRepository(context);
     }
 
     public Currency getMainCurrency() {
         long mainCurrencyId = mPreferences.getLong(MAIN_CURRENCY_ID, -1);
 
-        try {
-
-            return CurrencyRepository.get(mainCurrencyId);
-        } catch (CurrencyNotFoundException e) {
-
-            //todo sollte eigentlich nicht passieren können?
-            return null;
-        }
+        return fetchCurrency(mainCurrencyId);
     }
 
     public void setMainCurrency(Currency mainCurrency) {
@@ -127,9 +124,29 @@ public class UserSettingsPreferences {
 
         long accountId = mPreferences.getLong(ACTIVE_ACCOUNT, -1);
 
+        return fetchAccount(accountId);
+    }
+
+    public void setActiveAccount(Account account) {
+
+        mPreferences.edit().putLong(ACTIVE_ACCOUNT, account.getIndex()).apply();
+    }
+
+    private Currency fetchCurrency(long index) {
         try {
 
-            return AccountRepository.get(accountId);
+            return mCurrencyRepo.get(index);
+        } catch (CurrencyNotFoundException e) {
+
+            //todo sollte eigentlich nicht passieren können?
+            return null;
+        }
+    }
+
+    private Account fetchAccount(long index) {
+        try {
+
+            return mAccountRepo.get(index);
         } catch (AccountNotFoundException e) {
 
             //todo sollte eigentlich nicht passieren

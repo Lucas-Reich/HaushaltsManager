@@ -50,12 +50,19 @@ public class TabOneBookings extends Fragment {
     private Animation openFabAnim, closeFabAnim, rotateForwardAnim, rotateBackwardAnim;
     private boolean fabBigIsAnimated = false;
     private ParentActivity mParent;
+    private AccountRepository mAccountRepo;
+    private ChildExpenseRepository mChildExpenseRepo;
+    private ExpenseRepository mBookingRepo;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         mParent = (ParentActivity) getActivity();
+
+        mAccountRepo = new AccountRepository(mParent);
+        mChildExpenseRepo = new ChildExpenseRepository(mParent);
+        mBookingRepo = new ExpenseRepository(mParent);
     }
 
     /**
@@ -86,7 +93,7 @@ public class TabOneBookings extends Fragment {
                     resetActivityViewState();
                 } else {
 
-                    if (AccountRepository.getAll().size() != 0) {//todo elegantere Möglichkeit finden den user zu zwingen ein Konto zu erstellen, bevor er eine Buchung erstellt
+                    if (mAccountRepo.getAll().size() != 0) {//todo elegantere Möglichkeit finden den user zu zwingen ein Konto zu erstellen, bevor er eine Buchung erstellt
 
                         Intent createNewBookingIntent = new Intent(mainTab, ExpenseScreenActivity.class);
                         createNewBookingIntent.putExtra("mode", "createBooking");
@@ -117,10 +124,10 @@ public class TabOneBookings extends Fragment {
                         @Override
                         public void onTextInput(String title) {
 
-                            ExpenseObject parentBooking = ChildExpenseRepository.combineExpenses(getSelectedBookings(mListAdapter.getSelectedBookings()));
+                            ExpenseObject parentBooking = mChildExpenseRepo.combineExpenses(getSelectedBookings(mListAdapter.getSelectedBookings()));
                             try {
                                 parentBooking.setTitle(title);
-                                ExpenseRepository.update(parentBooking);
+                                mBookingRepo.update(parentBooking);
 
                                 mParent.updateExpenses();// die Liste der Buchungen wird neu geladen
                             } catch (ExpenseNotFoundException e) {
@@ -154,7 +161,7 @@ public class TabOneBookings extends Fragment {
                     for (Map.Entry<ExpenseObject, List<ExpenseObject>> bookings : mListAdapter.getSelectedBookings().entrySet()) {
                         for (ExpenseObject child : bookings.getValue()) {
                             try {
-                                ChildExpenseRepository.extractChildFromBooking(child);
+                                mChildExpenseRepo.extractChildFromBooking(child);
                             } catch (ChildExpenseNotFoundException e) {
                                 //todo was soll passieren wenn eine KindBuchung nicht in der Datenbank gefunden werden konnte
                             }
@@ -215,14 +222,14 @@ public class TabOneBookings extends Fragment {
             if (booking.getValue().size() != 0) {
                 for (ExpenseObject child : booking.getValue()) {
                     try {
-                        ChildExpenseRepository.delete(child);
+                        mChildExpenseRepo.delete(child);
                     } catch (CannotDeleteChildExpenseException e) {
                         //todo was soll ich machen wenn ein kind nicht gelöscht werden konnte
                     }
                 }
             } else {
                 try {
-                    ExpenseRepository.delete(booking.getKey());
+                    mBookingRepo.delete(booking.getKey());
                 } catch (CannotDeleteExpenseException e) {
                     //todo was soll ich machen wenn ich eine group buchung nicht gelöscht werden konnte
                 }
@@ -722,11 +729,11 @@ public class TabOneBookings extends Fragment {
             for (Map.Entry<ExpenseObject, List<ExpenseObject>> bookings : mDeletedBookings.entrySet()) {
                 ExpenseObject parent = bookings.getKey();
 
-                if (ExpenseRepository.exists(bookings.getKey())) {
+                if (mBookingRepo.exists(bookings.getKey())) {
 
                     for (ExpenseObject child : bookings.getValue()) {
                         try {
-                            ChildExpenseRepository.addChildToBooking(parent, child);
+                            mChildExpenseRepo.addChildToBooking(parent, child);
                         } catch (AddChildToChildException e) {
 
                             //todo was soll passieren wenn ich versuche ein Kind zu einer Kindbuchung hinzuzufügen
@@ -737,7 +744,7 @@ public class TabOneBookings extends Fragment {
 
                     parent.removeChildren();
                     parent.addChildren(bookings.getValue());
-                    ExpenseRepository.insert(parent);
+                    mBookingRepo.insert(parent);
                 }
             }
 

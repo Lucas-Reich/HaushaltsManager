@@ -26,6 +26,7 @@ public class TemplatesActivity extends AppCompatActivity {
 
     private List<ExpenseObject> mTemplates = new ArrayList<>();
     private ListView mListView;
+    private TemplateRepository mTemplateRepo;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -35,6 +36,8 @@ public class TemplatesActivity extends AppCompatActivity {
         initializeToolbar();
 
         mListView = findViewById(R.id.booking_listview);
+
+        mTemplateRepo = new TemplateRepository(this);
     }
 
     @Override
@@ -102,7 +105,7 @@ public class TemplatesActivity extends AppCompatActivity {
     }
 
     private void prepareListData() {
-        List<Template> templates = TemplateRepository.getAll();
+        List<Template> templates = mTemplateRepo.getAll();
         for (Template template : templates) {
             mTemplates.add(template.getTemplate());
         }

@@ -1,10 +1,8 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.Currencies;
 
-import android.content.Context;
 import android.database.CursorIndexOutOfBoundsException;
 import android.database.MatrixCursor;
 
-import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.Exceptions.CannotDeleteCurrencyException;
@@ -28,11 +26,14 @@ import static org.junit.Assert.assertTrue;
 public class CurrencyRepositoryTest {
     //todo ich kann irgendwie nicht alle tests auf einmal ausführen weil dann alles tests ab dem dritten fehlschlagen
 
+    private AccountRepository mAccountRepo;
+    private CurrencyRepository mCurrencyRepo;
+
     @Before
     public void setup() {
-        Context context = RuntimeEnvironment.application;
-        ExpensesDbHelper dbHelper = new ExpensesDbHelper(context);
-        DatabaseManager.initializeInstance(dbHelper);
+
+        mAccountRepo = new AccountRepository(RuntimeEnvironment.application);
+        mCurrencyRepo = new CurrencyRepository(RuntimeEnvironment.application);
     }
 
     private Currency getSimpleCurrency() {
@@ -45,9 +46,9 @@ public class CurrencyRepositoryTest {
 
     @Test
     public void testExistsWithExistingCurrency() {
-        Currency currency = CurrencyRepository.insert(getSimpleCurrency());
+        Currency currency = mCurrencyRepo.insert(getSimpleCurrency());
 
-        boolean exists = CurrencyRepository.exists(currency);
+        boolean exists = mCurrencyRepo.exists(currency);
         assertTrue("Die Währung wurde nicht in der Datenbank gefunden", exists);
     }
 
@@ -55,16 +56,16 @@ public class CurrencyRepositoryTest {
     public void testExistsWithNotExistingCurrencyShouldFail() {
         Currency notExistingCurrency = getSimpleCurrency();
 
-        boolean exists = CurrencyRepository.exists(notExistingCurrency);
+        boolean exists = mCurrencyRepo.exists(notExistingCurrency);
         assertFalse("Die Währung wurde in der Datenbank gefunden", exists);
     }
 
     @Test
     public void testGetWithExistingCurrencyShouldSucceed() {
-        Currency expectedCurrency = CurrencyRepository.insert(getSimpleCurrency());
+        Currency expectedCurrency = mCurrencyRepo.insert(getSimpleCurrency());
 
         try {
-            Currency fetchedCurrency = CurrencyRepository.get(expectedCurrency.getIndex());
+            Currency fetchedCurrency = mCurrencyRepo.get(expectedCurrency.getIndex());
             assertEquals(expectedCurrency, fetchedCurrency);
 
         } catch (CurrencyNotFoundException e) {
@@ -78,7 +79,7 @@ public class CurrencyRepositoryTest {
         long notExistingCurrencyId = 123;
 
         try {
-            CurrencyRepository.get(notExistingCurrencyId);
+            mCurrencyRepo.get(notExistingCurrencyId);
             Assert.fail("Nicht existierenden Wärhung wurde in der Datenbank gefunden");
 
         } catch (CurrencyNotFoundException e) {
@@ -89,12 +90,12 @@ public class CurrencyRepositoryTest {
 
     @Test
     public void testInsertWithValidCurrencyShouldSucceed() {
-        Currency expectedCurrency = CurrencyRepository.insert(getSimpleCurrency());
+        Currency expectedCurrency = mCurrencyRepo.insert(getSimpleCurrency());
 
         try {
-            Currency fetchedCurrency = CurrencyRepository.get(expectedCurrency.getIndex());
+            Currency fetchedCurrency = mCurrencyRepo.get(expectedCurrency.getIndex());
             assertEquals(expectedCurrency, fetchedCurrency);
-            assertTrue("Währung wurde nicht gefunden", CurrencyRepository.exists(expectedCurrency));
+            assertTrue("Währung wurde nicht gefunden", mCurrencyRepo.exists(expectedCurrency));
 
         } catch (CurrencyNotFoundException e) {
 
@@ -103,17 +104,12 @@ public class CurrencyRepositoryTest {
     }
 
     @Test
-    public void testInsertWithInvalidCurrencyShouldFail() {
-        //todo was sollte passieren wenn die Currency nicht richtig initialisiert wurde, zb keinen Namen o.ä.
-    }
-
-    @Test
     public void testDeleteWithExistingCurrencyShouldSucceed() {
-        Currency currency = CurrencyRepository.insert(getSimpleCurrency());
+        Currency currency = mCurrencyRepo.insert(getSimpleCurrency());
 
         try {
-            CurrencyRepository.delete(currency);
-            assertFalse("Währung wurde nicht gelöscht", CurrencyRepository.exists(currency));
+            mCurrencyRepo.delete(currency);
+            assertFalse("Währung wurde nicht gelöscht", mCurrencyRepo.exists(currency));
 
         } catch (CannotDeleteCurrencyException e) {
 
@@ -126,8 +122,8 @@ public class CurrencyRepositoryTest {
         Currency currency = getSimpleCurrency();
 
         try {
-            CurrencyRepository.delete(currency);
-            assertFalse("Währung wurde in der Datenbank gefunden", CurrencyRepository.exists(currency));
+            mCurrencyRepo.delete(currency);
+            assertFalse("Währung wurde in der Datenbank gefunden", mCurrencyRepo.exists(currency));
 
         } catch (CannotDeleteCurrencyException e) {
 
@@ -137,30 +133,30 @@ public class CurrencyRepositoryTest {
 
     @Test
     public void testDeleteWithExistingCurrencyAttachedToAccountShouldFailThrowCannotDeleteCurrencyException() {
-        Currency currency = CurrencyRepository.insert(getSimpleCurrency());
+        Currency currency = mCurrencyRepo.insert(getSimpleCurrency());
 
         Account account = new Account("Konto 1", 100, currency);
-        AccountRepository.insert(account);
+        mAccountRepo.insert(account);
 
         try {
-            CurrencyRepository.delete(currency);
+            mCurrencyRepo.delete(currency);
             Assert.fail("Währung konnte gelöscht werden obwohl es ein Konto mit dieser Währung gibt");
 
         } catch (CannotDeleteCurrencyException e) {
 
-            assertTrue("Währung konnte nicht in der Datenbank gefunden werden", CurrencyRepository.exists(currency));
+            assertTrue("Währung konnte nicht in der Datenbank gefunden werden", mCurrencyRepo.exists(currency));
             assertEquals(String.format("Currency %s cannot be deleted.", currency.getName()), e.getMessage());
         }
     }
 
     @Test
     public void testUpdateWithExistingCurrencyShouldSucceed() {
-        Currency expectedCurrency = CurrencyRepository.insert(getSimpleCurrency());
+        Currency expectedCurrency = mCurrencyRepo.insert(getSimpleCurrency());
 
         try {
             expectedCurrency.setName("New Name");
-            CurrencyRepository.update(expectedCurrency);
-            Currency fetchedCurrency = CurrencyRepository.get(expectedCurrency.getIndex());
+            mCurrencyRepo.update(expectedCurrency);
+            Currency fetchedCurrency = mCurrencyRepo.get(expectedCurrency.getIndex());
 
             assertEquals(expectedCurrency, fetchedCurrency);
 
@@ -176,7 +172,7 @@ public class CurrencyRepositoryTest {
 
         try {
             currency.setName("Dollar");
-            CurrencyRepository.update(currency);
+            mCurrencyRepo.update(currency);
 
             Assert.fail("Nicht existierende Währung konnte geupdated werden");
 

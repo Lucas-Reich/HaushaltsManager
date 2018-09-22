@@ -1,6 +1,7 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.Currencies;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -14,9 +15,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CurrencyRepository {
+    private SQLiteDatabase mDatabase;
 
-    public static boolean exists(Currency currency) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public CurrencyRepository(Context context) {
+        DatabaseManager.initializeInstance(new ExpensesDbHelper(context));
+
+        mDatabase = DatabaseManager.getInstance().openDatabase();
+    }
+
+    public boolean exists(Currency currency) {
         String selectQuery;
 
         selectQuery = "SELECT"
@@ -28,22 +35,19 @@ public class CurrencyRepository {
                 + " AND " + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SYMBOL + " = '" + currency.getSymbol() + "'"
                 + " LIMIT 1;";
 
-        Cursor c = db.rawQuery(selectQuery, null);
+        Cursor c = mDatabase.rawQuery(selectQuery, null);
 
         if (c.moveToFirst()) {
 
             c.close();
-            DatabaseManager.getInstance().closeDatabase();
             return true;
         }
 
         c.close();
-        DatabaseManager.getInstance().closeDatabase();
         return false;
     }
 
-    public static Currency get(long currencyId) throws CurrencyNotFoundException {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public Currency get(long currencyId) throws CurrencyNotFoundException {
 
         String selectQuery = "SELECT "
                 + ExpensesDbHelper.CURRENCIES_COL_ID + ", "
@@ -53,7 +57,7 @@ public class CurrencyRepository {
                 + " FROM " + ExpensesDbHelper.TABLE_CURRENCIES
                 + " WHERE " + ExpensesDbHelper.CURRENCIES_COL_ID + " = " + currencyId + ";";
 
-        Cursor c = db.rawQuery(selectQuery, null);
+        Cursor c = mDatabase.rawQuery(selectQuery, null);
 
         if (!c.moveToFirst()) {
             throw new CurrencyNotFoundException(currencyId);
@@ -62,12 +66,10 @@ public class CurrencyRepository {
         Currency currency = cursorToCurrency(c);
 
         c.close();
-        DatabaseManager.getInstance().closeDatabase();
         return currency;
     }
 
-    public static List<Currency> getAll() {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public List<Currency> getAll() {
 
         String selectQuery = "SELECT "
                 + ExpensesDbHelper.CURRENCIES_COL_ID + ", "
@@ -76,7 +78,7 @@ public class CurrencyRepository {
                 + ExpensesDbHelper.CURRENCIES_COL_SYMBOL
                 + " FROM " + ExpensesDbHelper.TABLE_CURRENCIES + ";";
 
-        Cursor c = db.rawQuery(selectQuery, null);
+        Cursor c = mDatabase.rawQuery(selectQuery, null);
         c.moveToFirst();
 
         ArrayList<Currency> currencies = new ArrayList<>();
@@ -87,20 +89,18 @@ public class CurrencyRepository {
         }
 
         c.close();
-        DatabaseManager.getInstance().closeDatabase();
         return currencies;
     }
 
-    public static Currency insert(Currency currency) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public Currency insert(Currency currency) {
+        SQLiteDatabase mDatabase = DatabaseManager.getInstance().openDatabase();
 
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.CURRENCIES_COL_NAME, currency.getName());
         values.put(ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME, currency.getShortName());
         values.put(ExpensesDbHelper.CURRENCIES_COL_SYMBOL, currency.getSymbol());
 
-        long insertedCurrencyId = db.insert(ExpensesDbHelper.TABLE_CURRENCIES, null, values);
-        DatabaseManager.getInstance().closeDatabase();
+        long insertedCurrencyId = mDatabase.insert(ExpensesDbHelper.TABLE_CURRENCIES, null, values);
 
         return new Currency(
                 insertedCurrencyId,
@@ -110,37 +110,32 @@ public class CurrencyRepository {
         );
     }
 
-    public static void delete(Currency currency) throws CannotDeleteCurrencyException {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public void delete(Currency currency) throws CannotDeleteCurrencyException {
 
         if (isAttachedToAccount(currency))
             throw new CannotDeleteCurrencyException(currency);
 
-        db.delete(ExpensesDbHelper.TABLE_CURRENCIES, ExpensesDbHelper.CURRENCIES_COL_ID + " = ?", new String[]{"" + currency.getIndex()});
-        DatabaseManager.getInstance().closeDatabase();
+        mDatabase.delete(ExpensesDbHelper.TABLE_CURRENCIES, ExpensesDbHelper.CURRENCIES_COL_ID + " = ?", new String[]{"" + currency.getIndex()});
     }
 
-    public static void update(Currency currency) throws CurrencyNotFoundException {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public void update(Currency currency) throws CurrencyNotFoundException {
 
         ContentValues updatedCurrency = new ContentValues();
         updatedCurrency.put(ExpensesDbHelper.CURRENCIES_COL_SYMBOL, currency.getSymbol());
         updatedCurrency.put(ExpensesDbHelper.CURRENCIES_COL_NAME, currency.getName());
         updatedCurrency.put(ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME, currency.getShortName());
 
-        int affectedRows = db.update(
+        int affectedRows = mDatabase.update(
                 ExpensesDbHelper.TABLE_CURRENCIES,
                 updatedCurrency, ExpensesDbHelper.CURRENCIES_COL_ID + " = ?",
                 new String[]{currency.getIndex() + ""}
         );
-        DatabaseManager.getInstance().closeDatabase();
 
         if (affectedRows == 0)
             throw new CurrencyNotFoundException(currency.getIndex());
     }
 
-    private static boolean isAttachedToAccount(Currency currency) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    private boolean isAttachedToAccount(Currency currency) {
 
         String selectQuery;
         selectQuery = "SELECT"
@@ -149,17 +144,15 @@ public class CurrencyRepository {
                 + " WHERE " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID + " = " + currency.getIndex()
                 + " LIMIT 1;";
 
-        Cursor c = db.rawQuery(selectQuery, null);
+        Cursor c = mDatabase.rawQuery(selectQuery, null);
 
         if (c.moveToFirst()) {
 
             c.close();
-            DatabaseManager.getInstance().closeDatabase();
             return true;
         }
 
         c.close();
-        DatabaseManager.getInstance().closeDatabase();
         return false;
     }
 

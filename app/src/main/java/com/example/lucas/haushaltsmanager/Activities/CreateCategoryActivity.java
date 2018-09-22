@@ -30,6 +30,8 @@ public class CreateCategoryActivity extends AppCompatActivity {
     private Button mCatNameBtn, mCatColorBtn, mSelectParentBtn, mCreateBtn;
     private RadioGroup mDefaultExpenseRadioGrp;
     private Category mParentCategory;
+    private ChildCategoryRepository mChildCategoryRepo;
+    private CategoryRepository mCategoryRepo;
 
     private creationModes CREATION_MODE;
 
@@ -42,6 +44,9 @@ public class CreateCategoryActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstances) {
         super.onCreate(savedInstances);
         setContentView(R.layout.activity_new_category);
+
+        mChildCategoryRepo = new ChildCategoryRepository(this);
+        mCategoryRepo = new CategoryRepository(this);
 
         mCatNameBtn = findViewById(R.id.new_category_name);
         mCatColorBtn = findViewById(R.id.new_category_color);
@@ -137,7 +142,7 @@ public class CreateCategoryActivity extends AppCompatActivity {
                 SingleChoiceDialog<Category> categoryPicker = new SingleChoiceDialog<>();
                 categoryPicker.createBuilder(CreateCategoryActivity.this);
                 categoryPicker.setTitle(getString(R.string.choose_parent_category));
-                categoryPicker.setContent(CategoryRepository.getAll(), -1);
+                categoryPicker.setContent(mCategoryRepo.getAll(), -1);
                 categoryPicker.setNeutralButton(getString(R.string.create_new));
                 categoryPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
                     @Override
@@ -161,7 +166,7 @@ public class CreateCategoryActivity extends AppCompatActivity {
                             @Override
                             public void onTextInput(String textInput) {
 
-                                mParentCategory = CategoryRepository.insert(new Category(textInput, "#000000", false, new ArrayList<Category>()));
+                                mParentCategory = mCategoryRepo.insert(new Category(textInput, "#000000", false, new ArrayList<Category>()));
                                 mSelectParentBtn.setText(mParentCategory.getTitle());
                             }
                         });
@@ -206,14 +211,14 @@ public class CreateCategoryActivity extends AppCompatActivity {
                             Toast.makeText(CreateCategoryActivity.this, "Wähle zuerst die übergeordnete Kategorie aus", Toast.LENGTH_SHORT).show();
                         } else {
 
-                            ChildCategoryRepository.insert(mParentCategory, mCategory);
+                            mChildCategoryRepo.insert(mParentCategory, mCategory);
                             finish();
                         }
                         break;
                     case UPDATE_CATEGORY:
 
                         try {
-                            CategoryRepository.update(mCategory);
+                            mCategoryRepo.update(mCategory);
                         } catch (CategoryNotFoundException e) {
 
                             Toast.makeText(CreateCategoryActivity.this, getString(R.string.category_not_found), Toast.LENGTH_SHORT).show();

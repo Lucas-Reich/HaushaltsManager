@@ -30,6 +30,7 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Acco
     private ListView mListView;
     private Context mContext;
     private Map<Account, Boolean> mInitialAccountState;
+    private AccountRepository mAccountRepo;
 
     /**
      * Standart Fragment Methode die genutzt wird, um zu checken ob die aufrufende Activity auch das interface inplementiert.
@@ -53,11 +54,13 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Acco
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SharedPreferences preferences = getActivity().getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
+        SharedPreferences preferences = getActivity().getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);//todo replace sharedPreferences call
+
+        mAccountRepo = new AccountRepository(mContext);
 
         mInitialAccountState = new HashMap<>();
 
-        for (Account account : AccountRepository.getAll()) {
+        for (Account account : mAccountRepo.getAll()) {
 
             mInitialAccountState.put(account, preferences.getBoolean(account.getTitle(), false));
         }
@@ -186,7 +189,7 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Acco
      * @param account Konto, welches gelöscht werden soll
      */
     private void deleteAccount(Account account) throws CannotDeleteAccountException {
-        AccountRepository.delete(account);
+        mAccountRepo.delete(account);
 
         SharedPreferences accountPreferences = mContext.getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
         accountPreferences.edit().remove(account.getTitle()).apply();

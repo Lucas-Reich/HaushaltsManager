@@ -34,11 +34,16 @@ public class CategoryListActivity extends AppCompatActivity {
     private CategoryAdapter mListAdapter;
     private Animation openFabAnim, closeFabAnim, rotateForwardAnim, rotateBackwardAnim;
     private boolean mIsMainFabAnimated = false;
+    private ChildCategoryRepository mChildCategoryRepo;
+    private CategoryRepository mCategoryRepo;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_categories);
+
+        mChildCategoryRepo = new ChildCategoryRepository(this);
+        mCategoryRepo = new CategoryRepository(this);
 
         initializeToolbar();
 
@@ -130,7 +135,7 @@ public class CategoryListActivity extends AppCompatActivity {
                 try {
 
                     for (Category childCategory : mListAdapter.getSelectedChildData())
-                        ChildCategoryRepository.delete(childCategory);
+                        mChildCategoryRepo.delete(childCategory);
 
                     animateFab(mListAdapter.getSelectedChildItemCount());
                     updateListView();
@@ -237,7 +242,7 @@ public class CategoryListActivity extends AppCompatActivity {
      * Methode um die Liste der Kategorien zu initilisieren.
      */
     private void prepareDataSources() {
-        mCategories = CategoryRepository.getAll();
+        mCategories = mCategoryRepo.getAll();
 
     }
 

@@ -1,9 +1,11 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
@@ -26,9 +28,19 @@ import java.util.Calendar;
 import java.util.List;
 
 public class ChildExpenseRepository {
+    private SQLiteDatabase mDatabase;
+    private BookingTagRepository mBookingTagRepo;
+    private ExpenseRepository mBookingRepo;
 
-    public static boolean exists(ExpenseObject expense) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public ChildExpenseRepository(Context context) {
+        DatabaseManager.initializeInstance(new ExpensesDbHelper(context));
+
+        mDatabase = DatabaseManager.getInstance().openDatabase();
+        mBookingTagRepo = new BookingTagRepository(context);
+        mBookingRepo = new ExpenseRepository(context);
+    }
+
+    public boolean exists(ExpenseObject expense) {
         String selectQuery;
 
         selectQuery = "SELECT"
@@ -47,30 +59,28 @@ public class ChildExpenseRepository {
                 + " AND " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_PARENT_ID + " IS NOT NULL"
                 + " LIMIT 1;";
 
-        Cursor c = db.rawQuery(selectQuery, null);
+        Cursor c = mDatabase.rawQuery(selectQuery, null);
 
         if (c.moveToFirst()) {
 
             c.close();
-            DatabaseManager.getInstance().closeDatabase();
             return true;
         }
 
         c.close();
-        DatabaseManager.getInstance().closeDatabase();
         return false;
     }
 
     /**
-     * Diese Funktion stellt sicher dass keine Kind zu einer Kindbuchung hinzugefügt werden kann.
-     * Sie überprüft ebenfalls ob die Parentbuchung bereits Kindbuchugen hat oder nicht.
+     * Diese Funktion stellt sicher dass keine Kind zu einer KinmDatabaseuchung hinzugefügt werden kann.
+     * Sie überprüft ebenfalls ob die Parentbuchung bereits KinmDatabaseuchugen hat oder nicht.
      * Hat die Parentbuchung keine Kinder wird eine Dummy Ausgabe erstellt, zu der die Kinder hinzugefügt werden.
      *
      * @param childExpense  Buchung welche dem Parent als Kind hinzugefügt werden soll
      * @param parentBooking Buchung der ein neues Kind hinzugefügt werden soll
-     * @return Kindbuchung, mit dem korrekten Index
+     * @return KinmDatabaseuchung, mit dem korrekten Index
      */
-    public static ExpenseObject addChildToBooking(ExpenseObject childExpense, ExpenseObject parentBooking) throws AddChildToChildException {
+    public ExpenseObject addChildToBooking(ExpenseObject childExpense, ExpenseObject parentBooking) throws AddChildToChildException {
         if (exists(parentBooking))
             throw new AddChildToChildException();
 
@@ -81,13 +91,13 @@ public class ChildExpenseRepository {
         } else {
 
             try {
-                ExpenseRepository.delete(parentBooking);
+                mBookingRepo.delete(parentBooking);
 
                 ExpenseObject dummyParentExpense = ExpenseObject.createDummyExpense();
                 dummyParentExpense.addChild(parentBooking);
                 dummyParentExpense.addChild(childExpense);
 
-                return ExpenseRepository.insert(dummyParentExpense);
+                return mBookingRepo.insert(dummyParentExpense);
             } catch (CannotDeleteExpenseException e) {
                 //Kann nicht passieren, da nur Buchung mit Kindern nicht gelöscht werden können und ich hier vorher übeprüft habe ob die Buchung Kinder hat oder nicht
                 return null;//todo kann ich die isChild funktionalität so implementieren dass ich nicht null returnen muss?
@@ -99,9 +109,9 @@ public class ChildExpenseRepository {
      * Methode um mehrere Buchungen zusammenzufügen
      *
      * @param expenses Liste der Buchungen die zusammengefügt werden sollen
-     * @return Parent der zusammengefügten Buchungen, mit den hinzugefügten Kindbuchungen
+     * @return Parent der zusammengefügten Buchungen, mit den hinzugefügten KinmDatabaseuchungen
      */
-    public static ExpenseObject combineExpenses(List<ExpenseObject> expenses) {
+    public ExpenseObject combineExpenses(List<ExpenseObject> expenses) {
         ExpenseObject dummyParentExpense = ExpenseObject.createDummyExpense();
 
         for (ExpenseObject expense : expenses) {
@@ -119,7 +129,7 @@ public class ChildExpenseRepository {
 
                 try {
                     dummyParentExpense.addChild(expense);
-                    ExpenseRepository.delete(expense);
+                    mBookingRepo.delete(expense);
                 } catch (CannotDeleteExpenseException e) {
 
                     //todo kann eine ParentExpense nicht gefunden werden muss der gesamte vorgang abgebrochen werden
@@ -128,10 +138,10 @@ public class ChildExpenseRepository {
             }
         }
 
-        return ExpenseRepository.insert(dummyParentExpense);
+        return mBookingRepo.insert(dummyParentExpense);
     }
 
-    public static ExpenseObject extractChildFromBooking(ExpenseObject childExpense) throws ChildExpenseNotFoundException {
+    public ExpenseObject extractChildFromBooking(ExpenseObject childExpense) throws ChildExpenseNotFoundException {
         if (!exists(childExpense))
             throw new ChildExpenseNotFoundException(childExpense.getIndex());
 
@@ -142,14 +152,14 @@ public class ChildExpenseRepository {
                 delete(childExpense);
                 parentExpense.removeChild(childExpense);
                 childExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE);
-                ExpenseRepository.delete(parentExpense);
+                mBookingRepo.delete(parentExpense);
             } else {
 
                 delete(childExpense);
                 childExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE);
             }
 
-            return ExpenseRepository.insert(childExpense);
+            return mBookingRepo.insert(childExpense);
         } catch (Exception e) {
 
             //todo was soll passieren wenn das Kind nicht gelöscht werden kann
@@ -157,8 +167,7 @@ public class ChildExpenseRepository {
         }
     }
 
-    public static ExpenseObject get(long expenseId) throws ChildExpenseNotFoundException {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public ExpenseObject get(long expenseId) throws ChildExpenseNotFoundException {
 
         String selectQuery;
         selectQuery = "SELECT "
@@ -186,7 +195,7 @@ public class ChildExpenseRepository {
                 + " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_ID + " = " + expenseId
                 + " ORDER BY " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_DATE + " DESC;";
 
-        Cursor c = db.rawQuery(selectQuery, null);
+        Cursor c = mDatabase.rawQuery(selectQuery, null);
 
         if (!c.moveToFirst()) {
             throw new ChildExpenseNotFoundException(expenseId);
@@ -195,12 +204,10 @@ public class ChildExpenseRepository {
         ExpenseObject expense = cursorToChildBooking(c);
 
         c.close();
-        DatabaseManager.getInstance().closeDatabase();
         return expense;
     }
 
-    public static List<ExpenseObject> getAll(long parentId) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public List<ExpenseObject> getAll(long parentId) {
 
         String selectQuery;
         selectQuery = "SELECT "
@@ -227,7 +234,7 @@ public class ChildExpenseRepository {
                 + " AND " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_HIDDEN + " != 1"
                 + " ORDER BY " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_DATE + " DESC;";
 
-        Cursor c = db.rawQuery(selectQuery, null);
+        Cursor c = mDatabase.rawQuery(selectQuery, null);
 
         c.moveToFirst();
         ArrayList<ExpenseObject> childBookings = new ArrayList<>();
@@ -238,13 +245,11 @@ public class ChildExpenseRepository {
         }
 
         c.close();
-        DatabaseManager.getInstance().closeDatabase();
 
         return childBookings;
     }
 
-    public static ExpenseObject insert(ExpenseObject parentExpense, ExpenseObject childExpense) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public ExpenseObject insert(ExpenseObject parentExpense, ExpenseObject childExpense) {
 
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.BOOKINGS_COL_EXPENSE_TYPE, childExpense.getExpenseType().name());
@@ -259,8 +264,7 @@ public class ChildExpenseRepository {
         values.put(ExpensesDbHelper.BOOKINGS_COL_CURRENCY_ID, childExpense.getCurrency().getIndex());
         values.put(ExpensesDbHelper.BOOKINGS_COL_HIDDEN, 0);
 
-        long insertedChildId = db.insert(ExpensesDbHelper.TABLE_BOOKINGS, null, values);
-        DatabaseManager.getInstance().closeDatabase();
+        long insertedChildId = mDatabase.insert(ExpensesDbHelper.TABLE_BOOKINGS, null, values);
 
         try {
             updateAccountBalance(
@@ -272,7 +276,7 @@ public class ChildExpenseRepository {
         }
 
         for (Tag tag : childExpense.getTags())
-            BookingTagRepository.insert(insertedChildId, tag, childExpense.getExpenseType());
+            mBookingTagRepo.insert(insertedChildId, tag);
 
         return new ExpenseObject(
                 insertedChildId,
@@ -290,8 +294,7 @@ public class ChildExpenseRepository {
         );
     }
 
-    public static void update(ExpenseObject childExpense) throws ChildExpenseNotFoundException {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public void update(ExpenseObject childExpense) throws ChildExpenseNotFoundException {
 
         ContentValues updatedChild = new ContentValues();
         updatedChild.put(ExpensesDbHelper.BOOKINGS_COL_EXPENSE_TYPE, childExpense.getExpenseType().name());
@@ -304,9 +307,9 @@ public class ChildExpenseRepository {
         updatedChild.put(ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID, childExpense.getAccountId());
         updatedChild.put(ExpensesDbHelper.BOOKINGS_COL_CURRENCY_ID, childExpense.getCurrency().getIndex());
 
-        BookingTagRepository.deleteAll(childExpense);
+        mBookingTagRepo.deleteAll(childExpense);
         for (Tag tag : childExpense.getTags()) {
-            BookingTagRepository.insert(childExpense.getIndex(), tag, childExpense.getExpenseType());
+            mBookingTagRepo.insert(childExpense.getIndex(), tag);
         }
 
         try {
@@ -317,36 +320,33 @@ public class ChildExpenseRepository {
                     childExpense.getSignedPrice() - oldExpense.getSignedPrice()
             );
 
-            int affectedRows = db.update(ExpensesDbHelper.TABLE_BOOKINGS, updatedChild, ExpensesDbHelper.BOOKINGS_COL_ID + " = ?", new String[]{childExpense.getIndex() + ""});
-            DatabaseManager.getInstance().closeDatabase();
+            int affectedRows = mDatabase.update(ExpensesDbHelper.TABLE_BOOKINGS, updatedChild, ExpensesDbHelper.BOOKINGS_COL_ID + " = ?", new String[]{childExpense.getIndex() + ""});
 
             if (affectedRows == 0)
                 throw new ChildExpenseNotFoundException(childExpense.getIndex());
         } catch (ChildExpenseNotFoundException e) {
 
-            DatabaseManager.getInstance().closeDatabase();
             throw new ChildExpenseNotFoundException(childExpense.getIndex());
         } catch (AccountNotFoundException e) {
 
-            DatabaseManager.getInstance().closeDatabase();
+            //todo do nothing?
         }
     }
 
-    public static void delete(ExpenseObject childExpense) throws CannotDeleteChildExpenseException {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public void delete(ExpenseObject childExpense) throws CannotDeleteChildExpenseException {
 
         if (isLastChildOfParent(childExpense)) {
 
             try {
                 ExpenseObject parentExpense = getParent(childExpense);
 
-                db.delete(ExpensesDbHelper.TABLE_BOOKINGS, ExpensesDbHelper.BOOKINGS_COL_ID + " = ?", new String[]{"" + childExpense.getIndex()});
+                mDatabase.delete(ExpensesDbHelper.TABLE_BOOKINGS, ExpensesDbHelper.BOOKINGS_COL_ID + " = ?", new String[]{"" + childExpense.getIndex()});
                 parentExpense.removeChild(childExpense);
                 updateAccountBalance(
                         childExpense.getAccountId(),
                         -childExpense.getSignedPrice()
                 );
-                ExpenseRepository.delete(parentExpense);
+                mBookingRepo.delete(parentExpense);
             } catch (Exception e) {
 
                 throw CannotDeleteChildExpenseException.RelatedExpenseNotFound(childExpense);
@@ -354,7 +354,7 @@ public class ChildExpenseRepository {
         } else {
 
             try {
-                db.delete(ExpensesDbHelper.TABLE_BOOKINGS, ExpensesDbHelper.BOOKINGS_COL_ID + " = ?", new String[]{"" + childExpense.getIndex()});
+                mDatabase.delete(ExpensesDbHelper.TABLE_BOOKINGS, ExpensesDbHelper.BOOKINGS_COL_ID + " = ?", new String[]{"" + childExpense.getIndex()});
                 updateAccountBalance(
                         childExpense.getAccountId(),
                         -childExpense.getSignedPrice()
@@ -367,22 +367,20 @@ public class ChildExpenseRepository {
         }
     }
 
-    public static void hide(ExpenseObject childExpense) throws ChildExpenseNotFoundException {
+    public void hide(ExpenseObject childExpense) throws ChildExpenseNotFoundException {
         //todo kann auch durch die Methode des parents ersetzt werden
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
 
         try {
             if (isLastVisibleChildOfParent(childExpense)) {
 
                 ExpenseObject parentExpense = getParent(childExpense);
-                ExpenseRepository.hide(parentExpense);
+                mBookingRepo.hide(parentExpense);
             }
 
             ContentValues values = new ContentValues();
             values.put(ExpensesDbHelper.BOOKINGS_COL_HIDDEN, 1);
 
-            int affectedRows = db.update(ExpensesDbHelper.TABLE_BOOKINGS, values, ExpensesDbHelper.BOOKINGS_COL_ID + " = ?", new String[]{"" + childExpense.getIndex()});
-            DatabaseManager.getInstance().closeDatabase();
+            int affectedRows = mDatabase.update(ExpensesDbHelper.TABLE_BOOKINGS, values, ExpensesDbHelper.BOOKINGS_COL_ID + " = ?", new String[]{"" + childExpense.getIndex()});
 
             if (affectedRows == 0)
                 throw new ChildExpenseNotFoundException(childExpense.getIndex());
@@ -402,9 +400,7 @@ public class ChildExpenseRepository {
         }
     }
 
-    public static boolean isHidden(ExpenseObject childExpense) throws ChildExpenseNotFoundException {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
-
+    public boolean isHidden(ExpenseObject childExpense) throws ChildExpenseNotFoundException {
         String selectQuery;
         selectQuery = "SELECT"
                 + " " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_HIDDEN
@@ -412,7 +408,7 @@ public class ChildExpenseRepository {
                 + " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_ID + " = " + childExpense.getIndex()
                 + ";";
 
-        Cursor c = db.rawQuery(selectQuery, null);
+        Cursor c = mDatabase.rawQuery(selectQuery, null);
 
         if (!c.moveToFirst()) {
             throw new ChildExpenseNotFoundException(childExpense.getIndex());
@@ -420,13 +416,11 @@ public class ChildExpenseRepository {
 
         boolean isHidden = c.getInt(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_HIDDEN)) == 1;
         c.close();
-        DatabaseManager.getInstance().closeDatabase();
 
         return isHidden;
     }
 
-    private static boolean isLastChildOfParent(ExpenseObject childExpense) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    private boolean isLastChildOfParent(ExpenseObject childExpense) {
 
         String subSelect;
         subSelect = "(SELECT "
@@ -442,22 +436,19 @@ public class ChildExpenseRepository {
                 + " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_PARENT_ID + " = " + subSelect
                 + ";";
 
-        Cursor c = db.rawQuery(selectQuery, null);
+        Cursor c = mDatabase.rawQuery(selectQuery, null);
 
         if (c.getCount() == 1) {
 
             c.close();
-            DatabaseManager.getInstance().closeDatabase();
             return true;
         }
 
         c.close();
-        DatabaseManager.getInstance().closeDatabase();
         return false;
     }
 
-    private static boolean isLastVisibleChildOfParent(ExpenseObject childExpense) throws ChildExpenseNotFoundException, ExpenseNotFoundException {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    private boolean isLastVisibleChildOfParent(ExpenseObject childExpense) throws ChildExpenseNotFoundException, ExpenseNotFoundException {
 
         ExpenseObject parentExpense = getParent(childExpense);
 
@@ -469,22 +460,19 @@ public class ChildExpenseRepository {
                 + " AND " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_HIDDEN + " != 1"
                 + ";";
 
-        Cursor c = db.rawQuery(selectQuery, null);
+        Cursor c = mDatabase.rawQuery(selectQuery, null);
 
         if (c.getCount() == 1) {
 
             c.close();
-            DatabaseManager.getInstance().closeDatabase();
             return true;
         }
 
         c.close();
-        DatabaseManager.getInstance().closeDatabase();
         return false;
     }
 
-    public static ExpenseObject getParent(ExpenseObject childExpense) throws ChildExpenseNotFoundException, ExpenseNotFoundException {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public ExpenseObject getParent(ExpenseObject childExpense) throws ChildExpenseNotFoundException, ExpenseNotFoundException {
 
         if (!exists(childExpense))
             throw new ChildExpenseNotFoundException(childExpense.getIndex());
@@ -520,7 +508,7 @@ public class ChildExpenseRepository {
                 + " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_ID + " = " + subQuery
                 + " ORDER BY " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_DATE + " DESC;";
 
-        Cursor c = db.rawQuery(selectQuery, null);
+        Cursor c = mDatabase.rawQuery(selectQuery, null);
 
         if (!c.moveToFirst()) {
             throw ExpenseNotFoundException.parentExpenseNotFoundException(childExpense);
@@ -529,7 +517,6 @@ public class ChildExpenseRepository {
         ExpenseObject expense = ExpenseRepository.cursorToExpense(c);
 
         c.close();
-        DatabaseManager.getInstance().closeDatabase();
         return expense;
     }
 
@@ -539,13 +526,15 @@ public class ChildExpenseRepository {
      * @param accountId Konto welches angepasst werden soll
      * @param amount    Betrag der angezogen oder hinzugefügt werden soll
      */
-    private static void updateAccountBalance(long accountId, double amount) throws AccountNotFoundException {
-        Account account1 = AccountRepository.get(accountId);
+    private void updateAccountBalance(long accountId, double amount) throws AccountNotFoundException {
+        AccountRepository repo = new AccountRepository(app.getContext());//todo AccountRepository injecten
+
+        Account account1 = repo.get(accountId);
         account1.setBalance(account1.getBalance() + amount);
-        AccountRepository.update(account1);
+        repo.update(account1);
     }
 
-    public static ExpenseObject cursorToChildBooking(Cursor c) {
+    public ExpenseObject cursorToChildBooking(Cursor c) {
         long expenseId = c.getLong(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_ID));
         Calendar date = Calendar.getInstance();
         String dateString = c.getString(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_DATE));
@@ -566,7 +555,7 @@ public class ChildExpenseRepository {
                 notice,
                 accountId,
                 ExpenseObject.EXPENSE_TYPES.CHILD_EXPENSE,
-                BookingTagRepository.get(expenseId, ExpenseObject.EXPENSE_TYPES.CHILD_EXPENSE),
+                mBookingTagRepo.get(expenseId),
                 new ArrayList<ExpenseObject>(),
                 CurrencyRepository.cursorToCurrency(c)
         );

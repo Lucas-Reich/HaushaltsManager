@@ -1,6 +1,7 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.BookingTags;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -14,6 +15,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BookingTagRepository {
+    private SQLiteDatabase mDatabase;
+
+    public BookingTagRepository(Context context) {
+        DatabaseManager.initializeInstance(new ExpensesDbHelper(context));
+
+        mDatabase = DatabaseManager.getInstance().openDatabase();
+    }
 
     /**
      * Methode um zu überprüfen ob es die Relation zwischen Buchung und Tag existiert.
@@ -22,8 +30,7 @@ public class BookingTagRepository {
      * @param tag     Tag, welches der Buchung zugeprdnet sein soll
      * @return TRUE wenn das Tag der Buchung zugeordnet ist, FALSE wenn nicht
      */
-    public static boolean exists(ExpenseObject expense, Tag tag) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public boolean exists(ExpenseObject expense, Tag tag) {
 
         String selectQuery;
         selectQuery = "SELECT"
@@ -33,29 +40,25 @@ public class BookingTagRepository {
                 + " AND " + ExpensesDbHelper.TABLE_BOOKINGS_TAGS + "." + ExpensesDbHelper.BOOKINGS_TAGS_COL_TAG_ID + " = " + tag.getIndex()
                 + " LIMIT 1;";
 
-        Cursor c = db.rawQuery(selectQuery, null);
+        Cursor c = mDatabase.rawQuery(selectQuery, null);
 
         if (c.moveToFirst()) {
 
             c.close();
-            DatabaseManager.getInstance().closeDatabase();
             return true;
         }
 
         c.close();
-        DatabaseManager.getInstance().closeDatabase();
         return false;
     }
 
     /**
      * Methode um alle Tags zu einer Buchung zu bekommen.
      *
-     * @param expenseId   Id der Buchung
-     * @param expenseType Ausgabentyp der Buchung (Um Herauszufinden ob die Buchung ein Kind ist oder nicht)
+     * @param expenseId Id der Buchung
      * @return Alle Tags die zu der angegebenen Buchung gehören
      */
-    public static List<Tag> get(long expenseId, ExpenseObject.EXPENSE_TYPES expenseType) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public List<Tag> get(long expenseId) {
 
         String selectQuery;
         selectQuery = "SELECT "
@@ -66,7 +69,7 @@ public class BookingTagRepository {
                 + " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS_TAGS + "." + ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_ID + " = " + expenseId
                 + ";";
 
-        Cursor c = db.rawQuery(selectQuery, null);
+        Cursor c = mDatabase.rawQuery(selectQuery, null);
 
         c.moveToFirst();
 
@@ -78,7 +81,6 @@ public class BookingTagRepository {
         }
 
         c.close();
-        DatabaseManager.getInstance().closeDatabase();
 
         return tags;
     }
@@ -90,8 +92,7 @@ public class BookingTagRepository {
      * @param bookingId Id der Buchung zu der das Tag hinzugefügt werden soll
      * @param tag       Tag welcher der angegebenen Buchung hinzugefügt werden soll
      */
-    public static void insert(long bookingId, Tag tag, ExpenseObject.EXPENSE_TYPES expenseType) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public void insert(long bookingId, Tag tag) {
 
         ContentValues values = new ContentValues();
         //todo ich muss überprüfen ob es das Tag auch wirklich gibt
@@ -100,8 +101,7 @@ public class BookingTagRepository {
         //todo ich muss überprüfen ob es die Buchung auch wirklich gibt
         values.put(ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_ID, bookingId);
 
-        db.insert(ExpensesDbHelper.TABLE_BOOKINGS_TAGS, null, values);
-        DatabaseManager.getInstance().closeDatabase();
+        mDatabase.insert(ExpensesDbHelper.TABLE_BOOKINGS_TAGS, null, values);
     }
 
     /**
@@ -110,8 +110,7 @@ public class BookingTagRepository {
      * @param expense Buchung, von der das Tag entfernt werden soll
      * @param tag     Tag, welches entfernt werden soll
      */
-    public static void delete(ExpenseObject expense, Tag tag) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public void delete(ExpenseObject expense, Tag tag) {
 
         String whereClause;
         whereClause = ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_ID + " = ?"
@@ -121,8 +120,7 @@ public class BookingTagRepository {
                 "" + tag.getIndex()
         };
 
-        db.delete(ExpensesDbHelper.TABLE_BOOKINGS_TAGS, whereClause, whereArgs);
-        DatabaseManager.getInstance().closeDatabase();
+        mDatabase.delete(ExpensesDbHelper.TABLE_BOOKINGS_TAGS, whereClause, whereArgs);
     }
 
     /**
@@ -130,10 +128,8 @@ public class BookingTagRepository {
      *
      * @param expense Buchung von der alle Tags entfernt werden sollen
      */
-    public static void deleteAll(ExpenseObject expense) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public void deleteAll(ExpenseObject expense) {
 
-        db.delete(ExpensesDbHelper.TABLE_BOOKINGS_TAGS, ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_ID + " = ?", new String[]{expense.getIndex() + ""});
-        DatabaseManager.getInstance().closeDatabase();
+        mDatabase.delete(ExpensesDbHelper.TABLE_BOOKINGS_TAGS, ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_ID + " = ?", new String[]{expense.getIndex() + ""});
     }
 }

@@ -80,11 +80,24 @@ public class ExpenseScreenActivity extends AppCompatActivity {
     private RadioGroup mExpenseTypeRadio;
     private ExpenseObject mParentBooking;
     private List<Tag> mTags;
+    private AccountRepository mAccountRepo;
+    private TemplateRepository mTemplateRepo;
+    private TagRepository mTagRepo;
+    private CurrencyRepository mCurrencyRepo;
+    private ChildExpenseRepository mChildExpenseRepo;
+    private ExpenseRepository mBookingRepo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_expense_screen);
+
+        mAccountRepo = new AccountRepository(this);
+        mTemplateRepo = new TemplateRepository(this);
+        mTagRepo = new TagRepository(this);
+        mCurrencyRepo = new CurrencyRepository(this);
+        mChildExpenseRepo = new ChildExpenseRepository(this);
+        mBookingRepo = new ExpenseRepository(this);
 
         initializeToolbar();
 
@@ -157,7 +170,7 @@ public class ExpenseScreenActivity extends AppCompatActivity {
 
         try {
             SharedPreferences preferences = getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
-            Account account = AccountRepository.get(preferences.getLong("activeAccount", 0));
+            Account account = mAccountRepo.get(preferences.getLong("activeAccount", 0));
             setAccount(account);
         } catch (AccountNotFoundException e) {
 
@@ -192,7 +205,7 @@ public class ExpenseScreenActivity extends AppCompatActivity {
         mCurrencySymbolTxt.setText(mExpense.getCurrency().getSymbol());
 
         try {
-            Account account = AccountRepository.get(mExpense.getAccountId());
+            Account account = mAccountRepo.get(mExpense.getAccountId());
             mAccountBtn.setText(account.getTitle());
 
         } catch (AccountNotFoundException e) {
@@ -206,7 +219,7 @@ public class ExpenseScreenActivity extends AppCompatActivity {
 
         mTitleBtn.setHint(mExpense.getTitle());
 
-        mTags = TagRepository.getAll();
+        mTags = mTagRepo.getAll();
         initializeAutComTxtView(mTags);
         for (Tag tag : mExpense.getTags())//kann ich einfach alle tags einer buchung nehmen oder gibt es fälle, in denen die liste noch nicht initialisiert ist?
             showTagInMultiView(tag);
@@ -391,7 +404,7 @@ public class ExpenseScreenActivity extends AppCompatActivity {
                 case UPDATE_EXPENSE_MODE:
 
                     try {
-                        ExpenseRepository.update(mExpense);
+                        mBookingRepo.update(mExpense);
                         Toast.makeText(ExpenseScreenActivity.this, "Updated Booking " + mExpense.getTitle(), Toast.LENGTH_SHORT).show();
                     } catch (ExpenseNotFoundException e) {
 
@@ -403,7 +416,7 @@ public class ExpenseScreenActivity extends AppCompatActivity {
                 case UPDATE_CHILD_MODE:
 
                     try {
-                        ChildExpenseRepository.update(mExpense);
+                        mChildExpenseRepo.update(mExpense);
                         Toast.makeText(ExpenseScreenActivity.this, "Updated Booking " + mExpense.getTitle(), Toast.LENGTH_SHORT).show();
                     } catch (ChildExpenseNotFoundException e) {
 
@@ -414,12 +427,12 @@ public class ExpenseScreenActivity extends AppCompatActivity {
                     break;
                 case ADD_CHILD_MODE:
 
-                    ChildExpenseRepository.insert(mParentBooking, mExpense);
+                    mChildExpenseRepo.insert(mParentBooking, mExpense);
                     Toast.makeText(ExpenseScreenActivity.this, "Added Booking \"" + mExpense.getTitle() + "\" to parent Booking " + mParentBooking.getTitle(), Toast.LENGTH_SHORT).show();
                     break;
                 case CREATE_EXPENSE_MODE:
 
-                    mExpense = ExpenseRepository.insert(mExpense);
+                    mExpense = mBookingRepo.insert(mExpense);
                     Toast.makeText(ExpenseScreenActivity.this, "Created Booking \"" + mExpense.getTitle() + "\"", Toast.LENGTH_SHORT).show();
                     break;
                 default:
@@ -435,7 +448,7 @@ public class ExpenseScreenActivity extends AppCompatActivity {
 */
 
             if (mTemplate)
-                TemplateRepository.insert(new Template(mExpense));
+                mTemplateRepo.insert(new Template(mExpense));
 
             Intent intent = new Intent(ExpenseScreenActivity.this, ParentActivity.class);
             ExpenseScreenActivity.this.startActivity(intent);
@@ -716,7 +729,7 @@ public class ExpenseScreenActivity extends AppCompatActivity {
                 SingleChoiceDialog<Account> accountPicker = new SingleChoiceDialog<>();
                 accountPicker.createBuilder(ExpenseScreenActivity.this);
                 accountPicker.setTitle(getString(R.string.input_account));
-                accountPicker.setContent(AccountRepository.getAll(), (int) mExpense.getAccountId());
+                accountPicker.setContent(mAccountRepo.getAll(), (int) mExpense.getAccountId());
                 accountPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
                     @Override
                     public void onPositiveClick(Object account) {
@@ -781,7 +794,7 @@ public class ExpenseScreenActivity extends AppCompatActivity {
         //funktion setzt das Datum der Buchung nicht neu, da bei einer Buchung immer das aktuellst Datum genommen werden sollte. Außer wenn es explizit vom user geändert wird.
         setNotice(expense.getNotice());
         try {
-            Account account = AccountRepository.get(expense.getAccountId());
+            Account account = mAccountRepo.get(expense.getAccountId());
             setAccount(account);
 
         } catch (AccountNotFoundException e) {
@@ -894,7 +907,7 @@ public class ExpenseScreenActivity extends AppCompatActivity {
     private void setExpenseCurrency() {
         try {
             SharedPreferences preferences = this.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
-            Currency currency = CurrencyRepository.get(preferences.getLong("mainCurrencyIndex", 1L));
+            Currency currency = mCurrencyRepo.get(preferences.getLong("mainCurrencyIndex", 1L));
 
             mCurrencySymbolTxt.setText(currency.getSymbol());
             mExpense.setCurrency(currency);

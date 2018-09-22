@@ -2,6 +2,7 @@ package com.example.lucas.haushaltsmanager;
 
 import android.os.Environment;
 
+import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
@@ -248,6 +249,6 @@ public class ExpenseObjectExporter {
      * Methode alle Konten in einer lokalen Liste zu speichern
      */
     private void initializeAccountList() {
-        mAccounts = AccountRepository.getAll();
+        mAccounts = new AccountRepository(app.getContext()).getAll(); //todo durch einen ordentliche initialisierung austauschen
     }
 }

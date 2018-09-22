@@ -2,6 +2,7 @@ package com.example.lucas.haushaltsmanager;
 
 import android.util.Log;
 
+import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepository;
@@ -18,8 +19,7 @@ import java.util.List;
 import java.util.Random;
 
 public class MockDataCreator {
-
-    private String TAG = MockDataCreator.class.getSimpleName();
+    private static final String TAG = MockDataCreator.class.getSimpleName();
 
     private int accountCount, bookingCount, categoryCount, tagCount;
     private List<Account> mAccounts;
@@ -47,7 +47,7 @@ public class MockDataCreator {
         for (; counter < count; counter++) {
 
             Account account = new Account(baseAccountName + counter, mRnd.nextInt(50000), mMainCurrency);
-            account = AccountRepository.insert(account);
+            account = new AccountRepository(app.getContext()).insert(account); //todo
             Log.d(TAG, "createAccounts: " + account.toString());
             accounts.add(account);
         }
@@ -59,7 +59,7 @@ public class MockDataCreator {
 
     private Currency createCurrency() {
 
-        return CurrencyRepository.insert(new Currency(-1, "Euro", "EUR", "€"));
+        return new CurrencyRepository(app.getContext()).insert(new Currency(-1, "Euro", "EUR", "€")); //todo
     }
 
     private List<Category> createCategories(int count) {
@@ -76,7 +76,7 @@ public class MockDataCreator {
             String categoryColor = "#" + String.format("%06d", mRnd.nextInt(999999));
 
             Category category = new Category(baseCategoryName + counter, categoryColor, false, new ArrayList<Category>());
-            category = CategoryRepository.insert(category);
+            category = new CategoryRepository(app.getContext()).insert(category);//todo
             Log.d(TAG, "createCategories: " + category.toString());
             categories.add(category);
         }
@@ -95,7 +95,7 @@ public class MockDataCreator {
         for (; counter < count; counter++) {
 
             Tag tag = new Tag(baseTagName + counter);
-            tag = TagRepository.insert(tag);
+            tag = new TagRepository(app.getContext()).insert(tag);//todo
             Log.d(TAG, "createTags: " + tag.toString());
         }
         Log.d(TAG, "createTags: Created " + counter + " new Tags");
@@ -116,7 +116,7 @@ public class MockDataCreator {
             if (mRnd.nextInt(7) == 5)
                 expense.addChildren(createChildBookings(3));
 
-            ExpenseRepository.insert(expense);
+            new ExpenseRepository(app.getContext()).insert(expense);//todo
             Log.d(TAG, "createBookings: " + expense.toString());
         }
         Log.d(TAG, "createBookings: Created " + counter + " Bookings");

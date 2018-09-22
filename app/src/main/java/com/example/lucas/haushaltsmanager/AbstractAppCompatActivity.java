@@ -3,6 +3,7 @@ package com.example.lucas.haushaltsmanager;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 
 public abstract class AbstractAppCompatActivity extends AppCompatActivity {
     //kann ich eine Abstrakt Klasse erstellen die von allen Actvities verwendet wird?
@@ -21,5 +22,16 @@ public abstract class AbstractAppCompatActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case android.R.id.home:
+
+                onBackPressed();
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

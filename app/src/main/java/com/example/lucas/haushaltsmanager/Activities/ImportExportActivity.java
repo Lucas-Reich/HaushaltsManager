@@ -36,6 +36,7 @@ public class ImportExportActivity extends AppCompatActivity {
     private FloatingActionButton mAddExportFab;
     private Button mSelectDirectoryBtn;
     private File mSelectedDirectory;
+    private ExpenseRepository mBookingRepo;
 
     private enum SupportedFileExtensions {
         CSV,
@@ -51,6 +52,8 @@ public class ImportExportActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_import_export);
+
+        mBookingRepo = new ExpenseRepository(this);
 
         mSelectableFileList = new ArrayList<>();
 
@@ -244,6 +247,6 @@ public class ImportExportActivity extends AppCompatActivity {
      * @return Alle Buchungen
      */
     private List<ExpenseObject> getAllExpenses() {
-        return ExpenseRepository.getAll();
+        return mBookingRepo.getAll();
     }
 }

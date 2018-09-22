@@ -58,6 +58,9 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
     private ViewPager mViewPager;
     private List<ExpenseObject> mExpenses = new ArrayList<>();
     private List<Long> mActiveAccounts = new ArrayList<>();
+    private AccountRepository mAccountRepo;
+    private ChildExpenseRepository mChildExpenseRepo;
+    private ExpenseRepository mBookingRepo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +68,10 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
         setContentView(R.layout.tab_main_mit_nav_drawer);
 
         setSharedPreferencesProperties();
+
+        mAccountRepo = new AccountRepository(this);
+        mChildExpenseRepo = new ChildExpenseRepository(this);
+        mBookingRepo = new ExpenseRepository(this);
 
         setActiveAccounts();
         updateExpenses();
@@ -335,7 +342,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
      * @return Liste alles verfügbaren Konten
      */
     private List<Account> getAllAccounts() {
-        return AccountRepository.getAll();
+        return mAccountRepo.getAll();
     }
 
     List<Long> getActiveAccounts() {
@@ -368,7 +375,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
      * Methode um die Liste der Buchungen zu erneuern.
      */
     void updateExpenses() {
-        mExpenses = ExpenseRepository.getAll();
+        mExpenses = mBookingRepo.getAll();
     }
 
     /**
@@ -415,7 +422,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
                 deleteChildren(expense.getChildren());
             } else {
                 try {
-                    ExpenseRepository.delete(expense);
+                    mBookingRepo.delete(expense);
                 } catch (CannotDeleteExpenseException e) {
                     //do nothing
                 }
@@ -428,7 +435,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
     private void deleteChildren(List<ExpenseObject> children) {
         for (ExpenseObject child : children) {
             try {
-                ChildExpenseRepository.delete(child);
+                mChildExpenseRepo.delete(child);
             } catch (CannotDeleteChildExpenseException e) {
                 //do nothing
             }

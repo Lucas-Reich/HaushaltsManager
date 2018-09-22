@@ -1,6 +1,7 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.Tags;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -14,9 +15,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TagRepository {
+    private SQLiteDatabase mDatabase;
 
-    public static boolean exists(Tag tag) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public TagRepository(Context context) {
+        DatabaseManager.initializeInstance(new ExpensesDbHelper(context));
+
+        mDatabase = DatabaseManager.getInstance().openDatabase();
+    }
+
+    public boolean exists(Tag tag) {
         String selectQuery;
 
         selectQuery = "SELECT"
@@ -26,22 +33,19 @@ public class TagRepository {
                 + " AND " + ExpensesDbHelper.TABLE_TAGS + "." + ExpensesDbHelper.TAGS_COL_NAME + " = '" + tag.getName() + "'"
                 + " LIMIT 1;";
 
-        Cursor c = db.rawQuery(selectQuery, null);
+        Cursor c = mDatabase.rawQuery(selectQuery, null);
 
         if (c.moveToFirst()) {
 
             c.close();
-            DatabaseManager.getInstance().closeDatabase();
             return true;
         }
 
         c.close();
-        DatabaseManager.getInstance().closeDatabase();
         return false;
     }
 
-    public static Tag get(long tagId) throws TagNotFoundException {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public Tag get(long tagId) throws TagNotFoundException {
 
         String selectQuery;
         selectQuery = "SELECT "
@@ -50,7 +54,7 @@ public class TagRepository {
                 + " FROM " + ExpensesDbHelper.TABLE_TAGS
                 + " WHERE " + ExpensesDbHelper.TAGS_COL_ID + " = " + tagId + ";";
 
-        Cursor c = db.rawQuery(selectQuery, null);
+        Cursor c = mDatabase.rawQuery(selectQuery, null);
 
         if (!c.moveToFirst()) {
             throw new TagNotFoundException(tagId);
@@ -59,19 +63,17 @@ public class TagRepository {
         Tag tag = cursorToTag(c);
 
         c.close();
-        DatabaseManager.getInstance().closeDatabase();
         return tag;
     }
 
-    public static List<Tag> getAll() {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public List<Tag> getAll() {
 
         String selectQuery = "SELECT "
                 + ExpensesDbHelper.TAGS_COL_ID + ", "
                 + ExpensesDbHelper.TAGS_COL_NAME
                 + " FROM " + ExpensesDbHelper.TABLE_TAGS + ";";
 
-        Cursor c = db.rawQuery(selectQuery, null);
+        Cursor c = mDatabase.rawQuery(selectQuery, null);
 
         c.moveToFirst();
 
@@ -83,18 +85,15 @@ public class TagRepository {
         }
 
         c.close();
-        DatabaseManager.getInstance().closeDatabase();
         return tags;
     }
 
-    public static Tag insert(Tag tag) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public Tag insert(Tag tag) {
 
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.TAGS_COL_NAME, tag.getName());
 
-        long insertedTagId = db.insert(ExpensesDbHelper.TABLE_TAGS, null, values);
-        DatabaseManager.getInstance().closeDatabase();
+        long insertedTagId = mDatabase.insert(ExpensesDbHelper.TABLE_TAGS, null, values);
 
         return new Tag(
                 insertedTagId,
@@ -102,32 +101,26 @@ public class TagRepository {
         );
     }
 
-    public static void delete(Tag tag) throws CannotDeleteTagException {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public void delete(Tag tag) throws CannotDeleteTagException {
 
         if (isAttachedToBooking(tag))
             throw new CannotDeleteTagException(tag);
 
-        db.delete(ExpensesDbHelper.TABLE_TAGS, ExpensesDbHelper.TAGS_COL_ID + " = ?", new String[]{"" + tag.getIndex()});
-
-        DatabaseManager.getInstance().closeDatabase();
+        mDatabase.delete(ExpensesDbHelper.TABLE_TAGS, ExpensesDbHelper.TAGS_COL_ID + " = ?", new String[]{"" + tag.getIndex()});
     }
 
-    public static void update(Tag tag) throws TagNotFoundException {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public void update(Tag tag) throws TagNotFoundException {
 
         ContentValues updatedTag = new ContentValues();
         updatedTag.put(ExpensesDbHelper.TAGS_COL_NAME, tag.getName());
 
-        int affectedRows = db.update(ExpensesDbHelper.TABLE_TAGS, updatedTag, ExpensesDbHelper.TAGS_COL_ID + " = ?", new String[]{tag.getIndex() + ""});
-        DatabaseManager.getInstance().closeDatabase();
+        int affectedRows = mDatabase.update(ExpensesDbHelper.TABLE_TAGS, updatedTag, ExpensesDbHelper.TAGS_COL_ID + " = ?", new String[]{tag.getIndex() + ""});
 
         if (affectedRows == 0)
             throw new TagNotFoundException(tag.getIndex());
     }
 
-    private static boolean isAttachedToBooking(Tag tag) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    private boolean isAttachedToBooking(Tag tag) {
 
         String selectQuery;
         selectQuery = "SELECT "
@@ -136,17 +129,15 @@ public class TagRepository {
                 + " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS_TAGS + "." + ExpensesDbHelper.BOOKINGS_TAGS_COL_TAG_ID + " = " + tag.getIndex()
                 + " LIMIT 1;";
 
-        Cursor c = db.rawQuery(selectQuery, null);
+        Cursor c = mDatabase.rawQuery(selectQuery, null);
 
         if (c.moveToFirst()) {
 
             c.close();
-            DatabaseManager.getInstance().closeDatabase();
             return true;
         }
 
         c.close();
-        DatabaseManager.getInstance().closeDatabase();
         return false;
     }
 

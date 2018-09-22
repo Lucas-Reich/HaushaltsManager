@@ -1,6 +1,5 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.Accounts;
 
-import android.content.Context;
 import android.database.CursorIndexOutOfBoundsException;
 import android.database.MatrixCursor;
 
@@ -18,6 +17,7 @@ import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 
 import junit.framework.Assert;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,15 +33,26 @@ import static org.mockito.Mockito.when;
 @RunWith(RobolectricTestRunner.class)
 public class AccountRepositoryTest {
     private Currency currency;
+    private AccountRepository mAccountRepo;
+    private CurrencyRepository mCurrencyRepo;
+    private ChildExpenseRepository mChildExpenseRepo;
+    private ExpenseRepository mBookingRepo;
 
     @Before
     public void setup() {
-        Context context = RuntimeEnvironment.application;
-        ExpensesDbHelper dbHelper = new ExpensesDbHelper(context);
-        DatabaseManager.initializeInstance(dbHelper);
+        mAccountRepo = new AccountRepository(RuntimeEnvironment.application);
+        mCurrencyRepo = new CurrencyRepository(RuntimeEnvironment.application);
+        mChildExpenseRepo = new ChildExpenseRepository(RuntimeEnvironment.application);
+        mBookingRepo = new ExpenseRepository(RuntimeEnvironment.application);
 
         currency = new Currency("Euro", "EUR", "€");
-        currency = CurrencyRepository.insert(currency);
+        currency = mCurrencyRepo.insert(currency);
+    }
+
+    @After
+    public void teardown() {
+
+        DatabaseManager.getInstance().closeDatabase();
     }
 
     public Account getSimpleAccount() {
@@ -54,9 +65,9 @@ public class AccountRepositoryTest {
 
     @Test
     public void testExistsWithExistingAccountShouldSucceed() {
-        Account account = AccountRepository.insert(getSimpleAccount());
+        Account account = mAccountRepo.insert(getSimpleAccount());
 
-        boolean exists = AccountRepository.exists(account);
+        boolean exists = mAccountRepo.exists(account);
         assertTrue("Das Konto konnte nicht in der Datenbank gefunden werrden", exists);
     }
 
@@ -64,16 +75,16 @@ public class AccountRepositoryTest {
     public void testExistsWithNotExistingAccountShouldSucceed() {
         Account account = getSimpleAccount();
 
-        boolean exists = AccountRepository.exists(account);
+        boolean exists = mAccountRepo.exists(account);
         assertFalse("Nicht existierendes Konto konnte in der Datenbank gefunden werden", exists);
     }
 
     @Test
     public void testGetWithExistingAccountShouldSucceed() {
-        Account expectedAccount = AccountRepository.insert(getSimpleAccount());
+        Account expectedAccount = mAccountRepo.insert(getSimpleAccount());
 
         try {
-            Account fetchedAccount = AccountRepository.get(expectedAccount.getIndex());
+            Account fetchedAccount = mAccountRepo.get(expectedAccount.getIndex());
             assertEquals(expectedAccount, fetchedAccount);
 
         } catch (AccountNotFoundException e) {
@@ -87,7 +98,7 @@ public class AccountRepositoryTest {
         long notExistingAccountId = 1337;
 
         try {
-            AccountRepository.get(notExistingAccountId);
+            mAccountRepo.get(notExistingAccountId);
             Assert.fail("Nicht existierendes Kont konnte gefunden werden");
 
         } catch (AccountNotFoundException e) {
@@ -98,10 +109,10 @@ public class AccountRepositoryTest {
 
     @Test
     public void testInsertWithValidAccountShouldSucceed() {
-        Account expectedAccount = AccountRepository.insert(getSimpleAccount());
+        Account expectedAccount = mAccountRepo.insert(getSimpleAccount());
 
         try {
-            Account fetchedAccount = AccountRepository.get(expectedAccount.getIndex());
+            Account fetchedAccount = mAccountRepo.get(expectedAccount.getIndex());
             assertEquals(expectedAccount, fetchedAccount);
 
         } catch (AccountNotFoundException e) {
@@ -111,17 +122,12 @@ public class AccountRepositoryTest {
     }
 
     @Test
-    public void testInsertWithInvalidAccountShouldFail() {
-        //todo was soll passieren wenn das Konto nicht richtig initialisiert wurde, zb keine währung
-    }
-
-    @Test
     public void testDeleteWithWithExistingAccountShouldSucceed() {
-        Account account = AccountRepository.insert(getSimpleAccount());
+        Account account = mAccountRepo.insert(getSimpleAccount());
 
         try {
-            AccountRepository.delete(account);
-            assertFalse("Konto wurde nicht gelöscht", AccountRepository.exists(account));
+            mAccountRepo.delete(account);
+            assertFalse("Konto wurde nicht gelöscht", mAccountRepo.exists(account));
 
         } catch (CannotDeleteAccountException e) {
 
@@ -131,28 +137,28 @@ public class AccountRepositoryTest {
 
     @Test
     public void testDeleteWithExistingAccountAttachedToParentExpenseShouldFailWithCannotDeleteAccountException() {
-        Account account = AccountRepository.insert(getSimpleAccount());
+        Account account = mAccountRepo.insert(getSimpleAccount());
 
         Category category = mock(Category.class);
         when(category.getIndex()).thenReturn(100L);
 
         ExpenseObject parentExpense = new ExpenseObject("Ausgabe", 0, false, category, account.getIndex(), currency);
-        ExpenseRepository.insert(parentExpense);
+        mBookingRepo.insert(parentExpense);
 
         try {
-            AccountRepository.delete(account);
+            mAccountRepo.delete(account);
             Assert.fail("Konto konnte gelöscht werden obwohl es eine ParentBuchung mit diesem Konto gibt");
 
         } catch (CannotDeleteAccountException e) {
 
-            assertTrue("Konto wurde gelöscht", AccountRepository.exists(account));
+            assertTrue("Konto wurde gelöscht", mAccountRepo.exists(account));
             assertEquals(String.format("Account %s cannot be deleted.", account.getTitle()), e.getMessage());
         }
     }
 
     @Test
     public void testDeleteWithExistingAccountAttachedToChildExpenseShouldFailWithCannotDeleteAccountException() {
-        Account account = AccountRepository.insert(getSimpleAccount());
+        Account account = mAccountRepo.insert(getSimpleAccount());
 
         ExpenseObject parentExpense = mock(ExpenseObject.class);
         when(parentExpense.getIndex()).thenReturn(100L);
@@ -161,15 +167,15 @@ public class AccountRepositoryTest {
         when(category.getIndex()).thenReturn(100L);
 
         ExpenseObject childExpense = new ExpenseObject("Ausgabe", 0, false, category, account.getIndex(), currency);
-        ChildExpenseRepository.insert(parentExpense, childExpense);
+        mChildExpenseRepo.insert(parentExpense, childExpense);
 
         try {
-            AccountRepository.delete(account);
+            mAccountRepo.delete(account);
             Assert.fail("Konto konnte gelöscht werden obwohl es eine KindBuchung mit diesem Konto gibt");
 
         } catch (CannotDeleteAccountException e) {
 
-            assertTrue("Konto wurde gelöscht", AccountRepository.exists(account));
+            assertTrue("Konto wurde gelöscht", mAccountRepo.exists(account));
             assertEquals(String.format("Account %s cannot be deleted.", account.getTitle()), e.getMessage());
         }
     }
@@ -179,8 +185,8 @@ public class AccountRepositoryTest {
         Account account = getSimpleAccount();
 
         try {
-            AccountRepository.delete(account);
-            assertFalse("Konto wurde in der Datenbank gefunden", AccountRepository.exists(account));
+            mAccountRepo.delete(account);
+            assertFalse("Konto wurde in der Datenbank gefunden", mAccountRepo.exists(account));
 
         } catch (CannotDeleteAccountException e) {
 
@@ -191,12 +197,12 @@ public class AccountRepositoryTest {
 
     @Test
     public void testUpdateWithWithExistingAccountShouldSucceed() {
-        Account expectedAccount = AccountRepository.insert(getSimpleAccount());
+        Account expectedAccount = mAccountRepo.insert(getSimpleAccount());
 
         try {
             expectedAccount.setName("New Account Name");
-            AccountRepository.update(expectedAccount);
-            Account fetchedAccount = AccountRepository.get(expectedAccount.getIndex());
+            mAccountRepo.update(expectedAccount);
+            Account fetchedAccount = mAccountRepo.get(expectedAccount.getIndex());
 
             assertEquals(expectedAccount, fetchedAccount);
 
@@ -211,7 +217,7 @@ public class AccountRepositoryTest {
         Account account = getSimpleAccount();
 
         try {
-            AccountRepository.update(account);
+            mAccountRepo.update(account);
             Assert.fail("Nicht existierendes Konto konnte geupdated werden");
 
         } catch (AccountNotFoundException e) {

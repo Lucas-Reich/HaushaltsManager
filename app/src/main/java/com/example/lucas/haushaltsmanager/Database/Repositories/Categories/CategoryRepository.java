@@ -1,9 +1,11 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.Categories;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.Exceptions.CategoryNotFoundException;
@@ -14,9 +16,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CategoryRepository {
+    private SQLiteDatabase mDatabase;
 
-    public static boolean exists(Category category) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public CategoryRepository(Context context) {
+        DatabaseManager.initializeInstance(new ExpensesDbHelper(context));
+
+        mDatabase = DatabaseManager.getInstance().openDatabase();
+    }
+
+    public boolean exists(Category category) {
         String selectQuery;
 
         selectQuery = "SELECT"
@@ -28,22 +36,19 @@ public class CategoryRepository {
                 + " AND " + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE + " = " + (category.getDefaultExpenseType() ? 1 : 0)
                 + " LIMIT 1;";
 
-        Cursor c = db.rawQuery(selectQuery, null);
+        Cursor c = mDatabase.rawQuery(selectQuery, null);
 
         if (c.moveToFirst()) {
 
             c.close();
-            DatabaseManager.getInstance().closeDatabase();
             return true;
         }
 
         c.close();
-        DatabaseManager.getInstance().closeDatabase();
         return false;
     }
 
-    public static Category get(long categoryId) throws CategoryNotFoundException {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public Category get(long categoryId) throws CategoryNotFoundException {
 
         String selectQuery = "SELECT "
                 + ExpensesDbHelper.CATEGORIES_COL_ID + ", "
@@ -53,22 +58,20 @@ public class CategoryRepository {
                 + " FROM " + ExpensesDbHelper.TABLE_CATEGORIES
                 + " WHERE " + ExpensesDbHelper.CATEGORIES_COL_ID + " = " + categoryId + ";";
 
-        Cursor c = db.rawQuery(selectQuery, null);
+        Cursor c = mDatabase.rawQuery(selectQuery, null);
 
         if (!c.moveToFirst()) {
             throw new CategoryNotFoundException(categoryId);
         }
 
         Category category = cursorToCategory(c);
-        category.addChildren(ChildCategoryRepository.getAll(category.getIndex()));
+        category.addChildren(new ChildCategoryRepository(app.getContext()).getAll(category.getIndex()));
 
         c.close();
-        DatabaseManager.getInstance().closeDatabase();
         return category;
     }
 
-    public static List<Category> getAll() {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public List<Category> getAll() {
 
         String selectQuery = "SELECT "
                 + ExpensesDbHelper.CATEGORIES_COL_ID + ", "
@@ -77,7 +80,7 @@ public class CategoryRepository {
                 + ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE + " "
                 + "FROM " + ExpensesDbHelper.TABLE_CATEGORIES + ";";
 
-        Cursor c = db.rawQuery(selectQuery, null);
+        Cursor c = mDatabase.rawQuery(selectQuery, null);
 
         c.moveToFirst();
         ArrayList<Category> categories = new ArrayList<>();
@@ -88,21 +91,18 @@ public class CategoryRepository {
         }
 
         c.close();
-        DatabaseManager.getInstance().closeDatabase();
 
         return categories;
     }
 
-    public static Category insert(Category category) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public Category insert(Category category) {
 
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.CATEGORIES_COL_NAME, category.getTitle());
         values.put(ExpensesDbHelper.CATEGORIES_COL_COLOR, category.getColorString());
         values.put(ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE, category.getDefaultExpenseType() ? 1 : 0);
 
-        long insertedCategoryId = db.insert(ExpensesDbHelper.TABLE_CATEGORIES, null, values);
-        DatabaseManager.getInstance().closeDatabase();
+        long insertedCategoryId = mDatabase.insert(ExpensesDbHelper.TABLE_CATEGORIES, null, values);
 
         Category parentCategory = new Category(
                 insertedCategoryId,
@@ -113,22 +113,20 @@ public class CategoryRepository {
         );
 
         for (Category childCategory : category.getChildren()) {
-            parentCategory.addChild(ChildCategoryRepository.insert(parentCategory, childCategory));
+            parentCategory.addChild(new ChildCategoryRepository(app.getContext()).insert(parentCategory, childCategory));
         }
 
         return parentCategory;
     }
 
-    public static void update(Category category) throws CategoryNotFoundException {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public void update(Category category) throws CategoryNotFoundException {
 
         ContentValues updatedCategory = new ContentValues();
         updatedCategory.put(ExpensesDbHelper.CATEGORIES_COL_NAME, category.getTitle());
         updatedCategory.put(ExpensesDbHelper.CATEGORIES_COL_COLOR, category.getColorString());
         updatedCategory.put(ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE, (category.getDefaultExpenseType() ? 1 : 0));
 
-        int affectedRows = db.update(ExpensesDbHelper.TABLE_CATEGORIES, updatedCategory, ExpensesDbHelper.CATEGORIES_COL_ID + " = ?", new String[]{category.getIndex() + ""});
-        DatabaseManager.getInstance().closeDatabase();
+        int affectedRows = mDatabase.update(ExpensesDbHelper.TABLE_CATEGORIES, updatedCategory, ExpensesDbHelper.CATEGORIES_COL_ID + " = ?", new String[]{category.getIndex() + ""});
 
         if (affectedRows == 0)
             throw new CategoryNotFoundException(category.getIndex());
@@ -145,7 +143,7 @@ public class CategoryRepository {
                 categoryName,
                 categoryColor,
                 defaultExpenseType,
-                ChildCategoryRepository.getAll(categoryIndex)
+                new ChildCategoryRepository(app.getContext()).getAll(categoryIndex)
         );
     }
 }

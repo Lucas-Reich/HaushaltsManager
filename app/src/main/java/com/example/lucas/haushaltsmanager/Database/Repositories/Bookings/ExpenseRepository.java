@@ -1,10 +1,12 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.Bookings;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
@@ -28,9 +30,15 @@ import java.util.List;
 
 public class ExpenseRepository {
     private static final String TAG = ExpenseRepository.class.getSimpleName();
+    private SQLiteDatabase mDatabase;
 
-    public static boolean exists(ExpenseObject expense) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public ExpenseRepository(Context context) {
+        DatabaseManager.initializeInstance(new ExpensesDbHelper(context));
+
+        mDatabase = DatabaseManager.getInstance().openDatabase();
+    }
+
+    public boolean exists(ExpenseObject expense) {
         String selectQuery;
 
         selectQuery = "SELECT"
@@ -49,22 +57,19 @@ public class ExpenseRepository {
                 + " AND " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_PARENT_ID + " IS NULL"
                 + " LIMIT 1;";
 
-        Cursor c = db.rawQuery(selectQuery, null);
+        Cursor c = mDatabase.rawQuery(selectQuery, null);
 
         if (c.moveToFirst()) {
 
             c.close();
-            DatabaseManager.getInstance().closeDatabase();
             return true;
         }
 
         c.close();
-        DatabaseManager.getInstance().closeDatabase();
         return false;
     }
 
-    public static ExpenseObject get(long expenseId) throws ExpenseNotFoundException {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public ExpenseObject get(long expenseId) throws ExpenseNotFoundException {
 
         String selectQuery = "SELECT "
                 + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_ID + ", "
@@ -89,7 +94,7 @@ public class ExpenseRepository {
                 + " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_ID + " = " + expenseId
                 + " ORDER BY " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_DATE + " DESC;";
 
-        Cursor c = db.rawQuery(selectQuery, null);
+        Cursor c = mDatabase.rawQuery(selectQuery, null);
 
         if (!c.moveToFirst()) {
             throw ExpenseNotFoundException.expenseNotFoundException(expenseId);
@@ -98,11 +103,10 @@ public class ExpenseRepository {
         ExpenseObject expense = cursorToExpense(c);
 
         c.close();
-        DatabaseManager.getInstance().closeDatabase();
         return expense;
     }
 
-    public static List<ExpenseObject> getAll() {
+    public List<ExpenseObject> getAll() {
 
         return getAll(0, Calendar.getInstance().getTimeInMillis());
     }
@@ -114,8 +118,7 @@ public class ExpenseRepository {
      * @param endDateInMills   ending date
      * @return list of Expenses which are between the starting and end date
      */
-    public static List<ExpenseObject> getAll(long startDateInMills, long endDateInMills) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public List<ExpenseObject> getAll(long startDateInMills, long endDateInMills) {
 
         String selectQuery;
         selectQuery = "SELECT "
@@ -143,7 +146,7 @@ public class ExpenseRepository {
                 + " AND " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_PARENT_ID + " IS NULL"
                 + " ORDER BY " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_DATE + " DESC;";
 
-        Cursor c = db.rawQuery(selectQuery, null);
+        Cursor c = mDatabase.rawQuery(selectQuery, null);
 
         c.moveToFirst();
         ArrayList<ExpenseObject> bookings = new ArrayList<>();
@@ -154,13 +157,11 @@ public class ExpenseRepository {
         }
 
         c.close();
-        DatabaseManager.getInstance().closeDatabase();
 
         return bookings;
     }
 
-    public static ExpenseObject insert(ExpenseObject expense) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public ExpenseObject insert(ExpenseObject expense) {
 
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.BOOKINGS_COL_EXPENSE_TYPE, expense.getExpenseType().name());
@@ -185,8 +186,7 @@ public class ExpenseRepository {
             //Sollte eingentlich nicht passieren können da der User nur aus existierenden Konten auswählen kann.
         }
 
-        long insertedExpenseId = db.insert(ExpensesDbHelper.TABLE_BOOKINGS, null, values);
-        DatabaseManager.getInstance().closeDatabase();
+        long insertedExpenseId = mDatabase.insert(ExpensesDbHelper.TABLE_BOOKINGS, null, values);
 
         ExpenseObject insertedExpense = new ExpenseObject(
                 insertedExpenseId,
@@ -204,18 +204,17 @@ public class ExpenseRepository {
         );
 
         for (Tag tag : expense.getTags()) {
-            BookingTagRepository.insert(insertedExpense.getIndex(), tag, insertedExpense.getExpenseType());//todo kann ich die Tags hier zur buchung zuordnen anstatt durch expense.getTags()
+            new BookingTagRepository(app.getContext()).insert(insertedExpense.getIndex(), tag);//todo kann ich die Tags hier zur buchung zuordnen anstatt durch expense.getTags()
         }
 
         for (ExpenseObject child : expense.getChildren()) {
-            insertedExpense.addChild(ChildExpenseRepository.insert(insertedExpense, child));
+            insertedExpense.addChild(new ChildExpenseRepository(app.getContext()).insert(insertedExpense, child));
         }
 
         return insertedExpense;
     }
 
-    public static void delete(ExpenseObject expense) throws CannotDeleteExpenseException {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public void delete(ExpenseObject expense) throws CannotDeleteExpenseException {
 
         if (isRecurringBooking(expense) || isTemplateBooking(expense)) {
 
@@ -244,9 +243,9 @@ public class ExpenseRepository {
                         -expense.getSignedPrice()
                 );
 
-                BookingTagRepository.deleteAll(expense);
+                new BookingTagRepository(app.getContext()).deleteAll(expense);
                 for (ExpenseObject childExpense : expense.getChildren()) {
-                    ChildExpenseRepository.delete(childExpense);
+                    new ChildExpenseRepository(app.getContext()).delete(childExpense);
                 }
             } catch (AccountNotFoundException e) {
 
@@ -259,13 +258,11 @@ public class ExpenseRepository {
                 throw CannotDeleteExpenseException.CannotDeleteChild(expense);
             }
 
-            db.delete(ExpensesDbHelper.TABLE_BOOKINGS, ExpensesDbHelper.BOOKINGS_COL_ID + " = ?", new String[]{"" + expense.getIndex()});
-            DatabaseManager.getInstance().closeDatabase();
+            mDatabase.delete(ExpensesDbHelper.TABLE_BOOKINGS, ExpensesDbHelper.BOOKINGS_COL_ID + " = ?", new String[]{"" + expense.getIndex()});
         }
     }
 
-    public static void update(ExpenseObject expense) throws ExpenseNotFoundException {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public void update(ExpenseObject expense) throws ExpenseNotFoundException {
 
         ContentValues updatedExpense = new ContentValues();
         updatedExpense.put(ExpensesDbHelper.BOOKINGS_COL_EXPENSE_TYPE, expense.getExpenseType().name());
@@ -278,9 +275,9 @@ public class ExpenseRepository {
         updatedExpense.put(ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID, expense.getAccountId());
         updatedExpense.put(ExpensesDbHelper.BOOKINGS_COL_CURRENCY_ID, expense.getCurrency().getIndex());
 
-        BookingTagRepository.deleteAll(expense);
+        new BookingTagRepository(app.getContext()).deleteAll(expense);
         for (Tag tag : expense.getTags()) {
-            BookingTagRepository.insert(expense.getIndex(), tag, expense.getExpenseType());
+            new BookingTagRepository(app.getContext()).insert(expense.getIndex(), tag);
         }
 
         try {
@@ -291,26 +288,22 @@ public class ExpenseRepository {
                     expense.getSignedPrice() - oldExpense.getSignedPrice()
             );
 
-            int affectedRows = db.update(ExpensesDbHelper.TABLE_BOOKINGS, updatedExpense, ExpensesDbHelper.BOOKINGS_COL_ID + " = ?", new String[]{expense.getIndex() + ""});
-            DatabaseManager.getInstance().closeDatabase();
+            int affectedRows = mDatabase.update(ExpensesDbHelper.TABLE_BOOKINGS, updatedExpense, ExpensesDbHelper.BOOKINGS_COL_ID + " = ?", new String[]{expense.getIndex() + ""});
 
             if (affectedRows == 0)
                 throw ExpenseNotFoundException.expenseNotFoundException(expense.getIndex());
 
         } catch (AccountNotFoundException e) {
 
-            DatabaseManager.getInstance().closeDatabase();
         }
     }
 
-    public static void hide(ExpenseObject expense) throws ExpenseNotFoundException {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public void hide(ExpenseObject expense) throws ExpenseNotFoundException {
 
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.BOOKINGS_COL_HIDDEN, 1);
 
-        int affectedRows = db.update(ExpensesDbHelper.TABLE_BOOKINGS, values, ExpensesDbHelper.BOOKINGS_COL_ID + " = ?", new String[]{"" + expense.getIndex()});
-        DatabaseManager.getInstance().closeDatabase();
+        int affectedRows = mDatabase.update(ExpensesDbHelper.TABLE_BOOKINGS, values, ExpensesDbHelper.BOOKINGS_COL_ID + " = ?", new String[]{"" + expense.getIndex()});
 
         if (affectedRows == 0)
             throw ExpenseNotFoundException.expenseNotFoundException(expense.getIndex());
@@ -328,8 +321,7 @@ public class ExpenseRepository {
         }
     }
 
-    public static boolean isHidden(ExpenseObject expense) throws ExpenseNotFoundException {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+    public boolean isHidden(ExpenseObject expense) throws ExpenseNotFoundException {
 
         String selectQuery;
         selectQuery = "SELECT"
@@ -338,7 +330,7 @@ public class ExpenseRepository {
                 + " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_ID + " = " + expense.getIndex()
                 + ";";
 
-        Cursor c = db.rawQuery(selectQuery, null);
+        Cursor c = mDatabase.rawQuery(selectQuery, null);
 
         if (!c.moveToFirst()) {
             throw ExpenseNotFoundException.expenseNotFoundException(expense.getIndex());
@@ -346,7 +338,6 @@ public class ExpenseRepository {
 
         boolean isHidden = c.getInt(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_HIDDEN)) == 1;
         c.close();
-        DatabaseManager.getInstance().closeDatabase();
 
         return isHidden;
     }
@@ -357,16 +348,15 @@ public class ExpenseRepository {
      * @param accountId Konto welches angepasst werden soll
      * @param amount    Betrag der angezogen oder hinzugefügt werden soll
      */
-    private static void updateAccountBalance(long accountId, double amount) throws AccountNotFoundException {
+    private void updateAccountBalance(long accountId, double amount) throws AccountNotFoundException {
 
-        Account account1 = AccountRepository.get(accountId);
+        Account account1 = new AccountRepository(app.getContext()).get(accountId); //todo
         account1.setBalance(account1.getBalance() + amount);
-        AccountRepository.update(account1);
+        new AccountRepository(app.getContext()).update(account1); //todo
     }
 
-    private static boolean isAttachedToChildExpenses(ExpenseObject expense) {
+    private boolean isAttachedToChildExpenses(ExpenseObject expense) {
         //todo kann ich auch durch ChildExpenseRepository.exists(expense) ersetzen
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
 
         String selectQuery;
         selectQuery = "SELECT"
@@ -375,26 +365,24 @@ public class ExpenseRepository {
                 + " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_PARENT_ID + " = " + expense.getIndex()
                 + " LIMIT 1;";
 
-        Cursor c = db.rawQuery(selectQuery, null);
+        Cursor c = mDatabase.rawQuery(selectQuery, null);
 
         if (c.moveToFirst()) {
 
             c.close();
-            DatabaseManager.getInstance().closeDatabase();
             return true;
         }
 
         c.close();
-        DatabaseManager.getInstance().closeDatabase();
         return false;
     }
 
-    private static boolean isTemplateBooking(ExpenseObject expense) {
-        return TemplateRepository.existsWithoutIndex(expense);
+    private boolean isTemplateBooking(ExpenseObject expense) {
+        return new TemplateRepository(app.getContext()).existsWithoutIndex(expense);//todo
     }
 
-    private static boolean isRecurringBooking(ExpenseObject expense) {
-        return RecurringBookingRepository.exists(expense);
+    private boolean isRecurringBooking(ExpenseObject expense) {
+        return new RecurringBookingRepository(app.getContext()).exists(expense);//todo
     }
 
     public static ExpenseObject cursorToExpense(Cursor c) {
@@ -420,13 +408,13 @@ public class ExpenseRepository {
                 notice,
                 accountId,
                 expense_type,
-                BookingTagRepository.get(expenseId, expense_type),
-                expense_type.equals(ExpenseObject.EXPENSE_TYPES.PARENT_EXPENSE) ? ChildExpenseRepository.getAll(expenseId) : new ArrayList<ExpenseObject>(),
+                new BookingTagRepository(app.getContext()).get(expenseId),
+                expense_type.equals(ExpenseObject.EXPENSE_TYPES.PARENT_EXPENSE) ? new ChildExpenseRepository(app.getContext()).getAll(expenseId) : new ArrayList<ExpenseObject>(),
                 CurrencyRepository.cursorToCurrency(c)
         );
     }
 
-    public static void assertSavableExpense(ExpenseObject expense) {
+    public void assertSavableExpense(ExpenseObject expense) {
         //todo funktion nicht mehr benutzen
         switch (expense.getExpenseType()) {
             case PARENT_EXPENSE:

@@ -29,6 +29,8 @@ public class CourseActivity extends AppCompatActivity {
     private List<ExpenseObject> mExpenses;
     private List<Long> mActiveAccounts;
     private ExpandableListView mListView;
+    private AccountRepository mAccountRepo;
+    private ExpenseRepository mBookingRepo;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -38,6 +40,9 @@ public class CourseActivity extends AppCompatActivity {
         mListView = findViewById(R.id.expandable_list_view);
         mExpenses = new ArrayList<>();
         mActiveAccounts = new ArrayList<>();
+
+        mAccountRepo = new AccountRepository(this);
+        mBookingRepo = new ExpenseRepository(this);
 
         initializeToolbar();
     }
@@ -87,7 +92,7 @@ public class CourseActivity extends AppCompatActivity {
     private void prepareDataSources() {
 
         Log.d(TAG, "prepareDataSources: Initialisiere die Buchungsliste");
-        mExpenses = ExpenseRepository.getAll();
+        mExpenses = mBookingRepo.getAll();
 
         prepareAccountData();
     }
@@ -98,7 +103,7 @@ public class CourseActivity extends AppCompatActivity {
     private void prepareAccountData() {
 
         Log.d(TAG, "prepareAccountData: Initialisiere Kontenliste");
-        List<Account> accounts = AccountRepository.getAll();
+        List<Account> accounts = mAccountRepo.getAll();
         for (Account account : accounts) {
             mActiveAccounts.add(account.getIndex());
         }

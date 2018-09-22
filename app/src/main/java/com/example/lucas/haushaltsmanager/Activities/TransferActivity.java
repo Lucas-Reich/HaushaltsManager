@@ -48,12 +48,22 @@ public class TransferActivity extends AppCompatActivity {
     private ExpenseObject mFromExpense;
     //Einnahme
     private ExpenseObject mToExpense;
+    private AccountRepository mAccountRepo;
+    private ChildExpenseRepository mChildExpenseRepo;
+    private ChildCategoryRepository mChildCategoryRepo;
+    private ExpenseRepository mBookingRepo;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+//fixme megadumm wenn ich unter dieser version bin dann kann ich die activity nicht aufrufen da die onCreate methode nicht aufgerufen wird
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_transfers);
+
+        mAccountRepo = new AccountRepository(this);
+        mChildExpenseRepo = new ChildExpenseRepository(this);
+        mChildCategoryRepo = new ChildCategoryRepository(this);
+        mBookingRepo = new ExpenseRepository(this);
 
         mCalendar = Calendar.getInstance();
 
@@ -131,7 +141,7 @@ public class TransferActivity extends AppCompatActivity {
                 accountPicker.createBuilder(TransferActivity.this);
                 accountPicker.setTitle(getString(R.string.input_account));
 
-                List<Account> accounts = AccountRepository.getAll();
+                List<Account> accounts = mAccountRepo.getAll();
                 accounts.remove(mToAccount);
                 accountPicker.setContent(accounts, -1);
                 accountPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
@@ -162,7 +172,7 @@ public class TransferActivity extends AppCompatActivity {
                 accountPicker.createBuilder(TransferActivity.this);
                 accountPicker.setTitle(getString(R.string.choose_account));
 
-                List<Account> accounts = AccountRepository.getAll();
+                List<Account> accounts = mAccountRepo.getAll();
                 accounts.remove(mFromAccount);
                 accountPicker.setContent(accounts, -1);
                 accountPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
@@ -221,10 +231,10 @@ public class TransferActivity extends AppCompatActivity {
                     bookings.add(mToExpense);
 
 
-                    ExpenseObject parent = ChildExpenseRepository.combineExpenses(bookings);
+                    ExpenseObject parent = mChildExpenseRepo.combineExpenses(bookings);
                     parent.setTitle(String.format("%s\n%s -> %s", getString(R.string.transfer), mFromAccount.getTitle(), mToAccount.getTitle()));
                     try {
-                        ExpenseRepository.update(parent);
+                        mBookingRepo.update(parent);
                     } catch (ExpenseNotFoundException e) {
 
                         Toast.makeText(TransferActivity.this, "Titel konnte nicht geupdated werden", Toast.LENGTH_SHORT).show();
@@ -280,7 +290,7 @@ public class TransferActivity extends AppCompatActivity {
      * @return Default TransferKategorie
      */
     private Category getTransferCategory() throws ChildCategoryNotFoundException {
-        return ChildCategoryRepository.get(1);
+        return mChildCategoryRepo.get(1);
     }
 
     /**

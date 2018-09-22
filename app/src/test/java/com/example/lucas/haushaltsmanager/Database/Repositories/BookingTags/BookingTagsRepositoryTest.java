@@ -1,10 +1,5 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.BookingTags;
 
-import android.content.Context;
-
-import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
-import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
-
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -12,12 +7,12 @@ import org.robolectric.RuntimeEnvironment;
 
 @RunWith(RobolectricTestRunner.class)
 public class BookingTagsRepositoryTest {
+    private BookingTagRepository mBookingTagRepo;
 
     @Before
     public void setup() {
-        Context context = RuntimeEnvironment.application;
-        ExpensesDbHelper dbHelper = new ExpensesDbHelper(context);
-        DatabaseManager.initializeInstance(dbHelper);
+
+        mBookingTagRepo = new BookingTagRepository(RuntimeEnvironment.application);
     }
 
     public void testGetWithExistingBookingTagsShouldSucceed() {
