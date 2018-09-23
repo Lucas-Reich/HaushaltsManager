@@ -3,6 +3,7 @@ package com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses;
 import android.database.CursorIndexOutOfBoundsException;
 import android.database.MatrixCursor;
 
+import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
@@ -20,12 +21,14 @@ import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 
 import junit.framework.Assert;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -42,16 +45,20 @@ public class ChildExpenseRepositoryTest {
     private Category category;
     private AccountRepository mAccountRepo;
     private CurrencyRepository mCurrencyRepo;
-    private ChildExpenseRepository mChildExpenseRepo;
     private ChildCategoryRepository mChildCategoryRepo;
+    private ChildExpenseRepository mChildExpenseRepo;
     private ExpenseRepository mBookingRepo;
+
+    private DatabaseManager mDbManagerInstance;
 
     @Before
     public void setup() {
 
+        mChildExpenseRepo = new ChildExpenseRepository(RuntimeEnvironment.application);
+        mDbManagerInstance = DatabaseManager.getInstance();
+
         mAccountRepo = new AccountRepository(RuntimeEnvironment.application);
         mCurrencyRepo = new CurrencyRepository(RuntimeEnvironment.application);
-        mChildExpenseRepo = new ChildExpenseRepository(RuntimeEnvironment.application);
         mChildCategoryRepo = new ChildCategoryRepository(RuntimeEnvironment.application);
         mBookingRepo = new ExpenseRepository(RuntimeEnvironment.application);
 
@@ -66,6 +73,13 @@ public class ChildExpenseRepositoryTest {
 
         account = new Account("Konto", 70, currency);
         account = mAccountRepo.insert(account);
+    }
+
+    @After
+    public void teardown() {
+
+        mChildExpenseRepo.closeDatabase();
+        mDbManagerInstance.closeDatabase();
     }
 
     private ExpenseObject getSimpleExpense() {
@@ -112,7 +126,7 @@ public class ChildExpenseRepositoryTest {
 
     @Test
     public void testAddChildToBookingWithExistingParentThatHasChildrenShouldSucceed() {
-        ExpenseObject parentExpense = mBookingRepo.insert(getParentExpenseWithChildren());
+        ExpenseObject parentExpense = getParentExpenseWithChildren();
 
         ExpenseObject childExpense = getSimpleExpense();
         childExpense.setExpenditure(false);
@@ -125,12 +139,12 @@ public class ChildExpenseRepositoryTest {
             assertEquals(parentExpense.getChildren().get(1), actualExpense.getChildren().get(1));
             assertEquals(parentExpense.getChildren().get(2), actualExpense.getChildren().get(2));
             assertEqualAccountBalance(
-                    account.getBalance() + parentExpense.getChildren().get(0).getSignedPrice() + parentExpense.getChildren().get(1).getSignedPrice() + childExpense.getSignedPrice(),
+                    account.getBalance() + childExpense.getSignedPrice(),
                     account.getIndex()
             );
         } catch (AddChildToChildException e) {
 
-            Assert.fail("KindBuchung konnte nicht zu einem Parent hinzugefügt werden");
+            Assert.fail("Could not add ChildExpense to ParentExpense");
         }
     }
 
@@ -484,7 +498,7 @@ public class ChildExpenseRepositoryTest {
         cursor.moveToFirst();
 
         try {
-            ExpenseObject actualChildExpense = mChildExpenseRepo.cursorToChildBooking(cursor);
+            ExpenseObject actualChildExpense = mChildExpenseRepo.fromCursor(cursor);
             assertEquals(expectedChildExpense, actualChildExpense);
 
         } catch (CursorIndexOutOfBoundsException e) {
@@ -536,7 +550,7 @@ public class ChildExpenseRepositoryTest {
         cursor.moveToFirst();
 
         try {
-            mChildExpenseRepo.cursorToChildBooking(cursor);
+            mChildExpenseRepo.fromCursor(cursor);
             Assert.fail("KindBuchung konnte trotz eines Fehlerhaften Cursor widerhergestellt werden");
 
         } catch (CursorIndexOutOfBoundsException e) {
@@ -659,6 +673,26 @@ public class ChildExpenseRepositoryTest {
         } catch (AccountNotFoundException e) {
 
             Assert.fail("Konto wurde nicht gefunden");
+        }
+    }
+
+    /**
+     * Methode um ein Feld einer Klasse durch ein anderes, mit injection, auszutauschen.
+     *
+     * @param obj       Objekt welches angepasst werden soll
+     * @param value     Neuer Wert des Felds
+     * @param fieldName Name des Feldes
+     */
+    private void injectMock(Object obj, Object value, String fieldName) {
+        try {
+            Class cls = obj.getClass();
+
+            Field field = cls.getDeclaredField(fieldName);
+            field.setAccessible(true);
+            field.set(obj, value);
+        } catch (Exception e) {
+
+            Assert.fail(String.format("Could not find field %s in class %s", fieldName, obj.getClass().getSimpleName()));
         }
     }
 }

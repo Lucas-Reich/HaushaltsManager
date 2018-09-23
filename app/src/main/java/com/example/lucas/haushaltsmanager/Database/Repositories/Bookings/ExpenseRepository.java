@@ -386,7 +386,6 @@ public class ExpenseRepository {
     }
 
     public static ExpenseObject cursorToExpense(Cursor c) {
-
         int expenseId = c.getInt(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_ID));
         Calendar date = Calendar.getInstance();
         String dateString = c.getString(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_DATE));
@@ -397,6 +396,9 @@ public class ExpenseRepository {
         String notice = c.getString(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_NOTICE));
         long accountId = c.getLong(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID));
         ExpenseObject.EXPENSE_TYPES expense_type = ExpenseObject.EXPENSE_TYPES.valueOf(c.getString(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_EXPENSE_TYPE)));
+
+        if (c.isLast())
+            c.close();
 
         return new ExpenseObject(
                 expenseId,
