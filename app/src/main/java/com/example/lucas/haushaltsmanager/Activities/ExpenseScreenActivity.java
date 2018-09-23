@@ -30,6 +30,7 @@ import android.widget.Toast;
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.BookingTags.BookingTagRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;

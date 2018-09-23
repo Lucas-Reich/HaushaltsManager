@@ -52,6 +52,32 @@ public class BookingTagRepository {
         return false;
     }
 
+
+    /**
+     * Methode um zuerfahren ob der angegebene Tag zu einer Buchung hinzugefügt wurde
+     *
+     * @param tag Zu überprüfendes Tag
+     * @return TRUE wenn es Buchungen mit diesem Tag gibt, FALSE wenn nicht
+     */
+    public boolean isTagAssignedToBooking(Tag tag) {
+        String selectQuery = "SELECT "
+                + " *"
+                + " FROM " + ExpensesDbHelper.TABLE_BOOKINGS_TAGS
+                + " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS_TAGS + "." + ExpensesDbHelper.BOOKINGS_TAGS_COL_TAG_ID + " = " + tag.getIndex()
+                + " LIMIT 1;";
+
+        Cursor c = mDatabase.rawQuery(selectQuery, null);
+
+        if (c.moveToFirst()) {
+
+            c.close();
+            return true;
+        }
+
+        c.close();
+        return false;
+    }
+
     /**
      * Methode um alle Tags zu einer Buchung zu bekommen.
      *
@@ -76,7 +102,7 @@ public class BookingTagRepository {
         List<Tag> tags = new ArrayList<>();
         while (!c.isAfterLast()) {
 
-            tags.add(TagRepository.cursorToTag(c));
+            tags.add(TagRepository.fromCursor(c));
             c.moveToNext();
         }
 

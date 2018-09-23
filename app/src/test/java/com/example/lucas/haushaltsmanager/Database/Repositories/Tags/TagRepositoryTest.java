@@ -8,7 +8,6 @@ import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.Repositories.BookingTags.BookingTagRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Tags.Exceptions.CannotDeleteTagException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Tags.Exceptions.TagNotFoundException;
-import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Tag;
 
 import junit.framework.Assert;
@@ -20,6 +19,8 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 
+import java.lang.reflect.Field;
+
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
@@ -29,21 +30,26 @@ import static org.mockito.Mockito.when;
 @RunWith(RobolectricTestRunner.class)
 public class TagRepositoryTest {
     private TagRepository mTagRepo;
-    private BookingTagRepository mBookingTagRepo;
+
+    /**
+     * Manager welcher die Datenbank verbindungen hält
+     */
+    private DatabaseManager mDatabaseManagerInstance;
 
     @Before
     public void setup() {
-        ExpensesDbHelper dbHelper = new ExpensesDbHelper(RuntimeEnvironment.application);
-        DatabaseManager.initializeInstance(dbHelper);
 
         mTagRepo = new TagRepository(RuntimeEnvironment.application);
-        mBookingTagRepo = new BookingTagRepository(RuntimeEnvironment.application);
+        mDatabaseManagerInstance = DatabaseManager.getInstance();
     }
 
     @After
     public void teardown() {
 
-        DatabaseManager.getInstance().closeDatabase();
+        // Keine Ahnung warum das so funktioniert aber irgendwie tut es das
+        // Angepasste Quelle: https://stackoverflow.com/questions/34742685/robolectric-running-multiple-tests-fails
+        mTagRepo.closeDatabase();
+        mDatabaseManagerInstance.closeDatabase();
     }
 
     private Tag getSimpleTag() {
@@ -54,7 +60,7 @@ public class TagRepositoryTest {
 
     @Test
     public void testExistsWithExistingTagShouldSucceed() {
-        Tag tag = mTagRepo.insert(getSimpleTag());
+        Tag tag = mTagRepo.create(getSimpleTag());
 
         boolean exists = mTagRepo.exists(tag);
         assertTrue("Das Tag wurde nicht in der Datenbank gefunden", exists);
@@ -70,7 +76,7 @@ public class TagRepositoryTest {
 
     @Test
     public void testGetWithExistingTagShouldSucceed() {
-        Tag expectedTag = mTagRepo.insert(getSimpleTag());
+        Tag expectedTag = mTagRepo.create(getSimpleTag());
 
         try {
             Tag fetchedTag = mTagRepo.get(expectedTag.getIndex());
@@ -99,7 +105,7 @@ public class TagRepositoryTest {
 
     @Test
     public void testInsertWithValidTagShouldSucceed() {
-        Tag expectedTag = mTagRepo.insert(getSimpleTag());
+        Tag expectedTag = mTagRepo.create(getSimpleTag());
 
         try {
             Tag fetchedTag = mTagRepo.get(expectedTag.getIndex());
@@ -112,13 +118,8 @@ public class TagRepositoryTest {
     }
 
     @Test
-    public void testInsertWithInvalidTagShouldFail() {
-        //todo was sollte passieren wenn ein Tag nicht richtig initialisiert wurde, zb kein namen hat
-    }
-
-    @Test
     public void testDeleteWithExistingTagShouldSucceed() {
-        Tag tag = mTagRepo.insert(getSimpleTag());
+        Tag tag = mTagRepo.create(getSimpleTag());
 
         try {
             mTagRepo.delete(tag);
@@ -147,13 +148,13 @@ public class TagRepositoryTest {
 
     @Test
     public void testDeleteWithExistingTagAttachedToBookingShouldThrowCannotDeleteTagException() {
-        ExpenseObject expenseObjectMock = mock(ExpenseObject.class);
-        when(expenseObjectMock.getIndex()).thenReturn(100L);
-        when(expenseObjectMock.getExpenseType()).thenReturn(ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE);
+        Tag tag = mTagRepo.create(getSimpleTag());
 
-        Tag tag = mTagRepo.insert(getSimpleTag());
+        //Mocking the BookingTagRepository and the isTagAssignedToBooking Method
+        BookingTagRepository mockBookingTagRepo = mock(BookingTagRepository.class);
+        when(mockBookingTagRepo.isTagAssignedToBooking(tag)).thenReturn(true);
 
-        mBookingTagRepo.insert(expenseObjectMock.getIndex(), tag);
+        injectMock(mTagRepo, mockBookingTagRepo, "mBookingTagsRepo");
 
         try {
             mTagRepo.delete(tag);
@@ -167,7 +168,7 @@ public class TagRepositoryTest {
 
     @Test
     public void testUpdateWithExistingTagShouldSucceed() {
-        Tag expectedTag = mTagRepo.insert(getSimpleTag());
+        Tag expectedTag = mTagRepo.create(getSimpleTag());
 
         try {
             expectedTag.setName("New Tag Name");
@@ -210,7 +211,7 @@ public class TagRepositoryTest {
         cursor.moveToFirst();
 
         try {
-            Tag fetchedTag = mTagRepo.cursorToTag(cursor);
+            Tag fetchedTag = TagRepository.fromCursor(cursor);
             assertEquals(expectedTag, fetchedTag);
 
         } catch (CursorIndexOutOfBoundsException e) {
@@ -233,12 +234,32 @@ public class TagRepositoryTest {
         cursor.moveToFirst();
 
         try {
-            mTagRepo.cursorToTag(cursor);
+            TagRepository.fromCursor(cursor);
             Assert.fail("Tag konnte trotz fehlender attribute erstellt werden");
 
         } catch (CursorIndexOutOfBoundsException e) {
 
             //do nothing
+        }
+    }
+
+    /**
+     * Methode um ein Feld einer Klasse durch ein anderes, mit injection, auszutauschen.
+     *
+     * @param obj       Objekt welches angepasst werden soll
+     * @param value     Neuer Wert des Felds
+     * @param fieldName Name des Feldes
+     */
+    private void injectMock(Object obj, Object value, String fieldName) {
+        try {
+            Class cls = obj.getClass();
+
+            Field field = cls.getDeclaredField(fieldName);
+            field.setAccessible(true);
+            field.set(obj, value);
+        } catch (Exception e) {
+
+            Assert.fail(String.format("Could not find field %s in class %s", fieldName, obj.getClass().getSimpleName()));
         }
     }
 }

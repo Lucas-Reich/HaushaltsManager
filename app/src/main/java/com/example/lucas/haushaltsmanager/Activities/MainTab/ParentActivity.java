@@ -87,7 +87,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
             public void onClick(View v) {
 
                 MockDataCreator test = new MockDataCreator();
-                test.createBookings(100);
+                test.createBookings(100, ParentActivity.this);
             }
         });
 

@@ -1,7 +1,6 @@
 package com.example.lucas.haushaltsmanager.Database;
 
 import com.example.lucas.haushaltsmanager.Database.Exceptions.CouldNotDeleteEntityException;
-import com.example.lucas.haushaltsmanager.Database.Exceptions.CouldNotUpdateEntityException;
 import com.example.lucas.haushaltsmanager.Database.Exceptions.EntityNotExistingException;
 
 import java.util.List;
@@ -14,9 +13,11 @@ public interface BaseRepository<T> {
 
     List<T> getAll();
 
-    boolean update(T entity) throws CouldNotUpdateEntityException;
+    void update(T entity) throws EntityNotExistingException;//todo oder sollte ich eine CouldNotUpdateEntityException zurückgeben?
 
     void delete(T entity) throws CouldNotDeleteEntityException;
 
     boolean exists(T object);
+
+//    T static fromCursor(Cursor c);
 }

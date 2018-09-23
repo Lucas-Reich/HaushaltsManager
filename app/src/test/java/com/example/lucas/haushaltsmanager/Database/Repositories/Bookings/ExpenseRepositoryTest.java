@@ -59,11 +59,11 @@ public class ExpenseRepositoryTest {
 
         mAccountRepo = new AccountRepository(RuntimeEnvironment.application);
         mTemplateRepo = new TemplateRepository(RuntimeEnvironment.application);
-        mTagRepo = new TagRepository(RuntimeEnvironment.application);
         mRecurringBookingRepo = new RecurringBookingRepository(RuntimeEnvironment.application);
         mChildCategoryRepo = new ChildCategoryRepository(RuntimeEnvironment.application);
         mBookingTagRepo = new BookingTagRepository(RuntimeEnvironment.application);
         mBookingRepo = new ExpenseRepository(RuntimeEnvironment.application);
+        mTagRepo = new TagRepository(RuntimeEnvironment.application);
         mCurrencyRepo = new CurrencyRepository(RuntimeEnvironment.application);
 
         Category parentCategoryMock = mock(Category.class);
@@ -111,11 +111,11 @@ public class ExpenseRepositoryTest {
 
     private ExpenseObject getExpenseWithTags() {
         Tag tag1 = new Tag("Tag 1");
-        tag1 = mTagRepo.insert(tag1);
+        tag1 = mTagRepo.create(tag1);
         Tag tag2 = new Tag("Tag 2");
-        tag2 = mTagRepo.insert(tag2);
+        tag2 = mTagRepo.create(tag2);
         Tag tag3 = new Tag("Tag 3");
-        tag3 = mTagRepo.insert(tag3);
+        tag3 = mTagRepo.create(tag3);
 
 
         ExpenseObject expenseWithTags = getSimpleExpense();
