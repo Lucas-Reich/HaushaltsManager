@@ -557,7 +557,7 @@ public class ChildExpenseRepository {
                 ExpenseObject.EXPENSE_TYPES.CHILD_EXPENSE,
                 mBookingTagRepo.get(expenseId),
                 new ArrayList<ExpenseObject>(),
-                CurrencyRepository.cursorToCurrency(c)
+                CurrencyRepository.fromCursor(c)
         );
     }
 }

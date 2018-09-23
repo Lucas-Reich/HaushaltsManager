@@ -5,8 +5,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.example.lucas.haushaltsmanager.Database.BaseRepository;
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.Exceptions.CannotDeleteCurrencyException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.Exceptions.CurrencyNotFoundException;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
@@ -14,19 +16,19 @@ import com.example.lucas.haushaltsmanager.Entities.Currency;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CurrencyRepository {
+public class CurrencyRepository implements BaseRepository<Currency> {
     private SQLiteDatabase mDatabase;
+    private AccountRepository mAccountRepo;
 
     public CurrencyRepository(Context context) {
         DatabaseManager.initializeInstance(new ExpensesDbHelper(context));
 
         mDatabase = DatabaseManager.getInstance().openDatabase();
+        mAccountRepo = new AccountRepository(context);
     }
 
     public boolean exists(Currency currency) {
-        String selectQuery;
-
-        selectQuery = "SELECT"
+        String selectQuery = "SELECT"
                 + " *"
                 + " FROM " + ExpensesDbHelper.TABLE_CURRENCIES
                 + " WHERE " + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_ID + " = " + currency.getIndex()
@@ -48,7 +50,6 @@ public class CurrencyRepository {
     }
 
     public Currency get(long currencyId) throws CurrencyNotFoundException {
-
         String selectQuery = "SELECT "
                 + ExpensesDbHelper.CURRENCIES_COL_ID + ", "
                 + ExpensesDbHelper.CURRENCIES_COL_NAME + ", "
@@ -59,18 +60,13 @@ public class CurrencyRepository {
 
         Cursor c = mDatabase.rawQuery(selectQuery, null);
 
-        if (!c.moveToFirst()) {
+        if (!c.moveToFirst())
             throw new CurrencyNotFoundException(currencyId);
-        }
 
-        Currency currency = cursorToCurrency(c);
-
-        c.close();
-        return currency;
+        return fromCursor(c);
     }
 
     public List<Currency> getAll() {
-
         String selectQuery = "SELECT "
                 + ExpensesDbHelper.CURRENCIES_COL_ID + ", "
                 + ExpensesDbHelper.CURRENCIES_COL_NAME + ", "
@@ -79,22 +75,15 @@ public class CurrencyRepository {
                 + " FROM " + ExpensesDbHelper.TABLE_CURRENCIES + ";";
 
         Cursor c = mDatabase.rawQuery(selectQuery, null);
-        c.moveToFirst();
 
         ArrayList<Currency> currencies = new ArrayList<>();
-        while (!c.isAfterLast()) {
+        while (c.moveToNext())
+            currencies.add(fromCursor(c));
 
-            currencies.add(cursorToCurrency(c));
-            c.moveToNext();
-        }
-
-        c.close();
         return currencies;
     }
 
-    public Currency insert(Currency currency) {
-        SQLiteDatabase mDatabase = DatabaseManager.getInstance().openDatabase();
-
+    public Currency create(Currency currency) {
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.CURRENCIES_COL_NAME, currency.getName());
         values.put(ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME, currency.getShortName());
@@ -111,15 +100,17 @@ public class CurrencyRepository {
     }
 
     public void delete(Currency currency) throws CannotDeleteCurrencyException {
-
-        if (isAttachedToAccount(currency))
+        if (mAccountRepo.isCurrencyAttachedToAccount(currency))
             throw new CannotDeleteCurrencyException(currency);
 
-        mDatabase.delete(ExpensesDbHelper.TABLE_CURRENCIES, ExpensesDbHelper.CURRENCIES_COL_ID + " = ?", new String[]{"" + currency.getIndex()});
+        mDatabase.delete(
+                ExpensesDbHelper.TABLE_CURRENCIES,
+                ExpensesDbHelper.CURRENCIES_COL_ID + " = ?",
+                new String[]{"" + currency.getIndex()}
+        );
     }
 
     public void update(Currency currency) throws CurrencyNotFoundException {
-
         ContentValues updatedCurrency = new ContentValues();
         updatedCurrency.put(ExpensesDbHelper.CURRENCIES_COL_SYMBOL, currency.getSymbol());
         updatedCurrency.put(ExpensesDbHelper.CURRENCIES_COL_NAME, currency.getName());
@@ -135,32 +126,14 @@ public class CurrencyRepository {
             throw new CurrencyNotFoundException(currency.getIndex());
     }
 
-    private boolean isAttachedToAccount(Currency currency) {
-
-        String selectQuery;
-        selectQuery = "SELECT"
-                + " *"
-                + " FROM " + ExpensesDbHelper.TABLE_ACCOUNTS
-                + " WHERE " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID + " = " + currency.getIndex()
-                + " LIMIT 1;";
-
-        Cursor c = mDatabase.rawQuery(selectQuery, null);
-
-        if (c.moveToFirst()) {
-
-            c.close();
-            return true;
-        }
-
-        c.close();
-        return false;
-    }
-
-    public static Currency cursorToCurrency(Cursor c) {
+    public static Currency fromCursor(Cursor c) {
         long currencyId = c.getLong(c.getColumnIndex(ExpensesDbHelper.CURRENCIES_COL_ID));
         String currencyName = c.getString(c.getColumnIndex(ExpensesDbHelper.CURRENCIES_COL_NAME));
         String currencyShortName = c.getString(c.getColumnIndex(ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME));
         String currencySymbol = c.getString(c.getColumnIndex(ExpensesDbHelper.CURRENCIES_COL_SYMBOL));
+
+        if (c.isLast())
+            c.close();
 
         return new Currency(
                 currencyId,
@@ -168,5 +141,9 @@ public class CurrencyRepository {
                 currencyShortName,
                 currencySymbol
         );
+    }
+
+    public void closeDatabase() {
+        DatabaseManager.getInstance().closeDatabase();
     }
 }

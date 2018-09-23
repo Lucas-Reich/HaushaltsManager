@@ -3,37 +3,52 @@ package com.example.lucas.haushaltsmanager.Database.Repositories.Currencies;
 import android.database.CursorIndexOutOfBoundsException;
 import android.database.MatrixCursor;
 
+import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.Exceptions.CannotDeleteCurrencyException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.Exceptions.CurrencyNotFoundException;
-import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 
 import junit.framework.Assert;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 
+import java.lang.reflect.Field;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @RunWith(RobolectricTestRunner.class)
 public class CurrencyRepositoryTest {
-    //todo ich kann irgendwie nicht alle tests auf einmal ausführen weil dann alles tests ab dem dritten fehlschlagen
-
-    private AccountRepository mAccountRepo;
     private CurrencyRepository mCurrencyRepo;
+
+    /**
+     * Manager welcher die Datenbank verbindungen hält
+     */
+    private DatabaseManager mDatabaseManagerInstance;
 
     @Before
     public void setup() {
-
-        mAccountRepo = new AccountRepository(RuntimeEnvironment.application);
+        mDatabaseManagerInstance = DatabaseManager.getInstance();
         mCurrencyRepo = new CurrencyRepository(RuntimeEnvironment.application);
+    }
+
+    @After
+    public void teardown() {
+
+        // Keine Ahnung warum das so funktioniert aber irgendwie tut es das
+        // Angepasste Quelle: https://stackoverflow.com/questions/34742685/robolectric-running-multiple-tests-fails
+        mCurrencyRepo.closeDatabase();
+        mDatabaseManagerInstance.closeDatabase();
     }
 
     private Currency getSimpleCurrency() {
@@ -46,10 +61,10 @@ public class CurrencyRepositoryTest {
 
     @Test
     public void testExistsWithExistingCurrency() {
-        Currency currency = mCurrencyRepo.insert(getSimpleCurrency());
+        Currency currency = mCurrencyRepo.create(getSimpleCurrency());
 
         boolean exists = mCurrencyRepo.exists(currency);
-        assertTrue("Die Währung wurde nicht in der Datenbank gefunden", exists);
+        assertTrue("Could not find Currency in database", exists);
     }
 
     @Test
@@ -57,12 +72,12 @@ public class CurrencyRepositoryTest {
         Currency notExistingCurrency = getSimpleCurrency();
 
         boolean exists = mCurrencyRepo.exists(notExistingCurrency);
-        assertFalse("Die Währung wurde in der Datenbank gefunden", exists);
+        assertFalse("Found Currency in database", exists);
     }
 
     @Test
     public void testGetWithExistingCurrencyShouldSucceed() {
-        Currency expectedCurrency = mCurrencyRepo.insert(getSimpleCurrency());
+        Currency expectedCurrency = mCurrencyRepo.create(getSimpleCurrency());
 
         try {
             Currency fetchedCurrency = mCurrencyRepo.get(expectedCurrency.getIndex());
@@ -70,7 +85,7 @@ public class CurrencyRepositoryTest {
 
         } catch (CurrencyNotFoundException e) {
 
-            Assert.fail("Währung wurde nicht gefunden");
+            Assert.fail("Could not find Currency in database");
         }
     }
 
@@ -80,7 +95,7 @@ public class CurrencyRepositoryTest {
 
         try {
             mCurrencyRepo.get(notExistingCurrencyId);
-            Assert.fail("Nicht existierenden Wärhung wurde in der Datenbank gefunden");
+            Assert.fail("Not existing Currency was found");
 
         } catch (CurrencyNotFoundException e) {
 
@@ -90,30 +105,30 @@ public class CurrencyRepositoryTest {
 
     @Test
     public void testInsertWithValidCurrencyShouldSucceed() {
-        Currency expectedCurrency = mCurrencyRepo.insert(getSimpleCurrency());
+        Currency expectedCurrency = mCurrencyRepo.create(getSimpleCurrency());
 
         try {
             Currency fetchedCurrency = mCurrencyRepo.get(expectedCurrency.getIndex());
             assertEquals(expectedCurrency, fetchedCurrency);
-            assertTrue("Währung wurde nicht gefunden", mCurrencyRepo.exists(expectedCurrency));
+            assertTrue("Could not find Currency in database", mCurrencyRepo.exists(expectedCurrency));
 
         } catch (CurrencyNotFoundException e) {
 
-            Assert.fail("Gerade erstellte Währung konnte nicht gefunden werden");
+            Assert.fail("Could not find just created Currency");
         }
     }
 
     @Test
     public void testDeleteWithExistingCurrencyShouldSucceed() {
-        Currency currency = mCurrencyRepo.insert(getSimpleCurrency());
+        Currency currency = mCurrencyRepo.create(getSimpleCurrency());
 
         try {
             mCurrencyRepo.delete(currency);
-            assertFalse("Währung wurde nicht gelöscht", mCurrencyRepo.exists(currency));
+            assertFalse("Currency was not deleted", mCurrencyRepo.exists(currency));
 
         } catch (CannotDeleteCurrencyException e) {
 
-            Assert.fail("Währung die zu keinem Konto zugeordnet ist konnte nicht gelöscht werden");
+            Assert.fail("Could not delete Currency");
         }
     }
 
@@ -123,35 +138,37 @@ public class CurrencyRepositoryTest {
 
         try {
             mCurrencyRepo.delete(currency);
-            assertFalse("Währung wurde in der Datenbank gefunden", mCurrencyRepo.exists(currency));
+            assertFalse("Found Currency in database", mCurrencyRepo.exists(currency));
 
         } catch (CannotDeleteCurrencyException e) {
 
-            Assert.fail("Nicht existierende Währung konnte nicht gelöscht werden.");
+            Assert.fail("Not existing Currency could be deleted");
         }
     }
 
     @Test
     public void testDeleteWithExistingCurrencyAttachedToAccountShouldFailThrowCannotDeleteCurrencyException() {
-        Currency currency = mCurrencyRepo.insert(getSimpleCurrency());
+        Currency currency = mCurrencyRepo.create(getSimpleCurrency());
 
-        Account account = new Account("Konto 1", 100, currency);
-        mAccountRepo.insert(account);
+        AccountRepository mockAccountRepo = mock(AccountRepository.class);
+        when(mockAccountRepo.isCurrencyAttachedToAccount(currency)).thenReturn(true);
+
+        injectMock(mCurrencyRepo, mockAccountRepo, "mAccountRepo");
 
         try {
             mCurrencyRepo.delete(currency);
-            Assert.fail("Währung konnte gelöscht werden obwohl es ein Konto mit dieser Währung gibt");
+            Assert.fail("Could delete Currency assigned to Account");
 
         } catch (CannotDeleteCurrencyException e) {
 
-            assertTrue("Währung konnte nicht in der Datenbank gefunden werden", mCurrencyRepo.exists(currency));
+            assertTrue("Could not find Currency in database", mCurrencyRepo.exists(currency));
             assertEquals(String.format("Currency %s cannot be deleted.", currency.getName()), e.getMessage());
         }
     }
 
     @Test
     public void testUpdateWithExistingCurrencyShouldSucceed() {
-        Currency expectedCurrency = mCurrencyRepo.insert(getSimpleCurrency());
+        Currency expectedCurrency = mCurrencyRepo.create(getSimpleCurrency());
 
         try {
             expectedCurrency.setName("New Name");
@@ -162,7 +179,7 @@ public class CurrencyRepositoryTest {
 
         } catch (CurrencyNotFoundException e) {
 
-            Assert.fail("Gerade erstellte Währung konnte nicht geupdated werden");
+            Assert.fail("Could not find just created Currency");
         }
     }
 
@@ -174,7 +191,7 @@ public class CurrencyRepositoryTest {
             currency.setName("Dollar");
             mCurrencyRepo.update(currency);
 
-            Assert.fail("Nicht existierende Währung konnte geupdated werden");
+            Assert.fail("Not existing Currency could be updated");
 
         } catch (CurrencyNotFoundException e) {
 
@@ -198,7 +215,7 @@ public class CurrencyRepositoryTest {
         cursor.addRow(new Object[]{expectedCurrency.getIndex(), "1532772073359", expectedCurrency.getName(), expectedCurrency.getShortName(), expectedCurrency.getSymbol()});
         cursor.moveToFirst();
 
-        Currency cursorCurrency = CurrencyRepository.cursorToCurrency(cursor);
+        Currency cursorCurrency = CurrencyRepository.fromCursor(cursor);
         assertEquals(expectedCurrency, cursorCurrency);
     }
 
@@ -219,12 +236,32 @@ public class CurrencyRepositoryTest {
         cursor.moveToFirst();
 
         try {
-            CurrencyRepository.cursorToCurrency(cursor);
-            Assert.fail("Währung konnte aus einem Cursor erstellt werden, in dem Felder fehlen");
+            CurrencyRepository.fromCursor(cursor);
+            Assert.fail("Could create Currency from incomplete Cursor");
 
         } catch (CursorIndexOutOfBoundsException e) {
 
             //do nothing
+        }
+    }
+
+    /**
+     * Methode um ein Feld einer Klasse durch ein anderes, mit injection, auszutauschen.
+     *
+     * @param obj       Objekt welches angepasst werden soll
+     * @param value     Neuer Wert des Felds
+     * @param fieldName Name des Feldes
+     */
+    private void injectMock(Object obj, Object value, String fieldName) {
+        try {
+            Class cls = obj.getClass();
+
+            Field field = cls.getDeclaredField(fieldName);
+            field.setAccessible(true);
+            field.set(obj, value);
+        } catch (Exception e) {
+
+            Assert.fail(String.format("Could not find field %s in class %s", fieldName, obj.getClass().getSimpleName()));
         }
     }
 }

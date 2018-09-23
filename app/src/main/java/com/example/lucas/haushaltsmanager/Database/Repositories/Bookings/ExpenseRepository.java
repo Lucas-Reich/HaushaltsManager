@@ -410,7 +410,7 @@ public class ExpenseRepository {
                 expense_type,
                 new BookingTagRepository(app.getContext()).get(expenseId),
                 expense_type.equals(ExpenseObject.EXPENSE_TYPES.PARENT_EXPENSE) ? new ChildExpenseRepository(app.getContext()).getAll(expenseId) : new ArrayList<ExpenseObject>(),
-                CurrencyRepository.cursorToCurrency(c)
+                CurrencyRepository.fromCursor(c)
         );
     }
 

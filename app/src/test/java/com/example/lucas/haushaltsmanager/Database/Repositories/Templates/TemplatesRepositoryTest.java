@@ -68,7 +68,7 @@ public class TemplatesRepositoryTest {
         mBookingRepo = new ExpenseRepository(RuntimeEnvironment.application);
 
         currency = new Currency("Euro", "EUR", "€");
-        currency = mCurrencyRepo.insert(currency);
+        currency = mCurrencyRepo.create(currency);
 
         account = new Account("Konto 1", 2453, currency);
         account = mAccountRepo.insert(account);

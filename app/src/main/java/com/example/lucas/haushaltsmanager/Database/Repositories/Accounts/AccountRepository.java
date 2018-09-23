@@ -11,6 +11,7 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Excepti
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.CannotDeleteAccountException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepository;
 import com.example.lucas.haushaltsmanager.Entities.Account;
+import com.example.lucas.haushaltsmanager.Entities.Currency;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -189,6 +190,31 @@ public class AccountRepository {
         return false;
     }
 
+    /**
+     * Methode um zu überprüfen ob es ein Konto mit der angegebenen Währug gibt.
+     *
+     * @param currency Zu überprüfende Wärhung
+     * @return TRUE wenn es ein Konto mit dieseer Währung gibt, FALSE wenn nicht
+     */
+    public boolean isCurrencyAttachedToAccount(Currency currency) {
+        String selectQuery = "SELECT"
+                + " *"
+                + " FROM " + ExpensesDbHelper.TABLE_ACCOUNTS
+                + " WHERE " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID + " = " + currency.getIndex()
+                + " LIMIT 1;";
+
+        Cursor c = mDatabase.rawQuery(selectQuery, null);
+
+        if (c.moveToFirst()) {
+
+            c.close();
+            return true;
+        }
+
+        c.close();
+        return false;
+    }
+
     public static Account cursorToAccount(Cursor c) {
         long accountId = c.getLong(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_ID));
         String accountName = c.getString(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_NAME));
@@ -198,7 +224,7 @@ public class AccountRepository {
                 accountId,
                 accountName,
                 accountBalance,
-                CurrencyRepository.cursorToCurrency(c)
+                CurrencyRepository.fromCursor(c)
         );
     }
 }

@@ -62,7 +62,7 @@ public class ChildExpenseRepositoryTest {
         category = mChildCategoryRepo.insert(parentCategory, category);
 
         Currency currency = new Currency("Euro", "EUR", "€");
-        currency = mCurrencyRepo.insert(currency);
+        currency = mCurrencyRepo.create(currency);
 
         account = new Account("Konto", 70, currency);
         account = mAccountRepo.insert(account);
@@ -70,7 +70,7 @@ public class ChildExpenseRepositoryTest {
 
     private ExpenseObject getSimpleExpense() {
         Currency currency = new Currency("Euro", "EUR", "€");
-        currency = mCurrencyRepo.insert(currency);
+        currency = mCurrencyRepo.create(currency);
 
         return new ExpenseObject(
                 "Ausgabe",

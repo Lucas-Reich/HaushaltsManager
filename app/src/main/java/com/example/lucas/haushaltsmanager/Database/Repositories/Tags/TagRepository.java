@@ -18,14 +18,12 @@ import java.util.List;
 
 public class TagRepository implements BaseRepository<Tag> {
     private SQLiteDatabase mDatabase;
-    private DatabaseManager mDbManager;
     private BookingTagRepository mBookingTagsRepo;
 
     public TagRepository(Context context) {
         DatabaseManager.initializeInstance(new ExpensesDbHelper(context));
 
-        mDbManager = DatabaseManager.getInstance();
-        mDatabase = mDbManager.openDatabase();
+        mDatabase = DatabaseManager.getInstance().openDatabase();
         mBookingTagsRepo = new BookingTagRepository(context);
     }
 
@@ -61,11 +59,7 @@ public class TagRepository implements BaseRepository<Tag> {
         if (!c.moveToFirst())
             throw new TagNotFoundException(tagId);
 
-
-        Tag tag = fromCursor(c);
-
-        c.close();
-        return tag;
+        return fromCursor(c);
     }
 
     public List<Tag> getAll() {
@@ -76,16 +70,10 @@ public class TagRepository implements BaseRepository<Tag> {
 
         Cursor c = mDatabase.rawQuery(selectQuery, null);
 
-        c.moveToFirst();
-
         List<Tag> tags = new ArrayList<>();
-        while (!c.isAfterLast()) {
-
+        while (c.moveToNext())
             tags.add(fromCursor(c));
-            c.moveToNext();
-        }
 
-        c.close();
         return tags;
     }
 
@@ -105,7 +93,11 @@ public class TagRepository implements BaseRepository<Tag> {
         if (mBookingTagsRepo.isTagAssignedToBooking(tag))
             throw new CannotDeleteTagException(tag);
 
-        mDatabase.delete(ExpensesDbHelper.TABLE_TAGS, ExpensesDbHelper.TAGS_COL_ID + " = ?", new String[]{"" + tag.getIndex()});
+        mDatabase.delete(
+                ExpensesDbHelper.TABLE_TAGS,
+                ExpensesDbHelper.TAGS_COL_ID + " = ?",
+                new String[]{"" + tag.getIndex()}
+        );
     }
 
     public void update(Tag tag) throws TagNotFoundException {
@@ -129,10 +121,13 @@ public class TagRepository implements BaseRepository<Tag> {
         long tagIndex = c.getLong(c.getColumnIndex(ExpensesDbHelper.TAGS_COL_ID));
         String tagName = c.getString(c.getColumnIndex(ExpensesDbHelper.TAGS_COL_NAME));
 
+        if (c.isLast())
+            c.close();
+
         return new Tag(tagIndex, tagName);
     }
 
     public void closeDatabase() {
-        mDbManager.closeDatabase();
+        DatabaseManager.getInstance().closeDatabase();
     }
 }

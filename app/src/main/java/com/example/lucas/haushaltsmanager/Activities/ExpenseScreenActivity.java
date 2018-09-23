@@ -919,4 +919,11 @@ public class ExpenseScreenActivity extends AppCompatActivity {
             //todo fehlerbehandlung
         }
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        mTagRepo.closeDatabase();
+    }
 }

@@ -45,6 +45,8 @@ public class MockDataCreator {
         mCategories = createCategories(3);
         createTags(3);
         createBookingsInternal(amount);
+
+        mTagRepo.closeDatabase();
     }
 
     private List<Account> createAccounts(int count) {
@@ -71,7 +73,7 @@ public class MockDataCreator {
 
     private Currency createCurrency() {
 
-        return mCurrencyRepo.insert(new Currency(-1, "Euro", "EUR", "€"));
+        return mCurrencyRepo.create(new Currency(-1, "Euro", "EUR", "€"));
     }
 
     private List<Category> createCategories(int count) {

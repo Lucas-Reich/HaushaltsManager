@@ -19,5 +19,7 @@ public interface BaseRepository<T> {
 
     boolean exists(T object);
 
+    void closeDatabase();
+
 //    T static fromCursor(Cursor c);
 }

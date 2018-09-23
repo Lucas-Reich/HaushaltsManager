@@ -73,7 +73,7 @@ public class ExpenseRepositoryTest {
         category = mChildCategoryRepo.insert(parentCategoryMock, category);
 
         currency = new Currency("Credits", "CRD", "C");
-        currency = mCurrencyRepo.insert(currency);
+        currency = mCurrencyRepo.create(currency);
 
         account = new Account("Konto", 100, currency);
         account = mAccountRepo.insert(account);
