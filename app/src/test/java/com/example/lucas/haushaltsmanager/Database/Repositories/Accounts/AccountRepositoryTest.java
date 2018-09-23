@@ -9,7 +9,6 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Excepti
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.CannotDeleteAccountException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepository;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
@@ -24,48 +23,55 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 
+import java.lang.reflect.Field;
+
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @RunWith(RobolectricTestRunner.class)
 public class AccountRepositoryTest {
-    private Currency currency;
-    private AccountRepository mAccountRepo;
-    private CurrencyRepository mCurrencyRepo;
+    private AccountRepositoryInterface mAccountRepo;
+
     private ChildExpenseRepository mChildExpenseRepo;
     private ExpenseRepository mBookingRepo;
+
+    /**
+     * Manager welcher die Datenbank verbindungen hält
+     */
+    private DatabaseManager mDatabaseManagerInstance;
 
     @Before
     public void setup() {
         mAccountRepo = new AccountRepository(RuntimeEnvironment.application);
-        mCurrencyRepo = new CurrencyRepository(RuntimeEnvironment.application);
+        mDatabaseManagerInstance = DatabaseManager.getInstance();
+
+
         mChildExpenseRepo = new ChildExpenseRepository(RuntimeEnvironment.application);
         mBookingRepo = new ExpenseRepository(RuntimeEnvironment.application);
-
-        currency = new Currency("Euro", "EUR", "€");
-        currency = mCurrencyRepo.create(currency);
     }
 
     @After
     public void teardown() {
 
-        DatabaseManager.getInstance().closeDatabase();
+        mAccountRepo.closeDatabase();
+        mDatabaseManagerInstance.closeDatabase();
     }
 
     public Account getSimpleAccount() {
+        Currency localCurrency = mock(Currency.class);
+
         return new Account(
                 "Konto",
                 7653,
-                currency
+                localCurrency
         );
     }
 
     @Test
     public void testExistsWithExistingAccountShouldSucceed() {
-        Account account = mAccountRepo.insert(getSimpleAccount());
+        Account account = mAccountRepo.create(getSimpleAccount());
 
         boolean exists = mAccountRepo.exists(account);
         assertTrue("Das Konto konnte nicht in der Datenbank gefunden werrden", exists);
@@ -81,7 +87,7 @@ public class AccountRepositoryTest {
 
     @Test
     public void testGetWithExistingAccountShouldSucceed() {
-        Account expectedAccount = mAccountRepo.insert(getSimpleAccount());
+        Account expectedAccount = mAccountRepo.create(getSimpleAccount());
 
         try {
             Account fetchedAccount = mAccountRepo.get(expectedAccount.getIndex());
@@ -109,7 +115,7 @@ public class AccountRepositoryTest {
 
     @Test
     public void testInsertWithValidAccountShouldSucceed() {
-        Account expectedAccount = mAccountRepo.insert(getSimpleAccount());
+        Account expectedAccount = mAccountRepo.create(getSimpleAccount());
 
         try {
             Account fetchedAccount = mAccountRepo.get(expectedAccount.getIndex());
@@ -123,7 +129,7 @@ public class AccountRepositoryTest {
 
     @Test
     public void testDeleteWithWithExistingAccountShouldSucceed() {
-        Account account = mAccountRepo.insert(getSimpleAccount());
+        Account account = mAccountRepo.create(getSimpleAccount());
 
         try {
             mAccountRepo.delete(account);
@@ -137,13 +143,17 @@ public class AccountRepositoryTest {
 
     @Test
     public void testDeleteWithExistingAccountAttachedToParentExpenseShouldFailWithCannotDeleteAccountException() {
-        Account account = mAccountRepo.insert(getSimpleAccount());
+        Account account = mAccountRepo.create(getSimpleAccount());
 
-        Category category = mock(Category.class);
-        when(category.getIndex()).thenReturn(100L);
+        Category mockCategory = mock(Category.class);
+        Currency mockCurrency = mock(Currency.class);
 
-        ExpenseObject parentExpense = new ExpenseObject("Ausgabe", 0, false, category, account.getIndex(), currency);
+        ExpenseObject parentExpense = new ExpenseObject("Ausgabe", 0, false, mockCategory, account.getIndex(), mockCurrency);
         mBookingRepo.insert(parentExpense);
+
+//        ExpenseRepository mockExpenseRepo = mock(ExpenseRepository.class);
+//        when(mockExpenseRepo.exists()).thenReturn(true);
+//        injectMock(mAccountRepo, mockExpenseRepo, "mBookingRepo");
 
         try {
             mAccountRepo.delete(account);
@@ -158,16 +168,18 @@ public class AccountRepositoryTest {
 
     @Test
     public void testDeleteWithExistingAccountAttachedToChildExpenseShouldFailWithCannotDeleteAccountException() {
-        Account account = mAccountRepo.insert(getSimpleAccount());
+        Account account = mAccountRepo.create(getSimpleAccount());
 
-        ExpenseObject parentExpense = mock(ExpenseObject.class);
-        when(parentExpense.getIndex()).thenReturn(100L);
+        ExpenseObject mockParentExpense = mock(ExpenseObject.class);
+        Category mockCategory = mock(Category.class);
+        Currency mockCurrency = mock(Currency.class);
 
-        Category category = mock(Category.class);
-        when(category.getIndex()).thenReturn(100L);
+        ExpenseObject childExpense = new ExpenseObject("Ausgabe", 0, false, mockCategory, account.getIndex(), mockCurrency);
+        mChildExpenseRepo.insert(mockParentExpense, childExpense);
 
-        ExpenseObject childExpense = new ExpenseObject("Ausgabe", 0, false, category, account.getIndex(), currency);
-        mChildExpenseRepo.insert(parentExpense, childExpense);
+//        ChildExpenseRepository mockChildExpenseRepo = mock(ChildExpenseRepository.class);
+//        when(mockChildExpenseRepo.exists()).thenReturn(true);
+//        injectMock(mAccountRepo, mockChildExpenseRepo, "mChildExpenseRepo");
 
         try {
             mAccountRepo.delete(account);
@@ -197,7 +209,7 @@ public class AccountRepositoryTest {
 
     @Test
     public void testUpdateWithWithExistingAccountShouldSucceed() {
-        Account expectedAccount = mAccountRepo.insert(getSimpleAccount());
+        Account expectedAccount = mAccountRepo.create(getSimpleAccount());
 
         try {
             expectedAccount.setName("New Account Name");
@@ -245,7 +257,7 @@ public class AccountRepositoryTest {
         cursor.moveToFirst();
 
         try {
-            Account fetchedAccount = AccountRepository.cursorToAccount(cursor);
+            Account fetchedAccount = mAccountRepo.fromCursor(cursor);
             assertEquals(expectedAccount, fetchedAccount);
 
         } catch (CursorIndexOutOfBoundsException e) {
@@ -270,12 +282,32 @@ public class AccountRepositoryTest {
         cursor.moveToFirst();
 
         try {
-            AccountRepository.cursorToAccount(cursor);
+            mAccountRepo.fromCursor(cursor);
             Assert.fail("Konto konnte aus einem Fehlerhaften Cursor wiederhergestellt werden");
 
         } catch (CursorIndexOutOfBoundsException e) {
 
             //do nothing
+        }
+    }
+
+    /**
+     * Methode um ein Feld einer Klasse durch ein anderes, mit injection, auszutauschen.
+     *
+     * @param obj       Objekt welches angepasst werden soll
+     * @param value     Neuer Wert des Felds
+     * @param fieldName Name des Feldes
+     */
+    private void injectMock(Object obj, Object value, String fieldName) {
+        try {
+            Class cls = obj.getClass();
+
+            Field field = cls.getDeclaredField(fieldName);
+            field.setAccessible(true);
+            field.set(obj, value);
+        } catch (Exception e) {
+
+            Assert.fail(String.format("Could not find field %s in class %s", fieldName, obj.getClass().getSimpleName()));
         }
     }
 }

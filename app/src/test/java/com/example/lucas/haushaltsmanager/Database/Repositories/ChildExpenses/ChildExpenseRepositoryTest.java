@@ -72,7 +72,7 @@ public class ChildExpenseRepositoryTest {
         currency = mCurrencyRepo.create(currency);
 
         account = new Account("Konto", 70, currency);
-        account = mAccountRepo.insert(account);
+        account = mAccountRepo.create(account);
     }
 
     @After

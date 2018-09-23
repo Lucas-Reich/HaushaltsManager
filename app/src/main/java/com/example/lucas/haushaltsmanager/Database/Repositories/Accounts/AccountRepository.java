@@ -16,7 +16,7 @@ import com.example.lucas.haushaltsmanager.Entities.Currency;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AccountRepository {
+public class AccountRepository implements AccountRepositoryInterface {
     private SQLiteDatabase mDatabase;
 
     public AccountRepository(Context context) {
@@ -27,9 +27,7 @@ public class AccountRepository {
     }
 
     public boolean exists(Account account) {
-
-        String selectQuery;
-        selectQuery = "SELECT"
+        String selectQuery = "SELECT"
                 + " *"
                 + " FROM " + ExpensesDbHelper.TABLE_ACCOUNTS
                 + " WHERE " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_ID + " = " + account.getIndex()
@@ -51,8 +49,7 @@ public class AccountRepository {
     }
 
     public Account get(long accountId) throws AccountNotFoundException {
-        String selectQuery;
-        selectQuery = "SELECT "
+        String selectQuery = "SELECT "
                 + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_ID + ", "
                 + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_NAME + ", "
                 + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_BALANCE + ", "
@@ -66,21 +63,14 @@ public class AccountRepository {
 
         Cursor c = mDatabase.rawQuery(selectQuery, null);
 
-        if (!c.moveToFirst()) {
-
-            c.close();
+        if (!c.moveToFirst())
             throw new AccountNotFoundException(accountId);
-        }
 
-        Account account = cursorToAccount(c);
-
-        c.close();
-        return account;
+        return fromCursor(c);
     }
 
     public List<Account> getAll() {
-        String selectQuery;
-        selectQuery = "SELECT "
+        String selectQuery = "SELECT "
                 + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_ID + ", "
                 + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_NAME + ", "
                 + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_BALANCE + ", "
@@ -93,21 +83,15 @@ public class AccountRepository {
                 + ";";
 
         Cursor c = mDatabase.rawQuery(selectQuery, null);
-        c.moveToFirst();
 
         ArrayList<Account> accounts = new ArrayList<>();
-        while (!c.isAfterLast()) {
+        while (c.moveToNext())
+            accounts.add(fromCursor(c));
 
-            accounts.add(cursorToAccount(c));
-            c.moveToNext();
-        }
-
-        c.close();
         return accounts;
     }
 
-    public Account insert(Account account) {
-
+    public Account create(Account account) {
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.ACCOUNTS_COL_NAME, account.getTitle());
         values.put(ExpensesDbHelper.ACCOUNTS_COL_BALANCE, account.getBalance());
@@ -124,7 +108,6 @@ public class AccountRepository {
     }
 
     public void delete(Account account) throws CannotDeleteAccountException {
-
         if (isAttachedToBooking(account))
             throw new CannotDeleteAccountException(account);
 
@@ -132,7 +115,6 @@ public class AccountRepository {
     }
 
     public void update(Account account) throws AccountNotFoundException {
-
         ContentValues updatedAccount = new ContentValues();
         updatedAccount.put(ExpensesDbHelper.ACCOUNTS_COL_NAME, account.getTitle());
         updatedAccount.put(ExpensesDbHelper.ACCOUNTS_COL_BALANCE, account.getBalance());
@@ -142,6 +124,52 @@ public class AccountRepository {
 
         if (affectedRows == 0)
             throw new AccountNotFoundException(account.getIndex());
+    }
+
+    /**
+     * Methode um zu überprüfen ob es ein Konto mit der angegebenen Währug gibt.
+     *
+     * @param currency Zu überprüfende Wärhung
+     * @return TRUE wenn es ein Konto mit dieseer Währung gibt, FALSE wenn nicht
+     */
+    public boolean isCurrencyAttachedToAccount(Currency currency) {
+        String selectQuery = "SELECT"
+                + " *"
+                + " FROM " + ExpensesDbHelper.TABLE_ACCOUNTS
+                + " WHERE " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID + " = " + currency.getIndex()
+                + " LIMIT 1;";
+
+        Cursor c = mDatabase.rawQuery(selectQuery, null);
+
+        if (c.moveToFirst()) {
+
+            c.close();
+            return true;
+        }
+
+        c.close();
+        return false;
+    }
+
+    public Account fromCursor(Cursor c) {
+        long accountId = c.getLong(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_ID));
+        String accountName = c.getString(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_NAME));
+        double accountBalance = c.getDouble(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_BALANCE));
+
+        if (c.isLast())
+            c.close();
+
+        return new Account(
+                accountId,
+                accountName,
+                accountBalance,
+                CurrencyRepository.fromCursor(c)
+        );
+    }
+
+    public void closeDatabase() {
+
+        DatabaseManager.getInstance().closeDatabase();
     }
 
     private boolean isAttachedToBooking(Account account) {
@@ -188,43 +216,5 @@ public class AccountRepository {
 
         c.close();
         return false;
-    }
-
-    /**
-     * Methode um zu überprüfen ob es ein Konto mit der angegebenen Währug gibt.
-     *
-     * @param currency Zu überprüfende Wärhung
-     * @return TRUE wenn es ein Konto mit dieseer Währung gibt, FALSE wenn nicht
-     */
-    public boolean isCurrencyAttachedToAccount(Currency currency) {
-        String selectQuery = "SELECT"
-                + " *"
-                + " FROM " + ExpensesDbHelper.TABLE_ACCOUNTS
-                + " WHERE " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID + " = " + currency.getIndex()
-                + " LIMIT 1;";
-
-        Cursor c = mDatabase.rawQuery(selectQuery, null);
-
-        if (c.moveToFirst()) {
-
-            c.close();
-            return true;
-        }
-
-        c.close();
-        return false;
-    }
-
-    public static Account cursorToAccount(Cursor c) {
-        long accountId = c.getLong(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_ID));
-        String accountName = c.getString(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_NAME));
-        double accountBalance = c.getDouble(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_BALANCE));
-
-        return new Account(
-                accountId,
-                accountName,
-                accountBalance,
-                CurrencyRepository.fromCursor(c)
-        );
     }
 }

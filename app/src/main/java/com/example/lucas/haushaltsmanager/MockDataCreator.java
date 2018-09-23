@@ -61,7 +61,7 @@ public class MockDataCreator {
         for (; counter < count; counter++) {
 
             Account account = new Account(baseAccountName + counter, mRnd.nextInt(50000), mMainCurrency);
-            account = mAccountRepo.insert(account);
+            account = mAccountRepo.create(account);
             Log.d(TAG, "createAccounts: " + account.toString());
             accounts.add(account);
         }

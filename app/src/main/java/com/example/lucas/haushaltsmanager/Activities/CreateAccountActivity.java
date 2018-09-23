@@ -186,7 +186,7 @@ public class CreateAccountActivity extends AppCompatActivity {
 
                 case CREATE_ACCOUNT:
 
-                    Account account = mAccountRepo.insert(mAccount);
+                    Account account = mAccountRepo.create(mAccount);
 
                     setNewActiveAccount(account);
                     break;

@@ -76,7 +76,7 @@ public class ExpenseRepositoryTest {
         currency = mCurrencyRepo.create(currency);
 
         account = new Account("Konto", 100, currency);
-        account = mAccountRepo.insert(account);
+        account = mAccountRepo.create(account);
     }
 
     private ExpenseObject getSimpleExpense() {

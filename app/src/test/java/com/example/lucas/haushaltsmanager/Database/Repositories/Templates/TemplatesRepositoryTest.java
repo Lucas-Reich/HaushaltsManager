@@ -71,7 +71,7 @@ public class TemplatesRepositoryTest {
         currency = mCurrencyRepo.create(currency);
 
         account = new Account("Konto 1", 2453, currency);
-        account = mAccountRepo.insert(account);
+        account = mAccountRepo.create(account);
 
         Category parentCategory = mock(Category.class);
         when(parentCategory.getIndex()).thenReturn(453L);

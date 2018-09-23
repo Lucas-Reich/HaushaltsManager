@@ -71,7 +71,7 @@ public class TestActiveAccountsPreferences {
         List<Account> expectedAccounts = getSimpleAccounts(4);
 
         for (Account account : expectedAccounts) {
-            mAccountRepo.insert(account);
+            mAccountRepo.create(account);
             mAccountsPreferences.addAccount(account);
         }
 
