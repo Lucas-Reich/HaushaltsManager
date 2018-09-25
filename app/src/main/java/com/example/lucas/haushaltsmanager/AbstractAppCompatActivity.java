@@ -12,7 +12,7 @@ public abstract class AbstractAppCompatActivity extends AppCompatActivity {
     /**
      * Methode um eine Toolbar anzuzeigen die den Titel und einen Zurückbutton enthält.
      */
-    private void initializeToolbar() {
+    public void initializeToolbar() {
         Toolbar toolbar = findViewById(R.id.toolbar);
 
         //schatten der toolbar

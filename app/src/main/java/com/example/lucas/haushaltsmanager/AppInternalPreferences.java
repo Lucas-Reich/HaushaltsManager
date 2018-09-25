@@ -2,18 +2,26 @@ package com.example.lucas.haushaltsmanager;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.util.Log;
+
+import com.example.lucas.haushaltsmanager.Entities.Directory;
 
 public class AppInternalPreferences {
+    private static final String TAG = AppInternalPreferences.class.getSimpleName();
     private static final String APP_INTERNAL_SETTINGS = "AppInternalSettings";
 
     private static final String BACKUP_JOB_EXECUTED = "backupJobExecuted";
     private static final String NOTIFICATION_JOB_EXECUTED = "notificationJobExecuted";
     private static final String NOTIFICATION_JOB_ID = "notificationJobId";
+    private static final String BACKUP_DIRECTORY = "backupDirectory";
 
     private SharedPreferences mPreferences;
+    private Context mContext;
 
     public AppInternalPreferences(Context context) {
 
+        mContext = context;
         mPreferences = context.getSharedPreferences(APP_INTERNAL_SETTINGS, Context.MODE_PRIVATE);
     }
 
@@ -45,5 +53,33 @@ public class AppInternalPreferences {
     public String getNotificationJobId() {
 
         return mPreferences.getString(NOTIFICATION_JOB_ID, "");
+    }
+
+    public Directory getBackupDirectory() {
+
+        return new Directory(mPreferences.getString(BACKUP_DIRECTORY, getDefaultBackupDir()));
+    }
+
+    private String getDefaultBackupDir() {
+        try {
+            return mContext
+                    .getPackageManager()
+                    .getPackageInfo(mContext.getPackageName(), 0)
+                    .applicationInfo
+                    .dataDir;
+
+            //todo sollte ich auch noch das suffix 'Backups' anfügen?
+        } catch (PackageManager.NameNotFoundException e) {
+
+            Log.e(TAG, "Could not find Package", e);
+            return "";
+        }
+    }
+
+    public void setBackupDirectory(Directory dir) {
+        if (!dir.exists())
+            dir.mkdir();
+
+        mPreferences.edit().putString(BACKUP_DIRECTORY, dir.toString()).apply();
     }
 }

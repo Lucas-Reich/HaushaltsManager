@@ -48,7 +48,7 @@
             android:label="@string/activity_new_category_name"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
         <activity
-            android:name=".Activities.CreateBackupActivity"
+            android:name=".Activities.BackupActivity"
             android:label="@string/activity_backups_name"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
         <activity

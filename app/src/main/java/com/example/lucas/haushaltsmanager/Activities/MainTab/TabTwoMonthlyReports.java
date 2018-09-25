@@ -31,7 +31,7 @@ public class TabTwoMonthlyReports extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.tab_two_monthly_reports, container, false);
 
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.tab_two_recycler_view);
+        mRecyclerView = rootView.findViewById(R.id.tab_two_recycler_view);
 
         updateView();
 
@@ -48,16 +48,19 @@ public class TabTwoMonthlyReports extends Fragment {
      */
     public void updateView() {
 
-        MonthlyReportAdapter adapter = new MonthlyReportAdapterCreator(
-                mParent.getExpenses(),
-                getContext(),
-                mParent.getActiveAccounts()
-        ).getAdapter();
+        //fixme: irgendwie kann meine ChartLibrary nicht mehr auf ihre eigenen value files mehr zugreifen
+        //da array in dem ich die style attribute für meinen chart definiere kann nicht mehr gefunden werden
 
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mRecyclerView.setAdapter(adapter);
-
-        adapter.notifyDataSetChanged();
+//        MonthlyReportAdapter adapter = new MonthlyReportAdapterCreator(
+//                mParent.getExpenses(),
+//                getContext(),
+//                mParent.getActiveAccounts()
+//        ).getAdapter();
+//
+//        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+//        mRecyclerView.setAdapter(adapter);
+//
+//        adapter.notifyDataSetChanged();
     }
 
 

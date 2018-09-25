@@ -1,16 +1,10 @@
 package com.example.lucas.haushaltsmanager.Activities;
 
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -19,24 +13,29 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.codekidlabs.storagechooser.StorageChooser;
+import com.example.lucas.haushaltsmanager.AbstractAppCompatActivity;
+import com.example.lucas.haushaltsmanager.AppInternalPreferences;
+import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
+import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
+import com.example.lucas.haushaltsmanager.Entities.Directory;
+import com.example.lucas.haushaltsmanager.FileDuplicator;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Services.BackupCreatorService;
 
 import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-public class CreateBackupActivity extends AppCompatActivity {
-    private static final String TAG = CreateBackupActivity.class.getSimpleName();
+public class BackupActivity extends AbstractAppCompatActivity {
+    private static final String TAG = BackupActivity.class.getSimpleName();
 
     private FloatingActionButton mCreateBackupFab;
     private Button mChooseDirectoryBtn;
-    private File mBackupDirectory = BackupCreatorService.getBackupDirectory();
+    private Directory mBackupDirectory;
     private ListView mListView;
 
     //.SavedDataFile
@@ -49,13 +48,15 @@ public class CreateBackupActivity extends AppCompatActivity {
 
         initializeToolbar();
 
-        mChooseDirectoryBtn = (Button) findViewById(R.id.create_backup_directory_btn);
-        mListView = (ListView) findViewById(R.id.create_backup_list_view);
+        mBackupDirectory = getBackupDirectory();
+
+        mChooseDirectoryBtn = findViewById(R.id.create_backup_directory_btn);
+        mListView = findViewById(R.id.create_backup_list_view);
         TextView emptyText = findViewById(R.id.empty_list_view);
         mListView.setEmptyView(emptyText);
         //todo die backups sollen so sortiert sein, dass der aktuellste eintrag an erster stelle steht
 
-        mCreateBackupFab = (FloatingActionButton) findViewById(R.id.create_backup_create_backup_btn);
+        mCreateBackupFab = findViewById(R.id.create_backup_create_backup_btn);
     }
 
     @Override
@@ -71,7 +72,7 @@ public class CreateBackupActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 StorageChooser storageChooser = new StorageChooser.Builder()
-                        .withActivity(CreateBackupActivity.this)
+                        .withActivity(BackupActivity.this)
                         .withFragmentManager(getFragmentManager())
                         .withMemoryBar(true)
                         .allowAddFolder(true)
@@ -85,7 +86,7 @@ public class CreateBackupActivity extends AppCompatActivity {
                     @Override
                     public void onSelect(String directory) {
 
-                        mBackupDirectory = new File(directory);
+                        mBackupDirectory = new Directory(directory);
                         mChooseDirectoryBtn.setText(mBackupDirectory.getName());
 
                         updateListView();
@@ -98,8 +99,21 @@ public class CreateBackupActivity extends AppCompatActivity {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                final File file = new File(mBackupDirectory + "/" + mListView.getItemAtPosition(position));
+                Bundle bundle = new Bundle();
+                bundle.putString(ConfirmationDialog.TITLE, getString(R.string.restoreBackup));
+                bundle.putString(ConfirmationDialog.CONTENT, getString(R.string.restore_backup_confirmation));
 
-                showConfirmationDialog(new File(mBackupDirectory + "/" + mListView.getItemAtPosition(position)));
+                ConfirmationDialog confirmationDialog = new ConfirmationDialog();
+                confirmationDialog.setOnConfirmationListener(new ConfirmationDialog.OnConfirmationResult() {
+                    @Override
+                    public void onConfirmationResult(boolean restore) {
+                        if (restore)
+                            restoreDatabaseState(file);
+                    }
+                });
+                confirmationDialog.setArguments(bundle);
+                confirmationDialog.show(getFragmentManager(), "backup_confirm_restore");
             }
         });
 
@@ -107,7 +121,6 @@ public class CreateBackupActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-
                 Bundle bundle = new Bundle();
                 bundle.putString(BasicTextInputDialog.TITLE, getResources().getString(R.string.choose_new_backup_name));
                 bundle.putString(BasicTextInputDialog.HINT, getDefaultBackupName());
@@ -122,35 +135,14 @@ public class CreateBackupActivity extends AppCompatActivity {
                     }
                 });
                 basicDialog.setArguments(bundle);
-                basicDialog.show(getFragmentManager(), "create_backup_name");
+                basicDialog.show(getFragmentManager(), "backup_name");
             }
         });
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId()) {
-            case android.R.id.home:
-
-                onBackPressed();
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    /**
-     * Methode um eine Toolbar anzuzeigen die den Titel und einen Zurückbutton enthält.
-     */
-    private void initializeToolbar() {
-        Toolbar toolbar = findViewById(R.id.toolbar);
-
-        //schatten der toolbar
-        if (Build.VERSION.SDK_INT >= 21)
-            toolbar.setElevation(10.f);
-
-        setSupportActionBar(toolbar);
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    private Directory getBackupDirectory() {
+        AppInternalPreferences preferences = new AppInternalPreferences(this);
+        return preferences.getBackupDirectory();
     }
 
     /**
@@ -173,10 +165,10 @@ public class CreateBackupActivity extends AppCompatActivity {
     private void createBackup(@Nullable String backupName) {
 
         Intent backupServiceIntent = new Intent(this, BackupCreatorService.class);
-        backupServiceIntent.putExtra("user_triggered", true);
-        backupServiceIntent.putExtra("backup_directory", mBackupDirectory.toString());
+        backupServiceIntent.putExtra(BackupCreatorService.USER_TRIGGERED, true);
+        backupServiceIntent.putExtra(BackupCreatorService.BACKUP_DIR_NAME, (Parcelable) mBackupDirectory);
         if (backupName != null)
-            backupServiceIntent.putExtra("backup_name", backupName);
+            backupServiceIntent.putExtra(BackupCreatorService.BACKUP_NAME, backupName);
 
         startService(backupServiceIntent);
 
@@ -186,53 +178,13 @@ public class CreateBackupActivity extends AppCompatActivity {
     /**
      * Methode um das vom User ausgewählte Backup wiederherzustellen
      *
-     * @param fileName Backup das wiederhergestellt werden soll
+     * @param backupDatabase Backup das wiederhergestellt werden soll
      */
-    private void restoreDatabaseState(File fileName) {
-
-        try {
-
-            BackupCreatorService.copyFile(fileName, getDatabasePath("expenses.db"));
-        } catch (IOException e) {
-
-            Log.e(TAG, "restoreDatabaseState: Fehler beim kopieren der Backupdatei", e);
-        }
-    }
-
-    /**
-     * Methode um einen ConfirmationDialog zu zeigen der den User fragt, ob er sich sicher ist, dass er das Backup wiederherstellen möchte.
-     *
-     * @param file Das Backup
-     */
-    private void showConfirmationDialog(final File file) {
-
-        //todo durch confirmationDialog ersetzen
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-        builder.setTitle(R.string.restoreBackup);
-
-        builder.setMessage(getResources().getString(R.string.restore_backup_confirmation) + ": " + file.getName());
-
-        builder.setPositiveButton(R.string.btn_ok, new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-                restoreDatabaseState(file);
-            }
-        });
-
-        builder.setNegativeButton(R.string.btn_cancel, new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                //do nothing
-            }
-        });
-
-        builder.create();
-
-        builder.show();
+    private void restoreDatabaseState(File backupDatabase) {
+        //todo funktioniere ich?
+        //Bitte überprüfe ob der User eine Datenbankdatei auswählen kann und diese dann laden
+        FileDuplicator fileDuplicator = new FileDuplicator(backupDatabase, new Directory(getDatabasePath(ExpensesDbHelper.DB_NAME).toString()));
+        fileDuplicator.copy(ExpensesDbHelper.DB_NAME + ".db");
     }
 
     /**
@@ -242,17 +194,10 @@ public class CreateBackupActivity extends AppCompatActivity {
      * @return Dateinamen der Backups
      */
     private List<String> getBackupsInDirectory(File directory) {
-
         List<String> backups = new ArrayList<>();
-        File[] files = directory.listFiles();
-
-        if (files != null && files.length != 0) {
-
-            for (int i = files.length - 1; i >= 0; i--) {
-                if (files[i].getName().contains(mBackupExtension)) {
-                    backups.add(files[i].getName());
-                }
-            }
+        for (File file : directory.listFiles()) {
+            if (file.getName().contains(mBackupExtension))
+                backups.add(file.getName());
         }
 
         return backups;

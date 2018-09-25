@@ -28,7 +28,7 @@ import android.widget.Toast;
 import com.example.lucas.haushaltsmanager.Activities.AboutUsActivity;
 import com.example.lucas.haushaltsmanager.Activities.CategoryListActivity;
 import com.example.lucas.haushaltsmanager.Activities.CourseActivity;
-import com.example.lucas.haushaltsmanager.Activities.CreateBackupActivity;
+import com.example.lucas.haushaltsmanager.Activities.BackupActivity;
 import com.example.lucas.haushaltsmanager.Activities.ImportExportActivity;
 import com.example.lucas.haushaltsmanager.Activities.RecurringBookingsActivity;
 import com.example.lucas.haushaltsmanager.Activities.SettingsActivity;
@@ -137,7 +137,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
                         break;
                     case R.id.backup:
 
-                        Intent backupIntent = new Intent(ParentActivity.this, CreateBackupActivity.class);
+                        Intent backupIntent = new Intent(ParentActivity.this, BackupActivity.class);
                         ParentActivity.this.startActivity(backupIntent);
                         break;
                     case R.id.import_export:

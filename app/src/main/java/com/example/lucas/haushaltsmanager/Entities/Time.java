@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager;
+package com.example.lucas.haushaltsmanager.Entities;
 
 import java.util.Calendar;
 import java.util.Locale;
