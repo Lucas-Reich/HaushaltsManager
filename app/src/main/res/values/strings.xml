@@ -471,7 +471,7 @@ prior to termination shall survive termination.
 *  and all other commercial damages or losses, even if such party      *
 *  shall have been informed of the possibility of such damages. This   *
 *  limitation of liability shall not apply to liability for death or   *
-*  personal injury resulting from such party's negligence to the       *
+*  personal injury resulting from such party\'s negligence to the       *
 *  extent applicable law prohibits such limitation. Some               *
 *  jurisdictions do not allow the exclusion or limitation of           *
 *  incidental or consequential damages, so this exclusion and          *
@@ -486,7 +486,7 @@ Any litigation relating to this License may be brought only in the
 courts of a jurisdiction where the defendant maintains its principal
 place of business and such litigation shall be governed by laws of that
 jurisdiction, without reference to its conflict-of-law provisions.
-Nothing in this Section shall prevent a party's ability to bring
+Nothing in this Section shall prevent a party\'s ability to bring
 cross-claims or counter-claims.
 
 9. Miscellaneous
@@ -557,7 +557,7 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
     <string name="about_us">About Us</string>
     <string name="contact">Contact</string>
     <string name="support">Support</string>
-    <string name="help_improve">Help inproving the app</string>
+    <string name="help_improve">Help improving the app</string>
     <string name="suggest_feature">Suggest new feature</string>
     <string name="app_version">App Version</string>
     <string name="licenses">Licenses</string>
@@ -575,5 +575,8 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
     <string name="activity_about_name">About</string>
     <string name="template_empty_list">No templates created</string>
     <string name="course_empty_list">No bookings created</string>
+    <string name="backups_empty_list">No Backups in this directory</string>
     <string name="licenses_title">Licenses</string>
+    <string name="backup_restoring_successful">Restored Backup</string>
+    <string name="backup_restoring_failed">Backup could not be restored</string>
 </resources>

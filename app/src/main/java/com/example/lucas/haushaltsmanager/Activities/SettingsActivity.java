@@ -19,7 +19,7 @@ import com.example.lucas.haushaltsmanager.Dialogs.SingleChoiceDialog;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.NotificationWorker;
 import com.example.lucas.haushaltsmanager.R;
-import com.example.lucas.haushaltsmanager.Time;
+import com.example.lucas.haushaltsmanager.Entities.Time;
 import com.example.lucas.haushaltsmanager.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.WeekdayUtils;
 

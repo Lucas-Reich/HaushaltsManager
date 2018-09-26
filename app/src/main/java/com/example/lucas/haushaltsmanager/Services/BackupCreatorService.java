@@ -1,190 +1,139 @@
 package com.example.lucas.haushaltsmanager.Services;
 
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
-import android.os.Environment;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.widget.Toast;
 
+import com.example.lucas.haushaltsmanager.AppInternalPreferences;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
-import com.example.lucas.haushaltsmanager.R;
+import com.example.lucas.haushaltsmanager.Entities.Directory;
+import com.example.lucas.haushaltsmanager.FileUtils;
 import com.example.lucas.haushaltsmanager.UserSettingsPreferences;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
 public class BackupCreatorService extends Service {
     private static final String TAG = BackupCreatorService.class.getSimpleName();
+    public static final String AUTOMATIC_BACKUP_NAME_REGEX = "([12]\\d{3}(0[1-9]|1[0-2])(0[1-9]|[12]\\d|3[01]))_Backup.sdf";
+    public static final String BACKUP_FILE_EXTENSION_REGEX = ".*.sdf";
 
-    // todo Wenn die App nicht mehr Haushaltsmanager heißen sollte dann muss hier der Name des externen Verzeichnisses angepasst werden.
-    //todo was soll passieren wenn es das datenbank file gar nicht gibt?
-    public static final String APP_EXTERNAL_STORAGE_DIR = "/Haushaltsmanager";
-    public static final String BACKUP_DIR = "/Backups";
-
-    private File mDatabaseFile;
-    private File mBackupDirectory;
-    private String mFileName;
-
-    /**
-     * Variable die true ist, wenn der BackupService durch den User ausgelöst wurde
-     */
-    boolean mUserTriggered;
+    public static final String INTENT_BACKUP_NAME = "backup_name";
+    public static final String INTENT_BACKUP_DIR = "backup_directory";
+    public static final String INTENT_USER_TRIGGERED = "user_triggered";
+    public static final String INTENT_PENDING_INTENT = "pending_intent";
 
     //.SavedDataFile
-    final String mFileExtension = ".sdf";
-
-    public BackupCreatorService() {
-
-        super();
-    }
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        mDatabaseFile = getDatabasePath(ExpensesDbHelper.DB_NAME);
-
-        mBackupDirectory = getBackupDirectory();
-
-        mFileName = new SimpleDateFormat("YYYYMMdd", Locale.US).format(Calendar.getInstance().getTime()) + "_Backup";
-    }
+    private static final String mFileExtension = ".sdf";
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        boolean isFileCopied = FileUtils.copy(
+                getDatabasePath(ExpensesDbHelper.DB_NAME),
+                getBackupDirectory(intent),
+                getFileName(intent)
+        );
 
-        if (intent != null) {
+        if (isFileCopied && !isUserTriggered(intent))
+            deleteBackup(getBackupDirectory(intent));
 
-            if (intent.hasExtra("backup_directory"))
-                mBackupDirectory = new File(intent.getStringExtra("backup_directory"));
-
-            if (intent.hasExtra("backup_name"))
-                mFileName = intent.getStringExtra("backup_name");
-
-            if (intent.hasExtra("user_triggered"))
-                mUserTriggered = intent.getBooleanExtra("user_triggered", false);
-        }
-
-        try {
-
-            boolean success = copyFile(mDatabaseFile, new File(mBackupDirectory.toString() + "/" + mFileName + mFileExtension));
-            if (mUserTriggered) {
-                if (success) {
-                    Toast.makeText(this, R.string.created_backup, Toast.LENGTH_SHORT).show();
-//                    deleteBackup(); todo funktionert irgendwie nicht wie gewollt
-                } else {
-                    Toast.makeText(this, R.string.could_not_create_backup, Toast.LENGTH_SHORT).show();
-                }
-            }
-        } catch (IOException e) {
-
-            Log.e(TAG, "onHandleIntent: ", e);
-        } finally {
-
-            stopSelf();
-        }
+        if (intent.hasExtra(INTENT_PENDING_INTENT))
+            notifyCaller(intent, isFileCopied);
 
         return Service.START_NOT_STICKY;
     }
 
     /**
-     * Antwort von: https://stackoverflow.com/a/9293885
-     * Methode um eine Datei zu kopieren
+     * Methode um den PendingIntent auszulösen, welcher dem Service übergeben wurde.
      *
-     * @param file    Datei die kopiert werden soll
-     * @param destDir Ort zu dem die Date kopiert werden soll
-     * @throws IOException Exception wenn beim kopieren etwas schiefgeht
+     * @param intent     Intent, welcher den PendingIntent enthält
+     * @param successful Boolean wert ob die Aktion erfoglreich war oder nicht
      */
-    public static boolean copyFile(File file, File destDir) throws IOException {
-        boolean copied = false;
-
-        InputStream in = new FileInputStream(file);
+    private void notifyCaller(Intent intent, boolean successful) {
+        PendingIntent pendingIntent = intent.getParcelableExtra(INTENT_PENDING_INTENT);
         try {
 
-            OutputStream out = new FileOutputStream(destDir);
-            try {
+            pendingIntent.send(successful ? 200 : 500);
+        } catch (PendingIntent.CanceledException e) {
 
-                // Transfer bytes from in to out
-                byte[] buf = new byte[1024];
-                int len;
-                while ((len = in.read(buf)) > 0) {
-
-                    out.write(buf, 0, len);
-                }
-
-                copied = true;
-            } finally {
-
-                out.close();
-            }
-        } finally {
-
-            in.close();
+            Log.e(TAG, "Could not send PendingIntent", e);
         }
+    }
 
-        return copied;
+    /**
+     * Methode um den Namen des Backups zu ermitteln.
+     * Ist keine individualisierter Name im Intent enthalten, dann wird einer, basierend auf dem aktuellen, Datumerstellt.
+     *
+     * @param intent Intent, welcher Informationen über den Dateinamen enthält.
+     * @return Dateiname des Backups
+     */
+    private String getFileName(Intent intent) {
+        if (intent != null && intent.hasExtra(INTENT_BACKUP_NAME))
+            return (intent.getStringExtra(INTENT_BACKUP_NAME) + mFileExtension).replace(" ", "");
+        else
+            return new SimpleDateFormat("YYYYMMdd", Locale.US).format(Calendar.getInstance().getTime()) + "_Backup" + mFileExtension;
+    }
+
+    /**
+     * Methode um das Backupverzeichnis zu ermitteln.
+     * Ist keine individualisiertes Verzeichnis angegeben, dann wird das standart Backupverzeichnis genommen.
+     *
+     * @param intent Intent, welcher Informationen über das Backupverzeichnis enthält
+     * @return Backupverzeichnis
+     */
+    private Directory getBackupDirectory(Intent intent) {
+        AppInternalPreferences preferences = new AppInternalPreferences(getApplicationContext());
+
+        if (intent != null && intent.hasExtra(INTENT_BACKUP_DIR))
+            return intent.getParcelableExtra(INTENT_BACKUP_DIR);
+        else
+            return preferences.getBackupDirectory();
+    }
+
+    /**
+     * Methode um zu ermitteln, ob die Backuperstellung manuell oder automatisch ausgelöst wurde.
+     *
+     * @param intent Intent, welcher Informationen über den auslöser enthält
+     * @return TRUE wenn der Service durch den User ausgelöst wurde, FALSE wenn nicht
+     */
+    private boolean isUserTriggered(Intent intent) {
+        return intent != null && intent.hasExtra(INTENT_USER_TRIGGERED) && intent.getBooleanExtra(INTENT_USER_TRIGGERED, false);
     }
 
     /**
      * Methode um die ältesten Backups zu löschen, wenn die Anzahl der Backups die Mmaximal zulässige Anzahl (vom User eingestellt) überschreitet.
      */
-    private void deleteBackup() {
+    private void deleteBackup(Directory directory) {
         UserSettingsPreferences userSettings = new UserSettingsPreferences(getApplication());
+        List<File> backups = FileUtils.listFiles(directory, true, AUTOMATIC_BACKUP_NAME_REGEX);
 
-        List<File> backups = getBackupsInDirectory(getBackupDirectory());
-        for (int i = userSettings.getMaxBackupCount(); i < backups.size(); i++) {
-            backups.get(i).delete();
+        for (int i = backups.size(); i > userSettings.getMaxBackupCount(); i--) {
+            getOldestBackup(backups).delete();
         }
     }
 
     /**
-     * Methode um alle Backupdatein in einem Verzeichniss zu bekommen.
+     * Methode um das älteste Backup aus einer Liste von Backups zu bekommen.
      *
-     * @return Liste der Backupdatein
+     * @param files List mit Datein
+     * @return Älteste Datei in der Liste
      */
-    private List<File> getBackupsInDirectory(File directory) {
-        List<File> backups = new ArrayList<>();
+    private File getOldestBackup(List<File> files) {
+        if (files == null || files.isEmpty())
+            return null;
 
-        File[] files = directory.listFiles();
+        File currentFile = files.get(0);
         for (File file : files) {
-            if (file.getName().contains(mFileExtension)) {
-                backups.add(file);
-            }
+            if (file.lastModified() > currentFile.lastModified())
+                currentFile = file;
         }
-
-        return backups;
-    }
-
-    /**
-     * Methode um den Pfad zum Speichertort der Backups zu bekommen.
-     *
-     * @return Speicherort des Backups
-     */
-    public static File getBackupDirectory() {
-        createBackupDirIfNotExists();
-        return new File(Environment.getExternalStorageDirectory() + APP_EXTERNAL_STORAGE_DIR + BACKUP_DIR);
-    }
-
-    /**
-     * Methode um den Speicheort der Backups zu initialisieren.
-     */
-    private static void createBackupDirIfNotExists() {
-        File externalStorageDir = new File(Environment.getExternalStorageDirectory().toString() + APP_EXTERNAL_STORAGE_DIR);
-        if (!externalStorageDir.exists())
-            externalStorageDir.mkdir();
-
-        File backupStorageDir = new File(externalStorageDir.toString() + BACKUP_DIR);
-        if (!backupStorageDir.exists())
-            backupStorageDir.mkdir();
+        return currentFile;
     }
 
     @Nullable
