@@ -4,13 +4,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.design.widget.FloatingActionButton;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import com.codekidlabs.storagechooser.StorageChooser;
 import com.example.lucas.haushaltsmanager.AbstractAppCompatActivity;
@@ -19,7 +20,7 @@ import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
 import com.example.lucas.haushaltsmanager.Entities.Directory;
-import com.example.lucas.haushaltsmanager.FileDuplicator;
+import com.example.lucas.haushaltsmanager.FileUtils;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Services.BackupCreatorService;
 
@@ -38,9 +39,6 @@ public class BackupActivity extends AbstractAppCompatActivity {
     private Directory mBackupDirectory;
     private ListView mListView;
 
-    //.SavedDataFile
-    final String mBackupExtension = ".sdf";
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,9 +50,7 @@ public class BackupActivity extends AbstractAppCompatActivity {
 
         mChooseDirectoryBtn = findViewById(R.id.create_backup_directory_btn);
         mListView = findViewById(R.id.create_backup_list_view);
-        TextView emptyText = findViewById(R.id.empty_list_view);
-        mListView.setEmptyView(emptyText);
-        //todo die backups sollen so sortiert sein, dass der aktuellste eintrag an erster stelle steht
+        mListView.setEmptyView(findViewById(R.id.empty_list_view));
 
         mCreateBackupFab = findViewById(R.id.create_backup_create_backup_btn);
     }
@@ -140,8 +136,14 @@ public class BackupActivity extends AbstractAppCompatActivity {
         });
     }
 
+    /**
+     * Methode um das aktuelle Backupverzeichniss zu bekommen.
+     *
+     * @return Pfad des Backupverzeichnisses
+     */
     private Directory getBackupDirectory() {
         AppInternalPreferences preferences = new AppInternalPreferences(this);
+
         return preferences.getBackupDirectory();
     }
 
@@ -160,19 +162,36 @@ public class BackupActivity extends AbstractAppCompatActivity {
     }
 
     /**
-     * Methode um ein Backup zu erstellen
+     * Methode ruft den BackupCreatorService auf welcher ein Backup erstellen soll.
      */
     private void createBackup(@Nullable String backupName) {
-
         Intent backupServiceIntent = new Intent(this, BackupCreatorService.class);
-        backupServiceIntent.putExtra(BackupCreatorService.USER_TRIGGERED, true);
-        backupServiceIntent.putExtra(BackupCreatorService.BACKUP_DIR_NAME, (Parcelable) mBackupDirectory);
+        backupServiceIntent.putExtra(BackupCreatorService.INTENT_USER_TRIGGERED, true);
+        backupServiceIntent.putExtra(BackupCreatorService.INTENT_BACKUP_DIR, (Parcelable) mBackupDirectory);
+        backupServiceIntent.putExtra(BackupCreatorService.INTENT_PENDING_INTENT, createPendingResult(100, new Intent(), 0));
         if (backupName != null)
-            backupServiceIntent.putExtra(BackupCreatorService.BACKUP_NAME, backupName);
+            backupServiceIntent.putExtra(BackupCreatorService.INTENT_BACKUP_NAME, backupName);
 
         startService(backupServiceIntent);
+    }
 
-        updateListView();
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 100) {
+            showToast(resultCode == 200 ? R.string.created_backup : R.string.could_not_create_backup);
+
+            updateListView();
+        }
+    }
+
+    private void showToast(@StringRes int message) {
+        Toast.makeText(
+                this,
+                message,
+                Toast.LENGTH_SHORT
+        ).show();
     }
 
     /**
@@ -181,10 +200,21 @@ public class BackupActivity extends AbstractAppCompatActivity {
      * @param backupDatabase Backup das wiederhergestellt werden soll
      */
     private void restoreDatabaseState(File backupDatabase) {
-        //todo funktioniere ich?
-        //Bitte überprüfe ob der User eine Datenbankdatei auswählen kann und diese dann laden
-        FileDuplicator fileDuplicator = new FileDuplicator(backupDatabase, new Directory(getDatabasePath(ExpensesDbHelper.DB_NAME).toString()));
-        fileDuplicator.copy(ExpensesDbHelper.DB_NAME + ".db");
+        boolean isRestored = FileUtils.copy(
+                backupDatabase,
+                getDatabaseDir(),
+                ExpensesDbHelper.DB_NAME
+        );
+
+        showToast(isRestored ? R.string.backup_restoring_successful : R.string.backup_restoring_failed);
+    }
+
+    private Directory getDatabaseDir() {
+        File databaseFile = getDatabasePath(ExpensesDbHelper.DB_NAME);
+        String path = databaseFile.toString();
+        path = path.substring(0, path.lastIndexOf(File.separator));
+
+        return new Directory(path);
     }
 
     /**
@@ -193,14 +223,13 @@ public class BackupActivity extends AbstractAppCompatActivity {
      * @param directory Verzeichniss, in dem gesucht werden soll.
      * @return Dateinamen der Backups
      */
-    private List<String> getBackupsInDirectory(File directory) {
-        List<String> backups = new ArrayList<>();
-        for (File file : directory.listFiles()) {
-            if (file.getName().contains(mBackupExtension))
-                backups.add(file.getName());
+    private List<String> getBackupsInDirectory(Directory directory) {
+        List<File> backups = FileUtils.listFiles(directory, true, BackupCreatorService.BACKUP_FILE_EXTENSION_REGEX);
+        List<String> backupNames = new ArrayList<>();
+        for (File file : backups) {
+            backupNames.add(file.getName());
         }
-
-        return backups;
+        return backupNames;
     }
 
     /**

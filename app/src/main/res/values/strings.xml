@@ -577,4 +577,6 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
     <string name="course_empty_list">No bookings created</string>
     <string name="backups_empty_list">No Backups in this directory</string>
     <string name="licenses_title">Licenses</string>
+    <string name="backup_restoring_successful">Restored Backup</string>
+    <string name="backup_restoring_failed">Backup could not be restored</string>
 </resources>

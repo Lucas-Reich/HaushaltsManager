@@ -1,63 +1,69 @@
 package com.example.lucas.haushaltsmanager.Services;
 
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.widget.Toast;
+import android.util.Log;
 
 import com.example.lucas.haushaltsmanager.AppInternalPreferences;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Entities.Directory;
-import com.example.lucas.haushaltsmanager.FileDuplicator;
-import com.example.lucas.haushaltsmanager.R;
+import com.example.lucas.haushaltsmanager.FileUtils;
 import com.example.lucas.haushaltsmanager.UserSettingsPreferences;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
 public class BackupCreatorService extends Service {
     private static final String TAG = BackupCreatorService.class.getSimpleName();
+    public static final String AUTOMATIC_BACKUP_NAME_REGEX = "([12]\\d{3}(0[1-9]|1[0-2])(0[1-9]|[12]\\d|3[01]))_Backup.sdf";
+    public static final String BACKUP_FILE_EXTENSION_REGEX = ".*.sdf";
 
-    public static final String BACKUP_NAME = "backup_name";
-    public static final String BACKUP_DIR_NAME = "backup_directory";
-    public static final String USER_TRIGGERED = "user_triggered";
+    public static final String INTENT_BACKUP_NAME = "backup_name";
+    public static final String INTENT_BACKUP_DIR = "backup_directory";
+    public static final String INTENT_USER_TRIGGERED = "user_triggered";
+    public static final String INTENT_PENDING_INTENT = "pending_intent";
 
     //.SavedDataFile
     private static final String mFileExtension = ".sdf";
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        boolean isFileCopied = copyFile(
+        boolean isFileCopied = FileUtils.copy(
                 getDatabasePath(ExpensesDbHelper.DB_NAME),
                 getBackupDirectory(intent),
                 getFileName(intent)
         );
 
-//        if (isFileCopied)
-//            deleteBackup(getBackupDirectory(intent));
+        if (isFileCopied && !isUserTriggered(intent))
+            deleteBackup(getBackupDirectory(intent));
 
-        if (isUserTriggered(intent))
-            showMessage(isFileCopied);
+        if (intent.hasExtra(INTENT_PENDING_INTENT))
+            notifyCaller(intent, isFileCopied);
 
         return Service.START_NOT_STICKY;
     }
 
     /**
-     * Methode um dem User eine Nachricht anzuzeigen, ob sein Aktion erfoglreich war oder nciht.
+     * Methode um den PendingIntent auszulösen, welcher dem Service übergeben wurde.
      *
-     * @param isSuccessful Boolscher Wert ob die Aktion erfolgreich war oder nicht
+     * @param intent     Intent, welcher den PendingIntent enthält
+     * @param successful Boolean wert ob die Aktion erfoglreich war oder nicht
      */
-    private void showMessage(boolean isSuccessful) {
-        Toast.makeText(
-                this,
-                isSuccessful ? R.string.created_backup : R.string.could_not_create_backup,
-                Toast.LENGTH_SHORT
-        ).show();
+    private void notifyCaller(Intent intent, boolean successful) {
+        PendingIntent pendingIntent = intent.getParcelableExtra(INTENT_PENDING_INTENT);
+        try {
+
+            pendingIntent.send(successful ? 200 : 500);
+        } catch (PendingIntent.CanceledException e) {
+
+            Log.e(TAG, "Could not send PendingIntent", e);
+        }
     }
 
     /**
@@ -68,8 +74,8 @@ public class BackupCreatorService extends Service {
      * @return Dateiname des Backups
      */
     private String getFileName(Intent intent) {
-        if (intent != null && intent.hasExtra(BACKUP_NAME))
-            return intent.getStringExtra(BACKUP_NAME) + mFileExtension;
+        if (intent != null && intent.hasExtra(INTENT_BACKUP_NAME))
+            return (intent.getStringExtra(INTENT_BACKUP_NAME) + mFileExtension).replace(" ", "");
         else
             return new SimpleDateFormat("YYYYMMdd", Locale.US).format(Calendar.getInstance().getTime()) + "_Backup" + mFileExtension;
     }
@@ -84,8 +90,8 @@ public class BackupCreatorService extends Service {
     private Directory getBackupDirectory(Intent intent) {
         AppInternalPreferences preferences = new AppInternalPreferences(getApplicationContext());
 
-        if (intent != null && intent.hasExtra(BACKUP_DIR_NAME))
-            return intent.getParcelableExtra(BACKUP_DIR_NAME);
+        if (intent != null && intent.hasExtra(INTENT_BACKUP_DIR))
+            return intent.getParcelableExtra(INTENT_BACKUP_DIR);
         else
             return preferences.getBackupDirectory();
     }
@@ -97,13 +103,7 @@ public class BackupCreatorService extends Service {
      * @return TRUE wenn der Service durch den User ausgelöst wurde, FALSE wenn nicht
      */
     private boolean isUserTriggered(Intent intent) {
-        return intent != null && intent.hasExtra(USER_TRIGGERED) && intent.getBooleanExtra(USER_TRIGGERED, false);
-    }
-
-    private boolean copyFile(File sourceFile, Directory targetDir, String fileCopyName) {
-        FileDuplicator fileDuplicator = new FileDuplicator(sourceFile, targetDir);
-
-        return fileDuplicator.copy(fileCopyName);
+        return intent != null && intent.hasExtra(INTENT_USER_TRIGGERED) && intent.getBooleanExtra(INTENT_USER_TRIGGERED, false);
     }
 
     /**
@@ -111,26 +111,29 @@ public class BackupCreatorService extends Service {
      */
     private void deleteBackup(Directory directory) {
         UserSettingsPreferences userSettings = new UserSettingsPreferences(getApplication());
+        List<File> backups = FileUtils.listFiles(directory, true, AUTOMATIC_BACKUP_NAME_REGEX);
 
-        List<File> backups = getBackupsInDirectory(directory);
-        for (int i = userSettings.getMaxBackupCount(); i < backups.size(); i++) {
-            backups.get(i).delete();
+        for (int i = backups.size(); i > userSettings.getMaxBackupCount(); i--) {
+            getOldestBackup(backups).delete();
         }
     }
 
     /**
-     * Methode um alle Backupdatein in einem Verzeichniss zu bekommen.
+     * Methode um das älteste Backup aus einer Liste von Backups zu bekommen.
      *
-     * @return Liste der Backupdatein
+     * @param files List mit Datein
+     * @return Älteste Datei in der Liste
      */
-    private List<File> getBackupsInDirectory(Directory directory) {
-        List<File> backups = new ArrayList<>();
-        for (File file : directory.listFiles()) {
-            if (file.getName().contains(mFileExtension))
-                backups.add(file);
-        }
+    private File getOldestBackup(List<File> files) {
+        if (files == null || files.isEmpty())
+            return null;
 
-        return backups;
+        File currentFile = files.get(0);
+        for (File file : files) {
+            if (file.lastModified() > currentFile.lastModified())
+                currentFile = file;
+        }
+        return currentFile;
     }
 
     @Nullable
