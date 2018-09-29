@@ -1,8 +1,12 @@
 package com.example.lucas.haushaltsmanager.Activities;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -12,14 +16,16 @@ import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.codekidlabs.storagechooser.StorageChooser;
 import com.example.lucas.haushaltsmanager.AppInternalPreferences;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepository;
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.SingleChoiceDialog;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
+import com.example.lucas.haushaltsmanager.Entities.Directory;
+import com.example.lucas.haushaltsmanager.Entities.Time;
 import com.example.lucas.haushaltsmanager.NotificationWorker;
 import com.example.lucas.haushaltsmanager.R;
-import com.example.lucas.haushaltsmanager.Entities.Time;
 import com.example.lucas.haushaltsmanager.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.WeekdayUtils;
 
@@ -31,7 +37,7 @@ import java.util.concurrent.TimeUnit;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 
-public class SettingsActivity extends AppCompatActivity {
+public class Settings extends AppCompatActivity {
 
     /**
      * Maximale Anzahl von gleichzeitig existierenden Backups.
@@ -43,10 +49,10 @@ public class SettingsActivity extends AppCompatActivity {
     public static final boolean DEFAULT_REMINDER_STATUS = false;
     public static final Time DEFAULT_REMINDER_TIME = new Time(10, 0);
 
-    private LinearLayout firstDayLayout, createBkpLayout, concurrentBackupsLayout, currencyLayout, notificationsAllowLayout, notificationTimeLayout;
+    private LinearLayout firstDayLayout, createBkpLayout, concurrentBackupsLayout, currencyLayout, notificationsAllowLayout, notificationTimeLayout, backupLocationLayout;
     private Button resetSettingsBtn;
     private CheckBox createBackupsChk, allowReminderChk;
-    private TextView currencyNameTxt, firstDayOfWeekTxt, maxBackupCountTxt, backupCountTextTxt, notificationTimeTxt, notificationTimeTextTxt;
+    private TextView currencyNameTxt, firstDayOfWeekTxt, maxBackupCountTxt, backupCountTextTxt, notificationTimeTxt, notificationTimeTextTxt, backupLocationTxt, backupLocationHeadingTxt;
     private UserSettingsPreferences mUserSettings;
     private WeekdayUtils mWeekdayUtils;
     private AppInternalPreferences mInternalPreferences;
@@ -65,6 +71,7 @@ public class SettingsActivity extends AppCompatActivity {
         currencyLayout = findViewById(R.id.settings_currency_wrapper);
         notificationsAllowLayout = findViewById(R.id.settings_notifications_allow_wrapper);
         notificationTimeLayout = findViewById(R.id.settings_notifications_time_wrapper);
+        backupLocationLayout = findViewById(R.id.settings_backups_location_wrapper);
 
         currencyNameTxt = findViewById(R.id.settings_currency_name);
         firstDayOfWeekTxt = findViewById(R.id.settings_general_first_of_week);
@@ -72,6 +79,8 @@ public class SettingsActivity extends AppCompatActivity {
         maxBackupCountTxt = findViewById(R.id.settings_backups_concurrent_count);
         notificationTimeTextTxt = findViewById(R.id.settings_notification_time_text);
         notificationTimeTxt = findViewById(R.id.settings_notifications_time);
+        backupLocationHeadingTxt = findViewById(R.id.settings_backups_location_heading);
+        backupLocationTxt = findViewById(R.id.settings_backups_location_location);
 
         createBackupsChk = findViewById(R.id.settings_backups_enable_chk);
         allowReminderChk = findViewById(R.id.settings_notifications_notificate_chk);
@@ -96,7 +105,7 @@ public class SettingsActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 SingleChoiceDialog<String> weekdayPicker = new SingleChoiceDialog<>();
-                weekdayPicker.createBuilder(SettingsActivity.this);
+                weekdayPicker.createBuilder(Settings.this);
                 weekdayPicker.setTitle(getString(R.string.choose_weekday));
                 weekdayPicker.setContent(Arrays.asList(mWeekdayUtils.getWeekdays()), mUserSettings.getFirstDayOfWeek());
                 weekdayPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
@@ -125,13 +134,41 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
+        setBackupLocation(mInternalPreferences.getBackupDirectory());
+        backupLocationLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (!hasFilePermission())
+                    requestFilePermission();
+
+                StorageChooser storageChooser = new StorageChooser.Builder()
+                        .withActivity(Settings.this)
+                        .withFragmentManager(getFragmentManager())
+                        .withMemoryBar(true)
+                        .allowAddFolder(true)
+                        .allowCustomPath(true)
+                        .setType(StorageChooser.DIRECTORY_CHOOSER)
+                        .build();
+
+                storageChooser.show();
+                storageChooser.setOnSelectListener(new StorageChooser.OnSelectListener() {
+                    @Override
+                    public void onSelect(String directory) {
+
+                        setBackupLocation(new Directory(directory));
+                    }
+                });
+            }
+        });
+
         setMaxBackupCount(mUserSettings.getMaxBackupCount());
         concurrentBackupsLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 SingleChoiceDialog<String> concurrentBackupCount = new SingleChoiceDialog<>();
-                concurrentBackupCount.createBuilder(SettingsActivity.this);
+                concurrentBackupCount.createBuilder(Settings.this);
                 concurrentBackupCount.setTitle(getString(R.string.choose_backup_amount));
                 concurrentBackupCount.setContent(Arrays.asList(getConcurrentBackupCountOptions()), -1);
                 concurrentBackupCount.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
@@ -160,7 +197,7 @@ public class SettingsActivity extends AppCompatActivity {
                 int mainCurrencyIndex = currencies.indexOf(mUserSettings.getMainCurrency());
 
                 SingleChoiceDialog<Currency> currencyPicker = new SingleChoiceDialog<>();
-                currencyPicker.createBuilder(SettingsActivity.this);
+                currencyPicker.createBuilder(Settings.this);
                 currencyPicker.setTitle(getString(R.string.select_currency));
                 currencyPicker.setContent(currencies, mainCurrencyIndex);
                 currencyPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
@@ -195,7 +232,7 @@ public class SettingsActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 SingleChoiceDialog<String> timePicker = new SingleChoiceDialog<>();
-                timePicker.createBuilder(SettingsActivity.this);
+                timePicker.createBuilder(Settings.this);
                 timePicker.setTitle(getString(R.string.choose_time));
                 timePicker.setContent(Arrays.asList(getTimeArray()), -1);
                 timePicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
@@ -243,6 +280,19 @@ public class SettingsActivity extends AppCompatActivity {
                 confirmationDialog.show(getFragmentManager(), "settings_confirm_reset");
             }
         });
+    }
+
+    private boolean hasFilePermission() {
+        String permission = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+
+        int status = ContextCompat.checkSelfPermission(this, permission);
+
+        return status == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void requestFilePermission() {
+
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
     }
 
     @Override
@@ -331,6 +381,17 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     /**
+     * Methode um das standart Backupverzeichnis anzupassen.
+     *
+     * @param dir Neues Backupverzeichnis
+     */
+    private void setBackupLocation(Directory dir) {
+
+        mInternalPreferences.setBackupDirectory(dir);
+        backupLocationTxt.setText(dir.getName());
+    }
+
+    /**
      * Methode um die Sichtbarkeit der Einträge im Backup bereich anzupassen.
      *
      * @param clickable Sichtbarkeitsstaus
@@ -339,10 +400,18 @@ public class SettingsActivity extends AppCompatActivity {
 
         if (clickable) {
 
+            backupLocationLayout.setClickable(true);
+            backupLocationHeadingTxt.setTextColor(getResources().getColor(R.color.primary_text_color));
+            backupLocationTxt.setTextColor(getResources().getColor(R.color.primary_text_color));
+
             concurrentBackupsLayout.setClickable(true);
             backupCountTextTxt.setTextColor(getResources().getColor(R.color.primary_text_color));
             maxBackupCountTxt.setTextColor(getResources().getColor(R.color.primary_text_color));
         } else {
+
+            backupLocationLayout.setClickable(false);
+            backupLocationHeadingTxt.setTextColor(getResources().getColor(R.color.text_color_disabled));
+            backupLocationTxt.setTextColor(getResources().getColor(R.color.text_color_disabled));
 
             concurrentBackupsLayout.setClickable(false);
             backupCountTextTxt.setTextColor(getResources().getColor(R.color.text_color_disabled));

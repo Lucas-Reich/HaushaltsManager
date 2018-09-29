@@ -3,7 +3,7 @@ package com.example.lucas.haushaltsmanager;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.example.lucas.haushaltsmanager.Activities.SettingsActivity;
+import com.example.lucas.haushaltsmanager.Activities.Settings;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepository;
@@ -61,7 +61,7 @@ public class UserSettingsPreferences {
 
     public int getMaxBackupCount() {
 
-        return mPreferences.getInt(MAX_BACKUP_COUNT, SettingsActivity.DEFAULT_BACKUP_CAP);
+        return mPreferences.getInt(MAX_BACKUP_COUNT, Settings.DEFAULT_BACKUP_CAP);
     }
 
     public void setMaxBackupCount(int maxBackupCount) {
@@ -71,7 +71,7 @@ public class UserSettingsPreferences {
 
     public boolean getReminderStatus() {
 
-        return mPreferences.getBoolean(SEND_REMINDER_NOTIFICATIONS, SettingsActivity.DEFAULT_REMINDER_STATUS);
+        return mPreferences.getBoolean(SEND_REMINDER_NOTIFICATIONS, Settings.DEFAULT_REMINDER_STATUS);
     }
 
     public void setReminderStatus(boolean reminderStatus) {
@@ -81,7 +81,7 @@ public class UserSettingsPreferences {
 
     public int getFirstDayOfWeek() {
 
-        return mPreferences.getInt(FIRST_DAY_OF_WEEK, SettingsActivity.DEFAULT_WEEKDAY);
+        return mPreferences.getInt(FIRST_DAY_OF_WEEK, Settings.DEFAULT_WEEKDAY);
     }
 
     public void setFirstDayOfWeek(String firstDayOfWeek) {
@@ -92,7 +92,7 @@ public class UserSettingsPreferences {
 
     public boolean getAutomaticBackupStatus() {
 
-        return mPreferences.getBoolean(AUTOMATIC_BACKUPS, SettingsActivity.DEFAULT_BACKUP_STATUS);
+        return mPreferences.getBoolean(AUTOMATIC_BACKUPS, Settings.DEFAULT_BACKUP_STATUS);
     }
 
     public void setAutomaticBackupStatus(boolean automaticBackupStatus) {
@@ -102,7 +102,7 @@ public class UserSettingsPreferences {
 
     public Time getReminderTime() {
 
-        String reminderTime = mPreferences.getString(REMINDER_TIME, SettingsActivity.DEFAULT_REMINDER_TIME.getTime());
+        String reminderTime = mPreferences.getString(REMINDER_TIME, Settings.DEFAULT_REMINDER_TIME.getTime());
         return Time.fromString(reminderTime);
     }
 
@@ -113,7 +113,7 @@ public class UserSettingsPreferences {
 
     public boolean getNotificationStatus() {
 
-        return mPreferences.getBoolean(ALLOW_NOTIFICATIONS, SettingsActivity.DEFAULT_REMINDER_STATUS);
+        return mPreferences.getBoolean(ALLOW_NOTIFICATIONS, Settings.DEFAULT_REMINDER_STATUS);
     }
 
     public void setNotificationStatus(boolean notificationStatus) {

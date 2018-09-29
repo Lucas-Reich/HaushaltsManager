@@ -63,7 +63,7 @@
             android:label="@string/activity_import_export_name"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
         <activity
-            android:name=".Activities.SettingsActivity"
+            android:name=".Activities.Settings"
             android:label="@string/activity_settings_name"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
         <activity

@@ -6,7 +6,7 @@
     android:orientation="vertical">
 
     <ListView
-        android:id="@+id/booking_listview"
+        android:id="@+id/booking_list_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 

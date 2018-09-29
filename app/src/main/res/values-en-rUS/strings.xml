@@ -190,4 +190,6 @@
     <string name="imports_empty_list">Could not find compatible files in this directory</string>
     <string name="backups_empty_list">No Backups in this directory</string>
     <string name="importing_not_yet_supported">Importing Expenses will be supported in the future</string>
+    <string name="recurring_bookings_empty_list">No recurring bookings currently</string>
+    <string name="default_backup_location">Choose default backup location</string>
 </resources>
