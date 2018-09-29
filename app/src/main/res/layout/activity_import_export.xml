@@ -35,16 +35,27 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
         </ListView>
+
+        <TextView
+            android:id="@+id/empty_list_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:paddingTop="16dp"
+            android:text="@string/imports_empty_list"
+            android:textColor="@color/primary_text_color"
+            android:visibility="gone"/>
     </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/activity_import_add_export_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|right|end"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="18dp"
         android:layout_marginBottom="18dp"
-        android:layout_marginRight="18dp"
         android:clickable="true"
+        android:focusable="true"
         app:srcCompat="@drawable/ic_add_white"/>
 
 </android.support.design.widget.CoordinatorLayout>

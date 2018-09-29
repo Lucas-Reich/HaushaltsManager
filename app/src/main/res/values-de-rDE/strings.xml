@@ -190,4 +190,8 @@
     <string name="template_empty_list">Keine Schablonen erstellt</string>
     <string name="course_empty_list">Keine Buchungen erstellt</string>
     <string name="licenses_title">Lizenzen</string>
+    <string name="backups_empty_list">Keine Backups in diesem Verzeichnis</string>
+    <string name="backup_restoring_successful">Backup wiederhergestellt</string>
+    <string name="backup_restoring_failed">Backup konnte nicht wiederhergestellt werden</string>
+    <string name="imports_empty_list">Keine kompatiblen Datein im aktuellen Verzeichniss gefunden</string>
 </resources>

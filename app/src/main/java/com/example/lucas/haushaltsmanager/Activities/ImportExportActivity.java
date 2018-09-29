@@ -1,65 +1,53 @@
 package com.example.lucas.haushaltsmanager.Activities;
 
-import android.os.Build;
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
+import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.codekidlabs.storagechooser.StorageChooser;
+import com.example.lucas.haushaltsmanager.AbstractAppCompatActivity;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ErrorAlertDialog;
+import com.example.lucas.haushaltsmanager.Entities.Directory;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.ExpenseObjectExporter;
 import com.example.lucas.haushaltsmanager.FileAdapter;
+import com.example.lucas.haushaltsmanager.FileUtils;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
-public class ImportExportActivity extends AppCompatActivity {
+public class ImportExportActivity extends AbstractAppCompatActivity {
+    private static final String TAG = ImportExportActivity.class.getSimpleName();
+    private static final String IMPORTABLE_FILE_CSV_REGEX = ".*.csv";
 
-    private List<File> mSelectableFileList;
     private ListView mListView;
-    private File mSelectedFile;
     private FloatingActionButton mAddExportFab;
     private Button mSelectDirectoryBtn;
-    private File mSelectedDirectory;
-    private ExpenseRepository mBookingRepo;
-
-    private enum SupportedFileExtensions {
-        CSV,
-        CUSTOM_FILE_EXTENSION;
-
-        @Override
-        public String toString() {
-            return super.toString().toLowerCase();
-        }
-    }
+    private Directory mSelectedDirectory;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_import_export);
 
-        mBookingRepo = new ExpenseRepository(this);
+        mListView = findViewById(R.id.activity_import_importable_files_list);
+        mListView.setEmptyView(findViewById(R.id.empty_list_view));
 
-        mSelectableFileList = new ArrayList<>();
-
-        mListView = (ListView) findViewById(R.id.activity_import_importable_files_list);
-        mAddExportFab = (FloatingActionButton) findViewById(R.id.activity_import_add_export_btn);
-        mSelectDirectoryBtn = (Button) findViewById(R.id.activity_import_directory_picker);
+        mAddExportFab = findViewById(R.id.activity_import_add_export_btn);
+        mSelectDirectoryBtn = findViewById(R.id.activity_import_directory_picker);
 
         initializeToolbar();
     }
@@ -72,9 +60,10 @@ public class ImportExportActivity extends AppCompatActivity {
         mSelectDirectoryBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getReadExternalStoragePermission();
+                if (!hasFilePermission())
+                    getFilePermission();
 
-                StorageChooser choose = new StorageChooser.Builder()
+                StorageChooser storageChooser = new StorageChooser.Builder()
                         .withActivity(ImportExportActivity.this)
                         .withFragmentManager(getFragmentManager())
                         .withMemoryBar(true)
@@ -82,51 +71,47 @@ public class ImportExportActivity extends AppCompatActivity {
                         .allowCustomPath(true)
                         .setType(StorageChooser.DIRECTORY_CHOOSER)
                         .build();
-                choose.show();
-                choose.setOnSelectListener(new StorageChooser.OnSelectListener() {
+
+                storageChooser.show();
+                storageChooser.setOnSelectListener(new StorageChooser.OnSelectListener() {
 
                     @Override
                     public void onSelect(String directory) {
-                        File file = new File(directory);
-                        mSelectDirectoryBtn.setText(file.getName());
-                        mSelectedDirectory = file;
+                        mSelectedDirectory = new Directory(directory);
+                        mSelectDirectoryBtn.setText(mSelectedDirectory.getName());
 
-                        mSelectableFileList.clear();
-                        mSelectableFileList.addAll(getImportableFilesInDirectory(file));
-
-                        updateListView();
+                        updateListView(mSelectedDirectory);
                     }
                 });
             }
         });
 
-        TextView emptyListViewText = new TextView(this);
-        emptyListViewText.setText(R.string.no_files_to_import);
-        mListView.setEmptyView(emptyListViewText);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                todo Die Importierfunktion wieder aktivieren
+//                final File selectedFile = mSelectableFileList.get(position);
+//
+//                Bundle bundle = new Bundle();
+//                bundle.putString(ConfirmationDialog.TITLE, getString(R.string.confirmation_dialog_title));
+//                bundle.putString(ConfirmationDialog.CONTENT, getString(R.string.import_bookings_confirmation));
+//
+//                ConfirmationDialog confirmationDialog = new ConfirmationDialog();
+//                confirmationDialog.setArguments(bundle);
+//                confirmationDialog.setOnConfirmationListener(new ConfirmationDialog.OnConfirmationResult() {
+//
+//                    @Override
+//                    public void onConfirmationResult(boolean importExpenses) {
+//                        if (importExpenses) {
+//
+//                            ExpenseObjectImporter fileImporter = new ExpenseObjectImporter(selectedFile, ImportExportActivity.this);
+//                            fileImporter.readAndSaveExpenseObjects();
+//                        }
+//                    }
+//                });
+//                confirmationDialog.show(getFragmentManager(), "import_confirm_import");
 
-                mSelectedFile = mSelectableFileList.get(position);
-
-                Bundle bundle = new Bundle();
-                bundle.putString(ConfirmationDialog.TITLE, getString(R.string.confirmation_dialog_title));
-                bundle.putString(ConfirmationDialog.CONTENT, getString(R.string.import_bookings_confirmation));
-
-                ConfirmationDialog confirmationDialog = new ConfirmationDialog();
-                confirmationDialog.setArguments(bundle);
-                confirmationDialog.setOnConfirmationListener(new ConfirmationDialog.OnConfirmationResult() {
-                    @Override
-                    public void onConfirmationResult(boolean result) {
-
-                        // todo aktivieren
-                        // ExpenseObjectImporter fileImporter = new ExpenseObjectImporter(mSelectedFile, this);
-                        // fileImporter.readAndSaveExpenseObjects();
-
-                        Toast.makeText(ImportExportActivity.this, R.string.not_implemented, Toast.LENGTH_SHORT).show();
-                    }
-                });
-                confirmationDialog.show(getFragmentManager(), "import_confirm_import");
+                Toast.makeText(ImportExportActivity.this, R.string.importing_not_yet_supported, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -143,6 +128,7 @@ public class ImportExportActivity extends AppCompatActivity {
                     ErrorAlertDialog errorDialog = new ErrorAlertDialog();
                     errorDialog.setArguments(bundle);
                     errorDialog.show(getFragmentManager(), "import_error_export");
+
                     return;
                 }
 
@@ -159,80 +145,48 @@ public class ImportExportActivity extends AppCompatActivity {
                         ExpenseObjectExporter fileExporter = new ExpenseObjectExporter(mSelectedDirectory);
                         fileExporter.convertAndExportExpenses(getAllExpenses());
 
-                        getImportableFilesInDirectory(mSelectedDirectory);
-                        updateListView();
+                        updateListView(mSelectedDirectory);
                     }
                 });
                 confirmationDialog.show(getFragmentManager(), "import_confirm_export");
             }
         });
 
-        getImportableFilesInDirectory(new File(getFilesDir().toString()));
-        updateListView();
+        updateListView(new Directory(getFilesDir().toString()));
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
+    private boolean hasFilePermission() {
+        String permission = Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
-                onBackPressed();
-        }
-        return super.onOptionsItemSelected(item);
-    }
+        int result = ContextCompat.checkSelfPermission(this, permission);
 
-    /**
-     * Methode um eine Toolbar anzuzeigen die den Titel und einen Zurückbutton enthält.
-     */
-    private void initializeToolbar() {
-        Toolbar toolbar = findViewById(R.id.toolbar);
-
-        //schatten der toolbar
-        if (Build.VERSION.SDK_INT >= 21)
-            toolbar.setElevation(10.f);
-
-        setSupportActionBar(toolbar);
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        return result == PackageManager.PERMISSION_GRANTED;
     }
 
     /**
      * Methode um die Berechtigung zum lesen und schreiben des externen Speichers zu erhalten
      */
-    private void getReadExternalStoragePermission() {
-        if (Build.VERSION.SDK_INT >= 23) {
-            ActivityCompat.requestPermissions(this, new String[]{"android.permission.READ_EXTERNAL_STORAGE"}, 0);
-        }
+    private void getFilePermission() {
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
     }
 
-    /**
-     * Methode um alle Datein in einem Verzeichniss zu bekommen, die importiert werden können.
-     *
-     * @param path Pfad, welcher überprüft werden soll
-     * @return Liste mit den unterstützten Datein
-     */
-    private List<File> getImportableFilesInDirectory(File path) {
-        mSelectableFileList.clear();
-        if (path.listFiles() != null) {
-            for (File file : path.listFiles()) {
-                for (SupportedFileExtensions fileExtension : SupportedFileExtensions.values()) {
-                    if (file.getName().contains(fileExtension.toString())) {
-                        mSelectableFileList.add(file);
-                        break;
-                    }
-                }
-
-            }
-        }
-        return new ArrayList<>();
+    private List<File> getImportableFilesInDirectory(Directory dir) {
+        return FileUtils.listFiles(
+                dir,
+                false,
+                IMPORTABLE_FILE_CSV_REGEX
+        );
     }
 
     /**
      * Methode um die ListView nach einer Änderung anzuzeigen.
      */
-    private void updateListView() {
+    private void updateListView(Directory selectedDirectory) {
+        Log.i(TAG, "Refreshing ListView");
 
-        FileAdapter fileAdapter = new FileAdapter(mSelectableFileList, this);
+        List<File> importableFileList = getImportableFilesInDirectory(selectedDirectory);
+
+        FileAdapter fileAdapter = new FileAdapter(importableFileList, this);
 
         mListView.setAdapter(fileAdapter);
 
@@ -241,12 +195,13 @@ public class ImportExportActivity extends AppCompatActivity {
 
     /**
      * Methode um alle Buchungen aus der Datenbank abzufragen.
-     * <p>
-     * TODO: 23.06.2018 Den User fragen welche Buchungen er genau exportieren möchte
      *
      * @return Alle Buchungen
      */
     private List<ExpenseObject> getAllExpenses() {
-        return mBookingRepo.getAll();
+        //todo Den User fragen welche Buchune genau exportiert werden sollen (welches Konto, Zeitraum, ...)
+        ExpenseRepository repo = new ExpenseRepository(this);
+
+        return repo.getAll();
     }
 }

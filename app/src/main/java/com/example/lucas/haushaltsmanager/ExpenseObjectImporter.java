@@ -2,7 +2,6 @@ package com.example.lucas.haushaltsmanager;
 
 import android.content.Context;
 
-import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 
@@ -15,10 +14,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ExpenseObjectImporter {
+    private static final String TAG = ExpenseObjectImporter.class.getSimpleName();
 
     private File mFile;
+    private Context mContext;
 
+    //todo den User die Informationen in der CSV Datei bestimmen lassen (siehe https://trello.com/c/fYk2L9vt/56-ausgaben-importer)
     public ExpenseObjectImporter(File file, Context context) {
+
+        mContext = context;
 
         assertFile(file);
         mFile = file;
@@ -94,7 +98,9 @@ public class ExpenseObjectImporter {
      * @param expenses Buchungen die in der Datenbank gespeichert werden sollen.
      */
     private void saveExpenseObjects(List<ExpenseObject> expenses) {
+        ExpenseRepository expenseRepo = new ExpenseRepository(mContext);
+
         for (ExpenseObject expense : expenses)
-            new ExpenseRepository(app.getContext()).insert(expense);//todo
+            expenseRepo.insert(expense);
     }
 }
