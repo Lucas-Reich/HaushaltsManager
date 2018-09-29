@@ -17,7 +17,7 @@
     <string name="left_slider_about">Über</string>
 
 
-    <string name="app_name">HaushaltsManager</string>
+    <string name="app_name">AusgabenManager</string>
 
     <string name="navigation_drawer_open">Öffne Menü</string>
     <string name="navigation_drawer_close">Schließe Menü</string>
@@ -190,4 +190,9 @@
     <string name="template_empty_list">Keine Schablonen erstellt</string>
     <string name="course_empty_list">Keine Buchungen erstellt</string>
     <string name="licenses_title">Lizenzen</string>
+    <string name="backups_empty_list">Keine Backups in diesem Verzeichnis</string>
+    <string name="backup_restoring_successful">Backup wiederhergestellt</string>
+    <string name="backup_restoring_failed">Backup konnte nicht wiederhergestellt werden</string>
+    <string name="imports_empty_list">Keine kompatiblen Datein im aktuellen Verzeichniss gefunden</string>
+    <string name="importing_not_yet_supported">Das Importieren von Ausgaben wird erst in der Zukunft unterstützt</string>
 </resources>

@@ -1,5 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name">HaushaltsManager</string>
+    <string name="app_name">FinanceManager</string>
 
     <string name="tab_one_title">Bookings</string>
     <string name="tab_two_title">Monthly Overview</string>
@@ -579,4 +579,6 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
     <string name="licenses_title">Licenses</string>
     <string name="backup_restoring_successful">Restored Backup</string>
     <string name="backup_restoring_failed">Backup could not be restored</string>
+    <string name="imports_empty_list">Could not find compatible files in this directory</string>
+    <string name="importing_not_yet_supported">Importing Expenses will be supported in the future</string>
 </resources>

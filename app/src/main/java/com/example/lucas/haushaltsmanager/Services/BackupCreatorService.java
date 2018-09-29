@@ -21,9 +21,11 @@ import java.util.Locale;
 
 public class BackupCreatorService extends Service {
     private static final String TAG = BackupCreatorService.class.getSimpleName();
-    public static final String AUTOMATIC_BACKUP_NAME_REGEX = "([12]\\d{3}(0[1-9]|1[0-2])(0[1-9]|[12]\\d|3[01]))_Backup.sdf";
-    public static final String BACKUP_FILE_EXTENSION_REGEX = ".*.sdf";
 
+    public static final String AUTOMATIC_BACKUP_REGEX = "([12]\\d{3}(0[1-9]|1[0-2])(0[1-9]|[12]\\d|3[01]))_Backup.sdf";
+    public static final String BACKUP_EXTENSION_REGEX = ".*.sdf";
+
+    //Mögliche Argumente die dem BackupServiceCreatorIntent übergeben werden können
     public static final String INTENT_BACKUP_NAME = "backup_name";
     public static final String INTENT_BACKUP_DIR = "backup_directory";
     public static final String INTENT_USER_TRIGGERED = "user_triggered";
@@ -111,29 +113,11 @@ public class BackupCreatorService extends Service {
      */
     private void deleteBackup(Directory directory) {
         UserSettingsPreferences userSettings = new UserSettingsPreferences(getApplication());
-        List<File> backups = FileUtils.listFiles(directory, true, AUTOMATIC_BACKUP_NAME_REGEX);
+        List<File> backups = FileUtils.listFiles(directory, true, AUTOMATIC_BACKUP_REGEX);
 
         for (int i = backups.size(); i > userSettings.getMaxBackupCount(); i--) {
-            getOldestBackup(backups).delete();
+            FileUtils.getOldestFile(backups).delete();
         }
-    }
-
-    /**
-     * Methode um das älteste Backup aus einer Liste von Backups zu bekommen.
-     *
-     * @param files List mit Datein
-     * @return Älteste Datei in der Liste
-     */
-    private File getOldestBackup(List<File> files) {
-        if (files == null || files.isEmpty())
-            return null;
-
-        File currentFile = files.get(0);
-        for (File file : files) {
-            if (file.lastModified() > currentFile.lastModified())
-                currentFile = file;
-        }
-        return currentFile;
     }
 
     @Nullable
