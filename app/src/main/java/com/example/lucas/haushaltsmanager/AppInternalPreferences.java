@@ -2,10 +2,11 @@ package com.example.lucas.haushaltsmanager;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.util.Log;
 
 import com.example.lucas.haushaltsmanager.Entities.Directory;
+
+import java.io.File;
 
 public class AppInternalPreferences {
     private static final String TAG = AppInternalPreferences.class.getSimpleName();
@@ -61,19 +62,14 @@ public class AppInternalPreferences {
     }
 
     private String getDefaultBackupDir() {
-        try {
-            return mContext
-                    .getPackageManager()
-                    .getPackageInfo(mContext.getPackageName(), 0)
-                    .applicationInfo
-                    .dataDir;
+        File file = new File(mContext.getApplicationInfo().dataDir + "/Backups");
 
-            //todo sollte ich auch noch das suffix 'Backups' anfügen?
-        } catch (PackageManager.NameNotFoundException e) {
-
-            Log.e(TAG, "Could not find Package", e);
-            return "";
+        if (!file.exists()) {
+            Log.w(TAG, "Creating not existing Backup directory.");
+            file.mkdir();
         }
+
+        return file.toString();
     }
 
     public void setBackupDirectory(Directory dir) {

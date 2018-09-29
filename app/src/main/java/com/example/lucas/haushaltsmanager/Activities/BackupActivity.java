@@ -224,7 +224,7 @@ public class BackupActivity extends AbstractAppCompatActivity {
      * @return Dateinamen der Backups
      */
     private List<String> getBackupsInDirectory(Directory directory) {
-        List<File> backups = FileUtils.listFiles(directory, true, BackupCreatorService.BACKUP_FILE_EXTENSION_REGEX);
+        List<File> backups = FileUtils.listFiles(directory, true, BackupCreatorService.BACKUP_EXTENSION_REGEX);
         List<String> backupNames = new ArrayList<>();
         for (File file : backups) {
             backupNames.add(file.getName());

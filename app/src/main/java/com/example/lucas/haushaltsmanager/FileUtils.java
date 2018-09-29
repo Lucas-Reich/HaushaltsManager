@@ -44,7 +44,7 @@ public class FileUtils {
                 int len;
                 while ((len = in.read(buf)) > 0) {
 
-                    out.write(buf, 0, len);//an welcher position wird das neue file erstellt? wird es alphabetisch sortiert?
+                    out.write(buf, 0, len);
                 }
 
             } finally {
@@ -63,5 +63,25 @@ public class FileUtils {
             Log.e(TAG, "Something went wrong while copying", e);
             return false;
         }
+    }
+
+
+    /**
+     * Methode um das älteste Backup aus einer Liste von Backups zu bekommen.
+     *
+     * @param fileList List mit Datein
+     * @return Älteste Datei in der Liste
+     */
+    public static File getOldestFile(List<File> fileList) {
+        if (fileList == null || fileList.isEmpty())
+            throw new IllegalArgumentException();
+
+        File oldestFile = fileList.get(0);
+        for (File file : fileList) {
+            if (file.lastModified() > oldestFile.lastModified())
+                oldestFile = file;
+        }
+
+        return oldestFile;
     }
 }
