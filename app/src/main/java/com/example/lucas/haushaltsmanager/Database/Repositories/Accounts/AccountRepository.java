@@ -155,6 +155,7 @@ public class AccountRepository implements AccountRepositoryInterface {
         long accountId = c.getLong(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_ID));
         String accountName = c.getString(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_NAME));
         double accountBalance = c.getDouble(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_BALANCE));
+        Currency accountCurrency = CurrencyRepository.fromCursor(c);
 
         if (c.isLast())
             c.close();
@@ -163,7 +164,7 @@ public class AccountRepository implements AccountRepositoryInterface {
                 accountId,
                 accountName,
                 accountBalance,
-                CurrencyRepository.fromCursor(c)
+                accountCurrency
         );
     }
 

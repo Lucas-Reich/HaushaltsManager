@@ -19,6 +19,8 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Ex
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.ChildExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepository;
 import com.example.lucas.haushaltsmanager.Entities.Account;
+import com.example.lucas.haushaltsmanager.Entities.Category;
+import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Tag;
 
@@ -502,6 +504,8 @@ public class ChildExpenseRepository {
         boolean expenditure = c.getInt(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_EXPENDITURE)) == 1;
         String notice = c.getString(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_NOTICE));
         long accountId = c.getLong(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID));
+        Category expenseCategory = CategoryRepository.cursorToCategory(c);
+        Currency expenseCurrency = CurrencyRepository.fromCursor(c);
 
         if (c.isLast())
             c.close();
@@ -512,13 +516,13 @@ public class ChildExpenseRepository {
                 price,
                 date,
                 expenditure,
-                CategoryRepository.cursorToCategory(c),
+                expenseCategory,
                 notice,
                 accountId,
                 ExpenseObject.EXPENSE_TYPES.CHILD_EXPENSE,
                 mBookingTagRepo.get(expenseId),
                 new ArrayList<ExpenseObject>(),
-                CurrencyRepository.fromCursor(c)
+                expenseCurrency
         );
     }
 
