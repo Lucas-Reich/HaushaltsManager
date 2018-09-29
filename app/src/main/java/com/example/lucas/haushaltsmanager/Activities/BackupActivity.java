@@ -1,11 +1,15 @@
 package com.example.lucas.haushaltsmanager.Activities;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -66,6 +70,8 @@ public class BackupActivity extends AbstractAppCompatActivity {
 
             @Override
             public void onClick(View v) {
+                if (!hasFilePermission())
+                    requestFilePermission();
 
                 StorageChooser storageChooser = new StorageChooser.Builder()
                         .withActivity(BackupActivity.this)
@@ -103,9 +109,18 @@ public class BackupActivity extends AbstractAppCompatActivity {
                 ConfirmationDialog confirmationDialog = new ConfirmationDialog();
                 confirmationDialog.setOnConfirmationListener(new ConfirmationDialog.OnConfirmationResult() {
                     @Override
-                    public void onConfirmationResult(boolean restore) {
-                        if (restore)
-                            restoreDatabaseState(file);
+                    public void onConfirmationResult(boolean restoreDatabase) {
+                        if (restoreDatabase) {
+                            //todo Was ist wenn die ausgewählte Datenbank und die aktuelle Datenbank unterschiedliche Versionen haben
+                            //Die alte Datenbank hat beispielsweise einige neue Tabellen oder Felder noch nicht, welche ich nach und nach der Datenbank hinzugefügt habe
+                            boolean isRestored = FileUtils.copy(
+                                    file,
+                                    getDatabaseDir(),
+                                    ExpensesDbHelper.DB_NAME
+                            );
+
+                            showToast(isRestored ? R.string.backup_restoring_successful : R.string.backup_restoring_failed);
+                        }
                     }
                 });
                 confirmationDialog.setArguments(bundle);
@@ -125,15 +140,34 @@ public class BackupActivity extends AbstractAppCompatActivity {
                 basicDialog.setOnTextInputListener(new BasicTextInputDialog.OnTextInput() {
 
                     @Override
-                    public void onTextInput(String textInput) {
+                    public void onTextInput(String backupName) {
+                        Intent backupServiceIntent = new Intent(BackupActivity.this, BackupCreatorService.class);
+                        backupServiceIntent.putExtra(BackupCreatorService.INTENT_USER_TRIGGERED, true);
+                        backupServiceIntent.putExtra(BackupCreatorService.INTENT_BACKUP_DIR, (Parcelable) mBackupDirectory);
+                        backupServiceIntent.putExtra(BackupCreatorService.INTENT_PENDING_INTENT, createPendingResult(100, new Intent(), 0));
+                        if (backupName != null)
+                            backupServiceIntent.putExtra(BackupCreatorService.INTENT_BACKUP_NAME, backupName);
 
-                        createBackup(textInput);
+                        startService(backupServiceIntent);
                     }
                 });
                 basicDialog.setArguments(bundle);
                 basicDialog.show(getFragmentManager(), "backup_name");
             }
         });
+    }
+
+    private boolean hasFilePermission() {
+        String permission = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+
+        final int hasPermission = ContextCompat.checkSelfPermission(this, permission);
+
+        return hasPermission == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void requestFilePermission() {
+
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
     }
 
     /**
@@ -161,20 +195,6 @@ public class BackupActivity extends AbstractAppCompatActivity {
         mListViewAdapter.notifyDataSetChanged();
     }
 
-    /**
-     * Methode ruft den BackupCreatorService auf welcher ein Backup erstellen soll.
-     */
-    private void createBackup(@Nullable String backupName) {
-        Intent backupServiceIntent = new Intent(this, BackupCreatorService.class);
-        backupServiceIntent.putExtra(BackupCreatorService.INTENT_USER_TRIGGERED, true);
-        backupServiceIntent.putExtra(BackupCreatorService.INTENT_BACKUP_DIR, (Parcelable) mBackupDirectory);
-        backupServiceIntent.putExtra(BackupCreatorService.INTENT_PENDING_INTENT, createPendingResult(100, new Intent(), 0));
-        if (backupName != null)
-            backupServiceIntent.putExtra(BackupCreatorService.INTENT_BACKUP_NAME, backupName);
-
-        startService(backupServiceIntent);
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -192,21 +212,6 @@ public class BackupActivity extends AbstractAppCompatActivity {
                 message,
                 Toast.LENGTH_SHORT
         ).show();
-    }
-
-    /**
-     * Methode um das vom User ausgewählte Backup wiederherzustellen
-     *
-     * @param backupDatabase Backup das wiederhergestellt werden soll
-     */
-    private void restoreDatabaseState(File backupDatabase) {
-        boolean isRestored = FileUtils.copy(
-                backupDatabase,
-                getDatabaseDir(),
-                ExpensesDbHelper.DB_NAME
-        );
-
-        showToast(isRestored ? R.string.backup_restoring_successful : R.string.backup_restoring_failed);
     }
 
     private Directory getDatabaseDir() {
@@ -229,6 +234,7 @@ public class BackupActivity extends AbstractAppCompatActivity {
         for (File file : backups) {
             backupNames.add(file.getName());
         }
+
         return backupNames;
     }
 
