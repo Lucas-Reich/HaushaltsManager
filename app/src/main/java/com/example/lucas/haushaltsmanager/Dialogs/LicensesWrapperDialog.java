@@ -35,8 +35,24 @@ public class LicensesWrapperDialog {
         notices.addNotice(getAndroidColorPickerNotice());
         notices.addNotice(getAndroidChangelogDialogNotice());
         notices.addNotice(getWorkManagerNotice());
+        notices.addNotice(getFABToolbarNotice());
 
         return notices;
+    }
+
+    /**
+     * Methode um den Lizenzen Eintrag für das OpenSource Projekt FABToolbar zu bekommen.
+     * Quelle: https://github.com/fafaldo/FABToolbar
+     *
+     * @return FABToolbar Notiz Eintrag
+     */
+    private Notice getFABToolbarNotice() {
+        return new Notice(
+                "FABToolbar",
+                "https://github.com/fafaldo/FABToolbar",
+                "Copyright (c) 2015 Rafał Tułaza",
+                new MITLicense()
+        );
     }
 
     /**

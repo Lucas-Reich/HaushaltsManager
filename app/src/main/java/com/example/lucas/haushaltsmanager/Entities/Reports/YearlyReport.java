@@ -1,14 +1,15 @@
-package com.example.lucas.haushaltsmanager;
+package com.example.lucas.haushaltsmanager.Entities.Reports;
 
 import android.support.annotation.NonNull;
 
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Reports.ReportInterface;
 
 import java.util.List;
 
-public class YearlyReport implements IPieChartCardView {
+public class YearlyReport implements ReportInterface {
     private String mCardTitle;
     private List<ExpenseObject> mExpenses;
     private Currency mCurrency;

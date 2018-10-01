@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Reports.MonthlyReport;
 
 import java.util.ArrayList;
 import java.util.Calendar;

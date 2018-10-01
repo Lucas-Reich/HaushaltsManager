@@ -35,7 +35,7 @@ public class TemplatesActivity extends AppCompatActivity {
 
         initializeToolbar();
 
-        mListView = findViewById(R.id.booking_listview);
+        mListView = findViewById(R.id.booking_list_view);
 
         mTemplateRepo = new TemplateRepository(this);
     }

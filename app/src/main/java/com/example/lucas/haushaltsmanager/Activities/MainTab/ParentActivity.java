@@ -31,7 +31,7 @@ import com.example.lucas.haushaltsmanager.Activities.CourseActivity;
 import com.example.lucas.haushaltsmanager.Activities.BackupActivity;
 import com.example.lucas.haushaltsmanager.Activities.ImportExportActivity;
 import com.example.lucas.haushaltsmanager.Activities.RecurringBookingsActivity;
-import com.example.lucas.haushaltsmanager.Activities.SettingsActivity;
+import com.example.lucas.haushaltsmanager.Activities.Settings;
 import com.example.lucas.haushaltsmanager.AppInternalPreferences;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.CannotDeleteExpenseException;
@@ -147,7 +147,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
                         break;
                     case R.id.preferences:
 
-                        Intent settingsIntent = new Intent(ParentActivity.this, SettingsActivity.class);
+                        Intent settingsIntent = new Intent(ParentActivity.this, Settings.class);
                         ParentActivity.this.startActivity(settingsIntent);
                         break;
                     case R.id.about:
