@@ -584,4 +584,5 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
     <string name="recurring_bookings_empty_list">No recurring bookings currently</string>
     <string name="default_backup_location">Choose default backup location</string>
     <string name="failed_to_delete_booking">Could not delete Booking</string>
+    <string name="could_not_update_booking">Failed to update Expense</string>
 </resources>

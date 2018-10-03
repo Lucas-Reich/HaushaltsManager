@@ -30,6 +30,7 @@ import com.example.lucas.haushaltsmanager.Activities.BackupActivity;
 import com.example.lucas.haushaltsmanager.Activities.CategoryListActivity;
 import com.example.lucas.haushaltsmanager.Activities.CourseActivity;
 import com.example.lucas.haushaltsmanager.Activities.ImportExportActivity;
+import com.example.lucas.haushaltsmanager.Activities.MainTab.TabOne.TabOneBookings;
 import com.example.lucas.haushaltsmanager.Activities.RecurringBookingsActivity;
 import com.example.lucas.haushaltsmanager.Activities.Settings;
 import com.example.lucas.haushaltsmanager.AppInternalPreferences;
@@ -345,7 +346,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
         return mAccountRepo.getAll();
     }
 
-    List<Long> getActiveAccounts() {
+    public List<Long> getActiveAccounts() {
         return mActiveAccounts;
     }
 
@@ -374,7 +375,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
     /**
      * Methode um die Liste der Buchungen zu erneuern.
      */
-    void updateExpenses() {
+    public void updateExpenses() {
         mExpenses = mBookingRepo.getAll();
     }
 
@@ -394,7 +395,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
      * @param to   Ende des Zeitraums
      * @return Buchungen innerhalb des angegebenen Zeitraums
      */
-    ArrayList<ExpenseObject> getExpenses(Calendar from, Calendar to) {
+    public ArrayList<ExpenseObject> getExpenses(Calendar from, Calendar to) {
 
         ArrayList<ExpenseObject> bookingsWithinTimeFrame = new ArrayList<>();
         for (ExpenseObject expense : mExpenses) {
