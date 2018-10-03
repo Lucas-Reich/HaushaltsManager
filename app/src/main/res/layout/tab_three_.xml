@@ -11,37 +11,4 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Hallo aus Tab 3"/>
-
-    <com.github.fafaldo.fabtoolbar.widget.FABToolbarLayout
-        android:id="@+id/fabtoolbar"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:containerId="@+id/fabtoolbar_container"
-        app:fabId="@+id/fabtoolbar_fab"
-        app:fabToolbarId="@+id/fabtoolbar_toolbar">
-
-        <RelativeLayout
-            android:id="@+id/fabtoolbar_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/fabtoolbar_fab"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_add_white"
-                app:fabSize="normal"/>
-        </RelativeLayout>
-
-        <LinearLayout
-            android:id="@+id/fabtoolbar_toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="70dp"
-            android:layout_alignParentBottom="true"
-            android:orientation="horizontal">
-
-            <!--Die Toolbar wird von der activity aus befüllt!-->
-
-        </LinearLayout>
-    </com.github.fafaldo.fabtoolbar.widget.FABToolbarLayout>
 </LinearLayout>

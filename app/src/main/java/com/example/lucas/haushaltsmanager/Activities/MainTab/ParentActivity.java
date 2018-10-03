@@ -26,9 +26,9 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Activities.AboutUsActivity;
+import com.example.lucas.haushaltsmanager.Activities.BackupActivity;
 import com.example.lucas.haushaltsmanager.Activities.CategoryListActivity;
 import com.example.lucas.haushaltsmanager.Activities.CourseActivity;
-import com.example.lucas.haushaltsmanager.Activities.BackupActivity;
 import com.example.lucas.haushaltsmanager.Activities.ImportExportActivity;
 import com.example.lucas.haushaltsmanager.Activities.RecurringBookingsActivity;
 import com.example.lucas.haushaltsmanager.Activities.Settings;
@@ -44,6 +44,7 @@ import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.MockDataCreator;
 import com.example.lucas.haushaltsmanager.MyAlarmReceiver;
 import com.example.lucas.haushaltsmanager.R;
+import com.example.lucas.haushaltsmanager.UserSettingsPreferences;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -75,10 +76,6 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
 
         setActiveAccounts();
         updateExpenses();
-
-        //Methode die jeden Tag einmal den BackupService laufen lässt
-//        scheduleBackupServiceAlarm(); todo
-
 
         //TODO den test button entfernen
         FloatingActionButton testService = findViewById(R.id.service_fab);
@@ -171,9 +168,12 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
      * Methode um die Hauptwährung und das Symbol der Hauptwährung in die SharedPreferences zu schreiben.
      */
     private void setSharedPreferencesProperties() {
-        SharedPreferences preferences = this.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
-        preferences.edit().putInt("maxBackupCount", 20).apply();
-        preferences.edit().putLong("mainCurrencyIndex", 32L).apply();
+        UserSettingsPreferences preferences = new UserSettingsPreferences(this);
+        preferences.setMaxBackupCount(20);
+
+        //todo hole dir die Main Currency aus der Datenbank und schreibe sie mit hilfe des UserSettingsPreferences Objetks in die SharedPreferences
+        SharedPreferences oldPreferences = this.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
+        oldPreferences.edit().putLong("mainCurrencyIndex", 32L).apply();
     }
 
     @Override
@@ -283,7 +283,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
             switch (visibleTabPosition) {
 
                 case 0:
-                    ((TabOneBookings) fragment).updateView();
+                    ((TabOneBookings) fragment).updateListView();
                     break;
                 case 1:
                     ((TabTwoMonthlyReports) fragment).updateView();

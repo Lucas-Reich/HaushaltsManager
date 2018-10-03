@@ -282,7 +282,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:visibility="gone"
-                    app:srcCompat="@drawable/ic_repeat"/>
+                    app:srcCompat="@drawable/ic_repeat_white"/>
 
                 <Button
                     android:id="@+id/expense_screen_recurring_frequency"

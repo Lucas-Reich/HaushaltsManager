@@ -29,16 +29,13 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     private Context mContext;
     private List<ExpenseObject> mGroupData;
     private HashMap<ExpenseObject, List<ExpenseObject>> mChildData;
-    private ArrayList<ExpenseObject> mSelectedGroups, mSelectedChildren;
     private int mRed, mGreen;
 
-    public ExpandableListAdapter(Context context, List<ExpenseObject> mGroupData, HashMap<ExpenseObject, List<ExpenseObject>> mChildData) {
+    ExpandableListAdapter(Context context, List<ExpenseObject> mGroupData, HashMap<ExpenseObject, List<ExpenseObject>> mChildData) {
 
         this.mContext = context;
         this.mGroupData = mGroupData;
         this.mChildData = mChildData;
-        this.mSelectedGroups = new ArrayList<>();
-        this.mSelectedChildren = new ArrayList<>();
 
         this.mRed = context.getResources().getColor(R.color.booking_expense);
         this.mGreen = context.getResources().getColor(R.color.booking_income);
@@ -290,16 +287,33 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     private int selectedChildren = 0;
     private int selectedParents = 0;
 
+    public void selectItem(int groupId, @Nullable Integer childId) {
+
+        selectBooking(groupId, childId);
+        notifyDataSetChanged();
+    }
+
+    public void deselectItem(int groupId, @Nullable Integer childId) {
+
+        deselectBooking(groupId, childId);
+        notifyDataSetChanged();
+        //kann ich die view auch irgendwie anders bekommen?
+        //kann ich das auch durch das passen der View erledigen
+    }
+
+    public boolean isItemSelected(int groupId, @Nullable Integer childId) {
+        return isBookingSelected(groupId, childId);
+    }
+
     /**
      * Methode um die angegebenen Buchung in die Liste der ausgwählten Buchungenzu schreiben.
      *
      * @param groupPosition Position der Gruppe
      * @param childPosition Position des Kindes oder NULL, wenn eine Groupbuchung ausgewählt wurde
      */
-    public void selectBooking(int groupPosition, @Nullable Integer childPosition) {
+    private void selectBooking(int groupPosition, @Nullable Integer childPosition) {
         ExpenseObject group = (ExpenseObject) getGroup(groupPosition);
         List<ExpenseObject> existingChildren = mChildData.get(group);
-//        group = removeChildren(group);
 
         if (childPosition != null) {
             ExpenseObject child = (ExpenseObject) getChild(groupPosition, childPosition);
@@ -333,9 +347,8 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
      * @param groupPosition Position der Gruppe
      * @param childPosition Position des Kindes oder NULL, wenn eine Groupbuchung ausgewählt wurde
      */
-    public void deselectBooking(int groupPosition, @Nullable Integer childPosition) {
+    private void deselectBooking(int groupPosition, @Nullable Integer childPosition) {
         ExpenseObject group = (ExpenseObject) getGroup(groupPosition);
-//        group = removeChildren(group);
 
         if (childPosition != null) {
 
@@ -366,9 +379,8 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
      * @param childPosition Position des Kindes oder NULL, wenn eine Groupbuchung ausgewählt wuerde
      * @return TRUE wenn die Buchung ausgewählt ist, FALSE wenn nicht
      */
-    public boolean isBookingSelected(int groupPosition, @Nullable Integer childPosition) {
+    private boolean isBookingSelected(int groupPosition, @Nullable Integer childPosition) {
         ExpenseObject group = (ExpenseObject) getGroup(groupPosition);
-//        group = removeChildren(group);
 
         if (!mSelectedBookings.containsKey(group)) {
             return false;
@@ -382,17 +394,6 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
             return true;
         }
-    }
-
-    /**
-     * Methode um alle Kinder von einer Buchung zu löschen.
-     *
-     * @param expense Buchung, welche keine Kinder mehr haben soll
-     * @return Buchung ohne Kinder
-     */
-    private ExpenseObject removeChildren(ExpenseObject expense) {
-        expense.removeChildren();
-        return expense;
     }
 
     /**

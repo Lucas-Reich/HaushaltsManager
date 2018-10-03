@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import com.example.lucas.haushaltsmanager.R;
 
 public class TabThree extends Fragment {
+    private static final String TAG = TabThree.class.getSimpleName();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstances) {

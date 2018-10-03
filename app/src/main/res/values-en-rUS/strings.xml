@@ -192,4 +192,5 @@
     <string name="importing_not_yet_supported">Importing Expenses will be supported in the future</string>
     <string name="recurring_bookings_empty_list">No recurring bookings currently</string>
     <string name="default_backup_location">Choose default backup location</string>
+    <string name="failed_to_delete_booking">Could not delete Booking</string>
 </resources>

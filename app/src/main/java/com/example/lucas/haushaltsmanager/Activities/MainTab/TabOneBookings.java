@@ -1,10 +1,10 @@
 package com.example.lucas.haushaltsmanager.Activities.MainTab;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.CoordinatorLayout;
@@ -15,12 +15,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ExpandableListView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.example.lucas.haushaltsmanager.Activities.ExpenseScreenActivity;
+import com.example.lucas.haushaltsmanager.Activities.ExpenseScreen;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.CannotDeleteExpenseException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
@@ -29,11 +30,16 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Ch
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.AddChildToChildException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.CannotDeleteChildExpenseException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.ChildExpenseNotFoundException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.RecurringBookingRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Templates.TemplateRepository;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Template;
 import com.example.lucas.haushaltsmanager.ExpandableListAdapter;
 import com.example.lucas.haushaltsmanager.ExpandableListAdapterCreator;
 import com.example.lucas.haushaltsmanager.R;
+import com.example.lucas.haushaltsmanager.TabOneFabToolbar;
+import com.github.fafaldo.fabtoolbar.widget.FABToolbarLayout;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -41,18 +47,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TabOneBookings extends Fragment {
+public class TabOneBookings extends Fragment implements TabOneFabToolbar.OnFabToolbarMenuItemClicked {
     private static final String TAG = TabOneBookings.class.getSimpleName();
 
     private ExpandableListAdapter mListAdapter;
     private ExpandableListView mExpListView;
     private FloatingActionButton fabBig, fabSmallTop, fabSmallLeft;
-    private Animation openFabAnim, closeFabAnim, rotateForwardAnim, rotateBackwardAnim;
+    private Animation openFabAnim, rotateForwardAnim;
     private boolean fabBigIsAnimated = false;
     private ParentActivity mParent;
     private AccountRepository mAccountRepo;
     private ChildExpenseRepository mChildExpenseRepo;
     private ExpenseRepository mBookingRepo;
+
+    private TabOneFabToolbar mTabOneFabToolbar;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -72,134 +80,19 @@ public class TabOneBookings extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstances) {
         View rootView = inflater.inflate(R.layout.tab_one_bookings, container, false);
 
-        mExpListView = (ExpandableListView) rootView.findViewById(R.id.expandable_list_view);
+        mExpListView = rootView.findViewById(R.id.expandable_list_view);
         mExpListView.setBackgroundColor(Color.WHITE);
         setOnGroupClickListener();
         setOnChildClickListener();
         setOnItemLongClickListener();
 
-        updateView();
+        updateListView();
 
-        final Activity mainTab = getActivity();
-
-        fabBig = (FloatingActionButton) rootView.findViewById(R.id.fab);
-        fabBig.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-
-                if (hasUserSelectedItems()) {
-
-                    resetActivityViewState();
-                } else {
-
-                    if (mAccountRepo.getAll().size() != 0) {//todo elegantere Möglichkeit finden den user zu zwingen ein Konto zu erstellen, bevor er eine Buchung erstellt
-
-                        Intent createNewBookingIntent = new Intent(mainTab, ExpenseScreenActivity.class);
-                        createNewBookingIntent.putExtra("mode", "createBooking");
-                        mainTab.startActivity(createNewBookingIntent);
-                    } else {
-
-                        //todo zeige dem user wie er ein neues Konto anlegen kann
-                        Toast.makeText(mainTab, getResources().getString(R.string.no_account), Toast.LENGTH_SHORT).show();
-                    }
-                }
-            }
-        });
-
-        fabSmallLeft = rootView.findViewById(R.id.fab_small_left);
-        fabSmallLeft.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-
-                if (combineBookingsMode()) {
-
-                    Bundle bundle = new Bundle();
-                    bundle.putString(BasicTextInputDialog.TITLE, getResources().getString(R.string.input_title));
-
-                    BasicTextInputDialog textInputDialog = new BasicTextInputDialog();
-                    textInputDialog.setArguments(bundle);
-                    textInputDialog.setOnTextInputListener(new BasicTextInputDialog.OnTextInput() {
-                        @Override
-                        public void onTextInput(String title) {
-
-                            ExpenseObject parentBooking = mChildExpenseRepo.combineExpenses(getSelectedBookings(mListAdapter.getSelectedBookings()));
-                            try {
-                                parentBooking.setTitle(title);
-                                mBookingRepo.update(parentBooking);
-
-                                mParent.updateExpenses();// die Liste der Buchungen wird neu geladen
-                            } catch (ExpenseNotFoundException e) {
-
-                                Toast.makeText(mainTab, "Ausgabe konnte nicht geupdated werden", Toast.LENGTH_SHORT).show();
-                                //todo fehlerbehandlung
-                                //todo übersetzung
-                            }
-                            mParent.updateExpenses();
-                            resetActivityViewState();
-                        }
-                    });
-                    textInputDialog.show(getActivity().getFragmentManager(), "");
-                }
-
-                if (addChildMode()) {
-
-                    ExpenseObject parentExpense = (ExpenseObject) mListAdapter.getSelectedBookings().keySet().toArray()[0];
-
-                    Intent createChildToBookingIntent = new Intent(mainTab, ExpenseScreenActivity.class);
-                    createChildToBookingIntent.putExtra("mode", "addChild");
-                    createChildToBookingIntent.putExtra("parentBooking", parentExpense);
-
-                    //todo die Änderung auch mParent mitteilen
-                    resetActivityViewState();
-                    mainTab.startActivity(createChildToBookingIntent);
-                }
-
-                if (extractChildMode()) {
-
-                    for (Map.Entry<ExpenseObject, List<ExpenseObject>> bookings : mListAdapter.getSelectedBookings().entrySet()) {
-                        for (ExpenseObject child : bookings.getValue()) {
-                            try {
-                                mChildExpenseRepo.extractChildFromBooking(child);
-                            } catch (ChildExpenseNotFoundException e) {
-                                //todo was soll passieren wenn eine KindBuchung nicht in der Datenbank gefunden werden konnte
-                            }
-                        }
-                    }
-
-                    mParent.updateExpenses();
-                    resetActivityViewState();
-                }
-            }
-        });
-
-        fabSmallTop = (FloatingActionButton) rootView.findViewById(R.id.fab_small_top);
-        fabSmallTop.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-
-                showSnackbar(
-                        mListAdapter.getSelectedBookings(),
-                        R.string.revert_deletion,
-                        R.string.bookings_successfully_restored
-                );
-
-
-                deleteBookings(mListAdapter.getSelectedBookings());
-                mParent.updateExpenses();
-
-                resetActivityViewState();
-            }
-        });
-
-
-        openFabAnim = AnimationUtils.loadAnimation(mainTab, R.anim.fab_open);
-        closeFabAnim = AnimationUtils.loadAnimation(mainTab, R.anim.fab_close);
-
-        rotateForwardAnim = AnimationUtils.loadAnimation(mainTab, R.anim.rotate_forward);
-        rotateBackwardAnim = AnimationUtils.loadAnimation(mainTab, R.anim.rotate_backward);
+        mTabOneFabToolbar = new TabOneFabToolbar(
+                (FABToolbarLayout) rootView.findViewById(R.id.fabtoolbar),
+                getContext(),
+                this
+        );
 
         return rootView;
     }
@@ -235,111 +128,6 @@ public class TabOneBookings extends Fragment {
                 }
             }
         }
-    }
-
-    /**
-     * Methdoe um einen ChildClickListener auf die ExpandableListView zu setzen.
-     */
-    private void setOnChildClickListener() {
-        mExpListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-
-            @Override
-            public boolean onChildClick(ExpandableListView parent, View view, int groupPosition, int childPosition, long id) {
-                ExpenseObject childExpense = (ExpenseObject) mListAdapter.getChild(groupPosition, childPosition);
-
-                if (!hasUserSelectedItems()) {
-
-                    Intent updateChildExpenseIntent = new Intent(getContext(), ExpenseScreenActivity.class);
-                    updateChildExpenseIntent.putExtra("mode", "updateChild");
-                    updateChildExpenseIntent.putExtra("updateChildExpense", childExpense);
-
-                    resetActivityViewState();
-                    startActivity(updateChildExpenseIntent);
-                    return true;
-                }
-
-                if (mListAdapter.isBookingSelected(groupPosition, childPosition)) {
-
-                    mListAdapter.deselectBooking(groupPosition, childPosition);
-                    view.setBackgroundColor(Color.WHITE);
-
-                    if (mListAdapter.getSelectedBookingsCount() == 0)
-                        enableLongClick();
-                } else {
-
-                    mListAdapter.selectBooking(groupPosition, childPosition);
-                    view.setBackgroundColor(getResources().getColor(R.color.highlighted_item_color));
-                }
-
-                return true;
-            }
-        });
-    }
-
-    /**
-     * Methode um einen GroupClickListener auf die ExpandableListView zu setzen.
-     */
-    private void setOnGroupClickListener() {
-        mExpListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
-
-            @Override
-            public boolean onGroupClick(ExpandableListView parent, View view, int groupPosition, long id) {
-                ExpenseObject groupExpense = (ExpenseObject) mListAdapter.getGroup(groupPosition);
-
-                if (mListAdapter.getSelectedBookingsCount() == 0 && groupExpense.getExpenseType() != ExpenseObject.EXPENSE_TYPES.PARENT_EXPENSE && groupExpense.getExpenseType() != ExpenseObject.EXPENSE_TYPES.DATE_PLACEHOLDER) {
-
-                    //falls keine Buchung markiert ist soll die Buchung im ExpenseScreen aufgerufen werden
-                    Intent updateParentExpenseIntent = new Intent(getContext(), ExpenseScreenActivity.class);
-                    updateParentExpenseIntent.putExtra("mode", "updateParent");
-                    updateParentExpenseIntent.putExtra("updateParentExpense", groupExpense);
-
-                    resetActivityViewState();
-                    startActivity(updateParentExpenseIntent);
-                    return true;
-                }
-
-                switch (groupExpense.getExpenseType()) {
-                    case TRANSFER_EXPENSE:
-                        //ignoriere transferBuchungen
-                        return true;
-                    case DATE_PLACEHOLDER:
-                        //ignoriere Datumstrenner
-                        return true;
-                    case PARENT_EXPENSE:
-                        if (!mListAdapter.isBookingSelected(groupPosition, null)) {
-                            if (hasUserSelectedItems())
-                                mListAdapter.selectBooking(groupPosition, null);
-                            animateFabs(mListAdapter.getSelectedGroupCount(), mListAdapter.getSelectedChildCount(), mListAdapter.getSelectedParentCount());
-                        } else {
-                            mListAdapter.deselectBooking(groupPosition, null);
-                            animateFabs(mListAdapter.getSelectedGroupCount(), mListAdapter.getSelectedChildCount(), mListAdapter.getSelectedParentCount());
-
-                            if (mListAdapter.getSelectedBookingsCount() == 0)
-                                enableLongClick();
-                        }
-                        return false;
-                    case NORMAL_EXPENSE:
-                    case CHILD_EXPENSE:
-
-                        if (mListAdapter.isBookingSelected(groupPosition, null)) {
-
-                            mListAdapter.deselectBooking(groupPosition, null);
-                            view.setBackgroundColor(Color.WHITE);
-
-                            if (mListAdapter.getSelectedBookingsCount() == 0)
-                                enableLongClick();
-                        } else {
-
-                            mListAdapter.selectBooking(groupPosition, null);
-                            view.setBackgroundColor(getResources().getColor(R.color.highlighted_item_color));
-                        }
-                        animateFabs(mListAdapter.getSelectedGroupCount(), mListAdapter.getSelectedChildCount(), mListAdapter.getSelectedParentCount());
-                        return true;
-                    default:
-                        return true;
-                }
-            }
-        });
     }
 
     /**
@@ -411,46 +199,115 @@ public class TabOneBookings extends Fragment {
 
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-
                 int groupPosition = ExpandableListView.getPackedPositionGroup(id);
                 int childPosition = ExpandableListView.getPackedPositionChild(id);
 
-                switch (ExpandableListView.getPackedPositionType(id)) {
+                mListAdapter.selectItem(groupPosition, childPosition != -1 ? childPosition : null);
 
-                    case ExpandableListView.PACKED_POSITION_TYPE_GROUP:
-                        ExpenseObject groupExpense = (ExpenseObject) mListAdapter.getGroup(groupPosition);
+                disableLongClick();
 
-                        if (groupExpense.isValidExpense()) {
+//                fillToolbar();
 
-                            mListAdapter.selectBooking(groupPosition, null);
-                            view.setBackgroundColor(getResources().getColor(R.color.highlighted_item_color));
+                mTabOneFabToolbar.show();
 
-                            disableLongClick();
-                            animateFabs(mListAdapter.getSelectedGroupCount(), mListAdapter.getSelectedChildCount(), mListAdapter.getSelectedParentCount());
-                            return true;
-                        }
+                return true;
+            }
+        });
+    }
 
-                        return false;
-                    case ExpandableListView.PACKED_POSITION_TYPE_CHILD:
-                        ExpenseObject childExpense = (ExpenseObject) mListAdapter.getChild(groupPosition, childPosition);
+    /**
+     * Methode um einen GroupClickListener auf die ExpandableListView zu setzen.
+     */
+    private void setOnGroupClickListener() {
+        mExpListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
 
-                        if (childExpense.isValidExpense()) {
+            @Override
+            public boolean onGroupClick(ExpandableListView parent, View view, int groupPosition, long id) {
+                ExpenseObject groupExpense = (ExpenseObject) mListAdapter.getGroup(groupPosition);
 
-                            mListAdapter.selectBooking(groupPosition, childPosition);
-                            view.setBackgroundColor(getResources().getColor(R.color.highlighted_item_color));
+                if (noBookingsSelected() && isEditable(groupExpense)) {
 
-                            disableLongClick();
-                            animateFabs(mListAdapter.getSelectedGroupCount(), mListAdapter.getSelectedChildCount(), mListAdapter.getSelectedParentCount());
+                    Intent updateParentExpenseIntent = new Intent(getContext(), ExpenseScreen.class);
+                    updateParentExpenseIntent.putExtra(ExpenseScreen.INTENT_MODE, ExpenseScreen.INTENT_MODE_UPDATE_PARENT);
+                    updateParentExpenseIntent.putExtra(ExpenseScreen.INTENT_BOOKING, groupExpense);
 
-                            return true;
-                        }
-                        return true;
+                    startActivity(updateParentExpenseIntent);
+
+                    return true;
+                }
+
+                switch (groupExpense.getExpenseType()) {
+                    case NORMAL_EXPENSE:
+                    case PARENT_EXPENSE:
+                    case CHILD_EXPENSE:
+                        if (mListAdapter.isItemSelected(groupPosition, null)) {
+                            mListAdapter.deselectItem(groupPosition, null);
+
+                            if (noBookingsSelected())
+                                enableLongClick();
+                        } else
+                            mListAdapter.selectItem(groupPosition, null);
+
+                        //todo update toolbar items
+                        changeToolbarMenuItems();
+                        return groupExpense.getExpenseType() != ExpenseObject.EXPENSE_TYPES.PARENT_EXPENSE;
                     default:
-
-                        return false;
+                        return true;
                 }
             }
         });
+    }
+
+    /**
+     * Methode um einen ChildClickListener auf die ExpandableListView zu setzen.
+     */
+    private void setOnChildClickListener() {
+        mExpListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+
+            @Override
+            public boolean onChildClick(ExpandableListView parent, View view, int groupPosition, int childPosition, long id) {
+                ExpenseObject childExpense = (ExpenseObject) mListAdapter.getChild(groupPosition, childPosition);
+
+                if (noBookingsSelected()) {
+
+                    Intent updateChildExpenseIntent = new Intent(getContext(), ExpenseScreen.class);
+                    updateChildExpenseIntent.putExtra(ExpenseScreen.INTENT_MODE, ExpenseScreen.INTENT_MODE_UPDATE_CHILD);
+                    updateChildExpenseIntent.putExtra(ExpenseScreen.INTENT_BOOKING, childExpense);
+
+                    startActivity(updateChildExpenseIntent);
+
+                    return true;
+                }
+
+                if (mListAdapter.isItemSelected(groupPosition, childPosition)) {
+                    mListAdapter.deselectItem(groupPosition, childPosition);
+
+                    if (noBookingsSelected())
+                        enableLongClick();
+                } else
+                    mListAdapter.selectItem(groupPosition, childPosition);
+
+                //todo update toolbar items
+                changeToolbarMenuItems();
+                return true;
+            }
+        });
+    }
+
+    private boolean noBookingsSelected() {
+        return mListAdapter.getSelectedBookingsCount() == 0;
+    }
+
+    private boolean isEditable(ExpenseObject expense) {
+        return !isParent(expense) && !isDateSep(expense);
+    }
+
+    private boolean isParent(ExpenseObject expense) {
+        return expense.getExpenseType() == ExpenseObject.EXPENSE_TYPES.PARENT_EXPENSE;
+    }
+
+    private boolean isDateSep(ExpenseObject expense) {
+        return expense.getExpenseType() == ExpenseObject.EXPENSE_TYPES.DATE_PLACEHOLDER;
     }
 
     /**
@@ -468,38 +325,20 @@ public class TabOneBookings extends Fragment {
     }
 
     /**
-     * Methode um die View in ihren Ausgangszustand zurückzusetzen.
+     * Methode um die ListView in ihren Ausgangszustand zurückzusetzen.
      */
-    private void resetActivityViewState() {
-
-        resetExpandableListView();
-        resetButtonAnimations();
-    }
-
-    /**
-     * Methode umd die ExpandableListView in ihren Ausgangstzstand zurückzusetzen.
-     */
-    private void resetExpandableListView() {
-
+    private void resetListView() {
         mListAdapter.deselectAll();
-        updateView();
+
+        updateListView();
+
         enableLongClick();
-    }
-
-    /**
-     * Methode um die Buttonanimationen auf ihre Uhrsprungszustand zurückzusetzen
-     */
-    private void resetButtonAnimations() {
-
-        closeFabSmallTop();
-        closeFabSmallLeft();
-        animatePlusClose();
     }
 
     /**
      * Methode um die ExpandableListView nach einer Änderung neu anzuzeigen.
      */
-    public void updateView() {
+    public void updateListView() {
 
         mListAdapter = new ExpandableListAdapterCreator(
                 mParent.getExpenses(getFirstOfMonth(), getLastOfMonth()),
@@ -552,7 +391,7 @@ public class TabOneBookings extends Fragment {
 
         //wenn keine buchung ausgewählt ist sollen die Buttons in den Normalzustand zurückkehren
         if (selectedChildren == 0 && selectedParents == 0 && selectedGroups == 0) {
-            resetButtonAnimations();
+//            resetButtonAnimations();
         }
 
         //wenn eine Buchung ausgewählt ist sollen die Buttons add child und Delete angezeigt werden
@@ -629,21 +468,6 @@ public class TabOneBookings extends Fragment {
     }
 
     /**
-     * Methode um einen FloatingActinButton zu verstecken.
-     *
-     * @param fab FAB
-     */
-    public void closeFab(FloatingActionButton fab) {
-
-        if (fab.getVisibility() != View.GONE) {
-
-            fab.setVisibility(View.GONE);
-            fab.startAnimation(closeFabAnim);
-            fab.setClickable(false);
-        }
-    }
-
-    /**
      * Methode die das plus auf dem Button animiert.
      * Wird diese Animation getriggert dreht sich das Pluszeichen um 45°.
      */
@@ -655,17 +479,6 @@ public class TabOneBookings extends Fragment {
     }
 
     /**
-     * Methode die das plus auf dem Button animiert.
-     * Wird diese Animation getriggert dreht sich das Pluszeichen um -45°.
-     */
-    public void animatePlusClose() {
-        if (fabBigIsAnimated) {
-            fabBig.startAnimation(rotateBackwardAnim);
-            fabBigIsAnimated = false;
-        }
-    }
-
-    /**
      * Methode die den LöschFab sichtbar und anklickbar macht.
      */
     public void openFabSmallTop() {
@@ -673,24 +486,10 @@ public class TabOneBookings extends Fragment {
     }
 
     /**
-     * Methode die den LöschFab unsichtbar und nicht mehr anklickbar macht.
-     */
-    public void closeFabSmallTop() {
-        closeFab(fabSmallTop);
-    }
-
-    /**
      * Methode die den KombinierFab sichtbar und anklickbar macht.
      */
     public void openFabSmallLeft() {
         showFab(fabSmallLeft);
-    }
-
-    /**
-     * Methode die den KombinierFab unsichtbar und nicht mehr anklickbar macht.
-     */
-    public void closeFabSmallLeft() {
-        closeFab(fabSmallLeft);
     }
 
     /**
@@ -706,6 +505,45 @@ public class TabOneBookings extends Fragment {
         Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG)
                 .setAction(R.string.revert_action, new UndoDeletionClickListener(bookings, successMessage))
                 .show();
+    }
+
+    @Override
+    public void onFabToolbarMenuItemClicked(String tag) {
+
+        //todo dem TabOneFragment bescheid geben
+        switch (tag) {
+            case TabOneFabToolbar.MENU_ITEM_ONE:
+                break;
+            case TabOneFabToolbar.MENU_ITEM_TWO:
+                break;
+            case TabOneFabToolbar.MENU_ITEM_THREE:
+                break;
+            case TabOneFabToolbar.MENU_ITEM_FOUR:
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public void onFabClick() {
+
+        if (hasUserSelectedItems()) {
+
+            resetListView();
+        } else {
+
+            if (mAccountRepo.getAll().size() != 0) {//todo elegantere Möglichkeit finden den user zu zwingen ein Konto zu erstellen, bevor er eine Buchung erstellt
+
+                Intent createNewBookingIntent = new Intent(getActivity(), ExpenseScreen.class);
+                createNewBookingIntent.putExtra(ExpenseScreen.INTENT_MODE, ExpenseScreen.INTENT_MODE_CREATE_BOOKING);
+                getActivity().startActivity(createNewBookingIntent);
+            } else {
+
+                //todo zeige dem user wie er ein neues Konto anlegen kann
+                Toast.makeText(getActivity(), getResources().getString(R.string.no_account), Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     /**
@@ -751,7 +589,7 @@ public class TabOneBookings extends Fragment {
             // todo überprüfen ob die buchung wirklich wiederhergestellt wurde
             Toast.makeText(getContext(), mSuccessMessage, Toast.LENGTH_SHORT).show();
             mParent.updateExpenses();
-            updateView();
+            updateListView();
         }
     }
 
@@ -768,9 +606,223 @@ public class TabOneBookings extends Fragment {
 
         if (this.isVisible()) {
             if (isVisibleToUser) {
-                updateView();
+                updateListView();
                 //todo nur updaten wenn etwas passiert ist
             }
         }
+    }
+
+    /**
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     */
+
+    private ImageView getCombineBookingsMenuItem() {
+        return getToolbarMenuItem(R.drawable.ic_merge_bookings_white, "", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bundle bundle = new Bundle();
+                bundle.putString(BasicTextInputDialog.TITLE, getResources().getString(R.string.input_title));
+
+                BasicTextInputDialog textInputDialog = new BasicTextInputDialog();
+                textInputDialog.setArguments(bundle);
+                textInputDialog.setOnTextInputListener(new BasicTextInputDialog.OnTextInput() {
+
+                    @Override
+                    public void onTextInput(String title) {
+
+                        combineBookings(title);
+                    }
+                });
+
+                textInputDialog.show(getActivity().getFragmentManager(), "");
+            }
+        });
+    }
+
+    private ImageView getExtractBookingsMenuItem() {
+        return getToolbarMenuItem(R.drawable.ic_extract_child_white, "", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                for (Map.Entry<ExpenseObject, List<ExpenseObject>> bookings : mListAdapter.getSelectedBookings().entrySet()) {
+                    for (ExpenseObject child : bookings.getValue()) {
+                        try {
+                            mChildExpenseRepo.extractChildFromBooking(child);
+                        } catch (ChildExpenseNotFoundException e) {
+                            //todo was soll passieren wenn eine KindBuchung nicht in der Datenbank gefunden werden konnte
+                        }
+                    }
+                }
+
+                mParent.updateExpenses();
+                mFabToolbar.hide();
+                resetListView();
+            }
+        });
+    }
+
+    private ImageView getAddChildMenuItem() {
+        return getToolbarMenuItem(R.drawable.ic_add_child_white, "", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                ExpenseObject parentExpense = (ExpenseObject) mListAdapter.getSelectedBookings().keySet().toArray()[0];
+
+                Intent createChildToBookingIntent = new Intent(getContext(), ExpenseScreen.class);
+                createChildToBookingIntent.putExtra(ExpenseScreen.INTENT_MODE, ExpenseScreen.INTENT_MODE_ADD_CHILD);
+                createChildToBookingIntent.putExtra(ExpenseScreen.INTENT_BOOKING, parentExpense);
+
+                //todo die Änderung auch mParent mitteilen
+                resetListView();
+                mFabToolbar.hide();
+                getContext().startActivity(createChildToBookingIntent);
+            }
+        });
+    }
+
+    private ImageView getDefaultMenuItem() {
+        //todo was ist die default option für die FABToolbar
+        return new ImageView(getContext());
+    }
+
+    private ImageView getChangeableMenuOption() {
+        ImageView imV = getDefaultMenuItem();
+
+        if (combineBookingsMode())
+            imV = getCombineBookingsMenuItem();
+
+        if (extractChildMode())
+            imV = getExtractBookingsMenuItem();
+
+        if (addChildMode())
+            imV = getAddChildMenuItem();
+
+        imV.setId(fabToolbarItemOne);
+
+        return imV;
+    }
+
+    private void saveAsTemplate() {
+        ExpenseObject expense = ExpenseObject.createDummyExpense();
+
+        //todo wenn mehr als eine Buchung markiert sind dann soll der template button versteckt werden
+        TemplateRepository templateRepository = new TemplateRepository(getContext());
+        templateRepository.insert(new Template(expense));
+    }
+
+    private void saveAsRecurring() {
+        ExpenseObject expense = ExpenseObject.createDummyExpense();
+
+        long start = 0;
+        long end = 0;
+        int freq = 1;
+
+        //todo wenn mehr als eine Buchung markiert ist dann soll der recurring button versteckt werden
+        //todo zeige einen alert dialog an welcher den user nach den zeiträumen fragt
+        RecurringBookingRepository recurringBookingRepository = new RecurringBookingRepository(getContext());
+        recurringBookingRepository.insert(expense, start, freq, end);
+    }
+
+    private void combineBookings(String title) {
+        ExpenseObject parentBooking = mChildExpenseRepo.combineExpenses(getSelectedBookings(mListAdapter.getSelectedBookings()));
+
+        try {
+            parentBooking.setTitle(title);
+            mBookingRepo.update(parentBooking);
+
+            mParent.updateExpenses();
+        } catch (ExpenseNotFoundException e) {
+
+            Toast.makeText(getContext(), "Ausgabe konnte nicht geupdated werden", Toast.LENGTH_SHORT).show();
+            //todo fehlerbehandlung
+            //todo übersetzung
+        }
+        mParent.updateExpenses();
+        resetListView();
+
+        mFabToolbar.hide();
+    }
+
+    private int fabToolbarItemOne;
+
+    private void changeToolbarMenuItems() {
+
+        int index = mFabToolbarToolbar.indexOfChild(mFabToolbarToolbar.findViewById(fabToolbarItemOne));
+        mFabToolbarToolbar.removeViewAt(index);
+        mFabToolbarToolbar.addView(getChangeableMenuOption(), index);
+    }
+
+    /**
+     * Methode um die FABToolbar mit Menuitems zu befüllen
+     */
+    private void fillToolbar() {
+        mFabToolbarToolbar.removeAllViews();
+        fabToolbarItemOne = 27;
+
+        ImageView addChild = getChangeableMenuOption();
+        addChild.setId(fabToolbarItemOne);
+        mFabToolbarToolbar.addView(addChild);
+
+        ImageView saveAsTemplate = getToolbarMenuItem(R.drawable.ic_template_white, "", new View.OnClickListener() {//todo besseres icon für template suchen
+            @Override
+            public void onClick(View v) {
+                saveAsTemplate();
+
+                mFabToolbar.hide();
+            }
+        });
+        mFabToolbarToolbar.addView(saveAsTemplate);
+
+        ImageView saveAsRecurring = getToolbarMenuItem(R.drawable.ic_repeat_white, "", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saveAsRecurring();
+
+                mFabToolbar.hide();
+            }
+        });
+        mFabToolbarToolbar.addView(saveAsRecurring);
+
+        ImageView delete = getToolbarMenuItem(R.drawable.ic_delete_white, "", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                showSnackbar(
+                        mListAdapter.getSelectedBookings(),
+                        R.string.revert_deletion,
+                        R.string.bookings_successfully_restored
+                );
+
+
+                deleteBookings(mListAdapter.getSelectedBookings());
+
+                mParent.updateExpenses();
+
+                resetListView();
+
+                mFabToolbar.hide();
+            }
+        });
+        mFabToolbarToolbar.addView(delete);
+    }
+
+    private ImageView getToolbarMenuItem(@DrawableRes int icon, String iconDesc, View.OnClickListener onClickListener) {
+        ViewGroup.LayoutParams layoutParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f);
+
+        ImageView imageView = new ImageView(getContext());
+        imageView.setImageResource(icon);
+        imageView.setContentDescription(iconDesc);
+        imageView.setLayoutParams(layoutParams);
+        imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        imageView.setOnClickListener(onClickListener);
+
+        return imageView;
     }
 }

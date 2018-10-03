@@ -11,34 +11,38 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_small_left"
+    <com.github.fafaldo.fabtoolbar.widget.FABToolbarLayout
+        android:id="@+id/fabtoolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_marginBottom="@dimen/fab_margin"
-        android:layout_marginEnd="90dp"
-        android:layout_marginRight="90dp"
-        android:visibility="gone"
-        app:srcCompat="@drawable/ic_combine_white"/>
+        android:layout_height="match_parent"
+        app:containerId="@+id/fabtoolbar_container"
+        app:fabId="@+id/fabtoolbar_fab"
+        app:fabToolbarId="@+id/fabtoolbar_toolbar">
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_small_top"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_marginBottom="90dp"
-        android:layout_marginEnd="@dimen/fab_margin"
-        android:layout_marginRight="@dimen/fab_margin"
-        android:visibility="gone"
-        app:srcCompat="@drawable/ic_delete_white"/>
+        <RelativeLayout
+            android:id="@+id/fabtoolbar_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end|bottom"
-        android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@drawable/ic_add_white"/>
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fabtoolbar_fab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_add_white"
+                app:fabSize="normal"/>
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/fabtoolbar_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="0dp"
+            android:orientation="horizontal">
+
+            <!--Die Toolbar wird von der activity aus befüllt!-->
+
+        </LinearLayout>
+    </com.github.fafaldo.fabtoolbar.widget.FABToolbarLayout>
 
 </android.support.design.widget.CoordinatorLayout>

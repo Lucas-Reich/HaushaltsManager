@@ -27,7 +27,7 @@
             android:label="@string/activity_template_name"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
         <activity
-            android:name=".Activities.ExpenseScreenActivity"
+            android:name=".Activities.ExpenseScreen"
             android:label="@string/activity_expense_screen_name"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
         <activity

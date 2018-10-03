@@ -30,7 +30,6 @@ import android.widget.Toast;
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
-import com.example.lucas.haushaltsmanager.Database.Repositories.BookingTags.BookingTagRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
@@ -51,14 +50,22 @@ import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Tag;
 import com.example.lucas.haushaltsmanager.Entities.Template;
 import com.example.lucas.haushaltsmanager.R;
+import com.example.lucas.haushaltsmanager.UserSettingsPreferences;
 
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-public class ExpenseScreenActivity extends AppCompatActivity {
-    private static final String TAG = ExpenseScreenActivity.class.getSimpleName();
+public class ExpenseScreen extends AppCompatActivity {
+    private static final String TAG = ExpenseScreen.class.getSimpleName();
+
+    public static final String INTENT_MODE = "mode";
+    public static final String INTENT_BOOKING = "booking";
+    public static final String INTENT_MODE_UPDATE_CHILD = "update_child";
+    public static final String INTENT_MODE_UPDATE_PARENT = "update_parent";
+    public static final String INTENT_MODE_ADD_CHILD = "add_child";
+    public static final String INTENT_MODE_CREATE_BOOKING = "create_booking";
 
     private creationModes CREATION_MODE;
 
@@ -126,40 +133,40 @@ public class ExpenseScreenActivity extends AppCompatActivity {
     private void resolveIntent(Bundle bundle) {
         if (bundle == null)
             return;
-        else if (!bundle.containsKey("mode"))
+        else if (!bundle.containsKey(INTENT_MODE))
             throw new UnsupportedOperationException("Du musst den Modus setzen!");
 
-        if ("updateChild".equals(bundle.getString("mode"))) {
+        if (INTENT_MODE_UPDATE_CHILD.equals(bundle.getString(INTENT_MODE))) {
 
             mSaveBtn.setText(getString(R.string.update));
 
             CREATION_MODE = creationModes.UPDATE_CHILD_MODE;
-            mExpense = getIntent().getParcelableExtra("updateChildExpense");
+            mExpense = getIntent().getParcelableExtra(INTENT_BOOKING);
             //todo use function showExpenseOnExpenseScreen
             Log.d(TAG, "resolveIntent: Updating Child Expense " + mExpense.toString());
             return;
         }
 
-        if ("updateParent".equals(bundle.getString("mode"))) {
+        if (INTENT_MODE_UPDATE_PARENT.equals(bundle.getString(INTENT_MODE))) {
 
             mSaveBtn.setText(getString(R.string.update));
 
             CREATION_MODE = creationModes.UPDATE_EXPENSE_MODE;
-            mExpense = getIntent().getParcelableExtra("updateParentExpense");
+            mExpense = getIntent().getParcelableExtra(INTENT_BOOKING);
             //todo use function showExpenseOnExpenseScreen
             Log.d(TAG, "resolveIntent: Updating Parent Expense " + mExpense.toString());
             return;
         }
 
-        if ("addChild".equals(bundle.getString("mode"))) {
+        if (INTENT_MODE_ADD_CHILD.equals(bundle.getString(INTENT_MODE))) {
 
             mSaveBtn.setText(getString(R.string.add_child_to_booking));
 
             CREATION_MODE = creationModes.ADD_CHILD_MODE;
-            mParentBooking = getIntent().getParcelableExtra("parentBooking");
+            mParentBooking = getIntent().getParcelableExtra(INTENT_BOOKING);
         }
 
-        if ("createBooking".equals(bundle.getString("mode"))) {
+        if (INTENT_MODE_CREATE_BOOKING.equals(bundle.getString(INTENT_MODE))) {
 
             mSaveBtn.setText(getString(R.string.create_booking));
             CREATION_MODE = creationModes.CREATE_EXPENSE_MODE;
@@ -169,15 +176,8 @@ public class ExpenseScreenActivity extends AppCompatActivity {
         mExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE);
         setExpenseCurrency();
 
-        try {
-            SharedPreferences preferences = getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
-            Account account = mAccountRepo.get(preferences.getLong("activeAccount", 0));
-            setAccount(account);
-        } catch (AccountNotFoundException e) {
-
-            Toast.makeText(this, "Kein Hauptkonto ausgewählt", Toast.LENGTH_SHORT).show();
-            finish();
-        }
+        UserSettingsPreferences preferences = new UserSettingsPreferences(this);
+        setAccount(preferences.getActiveAccount());
 
         Log.d(TAG, "resolveIntent: Creating Expense " + mExpense.toString());
     }
@@ -255,7 +255,7 @@ public class ExpenseScreenActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 mTemplate = true;
-                Toast.makeText(ExpenseScreenActivity.this, "Du möchtest die Ausgabe als Vorlage speichern", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ExpenseScreen.this, "Du möchtest die Ausgabe als Vorlage speichern", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -394,7 +394,7 @@ public class ExpenseScreenActivity extends AppCompatActivity {
             //AlertDialog text: "Du hast eine Buchung in der Zukunft erstellt. Diese wird dann zum entsprechenden Tag in deine Historie eingefügt"
             if (!mExpense.isSet()) {
 
-                Toast.makeText(ExpenseScreenActivity.this, R.string.error_create_expense_content_missing, Toast.LENGTH_SHORT).show();
+                Toast.makeText(ExpenseScreen.this, R.string.error_create_expense_content_missing, Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -406,10 +406,10 @@ public class ExpenseScreenActivity extends AppCompatActivity {
 
                     try {
                         mBookingRepo.update(mExpense);
-                        Toast.makeText(ExpenseScreenActivity.this, "Updated Booking " + mExpense.getTitle(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ExpenseScreen.this, "Updated Booking " + mExpense.getTitle(), Toast.LENGTH_SHORT).show();
                     } catch (ExpenseNotFoundException e) {
 
-                        Toast.makeText(ExpenseScreenActivity.this, "Buchung konnte nicht geupdated werden", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ExpenseScreen.this, "Buchung konnte nicht geupdated werden", Toast.LENGTH_SHORT).show();
                         //todo fehlerbehandlung
                         //todo übersetzung
                     }
@@ -418,10 +418,10 @@ public class ExpenseScreenActivity extends AppCompatActivity {
 
                     try {
                         mChildExpenseRepo.update(mExpense);
-                        Toast.makeText(ExpenseScreenActivity.this, "Updated Booking " + mExpense.getTitle(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ExpenseScreen.this, "Updated Booking " + mExpense.getTitle(), Toast.LENGTH_SHORT).show();
                     } catch (ChildExpenseNotFoundException e) {
 
-                        Toast.makeText(ExpenseScreenActivity.this, "KindBuchung konnte nicht geupdated werden", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ExpenseScreen.this, "KindBuchung konnte nicht geupdated werden", Toast.LENGTH_SHORT).show();
                         //todo fehlerbehandlung
                         //todo übersetzung
                     }
@@ -429,12 +429,12 @@ public class ExpenseScreenActivity extends AppCompatActivity {
                 case ADD_CHILD_MODE:
 
                     mChildExpenseRepo.insert(mParentBooking, mExpense);
-                    Toast.makeText(ExpenseScreenActivity.this, "Added Booking \"" + mExpense.getTitle() + "\" to parent Booking " + mParentBooking.getTitle(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ExpenseScreen.this, "Added Booking \"" + mExpense.getTitle() + "\" to parent Booking " + mParentBooking.getTitle(), Toast.LENGTH_SHORT).show();
                     break;
                 case CREATE_EXPENSE_MODE:
 
                     mExpense = mBookingRepo.insert(mExpense);
-                    Toast.makeText(ExpenseScreenActivity.this, "Created Booking \"" + mExpense.getTitle() + "\"", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ExpenseScreen.this, "Created Booking \"" + mExpense.getTitle() + "\"", Toast.LENGTH_SHORT).show();
                     break;
                 default:
                     throw new UnsupportedOperationException("ExpenseScreen unterstützt keine anderen Methoden als createExpense, createChildToExpense, updateExpense und updateChildExpense");
@@ -451,8 +451,8 @@ public class ExpenseScreenActivity extends AppCompatActivity {
             if (mTemplate)
                 mTemplateRepo.insert(new Template(mExpense));
 
-            Intent intent = new Intent(ExpenseScreenActivity.this, ParentActivity.class);
-            ExpenseScreenActivity.this.startActivity(intent);
+            Intent intent = new Intent(ExpenseScreen.this, ParentActivity.class);
+            ExpenseScreen.this.startActivity(intent);
         }
     };
 
@@ -470,8 +470,8 @@ public class ExpenseScreenActivity extends AppCompatActivity {
 
             case R.id.template:
 
-                Intent chooseTemplateIntent = new Intent(ExpenseScreenActivity.this, TemplatesActivity.class);
-                ExpenseScreenActivity.this.startActivityForResult(chooseTemplateIntent, 2);
+                Intent chooseTemplateIntent = new Intent(ExpenseScreen.this, TemplatesActivity.class);
+                ExpenseScreen.this.startActivityForResult(chooseTemplateIntent, 2);
                 break;
             case android.R.id.home:
 
@@ -676,8 +676,8 @@ public class ExpenseScreenActivity extends AppCompatActivity {
 
             case R.id.expense_screen_category:
 
-                Intent chooseCategoryIntent = new Intent(ExpenseScreenActivity.this, CategoryListActivity.class);
-                ExpenseScreenActivity.this.startActivityForResult(chooseCategoryIntent, 1);
+                Intent chooseCategoryIntent = new Intent(ExpenseScreen.this, CategoryListActivity.class);
+                ExpenseScreen.this.startActivityForResult(chooseCategoryIntent, 1);
                 break;
 
             case R.id.expense_screen_title:
@@ -728,7 +728,7 @@ public class ExpenseScreenActivity extends AppCompatActivity {
             case R.id.expense_screen_account:
 
                 SingleChoiceDialog<Account> accountPicker = new SingleChoiceDialog<>();
-                accountPicker.createBuilder(ExpenseScreenActivity.this);
+                accountPicker.createBuilder(ExpenseScreen.this);
                 accountPicker.setTitle(getString(R.string.input_account));
                 accountPicker.setContent(mAccountRepo.getAll(), (int) mExpense.getAccountId());
                 accountPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {

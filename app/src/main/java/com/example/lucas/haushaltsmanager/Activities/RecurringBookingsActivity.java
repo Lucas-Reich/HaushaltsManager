@@ -1,12 +1,9 @@
 package com.example.lucas.haushaltsmanager.Activities;
 
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 import android.widget.ListView;
 
+import com.example.lucas.haushaltsmanager.AbstractAppCompatActivity;
 import com.example.lucas.haushaltsmanager.BookingAdapter;
 import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.RecurringBookingRepository;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
@@ -15,14 +12,14 @@ import com.example.lucas.haushaltsmanager.R;
 import java.util.Calendar;
 import java.util.List;
 
-public class RecurringBookingsActivity extends AppCompatActivity {
+public class RecurringBookingsActivity extends AbstractAppCompatActivity {
     private static final String TAG = RecurringBookingsActivity.class.getSimpleName();
 
     private List<ExpenseObject> mRecurringBookings;
     private ListView mListView;
     private Calendar mStartDate = Calendar.getInstance();
     private Calendar mEndDate = Calendar.getInstance();
-    private RecurringBookingRepository mRecurrintBookingRepo;
+    private RecurringBookingRepository mRecurringBookingRepo;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -31,9 +28,10 @@ public class RecurringBookingsActivity extends AppCompatActivity {
 
         initializeToolbar();
 
-        mListView = (ListView) findViewById(R.id.booking_listview);
+        mListView = findViewById(R.id.booking_list_view);
+        mListView.setEmptyView(findViewById(R.id.empty_list_view));
 
-        mRecurrintBookingRepo = new RecurringBookingRepository(this);
+        mRecurringBookingRepo = new RecurringBookingRepository(this);
     }
 
     @Override
@@ -41,32 +39,6 @@ public class RecurringBookingsActivity extends AppCompatActivity {
         super.onStart();
 
         updateListView();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId()) {
-            case android.R.id.home:
-
-                onBackPressed();
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    /**
-     * Methode um eine Toolbar anzuzeigen die den Titel und einen Zurückbutton enthält.
-     */
-    private void initializeToolbar() {
-        Toolbar toolbar = findViewById(R.id.toolbar);
-
-        //schatten der toolbar
-        if (Build.VERSION.SDK_INT >= 21)
-            toolbar.setElevation(10.f);
-
-        setSupportActionBar(toolbar);
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     private void updateListView() {
@@ -85,16 +57,6 @@ public class RecurringBookingsActivity extends AppCompatActivity {
         mStartDate.set(mStartDate.get(Calendar.YEAR), mStartDate.get(Calendar.MONTH), 1);
         mEndDate.set(mEndDate.get(Calendar.YEAR), mEndDate.get(Calendar.MONTH), mEndDate.getActualMaximum(Calendar.DAY_OF_MONTH));
 
-        mRecurringBookings = mRecurrintBookingRepo.getAll(mStartDate, mEndDate);
-    }
-
-    public void setStartDate(long startInMills) {
-
-        this.mStartDate.setTimeInMillis(startInMills);
-    }
-
-    public void setEndDate(long endInMills) {
-
-        this.mEndDate.setTimeInMillis(endInMills);
+        mRecurringBookings = mRecurringBookingRepo.getAll(mStartDate, mEndDate);
     }
 }
