@@ -31,7 +31,7 @@ public class ColorPicker extends View {
     private final int paramOuterPadding = 2; // outer padding of the whole color picker view
     private final int paramInnerPadding = 5; // distance between value slider wheel and inner color wheel
     private final int paramValueSliderWidth = 10; // width of the value slider
-    private final int paramArrowPointerSize = 4; // size of the arrow pointer; set to 0 to hide the pointer
+    private final int paramArrowPointerSize = 4; // size of the arrow pointer; set to 0 to hideToolbar the pointer
 
     private Paint colorWheelPaint;
     private Paint valueSliderPaint;

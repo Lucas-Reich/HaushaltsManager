@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.lucas.haushaltsmanager.Entities.Reports.MonthlyReport;
+import com.example.lucas.haushaltsmanager.Entities.Reports.Month;
 import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
 import com.lucas.androidcharts.DataSet;
 import com.lucas.androidcharts.PieChart;
@@ -24,7 +24,7 @@ import java.util.Locale;
 public class MonthlyReportAdapter extends RecyclerView.Adapter<MonthlyReportAdapter.ViewHolder> {
 
     private Context mContext;
-    private List<MonthlyReport> mReports;
+    private List<Month> mReports;
 
     class ViewHolder extends RecyclerView.ViewHolder {
         TextView month, inbound, outbound, total, accountCurrency, stressedCategory, totalBookings;
@@ -47,7 +47,7 @@ public class MonthlyReportAdapter extends RecyclerView.Adapter<MonthlyReportAdap
         }
     }
 
-    MonthlyReportAdapter(Context context, List<MonthlyReport> reports) {
+    MonthlyReportAdapter(Context context, List<Month> reports) {
         mContext = context;
         mReports = reports;
     }
@@ -60,7 +60,7 @@ public class MonthlyReportAdapter extends RecyclerView.Adapter<MonthlyReportAdap
     }
 
     public void onBindViewHolder(final ViewHolder viewHolder, int position) {
-        MonthlyReport report = mReports.get(position);
+        Month report = mReports.get(position);
 
         viewHolder.month.setText(getMonth(Integer.parseInt(report.getCardTitle())));
 
@@ -105,7 +105,7 @@ public class MonthlyReportAdapter extends RecyclerView.Adapter<MonthlyReportAdap
      * @param monthlyReport Report, welcher als PieChart dargestellt werden soll
      * @return DataSet's
      */
-    private List<DataSet> preparePieData(MonthlyReport monthlyReport) {
+    private List<DataSet> preparePieData(Month monthlyReport) {
         if (monthlyReport.getBookingCount() == 0)
             return new ArrayList<>();
 

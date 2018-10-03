@@ -21,5 +21,5 @@
 #-keepattributes SourceFile,LineNumberTable
 
 # If you keep the line number information, uncomment this to
-# hide the original source file getName.
+# hideToolbar the original source file getName.
 #-renamesourcefileattribute SourceFile

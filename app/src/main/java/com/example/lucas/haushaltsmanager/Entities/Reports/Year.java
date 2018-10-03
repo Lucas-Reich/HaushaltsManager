@@ -9,12 +9,12 @@ import com.example.lucas.haushaltsmanager.Entities.Reports.ReportInterface;
 
 import java.util.List;
 
-public class YearlyReport implements ReportInterface {
+public class Year implements ReportInterface {
     private String mCardTitle;
     private List<ExpenseObject> mExpenses;
     private Currency mCurrency;
 
-    public YearlyReport(@NonNull String cardTitle, @NonNull List<ExpenseObject> expenses, @NonNull Currency currency) {
+    public Year(@NonNull String cardTitle, @NonNull List<ExpenseObject> expenses, @NonNull Currency currency) {
 
         mCardTitle = cardTitle;
         mExpenses = expenses;

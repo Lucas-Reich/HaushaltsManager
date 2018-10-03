@@ -14,14 +14,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MonthlyReport implements ReportInterface {
+public class Month implements ReportInterface {
 
     private String mCardTitle;
     private List<ExpenseObject> mExpenses;
     private Currency mCurrency;
     private Context mContext;
 
-    public MonthlyReport(@NonNull String cardTitle, @NonNull ArrayList<ExpenseObject> expense, @NonNull Currency currency, Context context) {
+    public Month(@NonNull String cardTitle, @NonNull ArrayList<ExpenseObject> expense, @NonNull Currency currency, Context context) {
 
         mCardTitle = cardTitle;
         mExpenses = expense;

@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
-import com.example.lucas.haushaltsmanager.Entities.Reports.MonthlyReport;
+import com.example.lucas.haushaltsmanager.Entities.Reports.Month;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -15,7 +15,7 @@ public class MonthlyReportAdapterCreator {
 
     private List<ExpenseObject> mExpenses;
     private Context mContext;
-    private List<MonthlyReport> mReports;
+    private List<Month> mReports;
     private List<Long> mActiveAccounts;
 
     public MonthlyReportAdapterCreator(List<ExpenseObject> expenses, Context context, List<Long> activeAccounts) {
@@ -44,7 +44,7 @@ public class MonthlyReportAdapterCreator {
     private void createMonthlyReports() {
 
         for (int i = getCurrentMonth(); i >= 1; i--) {
-            mReports.add(new MonthlyReport(i + "", new ArrayList<ExpenseObject>(), getMainCurrency(), mContext));
+            mReports.add(new Month(i + "", new ArrayList<ExpenseObject>(), getMainCurrency(), mContext));
         }
 
         fillMonthlyReports();
