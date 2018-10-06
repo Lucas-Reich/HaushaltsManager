@@ -11,7 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.example.lucas.haushaltsmanager.ActiveAccountsPreferences;
+import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences;
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
@@ -20,7 +20,7 @@ import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.R;
-import com.example.lucas.haushaltsmanager.UserSettingsPreferences;
+import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 
 public class CreateAccountActivity extends AppCompatActivity {
     private static final String TAG = CreateAccountActivity.class.getSimpleName();

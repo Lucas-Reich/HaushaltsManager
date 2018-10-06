@@ -48,9 +48,9 @@ class FABToolbar {
             mFabToolbar.hide();
     }
 
-    void changeToolbarItemOne(@DrawableRes int icon, String desc, String tag) {
-        ImageView imV = getToolbarMenuItem(icon, desc, getOnMenuItemClickListener());
-        imV.setTag(tag);
+    void changeToolbarItemOne(@DrawableRes int icon, String contentDesc, String actionTag) {
+        ImageView imV = getToolbarMenuItem(icon, contentDesc, getOnMenuItemClickListener());
+        imV.setTag(actionTag);
 
         mFabToolbarToolbar.removeViewAt(CHANGEABLE_OPTION_INDEX);
         mFabToolbarToolbar.addView(imV, CHANGEABLE_OPTION_INDEX);
@@ -59,7 +59,7 @@ class FABToolbar {
     private void populateToolbar() {
         mFabToolbarToolbar.removeAllViews();
 
-        ImageView addChild = getToolbarMenuItem(R.drawable.ic_add_child_white, "", getOnMenuItemClickListener());
+        ImageView addChild = getToolbarMenuItem(R.drawable.ic_add_child_white, "", getOnMenuItemClickListener());// Wenn ich als erstes eine KindBuchung auswähle müsste hier ein extract icon sein
         addChild.setTag(MENU_COMBINE_ACTION);
         mFabToolbarToolbar.addView(addChild, CHANGEABLE_OPTION_INDEX);
 

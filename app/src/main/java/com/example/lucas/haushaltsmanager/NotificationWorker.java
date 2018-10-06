@@ -8,6 +8,7 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
+import com.example.lucas.haushaltsmanager.PreferencesHelper.AppInternalPreferences;
 
 import java.util.Random;
 import java.util.concurrent.TimeUnit;

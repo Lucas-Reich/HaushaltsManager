@@ -50,7 +50,7 @@ import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Tag;
 import com.example.lucas.haushaltsmanager.Entities.Template;
 import com.example.lucas.haushaltsmanager.R;
-import com.example.lucas.haushaltsmanager.UserSettingsPreferences;
+import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 
 import java.text.DateFormat;
 import java.util.Calendar;

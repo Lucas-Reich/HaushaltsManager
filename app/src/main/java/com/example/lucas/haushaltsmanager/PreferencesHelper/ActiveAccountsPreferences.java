@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager;
+package com.example.lucas.haushaltsmanager.PreferencesHelper;
 
 import android.content.Context;
 import android.content.SharedPreferences;

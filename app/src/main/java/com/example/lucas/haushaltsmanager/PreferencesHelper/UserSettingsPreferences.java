@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager;
+package com.example.lucas.haushaltsmanager.PreferencesHelper;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -11,6 +11,7 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.Excep
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Time;
+import com.example.lucas.haushaltsmanager.WeekdayUtils;
 
 public class UserSettingsPreferences {
     private static final String USER_SETTINGS = "UserSettings";
@@ -150,7 +151,7 @@ public class UserSettingsPreferences {
             return mAccountRepo.get(index);
         } catch (AccountNotFoundException e) {
 
-            //todo sollte eigentlich nicht passieren
+            //todo wenn der user noch kein Konto erstellt hat dann wird null zurückgegeben
             return null;
         }
     }

@@ -3,7 +3,7 @@ package com.example.lucas.haushaltsmanager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,46 +23,50 @@ import java.util.List;
 import java.util.Map;
 
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
-    @SuppressWarnings("unused")
     private static final String TAG = ExpandableListAdapter.class.getSimpleName();
 
     private Context mContext;
     private List<ExpenseObject> mGroupData;
     private HashMap<ExpenseObject, List<ExpenseObject>> mChildData;
+    private List<ExpListViewSelectedItem> mSelectedItems = new ArrayList<>();
     private int mRed, mGreen;
 
-    ExpandableListAdapter(Context context, List<ExpenseObject> mGroupData, HashMap<ExpenseObject, List<ExpenseObject>> mChildData) {
+    ExpandableListAdapter(
+            Context context,
+            List<ExpenseObject> groupData,
+            HashMap<ExpenseObject, List<ExpenseObject>> childData
+    ) {
 
-        this.mContext = context;
-        this.mGroupData = mGroupData;
-        this.mChildData = mChildData;
+        mContext = context;
+        mGroupData = groupData;
+        mChildData = childData;
 
-        this.mRed = context.getResources().getColor(R.color.booking_expense);
-        this.mGreen = context.getResources().getColor(R.color.booking_income);
+        mRed = context.getResources().getColor(R.color.booking_expense);
+        mGreen = context.getResources().getColor(R.color.booking_income);
     }
 
     @Override
     public int getGroupCount() {
 
-        return this.mGroupData.size();
+        return mGroupData.size();
     }
 
     @Override
     public int getChildrenCount(int groupPosition) {
 
-        return this.mChildData.get(this.mGroupData.get(groupPosition)).size();
+        return mChildData.get(mGroupData.get(groupPosition)).size();
     }
 
     @Override
     public Object getGroup(int groupPosition) {
 
-        return this.mGroupData.get(groupPosition);
+        return mGroupData.get(groupPosition);
     }
 
     @Override
     public Object getChild(int groupPosition, int childPosition) {
 
-        return this.mChildData.get(this.mGroupData.get(groupPosition)).get(childPosition);
+        return mChildData.get(mGroupData.get(groupPosition)).get(childPosition);
     }
 
     @Override
@@ -85,18 +89,18 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
-
         ExpenseObject groupExpense = (ExpenseObject) getGroup(groupPosition);
-        LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        boolean isSelected = isBookingSelected(groupPosition, null);
+        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        boolean isSelected = isItemSelected(groupPosition, -1);
 
         switch (groupExpense.getExpenseType()) {
 
             case PARENT_EXPENSE:
 
-                convertView = inflater.inflate(R.layout.activity_exp_listview_parent, null);
+                convertView = inflater.inflate(R.layout.activity_exp_listview_parent, parent, false);
                 if (isExpanded)
                     convertView.findViewById(R.id.exp_listview_paren_divider).setVisibility(View.GONE);
+
                 if (isSelected)
                     convertView.setBackgroundColor(mContext.getResources().getColor(R.color.highlighted_item_color));
 
@@ -116,14 +120,14 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 break;
             case DATE_PLACEHOLDER:
 
-                convertView = inflater.inflate(R.layout.activity_exp_listview_date, null);
+                convertView = inflater.inflate(R.layout.activity_exp_listview_date, parent, false);
 
                 TextView date = convertView.findViewById(R.id.exp_listview_sep_header_date);
                 date.setText(groupExpense.getDate());
                 break;
             case NORMAL_EXPENSE:
 
-                convertView = inflater.inflate(R.layout.activity_exp_listview_group, null);
+                convertView = inflater.inflate(R.layout.activity_exp_listview_group, parent, false);
                 if (isSelected)
                     convertView.setBackgroundColor(mContext.getResources().getColor(R.color.highlighted_item_color));
 
@@ -154,7 +158,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             case TRANSFER_EXPENSE:
 
                 //todo eigenes layout für tramsfer mExpenses definieren
-                convertView = inflater.inflate(R.layout.activity_exp_listview_group, null);
+                convertView = inflater.inflate(R.layout.activity_exp_listview_group, parent, false);
                 if (isSelected)
                     convertView.setBackgroundColor(mContext.getResources().getColor(R.color.highlighted_item_color));
 
@@ -190,7 +194,6 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
      * @return DataSets
      */
     private List<DataSet> preparePieData(List<ExpenseObject> expenses) {
-
         List<DataSet> dataSets = new ArrayList<>();
         Map<Category, Integer> summedCategories = new HashMap<>();
 
@@ -236,7 +239,6 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-
         ExpenseObject childExpense = (ExpenseObject) getChild(groupPosition, childPosition);
         ChildViewHolder childViewHolder;
 
@@ -244,7 +246,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
             childViewHolder = new ChildViewHolder();
             LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.activity_exp_listview_child, null);
+            convertView = inflater.inflate(R.layout.activity_exp_listview_child, parent, false);
 
             childViewHolder.roundedTextView = convertView.findViewById(R.id.exp_list_view_item_circle);
             childViewHolder.txtTitle = convertView.findViewById(R.id.exp_list_view_item_title);
@@ -257,6 +259,11 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
             childViewHolder = (ChildViewHolder) convertView.getTag();
         }
+
+        if (isItemSelected(groupPosition, childPosition))
+            convertView.setBackgroundColor(mContext.getResources().getColor(R.color.highlighted_item_color));
+        else
+            convertView.setBackgroundColor(Color.WHITE);
 
 
         String category = childExpense.getCategory().getTitle();
@@ -278,156 +285,84 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public boolean isChildSelectable(int groupPosition, int childPosition) {
-
         return true;
     }
 
-    private HashMap<ExpenseObject, List<ExpenseObject>> mSelectedBookings = new HashMap<>();
-    private int selectedGroups = 0;
-    private int selectedChildren = 0;
-    private int selectedParents = 0;
+    public void selectItem(int groupPosition, int childPosition) {
+        Log.i(TAG, "Selecting item at position " + groupPosition + " " + childPosition);
 
-    public void selectItem(int groupId, @Nullable Integer childId) {
+        mSelectedItems.add(positionToSelectedItem(
+                groupPosition,
+                childPosition
+        ));
 
-        selectBooking(groupId, childId);
         notifyDataSetChanged();
     }
 
-    public void deselectItem(int groupId, @Nullable Integer childId) {
+    public void unselectItem(int groupPosition, int childPosition) {
+        Log.i(TAG, "Unselecting item at position " + groupPosition + " " + childPosition);
 
-        deselectBooking(groupId, childId);
+        mSelectedItems.remove(positionToSelectedItem(
+                groupPosition,
+                childPosition
+        ));
+
         notifyDataSetChanged();
-        //kann ich die view auch irgendwie anders bekommen?
-        //kann ich das auch durch das passen der View erledigen
     }
 
-    public boolean isItemSelected(int groupId, @Nullable Integer childId) {
-        return isBookingSelected(groupId, childId);
+    public boolean isItemSelected(int groupPosition, int childPosition) {
+        Log.i(TAG, "Checking if item " + groupPosition + " " + childPosition + " is selected");
+
+        return mSelectedItems.contains(positionToSelectedItem(
+                groupPosition,
+                childPosition
+        ));
     }
 
-    /**
-     * Methode um die angegebenen Buchung in die Liste der ausgwählten Buchungenzu schreiben.
-     *
-     * @param groupPosition Position der Gruppe
-     * @param childPosition Position des Kindes oder NULL, wenn eine Groupbuchung ausgewählt wurde
-     */
-    private void selectBooking(int groupPosition, @Nullable Integer childPosition) {
-        ExpenseObject group = (ExpenseObject) getGroup(groupPosition);
-        List<ExpenseObject> existingChildren = mChildData.get(group);
-
-        if (childPosition != null) {
-            ExpenseObject child = (ExpenseObject) getChild(groupPosition, childPosition);
-            List<ExpenseObject> children = new ArrayList<>();
-            children.add(child);
-
-            if (mSelectedBookings.containsKey(group)) {
-
-                List<ExpenseObject> children2 = mSelectedBookings.get(group);
-                children2.add(child);
-                mSelectedBookings.put(group, children2);
-            } else {
-                mSelectedBookings.put(group, children);
-            }
-            selectedChildren++;
-        } else {
-            if (group.isParent()) {
-                mSelectedBookings.put(group, existingChildren);
-                selectedParents++;
-            } else {
-
-                mSelectedBookings.put(group, new ArrayList<ExpenseObject>());
-                selectedGroups++;
-            }
-        }
-    }
-
-    /**
-     * Methode um eine Buchung aus der Liste der ausgewählten Buchungen zu entfernen.
-     *
-     * @param groupPosition Position der Gruppe
-     * @param childPosition Position des Kindes oder NULL, wenn eine Groupbuchung ausgewählt wurde
-     */
-    private void deselectBooking(int groupPosition, @Nullable Integer childPosition) {
+    private ExpListViewSelectedItem positionToSelectedItem(int groupPosition, int childPosition) {
         ExpenseObject group = (ExpenseObject) getGroup(groupPosition);
 
-        if (childPosition != null) {
-
-            ExpenseObject child = (ExpenseObject) getChild(groupPosition, childPosition);
-            List<ExpenseObject> children = mSelectedBookings.get(group);
-            children.remove(child);
-            if (children.size() == 0) {
-                mSelectedBookings.remove(group);
-            } else {
-                mSelectedBookings.put(group, children);
-            }
-            selectedChildren--;
-        } else {
-            mSelectedBookings.remove(group);
-
-            if (mChildData.get(group).size() != 0) {
-                selectedParents--;
-            } else {
-                selectedGroups--;
-            }
-        }
+        if (-1 == childPosition)
+            return new ExpListViewSelectedItem(
+                    group,
+                    null
+            );
+        else
+            return new ExpListViewSelectedItem(
+                    (ExpenseObject) getChild(groupPosition, childPosition),
+                    group
+            );
     }
 
-    /**
-     * Methode um herauszufinden ob die angegebene Buchung bereits ausgewählt ist.
-     *
-     * @param groupPosition Position der Gruppe
-     * @param childPosition Position des Kindes oder NULL, wenn eine Groupbuchung ausgewählt wuerde
-     * @return TRUE wenn die Buchung ausgewählt ist, FALSE wenn nicht
-     */
-    private boolean isBookingSelected(int groupPosition, @Nullable Integer childPosition) {
-        ExpenseObject group = (ExpenseObject) getGroup(groupPosition);
-
-        if (!mSelectedBookings.containsKey(group)) {
-            return false;
+    public int getSelectedGroupsCount() {
+        int counter = 0;
+        for (ExpListViewSelectedItem item : mSelectedItems) {
+            if (item.isParent())
+                counter++;
         }
 
-        if (childPosition != null) {
-            ExpenseObject child = (ExpenseObject) getChild(groupPosition, childPosition);
+        return counter;
+    }
 
-            return mSelectedBookings.get(group).contains(child);
-        } else {
-
-            return true;
+    public int getSelectedChildrenCount() {
+        int counter = 0;
+        for (ExpListViewSelectedItem item : mSelectedItems) {
+            if (!item.isParent())
+                counter++;
         }
+
+        return counter;
     }
 
-    /**
-     * Methode um alle ausgewählten Buchungen abzufragen.
-     *
-     * @return Ausgewählte Buchugen
-     */
-    public HashMap<ExpenseObject, List<ExpenseObject>> getSelectedBookings() {
-        return mSelectedBookings;
+    public int getSelectedItemCount() {
+        return mSelectedItems.size();
     }
 
-    /**
-     * Methode um alle ausgewählten Buchugen abzuwählen
-     */
-    public void deselectAll() {
-        selectedGroups = 0;
-        selectedChildren = 0;
-        selectedParents = 0;
-        mSelectedBookings.clear();
+    public List<ExpListViewSelectedItem> getSelectedItems() {
+        return mSelectedItems;
     }
 
-    public int getSelectedBookingsCount() {
-        return selectedGroups + selectedChildren + selectedParents;
-    }
-
-    public int getSelectedGroupCount() {
-        return selectedGroups;
-    }
-
-    public int getSelectedChildCount() {
-        return selectedChildren;
-    }
-
-    public int getSelectedParentCount() {
-        return selectedParents;
+    public void unselectAll() {
+        mSelectedItems.clear();
     }
 }

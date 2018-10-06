@@ -398,35 +398,31 @@ public class ExpenseObject implements Parcelable {
 
     @Override
     public boolean equals(Object obj) {
-
-        if (obj instanceof ExpenseObject) {
-
-            ExpenseObject otherExpense = (ExpenseObject) obj;
-
-            boolean result = getTitle().equals(otherExpense.getTitle());
-            result = result && (getUnsignedPrice() == otherExpense.getUnsignedPrice());
-            result = result && getAccountId() == otherExpense.getAccountId();
-            result = result && getExpenseType().equals(otherExpense.getExpenseType());
-            result = result && getDateTime().getTimeInMillis() == otherExpense.getDateTime().getTimeInMillis();
-            result = result && getNotice().equals(otherExpense.getNotice());
-            result = result && getCategory().getIndex() == otherExpense.getCategory().getIndex();//ich kann die objekte nicht vergleichen da parent buchungen nur dummies bekommen
-            result = result && getCurrency().getIndex() == otherExpense.getCurrency().getIndex();//ich kann die objekte nicht vergleichen da parent buchungen nur dummies bekommen
-
-            for (Tag tag : getTags()) {
-                for (Tag otherTag : otherExpense.getTags()) {
-                    result = result && tag.equals(otherTag);
-                }
-            }
-
-            for (ExpenseObject child : getChildren()) {
-                result = result && otherExpense.getChildren().contains(child);
-            }
-
-            return result;
-        } else {
-
+        if (!(obj instanceof ExpenseObject))
             return false;
+
+        ExpenseObject otherExpense = (ExpenseObject) obj;
+
+        boolean result = getTitle().equals(otherExpense.getTitle());
+        result = result && (getUnsignedPrice() == otherExpense.getUnsignedPrice());
+        result = result && getAccountId() == otherExpense.getAccountId();
+        result = result && getExpenseType().equals(otherExpense.getExpenseType());
+        result = result && getDateTime().getTimeInMillis() == otherExpense.getDateTime().getTimeInMillis();
+        result = result && getNotice().equals(otherExpense.getNotice());
+        result = result && getCategory().getIndex() == otherExpense.getCategory().getIndex();//ich kann die objekte nicht vergleichen da parent buchungen nur dummies bekommen
+        result = result && getCurrency().getIndex() == otherExpense.getCurrency().getIndex();//ich kann die objekte nicht vergleichen da parent buchungen nur dummies bekommen
+
+        for (Tag tag : getTags()) {
+            for (Tag otherTag : otherExpense.getTags()) {
+                result = result && tag.equals(otherTag);
+            }
         }
+
+        for (ExpenseObject child : getChildren()) {
+            result = result && otherExpense.getChildren().contains(child);
+        }
+
+        return result;
     }
 
     @Override
