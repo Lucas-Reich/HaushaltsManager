@@ -6,4 +6,9 @@
     <option name="SHOW_NOTIFICATION_AFTER_OPTIMIZE_IMPORTS_ACTION" value="false" />
     <option name="SHOW_PARAMETER_NAME_HINTS" value="false" />
   </component>
+  <component name="TodoConfiguration">
+    <pattern pattern="\btodo\b.*" />
+    <pattern pattern="\bfixme\b.*" />
+    <pattern pattern="\bcleanup\b.*" />
+  </component>
 </application>
