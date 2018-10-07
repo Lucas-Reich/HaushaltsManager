@@ -20,7 +20,7 @@ public class Template implements Parcelable {
         this(-1, template);
     }
 
-    public Template(Parcel source) {
+    private Template(Parcel source) {
         Log.v(TAG, "Recreating Template from parcel data");
 
         setIndex(source.readLong());
@@ -67,8 +67,8 @@ public class Template implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-
         Log.v(TAG, "Writing Template to parcel " + flags);
+
         dest.writeLong(getIndex());
         dest.writeParcelable(getTemplate(), flags);
     }

@@ -5,7 +5,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,16 +14,18 @@ import android.widget.AdapterView;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
 
+import com.example.lucas.haushaltsmanager.Activities.CreateRecurringBooking;
 import com.example.lucas.haushaltsmanager.Activities.ExpenseScreen;
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.CannotDeleteExpenseException;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.CannotDeleteChildExpenseException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.ChildExpenseNotFoundException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Templates.TemplateRepository;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Template;
 import com.example.lucas.haushaltsmanager.ExpListViewSelectedItem;
 import com.example.lucas.haushaltsmanager.ExpandableListAdapter;
 import com.example.lucas.haushaltsmanager.ExpandableListAdapterCreator;
@@ -33,9 +34,7 @@ import com.example.lucas.haushaltsmanager.R;
 import com.github.fafaldo.fabtoolbar.widget.FABToolbarLayout;
 
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class TabOneBookings extends Fragment implements FABToolbar.OnFabToolbarMenuItemClicked {
     private static final String TAG = TabOneBookings.class.getSimpleName();
@@ -44,9 +43,10 @@ public class TabOneBookings extends Fragment implements FABToolbar.OnFabToolbarM
     private ExpandableListView mExpListView;
     private ParentActivity mParent;
     private UserSettingsPreferences mUserSettings;
+    private RevertExpenseDeletionSnackbar mRevertDeletionSnackbar;
 
     private ChildExpenseRepository mChildExpenseRepo;
-    private ExpenseRepository mExpensesRepo;
+    private ExpenseRepository mExpenseRepo;
 
     private FABToolbar mTabOneFabToolbar;
 
@@ -59,12 +59,12 @@ public class TabOneBookings extends Fragment implements FABToolbar.OnFabToolbarM
         mUserSettings = new UserSettingsPreferences(getContext());
 
         mChildExpenseRepo = new ChildExpenseRepository(getContext());
-        mExpensesRepo = new ExpenseRepository(getContext());
+        mExpenseRepo = new ExpenseRepository(getContext());
     }
 
     /**
      * https://www.captechconsulting.com/blogs/android-expandablelistview-magic
-     * Anleitung um eine ExpandableListView ohne indicators zu machen
+     * Anleitung um eine ExpandableListView ohne Indikatoren zu machen
      */
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstances) {
         View rootView = inflater.inflate(R.layout.tab_one_bookings, container, false);
@@ -90,31 +90,29 @@ public class TabOneBookings extends Fragment implements FABToolbar.OnFabToolbarM
         return rootView;
     }
 
-    /**
-     * Methode um einen LongClickListener auf die ExpandableListView zu setzen.
-     */
     private void setOnItemLongClickListener() {
         mExpListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                //FIXME: wenn ich ein DateSep auswähle dann wird dieser markiert und er ruft die fabToolbar auf
+                int groupPosition = ExpandableListView.getPackedPositionGroup(id);
+                int childPosition = ExpandableListView.getPackedPositionChild(id);
+
+                if (isDateSep((ExpenseObject) mListAdapter.getGroup(groupPosition)))
+                    return true;
+
                 mListAdapter.selectItem(
-                        ExpandableListView.getPackedPositionGroup(id),
-                        ExpandableListView.getPackedPositionChild(id)
+                        groupPosition,
+                        childPosition
                 );
 
                 disableListViewLongClick();
 
                 mTabOneFabToolbar.showToolbar();
 
-                //todo
-                //Ich muss direkt nach dem öffnen der FabToolbar das ersteItem updaten, da ich nicht weiß welches ListViewItem (Child, Parent, Group) der user angeklickt hat
-                // wenn ich das nicht machen würde dann kann es sein, dass der user ein childElement anwählt, aber kein extract button angezeigt wird
-                // allerdings wird das erste Element so auch nicht mehr animiert wenn die Toolbar geöffnet wird
                 updateToolbarItemOne(
-                        mListAdapter.getSelectedChildrenCount(),
-                        mListAdapter.getSelectedGroupsCount()
+                        mListAdapter.getSelectedGroupsCount(),
+                        mListAdapter.getSelectedChildrenCount()
                 );
 
                 return true;
@@ -122,9 +120,6 @@ public class TabOneBookings extends Fragment implements FABToolbar.OnFabToolbarM
         });
     }
 
-    /**
-     * Methode um einen GroupClickListener auf die ExpandableListView zu setzen.
-     */
     private void setOnGroupClickListener() {
         mExpListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
 
@@ -158,8 +153,8 @@ public class TabOneBookings extends Fragment implements FABToolbar.OnFabToolbarM
                             mListAdapter.selectItem(groupPosition, -1);
 
                         updateToolbarItemOne(
-                                mListAdapter.getSelectedChildrenCount(),
-                                mListAdapter.getSelectedGroupsCount()
+                                mListAdapter.getSelectedGroupsCount(),
+                                mListAdapter.getSelectedChildrenCount()
                         );
                         return groupExpense.getExpenseType() != ExpenseObject.EXPENSE_TYPES.PARENT_EXPENSE;
                     default:
@@ -169,9 +164,6 @@ public class TabOneBookings extends Fragment implements FABToolbar.OnFabToolbarM
         });
     }
 
-    /**
-     * Methode um einen ChildClickListener auf die ExpandableListView zu setzen.
-     */
     private void setOnChildClickListener() {
         mExpListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
 
@@ -199,8 +191,8 @@ public class TabOneBookings extends Fragment implements FABToolbar.OnFabToolbarM
                     mListAdapter.selectItem(groupPosition, childPosition);
 
                 updateToolbarItemOne(
-                        mListAdapter.getSelectedChildrenCount(),
-                        mListAdapter.getSelectedGroupsCount()
+                        mListAdapter.getSelectedGroupsCount(),
+                        mListAdapter.getSelectedChildrenCount()
                 );
                 return true;
             }
@@ -231,9 +223,6 @@ public class TabOneBookings extends Fragment implements FABToolbar.OnFabToolbarM
         mExpListView.setLongClickable(true);
     }
 
-    /**
-     * Methode um die ListView in ihren Ausgangszustand zurückzusetzen.
-     */
     private void resetListView() {
         mListAdapter.unselectAll();
 
@@ -242,9 +231,6 @@ public class TabOneBookings extends Fragment implements FABToolbar.OnFabToolbarM
         enableListViewLongClick();
     }
 
-    /**
-     * Methode um die ExpandableListView nach einer Änderung neu anzuzeigen.
-     */
     public void updateListView() {
 
         mListAdapter = new ExpandableListAdapterCreator(
@@ -276,26 +262,34 @@ public class TabOneBookings extends Fragment implements FABToolbar.OnFabToolbarM
         return lastOfMonth;
     }
 
-    private void updateToolbarItemOne(int selectedParents, int selectedChildren) {
+    private void updateToolbarItemOne(int selectedParentCount, int selectedChildCount) {
+
+        if (selectedChildCount + selectedParentCount > 1) {
+            mTabOneFabToolbar.hideAction(FABToolbar.MENU_TEMPLATE_ACTION);
+            mTabOneFabToolbar.hideAction(FABToolbar.MENU_RECURRING_ACTION);
+        } else {
+            mTabOneFabToolbar.showAction(FABToolbar.MENU_TEMPLATE_ACTION);
+            mTabOneFabToolbar.showAction(FABToolbar.MENU_RECURRING_ACTION);
+        }
 
         //Wenn keine Buchung ausgewählt ist dann soll der FAB angezeigt werden
-        if (selectedParents == 0 && selectedChildren == 0)
+        if (selectedParentCount == 0 && selectedChildCount == 0)
             mTabOneFabToolbar.hideToolbar();
 
         //Wenn eine Buchung ausgewählt ist soll der ADD_CHILD Button angezeigt werden
-        if (selectedParents == 1 && selectedChildren == 0)
+        if (selectedParentCount == 1 && selectedChildCount == 0)
             mTabOneFabToolbar.changeToolbarItemOne(R.drawable.ic_add_child_white, "", FABToolbar.MENU_ADD_CHILD_ACTION);
 
         //Wenn mind. zwei Buchungen ausgewählt sind soll der MERGE Button angezeigt werden
-        if (selectedParents > 1 && selectedChildren == 0)
+        if (selectedParentCount > 1 && selectedChildCount == 0)
             mTabOneFabToolbar.changeToolbarItemOne(R.drawable.ic_merge_bookings_white, "", FABToolbar.MENU_COMBINE_ACTION);
 
         //Wenn mind. eine Buchung und mind. ein Parent ausgewählt ist soll der MERGE Button angezeigt werden
-        if (selectedParents >= 1 && selectedChildren >= 1)
+        if (selectedParentCount >= 1 && selectedChildCount >= 1)
             mTabOneFabToolbar.changeToolbarItemOne(R.drawable.ic_merge_bookings_white, "", FABToolbar.MENU_COMBINE_ACTION);
 
         //Wenn mind. ein Kind ausgewählt ist soll der EXTRACT Button angezeigt werden
-        if (selectedParents == 0 && selectedChildren >= 1)
+        if (selectedParentCount == 0 && selectedChildCount >= 1)
             mTabOneFabToolbar.changeToolbarItemOne(R.drawable.ic_extract_child_white, "", FABToolbar.MENU_EXTRACT_ACTION);
     }
 
@@ -308,36 +302,35 @@ public class TabOneBookings extends Fragment implements FABToolbar.OnFabToolbarM
 
         Intent createExpenseIntent = new Intent(getContext(), ExpenseScreen.class);
         createExpenseIntent.putExtra(ExpenseScreen.INTENT_MODE, ExpenseScreen.INTENT_MODE_CREATE_BOOKING);
-        getContext().startActivity(createExpenseIntent);
+        startActivity(createExpenseIntent);
     }
 
     @Override
     public void onFabToolbarMenuItemClicked(String actionTag) {
-        HashMap<ExpenseObject, List<ExpenseObject>> selectedBookings = new HashMap<>();
-        List<ExpListViewSelectedItem> selectedItems = mListAdapter.getSelectedItems(); //todo use SelectedItem List instead of HashMap
+        List<ExpListViewSelectedItem> selectedItems = mListAdapter.getSelectedItems();
 
         switch (actionTag) {
             case FABToolbar.MENU_COMBINE_ACTION:
-                combineBookingsAction();
+                combineBookingsAction(selectedItems);
                 break;
             case FABToolbar.MENU_EXTRACT_ACTION:
-                extractBookingsAction(selectedBookings);
+                extractBookingsAction(selectedItems);
                 break;
             case FABToolbar.MENU_ADD_CHILD_ACTION:
-                addChildAction((ExpenseObject) selectedBookings.keySet().toArray()[0]);
+                addChildAction(selectedItems.get(0).getItem());
+                break;
             case FABToolbar.MENU_RECURRING_ACTION:
-                saveAsRecurringAction();
+                saveAsRecurringAction(selectedItems.get(0).getItem());
                 break;
             case FABToolbar.MENU_TEMPLATE_ACTION:
-                saveAsTemplateAction();
+                saveAsTemplateAction(selectedItems.get(0).getItem());
                 break;
             case FABToolbar.MENU_DELETE_ACTION:
-                deleteBookingsAction(selectedBookings);
-                showRevertDeletionSnackbar(
-                        selectedBookings,
+                initializeRevertDeletionSnackbar(
                         R.string.revert_deletion,
                         R.string.bookings_successfully_restored
                 );
+                deleteBookingsAction(selectedItems);
                 break;
             default:
                 Log.e(TAG, "Found not existing Menu item " + actionTag);
@@ -346,31 +339,40 @@ public class TabOneBookings extends Fragment implements FABToolbar.OnFabToolbarM
         }
     }
 
-    private void combineBookingsAction() {
+    private void combineBookingsAction(final List<ExpListViewSelectedItem> selectedItems) {
         Bundle bundle = new Bundle();
-        bundle.putString(BasicTextInputDialog.TITLE, getResources().getString(R.string.input_title));
+        bundle.putString(BasicTextInputDialog.TITLE, getString(R.string.input_title));
 
         BasicTextInputDialog textInputDialog = new BasicTextInputDialog();
         textInputDialog.setArguments(bundle);
-        textInputDialog.setOnTextInputListener(new BasicTextInputDialog.OnTextInput() {
+        textInputDialog.setOnTextInputListener(getOnTextInputListener(selectedItems));
+        textInputDialog.show(getActivity().getFragmentManager(), "");
+    }
 
+    private BasicTextInputDialog.OnTextInput getOnTextInputListener(final List<ExpListViewSelectedItem> selectedItems) {
+        return new BasicTextInputDialog.OnTextInput() {
             @Override
-            public void onTextInput(String title) {
-//                ExpenseObject parentBooking = mChildExpenseRepo.combineExpenses(getSelectedBookings(mListAdapter.getSelectedBookings()));//todo replace function
-                ExpenseObject parentBooking = ExpenseObject.createDummyExpense(); //todo Die getSelectedItems methode benutzen
+            public void onTextInput(String textInput) {
+                ExpenseObject parent = ExpenseObject.createDummyExpense();
 
+                for (ExpListViewSelectedItem selectedItem : selectedItems) {
+                    try {
+                        if (selectedItem.isParent())
+                            mExpenseRepo.delete(selectedItem.getItem());
+                        else
+                            mChildExpenseRepo.delete(selectedItem.getItem());
 
-                try {
-                    parentBooking.setTitle(title);
-                    mExpensesRepo.update(parentBooking);
+                        parent.addChild(selectedItem.getItem());
+                    } catch (CannotDeleteChildExpenseException e) {
 
-                    mParent.updateExpenses();
-                } catch (ExpenseNotFoundException e) {
+                        Log.e(TAG, "Could not delete ChildExpense " + selectedItem.getItem().getTitle());
+                    } catch (CannotDeleteExpenseException e) {
 
-                    Log.e(TAG, getString(R.string.could_not_update_booking), e);
-                    Toast.makeText(getContext(), R.string.could_not_update_booking, Toast.LENGTH_SHORT).show();
-                    //todo fehlerbehandlung
+                        Log.e(TAG, "Could not delete Expense " + selectedItem.getItem().getTitle());
+                    }
                 }
+
+                mExpenseRepo.insert(parent);
 
                 mParent.updateExpenses();
 
@@ -378,19 +380,51 @@ public class TabOneBookings extends Fragment implements FABToolbar.OnFabToolbarM
 
                 mTabOneFabToolbar.hideToolbar();
             }
-        });
-
-        textInputDialog.show(getActivity().getFragmentManager(), "");
+        };
     }
 
-    private void extractBookingsAction(HashMap<ExpenseObject, List<ExpenseObject>> expenses) {
-        for (Map.Entry<ExpenseObject, List<ExpenseObject>> bookings : expenses.entrySet()) {
-            for (ExpenseObject child : bookings.getValue()) {
-                try {
-                    mChildExpenseRepo.extractChildFromBooking(child);
-                } catch (ChildExpenseNotFoundException e) {
-                    //todo was soll passieren wenn eine KindBuchung nicht in der Datenbank gefunden werden konnte
-                }
+    private void addChildAction(ExpenseObject parentExpense) {
+        Intent createChildToBookingIntent = new Intent(getContext(), ExpenseScreen.class);
+        createChildToBookingIntent.putExtra(ExpenseScreen.INTENT_MODE, ExpenseScreen.INTENT_MODE_ADD_CHILD);
+        createChildToBookingIntent.putExtra(ExpenseScreen.INTENT_BOOKING, parentExpense);
+
+        resetListView();
+
+        mTabOneFabToolbar.hideToolbar();
+
+        startActivity(createChildToBookingIntent);
+    }
+
+    private void saveAsRecurringAction(ExpenseObject recurringExpense) {
+        Intent recurringIntent = new Intent(getContext(), CreateRecurringBooking.class);
+        recurringIntent.putExtra(CreateRecurringBooking.INTENT_BOOKING, recurringExpense);
+
+        resetListView();
+
+        mTabOneFabToolbar.hideToolbar();
+
+        startActivity(recurringIntent);
+    }
+
+    private void saveAsTemplateAction(ExpenseObject templateExpense) {
+        TemplateRepository templateRepo = new TemplateRepository(getContext());
+        templateRepo.insert(new Template(templateExpense));
+
+        Toast.makeText(getContext(), R.string.saved_as_template, Toast.LENGTH_SHORT).show();
+
+        resetListView();
+
+        mTabOneFabToolbar.hideToolbar();
+    }
+
+    private void extractBookingsAction(List<ExpListViewSelectedItem> selectedItems) {
+        for (ExpListViewSelectedItem selectedItem : selectedItems) {
+            try {
+
+                mChildExpenseRepo.extractChildFromBooking(selectedItem.getItem());
+            } catch (ChildExpenseNotFoundException e) {
+
+                Log.e(TAG, "Could not extract ChildExpense " + selectedItem.getItem().getTitle(), e);
             }
         }
 
@@ -401,63 +435,42 @@ public class TabOneBookings extends Fragment implements FABToolbar.OnFabToolbarM
         mTabOneFabToolbar.hideToolbar();
     }
 
-    private void addChildAction(ExpenseObject parent) {
-        Intent createChildToBookingIntent = new Intent(getContext(), ExpenseScreen.class);
-        createChildToBookingIntent.putExtra(ExpenseScreen.INTENT_MODE, ExpenseScreen.INTENT_MODE_ADD_CHILD);
-        createChildToBookingIntent.putExtra(ExpenseScreen.INTENT_BOOKING, parent);
+    private void deleteBookingsAction(List<ExpListViewSelectedItem> selectedItems) {
+        for (ExpListViewSelectedItem selectedItem : selectedItems) {
+            try {
+                if (selectedItem.isParent())
+                    mExpenseRepo.delete(selectedItem.getItem());
+                else
+                    mChildExpenseRepo.delete(selectedItem.getItem());
+
+                mRevertDeletionSnackbar.addItem(selectedItem);
+
+            } catch (CannotDeleteExpenseException e) {
+
+                //todo was soll ich machen wenn eine Buchung nicht gelöscht werden konnte
+                Log.e(TAG, "Could not delete Expense " + selectedItem.getItem().getTitle(), e);
+            } catch (CannotDeleteChildExpenseException e) {
+
+                //todo was soll ich machen wenn eine KindBuchung nicht gelöscht werden konnte
+                Log.e(TAG, "Could not delete ChildExpense " + selectedItem.getItem().getTitle(), e);
+            }
+        }
+
+        mRevertDeletionSnackbar.showSnackbar(
+                getView().findViewById(R.id.tab_one_bookings_layout)
+        );
+
+        mParent.updateExpenses();
 
         resetListView();
 
         mTabOneFabToolbar.hideToolbar();
-
-        getContext().startActivity(createChildToBookingIntent);
     }
 
-    private void saveAsTemplateAction() {
-        //todo wenn mehr als eine Buchung markiert sind dann soll der template button versteckt werden
-
-        Toast.makeText(getContext(), R.string.not_implemented, Toast.LENGTH_SHORT).show();
-    }
-
-    private void saveAsRecurringAction() {
-        //todo wenn mehr als eine Buchung markiert ist dann soll der recurring button versteckt werden
-        //todo zeige einen alert dialog an welcher den user nach den zeiträumen fragt
-
-        Toast.makeText(getContext(), R.string.not_implemented, Toast.LENGTH_SHORT).show();
-    }
-
-    private void deleteBookingsAction(HashMap<ExpenseObject, List<ExpenseObject>> bookings) {
-        for (Map.Entry<ExpenseObject, List<ExpenseObject>> booking : bookings.entrySet()) {
-            if (booking.getValue().size() != 0) {
-                for (ExpenseObject child : booking.getValue()) {
-                    try {
-                        mChildExpenseRepo.delete(child);
-                    } catch (CannotDeleteChildExpenseException e) {
-                        //todo was soll ich machen wenn ein kind nicht gelöscht werden konnte
-                    }
-                }
-            } else {
-                try {
-                    mExpensesRepo.delete(booking.getKey());
-                } catch (CannotDeleteExpenseException e) {
-                    //todo was soll ich machen wenn ich eine group buchung nicht gelöscht werden konnte
-                }
-            }
-        }
-    }
-
-    /**
-     * Methode um eine Snackbar anzuzeigen.
-     *
-     * @param bookings       Buchungen die gelöscht wurden
-     * @param message        Nachricht die in der Snackbar angezeigt werden soll
-     * @param successMessage Nachricht die angezeigt wird wenn alles erfolgreich bearbeitet wurde
-     */
-    private void showRevertDeletionSnackbar(HashMap<ExpenseObject, List<ExpenseObject>> bookings, @StringRes int message, @StringRes final int successMessage) {
-        CoordinatorLayout coordinatorLayout = getView().findViewById(R.id.tab_one_bookings_layout);
-
-        RevertExpenseDeletionSnackbar snackbar = new RevertExpenseDeletionSnackbar(bookings, getContext());
-        snackbar.setOnRestoredActionListener(new RevertExpenseDeletionSnackbar.OnRestoredActionListener() {
+    private void initializeRevertDeletionSnackbar(@StringRes int message, @StringRes final int successMessage) {
+        mRevertDeletionSnackbar = new RevertExpenseDeletionSnackbar(getContext());
+        mRevertDeletionSnackbar.setMessage(getString(message));
+        mRevertDeletionSnackbar.setOnRestoredActionListener(new RevertExpenseDeletionSnackbar.OnRestoredActionListener() {
             @Override
             public void onExpensesRestored() {
                 Toast.makeText(getContext(), successMessage, Toast.LENGTH_SHORT).show();
@@ -467,7 +480,6 @@ public class TabOneBookings extends Fragment implements FABToolbar.OnFabToolbarM
                 updateListView();
             }
         });
-        snackbar.showSnackbar(coordinatorLayout, getString(message));
     }
 
     /**
@@ -480,11 +492,7 @@ public class TabOneBookings extends Fragment implements FABToolbar.OnFabToolbarM
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
 
-        if (this.isVisible()) {
-            if (isVisibleToUser) {
-                updateListView();
-                //todo nur updaten wenn etwas passiert ist
-            }
-        }
+        if (isVisible() && isVisibleToUser)
+            updateListView();
     }
 }

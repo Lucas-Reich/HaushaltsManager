@@ -5,7 +5,6 @@ import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
@@ -18,6 +17,8 @@ import com.example.lucas.haushaltsmanager.Activities.CreateAccountActivity;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.CannotDeleteAccountException;
 import com.example.lucas.haushaltsmanager.Entities.Account;
+import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences;
+import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.util.HashMap;
@@ -31,6 +32,8 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Acco
     private Context mContext;
     private Map<Account, Boolean> mInitialAccountState;
     private AccountRepository mAccountRepo;
+    private ActiveAccountsPreferences mAccountPreferences;
+    private UserSettingsPreferences mUserPreferences;
 
     /**
      * Standart Fragment Methode die genutzt wird, um zu checken ob die aufrufende Activity auch das interface inplementiert.
@@ -54,16 +57,15 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Acco
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SharedPreferences preferences = getActivity().getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);//todo replace sharedPreferences call
-
         mAccountRepo = new AccountRepository(mContext);
+
+        mAccountPreferences = new ActiveAccountsPreferences(mContext, mAccountRepo);
+        mUserPreferences = new UserSettingsPreferences(mContext);
 
         mInitialAccountState = new HashMap<>();
 
-        for (Account account : mAccountRepo.getAll()) {
-
-            mInitialAccountState.put(account, preferences.getBoolean(account.getTitle(), false));
-        }
+        for (Account account : mAccountRepo.getAll())
+            mInitialAccountState.put(account, mAccountPreferences.isActive(account));
     }
 
     @Override
@@ -178,9 +180,7 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Acco
      * @return TRUE wenn es das Hautpkonto ist, FALSE wenn nicht
      */
     private boolean isCurrentMainAccount(Account account) {
-        SharedPreferences preferences = mContext.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
-
-        return account.getIndex() == preferences.getLong("activeAccount", -1);
+        return account.equals(mUserPreferences.getActiveAccount());
     }
 
     /**
@@ -191,8 +191,7 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Acco
     private void deleteAccount(Account account) throws CannotDeleteAccountException {
         mAccountRepo.delete(account);
 
-        SharedPreferences accountPreferences = mContext.getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
-        accountPreferences.edit().remove(account.getTitle()).apply();
+        mAccountPreferences.removeAccount(account);
 
         mInitialAccountState.remove(account);
     }
@@ -214,8 +213,7 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Acco
      * @param account Neues Hauptkonto
      */
     private void makeAccountMain(Account account) {
-        SharedPreferences preferences = mContext.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
-        preferences.edit().putLong("activeAccount", account.getIndex()).apply();
+        mUserPreferences.setActiveAccount(account);
     }
 
     /**
@@ -234,9 +232,8 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Acco
      * @param isVisible Sichtabkeit. TRUE für sichtbar, FALSE für nicht sichtbar
      */
     private void setAccountVisibility(Account account, boolean isVisible) {
-        SharedPreferences preferences = getActivity().getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
+        mAccountPreferences.setVisibility(account, isVisible);
 
-        preferences.edit().putBoolean(account.getTitle(), isVisible).apply();
         mCallback.onAccountSelected(account.getIndex(), isVisible);
     }
 

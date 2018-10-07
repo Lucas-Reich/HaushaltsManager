@@ -56,10 +56,18 @@ class FABToolbar {
         mFabToolbarToolbar.addView(imV, CHANGEABLE_OPTION_INDEX);
     }
 
+    void hideAction(String actionTag) {
+        mFabToolbarToolbar.findViewWithTag(actionTag).setVisibility(View.GONE);
+    }
+
+    void showAction(String actionTag) {
+        mFabToolbarToolbar.findViewWithTag(actionTag).setVisibility(View.VISIBLE);
+    }
+
     private void populateToolbar() {
         mFabToolbarToolbar.removeAllViews();
 
-        ImageView addChild = getToolbarMenuItem(R.drawable.ic_add_child_white, "", getOnMenuItemClickListener());// Wenn ich als erstes eine KindBuchung auswähle müsste hier ein extract icon sein
+        ImageView addChild = getToolbarMenuItem(R.drawable.ic_add_child_white, "", getOnMenuItemClickListener());
         addChild.setTag(MENU_COMBINE_ACTION);
         mFabToolbarToolbar.addView(addChild, CHANGEABLE_OPTION_INDEX);
 

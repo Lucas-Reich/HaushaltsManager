@@ -25,17 +25,23 @@ public class ActiveAccountsPreferences {
 
     public void addAccount(Account account) {
 
-        mPreferences
-                .edit()
-                .putBoolean(account.getIndex() + "", true)
-                .apply();
+        mPreferences.edit().putBoolean(account.getIndex() + "", true).apply();
+    }
+
+    public void removeAccount(Account account) {
+
+        mPreferences.edit().remove(account.getIndex() + "").apply();
+    }
+
+    public void setVisibility(Account account, boolean visibility) {
+
+        mPreferences.edit().putBoolean(account.getIndex() + "", visibility).apply();
     }
 
     public boolean isActive(Account account) {
-        //todo sollte ich unterscheiden zwischen konten die nicht gefunden werden konnten und Konten die es tatsächlich gibt?
+        //todo sollte ich unterscheiden zwischen Konten die nicht gefunden werden konnten und Konten die es tatsächlich gibt?
 
-        return mPreferences
-                .getBoolean(account.getIndex() + "", false);
+        return mPreferences.getBoolean(account.getIndex() + "", false);
     }
 
     public List<Account> getActiveAccounts() {
@@ -51,11 +57,6 @@ public class ActiveAccountsPreferences {
         }
 
         return activeAccounts;
-    }
-
-    public List<Account> getInactiveAccounts() {
-
-        return new ArrayList<Account>();
     }
 
     private Account fetchAccount(long index) {

@@ -70,6 +70,10 @@
             android:name=".Activities.AboutUsActivity"
             android:label="@string/activity_about_name"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
+        <activity
+            android:name=".Activities.CreateRecurringBooking"
+            android:label="@string/activity_create_recurring_booking"
+            android:parentActivityName=".Activities.MainTab.ParentActivity"/>
 
         <receiver
             android:name=".MyAlarmReceiver"

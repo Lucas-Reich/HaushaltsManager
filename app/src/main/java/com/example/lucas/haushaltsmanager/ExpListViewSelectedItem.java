@@ -14,7 +14,7 @@ public class ExpListViewSelectedItem {
     }
 
     public boolean isParent() {
-        return mItemParent != null;
+        return mItemParent == null;
     }
 
     public ExpenseObject getParent() {
@@ -27,7 +27,6 @@ public class ExpListViewSelectedItem {
 
     @Override
     public boolean equals(Object obj) {
-        //cleanup kann ich die equals funktion noch ein wenig geiler machen?
         if (!(obj instanceof ExpListViewSelectedItem))
             return false;
 

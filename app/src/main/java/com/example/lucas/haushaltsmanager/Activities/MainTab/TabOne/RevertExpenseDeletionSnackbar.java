@@ -9,8 +9,10 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Expense
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.AddChildToChildException;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+import com.example.lucas.haushaltsmanager.ExpListViewSelectedItem;
 import com.example.lucas.haushaltsmanager.R;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,22 +24,46 @@ class RevertExpenseDeletionSnackbar {
     private ExpenseRepository mExpenseRepo;
     private ChildExpenseRepository mChildExpenseRepo;
     private OnRestoredActionListener mListener;
+    private String mSnackbarMessage;
 
-    RevertExpenseDeletionSnackbar(HashMap<ExpenseObject, List<ExpenseObject>> expenses, Context context) {
-        mExpenses = expenses;
+    RevertExpenseDeletionSnackbar(Context context) {
+        mExpenses = new HashMap<>();
 
         mExpenseRepo = new ExpenseRepository(context);
         mChildExpenseRepo = new ChildExpenseRepository(context);
+
+        mSnackbarMessage = "";
     }
 
     void setOnRestoredActionListener(OnRestoredActionListener listener) {
         mListener = listener;
     }
 
-    void showSnackbar(View parent, String snackbarMessage) {
-        Snackbar.make(parent, snackbarMessage, Snackbar.LENGTH_LONG)
+    void setMessage(String message) {
+        mSnackbarMessage = message;
+    }
+
+    void showSnackbar(View parent) {
+        Snackbar.make(parent, mSnackbarMessage, Snackbar.LENGTH_LONG)
                 .setAction(R.string.revert_action, getOnUndoClickListener())
                 .show();
+    }
+
+    void addItem(final ExpListViewSelectedItem item) {
+        if (null == item.getParent()) {
+            if (!mExpenses.containsKey(item.getItem()))
+                mExpenses.put(item.getItem(), new ArrayList<ExpenseObject>());
+        } else {
+            if (!mExpenses.containsKey(item.getParent())) {
+                mExpenses.put(item.getParent(), new ArrayList<ExpenseObject>() {{
+                    add(item.getItem());
+                }});
+            } else {
+                List<ExpenseObject> children = mExpenses.get(item.getParent());
+                children.add(item.getItem());
+                mExpenses.put(item.getParent(), children);
+            }
+        }
     }
 
     private View.OnClickListener getOnUndoClickListener() {
@@ -58,12 +84,14 @@ class RevertExpenseDeletionSnackbar {
     }
 
     private void restoreParentExpense(Map.Entry<ExpenseObject, List<ExpenseObject>> expense) {
+        Log.i(TAG, "Restoring ParentExpense " + expense.getKey().getTitle());
         mExpenseRepo.insert(mapEntryToExpense(expense));
     }
 
     private void restoreChildExpenses(ExpenseObject parent, List<ExpenseObject> children) {
         for (ExpenseObject child : children) {
             try {
+                Log.i(TAG, "Restoring ChildExpense " + child.getTitle() + " and attaching it to ParentExpense " + parent.getTitle());
                 mChildExpenseRepo.addChildToBooking(child, parent);
             } catch (AddChildToChildException e) {
                 Log.e(TAG, "Could not restore ChildExpense " + child.getTitle(), e);

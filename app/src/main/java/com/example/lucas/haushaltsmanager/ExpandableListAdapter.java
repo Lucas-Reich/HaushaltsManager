@@ -291,12 +291,15 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     public void selectItem(int groupPosition, int childPosition) {
         Log.i(TAG, "Selecting item at position " + groupPosition + " " + childPosition);
 
-        mSelectedItems.add(positionToSelectedItem(
-                groupPosition,
-                childPosition
-        ));
+        //Kindbuchungen und ParentBuchungen sollen nicht gleichzeitig markierbar sein
+        if (!(getSelectedGroupsCount() > 0 && childPosition != -1) && !(getSelectedChildrenCount() > 0 && childPosition == -1)) {
+            mSelectedItems.add(positionToSelectedItem(
+                    groupPosition,
+                    childPosition
+            ));
 
-        notifyDataSetChanged();
+            notifyDataSetChanged();
+        }
     }
 
     public void unselectItem(int groupPosition, int childPosition) {
@@ -311,8 +314,6 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     }
 
     public boolean isItemSelected(int groupPosition, int childPosition) {
-        Log.i(TAG, "Checking if item " + groupPosition + " " + childPosition + " is selected");
-
         return mSelectedItems.contains(positionToSelectedItem(
                 groupPosition,
                 childPosition

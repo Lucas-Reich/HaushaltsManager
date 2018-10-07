@@ -14,7 +14,6 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Excepti
 import com.example.lucas.haushaltsmanager.Database.Repositories.BookingTags.BookingTagRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.CannotDeleteExpenseException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.CannotDeleteChildExpenseException;
@@ -186,6 +185,8 @@ public class ExpenseRepository {
                 );
             }
         } catch (AccountNotFoundException e) {
+
+            Log.e(TAG, "", e);
             //Sollte eingentlich nicht passieren können da der User nur aus existierenden Konten auswählen kann.
         }
 
@@ -223,21 +224,21 @@ public class ExpenseRepository {
 
             try {
 
-                if (isAttachedToChildExpenses(expense)) {
+                if (hasChildren(expense)) {
                     throw CannotDeleteExpenseException.BookingAttachedToChildException(expense);
                 }
 
                 hide(expense);
             } catch (ExpenseNotFoundException e) {
 
-                //todo was soll passieren wenn eine buchugn nicht gefunden werden kann die als template buchung hinterlegt ist?
+                //todo was soll passieren wenn eine Buchung nicht gefunden werden kann die als template buchung hinterlegt ist?
                 // --> eintrag aus der template tabelle löschen
                 // -->
                 Log.e(TAG, "Could not find Expense " + expense);
             }
         } else {
 
-            if (isAttachedToChildExpenses(expense))
+            if (hasChildren(expense))
                 throw CannotDeleteExpenseException.BookingAttachedToChildException(expense);
 
             try {
@@ -254,7 +255,7 @@ public class ExpenseRepository {
 
                 //sollte das Konto aus irgendeinem Grund nicht mehr existieren, muss der Kontostand auch nicht mehr angepasst werden
 //                throw CannotDeleteExpenseException.RelatedAccountDoesNotExist(expense);
-                Log.e(TAG, "Could not find Account with id " + expense.getAccountId());
+                Log.e(TAG, "Could not delete Expense " + expense.getTitle() + " attached Account " + expense.getAccountId() + " does not exist");
             } catch (CannotDeleteChildExpenseException e) {
 
                 Log.e(TAG, e.getMessage());
@@ -358,7 +359,7 @@ public class ExpenseRepository {
         new AccountRepository(app.getContext()).update(account1); //todo
     }
 
-    private boolean isAttachedToChildExpenses(ExpenseObject expense) {
+    private boolean hasChildren(ExpenseObject expense) {
         //todo kann ich auch durch ChildExpenseRepository.exists(expense) ersetzen
 
         String selectQuery;

@@ -33,6 +33,7 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Excepti
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.AddChildToChildException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.ChildExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.Exceptions.CurrencyNotFoundException;
@@ -49,8 +50,8 @@ import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Tag;
 import com.example.lucas.haushaltsmanager.Entities.Template;
-import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
+import com.example.lucas.haushaltsmanager.R;
 
 import java.text.DateFormat;
 import java.util.Calendar;
@@ -428,8 +429,14 @@ public class ExpenseScreen extends AppCompatActivity {
                     break;
                 case ADD_CHILD_MODE:
 
-                    mChildExpenseRepo.insert(mParentBooking, mExpense);
-                    Toast.makeText(ExpenseScreen.this, "Added Booking \"" + mExpense.getTitle() + "\" to parent Booking " + mParentBooking.getTitle(), Toast.LENGTH_SHORT).show();
+                    try {
+                        mChildExpenseRepo.addChildToBooking(mExpense, mParentBooking);
+                        Toast.makeText(ExpenseScreen.this, "Added Booking \"" + mExpense.getTitle() + "\" to parent Booking " + mParentBooking.getTitle(), Toast.LENGTH_SHORT).show();
+                    } catch (AddChildToChildException e) {
+
+                        Log.e(TAG, "Could not add Child " + mExpense.getTitle() + " to parent " + mParentBooking.getTitle(), e);
+                        //todo ferhlerbehandlung
+                    }
                     break;
                 case CREATE_EXPENSE_MODE:
 
