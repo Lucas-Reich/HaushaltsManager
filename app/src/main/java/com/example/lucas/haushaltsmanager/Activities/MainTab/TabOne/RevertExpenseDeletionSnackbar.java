@@ -21,9 +21,9 @@ class RevertExpenseDeletionSnackbar {
     private static final String TAG = RevertExpenseDeletionSnackbar.class.getSimpleName();
 
     private HashMap<ExpenseObject, List<ExpenseObject>> mExpenses;
-    private ExpenseRepository mExpenseRepo;
     private ChildExpenseRepository mChildExpenseRepo;
     private OnRestoredActionListener mListener;
+    private ExpenseRepository mExpenseRepo;
     private String mSnackbarMessage;
 
     RevertExpenseDeletionSnackbar(Context context) {

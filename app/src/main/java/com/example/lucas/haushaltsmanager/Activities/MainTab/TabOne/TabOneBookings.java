@@ -355,6 +355,7 @@ public class TabOneBookings extends Fragment implements FABToolbar.OnFabToolbarM
             public void onTextInput(String textInput) {
                 ExpenseObject parent = ExpenseObject.createDummyExpense();
 
+                //TODO Wenn die angegebene Buchung eine ParentBuchung ist müssen anstatt der Buchung die KindBuchungen zusammengefügt werden
                 for (ExpListViewSelectedItem selectedItem : selectedItems) {
                     try {
                         if (selectedItem.isParent())
@@ -365,9 +366,11 @@ public class TabOneBookings extends Fragment implements FABToolbar.OnFabToolbarM
                         parent.addChild(selectedItem.getItem());
                     } catch (CannotDeleteChildExpenseException e) {
 
+                        //TODO was soll passieren
                         Log.e(TAG, "Could not delete ChildExpense " + selectedItem.getItem().getTitle());
                     } catch (CannotDeleteExpenseException e) {
 
+                        //TODO was soll passieren
                         Log.e(TAG, "Could not delete Expense " + selectedItem.getItem().getTitle());
                     }
                 }
@@ -436,6 +439,7 @@ public class TabOneBookings extends Fragment implements FABToolbar.OnFabToolbarM
     }
 
     private void deleteBookingsAction(List<ExpListViewSelectedItem> selectedItems) {
+        //todo Wenn die Buchung eine ParentBuchung ist müssen anstatt der angegebenen Buchung die Kinder gelöscht werden
         for (ExpListViewSelectedItem selectedItem : selectedItems) {
             try {
                 if (selectedItem.isParent())

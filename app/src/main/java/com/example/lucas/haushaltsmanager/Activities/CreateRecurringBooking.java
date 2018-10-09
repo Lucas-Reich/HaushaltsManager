@@ -2,15 +2,22 @@ package com.example.lucas.haushaltsmanager.Activities;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.AbstractAppCompatActivity;
+import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.RecurringBookingRepository;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.R;
+
+import java.util.Calendar;
 
 public class CreateRecurringBooking extends AbstractAppCompatActivity {
     public static final String INTENT_BOOKING = "expense";
 
     private ExpenseObject mRecurringExpense;
+    private Calendar mStartDate;
+    private Calendar mEndDate;
+    private int mFrequency;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -34,5 +41,33 @@ public class CreateRecurringBooking extends AbstractAppCompatActivity {
         //getFrequencyInInt
 
         //getEndTimeInMillis
+    }
+
+    private void setFrequency(int frequency) {
+        mFrequency = frequency;
+    }
+
+    private void setEndDate(Calendar endDate) {
+        mEndDate = endDate;
+    }
+
+    private void setStartDate(Calendar startDate) {
+        mStartDate = startDate;
+    }
+
+    private void saveRecurringBooking() {
+        if (mStartDate != null && mEndDate != null && mEndDate.after(mStartDate)) {
+            RecurringBookingRepository recurringBookingRepo = new RecurringBookingRepository(this);
+            recurringBookingRepo.insert(
+                    mRecurringExpense,
+                    mStartDate.getTimeInMillis(),
+                    mFrequency,
+                    mEndDate.getTimeInMillis()
+            );
+        } else {
+
+            //todo übersetzung
+            Toast.makeText(this, "Cannot save RecurringBooking", Toast.LENGTH_SHORT).show();
+        }
     }
 }
