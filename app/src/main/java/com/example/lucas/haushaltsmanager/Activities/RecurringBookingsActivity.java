@@ -3,7 +3,6 @@ package com.example.lucas.haushaltsmanager.Activities;
 import android.os.Bundle;
 import android.widget.ListView;
 
-import com.example.lucas.haushaltsmanager.AbstractAppCompatActivity;
 import com.example.lucas.haushaltsmanager.BookingAdapter;
 import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.RecurringBookingRepository;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;

@@ -25,11 +25,11 @@ public class NotificationWorker extends Worker {
         PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0, new Intent(getApplicationContext(), ParentActivity.class), 0);
 
         Notification notification = new Notification.Builder(getApplicationContext())
-                .setContentTitle("Hier ist eine Notification")
-                .setContentText("Hier ist die Nachricht der Notification die ich gerade gesendet habe")
+                .setContentTitle("Hier ist eine Notification")//TODO Notification titel anpassen
+                .setContentText("Hier ist die Nachricht der Notification die ich gerade gesendet habe")//TODO Notification body anpassen
                 .setAutoCancel(true)
                 .setContentIntent(pi)
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.mipmap.ic_launcher)//TODO Notification icon anpassen
                 .build();
 
         NotificationManagerCompat.from(getApplicationContext()).notify(new Random().nextInt(), notification);
@@ -43,10 +43,9 @@ public class NotificationWorker extends Worker {
      * Methode um einen neuen NotificationWorker zu starten.
      * Da man mit dem aktuellen WorkManager noch keine Wiederkehrenden Worker erstellen kann,
      * bei denen der erste Worker zu einer bestimmten Zeit ausgelöst wird,ist das hier der Workaround.
-     * <p>
-     * //todo Wenn man den ersten Worker schedulen kann diese Methodik entfernen
      */
     private void setNewWorker() {
+        //CLEANUP Wenn man den ersten Worker schedulen kann diese Methodik entfernen
         OneTimeWorkRequest workRequest = new OneTimeWorkRequest
                 .Builder(NotificationWorker.class)
                 .setInitialDelay(24, TimeUnit.HOURS)

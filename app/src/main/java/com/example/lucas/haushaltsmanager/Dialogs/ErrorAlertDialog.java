@@ -7,7 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
-import com.example.lucas.haushaltsmanager.BundleUtils;
+import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
 import com.example.lucas.haushaltsmanager.R;
 
 public class ErrorAlertDialog extends DialogFragment {

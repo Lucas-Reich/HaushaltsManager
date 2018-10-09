@@ -11,7 +11,7 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.Excep
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Time;
-import com.example.lucas.haushaltsmanager.WeekdayUtils;
+import com.example.lucas.haushaltsmanager.Utils.WeekdayUtils;
 
 public class UserSettingsPreferences {
     private static final String USER_SETTINGS = "UserSettings";

@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager;
+package com.example.lucas.haushaltsmanager.Utils;
 
 import android.content.res.Resources;
 import android.os.Bundle;

@@ -18,13 +18,12 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.codekidlabs.storagechooser.StorageChooser;
-import com.example.lucas.haushaltsmanager.AbstractAppCompatActivity;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.AppInternalPreferences;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
 import com.example.lucas.haushaltsmanager.Entities.Directory;
-import com.example.lucas.haushaltsmanager.FileUtils;
+import com.example.lucas.haushaltsmanager.Utils.FileUtils;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Services.BackupCreatorService;
 

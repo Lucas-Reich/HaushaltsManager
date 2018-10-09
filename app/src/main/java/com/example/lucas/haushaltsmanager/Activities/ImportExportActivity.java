@@ -15,7 +15,6 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.codekidlabs.storagechooser.StorageChooser;
-import com.example.lucas.haushaltsmanager.AbstractAppCompatActivity;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ErrorAlertDialog;
@@ -23,7 +22,7 @@ import com.example.lucas.haushaltsmanager.Entities.Directory;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.ExpenseObjectExporter;
 import com.example.lucas.haushaltsmanager.FileAdapter;
-import com.example.lucas.haushaltsmanager.FileUtils;
+import com.example.lucas.haushaltsmanager.Utils.FileUtils;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.io.File;

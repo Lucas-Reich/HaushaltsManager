@@ -27,7 +27,7 @@ import com.example.lucas.haushaltsmanager.Entities.Time;
 import com.example.lucas.haushaltsmanager.NotificationWorker;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
-import com.example.lucas.haushaltsmanager.WeekdayUtils;
+import com.example.lucas.haushaltsmanager.Utils.WeekdayUtils;
 
 import java.util.Arrays;
 import java.util.List;

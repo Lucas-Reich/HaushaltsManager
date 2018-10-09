@@ -8,7 +8,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.widget.DatePicker;
 
-import com.example.lucas.haushaltsmanager.BundleUtils;
+import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.util.Calendar;

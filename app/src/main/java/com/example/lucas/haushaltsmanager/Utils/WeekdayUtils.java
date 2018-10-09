@@ -1,6 +1,8 @@
-package com.example.lucas.haushaltsmanager;
+package com.example.lucas.haushaltsmanager.Utils;
 
 import android.content.Context;
+
+import com.example.lucas.haushaltsmanager.R;
 
 public class WeekdayUtils {
     public static final int MONDAY = 0;
