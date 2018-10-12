@@ -33,6 +33,7 @@ public class ActiveAccountsPreferences {
         mPreferences.edit().remove(account.getIndex() + "").apply();
     }
 
+    //TODO sollte ich die Funktion so abändern dass nur konten die auch wirklich existieren angepasst werden können?
     public void setVisibility(Account account, boolean visibility) {
 
         mPreferences.edit().putBoolean(account.getIndex() + "", visibility).apply();
@@ -50,10 +51,10 @@ public class ActiveAccountsPreferences {
 
         for (Map.Entry<String, ?> entry : allAccounts.entrySet()) {
             boolean value = (Boolean) entry.getValue();
-            if (value) {
-
+            //TODO sollte ich eine Konto welches nicht in der Datenbank gefunden werden konnte einfach aus der liste der aktiven Konten löschen?
+            // oder kann es dann sein dass dieses konto immer und immer wieder in die preferences geschrieben wird?
+            if (value)
                 activeAccounts.add(fetchAccount(Long.getLong(entry.getKey())));
-            }
         }
 
         return activeAccounts;
@@ -66,6 +67,8 @@ public class ActiveAccountsPreferences {
             return mAccountRepo.get(index);
         } catch (AccountNotFoundException e) {
 
+            //TODO wenn ein Account aus welchem grund auch immer nicht gefunden werden kann, kann ich nicht mal mehr den TabOne öffnen
+            // ich sollte hier also besser nicht null zurückgeben
             return null;
         }
     }

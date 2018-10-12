@@ -1,7 +1,6 @@
 package com.example.lucas.haushaltsmanager;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,6 +11,7 @@ import android.widget.TextView;
 
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
 import com.example.lucas.haushaltsmanager.Views.ViewUtils;
 import com.lucas.androidcharts.DataSet;
@@ -220,9 +220,9 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
      * @return MainCurrencySymbol
      */
     private String getMainCurrencySymbol() {
-        SharedPreferences preferences = mContext.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
+        UserSettingsPreferences preferences = new UserSettingsPreferences(mContext);
 
-        return preferences.getString("mainCurrencySymbol", "€");
+        return preferences.getMainCurrency().getSymbol();
     }
 
     /**

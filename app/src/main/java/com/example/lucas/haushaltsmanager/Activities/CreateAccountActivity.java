@@ -1,17 +1,12 @@
 package com.example.lucas.haushaltsmanager.Activities;
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences;
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
@@ -19,11 +14,17 @@ import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
-import com.example.lucas.haushaltsmanager.R;
+import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
+import com.example.lucas.haushaltsmanager.R;
 
-public class CreateAccountActivity extends AppCompatActivity {
+public class CreateAccountActivity extends AbstractAppCompatActivity {
     private static final String TAG = CreateAccountActivity.class.getSimpleName();
+
+    public static final String INTENT_MODE = "mode";
+    public static final String INTENT_MODE_UPDATE = "update";
+    public static final String INTENT_MODE_CREATE = "create";
+    public static final String INTENT_ACCOUNT_ID = "accountId";
 
     private Button mAccountNameBtn;
     private Button mAccountBalanceBtn, mCreateAccountBtn;
@@ -45,39 +46,41 @@ public class CreateAccountActivity extends AppCompatActivity {
 
         mAccountRepo = new AccountRepository(this);
 
-        final Bundle bundle = getIntent().getExtras();
-        if (bundle != null) {
-
-            switch (bundle.getString("mode")) {
-
-                case "update":
-                    mCreationMode = CREATION_MODES.UPDATE_ACCOUNT;
-
-                    try {
-                        long accountId = bundle.getLong("account_id");
-                        mAccount = mAccountRepo.get(accountId);
-                    } catch (AccountNotFoundException e) {
-
-                        Toast.makeText(this, getString(R.string.account_not_found), Toast.LENGTH_SHORT).show();
-                        finish();
-                    }
-                    break;
-                case "create":
-                    mCreationMode = CREATION_MODES.CREATE_ACCOUNT;
-
-                    mAccount = Account.createDummyAccount();
-                    mAccount.setCurrency(getDefaultCurrency());
-                    break;
-                default:
-                    break;
-            }
-        }
+        resolveMode(getIntent().getExtras());
 
         mAccountNameBtn = findViewById(R.id.new_account_name);
         mAccountBalanceBtn = findViewById(R.id.new_account_balance);
         mCreateAccountBtn = findViewById(R.id.new_account_create);
 
         initializeToolbar();
+    }
+
+    private void resolveMode(Bundle bundle) {
+        if (bundle == null || !bundle.containsKey(INTENT_MODE))
+            return;
+
+        switch (bundle.getString(INTENT_MODE)) {
+            case INTENT_MODE_UPDATE:
+                mCreationMode = CREATION_MODES.UPDATE_ACCOUNT;
+
+                try {
+                    long accountId = bundle.getLong(ACCOUNT_SERVICE);
+                    mAccount = mAccountRepo.get(accountId);
+                } catch (AccountNotFoundException e) {
+
+                    Toast.makeText(this, getString(R.string.account_not_found), Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+                break;
+            case INTENT_MODE_CREATE:
+                mCreationMode = CREATION_MODES.CREATE_ACCOUNT;
+
+                mAccount = Account.createDummyAccount();
+                mAccount.setCurrency(getDefaultCurrency());
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
@@ -140,33 +143,8 @@ public class CreateAccountActivity extends AppCompatActivity {
             mCreateAccountBtn.setText(R.string.update);
         else
             mCreateAccountBtn.setText(R.string.btn_save);
+
         mCreateAccountBtn.setOnClickListener(createAccountClickListener);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId()) {
-            case android.R.id.home:
-
-                onBackPressed();
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    /**
-     * Methode um eine Toolbar anzuzeigen die den Titel und einen Zurückbutton enthält.
-     */
-    private void initializeToolbar() {
-        Toolbar toolbar = findViewById(R.id.toolbar);
-
-        //schatten der toolbar
-        if (Build.VERSION.SDK_INT >= 21)
-            toolbar.setElevation(10.f);
-
-        setSupportActionBar(toolbar);
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     /**
@@ -180,15 +158,15 @@ public class CreateAccountActivity extends AppCompatActivity {
             if (!mAccount.isSet())
                 return;
 
-            addAccountToPreferencesAccountsList(mAccount);
 
             switch (mCreationMode) {
 
                 case CREATE_ACCOUNT:
 
-                    Account account = mAccountRepo.create(mAccount);
+                    mAccount = mAccountRepo.create(mAccount);
 
-                    setNewActiveAccount(account);
+                    addAccountToPreferences(mAccount);
+                    setAsActiveAccount(mAccount);
                     break;
                 case UPDATE_ACCOUNT:
 
@@ -204,7 +182,7 @@ public class CreateAccountActivity extends AppCompatActivity {
             }
 
             Intent startMainTab = new Intent(CreateAccountActivity.this, ParentActivity.class);
-            CreateAccountActivity.this.startActivity(startMainTab);
+            startActivity(startMainTab);
         }
     };
 
@@ -213,7 +191,7 @@ public class CreateAccountActivity extends AppCompatActivity {
      *
      * @param account Zu speicherndes Konto
      */
-    private void addAccountToPreferencesAccountsList(Account account) {
+    private void addAccountToPreferences(Account account) {
         ActiveAccountsPreferences accountsPreferences = new ActiveAccountsPreferences(CreateAccountActivity.this, new AccountRepository(this));
 
         accountsPreferences.addAccount(account);
@@ -235,7 +213,7 @@ public class CreateAccountActivity extends AppCompatActivity {
      *
      * @param account Neues Hauptkonto
      */
-    private void setNewActiveAccount(Account account) {
+    private void setAsActiveAccount(Account account) {
         UserSettingsPreferences preferences = new UserSettingsPreferences(this);
 
         preferences.setActiveAccount(account);

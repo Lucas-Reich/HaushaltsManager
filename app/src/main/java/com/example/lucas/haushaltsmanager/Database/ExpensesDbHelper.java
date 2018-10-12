@@ -2,16 +2,18 @@ package com.example.lucas.haushaltsmanager.Database;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Entities.Category;
+import com.example.lucas.haushaltsmanager.Entities.Currency;
+import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ExpensesDbHelper extends SQLiteOpenHelper {
     private static final String TAG = ExpensesDbHelper.class.getSimpleName();
@@ -301,58 +303,64 @@ public class ExpensesDbHelper extends SQLiteOpenHelper {
      * @param db reference to editable mDatabase
      */
     private void insertCurrencies(SQLiteDatabase db) {
-        SharedPreferences preferences = app.getContext().getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
+        UserSettingsPreferences preferences = new UserSettingsPreferences(app.getContext());
 
         //details from: https://developers.google.com/public-data/docs/canonical/currencies_csv
-        ArrayList<String[]> currencies = new ArrayList<>();
-        currencies.add(new String[]{"AUD", "Australian Dollar", "$"});
-        currencies.add(new String[]{"BGN", "Bulgarian Lev", "лв"});
-        currencies.add(new String[]{"BRL", "Brazilian Real", "R$"});
-        currencies.add(new String[]{"CAD", "Canadian Dollar", "$"});
-        currencies.add(new String[]{"CHF", "Swiss Franc", "CHF"});
-        currencies.add(new String[]{"CNY", "Yuan Reminbi", "¥"});
-        currencies.add(new String[]{"CZK", "Czech Koruna", "Kč"});
-        currencies.add(new String[]{"DKK", "Danish Krone", "kr"});
-        currencies.add(new String[]{"GBP", "Pound Sterling", "£"});
-        currencies.add(new String[]{"HKD", "Hong Kong Dollar", "$"});
-        currencies.add(new String[]{"HRK", "Croatian Kuna", "kn"});
-        currencies.add(new String[]{"HUF", "Forint", "Ft"});
-        currencies.add(new String[]{"IDR", "Rupiah", "Rp"});
-        currencies.add(new String[]{"ILS", "New Israeli Sheqel", "₪"});
-        currencies.add(new String[]{"INR", "Indian Rupee", null});
-        currencies.add(new String[]{"JPY", "Yen", "¥"});
-        currencies.add(new String[]{"KRW", "Won", "₩"});
-        currencies.add(new String[]{"MXN", "Mexican Peso", "$"});
-        currencies.add(new String[]{"MYR", "Malaysian Ringgit", "RM"});
-        currencies.add(new String[]{"NOK", "Norwegian Krone", "kr"});
-        currencies.add(new String[]{"NZD", "New Zealand Dollar", "$"});
-        currencies.add(new String[]{"PHP", "Philippine Peso", "Php"});
-        currencies.add(new String[]{"PLN", "Zloty", "zł"});
-        currencies.add(new String[]{"RON", "Romanian Leu", "lei"});
-        currencies.add(new String[]{"RUB", "Russian Ruble", "руб"});
-        currencies.add(new String[]{"SEK", "Swedish Krona", "kr"});
-        currencies.add(new String[]{"SGD", "Singapore Dollar", "$"});
-        currencies.add(new String[]{"THB", "Baht", "฿"});
-        currencies.add(new String[]{"TRY", "Turkish Lira", "TL"});
-        currencies.add(new String[]{"USD", "US Dollar", "$"});
-        currencies.add(new String[]{"ZAR", "Rand", "R"});
-        currencies.add(new String[]{"EUR", "Euro", "€"});
+        //TODO die Währungen sollten in einer XML datei gespeichert sein, dann kann man sie auch übersetzen
+        List<Currency> currencies = new ArrayList<>();
+        currencies.add(new Currency("AUD", "", "$"));
+        currencies.add(new Currency("BGN", "", "лв"));
+        currencies.add(new Currency("BRL", "", "R$"));
+        currencies.add(new Currency("CAD", "", "$"));
+        currencies.add(new Currency("CHF", "", "CHF"));
+        currencies.add(new Currency("CNY", "", "¥"));
+        currencies.add(new Currency("CZK", "", "Kč"));
+        currencies.add(new Currency("DKK", "", "kr"));
+        currencies.add(new Currency("GBP", "", "£"));
+        currencies.add(new Currency("HKD", "", "$"));
+        currencies.add(new Currency("HRK", "Croatian Kuna", "kn"));
+        currencies.add(new Currency("HUF", "Forint", "Ft"));
+        currencies.add(new Currency("IDR", "Rupiah", "Rp"));
+        currencies.add(new Currency("ILS", "New Israeli Sheqel", "₪"));
+        currencies.add(new Currency("INR", "Indian Rupee", "₪"));
+        currencies.add(new Currency("JPY", "Yen", "¥"));
+        currencies.add(new Currency("KRW", "Won", "₩"));
+        currencies.add(new Currency("MXN", "Mexican Peso", "$"));
+        currencies.add(new Currency("MYR", "Malaysian Ringgit", "RM"));
+        currencies.add(new Currency("NOK", "Norwegian Krone", "kr"));
+        currencies.add(new Currency("NZD", "New Zealand Dollar", "$"));
+        currencies.add(new Currency("PHP", "Philippine Peso", "Php"));
+        currencies.add(new Currency("PLN", "Zloty", "zł"));
+        currencies.add(new Currency("RON", "Romanian Leu", "lei"));
+        currencies.add(new Currency("RUB", "Russian Ruble", "руб"));
+        currencies.add(new Currency("SEK", "Swedish Krona", "kr"));
+        currencies.add(new Currency("SGD", "Singapore Dollar", "$"));
+        currencies.add(new Currency("THB", "Baht", "฿"));
+        currencies.add(new Currency("TRY", "Turkish Lira", "TL"));
+        currencies.add(new Currency("USD", "US Dollar", "$"));
+        currencies.add(new Currency("ZAR", "Rand", "R"));
+        currencies.add(new Currency("EUR", "Euro", "€"));
 
-        for (String[] entry : currencies) {
+
+        for (Currency currency : currencies) {
 
             ContentValues values = new ContentValues();
-            values.put(CURRENCIES_COL_SHORT_NAME, entry[0]);
-            values.put(CURRENCIES_COL_NAME, entry[1]);
-            values.put(CURRENCIES_COL_SYMBOL, entry[2]);
+            values.put(CURRENCIES_COL_NAME, currency.getName());
+            values.put(CURRENCIES_COL_SHORT_NAME, currency.getShortName());
+            values.put(CURRENCIES_COL_SYMBOL, currency.getSymbol());
 
             //todo das wählen der hauptwährung sollte auf dem Standort des Users passieren
             //android.icu.util.Currency currency = android.icu.util.Currency.getInstance(getResources().getConfiguration().locale);
             //Quelle: https://stackoverflow.com/questions/27228514/android-is-it-possible-to-get-the-currency-code-of-the-country-where-the-user-a
             //todo wenn die Standartwährung nicht gesetzt werden kann, soll der User darauf hingewiesen werden und gefragt werden dies zu Tun
             long index = db.insert(TABLE_CURRENCIES, null, values);
-            if (entry[1].equals("EUR") && index != -1) {
-                preferences.edit().putLong("mainCurrencyIndex", index).apply();
-                preferences.edit().putString("mainCurrencySymbol", entry[2]).apply();
+            if (currency.getShortName().equals("EUR") && index != -1) {
+                preferences.setMainCurrency(new Currency(
+                        index,
+                        currency.getName(),
+                        currency.getShortName(),
+                        currency.getSymbol()
+                ));
             }
         }
     }
@@ -363,6 +371,7 @@ public class ExpensesDbHelper extends SQLiteOpenHelper {
      * @param db Datenbank
      */
     private void insertHiddenCategories(SQLiteDatabase db) {
+        //TODO SystemKategorien sollten in einer XML Datei gespeichert sein, dann kann man sie einfacher übersetzen
 
         ArrayList<Category> categories = new ArrayList<>();
         categories.add(new Category(

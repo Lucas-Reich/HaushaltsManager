@@ -3,7 +3,6 @@ package com.example.lucas.haushaltsmanager.Activities;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
@@ -36,7 +35,6 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Ch
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.AddChildToChildException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.ChildExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.Exceptions.CurrencyNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Tags.TagRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Templates.TemplateRepository;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
@@ -913,18 +911,11 @@ public class ExpenseScreen extends AppCompatActivity {
      * Methode, welche die angezeigte Währung und die Währung der zu speichernden Ausgabe anpasst.
      */
     private void setExpenseCurrency() {
-        try {
-            SharedPreferences preferences = this.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
-            Currency currency = mCurrencyRepo.get(preferences.getLong("mainCurrencyIndex", 1L));
+        UserSettingsPreferences preferences = new UserSettingsPreferences(this);
+        Currency currency = preferences.getMainCurrency();
 
-            mCurrencySymbolTxt.setText(currency.getSymbol());
-            mExpense.setCurrency(currency);
-        } catch (CurrencyNotFoundException e) {
-
-            Toast.makeText(this, "Währung wurde nicht gefunden", Toast.LENGTH_SHORT).show();
-            //todo übersetzung
-            //todo fehlerbehandlung
-        }
+        mCurrencySymbolTxt.setText(currency.getSymbol());
+        mExpense.setCurrency(currency);
     }
 
     @Override

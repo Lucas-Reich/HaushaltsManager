@@ -139,8 +139,8 @@ public class AccountAdapter extends ArrayAdapter<Account> {
                         case R.id.edit_account_edit:
 
                             Intent updateAccountIntent = new Intent(mContext, CreateAccountActivity.class);
-                            updateAccountIntent.putExtra("mode", "update");
-                            updateAccountIntent.putExtra("account_id", mAccount.getIndex());
+                            updateAccountIntent.putExtra(CreateAccountActivity.INTENT_MODE, CreateAccountActivity.INTENT_MODE_UPDATE);
+                            updateAccountIntent.putExtra(CreateAccountActivity.INTENT_ACCOUNT_ID, mAccount.getIndex());
                             mContext.startActivity(updateAccountIntent);
 
                             Log.d(TAG, "onMenuItemSelected: edit selected");

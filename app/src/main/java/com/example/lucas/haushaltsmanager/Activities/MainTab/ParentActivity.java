@@ -4,7 +4,6 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -19,7 +18,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,7 +31,6 @@ import com.example.lucas.haushaltsmanager.Activities.ImportExportActivity;
 import com.example.lucas.haushaltsmanager.Activities.MainTab.TabOne.TabOneBookings;
 import com.example.lucas.haushaltsmanager.Activities.RecurringBookingsActivity;
 import com.example.lucas.haushaltsmanager.Activities.Settings;
-import com.example.lucas.haushaltsmanager.PreferencesHelper.AppInternalPreferences;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.CannotDeleteExpenseException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
@@ -44,8 +41,10 @@ import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.MockDataCreator;
 import com.example.lucas.haushaltsmanager.MyAlarmReceiver;
-import com.example.lucas.haushaltsmanager.R;
+import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences;
+import com.example.lucas.haushaltsmanager.PreferencesHelper.AppInternalPreferences;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
+import com.example.lucas.haushaltsmanager.R;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -60,7 +59,6 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
     private ViewPager mViewPager;
     private List<ExpenseObject> mExpenses = new ArrayList<>();
     private List<Long> mActiveAccounts = new ArrayList<>();
-    private AccountRepository mAccountRepo;
     private ChildExpenseRepository mChildExpenseRepo;
     private ExpenseRepository mBookingRepo;
 
@@ -71,7 +69,6 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
 
         setSharedPreferencesProperties();
 
-        mAccountRepo = new AccountRepository(this);
         mChildExpenseRepo = new ChildExpenseRepository(this);
         mBookingRepo = new ExpenseRepository(this);
 
@@ -172,9 +169,9 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
         UserSettingsPreferences preferences = new UserSettingsPreferences(this);
         preferences.setMaxBackupCount(20);
 
-        //todo hole dir die Main Currency aus der Datenbank und schreibe sie mit hilfe des UserSettingsPreferences Objetks in die SharedPreferences
-        SharedPreferences oldPreferences = this.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
-        oldPreferences.edit().putLong("mainCurrencyIndex", 32L).apply();
+        //TODO Die MainCurrency sollte bereits beim erstellen der Datenbank in den Preferences gespeichert worden sein
+//        SharedPreferences oldPreferences = this.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
+//        oldPreferences.edit().putLong("mainCurrencyIndex", 32L).apply();
     }
 
     @Override
@@ -225,13 +222,11 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
     private class SectionsPagerAdapter extends FragmentPagerAdapter {
 
         SectionsPagerAdapter(FragmentManager fm) {
-
             super(fm);
         }
 
         @Override
         public Fragment getItem(int position) {
-
             switch (position) {
                 case 0:
                     return new TabOneBookings();
@@ -246,23 +241,17 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
 
         @Override
         public int getCount() {
-
             return 3;//show 3 pages
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
-
             switch (position) {
-
                 case 0:
-
                     return getString(R.string.tab_one_title);
                 case 1:
-
                     return getString(R.string.tab_two_title);
                 case 2:
-
                     return getString(R.string.tab_three_title);
             }
             return null;
@@ -321,29 +310,23 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
         }
     }
 
-    //ab hier werden die aktiven konten gesetzt
-
     /**
      * Methode um die mActiveAccounts liste zu initialisieren
      */
     private void setActiveAccounts() {
-        Log.d(TAG, "setActiveAccounts: Erneuere aktive Kontenliste");
+        ActiveAccountsPreferences preferences = new ActiveAccountsPreferences(this, new AccountRepository(this));
 
-        SharedPreferences preferences = getSharedPreferences("ActiveAccounts", Context.MODE_PRIVATE);
-
-        for (Account account : getAllAccounts()) {
-            if (preferences.getBoolean(account.getTitle(), false))
-                mActiveAccounts.add(account.getIndex());
-        }
+        mActiveAccounts = accountToIdList(
+                preferences.getActiveAccounts()
+        );
     }
 
-    /**
-     * Methode um alle verfügbaren Konten aus der Datenbank zu holen
-     *
-     * @return Liste alles verfügbaren Konten
-     */
-    private List<Account> getAllAccounts() {
-        return mAccountRepo.getAll();
+    private List<Long> accountToIdList(List<Account> activeAccounts) {
+        List<Long> idList = new ArrayList<>();
+        for (Account account : activeAccounts)
+            idList.add(account.getIndex());
+
+        return idList;
     }
 
     public List<Long> getActiveAccounts() {

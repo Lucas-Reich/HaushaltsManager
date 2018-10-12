@@ -1,8 +1,6 @@
 package com.example.lucas.haushaltsmanager.Activities;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -29,8 +27,8 @@ import com.example.lucas.haushaltsmanager.Dialogs.SingleChoiceDialog;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
-import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
+import com.example.lucas.haushaltsmanager.R;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -118,11 +116,15 @@ public class TransferActivity extends AppCompatActivity {
                 expenseInput.setOnPriceSelectedListener(new PriceInputDialog.OnPriceSelected() {
                     @Override
                     public void onPriceSelected(double price) {
-                        SharedPreferences preferences = getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
+                        UserSettingsPreferences preferences = new UserSettingsPreferences(TransferActivity.this);
 
                         mFromExpense.setPrice(price);
                         mFromExpense.setExpenditure(true);
-                        mAmountBtn.setText(String.format(getResources().getConfiguration().locale, "%.2f %s", mFromExpense.getUnsignedPrice(), preferences.getString("mainCurrencySymbol", "€")));
+                        mAmountBtn.setText(String.format(
+                                getResources().getConfiguration().locale, "%.2f %s",
+                                mFromExpense.getUnsignedPrice(),
+                                preferences.getMainCurrency().getSymbol())
+                        );
 
                         setToExpense(price);
                     }

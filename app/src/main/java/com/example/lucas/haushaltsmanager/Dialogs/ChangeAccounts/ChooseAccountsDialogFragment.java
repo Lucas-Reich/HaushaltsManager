@@ -102,7 +102,7 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Acco
             public void onClick(DialogInterface dialog, int which) {
 
                 Intent newAccountIntent = new Intent(getActivity(), CreateAccountActivity.class);
-                newAccountIntent.putExtra("mode", "create");
+                newAccountIntent.putExtra(CreateAccountActivity.INTENT_MODE, CreateAccountActivity.INTENT_MODE_CREATE);
                 getActivity().startActivity(newAccountIntent);
             }
         });
