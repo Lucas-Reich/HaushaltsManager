@@ -198,4 +198,9 @@
     <string name="saved_as_recurring">Created recurring booking</string>
     <string name="set_recurring_timeframe">Set timeframe</string>
     <string name="activity_create_recurring_booking">Create recurring booking</string>
+    <string name="from">From</string>
+    <string name="till">Till</string>
+    <string name="could_not_save_recurring_booking">Cannot save RecurringBooking</string>
+    <string name="frequency_in_days">Frequency in days</string>
+    <string name="input_frequency_label">"Frequency in days: "</string>
 </resources>

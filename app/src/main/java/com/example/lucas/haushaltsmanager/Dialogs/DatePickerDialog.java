@@ -8,15 +8,16 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.widget.DatePicker;
 
-import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
 import com.example.lucas.haushaltsmanager.R;
+import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
 
 import java.util.Calendar;
 
 public class DatePickerDialog extends DialogFragment implements DatePicker.OnDateChangedListener {
     private static final String TAG = DatePickerDialog.class.getSimpleName();
     public static final String TITLE = "title";
-    public static final String CURRENT_DAY = "current_day";
+    public static final String CURRENT_DAY_IN_MILLIS = "current_day";
+    public static final String MIN_DATE_IN_MILLIS = "min_date";
 
     private OnDateSelected mCallback;
     private Context mContext;
@@ -34,10 +35,11 @@ public class DatePickerDialog extends DialogFragment implements DatePicker.OnDat
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         BundleUtils args = new BundleUtils(getArguments());
 
-        mCalendar.setTimeInMillis(args.getLong(CURRENT_DAY, Calendar.getInstance().getTimeInMillis()));
+        mCalendar.setTimeInMillis(args.getLong(CURRENT_DAY_IN_MILLIS, Calendar.getInstance().getTimeInMillis()));
 
         DatePicker datePicker = new DatePicker(mContext);
         datePicker.init(mCalendar.get(Calendar.YEAR), mCalendar.get(Calendar.MONTH), mCalendar.get(Calendar.DAY_OF_MONTH), this);
+        datePicker.setMinDate(args.getLong(MIN_DATE_IN_MILLIS, 0L));
 
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 

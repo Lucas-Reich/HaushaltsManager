@@ -14,7 +14,7 @@ import android.widget.AdapterView;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
 
-import com.example.lucas.haushaltsmanager.Activities.CreateRecurringBooking;
+import com.example.lucas.haushaltsmanager.Activities.EditRecurringBooking;
 import com.example.lucas.haushaltsmanager.Activities.ExpenseScreen;
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.CannotDeleteExpenseException;
@@ -399,8 +399,8 @@ public class TabOneBookings extends Fragment implements FABToolbar.OnFabToolbarM
     }
 
     private void saveAsRecurringAction(ExpenseObject recurringExpense) {
-        Intent recurringIntent = new Intent(getContext(), CreateRecurringBooking.class);
-        recurringIntent.putExtra(CreateRecurringBooking.INTENT_BOOKING, recurringExpense);
+        Intent recurringIntent = new Intent(getContext(), EditRecurringBooking.class);
+        recurringIntent.putExtra(EditRecurringBooking.INTENT_BOOKING, recurringExpense);
 
         resetListView();
 

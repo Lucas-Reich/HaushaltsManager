@@ -202,7 +202,7 @@ public class TransferActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 Bundle bundle = new Bundle();
-                bundle.putLong(DatePickerDialog.CURRENT_DAY, mCalendar.getTimeInMillis());
+                bundle.putLong(DatePickerDialog.CURRENT_DAY_IN_MILLIS, mCalendar.getTimeInMillis());
 
                 DatePickerDialog datePicker = new DatePickerDialog();
                 datePicker.setArguments(bundle);

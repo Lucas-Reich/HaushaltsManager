@@ -35,7 +35,7 @@
             android:label="@string/activity_category_name"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
         <activity
-            android:name=".Activities.RecurringBookingsActivity"
+            android:name=".Activities.RecurringBookingList"
             android:label="@string/activity_recurring_bookings_name"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
         <activity
@@ -71,7 +71,7 @@
             android:label="@string/activity_about_name"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
         <activity
-            android:name=".Activities.CreateRecurringBooking"
+            android:name=".Activities.EditRecurringBooking"
             android:label="@string/activity_create_recurring_booking"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
 

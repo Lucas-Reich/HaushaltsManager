@@ -11,8 +11,8 @@ import com.example.lucas.haushaltsmanager.R;
 import java.util.Calendar;
 import java.util.List;
 
-public class RecurringBookingsActivity extends AbstractAppCompatActivity {
-    private static final String TAG = RecurringBookingsActivity.class.getSimpleName();
+public class RecurringBookingList extends AbstractAppCompatActivity {
+    private static final String TAG = RecurringBookingList.class.getSimpleName();
 
     private List<ExpenseObject> mRecurringBookings;
     private ListView mListView;

@@ -106,7 +106,7 @@
     <string name="no_bookings_in_month">Keine Buchungen diesen Monat</string>
     <string name="category">Kategorie</string>
     <string name="input_price">Geben Sie den Preis ein</string>
-    <string name="input_frequency">Geben Sie die Häufigkeit ein</string>
+    <string name="input_frequency">Geben Sie die Häufigkeit an</string>
     <string name="show_templates">Vorlagen</string>
     <string name="filter">Filter</string>
     <string name="sort">Sortiere</string>
@@ -195,4 +195,17 @@
     <string name="backup_restoring_failed">Backup konnte nicht wiederhergestellt werden</string>
     <string name="imports_empty_list">Keine kompatiblen Datein im aktuellen Verzeichniss gefunden</string>
     <string name="importing_not_yet_supported">Das Importieren von Ausgaben wird erst in der Zukunft unterstützt</string>
+    <string name="recurring_bookings_empty_list">Keine wiederkehrende Buchungen</string>
+    <string name="default_backup_location">Wähle das Standart Backupverzeichniss</string>
+    <string name="failed_to_delete_booking">Buchung konnte nicht gelöscht werden</string>
+    <string name="could_not_update_booking">Buchungsupdate fehlgeschlagen</string>
+    <string name="saved_as_template">Buchung wurde als Template gespeichert</string>
+    <string name="saved_as_recurring">Wiederkehrende Buchung erstellt</string>
+    <string name="set_recurring_timeframe">Wähle den Zeitraum</string>
+    <string name="activity_create_recurring_booking">Erstelle wiederkehrende Buchung</string>
+    <string name="from">Von</string>
+    <string name="till">Bis</string>
+    <string name="could_not_save_recurring_booking">Wiederkehrende Buchung konnte nicht gespeichert werden</string>
+    <string name="frequency_in_days">Häufigkeit in Tagen</string>
+    <string name="input_frequency_label">"Häufigkeit in Tagen: "</string>
 </resources>

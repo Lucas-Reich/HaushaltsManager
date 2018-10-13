@@ -1,8 +1,5 @@
 package com.example.lucas.haushaltsmanager.Activities.MainTab;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -29,7 +26,7 @@ import com.example.lucas.haushaltsmanager.Activities.CategoryListActivity;
 import com.example.lucas.haushaltsmanager.Activities.CourseActivity;
 import com.example.lucas.haushaltsmanager.Activities.ImportExportActivity;
 import com.example.lucas.haushaltsmanager.Activities.MainTab.TabOne.TabOneBookings;
-import com.example.lucas.haushaltsmanager.Activities.RecurringBookingsActivity;
+import com.example.lucas.haushaltsmanager.Activities.RecurringBookingList;
 import com.example.lucas.haushaltsmanager.Activities.Settings;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.CannotDeleteExpenseException;
@@ -40,9 +37,7 @@ import com.example.lucas.haushaltsmanager.Dialogs.ChangeAccounts.ChooseAccountsD
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.MockDataCreator;
-import com.example.lucas.haushaltsmanager.MyAlarmReceiver;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences;
-import com.example.lucas.haushaltsmanager.PreferencesHelper.AppInternalPreferences;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
 
@@ -127,7 +122,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
                         break;
                     case R.id.standing_orders:
 
-                        Intent recurringBookingIntent = new Intent(ParentActivity.this, RecurringBookingsActivity.class);
+                        Intent recurringBookingIntent = new Intent(ParentActivity.this, RecurringBookingList.class);
                         ParentActivity.this.startActivity(recurringBookingIntent);
                         break;
                     case R.id.backup:
@@ -286,31 +281,6 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
     }
 
     /**
-     * Methode um meinen BackupService periodische jeden Tag einmal laufen zu lassen.
-     * <p>
-     * Anleitung siehe: https://guides.codepath.com/android/Starting-Background-Services#using-with-alarmmanager-for-periodic-tasks
-     *///todo es sollte nicht jedes mal ein backup erstellt werden wenn die app aufgerufen wird
-    private void scheduleBackupServiceAlarm() {
-        AppInternalPreferences preferences = new AppInternalPreferences(this);
-
-        //nur wenn noch kein BackupCreator service läuft soll einer gestartet werden
-        if (preferences.getBackupJobExecutionStatus()) {
-
-            Intent backupServiceIntent = new Intent(getApplicationContext(), MyAlarmReceiver.class);
-
-            final PendingIntent pendingIntent = PendingIntent.getBroadcast(this, MyAlarmReceiver.REQUEST_CODE, backupServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-
-            long startInMillis = System.currentTimeMillis();
-
-            AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-
-            alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, startInMillis, AlarmManager.INTERVAL_DAY, pendingIntent);
-
-            preferences.setBackupJobExecutionStatus(true);
-        }
-    }
-
-    /**
      * Methode um die mActiveAccounts liste zu initialisieren
      */
     private void setActiveAccounts() {
@@ -335,7 +305,6 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
 
     /**
      * Anleitung von: https://stackoverflow.com/questions/27204409/android-calling-a-function-inside-a-fragment-from-a-custom-action-bar
-     * <p>
      * Der User hat im ChooseAccountDialogFragment ein Konto angewählt.
      *
      * @param accountId Id des angewählten Kontos.
