@@ -4,20 +4,23 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
-import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.Exceptions.EntityNotExistingException;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.Exceptions.RecurringBookingNotFoundException;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.RecurringBooking;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
 public class RecurringBookingRepository {
+    private static final String TAG = RecurringBookingRepository.class.getSimpleName();
     //todo ein neues Objekt erstellen RecurringBooking
     //dieses Objekt hat index, start, end, häufigkeit und ExpenseObject als felder
     private SQLiteDatabase mDatabase;
@@ -31,9 +34,7 @@ public class RecurringBookingRepository {
     }
 
     public boolean exists(ExpenseObject recurringBooking) {
-
-        String selectQuery;
-        selectQuery = "SELECT"
+        String selectQuery = "SELECT"
                 + " *"
                 + " FROM " + ExpensesDbHelper.TABLE_RECURRING_BOOKINGS
                 + " WHERE " + ExpensesDbHelper.TABLE_RECURRING_BOOKINGS + "." + ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID + " = " + recurringBooking.getIndex()
@@ -52,10 +53,7 @@ public class RecurringBookingRepository {
         return false;
     }
 
-    public ExpenseObject insert(ExpenseObject expense, long startTimeInMillis, int frequency, long endTimeInMillis) {
-
-        mBookingRepo.assertSavableExpense(expense);
-
+    public ExpenseObject create(ExpenseObject expense, long startTimeInMillis, int frequency, long endTimeInMillis) {
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID, expense.getIndex());
         values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_START, startTimeInMillis);
@@ -80,32 +78,86 @@ public class RecurringBookingRepository {
         );
     }
 
-    public ExpenseObject get(long recurringBookingId) throws RecurringBookingNotFoundException {
-
+    public ExpenseObject get(long index) throws RecurringBookingNotFoundException {
         String selectQuery = "SELECT "
                 + ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID
                 + " FROM " + ExpensesDbHelper.TABLE_RECURRING_BOOKINGS
-                + " WHERE " + ExpensesDbHelper.RECURRING_BOOKINGS_COL_ID + " = " + recurringBookingId;
+                + " WHERE " + ExpensesDbHelper.RECURRING_BOOKINGS_COL_ID + " = " + index;
 
         Cursor c = mDatabase.rawQuery(selectQuery, null);
 
-        if (!c.moveToFirst()) {
-            throw new RecurringBookingNotFoundException(recurringBookingId);
-        }
+        if (!c.moveToFirst())
+            throw new RecurringBookingNotFoundException(index);
 
-        ExpenseObject expense;
         try {
-            expense = getExpense(c);
+
+            return getExpense(c);
         } catch (EntityNotExistingException e) {
 
-            //Kann keine Buchung zu einer Wiederkehrenden Buchung gefunden werden so wird diese aus der Datenbank gelöcht.
+            //Kann keine Buchung zu einer Wiederkehrenden Buchung gefunden werden so wird diese aus der Datenbank gelöscht.
             //Buchungen die einmal gelöscht wurden können nachträglicg nicht mehr wiederhergestellt werden.
-            mDatabase.delete(ExpensesDbHelper.TABLE_RECURRING_BOOKINGS, ExpensesDbHelper.RECURRING_BOOKINGS_COL_ID + " = ?", new String[]{"" + recurringBookingId});
-            throw new RecurringBookingNotFoundException(recurringBookingId);
+            mDatabase.delete(ExpensesDbHelper.TABLE_RECURRING_BOOKINGS, ExpensesDbHelper.RECURRING_BOOKINGS_COL_ID + " = ?", new String[]{"" + index});
+            throw new RecurringBookingNotFoundException(index);
+        }
+    }
+
+    public List<RecurringBooking> getAll2(Calendar start, Calendar end) {
+        String selectQuery = "SELECT "
+                + ExpensesDbHelper.RECURRING_BOOKINGS_COL_ID + ", "
+                + ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID + ", "
+                + ExpensesDbHelper.RECURRING_BOOKINGS_COL_FREQUENCY + ", "
+                + ExpensesDbHelper.RECURRING_BOOKINGS_COL_START + ", "
+                + ExpensesDbHelper.RECURRING_BOOKINGS_COL_END
+                + " FROM " + ExpensesDbHelper.TABLE_RECURRING_BOOKINGS
+                + " WHERE " + ExpensesDbHelper.RECURRING_BOOKINGS_COL_END + " > " + start.getTimeInMillis() + ";";
+
+        Cursor c = mDatabase.rawQuery(selectQuery, null);
+
+        List<RecurringBooking> recurringBookings = new ArrayList<>();
+        while (c.moveToNext()) {
+            RecurringBooking expense = fromCursor(c);
+
+            if (expense.occursInRange(start, end))
+                recurringBookings.add(expense);
         }
 
-        c.close();
-        return expense;
+        return recurringBookings;
+    }
+
+    private RecurringBooking fromCursor(Cursor c) {
+        long index = c.getLong(c.getColumnIndex(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID));
+
+        long startInMillis = c.getLong(c.getColumnIndex(ExpensesDbHelper.RECURRING_BOOKINGS_COL_START));
+        Calendar start = Calendar.getInstance();
+        start.setTimeInMillis(startInMillis);
+
+        long endInMillis = c.getLong(c.getColumnIndex(ExpensesDbHelper.RECURRING_BOOKINGS_COL_END));
+        Calendar end = Calendar.getInstance();
+        end.setTimeInMillis(endInMillis);
+
+        int frequencyInHours = c.getInt(c.getColumnIndex(ExpensesDbHelper.RECURRING_BOOKINGS_COL_FREQUENCY));
+
+        //TODO kann man das auch irgendwie anders handeln?
+        ExpenseObject expense = null;
+        long expenseId = c.getLong(c.getColumnIndex(ExpensesDbHelper.RECURRING_BOOKINGS_COL_ID));
+        try {
+
+            expense = mBookingRepo.get(expenseId);
+        } catch (ExpenseNotFoundException e) {
+
+            Log.e(TAG, "Failed to fetch Expense " + expenseId, e);
+        }
+
+        if (c.isLast())
+            c.close();
+
+        return new RecurringBooking(
+                index,
+                start,
+                end,
+                frequencyInHours,
+                expense
+        );
     }
 
     public List<ExpenseObject> getAll(Calendar dateRangeStart, Calendar dateRangeEnd) {//TODO nicht ganz zufrieden mit der funktion, bitte überdenken
@@ -115,18 +167,16 @@ public class RecurringBookingRepository {
                 + ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID + ", "
                 + ExpensesDbHelper.RECURRING_BOOKINGS_COL_FREQUENCY
                 + " FROM " + ExpensesDbHelper.TABLE_RECURRING_BOOKINGS
-                + " WHERE " + ExpensesDbHelper.RECURRING_BOOKINGS_COL_END + " > " + dateRangeEnd.getTimeInMillis() + ";";
+                + " WHERE " + ExpensesDbHelper.RECURRING_BOOKINGS_COL_END + " > " + dateRangeStart.getTimeInMillis() + ";";
 
         Cursor c = mDatabase.rawQuery(selectQuery, null);
-
-        c.moveToFirst();
 
         ExpenseObject expense;
         Calendar start = Calendar.getInstance();
         Calendar end = Calendar.getInstance();
 
         ArrayList<ExpenseObject> allRecurringBookings = new ArrayList<>();
-        while (!c.isAfterLast()) {
+        while (c.moveToNext()) {
 
             //getAll start date of recurring booking
             String startDateString = c.getString(c.getColumnIndex(ExpensesDbHelper.RECURRING_BOOKINGS_COL_START));
@@ -172,16 +222,18 @@ public class RecurringBookingRepository {
     }
 
     public boolean update(ExpenseObject newRecurringBooking, long startDateInMills, int frequency, long endDateInMills, long recurringId) {
-
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID, newRecurringBooking.getIndex());
         values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_START, startDateInMills);
         values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_FREQUENCY, frequency);
         values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_END, endDateInMills);
 
-        int affectedRows = mDatabase.update(ExpensesDbHelper.TABLE_RECURRING_BOOKINGS, values, ExpensesDbHelper.RECURRING_BOOKINGS_COL_ID + " = ?", new String[]{"" + recurringId});
-
-        return affectedRows == 1;
+        return 1 == mDatabase.update(
+                ExpensesDbHelper.TABLE_RECURRING_BOOKINGS,
+                values,
+                ExpensesDbHelper.RECURRING_BOOKINGS_COL_ID + " = ?",
+                new String[]{"" + recurringId}
+        );
     }
 
     public void delete(long recurringBookingId) {
@@ -189,10 +241,17 @@ public class RecurringBookingRepository {
         mDatabase.delete(ExpensesDbHelper.TABLE_RECURRING_BOOKINGS, ExpensesDbHelper.RECURRING_BOOKINGS_COL_ID + "= ?", new String[]{"" + recurringBookingId});
     }
 
-    private static ExpenseObject getExpense(Cursor c) throws EntityNotExistingException {
+    private ExpenseObject getExpense(Cursor c) throws EntityNotExistingException {
         //ich kann nun nicht mehr unterscheiden welchen typ von ausgabe ich genau habe
         //an sich nicht schlimm da ich auch Kinder aus dem ExpensesRepo bekomme, aber nicht der schönste weg
         //todo gibt es einen anderen Weg die Expense zu bekommen
-        return new ExpenseRepository(app.getContext()).get(c.getLong(c.getColumnIndex(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID)));//todo
+        ExpenseObject expense = mBookingRepo.get(
+                c.getLong(c.getColumnIndex(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID))
+        );
+
+        if (c.isLast())
+            c.close();
+
+        return expense;
     }
 }

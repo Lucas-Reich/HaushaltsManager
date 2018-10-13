@@ -1,12 +1,12 @@
 package com.example.lucas.haushaltsmanager.Activities;
 
 import android.os.Bundle;
-import android.widget.ListView;
+import android.widget.ExpandableListView;
 
-import com.example.lucas.haushaltsmanager.BookingAdapter;
 import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.RecurringBookingRepository;
-import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.RecurringBooking;
 import com.example.lucas.haushaltsmanager.R;
+import com.example.lucas.haushaltsmanager.RecurringBookingAdapter;
 
 import java.util.Calendar;
 import java.util.List;
@@ -14,10 +14,7 @@ import java.util.List;
 public class RecurringBookingList extends AbstractAppCompatActivity {
     private static final String TAG = RecurringBookingList.class.getSimpleName();
 
-    private List<ExpenseObject> mRecurringBookings;
-    private ListView mListView;
-    private Calendar mStartDate = Calendar.getInstance();
-    private Calendar mEndDate = Calendar.getInstance();
+    private ExpandableListView mExpListView;
     private RecurringBookingRepository mRecurringBookingRepo;
 
     @Override
@@ -27,8 +24,8 @@ public class RecurringBookingList extends AbstractAppCompatActivity {
 
         initializeToolbar();
 
-        mListView = findViewById(R.id.booking_list_view);
-        mListView.setEmptyView(findViewById(R.id.empty_list_view));
+        mExpListView = findViewById(R.id.booking_list_view);
+        mExpListView.setEmptyView(findViewById(R.id.empty_list_view));
 
         mRecurringBookingRepo = new RecurringBookingRepository(this);
     }
@@ -41,21 +38,42 @@ public class RecurringBookingList extends AbstractAppCompatActivity {
     }
 
     private void updateListView() {
+        RecurringBookingAdapter recurringBookingAdapter = new RecurringBookingAdapter(
+                this,
+                getRecurringBookings()
+        );
 
-        prepareListData();
+        mExpListView.setAdapter(recurringBookingAdapter);
 
-        BookingAdapter bookingAdapter = new BookingAdapter(mRecurringBookings, this);
-
-        mListView.setAdapter(bookingAdapter);
-
-        bookingAdapter.notifyDataSetChanged();
+        recurringBookingAdapter.notifyDataSetChanged();
     }
 
-    private void prepareListData() {
+    private List<RecurringBooking> getRecurringBookings() {
+        return mRecurringBookingRepo.getAll2(
+                getFirstOfMonth(),
+                getLastOfMonth()
+        );
+    }
 
-        mStartDate.set(mStartDate.get(Calendar.YEAR), mStartDate.get(Calendar.MONTH), 1);
-        mEndDate.set(mEndDate.get(Calendar.YEAR), mEndDate.get(Calendar.MONTH), mEndDate.getActualMaximum(Calendar.DAY_OF_MONTH));
+    private Calendar getFirstOfMonth() {
+        Calendar date = Calendar.getInstance();
+        date.set(
+                date.get(Calendar.YEAR),
+                date.get(Calendar.MONTH),
+                1
+        );
 
-        mRecurringBookings = mRecurringBookingRepo.getAll(mStartDate, mEndDate);
+        return date;
+    }
+
+    private Calendar getLastOfMonth() {
+        Calendar date = Calendar.getInstance();
+        date.set(
+                date.get(Calendar.YEAR),
+                date.get(Calendar.MONTH),
+                date.getActualMaximum(Calendar.DAY_OF_MONTH)
+        );
+
+        return date;
     }
 }

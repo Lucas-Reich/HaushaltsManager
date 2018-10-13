@@ -17,6 +17,7 @@ import java.util.Calendar;
 
 public class EditRecurringBooking extends AbstractAppCompatActivity {
     private static final String TAG = EditRecurringBooking.class.getSimpleName();
+    private static final long DAY_IN_MILLIS = 86400000;
 
     public static final String INTENT_BOOKING = "recurringBooking";
 
@@ -146,10 +147,10 @@ public class EditRecurringBooking extends AbstractAppCompatActivity {
             return false;
 
         RecurringBookingRepository recurringBookingRepo = new RecurringBookingRepository(this);
-        recurringBookingRepo.insert(
+        recurringBookingRepo.create(
                 mRecurringExpense,
                 mStartDate.getTimeInMillis(),
-                mFrequency,
+                mFrequency * 24,
                 mEndDate.getTimeInMillis()
         );
 
