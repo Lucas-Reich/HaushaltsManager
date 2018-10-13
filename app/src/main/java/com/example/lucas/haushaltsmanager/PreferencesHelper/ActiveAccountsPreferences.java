@@ -39,8 +39,8 @@ public class ActiveAccountsPreferences {
         mPreferences.edit().putBoolean(account.getIndex() + "", visibility).apply();
     }
 
+    //TODO sollte ich unterscheiden zwischen Konten die nicht gefunden werden konnten und Konten die es tatsächlich gibt?
     public boolean isActive(Account account) {
-        //todo sollte ich unterscheiden zwischen Konten die nicht gefunden werden konnten und Konten die es tatsächlich gibt?
 
         return mPreferences.getBoolean(account.getIndex() + "", false);
     }
@@ -54,7 +54,7 @@ public class ActiveAccountsPreferences {
             //TODO sollte ich eine Konto welches nicht in der Datenbank gefunden werden konnte einfach aus der liste der aktiven Konten löschen?
             // oder kann es dann sein dass dieses konto immer und immer wieder in die preferences geschrieben wird?
             if (value)
-                activeAccounts.add(fetchAccount(Long.getLong(entry.getKey())));
+                activeAccounts.add(fetchAccount(Long.parseLong(entry.getKey())));
         }
 
         return activeAccounts;
