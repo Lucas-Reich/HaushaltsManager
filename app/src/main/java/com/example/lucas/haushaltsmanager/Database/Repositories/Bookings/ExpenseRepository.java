@@ -41,9 +41,7 @@ public class ExpenseRepository {
     }
 
     public boolean exists(ExpenseObject expense) {
-        String selectQuery;
-
-        selectQuery = "SELECT"
+        String selectQuery = "SELECT"
                 + " *"
                 + " FROM " + ExpensesDbHelper.TABLE_BOOKINGS
                 + " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_ID + " = " + expense.getIndex()
@@ -216,6 +214,43 @@ public class ExpenseRepository {
         }
 
         return insertedExpense;
+    }
+
+    public void forceDelete(ExpenseObject expense) {
+        if (isRecurringBooking(expense) || isTemplateBooking(expense)) {
+            if (hasChildren(expense)) {
+                for (ExpenseObject child : expense.getChildren()) {
+                    try {
+                        hide(child);
+                    } catch (ExpenseNotFoundException e) {
+                        Log.e(TAG, "Failed to delete expense " + expense.getTitle(), e);
+                    }
+                }
+            } else {
+                try {
+                    hide(expense);
+                } catch (ExpenseNotFoundException e) {
+                    Log.e(TAG, "Failed to delete expense " + expense.getTitle(), e);
+                }
+            }
+        } else {
+            if (hasChildren(expense)) {
+                for (ExpenseObject child : expense.getChildren()) {
+                    try {
+                        delete(child);
+                    } catch (CannotDeleteExpenseException e) {
+                        Log.e(TAG, "Failed to delete expense " + expense.getTitle(), e);
+                    }
+                }
+            } else {
+
+                try {
+                    delete(expense);
+                } catch (CannotDeleteExpenseException e) {
+                    Log.e(TAG, "Failed to delete expense " + expense.getTitle(), e);
+                }
+            }
+        }
     }
 
     public void delete(ExpenseObject expense) throws CannotDeleteExpenseException {

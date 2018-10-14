@@ -234,7 +234,7 @@ public class TabOneBookings extends Fragment implements FABToolbar.OnFabToolbarM
     public void updateListView() {
 
         mListAdapter = new ExpandableListAdapterCreator(
-                mParent.getExpenses(getDayFirstOfMonth(), getLastDayOfMonth()),
+                mParent.getExpenses(getFirstOfMonth(), getLastOfMonth()),
                 mParent.getActiveAccounts(),
                 getContext()
         ).getExpandableListAdapter();
@@ -244,7 +244,7 @@ public class TabOneBookings extends Fragment implements FABToolbar.OnFabToolbarM
         mListAdapter.notifyDataSetChanged();
     }
 
-    private Calendar getDayFirstOfMonth() {
+    private Calendar getFirstOfMonth() {
         Calendar firstOfMonth = Calendar.getInstance();
         firstOfMonth.set(Calendar.HOUR_OF_DAY, 0);
         firstOfMonth.set(Calendar.MINUTE, 0);
@@ -254,7 +254,7 @@ public class TabOneBookings extends Fragment implements FABToolbar.OnFabToolbarM
         return firstOfMonth;
     }
 
-    private Calendar getLastDayOfMonth() {
+    private Calendar getLastOfMonth() {
         int lastDayMonth = Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH);
         Calendar lastOfMonth = Calendar.getInstance();
         lastOfMonth.set(Calendar.DAY_OF_MONTH, lastDayMonth);
