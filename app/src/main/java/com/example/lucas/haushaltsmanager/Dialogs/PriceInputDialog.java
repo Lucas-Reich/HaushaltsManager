@@ -16,7 +16,7 @@ import android.widget.TextView;
 
 import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
 import com.example.lucas.haushaltsmanager.R;
-import com.example.lucas.haushaltsmanager.Views.ViewUtils;
+import com.example.lucas.haushaltsmanager.Utils.ViewUtils;
 
 public class PriceInputDialog extends DialogFragment {
     private static final String TAG = PriceInputDialog.class.getSimpleName();

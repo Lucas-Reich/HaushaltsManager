@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
-import com.example.lucas.haushaltsmanager.Views.ViewUtils;
+import com.example.lucas.haushaltsmanager.Utils.ViewUtils;
 
 import java.util.ArrayList;
 import java.util.List;

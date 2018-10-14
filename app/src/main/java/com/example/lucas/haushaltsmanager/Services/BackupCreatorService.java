@@ -7,11 +7,11 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.example.lucas.haushaltsmanager.PreferencesHelper.AppInternalPreferences;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Entities.Directory;
-import com.example.lucas.haushaltsmanager.Utils.FileUtils;
+import com.example.lucas.haushaltsmanager.PreferencesHelper.AppInternalPreferences;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
+import com.example.lucas.haushaltsmanager.Utils.FileUtils;
 
 import java.io.File;
 import java.text.SimpleDateFormat;

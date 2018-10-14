@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager.Views;
+package com.example.lucas.haushaltsmanager.Utils;
 
 import android.content.Context;
 import android.content.res.Resources;

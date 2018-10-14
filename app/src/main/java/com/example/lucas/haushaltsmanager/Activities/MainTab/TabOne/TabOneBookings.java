@@ -352,8 +352,9 @@ public class TabOneBookings extends Fragment implements FABToolbar.OnFabToolbarM
     private BasicTextInputDialog.OnTextInput getOnTextInputListener(final List<ExpListViewSelectedItem> selectedItems) {
         return new BasicTextInputDialog.OnTextInput() {
             @Override
-            public void onTextInput(String textInput) {
+            public void onTextInput(String combinedExpenseTitle) {
                 ExpenseObject parent = ExpenseObject.createDummyExpense();
+                parent.setTitle(combinedExpenseTitle);
 
                 //TODO Wenn die angegebene Buchung eine ParentBuchung ist müssen anstatt der Buchung die KindBuchungen zusammengefügt werden
                 for (ExpListViewSelectedItem selectedItem : selectedItems) {
@@ -439,20 +440,23 @@ public class TabOneBookings extends Fragment implements FABToolbar.OnFabToolbarM
     }
 
     private void deleteBookingsAction(List<ExpListViewSelectedItem> selectedItems) {
-        //todo Wenn die Buchung eine ParentBuchung ist müssen anstatt der angegebenen Buchung die Kinder gelöscht werden
         for (ExpListViewSelectedItem selectedItem : selectedItems) {
             try {
-                if (selectedItem.isParent())
-                    mExpenseRepo.delete(selectedItem.getItem());
-                else
+                if (selectedItem.isParent()) {
+                    for (ExpenseObject child : selectedItem.getItem().getChildren()) {
+                        mChildExpenseRepo.delete(child);
+                        mRevertDeletionSnackbar.addItem(new ExpListViewSelectedItem(
+                                child,
+                                selectedItem.getItem()
+                        ));
+                    }
+                } else {
                     mChildExpenseRepo.delete(selectedItem.getItem());
+                    mRevertDeletionSnackbar.addItem(selectedItem);
+                }
 
                 mRevertDeletionSnackbar.addItem(selectedItem);
 
-            } catch (CannotDeleteExpenseException e) {
-
-                //todo was soll ich machen wenn eine Buchung nicht gelöscht werden konnte
-                Log.e(TAG, "Could not delete Expense " + selectedItem.getItem().getTitle(), e);
             } catch (CannotDeleteChildExpenseException e) {
 
                 //todo was soll ich machen wenn eine KindBuchung nicht gelöscht werden konnte

@@ -8,7 +8,7 @@ public class ExpListViewSelectedItem {
     private ExpenseObject mSelectedItem;
     private ExpenseObject mItemParent;
 
-    ExpListViewSelectedItem(ExpenseObject item, @Nullable ExpenseObject parent) {
+    public ExpListViewSelectedItem(ExpenseObject item, @Nullable ExpenseObject parent) {
         mSelectedItem = item;
         mItemParent = parent;
     }

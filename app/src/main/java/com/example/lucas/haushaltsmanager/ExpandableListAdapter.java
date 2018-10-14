@@ -13,7 +13,7 @@ import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
-import com.example.lucas.haushaltsmanager.Views.ViewUtils;
+import com.example.lucas.haushaltsmanager.Utils.ViewUtils;
 import com.lucas.androidcharts.DataSet;
 import com.lucas.androidcharts.PieChart;
 
