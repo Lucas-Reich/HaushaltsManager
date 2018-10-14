@@ -11,17 +11,17 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBooking
 import com.example.lucas.haushaltsmanager.Dialogs.DatePickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.RecurringBooking;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.util.Calendar;
 
 public class EditRecurringBooking extends AbstractAppCompatActivity {
     private static final String TAG = EditRecurringBooking.class.getSimpleName();
-    private static final long DAY_IN_MILLIS = 86400000;
 
     public static final String INTENT_BOOKING = "recurringBooking";
 
-    private ExpenseObject mRecurringExpense;
+    private ExpenseObject mExpense;
     private Calendar mStartDate, mEndDate;
     private int mFrequency;
     private Button mSaveBtn, mStartDateBtn, mEndDateBtn, mFrequencyBtn;
@@ -33,7 +33,7 @@ public class EditRecurringBooking extends AbstractAppCompatActivity {
 
         Bundle bundle = getIntent().getExtras();
         if (null != bundle)
-            mRecurringExpense = bundle.getParcelable(INTENT_BOOKING);
+            mExpense = bundle.getParcelable(INTENT_BOOKING);
 
         mSaveBtn = findViewById(R.id.edit_recurring_booking_save);
         mStartDateBtn = findViewById(R.id.edit_recurring_booking_from_date);
@@ -147,12 +147,12 @@ public class EditRecurringBooking extends AbstractAppCompatActivity {
             return false;
 
         RecurringBookingRepository recurringBookingRepo = new RecurringBookingRepository(this);
-        recurringBookingRepo.create(
-                mRecurringExpense,
-                mStartDate.getTimeInMillis(),
-                mFrequency * 24,
-                mEndDate.getTimeInMillis()
-        );
+        recurringBookingRepo.create(new RecurringBooking(
+                mStartDate,
+                mEndDate,
+                mFrequency,
+                mExpense
+        ));
 
         return true;
     }

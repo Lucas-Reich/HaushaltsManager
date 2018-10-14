@@ -25,6 +25,10 @@ public class RecurringBooking {
         mExpense = expense;
     }
 
+    public RecurringBooking(Calendar start, Calendar end, int frequency, ExpenseObject expense) {
+        this(-1, start, end, frequency, expense);
+    }
+
     public long getIndex() {
         return mIndex;
     }

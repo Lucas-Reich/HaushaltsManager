@@ -49,7 +49,7 @@ public class RecurringBookingList extends AbstractAppCompatActivity {
     }
 
     private List<RecurringBooking> getRecurringBookings() {
-        return mRecurringBookingRepo.getAll2(
+        return mRecurringBookingRepo.getAll(
                 getFirstOfMonth(),
                 getLastOfMonth()
         );

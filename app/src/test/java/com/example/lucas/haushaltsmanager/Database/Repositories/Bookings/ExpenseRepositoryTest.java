@@ -357,9 +357,9 @@ public class ExpenseRepositoryTest {
     public void testDeleteWithExistingBookingThatIsARecurringShouldSucceedAndChangeBookingVisibilityToHidden() {
         //fixme Test ausführen, wenn Buchungen als versteckt markiert werden wenn sie noch einen Wiederkehrende Buchung sind
         ExpenseObject expense = mBookingRepo.insert(getSimpleExpense());
-        mRecurringBookingRepo.create(getSimpleExpense(), 0, 100, 77);
 
         try {
+            //TODO die recurringBookingExists methode welche in der delete methode aufgerufen wird sollte true zurückgeben
             mBookingRepo.delete(expense);
 
             assertFalse("Versteckte Buchung wurde aus der Datenbank geholt", mBookingRepo.getAll().contains(expense));

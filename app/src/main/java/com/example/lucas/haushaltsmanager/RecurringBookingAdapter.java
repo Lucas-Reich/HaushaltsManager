@@ -26,12 +26,15 @@ public class RecurringBookingAdapter extends BaseExpandableListAdapter {
     private Context mContext;
     private List<ExpenseObject> mGroupData;
     private HashMap<ExpenseObject, List<ExpenseObject>> mChildData;
+    private List<RecurringBooking> mRecurringBookings;
     private int mRed, mGreen;
 
     public RecurringBookingAdapter(Context context, List<RecurringBooking> recurringBookings) {
         mGroupData = new ArrayList<>();
         mChildData = new HashMap<>();
         mContext = context;
+
+        mRecurringBookings = recurringBookings;
 
         for (RecurringBooking booking : recurringBookings) {
             mGroupData.add(booking.getExpense());
@@ -44,22 +47,30 @@ public class RecurringBookingAdapter extends BaseExpandableListAdapter {
 
     @Override
     public int getGroupCount() {
-        return mGroupData.size();
+        return mRecurringBookings.size();
+//        return mGroupData.size();
     }
 
     @Override
     public int getChildrenCount(int groupPosition) {
-        return mChildData.size();
+        int counter = 0;
+        for (RecurringBooking booking : mRecurringBookings)
+            counter += booking.getExpense().getChildren().size();
+
+        return counter;
+//        return mChildData.size();
     }
 
     @Override
     public Object getGroup(int groupPosition) {
-        return mGroupData.get(groupPosition);
+        return mRecurringBookings.get(groupPosition);
+//        return mGroupData.get(groupPosition);
     }
 
     @Override
     public Object getChild(int groupPosition, int childPosition) {
-        return mChildData.get(mGroupData.get(groupPosition)).get(childPosition);
+        return mRecurringBookings.get(groupPosition).getExpense().getChildren().get(childPosition);
+//        return mChildData.get(mGroupData.get(groupPosition)).get(childPosition);
     }
 
     @Override
@@ -79,7 +90,9 @@ public class RecurringBookingAdapter extends BaseExpandableListAdapter {
 
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
-        ExpenseObject groupExpense = (ExpenseObject) getGroup(groupPosition);
+        RecurringBooking recurringBooking = (RecurringBooking) getGroup(groupPosition);
+        ExpenseObject groupExpense = recurringBooking.getExpense();
+
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         switch (groupExpense.getExpenseType()) {
