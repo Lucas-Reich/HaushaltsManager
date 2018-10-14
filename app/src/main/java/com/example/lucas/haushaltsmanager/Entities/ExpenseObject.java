@@ -104,7 +104,20 @@ public class ExpenseObject implements Parcelable {
 
     public ExpenseObject(@NonNull String title, double price, boolean expenditure, @NonNull Category category, long accountId, Currency currency) {
 
-        this(-1, title, price, Calendar.getInstance(), expenditure, category, null, accountId, EXPENSE_TYPES.NORMAL_EXPENSE, new ArrayList<Tag>(), new ArrayList<ExpenseObject>(), currency);
+        this(
+                -1,
+                title,
+                price,
+                Calendar.getInstance(),
+                expenditure,
+                category,
+                null,
+                accountId,
+                EXPENSE_TYPES.NORMAL_EXPENSE,
+                new ArrayList<Tag>(),
+                new ArrayList<ExpenseObject>(),
+                currency
+        );
     }
 
     /**

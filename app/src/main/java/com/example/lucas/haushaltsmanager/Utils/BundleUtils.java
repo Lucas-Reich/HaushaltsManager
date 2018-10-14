@@ -57,4 +57,9 @@ public class BundleUtils {
 
         return mBundle.containsKey(key) ? mBundle.getBoolean(key) : def;
     }
+
+    public Object getParcelable(String key, Object def) {
+
+        return mBundle.containsKey(key) ? mBundle.getParcelable(key) : def;
+    }
 }
