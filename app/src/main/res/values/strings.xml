@@ -581,7 +581,7 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
     <string name="backup_restoring_failed">Backup could not be restored</string>
     <string name="imports_empty_list">Could not find compatible files in this directory</string>
     <string name="importing_not_yet_supported">Importing Expenses will be supported in the future</string>
-    <string name="recurring_bookings_empty_list">No recurring bookings currently</string>
+    <string name="recurring_bookings_empty_list">No recurring bookings this month</string>
     <string name="default_backup_location">Choose default backup location</string>
     <string name="failed_to_delete_booking">Could not delete Booking</string>
     <string name="could_not_update_booking">Failed to update Expense</string>

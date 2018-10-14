@@ -195,7 +195,7 @@
     <string name="backup_restoring_failed">Backup konnte nicht wiederhergestellt werden</string>
     <string name="imports_empty_list">Keine kompatiblen Datein im aktuellen Verzeichniss gefunden</string>
     <string name="importing_not_yet_supported">Das Importieren von Ausgaben wird erst in der Zukunft unterstützt</string>
-    <string name="recurring_bookings_empty_list">Keine wiederkehrende Buchungen</string>
+    <string name="recurring_bookings_empty_list">Keine wiederkehrende Buchung diesen Monat</string>
     <string name="default_backup_location">Wähle das Standart Backupverzeichniss</string>
     <string name="failed_to_delete_booking">Buchung konnte nicht gelöscht werden</string>
     <string name="could_not_update_booking">Buchungsupdate fehlgeschlagen</string>

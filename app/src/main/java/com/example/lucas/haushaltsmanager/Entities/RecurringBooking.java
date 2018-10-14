@@ -9,7 +9,7 @@ public class RecurringBooking {
      */
     private int mFrequency;
     private long mIndex;
-    private ExpenseObject mExpense;
+    private ExpenseObject mExpense;//TODO kann ich die Buchung nur als referenz speichern (nur als id)?
 
     public RecurringBooking(
             long index,
