@@ -125,8 +125,9 @@ public class Category implements Parcelable {
      * @return Ob die Kategorie in die Datenbank geschrieben werden kann
      */
     public boolean isSet() {
-
-        return !mName.isEmpty() && !mColor.isEmpty();
+        return !mName.equals(
+                app.getContext().getString(R.string.no_name)
+        );
     }
 
     public void addChild(Category child) {
@@ -142,17 +143,6 @@ public class Category implements Parcelable {
 
     public List<Category> getChildren() {
         return mChildren;
-    }
-
-    /**
-     * Wenn der mIndex der Kategorie größer als null ist, dann gibt es die Kategorie bereits in der Datenbank
-     * und man kann sie sicher verwenden.
-     *
-     * @return boolean
-     */
-    public boolean isValid() {
-
-        return getIndex() > -1;
     }
 
     @Override

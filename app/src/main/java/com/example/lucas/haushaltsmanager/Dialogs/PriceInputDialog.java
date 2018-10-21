@@ -14,8 +14,8 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
 import com.example.lucas.haushaltsmanager.R;
+import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
 import com.example.lucas.haushaltsmanager.Utils.ViewUtils;
 
 public class PriceInputDialog extends DialogFragment {
@@ -45,7 +45,7 @@ public class PriceInputDialog extends DialogFragment {
         BundleUtils args = new BundleUtils(getArguments());
 
         final EditText input = createInputView();
-        input.setHint(args.getString(HINT, ""));
+        input.setHint(args.getString(HINT, "")); // TODO Formatierung anpassen
 
         //wrapper für die text eingabe, sodass dieser eine padding gegeben werden kann
         //Quelle: http://android.pcsalt.com/create-alertdialog-with-custom-layout-programmatically/

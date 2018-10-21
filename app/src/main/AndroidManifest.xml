@@ -74,6 +74,7 @@
             android:name=".Activities.EditRecurringBooking"
             android:label="@string/activity_create_recurring_booking"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
+        <activity android:name=".Activities.ExpenseScreenV2"/>
 
         <receiver
             android:name=".MyAlarmReceiver"

@@ -446,10 +446,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
     private void setCategory(Category category) {
         mExpense.setCategory(category);
         mCategoryBtn.setText(mExpense.getCategory().getTitle());
-        mExpenseTypeRadio.check(mExpense.getCategory().getDefaultExpenseType()
-                ? R.id.expense_screen_radio_expense
-                : R.id.expense_screen_radio_income
-        );
+        setExpenseType(mExpense.getCategory().getDefaultExpenseType());
     }
 
     /**

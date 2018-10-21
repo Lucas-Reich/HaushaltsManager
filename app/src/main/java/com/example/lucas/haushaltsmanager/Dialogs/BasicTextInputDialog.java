@@ -16,8 +16,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
 import com.example.lucas.haushaltsmanager.R;
+import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
 import com.example.lucas.haushaltsmanager.Utils.ViewUtils;
 
 public class BasicTextInputDialog extends DialogFragment {

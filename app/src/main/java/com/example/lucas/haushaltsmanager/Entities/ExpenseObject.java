@@ -327,6 +327,10 @@ public class ExpenseObject implements Parcelable {
         mAccountId = accountId;
     }
 
+    public void setAccount(Account account) {
+        mAccountId = account.getIndex();
+    }
+
     public void setCurrency(Currency currency) {
         mCurrency = currency;
     }
@@ -385,28 +389,10 @@ public class ExpenseObject implements Parcelable {
      */
     public boolean isSet() {
 
-        return !this.title.isEmpty() && this.price != 0 && this.category.isSet() && this.mAccountId != -1;
-    }
-
-    /**
-     * Wenn der index der Buchung größer als null ist, dann gibt es die Buchung bereits in der Datenbank
-     * und man kann sie sicher verwenden.
-     *
-     * @return boolean
-     */
-    public boolean isValid() {
-
-        return getIndex() > -1 && mAccountId != -1 && category.isValid() && areTagsValid();
-    }
-
-    private boolean areTagsValid() {
-
-        boolean result = true;
-        for (Tag tag : getTags()) {
-            result = result && tag.isValid();
-        }
-
-        return result;
+        return !this.title.equals(app.getContext().getString(R.string.no_name))
+                && this.price != 0
+                && this.category.isSet()
+                && this.mAccountId != -1;
     }
 
     @Override
