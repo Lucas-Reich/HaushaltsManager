@@ -234,7 +234,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Einnahme"
+            android:text="@string/income"
             android:textColor="@color/primary_text_color_bright"/>
 
         <Button
@@ -243,7 +243,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Ausgabe"
+            android:text="@string/expense"
             android:textColor="@color/primary_text_color_bright"/>
     </LinearLayout>
 

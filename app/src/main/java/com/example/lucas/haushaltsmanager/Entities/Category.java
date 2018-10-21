@@ -1,5 +1,6 @@
 package com.example.lucas.haushaltsmanager.Entities;
 
+import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.ColorInt;
@@ -95,7 +96,7 @@ public class Category implements Parcelable {
     @ColorInt
     public int getColorInt() {
 
-        return (int) Long.parseLong(mColor.substring(1), 16);
+        return Color.parseColor(mColor);
     }
 
     public void setColor(@NonNull String color) {

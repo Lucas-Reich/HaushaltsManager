@@ -103,6 +103,14 @@ public class RoundedTextView extends ViewUtils {
 
     public void setCircleColor(@NonNull String circleColor) {
         mCirclePaint.setColor(Color.parseColor(circleColor));
+
+        this.invalidate();
+    }
+
+    public void setCircleColor(@ColorInt int color) {
+        mCirclePaint.setColor(color);
+
+        this.invalidate();
     }
 
     /**

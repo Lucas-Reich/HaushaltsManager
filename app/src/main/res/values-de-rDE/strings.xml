@@ -157,7 +157,7 @@
     <string name="choose_time">Wähle eine Zeit aus</string>
     <string name="attention">Achtung!</string>
     <string name="reset_settings_alert_message">Du bist gerade dabei alle Änderungen auf den Default wert zurückzusetzen! Bist du sicher, dass du fortfahren möchtest?</string>
-    <string name="create_new">Erstelle neu</string>
+    <string name="create_new">Neue</string>
     <string name="first_day_of_week">Erster Tag der Woche</string>
     <string name="automatic_backups">Automatische Backups erstellen?</string>
     <string name="concurrent_backup_count">Maximale Anzahl an gleichzeitig existierenden Backups</string>
@@ -208,5 +208,9 @@
     <string name="could_not_save_recurring_booking">Wiederkehrende Buchung konnte nicht gespeichert werden</string>
     <string name="frequency_in_days">Häufigkeit in Tagen</string>
     <string name="input_frequency_label">"Häufigkeit in Tagen: "</string>
-    <string name="expense_screen_abort_confirmation">Nicht gespeicherte Daten gehen verloren! Trotzdem schließen?</string>
+    <string name="abort_action_confirmation_text">Nicht gespeicherte Daten gehen verloren! Trotzdem schließen?</string>
+    <string name="income">Einnahme</string>
+    <string name="expense">Ausgabe</string>
+    <string name="choose_parent_category_hint">Wähle eine übergeordnete Kategorie</string>
+    <string name="no_parent_error">Bitte wähle eine übergeordnete Kategorie aus</string>
 </resources>

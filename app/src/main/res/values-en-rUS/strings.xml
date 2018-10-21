@@ -152,13 +152,13 @@
     <string name="choose_time">Choose a time</string>
     <string name="attention">Attention</string>
     <string name="reset_settings_alert_message">Your are about to reset all changes to default value! Are you sure you want to contiue?</string>
-    <string name="create_new">Create New</string>
+    <string name="create_new">New</string>
     <string name="btn_dismiss">Dismiss</string>
     <string name="changelog_title">Changelog</string>
     <string name="error_no_mail_clients">There are no email clients installed.</string>
     <string name="about_us">About Us</string>
     <string name="contact">Contact</string>
-    <string name="help_improve">Help inproving the app</string>
+    <string name="help_improve">Help improving the app</string>
     <string name="suggest_feature">Suggest new feature</string>
     <string name="app_version">App Version</string>
     <string name="first_day_of_week">First day of week</string>
@@ -203,5 +203,9 @@
     <string name="could_not_save_recurring_booking">Cannot save RecurringBooking</string>
     <string name="frequency_in_days">Frequency in days</string>
     <string name="input_frequency_label">"Frequency in days: "</string>
-    <string name="expense_screen_abort_confirmation">Unsaved data will be lost! Still close?</string>
+    <string name="abort_action_confirmation_text">Unsaved data will be lost! Still close?</string>
+    <string name="no_parent_error">You have to choose a parent category first!</string>
+    <string name="income">Income</string>
+    <string name="expense">Expense</string>
+    <string name="choose_parent_category_hint">Choose superordinate category</string>
 </resources>

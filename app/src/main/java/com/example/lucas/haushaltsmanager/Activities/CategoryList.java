@@ -3,12 +3,8 @@ package com.example.lucas.haushaltsmanager.Activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -25,8 +21,13 @@ import com.example.lucas.haushaltsmanager.R;
 
 import java.util.List;
 
-public class CategoryListActivity extends AppCompatActivity {
-    private static final String TAG = CategoryListActivity.class.getSimpleName();
+import static com.example.lucas.haushaltsmanager.Activities.CreateCategory.INTENT_CATEGORY;
+import static com.example.lucas.haushaltsmanager.Activities.CreateCategory.INTENT_MODE;
+import static com.example.lucas.haushaltsmanager.Activities.CreateCategory.INTENT_MODE_UPDATE;
+import static com.example.lucas.haushaltsmanager.Activities.CreateCategory.INTENT_PARENT;
+
+public class CategoryList extends AbstractAppCompatActivity {
+    private static final String TAG = CategoryList.class.getSimpleName();
 
     private List<Category> mCategories;
     private FloatingActionButton mFabMain, mFabDelete;
@@ -47,11 +48,11 @@ public class CategoryListActivity extends AppCompatActivity {
 
         initializeToolbar();
 
-        mExpListView = (ExpandableListView) findViewById(R.id.categories_exp_list_view);
+        mExpListView = findViewById(R.id.categories_exp_list_view);
 
-        mFabMain = (FloatingActionButton) findViewById(R.id.categories_fab);
+        mFabMain = findViewById(R.id.categories_fab);
 
-        mFabDelete = (FloatingActionButton) findViewById(R.id.categories_fab_delete);
+        mFabDelete = findViewById(R.id.categories_fab_delete);
     }
 
     @Override
@@ -86,10 +87,11 @@ public class CategoryListActivity extends AppCompatActivity {
                         finish();
                     } else {
 
-                        Intent updateCategoryIntent = new Intent(CategoryListActivity.this, CreateCategoryActivity.class);
-                        updateCategoryIntent.putExtra("mode", "updateCategory");
-                        updateCategoryIntent.putExtra("updateCategory", clickedCategory);
-                        CategoryListActivity.this.startActivity(updateCategoryIntent);
+                        Intent updateCategoryIntent = new Intent(CategoryList.this, CreateCategory.class);
+                        updateCategoryIntent.putExtra(INTENT_MODE, INTENT_MODE_UPDATE);
+                        updateCategoryIntent.putExtra(INTENT_CATEGORY, clickedCategory);
+                        updateCategoryIntent.putExtra(INTENT_PARENT, (Category) mListAdapter.getGroup(groupPosition));
+                        CategoryList.this.startActivity(updateCategoryIntent);
                     }
                 }
 
@@ -142,7 +144,7 @@ public class CategoryListActivity extends AppCompatActivity {
                 } catch (CannotDeleteChildCategoryException e) {
 
                     //todo ich sollte den try catch nur um die for schleife machen und die categorien die nicht gelöscht werden konnten speichern und etwas mit ihnen machen
-                    Toast.makeText(CategoryListActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CategoryList.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -157,9 +159,9 @@ public class CategoryListActivity extends AppCompatActivity {
                     resetActivityViewState();
                 } else {
 
-                    Intent createCategoryIntent = new Intent(CategoryListActivity.this, CreateCategoryActivity.class);
-                    createCategoryIntent.putExtra("mode", "createCategory");
-                    CategoryListActivity.this.startActivity(createCategoryIntent);
+                    Intent createCategoryIntent = new Intent(CategoryList.this, CreateCategory.class);
+                    createCategoryIntent.putExtra(CreateCategory.INTENT_MODE, CreateCategory.INTENT_MODE_CREATE);
+                    CategoryList.this.startActivity(createCategoryIntent);
                 }
             }
         });
@@ -170,31 +172,6 @@ public class CategoryListActivity extends AppCompatActivity {
 
         rotateForwardAnim = AnimationUtils.loadAnimation(this, R.anim.rotate_forward);
         rotateBackwardAnim = AnimationUtils.loadAnimation(this, R.anim.rotate_backward);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-
-                onBackPressed();
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    /**
-     * Methode um eine Toolbar anzuzeigen die den Titel und einen Zurückbutton enthält.
-     */
-    private void initializeToolbar() {
-        Toolbar toolbar = findViewById(R.id.toolbar);
-
-        //schatten der toolbar
-        if (Build.VERSION.SDK_INT >= 21)
-            toolbar.setElevation(10.f);
-
-        setSupportActionBar(toolbar);
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     private void resetActivityViewState() {

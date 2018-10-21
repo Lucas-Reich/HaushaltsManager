@@ -171,7 +171,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
         mCategoryTxt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent categoryIntent = new Intent(ExpenseScreen.this, CategoryListActivity.class);
+                Intent categoryIntent = new Intent(ExpenseScreen.this, CategoryList.class);
                 startActivityForResult(categoryIntent, 1);
             }
         });
@@ -260,7 +260,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
     private void showCloseScreenDialog() {
         Bundle bundle = new Bundle();
         bundle.putString(ConfirmationDialog.TITLE, getString(R.string.attention));
-        bundle.putString(ConfirmationDialog.CONTENT, getString(R.string.expense_screen_abort_confirmation));
+        bundle.putString(ConfirmationDialog.CONTENT, getString(R.string.abort_action_confirmation_text));
 
         ConfirmationDialog confirmationDialog = new ConfirmationDialog();
         confirmationDialog.setArguments(bundle);

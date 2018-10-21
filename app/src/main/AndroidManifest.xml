@@ -27,7 +27,7 @@
             android:label="@string/activity_template_name"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
         <activity
-            android:name=".Activities.CategoryListActivity"
+            android:name=".Activities.CategoryList"
             android:label="@string/activity_category_name"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
         <activity
@@ -39,7 +39,7 @@
             android:label="@string/activity_new_account_name"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
         <activity
-            android:name=".Activities.CreateCategoryActivity"
+            android:name=".Activities.CreateCategory"
             android:label="@string/activity_new_category_name"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
         <activity

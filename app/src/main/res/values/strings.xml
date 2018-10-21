@@ -167,7 +167,7 @@
     <string name="choose_time">Choose a time</string>
     <string name="attention">Attention</string>
     <string name="reset_settings_alert_message">Your are about to reset all changes to default value! Are you sure you want to continue?</string>
-    <string name="create_new">Create New</string>
+    <string name="create_new">New</string>
     <string name="first_day_of_week">First day of the week</string>
     <string name="automatic_backups">Automatically create Backups?</string>
     <string name="concurrent_backup_count">Max backup count</string>
@@ -596,5 +596,9 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
     <string name="frequency_in_days">Frequency in days</string>
     <!--TODO below kann ich eventuell durch frequency_in_days ersetzen-->
     <string name="input_frequency_label">Frequency in days: </string>
-    <string name="expense_screen_abort_confirmation">Unsaved data will be lost! Still close?</string>
+    <string name="abort_action_confirmation_text">Unsaved data will be lost! Still close?</string>
+    <string name="no_parent_error">You have to choose a parent category first!</string>
+    <string name="income">Income</string>
+    <string name="expense">Expense</string>
+    <string name="choose_parent_category_hint">Choose superordinate category</string>
 </resources>
