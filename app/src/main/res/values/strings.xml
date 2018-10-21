@@ -596,4 +596,5 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
     <string name="frequency_in_days">Frequency in days</string>
     <!--TODO below kann ich eventuell durch frequency_in_days ersetzen-->
     <string name="input_frequency_label">Frequency in days: </string>
+    <string name="expense_screen_abort_confirmation">Unsaved data will be lost! Still close?</string>
 </resources>

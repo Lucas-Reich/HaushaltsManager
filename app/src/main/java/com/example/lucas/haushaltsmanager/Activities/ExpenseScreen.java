@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
@@ -236,17 +237,19 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
 
         mSaveFab.setOnClickListener(getSaveClickListener());
 
+
+        setExpenditureType(mExpense.isExpenditure());
         mIncomeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setExpenditureType(true);
+                setExpenditureType(false);
             }
         });
 
         mExpenseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setExpenditureType(false);
+                setExpenditureType(true);
             }
         });
     }
@@ -254,7 +257,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
     private void showCloseScreenDialog() {
         Bundle bundle = new Bundle();
         bundle.putString(ConfirmationDialog.TITLE, getString(R.string.attention));
-        bundle.putString(ConfirmationDialog.CONTENT, "Möchtest du die Ausgabenerstellung wirklich abbrechen?"); //TODO übersetzung
+        bundle.putString(ConfirmationDialog.CONTENT, getString(R.string.expense_screen_abort_confirmation));
 
         ConfirmationDialog confirmationDialog = new ConfirmationDialog();
         confirmationDialog.setArguments(bundle);
@@ -287,9 +290,8 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
                             Toast.makeText(ExpenseScreen.this, "Updated Booking " + mExpense.getTitle(), Toast.LENGTH_SHORT).show();
                         } catch (ExpenseNotFoundException e) {
 
-                            Toast.makeText(ExpenseScreen.this, "Buchung konnte nicht geupdated werden", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ExpenseScreen.this, R.string.could_not_update_booking, Toast.LENGTH_SHORT).show();
                             //todo fehlerbehandlung
-                            //todo übersetzung
                         }
                         break;
                     case INTENT_MODE_UPDATE_CHILD:
@@ -299,9 +301,8 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
                             Toast.makeText(ExpenseScreen.this, "Updated Booking " + mExpense.getTitle(), Toast.LENGTH_SHORT).show();
                         } catch (ChildExpenseNotFoundException e) {
 
-                            Toast.makeText(ExpenseScreen.this, "KindBuchung konnte nicht geupdated werden", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ExpenseScreen.this, R.string.could_not_update_booking, Toast.LENGTH_SHORT).show();
                             //todo fehlerbehandlung
-                            //todo übersetzung
                         }
                         break;
                     case INTENT_MODE_ADD_CHILD:
@@ -321,10 +322,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
                         Toast.makeText(ExpenseScreen.this, "Created Booking \"" + mExpense.getTitle() + "\"", Toast.LENGTH_SHORT).show();
                         break;
                     default:
-                        throw new UnsupportedOperationException(
-                                "ExpenseScreen unterstützt keine anderen Methoden als createExpense, createChildToExpense, updateExpense und updateChildExpense. Modus: "
-                                        + bundle.getString(INTENT_MODE, INTENT_MODE_CREATE_BOOKING)
-                        );
+                        throw new UnsupportedOperationException("Could not handle intent mode " + bundle.getString(INTENT_MODE, null));
                 }
 
                 Intent intent = new Intent(ExpenseScreen.this, ParentActivity.class);
@@ -412,9 +410,12 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
     private void setExpenditureType(boolean expenditure) {
         mExpense.setExpenditure(expenditure);
 
-        //TODO eventuell noch den hitnergrund der toolbar anpassen
-        // oder den hintergrund vom preis anpassen
-        // oder ein plus bzw ein minus beim preis anzeigen
+        LinearLayout ll = findViewById(R.id.expense_screen_bottom_toolbar);
+        ll.setBackgroundColor(
+                expenditure
+                        ? getResources().getColor(R.color.booking_expense)
+                        : getResources().getColor(R.color.booking_income)
+        );
     }
 
     private void setCategory(Category category) {
@@ -431,6 +432,11 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
     private void setTitle(String title) {
         mExpense.setTitle(title);
         mTitleTxt.setText(mExpense.getTitle());
+
+        if (mExpense.isSet())
+            runCrossToCheckAnimation();
+        else
+            runCheckToCrossAnimation();
     }
 
     private void setDate(Calendar date) {
@@ -446,11 +452,6 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
     private void setAccount(Account account) {
         mExpense.setAccount(account);
         mAccountTxt.setText(account.getTitle());
-
-        if (mExpense.isSet())
-            runCrossToCheckAnimation();
-        else
-            runCheckToCrossAnimation();
     }
 
     private void setExpenseCurrency() {

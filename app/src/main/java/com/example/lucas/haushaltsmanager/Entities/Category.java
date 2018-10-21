@@ -125,9 +125,7 @@ public class Category implements Parcelable {
      * @return Ob die Kategorie in die Datenbank geschrieben werden kann
      */
     public boolean isSet() {
-        return !mName.equals(
-                app.getContext().getString(R.string.no_name)
-        );
+        return !mName.equals(app.getContext().getString(R.string.no_name));
     }
 
     public void addChild(Category child) {

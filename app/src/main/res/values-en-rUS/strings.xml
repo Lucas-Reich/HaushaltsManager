@@ -203,4 +203,5 @@
     <string name="could_not_save_recurring_booking">Cannot save RecurringBooking</string>
     <string name="frequency_in_days">Frequency in days</string>
     <string name="input_frequency_label">"Frequency in days: "</string>
+    <string name="expense_screen_abort_confirmation">Unsaved data will be lost! Still close?</string>
 </resources>

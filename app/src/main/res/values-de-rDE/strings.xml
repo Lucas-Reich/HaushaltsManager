@@ -208,4 +208,5 @@
     <string name="could_not_save_recurring_booking">Wiederkehrende Buchung konnte nicht gespeichert werden</string>
     <string name="frequency_in_days">Häufigkeit in Tagen</string>
     <string name="input_frequency_label">"Häufigkeit in Tagen: "</string>
+    <string name="expense_screen_abort_confirmation">Nicht gespeicherte Daten gehen verloren! Trotzdem schließen?</string>
 </resources>
