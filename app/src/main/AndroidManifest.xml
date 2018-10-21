@@ -27,10 +27,6 @@
             android:label="@string/activity_template_name"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
         <activity
-            android:name=".Activities.ExpenseScreen"
-            android:label="@string/activity_expense_screen_name"
-            android:parentActivityName=".Activities.MainTab.ParentActivity"/>
-        <activity
             android:name=".Activities.CategoryListActivity"
             android:label="@string/activity_category_name"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
@@ -74,7 +70,7 @@
             android:name=".Activities.EditRecurringBooking"
             android:label="@string/activity_create_recurring_booking"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
-        <activity android:name=".Activities.ExpenseScreenV2"/>
+        <activity android:name=".Activities.ExpenseScreen"/>
 
         <receiver
             android:name=".MyAlarmReceiver"

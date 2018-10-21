@@ -176,7 +176,7 @@
     <string name="btn_dismiss">Verwerfen</string>
     <string name="licenses">Lizenzen</string>
     <string name="activity_template_name">Schablonen</string>
-    <string name="activity_category_name">Kategoriem</string>
+    <string name="activity_category_name">Kategorien</string>
     <string name="activity_expense_screen_name">Erstelle eine Buchung</string>
     <string name="activity_recurring_bookings_name">Wiederkehrende Buchungen</string>
     <string name="activity_new_account_name">Erstelle ein neues Konto</string>
@@ -196,7 +196,7 @@
     <string name="imports_empty_list">Keine kompatiblen Datein im aktuellen Verzeichniss gefunden</string>
     <string name="importing_not_yet_supported">Das Importieren von Ausgaben wird erst in der Zukunft unterstützt</string>
     <string name="recurring_bookings_empty_list">Keine wiederkehrende Buchung diesen Monat</string>
-    <string name="default_backup_location">Wähle das Standart Backupverzeichniss</string>
+    <string name="default_backup_location">Wähle das Standard Backupverzeichniss</string>
     <string name="failed_to_delete_booking">Buchung konnte nicht gelöscht werden</string>
     <string name="could_not_update_booking">Buchungsupdate fehlgeschlagen</string>
     <string name="saved_as_template">Buchung wurde als Template gespeichert</string>

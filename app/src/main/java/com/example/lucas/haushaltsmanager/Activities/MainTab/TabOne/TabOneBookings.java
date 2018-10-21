@@ -16,7 +16,6 @@ import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Activities.EditRecurringBooking;
 import com.example.lucas.haushaltsmanager.Activities.ExpenseScreen;
-import com.example.lucas.haushaltsmanager.Activities.ExpenseScreenV2;
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.CannotDeleteExpenseException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
@@ -301,7 +300,7 @@ public class TabOneBookings extends Fragment implements FABToolbar.OnFabToolbarM
             return;
         }
 
-        Intent createExpenseIntent = new Intent(getContext(), ExpenseScreenV2.class);
+        Intent createExpenseIntent = new Intent(getContext(), ExpenseScreen.class);
         createExpenseIntent.putExtra(ExpenseScreen.INTENT_MODE, ExpenseScreen.INTENT_MODE_CREATE_BOOKING);
         startActivity(createExpenseIntent);
     }
