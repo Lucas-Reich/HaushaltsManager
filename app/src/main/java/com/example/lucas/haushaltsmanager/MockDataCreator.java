@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Random;
 
 public class MockDataCreator {
+    // TODO noch einmal überarbeiten, sodass man den MockDataCreator auch als Demo benutzen kann
     private static final String TAG = MockDataCreator.class.getSimpleName();
 
     private int accountCount, bookingCount, categoryCount, tagCount;

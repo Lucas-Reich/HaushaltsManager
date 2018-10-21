@@ -601,4 +601,5 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
     <string name="income">Income</string>
     <string name="expense">Expense</string>
     <string name="choose_parent_category_hint">Choose superordinate category</string>
+    <string name="failed_to_delete_category">Could not delete Category</string>
 </resources>

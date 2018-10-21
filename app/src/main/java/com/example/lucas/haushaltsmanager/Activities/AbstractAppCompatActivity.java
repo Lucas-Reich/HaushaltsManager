@@ -8,8 +8,6 @@ import android.view.MenuItem;
 import com.example.lucas.haushaltsmanager.R;
 
 public abstract class AbstractAppCompatActivity extends AppCompatActivity {
-    //kann ich eine Abstrakt Klasse erstellen die von allen Actvities verwendet wird?
-    // macht das sinn?
 
     /**
      * Methode um eine Toolbar anzuzeigen die den Titel und einen Zurückbutton enthält.
@@ -30,7 +28,7 @@ public abstract class AbstractAppCompatActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                onBackPressed();
+                finish();
         }
         return super.onOptionsItemSelected(item);
     }

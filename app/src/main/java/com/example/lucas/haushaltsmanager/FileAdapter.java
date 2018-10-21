@@ -33,7 +33,7 @@ public class FileAdapter extends ArrayAdapter<File> {
             LayoutInflater inflater = LayoutInflater.from(getContext());
             convertView = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
 
-            viewHolder.txtFileName = (TextView) convertView.findViewById(android.R.id.text1);
+            viewHolder.txtFileName = convertView.findViewById(android.R.id.text1);
 
             convertView.setTag(viewHolder);
         } else {

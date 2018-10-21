@@ -33,18 +33,15 @@ public class CategoryList extends AbstractAppCompatActivity {
     private FloatingActionButton mFabMain, mFabDelete;
     private ExpandableListView mExpListView;
     private CategoryAdapter mListAdapter;
+
+    // TODO sollte ich statdessen die FABToolbar implementieren?
     private Animation openFabAnim, closeFabAnim, rotateForwardAnim, rotateBackwardAnim;
     private boolean mIsMainFabAnimated = false;
-    private ChildCategoryRepository mChildCategoryRepo;
-    private CategoryRepository mCategoryRepo;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_categories);
-
-        mChildCategoryRepo = new ChildCategoryRepository(this);
-        mCategoryRepo = new CategoryRepository(this);
 
         initializeToolbar();
 
@@ -133,18 +130,19 @@ public class CategoryList extends AbstractAppCompatActivity {
 
             @Override
             public void onClick(View v) {
+                ChildCategoryRepository childRepo = new ChildCategoryRepository(CategoryList.this);
 
                 try {
 
                     for (Category childCategory : mListAdapter.getSelectedChildData())
-                        mChildCategoryRepo.delete(childCategory);
+                        childRepo.delete(childCategory);
 
                     animateFab(mListAdapter.getSelectedChildItemCount());
                     updateListView();
                 } catch (CannotDeleteChildCategoryException e) {
 
                     //todo ich sollte den try catch nur um die for schleife machen und die categorien die nicht gelöscht werden konnten speichern und etwas mit ihnen machen
-                    Toast.makeText(CategoryList.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CategoryList.this, getString(R.string.failed_to_delete_category), Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -219,8 +217,8 @@ public class CategoryList extends AbstractAppCompatActivity {
      * Methode um die Liste der Kategorien zu initilisieren.
      */
     private void prepareDataSources() {
-        mCategories = mCategoryRepo.getAll();
-
+        CategoryRepository categoryRepo = new CategoryRepository(this);
+        mCategories = categoryRepo.getAll();
     }
 
     private void animateFab(int selectedChildrenCount) {

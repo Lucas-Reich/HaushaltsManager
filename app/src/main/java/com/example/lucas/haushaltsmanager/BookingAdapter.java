@@ -7,14 +7,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class BookingAdapter extends ArrayAdapter<ExpenseObject> implements View.OnClickListener {
+public class BookingAdapter extends ArrayAdapter<ExpenseObject> {
 
     private static class ViewHolder {
         TextView circleLetter;
@@ -28,15 +26,8 @@ public class BookingAdapter extends ArrayAdapter<ExpenseObject> implements View.
         super(context, R.layout.booking_item, data);
     }
 
-    @Override
-    public void onClick(View v) {
-
-        Toast.makeText(getContext(), "du hast geklickt", Toast.LENGTH_SHORT).show();
-    }
-
     @NonNull
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
-
         ExpenseObject expenseObject = getItem(position);
         ViewHolder viewHolder;
 
@@ -47,11 +38,11 @@ public class BookingAdapter extends ArrayAdapter<ExpenseObject> implements View.
             convertView = inflater.inflate(R.layout.booking_item, parent, false);
 
 
-            viewHolder.circleLetter = (TextView) convertView.findViewById(R.id.exp_listview_group_rounded_textview);
-            viewHolder.txtTitle = (TextView) convertView.findViewById(R.id.exp_listview_group_title);
-            viewHolder.txtPrice = (TextView) convertView.findViewById(R.id.exp_listview_group_price);
-            viewHolder.txtCurrencySymbol = (TextView) convertView.findViewById(R.id.exp_listview_group_currency_symbol);
-            viewHolder.txtPerson = (TextView) convertView.findViewById(R.id.exp_listview_group_person);
+            viewHolder.circleLetter = convertView.findViewById(R.id.exp_listview_group_rounded_textview);
+            viewHolder.txtTitle = convertView.findViewById(R.id.exp_listview_group_title);
+            viewHolder.txtPrice = convertView.findViewById(R.id.exp_listview_group_price);
+            viewHolder.txtCurrencySymbol = convertView.findViewById(R.id.exp_listview_group_currency_symbol);
+            viewHolder.txtPerson = convertView.findViewById(R.id.exp_listview_group_person);
 
             convertView.setTag(viewHolder);
         } else {
