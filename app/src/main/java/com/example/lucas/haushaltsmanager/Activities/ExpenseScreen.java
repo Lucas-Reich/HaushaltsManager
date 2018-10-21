@@ -34,6 +34,7 @@ import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
 
 import java.util.Calendar;
+import java.util.List;
 
 public class ExpenseScreen extends AbstractAppCompatActivity {
     private static final String TAG = ExpenseScreen.class.getSimpleName();
@@ -214,10 +215,12 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
         mAccountTxt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                List<Account> accounts = mAccountRepo.getAll();
+
                 SingleChoiceDialog<Account> accountPicker = new SingleChoiceDialog<>();
                 accountPicker.createBuilder(ExpenseScreen.this);
                 accountPicker.setTitle(getString(R.string.input_account));
-                accountPicker.setContent(mAccountRepo.getAll(), (int) mExpense.getAccountId());
+                accountPicker.setContent(accounts, accounts.indexOf(getExpenseAccount(mExpense.getAccountId())));
                 accountPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
                     @Override
                     public void onPositiveClick(Object account) {
