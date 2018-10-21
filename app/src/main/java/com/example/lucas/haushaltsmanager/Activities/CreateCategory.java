@@ -40,7 +40,7 @@ public class CreateCategory extends AbstractAppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstances) {
         super.onCreate(savedInstances);
-        setContentView(R.layout.activity_new_category_ver2);
+        setContentView(R.layout.activity_new_category);
 
         mCategoryRepo = new CategoryRepository(this);
 
