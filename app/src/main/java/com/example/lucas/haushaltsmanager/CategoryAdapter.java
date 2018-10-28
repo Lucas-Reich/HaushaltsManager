@@ -6,11 +6,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.ExpandableListView;
 import android.widget.TextView;
 
 import com.example.lucas.haushaltsmanager.Entities.Category;
-import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
 import com.example.lucas.haushaltsmanager.Utils.ViewUtils;
+import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -149,13 +150,16 @@ public class CategoryAdapter extends BaseExpandableListAdapter {
         return true;
     }
 
+    public boolean isGroup(long id) {
+        return ExpandableListView.getPackedPositionType(id) == ExpandableListView.PACKED_POSITION_TYPE_GROUP;
+    }
+
     public boolean isChildSelected(Category category) {
         return mSelectedChildren.contains(category);
     }
 
     public void deselectChild(Category category) {
-        if (mSelectedChildren.contains(category))
-            mSelectedChildren.remove(category);
+        mSelectedChildren.remove(category);
     }
 
     public void deselectAll() {

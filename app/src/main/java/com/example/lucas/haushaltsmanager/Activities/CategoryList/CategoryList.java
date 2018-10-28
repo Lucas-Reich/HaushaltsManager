@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ExpandableListView;
@@ -78,14 +79,14 @@ public class CategoryList extends AbstractAppCompatActivity implements CategoryF
         mExpListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                if (isGroup(id))
+                if (mCategoryAdapter.isGroup(id))
                     return true;
 
                 selectCategory(getCategory(id), view);
 
                 mFabToolbar.showToolbar();
 
-                disableLongClick();
+                setListLongClickable(false);
 
                 return true;
             }
@@ -116,7 +117,7 @@ public class CategoryList extends AbstractAppCompatActivity implements CategoryF
 
         if (noChildrenSelected()) {
             mFabToolbar.hideToolbar();
-            enableLongClick();
+            setListLongClickable(true);
         }
     }
 
@@ -132,24 +133,12 @@ public class CategoryList extends AbstractAppCompatActivity implements CategoryF
         );
     }
 
-    private boolean isGroup(long id) {
-        return ExpandableListView.getPackedPositionType(id) == ExpandableListView.PACKED_POSITION_TYPE_GROUP;
-    }
-
     private boolean noChildrenSelected() {
-
         return mCategoryAdapter.getSelectedChildItemCount() == 0;
     }
 
-    /**
-     * Helper Methode um den Longclick der ExpandableListView zu deaktivieren
-     */
-    private void disableLongClick() {
-        mExpListView.setLongClickable(false);
-    }
-
-    private void enableLongClick() {
-        mExpListView.setLongClickable(true);
+    private void setListLongClickable(boolean isLongClickable) {
+        mExpListView.setLongClickable(isLongClickable);
     }
 
     /**
@@ -157,14 +146,14 @@ public class CategoryList extends AbstractAppCompatActivity implements CategoryF
      */
     private void updateListView() {
 
-        mCategoryAdapter = new CategoryAdapter(getAllParentCategories(), this);
+        mCategoryAdapter = new CategoryAdapter(getAllCategories(), this);
 
         mExpListView.setAdapter(mCategoryAdapter);
 
         mCategoryAdapter.notifyDataSetChanged();
     }
 
-    private List<Category> getAllParentCategories() {
+    private List<Category> getAllCategories() {
         CategoryRepository categoryRepo = new CategoryRepository(this);
         return categoryRepo.getAll();
     }
@@ -186,6 +175,7 @@ public class CategoryList extends AbstractAppCompatActivity implements CategoryF
 
                     //todo ich sollte den try catch nur um die for schleife machen und die categorien die nicht gelöscht werden konnten speichern und etwas mit ihnen machen
                     Toast.makeText(this, getString(R.string.failed_to_delete_category), Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Could not delete ChildCategory: " + e.getMessage());
                 }
                 break;
             default:
