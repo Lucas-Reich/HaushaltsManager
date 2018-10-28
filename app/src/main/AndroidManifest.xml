@@ -27,10 +27,6 @@
             android:label="@string/activity_template_name"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
         <activity
-            android:name=".Activities.CategoryList.CategoryList"
-            android:label="@string/activity_categories"
-            android:parentActivityName=".Activities.MainTab.ParentActivity"/>
-        <activity
             android:name=".Activities.RecurringBookingList"
             android:label="@string/activity_recurring_bookings_name"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
@@ -75,7 +71,7 @@
             android:label="@string/activity_expense_screen_name"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
         <activity
-            android:name=".Activities.CategoryList.CategoryListVer2"
+            android:name=".Activities.CategoryList.CategoryList"
             android:label="@string/activity_categories"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
 

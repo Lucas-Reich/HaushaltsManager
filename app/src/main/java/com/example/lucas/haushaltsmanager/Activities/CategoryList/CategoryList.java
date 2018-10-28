@@ -4,10 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
+import android.support.annotation.Nullable;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
@@ -20,6 +18,7 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.Exceptions.CannotDeleteChildCategoryException;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.R;
+import com.github.fafaldo.fabtoolbar.widget.FABToolbarLayout;
 
 import java.util.List;
 
@@ -28,29 +27,27 @@ import static com.example.lucas.haushaltsmanager.Activities.CreateCategory.INTEN
 import static com.example.lucas.haushaltsmanager.Activities.CreateCategory.INTENT_MODE_UPDATE;
 import static com.example.lucas.haushaltsmanager.Activities.CreateCategory.INTENT_PARENT;
 
-public class CategoryList extends AbstractAppCompatActivity {
+public class CategoryList extends AbstractAppCompatActivity implements CategoryFABToolbar.OnCategoryFABToolbarMenuItemClicked {
     private static final String TAG = CategoryList.class.getSimpleName();
 
-    private FloatingActionButton mFabMain, mFabDelete;
+    private CategoryFABToolbar mFabToolbar;
     private ExpandableListView mExpListView;
-    private CategoryAdapter mListAdapter;
-
-    // TODO sollte ich statdessen die FABToolbar implementieren?
-    private Animation openFabAnim, closeFabAnim, rotateForwardAnim, rotateBackwardAnim;
-    private boolean mIsMainFabAnimated = false;
+    private CategoryAdapter mCategoryAdapter;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_categories);
+        setContentView(R.layout.activity_category_list);
+
+        mExpListView = findViewById(R.id.expandable_list_view);
+
+        mFabToolbar = new CategoryFABToolbar(
+                (FABToolbarLayout) findViewById(R.id.category_list_fab_toolbar),
+                this,
+                this
+        );
 
         initializeToolbar();
-
-        mExpListView = findViewById(R.id.categories_exp_list_view);
-
-        mFabMain = findViewById(R.id.categories_fab);
-
-        mFabDelete = findViewById(R.id.categories_fab_delete);
     }
 
     @Override
@@ -61,37 +58,18 @@ public class CategoryList extends AbstractAppCompatActivity {
         mExpListView.setBackgroundColor(Color.WHITE);
         mExpListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
-            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                Category clickedCategory = (Category) mListAdapter.getChild(groupPosition, childPosition);
+            public boolean onChildClick(ExpandableListView parent, View view, int groupPosition, int childPosition, long id) {
+                Category category = (Category) mCategoryAdapter.getChild(groupPosition, childPosition);
 
-                if (areChildrenSelected()) {
-
-                    if (mListAdapter.isChildSelected(clickedCategory)) {
-
-                        v.setBackgroundColor(Color.WHITE);
-                        mListAdapter.deselectChild(clickedCategory);
-                        animateFab(mListAdapter.getSelectedChildItemCount());
-                    } else {
-                        v.setBackgroundColor(getResources().getColor(R.color.highlighted_item_color));
-                        mListAdapter.selectChild(clickedCategory);
-                    }
-                } else {
-
-                    if (getCallingActivity() != null) {
-
-                        Intent returnCategoryIntent = new Intent();
-                        returnCategoryIntent.putExtra("categoryObj", clickedCategory);
-                        setResult(Activity.RESULT_OK, returnCategoryIntent);
-                        finish();
-                    } else {
-
-                        Intent updateCategoryIntent = new Intent(CategoryList.this, CreateCategory.class);
-                        updateCategoryIntent.putExtra(INTENT_MODE, INTENT_MODE_UPDATE);
-                        updateCategoryIntent.putExtra(INTENT_CATEGORY, clickedCategory);
-                        updateCategoryIntent.putExtra(INTENT_PARENT, (Category) mListAdapter.getGroup(groupPosition));
-                        CategoryList.this.startActivity(updateCategoryIntent);
-                    }
+                if (!areChildrenSelected()) {
+                    handleOpenChildClick(category, (Category) mCategoryAdapter.getGroup(groupPosition));
+                    return false;
                 }
+
+                if (mCategoryAdapter.isChildSelected(category))
+                    unselectCategory(category, view);
+                else
+                    selectCategory(category, view);
 
                 return true;
             }
@@ -100,90 +78,67 @@ public class CategoryList extends AbstractAppCompatActivity {
         mExpListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                if (isGroup(id))
+                    return true;
 
-                int groupPosition = ExpandableListView.getPackedPositionGroup(id);
-                int childPosition = ExpandableListView.getPackedPositionChild(id);
+                selectCategory(getCategory(id), view);
 
-                switch (ExpandableListView.getPackedPositionType(id)) {
+                mFabToolbar.showToolbar();
 
-                    case ExpandableListView.PACKED_POSITION_TYPE_GROUP:
-                        // do nothing
+                disableLongClick();
 
-                        return false;
-                    case ExpandableListView.PACKED_POSITION_TYPE_CHILD:
-                        Category childCategory = (Category) mListAdapter.getChild(groupPosition, childPosition);
-
-                        mListAdapter.selectChild(childCategory);
-                        view.setBackgroundColor(getResources().getColor(R.color.highlighted_item_color));
-
-                        disableLongClick();
-                        animateFab(mListAdapter.getSelectedChildItemCount());
-
-                        return true;
-                    default:
-
-                        return false;
-                }
+                return true;
             }
         });
-
-        mFabDelete.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                ChildCategoryRepository childRepo = new ChildCategoryRepository(CategoryList.this);
-
-                try {
-
-                    for (Category childCategory : mListAdapter.getSelectedChildData())
-                        childRepo.delete(childCategory);
-
-                    animateFab(mListAdapter.getSelectedChildItemCount());
-                    updateListView();
-                } catch (CannotDeleteChildCategoryException e) {
-
-                    //todo ich sollte den try catch nur um die for schleife machen und die categorien die nicht gelöscht werden konnten speichern und etwas mit ihnen machen
-                    Toast.makeText(CategoryList.this, getString(R.string.failed_to_delete_category), Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-        mFabMain.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-
-                if (areChildrenSelected()) {
-
-                    resetActivityViewState();
-                } else {
-
-                    Intent createCategoryIntent = new Intent(CategoryList.this, CreateCategory.class);
-                    createCategoryIntent.putExtra(CreateCategory.INTENT_MODE, CreateCategory.INTENT_MODE_CREATE);
-                    CategoryList.this.startActivity(createCategoryIntent);
-                }
-            }
-        });
-
-
-        openFabAnim = AnimationUtils.loadAnimation(this, R.anim.fab_open);
-        closeFabAnim = AnimationUtils.loadAnimation(this, R.anim.fab_close);
-
-        rotateForwardAnim = AnimationUtils.loadAnimation(this, R.anim.rotate_forward);
-        rotateBackwardAnim = AnimationUtils.loadAnimation(this, R.anim.rotate_backward);
     }
 
-    private void resetActivityViewState() {
+    private void handleOpenChildClick(Category clickedCategory, Category parent) {
 
-        mListAdapter.deselectAll();
-        enableLongClick();
-        mListAdapter.notifyDataSetChanged();
-        animateFab(mListAdapter.getSelectedChildItemCount());
+        if (getCallingActivity() != null) {
+
+            Intent returnCategoryIntent = new Intent();
+            returnCategoryIntent.putExtra("categoryObj", clickedCategory);
+            setResult(Activity.RESULT_OK, returnCategoryIntent);
+            finish();
+        } else {
+
+            Intent updateCategoryIntent = new Intent(CategoryList.this, CreateCategory.class);
+            updateCategoryIntent.putExtra(INTENT_MODE, INTENT_MODE_UPDATE);
+            updateCategoryIntent.putExtra(INTENT_CATEGORY, clickedCategory);
+            updateCategoryIntent.putExtra(INTENT_PARENT, parent);
+            startActivity(updateCategoryIntent);
+        }
+    }
+
+    private void unselectCategory(Category category, View categoryView) {
+        mCategoryAdapter.deselectChild(category);
+        categoryView.setBackgroundColor(Color.WHITE);
+
+        if (!areChildrenSelected()) {
+            mFabToolbar.hideToolbar();
+            enableLongClick();
+        }
+    }
+
+    private void selectCategory(Category category, View categoryView) {
+        mCategoryAdapter.selectChild(category);
+        categoryView.setBackgroundColor(getResources().getColor(R.color.highlighted_item_color));
+    }
+
+    private Category getCategory(long id) {
+        return (Category) mCategoryAdapter.getChild(
+                ExpandableListView.getPackedPositionGroup(id),
+                ExpandableListView.getPackedPositionChild(id)
+        );
+    }
+
+    private boolean isGroup(long id) {
+        return ExpandableListView.getPackedPositionType(id) == ExpandableListView.PACKED_POSITION_TYPE_GROUP;
     }
 
     private boolean areChildrenSelected() {
 
-        return mListAdapter.getSelectedChildItemCount() > 0;
+        return mCategoryAdapter.getSelectedChildItemCount() > 0;
     }
 
     /**
@@ -193,9 +148,6 @@ public class CategoryList extends AbstractAppCompatActivity {
         mExpListView.setLongClickable(false);
     }
 
-    /**
-     * Helper Methode um den Longclick der ExpandableListView zu aktivieren
-     */
     private void enableLongClick() {
         mExpListView.setLongClickable(true);
     }
@@ -205,11 +157,11 @@ public class CategoryList extends AbstractAppCompatActivity {
      */
     private void updateListView() {
 
-        mListAdapter = new CategoryAdapter(getAllParentCategories(), this);
+        mCategoryAdapter = new CategoryAdapter(getAllParentCategories(), this);
 
-        mExpListView.setAdapter(mListAdapter);
+        mExpListView.setAdapter(mCategoryAdapter);
 
-        mListAdapter.notifyDataSetChanged();
+        mCategoryAdapter.notifyDataSetChanged();
     }
 
     private List<Category> getAllParentCategories() {
@@ -217,81 +169,35 @@ public class CategoryList extends AbstractAppCompatActivity {
         return categoryRepo.getAll();
     }
 
-    private void animateFab(int selectedChildrenCount) {
+    @Override
+    public void onToolbarMenuItemClicked(String tag) {
+        switch (tag) {
+            case CategoryFABToolbar.MENU_DELETE_ACTION:
+                ChildCategoryRepository childRepo = new ChildCategoryRepository(this);
 
-        if (selectedChildrenCount == 0) {
-            animatePlusClose();
-            closeFabDelete();
-        } else {
+                try {
+                    for (Category childCategory : mCategoryAdapter.getSelectedChildData())
+                        childRepo.delete(childCategory);
 
-            animatePlusOpen();
-            openFabDelete();
+                    mFabToolbar.hideToolbar();
+
+                    updateListView();
+                } catch (CannotDeleteChildCategoryException e) {
+
+                    //todo ich sollte den try catch nur um die for schleife machen und die categorien die nicht gelöscht werden konnten speichern und etwas mit ihnen machen
+                    Toast.makeText(this, getString(R.string.failed_to_delete_category), Toast.LENGTH_SHORT).show();
+                }
+                break;
+            default:
+                throw new UnsupportedOperationException(tag + " Action does not exist.");
         }
     }
 
-    /**
-     * Methode die das plus auf dem Button animiert.
-     * Wird diese Animation getriggert dreht sich das Pluszeichen um 45°.
-     */
-    public void animatePlusOpen() {
-        if (!mIsMainFabAnimated) {
-            mFabMain.startAnimation(rotateForwardAnim);
-            mIsMainFabAnimated = true;
-        }
-    }
+    @Override
+    public void onFabClicked() {
+        Intent createCategoryIntent = new Intent(this, CreateCategory.class);
+        createCategoryIntent.putExtra(CreateCategory.INTENT_MODE, CreateCategory.INTENT_MODE_CREATE);
 
-    /**
-     * Methode die das plus auf dem Button animiert.
-     * Wird diese Animation getriggert dreht sich das Pluszeichen um -45°.
-     */
-    public void animatePlusClose() {
-        if (mIsMainFabAnimated) {
-            mFabMain.startAnimation(rotateBackwardAnim);
-            mIsMainFabAnimated = false;
-        }
-    }
-
-    /**
-     * Methode die den KombinierFab sichtbar und anklickbar macht.
-     */
-    public void openFabDelete() {
-        showFab(mFabDelete);
-    }
-
-    /**
-     * Methode die den KombinierFab unsichtbar und nicht mehr anklickbar macht.
-     */
-    public void closeFabDelete() {
-        closeFab(mFabDelete);
-    }
-
-    /**
-     * Methode um einen FloatingActionButton anzuzeigen.
-     *
-     * @param fab FAB
-     */
-    public void showFab(FloatingActionButton fab) {
-
-        if (fab.getVisibility() != View.VISIBLE) {
-
-            fab.setVisibility(View.VISIBLE);
-            fab.startAnimation(openFabAnim);
-            fab.setClickable(true);
-        }
-    }
-
-    /**
-     * Methode um einen FloatingActinButton zu verstecken.
-     *
-     * @param fab FAB
-     */
-    public void closeFab(FloatingActionButton fab) {
-
-        if (fab.getVisibility() != View.GONE) {
-
-            fab.setVisibility(View.GONE);
-            fab.startAnimation(closeFabAnim);
-            fab.setClickable(false);
-        }
+        startActivity(createCategoryIntent);
     }
 }

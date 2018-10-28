@@ -22,7 +22,7 @@ import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Activities.AboutUsActivity;
 import com.example.lucas.haushaltsmanager.Activities.BackupActivity;
-import com.example.lucas.haushaltsmanager.Activities.CategoryList.CategoryListVer2;
+import com.example.lucas.haushaltsmanager.Activities.CategoryList.CategoryList;
 import com.example.lucas.haushaltsmanager.Activities.CourseActivity;
 import com.example.lucas.haushaltsmanager.Activities.ImportExportActivity;
 import com.example.lucas.haushaltsmanager.Activities.MainTab.TabOne.TabOneBookings;
@@ -112,7 +112,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
 
                     case R.id.categories:
 
-                        Intent categoryIntent = new Intent(ParentActivity.this, CategoryListVer2.class);
+                        Intent categoryIntent = new Intent(ParentActivity.this, CategoryList.class);
                         ParentActivity.this.startActivity(categoryIntent);
                         break;
                     case R.id.course:
