@@ -34,6 +34,7 @@ public class CreateCategory extends AbstractAppCompatActivity {
     private Button mTitleBtn, mParentBtn, mExpenseBtn, mIncomeBtn;
     private RoundedTextView mColorView;
     private FloatingActionButton mSaveFAB;
+    private boolean parentCategoryCreated = false;
 
     private CategoryRepository mCategoryRepo;
 
@@ -152,6 +153,7 @@ public class CreateCategory extends AbstractAppCompatActivity {
                                         new ArrayList<Category>()))
                                 );
 
+                                parentCategoryCreated = true;
                             }
                         });
                         textInputDialog.show(getFragmentManager(), "create_category_parent_name");
@@ -193,6 +195,8 @@ public class CreateCategory extends AbstractAppCompatActivity {
 
                 switch (bundle.getString(INTENT_MODE, INTENT_MODE_CREATE)) {
                     case INTENT_MODE_CREATE:
+                        if (parentCategoryCreated)
+                            setParentCategoryColor();
 
                         ChildCategoryRepository childRepo = new ChildCategoryRepository(CreateCategory.this);
                         childRepo.insert(mParentCategory, mCategory);
@@ -212,6 +216,18 @@ public class CreateCategory extends AbstractAppCompatActivity {
                 finish();
             }
         };
+    }
+
+    private void setParentCategoryColor() {
+        try {
+
+            mParentCategory.setColor(mCategory.getColorInt());
+            mCategoryRepo.update(mParentCategory);
+        } catch (CategoryNotFoundException e) {
+
+            // TODO what should I do in this case?
+            // can this even happen?
+        }
     }
 
     private void showCloseScreenDialog() {
