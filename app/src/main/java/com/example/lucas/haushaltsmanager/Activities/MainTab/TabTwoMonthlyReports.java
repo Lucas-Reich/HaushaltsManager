@@ -51,16 +51,16 @@ public class TabTwoMonthlyReports extends Fragment {
         //fixme: irgendwie kann meine ChartLibrary nicht mehr auf ihre eigenen value files mehr zugreifen
         //da array in dem ich die style attribute für meinen chart definiere kann nicht mehr gefunden werden
 
-//        MonthlyReportAdapter adapter = new MonthlyReportAdapterCreator(
-//                mParent.getExpenses(),
-//                getContext(),
-//                mParent.getActiveAccounts()
-//        ).getAdapter();
-//
-//        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-//        mRecyclerView.setAdapter(adapter);
-//
-//        adapter.notifyDataSetChanged();
+        MonthlyReportAdapter adapter = new MonthlyReportAdapterCreator(
+                mParent.getExpenses(),
+                getContext(),
+                mParent.getActiveAccounts()
+        ).getAdapter();
+
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        mRecyclerView.setAdapter(adapter);
+
+        adapter.notifyDataSetChanged();
     }
 
 
