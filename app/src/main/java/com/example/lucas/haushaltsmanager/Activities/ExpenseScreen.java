@@ -13,6 +13,8 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.example.lucas.haushaltsmanager.Activities.CategoryList.CategoryList;
+import com.example.lucas.haushaltsmanager.Activities.CategoryList.CategoryListVer2;
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
@@ -171,7 +173,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
         mCategoryTxt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent categoryIntent = new Intent(ExpenseScreen.this, CategoryList.class);
+                Intent categoryIntent = new Intent(ExpenseScreen.this, CategoryListVer2.class);
                 startActivityForResult(categoryIntent, 1);
             }
         });

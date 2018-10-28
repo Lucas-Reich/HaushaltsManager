@@ -15,7 +15,7 @@ public abstract class AbstractAppCompatActivity extends AppCompatActivity {
     public void initializeToolbar() {
         Toolbar toolbar = findViewById(R.id.toolbar);
 
-        //schatten der toolbar
+        // Toolbarschatten ist vor Androidversion 21 nicht verfügbar
         if (Build.VERSION.SDK_INT >= 21)
             toolbar.setElevation(10.f);
 

@@ -32,11 +32,15 @@ public class NotificationWorker extends Worker {
                 .setSmallIcon(R.mipmap.ic_launcher)//TODO Notification icon anpassen
                 .build();
 
-        NotificationManagerCompat.from(getApplicationContext()).notify(new Random().nextInt(), notification);
+        NotificationManagerCompat.from(getApplicationContext()).notify(getNotificationId(), notification);
 
         setNewWorker();
 
         return Result.SUCCESS;
+    }
+
+    private int getNotificationId() {
+        return new Random().nextInt();
     }
 
     /**

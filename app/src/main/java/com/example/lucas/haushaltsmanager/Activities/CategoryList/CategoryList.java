@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager.Activities;
+package com.example.lucas.haushaltsmanager.Activities.CategoryList;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -12,6 +12,8 @@ import android.widget.AdapterView;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
 
+import com.example.lucas.haushaltsmanager.Activities.AbstractAppCompatActivity;
+import com.example.lucas.haushaltsmanager.Activities.CreateCategory;
 import com.example.lucas.haushaltsmanager.CategoryAdapter;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepository;
@@ -29,7 +31,6 @@ import static com.example.lucas.haushaltsmanager.Activities.CreateCategory.INTEN
 public class CategoryList extends AbstractAppCompatActivity {
     private static final String TAG = CategoryList.class.getSimpleName();
 
-    private List<Category> mCategories;
     private FloatingActionButton mFabMain, mFabDelete;
     private ExpandableListView mExpListView;
     private CategoryAdapter mListAdapter;
@@ -204,21 +205,16 @@ public class CategoryList extends AbstractAppCompatActivity {
      */
     private void updateListView() {
 
-        prepareDataSources();
-
-        mListAdapter = new CategoryAdapter(mCategories, this);
+        mListAdapter = new CategoryAdapter(getAllParentCategories(), this);
 
         mExpListView.setAdapter(mListAdapter);
 
         mListAdapter.notifyDataSetChanged();
     }
 
-    /**
-     * Methode um die Liste der Kategorien zu initilisieren.
-     */
-    private void prepareDataSources() {
+    private List<Category> getAllParentCategories() {
         CategoryRepository categoryRepo = new CategoryRepository(this);
-        mCategories = categoryRepo.getAll();
+        return categoryRepo.getAll();
     }
 
     private void animateFab(int selectedChildrenCount) {
