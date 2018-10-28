@@ -1,7 +1,9 @@
 package com.example.lucas.haushaltsmanager.Activities.MainTab;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,9 +13,21 @@ import com.example.lucas.haushaltsmanager.R;
 public class TabThree extends Fragment {
     private static final String TAG = TabThree.class.getSimpleName();
 
+    private CardView mIncomeCard, mExpenseCard, mTimeframeCard;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstances) {
-        View rootView = inflater.inflate(R.layout.tab_three_, container, false);
+        View rootView = inflater.inflate(R.layout.tab_three_ambigious_reports_ver2, container, false);
+
+        mIncomeCard = rootView.findViewById(R.id.tab_three_income_card);
+        mExpenseCard = rootView.findViewById(R.id.tab_three_expense_card);
+        mTimeframeCard = rootView.findViewById(R.id.tab_three_timeframe_report_card);
 
         return rootView;
     }
