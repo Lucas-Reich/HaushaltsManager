@@ -126,7 +126,7 @@ public class CategoryAdapter extends BaseExpandableListAdapter {
 
         String categoryName = childCategory.getTitle();
         if (mSelectedChildren.contains(childCategory)) {
-            convertView.setBackgroundColor(mContext.getResources().getColor(R.color.highlighted_item_color));
+            convertView.setBackgroundColor(mContext.getResources().getColor(R.color.list_item_highlighted));
         } else {
             convertView.setBackgroundColor(Color.WHITE);
         }

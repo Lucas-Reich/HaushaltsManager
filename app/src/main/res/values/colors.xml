@@ -6,7 +6,7 @@
     <color name="mainColor">#ffffff</color>
     <color name="booking_expense">#bc0000</color>
     <color name="booking_income">#04925d</color>
-    <color name="highlighted_item_color">#5CE675</color>
+    <color name="list_item_highlighted">#5CE675</color>
     <color name="separator_color">#dcdbdb</color>
     <color name="text_color_disabled">#808080</color>
     <color name="primary_text_color">#222222</color>

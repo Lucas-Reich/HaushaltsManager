@@ -61,7 +61,7 @@ public class CategoryList extends AbstractAppCompatActivity implements CategoryF
             public boolean onChildClick(ExpandableListView parent, View view, int groupPosition, int childPosition, long id) {
                 Category category = (Category) mCategoryAdapter.getChild(groupPosition, childPosition);
 
-                if (!areChildrenSelected()) {
+                if (noChildrenSelected()) {
                     handleOpenChildClick(category, (Category) mCategoryAdapter.getGroup(groupPosition));
                     return false;
                 }
@@ -114,7 +114,7 @@ public class CategoryList extends AbstractAppCompatActivity implements CategoryF
         mCategoryAdapter.deselectChild(category);
         categoryView.setBackgroundColor(Color.WHITE);
 
-        if (!areChildrenSelected()) {
+        if (noChildrenSelected()) {
             mFabToolbar.hideToolbar();
             enableLongClick();
         }
@@ -122,7 +122,7 @@ public class CategoryList extends AbstractAppCompatActivity implements CategoryF
 
     private void selectCategory(Category category, View categoryView) {
         mCategoryAdapter.selectChild(category);
-        categoryView.setBackgroundColor(getResources().getColor(R.color.highlighted_item_color));
+        categoryView.setBackgroundColor(getResources().getColor(R.color.list_item_highlighted));
     }
 
     private Category getCategory(long id) {
@@ -136,9 +136,9 @@ public class CategoryList extends AbstractAppCompatActivity implements CategoryF
         return ExpandableListView.getPackedPositionType(id) == ExpandableListView.PACKED_POSITION_TYPE_GROUP;
     }
 
-    private boolean areChildrenSelected() {
+    private boolean noChildrenSelected() {
 
-        return mCategoryAdapter.getSelectedChildItemCount() > 0;
+        return mCategoryAdapter.getSelectedChildItemCount() == 0;
     }
 
     /**

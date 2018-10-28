@@ -102,7 +102,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                     convertView.findViewById(R.id.exp_listview_paren_divider).setVisibility(View.GONE);
 
                 if (isSelected)
-                    convertView.setBackgroundColor(mContext.getResources().getColor(R.color.highlighted_item_color));
+                    convertView.setBackgroundColor(mContext.getResources().getColor(R.color.list_item_highlighted));
 
                 PieChart pieChart = convertView.findViewById(R.id.exp_listview_parent_pie_chart);
                 TextView txtTitle22 = convertView.findViewById(R.id.exp_listview_parent_title);
@@ -129,7 +129,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
                 convertView = inflater.inflate(R.layout.activity_exp_listview_group, parent, false);
                 if (isSelected)
-                    convertView.setBackgroundColor(mContext.getResources().getColor(R.color.highlighted_item_color));
+                    convertView.setBackgroundColor(mContext.getResources().getColor(R.color.list_item_highlighted));
 
                 RoundedTextView roundedTextView = convertView.findViewById(R.id.exp_listview_group_rounded_textview);
                 TextView txtTitle2 = convertView.findViewById(R.id.exp_listview_group_title);
@@ -160,7 +160,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 //todo eigenes layout für tramsfer mExpenses definieren
                 convertView = inflater.inflate(R.layout.activity_exp_listview_group, parent, false);
                 if (isSelected)
-                    convertView.setBackgroundColor(mContext.getResources().getColor(R.color.highlighted_item_color));
+                    convertView.setBackgroundColor(mContext.getResources().getColor(R.color.list_item_highlighted));
 
                 RoundedTextView roundedTextView3 = convertView.findViewById(R.id.exp_listview_group_rounded_textview);
                 TextView txtTitle3 = convertView.findViewById(R.id.exp_listview_group_title);
@@ -261,7 +261,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         }
 
         if (isItemSelected(groupPosition, childPosition))
-            convertView.setBackgroundColor(mContext.getResources().getColor(R.color.highlighted_item_color));
+            convertView.setBackgroundColor(mContext.getResources().getColor(R.color.list_item_highlighted));
         else
             convertView.setBackgroundColor(Color.WHITE);
 
