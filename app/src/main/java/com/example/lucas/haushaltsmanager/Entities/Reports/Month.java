@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
-import com.example.lucas.haushaltsmanager.Entities.Reports.ReportInterface;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.util.ArrayList;
@@ -21,8 +20,12 @@ public class Month implements ReportInterface {
     private Currency mCurrency;
     private Context mContext;
 
-    public Month(@NonNull String cardTitle, @NonNull ArrayList<ExpenseObject> expense, @NonNull Currency currency, Context context) {
-
+    public Month(
+            @NonNull String cardTitle,
+            @NonNull ArrayList<ExpenseObject> expense,
+            @NonNull Currency currency,
+            Context context
+    ) {
         mCardTitle = cardTitle;
         mExpenses = expense;
         mCurrency = currency;
