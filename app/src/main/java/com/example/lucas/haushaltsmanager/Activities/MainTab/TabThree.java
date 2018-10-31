@@ -42,16 +42,20 @@ public class TabThree extends Fragment {
 
 
         PieChartCardPopulator incomeCard = new PieChartCardPopulator(
-                (CardView) rootView.findViewById(R.id.tab_three_income_card),
-                getContext()
+                (CardView) rootView.findViewById(R.id.tab_three_income_card)
         );
-        incomeCard.setData(mParent.getExpenses(), getString(R.string.income));
+        incomeCard.setData(createYearReportInterface(
+                getString(R.string.income)),
+                PieChartCardPopulator.INCOME_CHART
+        );
 
         PieChartCardPopulator expenseCard = new PieChartCardPopulator(
-                (CardView) rootView.findViewById(R.id.tab_three_expense_card),
-                getContext()
+                (CardView) rootView.findViewById(R.id.tab_three_expense_card)
         );
-        expenseCard.setData(mParent.getExpenses(), getString(R.string.expense));
+        expenseCard.setData(createYearReportInterface(
+                getString(R.string.expense)),
+                PieChartCardPopulator.EXPENDITURE_CHART
+        );
 
         return rootView;
     }
