@@ -71,7 +71,7 @@ public class TabThree extends Fragment {
 
     public void updateView() {
 
-        //todo
+        //todo redraw cards when user changed account visbilities
     }
 
     /**
