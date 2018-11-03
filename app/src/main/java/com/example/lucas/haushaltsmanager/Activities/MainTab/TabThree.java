@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.lucas.haushaltsmanager.Entities.Reports.Year;
+import com.example.lucas.haushaltsmanager.LineChartCardPopulator;
 import com.example.lucas.haushaltsmanager.PieChartCardPopulator;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
@@ -57,6 +58,14 @@ public class TabThree extends Fragment {
                 PieChartCardPopulator.EXPENDITURE_CHART
         );
 
+        LineChartCardPopulator lineChartCard = new LineChartCardPopulator(
+                (CardView) rootView.findViewById(R.id.tab_three_line_chart),
+                getContext()
+        );
+        lineChartCard.setData(createYearReportInterface(
+                getStringifiedYear()
+        ));
+
         return rootView;
     }
 
@@ -93,8 +102,6 @@ public class TabThree extends Fragment {
     }
 
     private String getStringifiedYear() {
-        int year = Calendar.getInstance().get(Calendar.YEAR);
-
-        return String.valueOf(year);
+        return String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
     }
 }
