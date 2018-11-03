@@ -17,8 +17,8 @@ import com.example.lucas.haushaltsmanager.TimeFrameCardPopulator;
 
 import java.util.Calendar;
 
-public class TabThree extends Fragment {
-    private static final String TAG = TabThree.class.getSimpleName();
+public class TabThreeYearlyReports extends Fragment {
+    private static final String TAG = TabThreeYearlyReports.class.getSimpleName();
 
     private ParentActivity mParent;
     private UserSettingsPreferences mUserPreferences;
@@ -33,7 +33,7 @@ public class TabThree extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstances) {
-        View rootView = inflater.inflate(R.layout.tab_three_ambigious_reports_ver2, container, false);
+        View rootView = inflater.inflate(R.layout.tab_three_yearly_reports, container, false);
 
         TimeFrameCardPopulator extendedYearlyChart = new TimeFrameCardPopulator(
                 (CardView) rootView.findViewById(R.id.tab_three_timeframe_report_card),

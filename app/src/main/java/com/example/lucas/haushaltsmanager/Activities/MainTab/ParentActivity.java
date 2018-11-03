@@ -228,7 +228,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
                 case 1:
                     return new TabTwoMonthlyReports();
                 case 2:
-                    return new TabThree();
+                    return new TabThreeYearlyReports();
                 default:
                     return null;
             }
@@ -274,7 +274,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
                     ((TabTwoMonthlyReports) fragment).updateView();
                     break;
                 case 3:
-                    ((TabThree) fragment).updateView();
+                    ((TabThreeYearlyReports) fragment).updateView();
                     break;
             }
         }
