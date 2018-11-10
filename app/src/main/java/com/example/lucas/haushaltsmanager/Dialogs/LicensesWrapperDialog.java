@@ -36,8 +36,24 @@ public class LicensesWrapperDialog {
         notices.addNotice(getAndroidChangelogDialogNotice());
         notices.addNotice(getWorkManagerNotice());
         notices.addNotice(getFABToolbarNotice());
+        notices.addNotice(getMPAndroidChartNotice());
 
         return notices;
+    }
+
+    /**
+     * Methode um den Lizenzen EIntrag für das OpenSource Projekt MpAndroidChart zu bekommen.
+     * Quelle: https://github.com/PhilJay/MPAndroidChart
+     *
+     * @return MpAndroidChart Notiz Eintrag
+     */
+    private Notice getMPAndroidChartNotice() {
+        return new Notice(
+                "MPAndroidChart",
+                "https://github.com/PhilJay/MPAndroidChart",
+                "Copyright (c) 2018 Philipp Jahoda",
+                new ApacheSoftwareLicense20()
+        );
     }
 
     /**

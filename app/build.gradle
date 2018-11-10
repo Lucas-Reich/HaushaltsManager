@@ -44,7 +44,7 @@ dependencies {
     //API welche ich benutze um Hintergrundaufgaben laufen zu lassen
     implementation "android.arch.work:work-runtime:1.0.0-alpha08"
     //Chart Views
-    implementation 'com.github.LabberToasT:Android-Charts:1.0.1'
+    implementation 'com.github.LabberToasT:Android-Charts:1.0.2'
     //AlertDialog zum anzeigen von eines Changelogs
     implementation 'com.github.LabberToasT:Android-ChangelogDialog:1.0.3'
     //AlertDialog zum anzeigen der von mir genutzten OpenSource Pakete
