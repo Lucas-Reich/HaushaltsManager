@@ -69,21 +69,9 @@ public class PieChartCardPopulator {
     }
 
     private HashMap<Category, Double> sumByCategory(List<ExpenseObject> expenses) {
-        HashMap<Category, Double> categories = new HashMap<>();
+        ExpenseSum expenseSum = new ExpenseSum();
 
-        for (ExpenseObject expense : expenses) {
-            if (!displayExpense(expense))
-                continue;
-
-            Category expenseCategory = expense.getCategory();
-
-            if (!categories.containsKey(expenseCategory))
-                categories.put(expenseCategory, 0d);
-
-            categories.put(expenseCategory, categories.get(expenseCategory) + expense.getSignedPrice());
-        }
-
-        return categories;
+        return expenseSum.sumBookingsByCategory(expenses);
     }
 
     /**

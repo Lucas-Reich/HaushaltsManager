@@ -8,7 +8,7 @@ import android.widget.TextView;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
-import com.example.lucas.haushaltsmanager.Entities.Reports.Year;
+import com.example.lucas.haushaltsmanager.Entities.Reports.ReportInterface;
 import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
 import com.lucas.androidcharts.DataSet;
 import com.lucas.androidcharts.PieChart;
@@ -35,25 +35,20 @@ public class TimeFrameCardPopulator {
         mRootView.setOnClickListener(listener);
     }
 
-    public void setData(Year data) {
-        populateView(data);
-        mRootView.invalidate();
-    }
+    public void setData(ReportInterface report) {
+        setCardTitle(report.getCardTitle());
 
-    private void populateView(Year year) {
-        setCardTitle(year.getCardTitle());
+        setIncome(report.getIncoming(), report.getCurrency());
 
-        setIncome(year.getIncoming(), year.getCurrency());
+        setOutgoing(report.getOutgoing(), report.getCurrency());
 
-        setOutgoing(year.getOutgoing(), year.getCurrency());
+        setTotal(report.getTotal(), report.getCurrency());
 
-        setTotal(year.getTotal(), year.getCurrency());
+        setTotalBookingsCount(report.getBookingCount());
 
-        setTotalBookingsCount(year.getBookingCount());
+        setCategory(report.getMostStressedCategory(mContext));
 
-        setCategory(year.getMostStressedCategory());
-
-        setPieChart(year);
+        setPieChart(report);
     }
 
     private void setCardTitle(String title) {
@@ -84,18 +79,18 @@ public class TimeFrameCardPopulator {
         mViewHolder.mCategoryTitle.setText(category.getTitle());
     }
 
-    private void setPieChart(Year yearReport) {
-        mViewHolder.mPieChart.setPieData(preparePieData(yearReport));
+    private void setPieChart(ReportInterface data) {
+        mViewHolder.mPieChart.setPieData(preparePieData(data));
         mViewHolder.mPieChart.setNoDataText(R.string.no_bookings_in_year);
 //        mViewHolder.mPieChart.useCompressedChart(true);
     }
 
-    private List<DataSet> preparePieData(Year year) {
-        if (year.getBookingCount() == 0)
+    private List<DataSet> preparePieData(ReportInterface data) {
+        if (data.getBookingCount() == 0)
             return new ArrayList<>();
 
         List<DataSet> pieData = new ArrayList<>();
-        for (Map.Entry<Category, Double> set : sumByCategory(year.getExpenses()).entrySet()) {
+        for (Map.Entry<Category, Double> set : sumByCategory(data.getExpenses()).entrySet()) {
             pieData.add(new DataSet(
                     set.getValue().floatValue(),
                     set.getKey().getColorInt(),
@@ -107,18 +102,9 @@ public class TimeFrameCardPopulator {
     }
 
     private HashMap<Category, Double> sumByCategory(List<ExpenseObject> expenses) {
-        HashMap<Category, Double> categories = new HashMap<>();
+        ExpenseSum expenseSum = new ExpenseSum();
 
-        for (ExpenseObject expense : expenses) {
-            Category expenseCategory = expense.getCategory();
-
-            if (!categories.containsKey(expenseCategory))
-                categories.put(expenseCategory, 0d);
-
-            categories.put(expenseCategory, categories.get(expenseCategory) + expense.getSignedPrice());
-        }
-
-        return categories;
+        return expenseSum.sumBookingsByCategory(expenses);
     }
 
     private String formatMoney(double money) {

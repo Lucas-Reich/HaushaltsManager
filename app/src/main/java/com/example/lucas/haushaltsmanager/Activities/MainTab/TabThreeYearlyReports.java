@@ -63,7 +63,7 @@ public class TabThreeYearlyReports extends Fragment {
                 getContext()
         );
         lineChartCard.setData(createYearReportInterface(
-                getStringifiedYear()
+                String.format("%s - %s", getStringifiedYear(), getString(R.string.account_balance))
         ));
 
         return rootView;
@@ -73,14 +73,13 @@ public class TabThreeYearlyReports extends Fragment {
         return new Year(
                 title,
                 mParent.getExpenses(),
-                mUserPreferences.getMainCurrency(),
-                getContext()
+                mUserPreferences.getMainCurrency()
         );
     }
 
     public void updateView() {
 
-        //todo redraw cards when user changed account visbilities
+        //todo Die Datengrundlage muss der Karten muss angepasst werden wenn der user Konten an oder abwählt
     }
 
     /**

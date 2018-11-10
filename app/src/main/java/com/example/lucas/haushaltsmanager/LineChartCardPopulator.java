@@ -50,10 +50,10 @@ public class LineChartCardPopulator {
 
     private void setLineChart(Year year) {
         mViewHolder.mLineChart.setData(prepareLineData(year));
-        mViewHolder.mLineChart.setBackgroundColor(getColor(R.color.primaryBackgroundColor));
+        mViewHolder.mLineChart.setBackgroundColor(getColorResource(R.color.primaryBackgroundColor));
 
-        mViewHolder.mLineChart.setNoDataText(getString(R.string.no_bookings_in_year));
-        mViewHolder.mLineChart.setNoDataTextColor(getColor(R.color.booking_expense));
+        mViewHolder.mLineChart.setNoDataText(getStringResource(R.string.no_bookings_in_year));
+        mViewHolder.mLineChart.setNoDataTextColor(getColorResource(R.color.booking_expense));
 
         mViewHolder.mLineChart.setTouchEnabled(false);
 
@@ -72,19 +72,19 @@ public class LineChartCardPopulator {
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
     }
 
-    private int getColor(@ColorRes int color) {
+    private int getColorResource(@ColorRes int color) {
         return mContext.getResources().getColor(color);
     }
 
-    private String getString(@StringRes int string) {
+    private String getStringResource(@StringRes int string) {
         return mContext.getString(string);
     }
 
     private LineData prepareLineData(Year year) {
         LineDataSet lds = new LineDataSet(getChartEntries(year), "");
-        lds.setColor(getColor(R.color.colorPrimary));
-        lds.setCircleColor(getColor(R.color.colorAccent));
-        lds.setValueTextColor(getColor(R.color.primary_text_color));
+        lds.setColor(getColorResource(R.color.colorPrimary));
+        lds.setCircleColor(getColorResource(R.color.colorAccent));
+        lds.setValueTextColor(getColorResource(R.color.primary_text_color));
 
         return new LineData(lds);
     }

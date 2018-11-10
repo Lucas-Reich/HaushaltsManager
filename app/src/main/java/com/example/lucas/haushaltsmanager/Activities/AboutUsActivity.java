@@ -14,7 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.lucas.haushaltsmanager.Assets.ReleaseHistory;
+import com.example.lucas.haushaltsmanager.Assets.AppReleaseHistory;
 import com.example.lucas.haushaltsmanager.BuildConfig;
 import com.example.lucas.haushaltsmanager.Dialogs.LicensesWrapperDialog;
 import com.example.lucas.haushaltsmanager.R;
@@ -80,7 +80,7 @@ public class AboutUsActivity extends AppCompatActivity {
                 ChangelogDialog changelogDialog = new ChangelogDialog();
                 changelogDialog.createBuilder(AboutUsActivity.this);
                 changelogDialog.setTitle(getString(R.string.changelog_title));
-                changelogDialog.setReleaseHistory(new ReleaseHistory());
+                changelogDialog.setReleaseHistory(new AppReleaseHistory());
                 changelogDialog.show(getFragmentManager(), "about_us_changelog");
             }
         });
