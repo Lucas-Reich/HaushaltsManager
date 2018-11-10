@@ -211,4 +211,5 @@
     <string name="failed_to_delete_category">Could not delete Category</string>
     <string name="no_bookings_in_year">No bookings this year</string>
     <string name="bookings">Bookings</string>
+    <string name="account_balance">Account balance</string>
 </resources>

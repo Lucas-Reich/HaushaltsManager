@@ -213,4 +213,8 @@
     <string name="expense">Ausgabe</string>
     <string name="choose_parent_category_hint">Wähle eine übergeordnete Kategorie</string>
     <string name="no_parent_error">Bitte wähle eine übergeordnete Kategorie aus</string>
+    <string name="failed_to_delete_category">Kategorie konnte nicht gelöscht werden</string>
+    <string name="no_bookings_in_year">Keine Buchungen dieses Jahr</string>
+    <string name="bookings">Buchungen</string>
+    <string name="account_balance">Kontostand</string>
 </resources>

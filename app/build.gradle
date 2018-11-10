@@ -48,7 +48,7 @@ dependencies {
     //AlertDialog zum anzeigen von eines Changelogs
     implementation 'com.github.LabberToasT:Android-ChangelogDialog:1.0.3'
     //AlertDialog zum anzeigen der von mir genutzten OpenSource Pakete
-    implementation 'de.psdev.licensesdialog:licensesdialog:1.7.0'
+    implementation 'de.psdev.licensesdialog:licensesdialog:1.8.3'
     //AlertDialog um den User ein Verzeichniss auswählen zu lassen
     implementation 'com.github.codekidX:storage-chooser:2.0.3'
     //todo replace ColorPicker with one of https://android-arsenal.com/tag/18?sort=created

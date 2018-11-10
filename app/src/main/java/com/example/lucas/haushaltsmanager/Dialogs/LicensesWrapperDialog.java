@@ -2,12 +2,12 @@ package com.example.lucas.haushaltsmanager.Dialogs;
 
 import android.content.Context;
 
-import com.example.lucas.haushaltsmanager.Assets.MozillaPublicLicenseV2;
 import com.example.lucas.haushaltsmanager.R;
 
 import de.psdev.licensesdialog.LicensesDialog;
 import de.psdev.licensesdialog.licenses.ApacheSoftwareLicense20;
 import de.psdev.licensesdialog.licenses.MITLicense;
+import de.psdev.licensesdialog.licenses.MozillaPublicLicense20;
 import de.psdev.licensesdialog.model.Notice;
 import de.psdev.licensesdialog.model.Notices;
 
@@ -112,7 +112,7 @@ public class LicensesWrapperDialog {
                 "Storage Chooser",
                 "https://github.com/codekidX/storage-chooser",
                 "Copyright 2013 Chiral Code",
-                new MozillaPublicLicenseV2()
+                new MozillaPublicLicense20()
         );
     }
 
