@@ -18,18 +18,15 @@ public class Month implements ReportInterface {
     private String mCardTitle;
     private List<ExpenseObject> mExpenses;
     private Currency mCurrency;
-    private Context mContext;
 
     public Month(
             @NonNull String cardTitle,
-            @NonNull ArrayList<ExpenseObject> expense,
-            @NonNull Currency currency,
-            Context context
+            @NonNull List<ExpenseObject> expense,
+            @NonNull Currency currency
     ) {
         mCardTitle = cardTitle;
         mExpenses = expense;
         mCurrency = currency;
-        mContext = context;
     }
 
     /**
@@ -143,11 +140,11 @@ public class Month implements ReportInterface {
      * @return Category
      */
     @Override
-    public Category getMostStressedCategory() {
+    public Category getMostStressedCategory(Context context) {
         HashMap<Category, Double> categories = sumExpensesByCategory();
 
         if (categories.isEmpty())
-            return new Category(mContext.getResources().getString(R.string.no_expenses), "#FFFFFF", false, new ArrayList<Category>());
+            return new Category(context.getResources().getString(R.string.no_expenses), "#FFFFFF", false, new ArrayList<Category>());
 
         Map.Entry<Category, Double> minCategory = null;
         for (Map.Entry<Category, Double> entry : categories.entrySet()) {
