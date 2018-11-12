@@ -68,6 +68,18 @@ public class ExpenseFilterTest {
         assertEquals(2, filteredExpenses.size());
     }
 
+    @Test
+    public void testFilterByExpenditureShouldNotIncludeParents() {
+        List<ExpenseObject> expenses = new ArrayList<>();
+        ExpenseObject parent = getSimpleExpense(true);
+        parent.addChild(getSimpleExpense(false));
+        expenses.add(parent);
+
+        List<ExpenseObject> filteredExpenses = mExpenseFilter.byExpenditureType(expenses, true);
+
+        assertEquals(0, filteredExpenses.size());
+    }
+
     private ExpenseObject getSimpleExpense(boolean isExpenditure) {
         return new ExpenseObject(
                 32,

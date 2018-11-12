@@ -11,10 +11,14 @@ public class ExpenseFilter {
         List<ExpenseObject> filteredExpenses = new ArrayList<>();
 
         for (ExpenseObject expense : expenses) {
-            if (expense.isExpenditure() == filter)
+            if (matchesFilter(expense, filter) && !expense.isParent())
                 filteredExpenses.add(expense);
         }
 
         return filteredExpenses;
+    }
+
+    private boolean matchesFilter(ExpenseObject expense, boolean filter) {
+        return expense.isExpenditure() == filter;
     }
 }

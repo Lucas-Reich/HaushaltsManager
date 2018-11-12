@@ -46,7 +46,7 @@ public class ExpenseGrouper {
     public HashMap<Category, List<ExpenseObject>> byCategory(List<ExpenseObject> expenses) {
         HashMap<Category, List<ExpenseObject>> groupedExpenses = new HashMap<>();
 
-        for (final ExpenseObject expense : expenses) {
+        for (ExpenseObject expense : expenses) {
             Category expenseCategory = expense.getCategory();
 
             if (!groupedExpenses.containsKey(expenseCategory))

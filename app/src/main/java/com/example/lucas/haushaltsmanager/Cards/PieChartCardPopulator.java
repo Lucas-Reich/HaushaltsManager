@@ -56,13 +56,15 @@ public class PieChartCardPopulator {
 
     private void setPieChart(ReportInterface report) {
         mViewHolder.mPieChart.setNoDataText(R.string.no_bookings_in_year);
-        mViewHolder.mPieChart.setPieData(createDataSets(
-                filterExpenses(report.getExpenses(), mShowExpenditures))
-        );
+        mViewHolder.mPieChart.setPieData(createDataSets(report.getExpenses()));
     }
 
     private List<DataSet> createDataSets(List<ExpenseObject> expenses) {
-        HashMap<Category, Double> aggregatedExpenses = sumByCategory(expenses);
+        List<ExpenseObject> expensesWithoutParents = extractChildren(expenses);
+
+        expensesWithoutParents = filterExpenses(expensesWithoutParents, mShowExpenditures);
+
+        HashMap<Category, Double> aggregatedExpenses = sumByCategory(expensesWithoutParents);
 
         List<DataSet> dataSets = new ArrayList<>();
         for (Map.Entry<Category, Double> entry : aggregatedExpenses.entrySet()) {
@@ -70,6 +72,19 @@ public class PieChartCardPopulator {
         }
 
         return dataSets;
+    }
+
+    private List<ExpenseObject> extractChildren(List<ExpenseObject> expenses) {
+        List<ExpenseObject> flatExpenseList = new ArrayList<>();
+
+        for (ExpenseObject expense : expenses) {
+            if (expense.isParent())
+                flatExpenseList.addAll(expense.getChildren());
+            else
+                flatExpenseList.add(expense);
+        }
+
+        return flatExpenseList;
     }
 
     private DataSet toDataSet(Map.Entry<Category, Double> entry) {

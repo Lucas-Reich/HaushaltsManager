@@ -16,9 +16,9 @@ public class ExpenseSum {
     }
 
     public HashMap<Category, Double> sumBookingsByCategory(List<ExpenseObject> expenses) {
-        HashMap<Category, Double> summedExpenses = new HashMap<>();
         HashMap<Category, List<ExpenseObject>> expensesGroupedByCategory = mExpenseGrouper.byCategory(flattenBookings(expenses));
 
+        HashMap<Category, Double> summedExpenses = new HashMap<>();
         for (Map.Entry<Category, List<ExpenseObject>> entry : expensesGroupedByCategory.entrySet()) {
             summedExpenses.put(
                     entry.getKey(),
