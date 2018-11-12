@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager;
+package com.example.lucas.haushaltsmanager.Cards;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
@@ -7,7 +7,9 @@ import android.widget.TextView;
 
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
-import com.example.lucas.haushaltsmanager.Entities.Reports.Year;
+import com.example.lucas.haushaltsmanager.Entities.Report.ReportInterface;
+import com.example.lucas.haushaltsmanager.ExpenseSum;
+import com.example.lucas.haushaltsmanager.R;
 import com.lucas.androidcharts.DataSet;
 import com.lucas.androidcharts.PieChart;
 
@@ -36,23 +38,23 @@ public class PieChartCardPopulator {
         mRootView.setOnClickListener(listener);
     }
 
-    public void setData(Year year, boolean chartType) {
-        setCardTitle(year.getCardTitle());
+    public void setData(ReportInterface report, boolean chartType) {
+        setCardTitle(report.getCardTitle());
 
         mChartType = chartType;
-        setPieChart(year);
+        setPieChart(report);
     }
 
     private void setCardTitle(@NonNull String title) {
         mViewHolder.mTitleTxt.setText(title);
     }
 
-    private void setPieChart(Year year) {
-        mViewHolder.mPieChart.setPieData(preparePieData(year));
+    private void setPieChart(ReportInterface report) {
+        mViewHolder.mPieChart.setPieData(preparePieData(report));
         mViewHolder.mPieChart.setNoDataText(R.string.no_bookings_in_year);
     }
 
-    private List<DataSet> preparePieData(Year year) {
+    private List<DataSet> preparePieData(ReportInterface year) {
         if (year.getBookingCount() == 0)
             return new ArrayList<>();
 

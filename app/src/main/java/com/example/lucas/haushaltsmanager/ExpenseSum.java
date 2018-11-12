@@ -17,7 +17,7 @@ public class ExpenseSum {
 
     public HashMap<Category, Double> sumBookingsByCategory(List<ExpenseObject> expenses) {
         HashMap<Category, Double> summedExpenses = new HashMap<>();
-        HashMap<Category, List<ExpenseObject>> expensesGroupedByCategory = mExpenseGrouper.groupByCategory(flattenBookings(expenses));
+        HashMap<Category, List<ExpenseObject>> expensesGroupedByCategory = mExpenseGrouper.byCategory(flattenBookings(expenses));
 
         for (Map.Entry<Category, List<ExpenseObject>> entry : expensesGroupedByCategory.entrySet()) {
             summedExpenses.put(
@@ -27,6 +27,17 @@ public class ExpenseSum {
         }
 
         return summedExpenses;
+    }
+
+    public double sumBookingsByExpenditureType(boolean expenditureType, List<ExpenseObject> expenses) {
+        List<ExpenseObject> expensesWithCorrectExpenditureType = new ArrayList<>();
+
+        for (ExpenseObject expense : flattenBookings(expenses)) {
+            if (expense.isExpenditure() == expenditureType)
+                expensesWithCorrectExpenditureType.add(expense);
+        }
+
+        return getSum(expensesWithCorrectExpenditureType);
     }
 
     private Double getSum(List<ExpenseObject> expenses) {

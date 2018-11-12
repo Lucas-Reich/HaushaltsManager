@@ -97,6 +97,108 @@ public class ExpenseSumTest {
         assertEquals(1337, categorySum.get(category), 0);
     }
 
+    @Test
+    public void testSumByCategoriesWithEmptyList() {
+        List<ExpenseObject> expenses = new ArrayList<>();
+
+        HashMap<Category, Double> expenseSum = mExpenseSum.sumBookingsByCategory(expenses);
+
+        assertEquals(0, expenseSum.size());
+    }
+
+    @Test
+    public void testSumByExpenditureTypeWithNoMatchingExpenses() {
+        Category category = getSimpleCategory(1, "Kategorie");
+
+        List<ExpenseObject> expenses = new ArrayList<>();
+        expenses.add(getSimpleExpense(category, 1, true));
+        expenses.add(getSimpleExpense(category, 2, true));
+        expenses.add(getSimpleExpense(category, 3, true));
+        expenses.add(getSimpleExpense(category, 4, true));
+        expenses.add(getSimpleExpense(category, 5, true));
+        expenses.add(getSimpleExpense(category, 6, true));
+
+        assertEquals(0, mExpenseSum.sumBookingsByExpenditureType(false, expenses), 0);
+    }
+
+    @Test
+    public void testSumByExpenditureTypeTrue() {
+        Category category = getSimpleCategory(1, "Kategorie");
+
+        List<ExpenseObject> expenses = new ArrayList<>();
+        expenses.add(getSimpleExpense(category, 79, true));
+        expenses.add(getSimpleExpense(category, 134, true));
+        expenses.add(getSimpleExpense(category, 42, false));
+        expenses.add(getSimpleExpense(category, 331, false));
+        expenses.add(getSimpleExpense(category, 754, false));
+        expenses.add(getSimpleExpense(category, 100, true));
+
+        assertEquals(-313, mExpenseSum.sumBookingsByExpenditureType(true, expenses), 0);
+    }
+
+    @Test
+    public void testSumByExpenditureTypeFalse() {
+        Category category = getSimpleCategory(1, "Kategorie");
+
+        List<ExpenseObject> expenses = new ArrayList<>();
+        expenses.add(getSimpleExpense(category, 43, false));
+        expenses.add(getSimpleExpense(category, 1337, true));
+        expenses.add(getSimpleExpense(category, 41, false));
+        expenses.add(getSimpleExpense(category, 54, false));
+        expenses.add(getSimpleExpense(category, 53, false));
+        expenses.add(getSimpleExpense(category, 312, false));
+
+        assertEquals(-1337, mExpenseSum.sumBookingsByExpenditureType(true, expenses), 0);
+    }
+
+    @Test
+    public void testSumByExpenditureTypeWithChildren() {
+        Category category = getSimpleCategory(1, "Kategorie");
+
+        List<ExpenseObject> expenses = new ArrayList<>();
+        expenses.add(getSimpleExpense(category, 445, false));
+
+        ExpenseObject parent1 = getSimpleExpense(category, 0, true);
+        parent1.addChild(getSimpleExpense(category, 545, true));
+        parent1.addChild(getSimpleExpense(category, 48, false));
+        parent1.addChild(getSimpleExpense(category, 605, true));
+        expenses.add(parent1);
+
+        ExpenseObject parent2 = getSimpleExpense(category, 0, true);
+        parent2.addChild(getSimpleExpense(category, 878, false));
+        parent2.addChild(getSimpleExpense(category, 132, false));
+        parent2.addChild(getSimpleExpense(category, 4879, false));
+        expenses.add(parent2);
+
+        expenses.add(getSimpleExpense(category, 48, false));
+        expenses.add(getSimpleExpense(category, 500, true));
+
+        assertEquals(-1650, mExpenseSum.sumBookingsByExpenditureType(true, expenses), 0);
+    }
+
+    @Test
+    public void testSumByExpenditureTypeIgnoresParentPrice() {
+        Category category = getSimpleCategory(1, "Category");
+
+        List<ExpenseObject> expenses = new ArrayList<>();
+        ExpenseObject parentWithPrice = getSimpleExpense(category, 120, false);
+        parentWithPrice.addChild(getSimpleExpense(category, 312, true));
+        parentWithPrice.addChild(getSimpleExpense(category, 111, true));
+
+        expenses.add(parentWithPrice);
+
+        assertEquals(0, mExpenseSum.sumBookingsByExpenditureType(false, expenses), 0);
+    }
+
+    @Test
+    public void testSumByExpenditureTypeWithEmptyList() {
+        List<ExpenseObject> expenses = new ArrayList<>();
+
+        double expenseSum = mExpenseSum.sumBookingsByExpenditureType(true, expenses);
+
+        assertEquals(0, expenseSum, 0);
+    }
+
     private ExpenseObject getSimpleExpense(Category category, double price, boolean expenditure) {
         return new ExpenseObject(
                 "Ausgabe",

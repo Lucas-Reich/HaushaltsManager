@@ -15,7 +15,7 @@ public class ExpenseGrouper {
      *
      * @param month Started bei 1 (Januar) und endet bei 12 (Dezember).
      */
-    public List<ExpenseObject> groupByMonth(List<ExpenseObject> expenses, int month, int year) {
+    public List<ExpenseObject> byMonth(List<ExpenseObject> expenses, int month, int year) {
         List<ExpenseObject> groupedExpenses = new ArrayList<>();
 
         for (ExpenseObject expense : expenses) {
@@ -29,7 +29,7 @@ public class ExpenseGrouper {
     /**
      * Kindbuchungen werden von der Funktion nicht beachtet.
      */
-    public List<ExpenseObject> groupByYear(List<ExpenseObject> expenses, int year) {
+    public List<ExpenseObject> byYear(List<ExpenseObject> expenses, int year) {
         List<ExpenseObject> groupedExpenses = new ArrayList<>();
 
         for (ExpenseObject expense : expenses) {
@@ -43,7 +43,7 @@ public class ExpenseGrouper {
     /**
      * Kindbuchungen werden von der Funktion nicht beachtet.
      */
-    public HashMap<Category, List<ExpenseObject>> groupByCategory(List<ExpenseObject> expenses) {
+    public HashMap<Category, List<ExpenseObject>> byCategory(List<ExpenseObject> expenses) {
         HashMap<Category, List<ExpenseObject>> groupedExpenses = new HashMap<>();
 
         for (final ExpenseObject expense : expenses) {

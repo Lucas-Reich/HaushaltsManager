@@ -39,7 +39,7 @@ public class ExpenseGrouperTest {
         expenses.add(getSimpleExpense(getCalendarInstance(1, 2, 2018), mock(Category.class)));
         expenses.add(getSimpleExpense(getCalendarInstance(5, 1, 2019), mock(Category.class)));
 
-        List<ExpenseObject> sortedExpenses = expenseGrouper.groupByMonth(expenses, 1, 2018);
+        List<ExpenseObject> sortedExpenses = expenseGrouper.byMonth(expenses, 1, 2018);
 
         assertEquals(3, sortedExpenses.size());
     }
@@ -52,7 +52,7 @@ public class ExpenseGrouperTest {
         expenses.add(getSimpleExpense(getCalendarInstance(4, 6, 3014), mock(Category.class)));
         expenses.add(getSimpleExpense(getCalendarInstance(4, 8, 2017), mock(Category.class)));
 
-        List<ExpenseObject> groupedExpenses = expenseGrouper.groupByYear(expenses, 2017);
+        List<ExpenseObject> groupedExpenses = expenseGrouper.byYear(expenses, 2017);
 
         assertEquals(2, groupedExpenses.size());
     }
@@ -70,7 +70,7 @@ public class ExpenseGrouperTest {
         expenses.add(getSimpleExpense(getCalendarInstance(1, 1, 2015), category1));
         expenses.add(getSimpleExpense(getCalendarInstance(1, 1, 2018), category3));
 
-        HashMap<Category, List<ExpenseObject>> groupedExpenses = expenseGrouper.groupByCategory(expenses);
+        HashMap<Category, List<ExpenseObject>> groupedExpenses = expenseGrouper.byCategory(expenses);
 
         assertEquals(1, groupedExpenses.get(category3).size());
         assertEquals(1, groupedExpenses.get(category2).size());

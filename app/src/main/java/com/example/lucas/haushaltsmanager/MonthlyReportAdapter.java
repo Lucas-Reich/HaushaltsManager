@@ -8,7 +8,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.lucas.haushaltsmanager.Entities.Reports.Month;
+import com.example.lucas.haushaltsmanager.Cards.TimeFrameCardPopulator;
+import com.example.lucas.haushaltsmanager.Entities.Report.Report;
+import com.example.lucas.haushaltsmanager.Entities.Report.ReportInterface;
 import com.example.lucas.haushaltsmanager.Utils.ViewUtils;
 
 import java.util.List;
@@ -19,7 +21,7 @@ import java.util.List;
 public class MonthlyReportAdapter extends RecyclerView.Adapter<MonthlyReportAdapter.ViewHolder> {
 
     private Context mContext;
-    private List<Month> mReports;
+    private List<ReportInterface> mReports;
 
     class ViewHolder extends RecyclerView.ViewHolder {
         ViewHolder(View view) {
@@ -27,7 +29,7 @@ public class MonthlyReportAdapter extends RecyclerView.Adapter<MonthlyReportAdap
         }
     }
 
-    MonthlyReportAdapter(Context context, List<Month> reports) {
+    MonthlyReportAdapter(Context context, List<ReportInterface> reports) {
         mContext = context;
         mReports = reports;
     }
@@ -61,7 +63,7 @@ public class MonthlyReportAdapter extends RecyclerView.Adapter<MonthlyReportAdap
     }
 
     public void onBindViewHolder(final ViewHolder viewHolder, int position) {
-        Month month = mReports.get(position);
+        Report month = (Report) mReports.get(position);
 
         TimeFrameCardPopulator timeFrameCardPopulator = new TimeFrameCardPopulator(
                 (CardView) viewHolder.itemView,

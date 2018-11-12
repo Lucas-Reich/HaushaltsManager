@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager.Entities.Reports;
+package com.example.lucas.haushaltsmanager.Entities.Report;
 
 import android.content.Context;
 

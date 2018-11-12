@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager;
+package com.example.lucas.haushaltsmanager.Cards;
 
 import android.content.Context;
 import android.support.annotation.ColorRes;
@@ -8,7 +8,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
-import com.example.lucas.haushaltsmanager.Entities.Reports.Year;
+import com.example.lucas.haushaltsmanager.Entities.Report.ReportInterface;
+import com.example.lucas.haushaltsmanager.R;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
@@ -38,18 +39,18 @@ public class LineChartCardPopulator {
         mRootView.setOnClickListener(listener);
     }
 
-    public void setData(Year year) {
-        setCardTitle(year.getCardTitle());
+    public void setData(ReportInterface report) {
+        setCardTitle(report.getCardTitle());
 
-        setLineChart(year);
+        setLineChart(report);
     }
 
     private void setCardTitle(String title) {
         mViewHolder.mTitle.setText(title);
     }
 
-    private void setLineChart(Year year) {
-        mViewHolder.mLineChart.setData(prepareLineData(year));
+    private void setLineChart(ReportInterface report) {
+        mViewHolder.mLineChart.setData(prepareLineData(report));
         mViewHolder.mLineChart.setBackgroundColor(getColorResource(R.color.primaryBackgroundColor));
 
         mViewHolder.mLineChart.setNoDataText(getStringResource(R.string.no_bookings_in_year));
@@ -80,8 +81,8 @@ public class LineChartCardPopulator {
         return mContext.getString(string);
     }
 
-    private LineData prepareLineData(Year year) {
-        LineDataSet lds = new LineDataSet(getChartEntries(year), "");
+    private LineData prepareLineData(ReportInterface report) {
+        LineDataSet lds = new LineDataSet(getChartEntries(report), "");
         lds.setColor(getColorResource(R.color.colorPrimary));
         lds.setCircleColor(getColorResource(R.color.colorAccent));
         lds.setValueTextColor(getColorResource(R.color.primary_text_color));
@@ -111,13 +112,13 @@ public class LineChartCardPopulator {
     }
 
     // TODO: Sollte ich vielleicht den Kontostand anzeigen?
-    private List<Entry> getChartEntries(Year year) {
+    private List<Entry> getChartEntries(ReportInterface report) {
         List<Entry> entries = new ArrayList<>();
 
         for (int month = 0; month < 12; month++) {
             entries.add(new Entry(
                     month + 1,
-                    sumIncomeByMonth(year.getExpenses(), month)
+                    sumIncomeByMonth(report.getExpenses(), month)
             ));
         }
 

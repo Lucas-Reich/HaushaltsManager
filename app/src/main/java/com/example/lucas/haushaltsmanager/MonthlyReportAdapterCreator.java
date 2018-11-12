@@ -4,7 +4,8 @@ import android.content.Context;
 
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
-import com.example.lucas.haushaltsmanager.Entities.Reports.Month;
+import com.example.lucas.haushaltsmanager.Entities.Report.Report;
+import com.example.lucas.haushaltsmanager.Entities.Report.ReportInterface;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 
 import java.util.ArrayList;
@@ -47,7 +48,7 @@ public class MonthlyReportAdapterCreator {
     }
 
     public MonthlyReportAdapter getAdapter() {
-        List<Month> reports = createMonthlyReports();
+        List<ReportInterface> reports = createMonthlyReports();
 
         return new MonthlyReportAdapter(
                 mContext,
@@ -55,11 +56,11 @@ public class MonthlyReportAdapterCreator {
         );
     }
 
-    private List<Month> createMonthlyReports() {
-        List<Month> reports = new ArrayList<>();
+    private List<ReportInterface> createMonthlyReports() {
+        List<ReportInterface> reports = new ArrayList<>();
 
         for (int i = getCurrentMonth(); i >= 1; i--) {
-            reports.add(new Month(
+            reports.add(new Report(
                     getStringifiedMonth(i - 1),
                     groupExpensesByMonth(i),
                     getMainCurrency()
@@ -70,7 +71,7 @@ public class MonthlyReportAdapterCreator {
     }
 
     private List<ExpenseObject> groupExpensesByMonth(int month) {
-        return mExpenseGrouper.groupByMonth(
+        return mExpenseGrouper.byMonth(
                 mExpenses,
                 month,
                 getCurrentYear()

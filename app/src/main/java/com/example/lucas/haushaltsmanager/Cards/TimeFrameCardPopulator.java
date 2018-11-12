@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager;
+package com.example.lucas.haushaltsmanager.Cards;
 
 import android.content.Context;
 import android.support.v7.widget.CardView;
@@ -8,7 +8,9 @@ import android.widget.TextView;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
-import com.example.lucas.haushaltsmanager.Entities.Reports.ReportInterface;
+import com.example.lucas.haushaltsmanager.Entities.Report.ReportInterface;
+import com.example.lucas.haushaltsmanager.ExpenseSum;
+import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
 import com.lucas.androidcharts.DataSet;
 import com.lucas.androidcharts.PieChart;
@@ -90,7 +92,10 @@ public class TimeFrameCardPopulator {
             return new ArrayList<>();
 
         List<DataSet> pieData = new ArrayList<>();
-        for (Map.Entry<Category, Double> set : sumByCategory(data.getExpenses()).entrySet()) {
+
+        List<ExpenseObject> test = flattenExpenses(data.getExpenses());
+
+        for (Map.Entry<Category, Double> set : sumByCategory(test).entrySet()) {
             pieData.add(new DataSet(
                     set.getValue().floatValue(),
                     set.getKey().getColorInt(),
@@ -99,6 +104,19 @@ public class TimeFrameCardPopulator {
         }
 
         return pieData;
+    }
+
+    private List<ExpenseObject> flattenExpenses(List<ExpenseObject> expenses) {
+        List<ExpenseObject> extractedChildren = new ArrayList<>();
+
+        for (ExpenseObject expense : expenses) {
+            if (expense.isParent())
+                extractedChildren.addAll(expense.getChildren());
+            else
+                extractedChildren.add(expense);
+        }
+
+        return extractedChildren;
     }
 
     private HashMap<Category, Double> sumByCategory(List<ExpenseObject> expenses) {
