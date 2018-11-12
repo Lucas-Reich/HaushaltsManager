@@ -8,6 +8,7 @@ import android.widget.TextView;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Report.ReportInterface;
+import com.example.lucas.haushaltsmanager.ExpenseFilter;
 import com.example.lucas.haushaltsmanager.ExpenseSum;
 import com.example.lucas.haushaltsmanager.R;
 import com.lucas.androidcharts.DataSet;
@@ -19,17 +20,14 @@ import java.util.List;
 import java.util.Map;
 
 public class PieChartCardPopulator {
-    private static final String TAG = PieChartCardPopulator.class.getSimpleName();
-
-    public static final boolean EXPENDITURE_CHART = true;
-    public static final boolean INCOME_CHART = false;
-
     private CardView mRootView;
     private ViewHolder mViewHolder;
-    private boolean mChartType;
+    private boolean mShowExpenditures;
 
     public PieChartCardPopulator(CardView rootView) {
         mRootView = rootView;
+
+        mShowExpenditures = true;
 
         initializeViewHolder();
     }
@@ -38,11 +36,18 @@ public class PieChartCardPopulator {
         mRootView.setOnClickListener(listener);
     }
 
-    public void setData(ReportInterface report, boolean chartType) {
+    public void setData(ReportInterface report) {
         setCardTitle(report.getCardTitle());
 
-        mChartType = chartType;
         setPieChart(report);
+    }
+
+    public void showIncome() {
+        mShowExpenditures = false;
+    }
+
+    public void showExpense() {
+        mShowExpenditures = true;
     }
 
     private void setCardTitle(@NonNull String title) {
@@ -50,40 +55,41 @@ public class PieChartCardPopulator {
     }
 
     private void setPieChart(ReportInterface report) {
-        mViewHolder.mPieChart.setPieData(preparePieData(report));
         mViewHolder.mPieChart.setNoDataText(R.string.no_bookings_in_year);
+        mViewHolder.mPieChart.setPieData(createDataSets(
+                filterExpenses(report.getExpenses(), mShowExpenditures))
+        );
     }
 
-    private List<DataSet> preparePieData(ReportInterface year) {
-        if (year.getBookingCount() == 0)
-            return new ArrayList<>();
+    private List<DataSet> createDataSets(List<ExpenseObject> expenses) {
+        HashMap<Category, Double> aggregatedExpenses = sumByCategory(expenses);
 
-        List<DataSet> dataSet = new ArrayList<>();
-        for (Map.Entry<Category, Double> entry : sumByCategory(year.getExpenses()).entrySet()) {
-            dataSet.add(new DataSet(
-                    entry.getValue().floatValue(),
-                    entry.getKey().getColorInt(),
-                    entry.getKey().getTitle()
-            ));
+        List<DataSet> dataSets = new ArrayList<>();
+        for (Map.Entry<Category, Double> entry : aggregatedExpenses.entrySet()) {
+            dataSets.add(toDataSet(entry));
         }
 
-        return dataSet;
+        return dataSets;
+    }
+
+    private DataSet toDataSet(Map.Entry<Category, Double> entry) {
+        return new DataSet(
+                entry.getValue().floatValue(),
+                entry.getKey().getColorInt(),
+                entry.getKey().getTitle()
+        );
+    }
+
+    private List<ExpenseObject> filterExpenses(List<ExpenseObject> expenses, boolean filter) {
+        ExpenseFilter expenseFilter = new ExpenseFilter();
+
+        return expenseFilter.byExpenditureType(expenses, filter);
     }
 
     private HashMap<Category, Double> sumByCategory(List<ExpenseObject> expenses) {
         ExpenseSum expenseSum = new ExpenseSum();
 
         return expenseSum.sumBookingsByCategory(expenses);
-    }
-
-    /**
-     * Die Ausgabe wird nur angezeigt, wenn sie vom gleichen Typ wie der ChartType ist.
-     *
-     * @param expense Zu überprüfende Ausgabe
-     * @return TRUE wenn die Ausgabe angezeigt werden soll, FALSE wenn nicht.
-     */
-    private boolean displayExpense(ExpenseObject expense) {
-        return expense.isExpenditure() == mChartType;
     }
 
     private void initializeViewHolder() {

@@ -21,9 +21,7 @@ import com.example.lucas.haushaltsmanager.R;
 import java.util.Calendar;
 import java.util.List;
 
-public class TabThreeYearlyReports extends Fragment {
-    private static final String TAG = TabThreeYearlyReports.class.getSimpleName();
-
+public class TabThreeYearlyReports extends AbstractMainTab {
     private ParentActivity mParent;
     private UserSettingsPreferences mUserPreferences;
 
@@ -43,68 +41,54 @@ public class TabThreeYearlyReports extends Fragment {
                 (CardView) rootView.findViewById(R.id.tab_three_timeframe_report_card),
                 getContext()
         );
-        extendedYearlyChart.setData(createYearReportInterface(getStringifiedYear()));
-
+        extendedYearlyChart.setData(createReport(
+                getStringifiedYear(),
+                mParent.getExpenses()
+        ));
 
         PieChartCardPopulator incomeCard = new PieChartCardPopulator(
                 (CardView) rootView.findViewById(R.id.tab_three_income_card)
         );
-        incomeCard.setData(createYearReportInterface(
-                getString(R.string.income)),
-                PieChartCardPopulator.INCOME_CHART
-        );
+        incomeCard.showIncome();
+        incomeCard.setData(createReport(
+                getString(R.string.income),
+                mParent.getExpenses()
+        ));
 
         PieChartCardPopulator expenseCard = new PieChartCardPopulator(
                 (CardView) rootView.findViewById(R.id.tab_three_expense_card)
         );
-        expenseCard.setData(createYearReportInterface(
-                getString(R.string.expense)),
-                PieChartCardPopulator.EXPENDITURE_CHART
-        );
+        expenseCard.showExpense();
+        expenseCard.setData(createReport(
+                getString(R.string.expense),
+                mParent.getExpenses()
+        ));
 
         LineChartCardPopulator lineChartCard = new LineChartCardPopulator(
                 (CardView) rootView.findViewById(R.id.tab_three_line_chart),
                 getContext()
         );
-        lineChartCard.setData(createYearReportInterface(
-                String.format("%s - %s", getStringifiedYear(), getString(R.string.account_balance))
+        lineChartCard.setData(createReport(
+                getString(R.string.account_balance),
+                mParent.getExpenses()
         ));
 
         return rootView;
     }
 
     public void updateView() {
-
-        //todo Die Datengrundlage muss der Karten muss angepasst werden wenn der user Konten an oder abwählt
+        // TODO: Wenn die sichtbaren Konten geupdated wurden müssen die Ausgaben von dem Parent abgefragt werden und angezeigt werden
     }
 
-    /**
-     * Methode um herauszufinden, ob der aktuelle tab gerade sichtbar geworden ist oder nicht.
-     * Quelle: https://stackoverflow.com/a/9779971
-     *
-     * @param isVisibleToUser Indikator ob die aktuelle UI für den User sichtbar ist. Default ist True.
-     */
-    @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-
-        if (this.isVisible()) {
-            if (isVisibleToUser) {
-                updateView();
-                //todo die view sollte nur geupdated werden wenn es auch wirklich veränderungen gab
-            }
-        }
-    }
-
-    private ReportInterface createYearReportInterface(String title) {
+    private ReportInterface createReport(String title, List<ExpenseObject> expenses) {
         return new Report(
                 title,
-                getExpensesInYear(mParent.getExpenses(), getCurrentYear()),
+                filterByYear(expenses, getCurrentYear()),
                 mUserPreferences.getMainCurrency()
         );
     }
 
-    private List<ExpenseObject> getExpensesInYear(List<ExpenseObject> expenses, int year) {
+    private List<ExpenseObject> filterByYear(List<ExpenseObject> expenses, int year) {
         ExpenseGrouper expenseGrouper = new ExpenseGrouper();
 
         return expenseGrouper.byYear(expenses, year);

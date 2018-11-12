@@ -268,7 +268,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
             switch (visibleTabPosition) {
 
                 case 0:
-                    ((TabOneBookings) fragment).updateListView();
+                    ((TabOneBookings) fragment).updateView();
                     break;
                 case 1:
                     ((TabTwoMonthlyReports) fragment).updateView();

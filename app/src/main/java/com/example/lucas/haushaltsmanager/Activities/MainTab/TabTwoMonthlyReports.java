@@ -13,16 +13,13 @@ import com.example.lucas.haushaltsmanager.MonthlyReportAdapter;
 import com.example.lucas.haushaltsmanager.MonthlyReportAdapterCreator;
 import com.example.lucas.haushaltsmanager.R;
 
-public class TabTwoMonthlyReports extends Fragment {
-    private static final String TAG = TabTwoMonthlyReports.class.getSimpleName();
-
+public class TabTwoMonthlyReports extends AbstractMainTab {
     private RecyclerView mRecyclerView;
     private ParentActivity mParent;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
 
         mParent = (ParentActivity) getActivity();
     }
@@ -58,24 +55,5 @@ public class TabTwoMonthlyReports extends Fragment {
         mRecyclerView.setAdapter(adapter);
 
         adapter.notifyDataSetChanged();
-    }
-
-
-    /**
-     * Methode um herauszufinden, ob der aktuelle tab gerade sichtbar geworden ist oder nicht.
-     * Quelle: https://stackoverflow.com/a/9779971
-     *
-     * @param isVisibleToUser Indikator ob die aktuelle UI für den User sichtbar ist. Default ist True.
-     */
-    @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-
-        if (this.isVisible()) {
-            if (isVisibleToUser) {
-                updateView();
-                //todo nur updaten wenn etwas passiert ist
-            }
-        }
     }
 }

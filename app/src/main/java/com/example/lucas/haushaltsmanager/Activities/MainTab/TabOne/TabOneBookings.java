@@ -5,7 +5,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +15,7 @@ import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Activities.EditRecurringBooking;
 import com.example.lucas.haushaltsmanager.Activities.ExpenseScreen;
+import com.example.lucas.haushaltsmanager.Activities.MainTab.AbstractMainTab;
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.CannotDeleteExpenseException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
@@ -36,7 +36,7 @@ import com.github.fafaldo.fabtoolbar.widget.FABToolbarLayout;
 import java.util.Calendar;
 import java.util.List;
 
-public class TabOneBookings extends Fragment implements FABToolbar.OnFabToolbarMenuItemClicked {
+public class TabOneBookings extends AbstractMainTab implements FABToolbar.OnFabToolbarMenuItemClicked {
     private static final String TAG = TabOneBookings.class.getSimpleName();
 
     private ExpandableListAdapter mListAdapter;
@@ -79,7 +79,7 @@ public class TabOneBookings extends Fragment implements FABToolbar.OnFabToolbarM
 
         setOnItemLongClickListener();
 
-        updateListView();
+        updateView();
 
         mTabOneFabToolbar = new FABToolbar(
                 (FABToolbarLayout) rootView.findViewById(R.id.fabtoolbar),
@@ -226,12 +226,12 @@ public class TabOneBookings extends Fragment implements FABToolbar.OnFabToolbarM
     private void resetListView() {
         mListAdapter.unselectAll();
 
-        updateListView();
+        updateView();
 
         enableListViewLongClick();
     }
 
-    public void updateListView() {
+    public void updateView() {
 
         mListAdapter = new ExpandableListAdapterCreator(
                 mParent.getExpenses(getFirstOfMonth(), getLastOfMonth()),
@@ -485,22 +485,8 @@ public class TabOneBookings extends Fragment implements FABToolbar.OnFabToolbarM
 
                 mParent.updateExpenses();
 
-                updateListView();
+                updateView();
             }
         });
-    }
-
-    /**
-     * Methode um herauszufinden, ob der aktuelle tab gerade sichtbar geworden ist oder nicht.
-     * Quelle: https://stackoverflow.com/a/9779971
-     *
-     * @param isVisibleToUser Indikator ob die aktuelle UI für den User sichtbar ist. Default ist True.
-     */
-    @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-
-        if (isVisible() && isVisibleToUser)
-            updateListView();
     }
 }
