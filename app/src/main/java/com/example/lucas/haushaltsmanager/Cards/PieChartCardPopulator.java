@@ -104,7 +104,7 @@ public class PieChartCardPopulator {
     private HashMap<Category, Double> sumByCategory(List<ExpenseObject> expenses) {
         ExpenseSum expenseSum = new ExpenseSum();
 
-        return expenseSum.sumBookingsByCategory(expenses);
+        return expenseSum.byCategory(expenses);
     }
 
     private void initializeViewHolder() {

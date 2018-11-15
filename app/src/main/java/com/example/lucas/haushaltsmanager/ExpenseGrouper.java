@@ -12,33 +12,33 @@ public class ExpenseGrouper {
 
     /**
      * Kindbuchungen werden von der Funktion nicht beachtet.
-     *
-     * @param month Started bei 1 (Januar) und endet bei 12 (Dezember).
      */
-    public List<ExpenseObject> byMonth(List<ExpenseObject> expenses, int month, int year) {
-        List<ExpenseObject> groupedExpenses = new ArrayList<>();
-
-        for (ExpenseObject expense : expenses) {
-            if (isExpenseInMonth(expense, (month - 1), year))
-                groupedExpenses.add(expense);
-        }
-
-        return groupedExpenses;
-    }
-
-    /**
-     * Kindbuchungen werden von der Funktion nicht beachtet.
-     */
+    // TODO: Kann ich die Funktion durch byYears() ersetzen?
     public List<ExpenseObject> byYear(List<ExpenseObject> expenses, int year) {
         List<ExpenseObject> groupedExpenses = new ArrayList<>();
 
         for (ExpenseObject expense : expenses) {
-            if (isExpenseInYear(expense, year))
+            if (isInYear(expense, year))
                 groupedExpenses.add(expense);
         }
 
         return groupedExpenses;
     }
+
+    public HashMap<Integer, List<ExpenseObject>> byYears(List<ExpenseObject> expenses) {
+        HashMap<Integer, List<ExpenseObject>> groupedExpenses = new HashMap<>();
+
+        for (ExpenseObject expense : expenses) {
+            int expenseYear = expense.getDateTime().get(Calendar.YEAR);
+
+            if (!groupedExpenses.containsKey(expenseYear))
+                groupedExpenses.put(expenseYear, new ArrayList<ExpenseObject>());
+
+            groupedExpenses.get(expenseYear).add(expense);
+        }
+
+        return groupedExpenses;
+    } // TODO: Tests schreiben
 
     /**
      * Kindbuchungen werden von der Funktion nicht beachtet.
@@ -58,12 +58,42 @@ public class ExpenseGrouper {
         return groupedExpenses;
     }
 
-    private boolean isExpenseInMonth(ExpenseObject expense, int month, int year) {
-        return expense.getDateTime().get(Calendar.MONTH) == month
-                && isExpenseInYear(expense, year);
+    public List<ExpenseObject> byMonth(List<ExpenseObject> expenses, int month, int year) {
+        List<ExpenseObject> groupedExpenses = new ArrayList<>();
+
+        for (ExpenseObject expense : expenses) {
+            if (isInMonth(expense, month) && isInYear(expense, year))
+                groupedExpenses.add(expense);
+        }
+
+        return groupedExpenses;
     }
 
-    private boolean isExpenseInYear(ExpenseObject expense, int year) {
+    public List<List<ExpenseObject>> byMonths(List<ExpenseObject> expenses, int year) {
+        List<List<ExpenseObject>> groupedExpenses = new ArrayList<>();
+        for (int i = 0; i < 12; i++) {
+            groupedExpenses.add(new ArrayList<ExpenseObject>());
+        }
+
+        for (ExpenseObject expense : expenses) {
+            if (!isInYear(expense, year))
+                continue;
+
+            groupedExpenses.get(extractMonth(expense)).add(expense);
+        }
+
+        return groupedExpenses;
+    }
+
+    private int extractMonth(ExpenseObject expense) {
+        return expense.getDateTime().get(Calendar.MONTH);
+    }
+
+    private boolean isInMonth(ExpenseObject expense, int month) {
+        return expense.getDateTime().get(Calendar.MONTH) == month;
+    }
+
+    private boolean isInYear(ExpenseObject expense, int year) {
         return expense.getDateTime().get(Calendar.YEAR) == year;
     }
 }

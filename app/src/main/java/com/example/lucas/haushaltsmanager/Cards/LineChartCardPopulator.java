@@ -1,14 +1,17 @@
 package com.example.lucas.haushaltsmanager.Cards;
 
-import android.content.Context;
+import android.content.res.Resources;
 import android.support.annotation.ColorRes;
 import android.support.annotation.StringRes;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.CardView;
 import android.view.View;
 import android.widget.TextView;
 
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Report.ReportInterface;
+import com.example.lucas.haushaltsmanager.ExpenseGrouper;
+import com.example.lucas.haushaltsmanager.ExpenseSum;
 import com.example.lucas.haushaltsmanager.R;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
@@ -20,18 +23,20 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 public class LineChartCardPopulator {
+    // TODO: Ich kann die Linie, basierend auf dem Kontostand einfärben. Wenn der Kontostand kleiner als 0 ist Rot größer oder gleich 0 grün
+    // Trello: https://trello.com/c/uAhKQUnK/62-farbe-des-linecharts-im-tabthree-basierend-auf-dem-kontostand-einfärben
     private CardView mRootView;
     private ViewHolder mViewHolder;
-    private Context mContext;
+    private Resources mResources;
+    private double mLastYearAccountBalance; // TODO: Geht das auch anders?
 
-    public LineChartCardPopulator(CardView rootView, Context context) {
+    public LineChartCardPopulator(CardView rootView, double lastYearAccountBalance) {
         mRootView = rootView;
-        mContext = context;
 
+        mLastYearAccountBalance = lastYearAccountBalance;
         initializeViewHolder();
     }
 
@@ -39,18 +44,19 @@ public class LineChartCardPopulator {
         mRootView.setOnClickListener(listener);
     }
 
-    public void setData(ReportInterface report) {
+    public void setData(ReportInterface report, Resources resources, int year) {
         setCardTitle(report.getCardTitle());
 
-        setLineChart(report);
+        mResources = resources;
+        setLineChart(report, year);
     }
 
     private void setCardTitle(String title) {
         mViewHolder.mTitle.setText(title);
     }
 
-    private void setLineChart(ReportInterface report) {
-        mViewHolder.mLineChart.setData(prepareLineData(report));
+    private void setLineChart(ReportInterface report, int year) {
+        mViewHolder.mLineChart.setData(prepareLineData(report, year));
         mViewHolder.mLineChart.setBackgroundColor(getColorResource(R.color.primaryBackgroundColor));
 
         mViewHolder.mLineChart.setNoDataText(getStringResource(R.string.no_bookings_in_year));
@@ -74,15 +80,15 @@ public class LineChartCardPopulator {
     }
 
     private int getColorResource(@ColorRes int color) {
-        return mContext.getResources().getColor(color);
+        return ResourcesCompat.getColor(mResources, color, null);
     }
 
     private String getStringResource(@StringRes int string) {
-        return mContext.getString(string);
+        return mResources.getString(string);
     }
 
-    private LineData prepareLineData(ReportInterface report) {
-        LineDataSet lds = new LineDataSet(getChartEntries(report), "");
+    private LineData prepareLineData(ReportInterface report, int year) {
+        LineDataSet lds = new LineDataSet(getChartEntries(report.getExpenses(), year), "");
         lds.setColor(getColorResource(R.color.colorPrimary));
         lds.setCircleColor(getColorResource(R.color.colorAccent));
         lds.setValueTextColor(getColorResource(R.color.primary_text_color));
@@ -102,7 +108,7 @@ public class LineChartCardPopulator {
     }
 
     private String[] getMonthsShortened() {
-        String[] months = mContext.getResources().getStringArray(R.array.months);
+        String[] months = mResources.getStringArray(R.array.months);
 
         for (int i = 0; i < months.length; i++) {
             months[i] = months[i].substring(0, 3);
@@ -111,38 +117,28 @@ public class LineChartCardPopulator {
         return months;
     }
 
-    // TODO: Sollte ich vielleicht den Kontostand anzeigen?
-    private List<Entry> getChartEntries(ReportInterface report) {
+    private List<Entry> getChartEntries(List<ExpenseObject> expenses, int year) {
         List<Entry> entries = new ArrayList<>();
 
-        for (int month = 0; month < 12; month++) {
+        List<List<ExpenseObject>> groupedValues = getAccountBalances(expenses, year);
+
+        float lastValue = (float) mLastYearAccountBalance;
+        for (int i = 0; i < 12; i++) {
             entries.add(new Entry(
-                    month + 1,
-                    sumIncomeByMonth(report.getExpenses(), month)
+                    i + 1,
+                    lastValue += (float) sum(groupedValues.get(i))
             ));
         }
-
 
         return entries;
     }
 
-    private int sumIncomeByMonth(List<ExpenseObject> expenses, int month) {
-        double income = 0;
-
-        for (ExpenseObject expense : expenses) {
-            if (isExpenseInMonth(expense, month) && isExpenseIncome(expense))
-                income += expense.getUnsignedPrice();
-        }
-
-        return (int) income;
+    private double sum(List<ExpenseObject> expenses) {
+        return new ExpenseSum().sum(expenses);
     }
 
-    private boolean isExpenseIncome(ExpenseObject expense) {
-        return !expense.isExpenditure();
-    }
-
-    private boolean isExpenseInMonth(ExpenseObject expense, int month) {
-        return expense.getDateTime().get(Calendar.MONTH) == month;
+    private List<List<ExpenseObject>> getAccountBalances(List<ExpenseObject> expenses, int year) {
+        return new ExpenseGrouper().byMonths(expenses, year);
     }
 
     private void initializeViewHolder() {

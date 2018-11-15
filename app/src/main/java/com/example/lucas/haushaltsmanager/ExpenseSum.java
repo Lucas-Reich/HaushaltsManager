@@ -9,38 +9,38 @@ import java.util.List;
 import java.util.Map;
 
 public class ExpenseSum {
-    private ExpenseGrouper mExpenseGrouper;
 
-    public ExpenseSum() {
-        mExpenseGrouper = new ExpenseGrouper();
-    }
-
-    public HashMap<Category, Double> sumBookingsByCategory(List<ExpenseObject> expenses) {
-        HashMap<Category, List<ExpenseObject>> expensesGroupedByCategory = mExpenseGrouper.byCategory(flattenBookings(expenses));
+    public HashMap<Category, Double> byCategory(List<ExpenseObject> expenses) {
+        HashMap<Category, List<ExpenseObject>> expensesGroupedByCategory = groupByCategory(pullChildrenUp(expenses));
 
         HashMap<Category, Double> summedExpenses = new HashMap<>();
         for (Map.Entry<Category, List<ExpenseObject>> entry : expensesGroupedByCategory.entrySet()) {
             summedExpenses.put(
                     entry.getKey(),
-                    getSum(entry.getValue())
+                    sum(entry.getValue())
             );
         }
 
         return summedExpenses;
     }
 
-    public double sumBookingsByExpenditureType(boolean expenditureType, List<ExpenseObject> expenses) {
-        List<ExpenseObject> expensesWithCorrectExpenditureType = new ArrayList<>();
+    public double byExpenditureType(boolean expenditureType, List<ExpenseObject> expenses) {
+        List<ExpenseObject> filteredExpenses = pullChildrenUp(expenses);
 
-        for (ExpenseObject expense : flattenBookings(expenses)) {
-            if (expense.isExpenditure() == expenditureType)
-                expensesWithCorrectExpenditureType.add(expense);
-        }
+        filteredExpenses = filterByExpenditureType(filteredExpenses, expenditureType);
 
-        return getSum(expensesWithCorrectExpenditureType);
+        return sum(filteredExpenses);
     }
 
-    private Double getSum(List<ExpenseObject> expenses) {
+    public double byMonth(List<ExpenseObject> expenses, int month, int year) {
+        List<ExpenseObject> expensesInMonth = pullChildrenUp(expenses);
+
+        expensesInMonth = filterByMonth(expensesInMonth, month, year);
+
+        return sum(expensesInMonth);
+    }
+
+    public Double sum(List<ExpenseObject> expenses) {
         Double sum = 0D;
 
         for (ExpenseObject expense : expenses) {
@@ -50,12 +50,37 @@ public class ExpenseSum {
         return sum;
     }
 
-    /**
-     * Funktion stellt sicher das keine Buchung mehr Kinder hat.
-     * Falls eine Buchung mit Kindern gefunden wird,
-     * dann werden diese extrahiert und der Buchungsliste hinzugefügt.
-     */
-    private List<ExpenseObject> flattenBookings(List<ExpenseObject> expenses) {
+    public HashMap<Integer, Double> byYear(List<ExpenseObject> expenses) {
+        HashMap<Integer, List<ExpenseObject>> groupedExpenses = groupByYear(pullChildrenUp(expenses));
+
+        HashMap<Integer, Double> summedExpenses = new HashMap<>();
+        for (Map.Entry<Integer, List<ExpenseObject>> entry : groupedExpenses.entrySet()) {
+            summedExpenses.put(
+                    entry.getKey(),
+                    sum(entry.getValue())
+            );
+        }
+
+        return summedExpenses;
+    }
+
+    private List<ExpenseObject> filterByExpenditureType(List<ExpenseObject> expenses, boolean expenditureType) {
+        return new ExpenseFilter().byExpenditureType(expenses, expenditureType);
+    }
+
+    private List<ExpenseObject> filterByMonth(List<ExpenseObject> expenses, int month, int year) {
+        return new ExpenseFilter().byMonth(expenses, month, year);
+    }
+
+    private HashMap<Category, List<ExpenseObject>> groupByCategory(List<ExpenseObject> expenses) {
+        return new ExpenseGrouper().byCategory(expenses);
+    }
+
+    private HashMap<Integer, List<ExpenseObject>> groupByYear(List<ExpenseObject> expenses) {
+        return new ExpenseGrouper().byYears(expenses);
+    }
+
+    private List<ExpenseObject> pullChildrenUp(List<ExpenseObject> expenses) {
         List<ExpenseObject> extractedExpenses = new ArrayList<>();
 
         for (ExpenseObject expense : expenses) {

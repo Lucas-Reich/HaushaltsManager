@@ -62,7 +62,7 @@ public class MonthlyReportAdapterCreator {
         for (int i = getCurrentMonth(); i >= 1; i--) {
             reports.add(new Report(
                     getStringifiedMonth(i - 1),
-                    groupExpensesByMonth(i),
+                    groupExpensesByMonth(i - 1),
                     getMainCurrency()
             ));
         }

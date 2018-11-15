@@ -45,14 +45,14 @@ public class Report implements ReportInterface {
     public double getIncoming() {
         ExpenseSum expenseSum = new ExpenseSum();
 
-        return expenseSum.sumBookingsByExpenditureType(false, mExpenses);
+        return expenseSum.byExpenditureType(false, mExpenses);
     }
 
     @Override
     public double getOutgoing() {
         ExpenseSum expenseSum = new ExpenseSum();
 
-        return expenseSum.sumBookingsByExpenditureType(true, mExpenses);
+        return expenseSum.byExpenditureType(true, mExpenses);
     }
 
     @Override
@@ -96,7 +96,7 @@ public class Report implements ReportInterface {
     private HashMap<Category, Double> sumExpensesByCategory() {
         ExpenseSum expenseSum = new ExpenseSum();
 
-        return expenseSum.sumBookingsByCategory(mExpenses);
+        return expenseSum.byCategory(mExpenses);
     }
 
     private Map.Entry<Category, Double> getMaxEntry(HashMap<Category, Double> categoryDoubleHashMap) {

@@ -2,7 +2,6 @@ package com.example.lucas.haushaltsmanager.Activities.MainTab;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,15 +14,18 @@ import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Report.Report;
 import com.example.lucas.haushaltsmanager.Entities.Report.ReportInterface;
 import com.example.lucas.haushaltsmanager.ExpenseGrouper;
+import com.example.lucas.haushaltsmanager.ExpenseSum;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 
 public class TabThreeYearlyReports extends AbstractMainTab {
     private ParentActivity mParent;
     private UserSettingsPreferences mUserPreferences;
+    private HashMap<Integer, Double> mAccountBalanceYear; // TODO: Würde ich gerne anders machen
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -31,6 +33,8 @@ public class TabThreeYearlyReports extends AbstractMainTab {
 
         mParent = (ParentActivity) getActivity();
         mUserPreferences = new UserSettingsPreferences(getContext());
+
+        mAccountBalanceYear = new ExpenseSum().byYear(mParent.getExpenses());
     }
 
     @Override
@@ -66,12 +70,13 @@ public class TabThreeYearlyReports extends AbstractMainTab {
 
         LineChartCardPopulator lineChartCard = new LineChartCardPopulator(
                 (CardView) rootView.findViewById(R.id.tab_three_line_chart),
-                getContext()
+                mAccountBalanceYear.get(getCurrentYear() - 1)
         );
-        lineChartCard.setData(createReport(
-                getString(R.string.account_balance),
-                mParent.getExpenses()
-        ));
+        lineChartCard.setData(
+                createReport(getString(R.string.account_balance), mParent.getExpenses()),
+                mParent.getResources(),
+                getCurrentYear() // TODO: Kann ich das mit dem Jahr anders machen. Es wird nur für die GroupFunkion benutzt
+        );
 
         return rootView;
     }
@@ -89,9 +94,7 @@ public class TabThreeYearlyReports extends AbstractMainTab {
     }
 
     private List<ExpenseObject> filterByYear(List<ExpenseObject> expenses, int year) {
-        ExpenseGrouper expenseGrouper = new ExpenseGrouper();
-
-        return expenseGrouper.byYear(expenses, year);
+        return new ExpenseGrouper().byYear(expenses, year);
     }
 
     private String getStringifiedYear() {
