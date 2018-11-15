@@ -32,8 +32,8 @@ public class ExpenseFilterTest {
     @Test
     public void testFilterByExpenditureWithNoMatchingExpenses() {
         List<ExpenseObject> expenses = new ArrayList<>();
-        expenses.add(getSimpleExpense(false, getSimpleCalendar(Calendar.JANUARY, 2018)));
-        expenses.add(getSimpleExpense(false, getSimpleCalendar(Calendar.JANUARY, 2018)));
+        expenses.add(getExpenseWithType(false));
+        expenses.add(getExpenseWithType(false));
 
         List<ExpenseObject> filteredExpenses = mExpenseFilter.byExpenditureType(expenses, true);
 
@@ -43,11 +43,11 @@ public class ExpenseFilterTest {
     @Test
     public void testFilterByExpenditure() {
         List<ExpenseObject> expenses = new ArrayList<>();
-        expenses.add(getSimpleExpense(false, getSimpleCalendar(Calendar.JANUARY, 2018)));
-        expenses.add(getSimpleExpense(false, getSimpleCalendar(Calendar.JANUARY, 2018)));
-        expenses.add(getSimpleExpense(false, getSimpleCalendar(Calendar.JANUARY, 2018)));
-        expenses.add(getSimpleExpense(true, getSimpleCalendar(Calendar.JANUARY, 2018)));
-        expenses.add(getSimpleExpense(false, getSimpleCalendar(Calendar.JANUARY, 2018)));
+        expenses.add(getExpenseWithType(false));
+        expenses.add(getExpenseWithType(false));
+        expenses.add(getExpenseWithType(false));
+        expenses.add(getExpenseWithType(true));
+        expenses.add(getExpenseWithType(false));
 
         List<ExpenseObject> filteredExpenses = mExpenseFilter.byExpenditureType(expenses, false);
 
@@ -57,11 +57,11 @@ public class ExpenseFilterTest {
     @Test
     public void testFilterByIncome() {
         List<ExpenseObject> expenses = new ArrayList<>();
-        expenses.add(getSimpleExpense(false, getSimpleCalendar(Calendar.JANUARY, 2018)));
-        expenses.add(getSimpleExpense(true, getSimpleCalendar(Calendar.JANUARY, 2018)));
-        expenses.add(getSimpleExpense(false, getSimpleCalendar(Calendar.JANUARY, 2018)));
-        expenses.add(getSimpleExpense(true, getSimpleCalendar(Calendar.JANUARY, 2018)));
-        expenses.add(getSimpleExpense(false, getSimpleCalendar(Calendar.JANUARY, 2018)));
+        expenses.add(getExpenseWithType(false));
+        expenses.add(getExpenseWithType(true));
+        expenses.add(getExpenseWithType(false));
+        expenses.add(getExpenseWithType(true));
+        expenses.add(getExpenseWithType(false));
 
         List<ExpenseObject> filteredExpenses = mExpenseFilter.byExpenditureType(expenses, true);
 
@@ -71,8 +71,8 @@ public class ExpenseFilterTest {
     @Test
     public void testFilterByExpenditureShouldNotIncludeParents() {
         List<ExpenseObject> expenses = new ArrayList<>();
-        ExpenseObject parent = getSimpleExpense(true, getSimpleCalendar(Calendar.JANUARY, 2018));
-        parent.addChild(getSimpleExpense(false, getSimpleCalendar(Calendar.JANUARY, 2018)));
+        ExpenseObject parent = getExpenseWithType(true);
+        parent.addChild(getExpenseWithType(false));
         expenses.add(parent);
 
         List<ExpenseObject> filteredExpenses = mExpenseFilter.byExpenditureType(expenses, true);
@@ -83,10 +83,10 @@ public class ExpenseFilterTest {
     @Test
     public void testFilterByMonth() {
         List<ExpenseObject> expenses = new ArrayList<>();
-        expenses.add(getSimpleExpense(true, getSimpleCalendar(Calendar.JANUARY, 2018)));
-        expenses.add(getSimpleExpense(true, getSimpleCalendar(Calendar.FEBRUARY, 2018)));
-        expenses.add(getSimpleExpense(true, getSimpleCalendar(Calendar.JANUARY, 2018)));
-        expenses.add(getSimpleExpense(true, getSimpleCalendar(Calendar.JANUARY, 2017)));
+        expenses.add(getExpenseWithDate(getSimpleCalendar(Calendar.JANUARY, 2018)));
+        expenses.add(getExpenseWithDate(getSimpleCalendar(Calendar.FEBRUARY, 2018)));
+        expenses.add(getExpenseWithDate(getSimpleCalendar(Calendar.JANUARY, 2018)));
+        expenses.add(getExpenseWithDate(getSimpleCalendar(Calendar.JANUARY, 2017)));
 
         List<ExpenseObject> filteredExpenses = mExpenseFilter.byMonth(expenses, Calendar.JANUARY, 2018);
 
@@ -96,10 +96,10 @@ public class ExpenseFilterTest {
     @Test
     public void testFilterByMonthWithNoMatchingExpenses() {
         List<ExpenseObject> expenses = new ArrayList<>();
-        expenses.add(getSimpleExpense(true, getSimpleCalendar(Calendar.FEBRUARY, 2019)));
-        expenses.add(getSimpleExpense(true, getSimpleCalendar(Calendar.FEBRUARY, 2017)));
-        expenses.add(getSimpleExpense(true, getSimpleCalendar(Calendar.JANUARY, 2018)));
-        expenses.add(getSimpleExpense(true, getSimpleCalendar(Calendar.MARCH, 2017)));
+        expenses.add(getExpenseWithDate(getSimpleCalendar(Calendar.FEBRUARY, 2019)));
+        expenses.add(getExpenseWithDate(getSimpleCalendar(Calendar.FEBRUARY, 2017)));
+        expenses.add(getExpenseWithDate(getSimpleCalendar(Calendar.JANUARY, 2018)));
+        expenses.add(getExpenseWithDate(getSimpleCalendar(Calendar.MARCH, 2017)));
 
         List<ExpenseObject> filteredExpenses = mExpenseFilter.byMonth(expenses, Calendar.FEBRUARY, 2018);
 
@@ -109,18 +109,88 @@ public class ExpenseFilterTest {
     @Test
     public void testFilterByMonthShouldNotIncludeParents() {
         List<ExpenseObject> expenses = new ArrayList<>();
-        ExpenseObject parent = getSimpleExpense(false, getSimpleCalendar(Calendar.JANUARY, 2018));
-        parent.addChild(getSimpleExpense(true, getSimpleCalendar(Calendar.DECEMBER, 2018)));
+        ExpenseObject parent = getExpenseWithDate(getSimpleCalendar(Calendar.JANUARY, 2018));
+        parent.addChild(getExpenseWithDate(getSimpleCalendar(Calendar.DECEMBER, 2018)));
 
         expenses.add(parent);
-        expenses.add(getSimpleExpense(false, getSimpleCalendar(Calendar.JANUARY, 2018)));
+        expenses.add(getExpenseWithDate(getSimpleCalendar(Calendar.JANUARY, 2018)));
 
         List<ExpenseObject> filteredExpenses = mExpenseFilter.byMonth(expenses, Calendar.JANUARY, 2018);
 
         assertEquals(1, filteredExpenses.size());
     }
 
-    private ExpenseObject getSimpleExpense(boolean isExpenditure, Calendar date) {
+    @Test
+    public void testFilterByAccounts() {
+        List<Long> activeAccounts = new ArrayList<>();
+        activeAccounts.add(1L);
+        activeAccounts.add(3L);
+
+        List<ExpenseObject> expenses = new ArrayList<>();
+        expenses.add(getExpenseWithAccount(1));
+        expenses.add(getExpenseWithAccount(3));
+        expenses.add(getExpenseWithAccount(2));
+        expenses.add(getExpenseWithAccount(2));
+        expenses.add(getExpenseWithAccount(3));
+
+        List<ExpenseObject> filteredExpenses = mExpenseFilter.byAccount(expenses, activeAccounts);
+
+        assertEquals(3, filteredExpenses.size());
+    }
+
+    @Test
+    public void testFilterByAccountsShouldNotConsiderParents() {
+        List<Long> activeAccounts = new ArrayList<>();
+        activeAccounts.add(1L);
+        activeAccounts.add(3L);
+
+        List<ExpenseObject> expenses = new ArrayList<>();
+
+        ExpenseObject parent = getExpenseWithAccount(1L);
+        parent.addChild(getExpenseWithAccount(1L));
+        expenses.add(parent);
+
+        expenses.add(getExpenseWithAccount(2L));
+        expenses.add(getExpenseWithAccount(3L));
+
+        List<ExpenseObject> filteredExpenses = mExpenseFilter.byAccount(expenses, activeAccounts);
+
+        assertEquals(1, filteredExpenses.size());
+    }
+
+    @Test
+    public void testFilterByAccountsWithChildrenShouldConsiderChildren() {
+        List<Long> activeAccounts = new ArrayList<>();
+        activeAccounts.add(1L);
+        activeAccounts.add(3L);
+
+        List<ExpenseObject> expenses = new ArrayList<>();
+
+        ExpenseObject parent = getExpenseWithAccount(1L);
+        parent.addChild(getExpenseWithAccount(1L));
+        expenses.add(parent);
+
+        expenses.add(getExpenseWithAccount(2L));
+        expenses.add(getExpenseWithAccount(3L));
+
+        List<ExpenseObject> filteredExpenses = mExpenseFilter.byAccountWithChildren(expenses, activeAccounts);
+
+        assertEquals(2, filteredExpenses.size());
+    }
+
+    private ExpenseObject getExpenseWithAccount(long accountId) {
+        return getExpense(true, getSimpleCalendar(Calendar.JANUARY, 2018), accountId);
+    }
+
+    private ExpenseObject getExpenseWithDate(Calendar date) {
+        return getExpense(true, date, -1);
+    }
+
+    private ExpenseObject getExpenseWithType(boolean isExpenditure) {
+        return getExpense(isExpenditure, getSimpleCalendar(Calendar.JANUARY, 2018), -1);
+    }
+
+    private ExpenseObject getExpense(boolean isExpenditure, Calendar date, long accountId) {
         return new ExpenseObject(
                 32,
                 "Ausgabe",
@@ -129,7 +199,7 @@ public class ExpenseFilterTest {
                 isExpenditure,
                 mock(Category.class),
                 "",
-                -1,
+                accountId,
                 ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE,
                 new ArrayList<Tag>(),
                 new ArrayList<ExpenseObject>(),

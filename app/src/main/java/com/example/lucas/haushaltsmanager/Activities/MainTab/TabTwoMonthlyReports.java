@@ -2,7 +2,6 @@ package com.example.lucas.haushaltsmanager.Activities.MainTab;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,7 +12,7 @@ import com.example.lucas.haushaltsmanager.MonthlyReportAdapter;
 import com.example.lucas.haushaltsmanager.MonthlyReportAdapterCreator;
 import com.example.lucas.haushaltsmanager.R;
 
-public class TabTwoMonthlyReports extends AbstractMainTab {
+public class TabTwoMonthlyReports extends AbstractTab {
     private RecyclerView mRecyclerView;
     private ParentActivity mParent;
 

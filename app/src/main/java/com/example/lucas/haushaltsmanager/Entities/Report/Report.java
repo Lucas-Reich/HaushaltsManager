@@ -25,7 +25,7 @@ public class Report implements ReportInterface {
             @NonNull List<ExpenseObject> expenses,
             @NonNull Currency currency
     ) {
-        mCardTitle = cardTitle;
+        setCardTitle(cardTitle);
         mExpenses = expenses;
         mCurrency = currency;
     }
@@ -78,6 +78,11 @@ public class Report implements ReportInterface {
     @Override
     public Currency getCurrency() {
         return mCurrency;
+    }
+
+    @Override
+    public void setCardTitle(String title) {
+        mCardTitle = title;
     }
 
     private String getResourceString(@StringRes int stringRes, Context context) {

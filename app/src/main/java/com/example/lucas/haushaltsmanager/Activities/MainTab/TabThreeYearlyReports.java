@@ -22,10 +22,13 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
-public class TabThreeYearlyReports extends AbstractMainTab {
+public class TabThreeYearlyReports extends AbstractTab {
     private ParentActivity mParent;
     private UserSettingsPreferences mUserPreferences;
     private HashMap<Integer, Double> mAccountBalanceYear; // TODO: Würde ich gerne anders machen
+    private LineChartCardPopulator mLineChartPopulator;
+    private PieChartCardPopulator mIncomeCardPopulator, mExpenseCardPopulator;
+    private TimeFrameCardPopulator mTimeFrameCardPopulator;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -41,48 +44,60 @@ public class TabThreeYearlyReports extends AbstractMainTab {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstances) {
         View rootView = inflater.inflate(R.layout.tab_three_yearly_reports, container, false);
 
-        TimeFrameCardPopulator extendedYearlyChart = new TimeFrameCardPopulator(
+        mTimeFrameCardPopulator = new TimeFrameCardPopulator(
                 (CardView) rootView.findViewById(R.id.tab_three_timeframe_report_card),
                 getContext()
         );
-        extendedYearlyChart.setData(createReport(
+        mTimeFrameCardPopulator.setData(createReport(
                 getStringifiedYear(),
                 mParent.getExpenses()
         ));
 
-        PieChartCardPopulator incomeCard = new PieChartCardPopulator(
+        mIncomeCardPopulator = new PieChartCardPopulator(
                 (CardView) rootView.findViewById(R.id.tab_three_income_card)
         );
-        incomeCard.showIncome();
-        incomeCard.setData(createReport(
+        mIncomeCardPopulator.showIncome();
+        mIncomeCardPopulator.setData(createReport(
                 getString(R.string.income),
                 mParent.getExpenses()
         ));
 
-        PieChartCardPopulator expenseCard = new PieChartCardPopulator(
+        mExpenseCardPopulator = new PieChartCardPopulator(
                 (CardView) rootView.findViewById(R.id.tab_three_expense_card)
         );
-        expenseCard.showExpense();
-        expenseCard.setData(createReport(
+        mExpenseCardPopulator.showExpense();
+        mExpenseCardPopulator.setData(createReport(
                 getString(R.string.expense),
                 mParent.getExpenses()
         ));
 
-        LineChartCardPopulator lineChartCard = new LineChartCardPopulator(
+        mLineChartPopulator = new LineChartCardPopulator(
                 (CardView) rootView.findViewById(R.id.tab_three_line_chart),
                 mAccountBalanceYear.get(getCurrentYear() - 1)
         );
-        lineChartCard.setData(
-                createReport(getString(R.string.account_balance), mParent.getExpenses()),
-                mParent.getResources(),
-                getCurrentYear() // TODO: Kann ich das mit dem Jahr anders machen. Es wird nur für die GroupFunkion benutzt
-        );
+        mLineChartPopulator.setResources(mParent.getResources(), getCurrentYear()); // TODO: Kann ich das mit dem Jahr anders machen. Es wird nur für die GroupFunkion benutzt
+        mLineChartPopulator.setData(createReport(
+                getString(R.string.account_balance),
+                mParent.getExpenses()
+        ));
 
         return rootView;
     }
 
     public void updateView() {
-        // TODO: Wenn die sichtbaren Konten geupdated wurden müssen die Ausgaben von dem Parent abgefragt werden und angezeigt werden
+        ReportInterface report = createReport("", mParent.getVisibleExpenses());
+
+        report.setCardTitle(getStringifiedYear());
+        mTimeFrameCardPopulator.setData(report);
+
+        report.setCardTitle(getString(R.string.account_balance));
+        mLineChartPopulator.setData(report);
+
+        report.setCardTitle(getString(R.string.income));
+        mIncomeCardPopulator.setData(report);
+
+        report.setCardTitle(getString(R.string.expense));
+        mExpenseCardPopulator.setData(report);
     }
 
     private ReportInterface createReport(String title, List<ExpenseObject> expenses) {

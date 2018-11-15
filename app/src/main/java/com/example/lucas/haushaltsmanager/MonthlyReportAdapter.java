@@ -43,6 +43,21 @@ public class MonthlyReportAdapter extends RecyclerView.Adapter<MonthlyReportAdap
         return new ViewHolder(itemView);
     }
 
+    public void onBindViewHolder(final ViewHolder viewHolder, int position) {
+        Report month = (Report) mReports.get(position);
+
+        TimeFrameCardPopulator timeFrameCardPopulator = new TimeFrameCardPopulator(
+                (CardView) viewHolder.itemView,
+                mContext
+        );
+        timeFrameCardPopulator.setData(month);
+    }
+
+    @Override
+    public int getItemCount() {
+        return mReports.size();
+    }
+
     private void applyMargin(View view) {
         CardView.LayoutParams clp = new CardView.LayoutParams(
                 CardView.LayoutParams.MATCH_PARENT,
@@ -60,20 +75,5 @@ public class MonthlyReportAdapter extends RecyclerView.Adapter<MonthlyReportAdap
 
     private View inflateRootView(ViewGroup parent, @LayoutRes int layout) {
         return LayoutInflater.from(parent.getContext()).inflate(layout, parent, false);
-    }
-
-    public void onBindViewHolder(final ViewHolder viewHolder, int position) {
-        Report month = (Report) mReports.get(position);
-
-        TimeFrameCardPopulator timeFrameCardPopulator = new TimeFrameCardPopulator(
-                (CardView) viewHolder.itemView,
-                mContext
-        );
-        timeFrameCardPopulator.setData(month);
-    }
-
-    @Override
-    public int getItemCount() {
-        return mReports.size();
     }
 }

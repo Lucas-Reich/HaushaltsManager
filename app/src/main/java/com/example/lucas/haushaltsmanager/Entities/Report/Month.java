@@ -26,8 +26,8 @@ public class Month extends AbstractReport {
         int month = 0; // TODO: Wie bekomme ich die Werte von dem Konstruktor hierhien
         int year = 0; // TODO: Wie bekomme ich die Werte von dem Konstruktor hierhien
 
-        ExpenseGrouper expenseGrouper = new ExpenseGrouper();
-        return expenseGrouper.byMonth(
+        // TODO: Wie bekomme ich die Buchungen aussortieren, welche nicht benötigt werden
+        return new ExpenseGrouper().byMonth(
                 expenses,
                 month,
                 year

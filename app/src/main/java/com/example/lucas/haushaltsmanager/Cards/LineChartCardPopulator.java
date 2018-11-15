@@ -32,6 +32,7 @@ public class LineChartCardPopulator {
     private ViewHolder mViewHolder;
     private Resources mResources;
     private double mLastYearAccountBalance; // TODO: Geht das auch anders?
+    private int mCurrentYear;
 
     public LineChartCardPopulator(CardView rootView, double lastYearAccountBalance) {
         mRootView = rootView;
@@ -44,19 +45,23 @@ public class LineChartCardPopulator {
         mRootView.setOnClickListener(listener);
     }
 
-    public void setData(ReportInterface report, Resources resources, int year) {
+    public void setData(ReportInterface report) {
         setCardTitle(report.getCardTitle());
 
+        setLineChart(report);
+    }
+
+    public void setResources(Resources resources, int year) {
         mResources = resources;
-        setLineChart(report, year);
+        mCurrentYear = year;
     }
 
     private void setCardTitle(String title) {
         mViewHolder.mTitle.setText(title);
     }
 
-    private void setLineChart(ReportInterface report, int year) {
-        mViewHolder.mLineChart.setData(prepareLineData(report, year));
+    private void setLineChart(ReportInterface report) {
+        mViewHolder.mLineChart.setData(prepareLineData(report));
         mViewHolder.mLineChart.setBackgroundColor(getColorResource(R.color.primaryBackgroundColor));
 
         mViewHolder.mLineChart.setNoDataText(getStringResource(R.string.no_bookings_in_year));
@@ -77,6 +82,7 @@ public class LineChartCardPopulator {
         xAxis.setDrawGridLines(false);
         xAxis.setValueFormatter(getXAxisLabels());
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        mViewHolder.mLineChart.invalidate();
     }
 
     private int getColorResource(@ColorRes int color) {
@@ -87,8 +93,8 @@ public class LineChartCardPopulator {
         return mResources.getString(string);
     }
 
-    private LineData prepareLineData(ReportInterface report, int year) {
-        LineDataSet lds = new LineDataSet(getChartEntries(report.getExpenses(), year), "");
+    private LineData prepareLineData(ReportInterface report) {
+        LineDataSet lds = new LineDataSet(getChartEntries(report.getExpenses()), "");
         lds.setColor(getColorResource(R.color.colorPrimary));
         lds.setCircleColor(getColorResource(R.color.colorAccent));
         lds.setValueTextColor(getColorResource(R.color.primary_text_color));
@@ -117,10 +123,10 @@ public class LineChartCardPopulator {
         return months;
     }
 
-    private List<Entry> getChartEntries(List<ExpenseObject> expenses, int year) {
+    private List<Entry> getChartEntries(List<ExpenseObject> expenses) {
         List<Entry> entries = new ArrayList<>();
 
-        List<List<ExpenseObject>> groupedValues = getAccountBalances(expenses, year);
+        List<List<ExpenseObject>> groupedValues = getAccountBalances(expenses);
 
         float lastValue = (float) mLastYearAccountBalance;
         for (int i = 0; i < 12; i++) {
@@ -137,8 +143,8 @@ public class LineChartCardPopulator {
         return new ExpenseSum().sum(expenses);
     }
 
-    private List<List<ExpenseObject>> getAccountBalances(List<ExpenseObject> expenses, int year) {
-        return new ExpenseGrouper().byMonths(expenses, year);
+    private List<List<ExpenseObject>> getAccountBalances(List<ExpenseObject> expenses) {
+        return new ExpenseGrouper().byMonths(expenses, mCurrentYear);
     }
 
     private void initializeViewHolder() {

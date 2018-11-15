@@ -30,6 +30,38 @@ public class ExpenseFilter {
         return filteredExpenses;
     }
 
+    public List<ExpenseObject> byAccountWithChildren(List<ExpenseObject> expenses, List<Long> accounts) {
+        return byAccount(pullChildrenUp(expenses), accounts);
+    }
+
+    public List<ExpenseObject> byAccount(List<ExpenseObject> expenses, List<Long> accounts) {
+        List<ExpenseObject> filteredExpenses = new ArrayList<>();
+
+        for (ExpenseObject expense : expenses) {
+            if (hasAccount(expense, accounts) && !expense.isParent())
+                filteredExpenses.add(expense);
+        }
+
+        return filteredExpenses;
+    }
+
+    private List<ExpenseObject> pullChildrenUp(List<ExpenseObject> expenses) {
+        List<ExpenseObject> extractedExpenses = new ArrayList<>();
+
+        for (ExpenseObject expense : expenses) {
+            if (expense.isParent())
+                extractedExpenses.addAll(expense.getChildren());
+            else
+                extractedExpenses.add(expense);
+        }
+
+        return extractedExpenses;
+    }
+
+    private boolean hasAccount(ExpenseObject expense, List<Long> accounts) {
+        return accounts.contains(expense.getAccountId());
+    }
+
     private boolean isInMonth(ExpenseObject expense, int month) {
         return expense.getDateTime().get(Calendar.MONTH) == month;
     }

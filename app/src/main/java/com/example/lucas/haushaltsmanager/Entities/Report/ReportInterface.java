@@ -22,6 +22,8 @@ public interface ReportInterface {
 
     String getCardTitle();
 
+    void setCardTitle(String title);
+
     Currency getCurrency();
 
     List<ExpenseObject> getExpenses();

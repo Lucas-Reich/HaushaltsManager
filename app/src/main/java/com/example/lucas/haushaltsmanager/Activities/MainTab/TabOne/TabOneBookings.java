@@ -15,7 +15,7 @@ import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Activities.EditRecurringBooking;
 import com.example.lucas.haushaltsmanager.Activities.ExpenseScreen;
-import com.example.lucas.haushaltsmanager.Activities.MainTab.AbstractMainTab;
+import com.example.lucas.haushaltsmanager.Activities.MainTab.AbstractTab;
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.CannotDeleteExpenseException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
@@ -36,7 +36,7 @@ import com.github.fafaldo.fabtoolbar.widget.FABToolbarLayout;
 import java.util.Calendar;
 import java.util.List;
 
-public class TabOneBookings extends AbstractMainTab implements FABToolbar.OnFabToolbarMenuItemClicked {
+public class TabOneBookings extends AbstractTab implements FABToolbar.OnFabToolbarMenuItemClicked {
     private static final String TAG = TabOneBookings.class.getSimpleName();
 
     private ExpandableListAdapter mListAdapter;
