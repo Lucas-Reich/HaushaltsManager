@@ -12,6 +12,7 @@ import com.example.lucas.haushaltsmanager.R;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Category implements Parcelable {
     private static final String TAG = Category.class.getSimpleName();
@@ -165,6 +166,17 @@ public class Category implements Parcelable {
     public String toString() {
 
         return getTitle();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                getIndex(),
+                getTitle(),
+                getColorString(),
+                getDefaultExpenseType(),
+                getChildren()
+        );
     }
 
     /**

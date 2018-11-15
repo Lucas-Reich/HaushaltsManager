@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/timeframe_report_card"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent">
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/timeframe_report_card_root"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/timeframe_report_card_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="Title"
+            android:textColor="@color/primary_text_color"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <TextView
+            android:id="@+id/timeframe_report_card_income"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="---,--"
+            android:textColor="@color/secondary_text_color"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/timeframe_report_card_title"/>
+
+        <TextView
+            android:id="@+id/timeframe_report_card_income_currency"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="2dp"
+            android:layout_marginTop="8dp"
+            android:text="€"
+            android:textColor="@color/secondary_text_color"
+            app:layout_constraintStart_toEndOf="@+id/timeframe_report_card_income"
+            app:layout_constraintTop_toBottomOf="@+id/timeframe_report_card_title"/>
+
+        <TextView
+            android:id="@+id/timeframe_report_card_expense"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="8dp"
+            android:text="---,--"
+            android:textColor="@color/secondary_text_color"
+            app:layout_constraintStart_toEndOf="@+id/timeframe_report_card_income_currency"
+            app:layout_constraintTop_toBottomOf="@+id/timeframe_report_card_title"/>
+
+        <TextView
+            android:id="@+id/timeframe_report_card_expense_currency"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="2dp"
+            android:layout_marginTop="8dp"
+            android:text="€"
+            android:textColor="@color/secondary_text_color"
+            app:layout_constraintStart_toEndOf="@+id/timeframe_report_card_expense"
+            app:layout_constraintTop_toBottomOf="@+id/timeframe_report_card_title"/>
+
+        <TextView
+            android:id="@+id/timeframe_report_card_total"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="8dp"
+            android:text="---,--"
+            android:textColor="@color/secondary_text_color"
+            app:layout_constraintStart_toEndOf="@+id/timeframe_report_card_expense_currency"
+            app:layout_constraintTop_toBottomOf="@+id/timeframe_report_card_title"/>
+
+        <TextView
+            android:id="@+id/timeframe_report_card_total_currency"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="2dp"
+            android:layout_marginTop="8dp"
+            android:text="€"
+            android:textColor="@color/secondary_text_color"
+            app:layout_constraintStart_toEndOf="@+id/timeframe_report_card_total"
+            app:layout_constraintTop_toBottomOf="@+id/timeframe_report_card_title"/>
+
+        <TextView
+            android:id="@+id/timeframe_report_card_total_bookings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="100 Buchungen"
+            android:textColor="@color/secondary_text_color"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/timeframe_report_card_income"/>
+
+        <TextView
+            android:id="@+id/timeframe_report_card_most_expenses"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/most_bookings_in"
+            android:textColor="@color/secondary_text_color"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/timeframe_report_card_total_bookings"/>
+
+        <com.example.lucas.haushaltsmanager.Views.RoundedTextView
+            android:id="@+id/timeframe_report_card_category_color"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/timeframe_report_card_most_expenses"
+            />
+
+        <TextView
+            android:id="@+id/timeframe_report_card_category_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="Kategorie"
+            android:textColor="@color/secondary_text_color"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/timeframe_report_card_category_color"
+            app:layout_constraintTop_toBottomOf="@+id/timeframe_report_card_most_expenses"
+            />
+
+        <android.support.constraint.Barrier
+            android:id="@+id/barrier4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="right"
+            app:constraint_referenced_ids="timeframe_report_card_category_title,timeframe_report_card_category_color,timeframe_report_card_most_expenses,timeframe_report_card_total_bookings,timeframe_report_card_total_currency,timeframe_report_card_total,timeframe_report_card_expense_currency,timeframe_report_card_expense,timeframe_report_card_income_currency,timeframe_report_card_income,timeframe_report_card_title"
+            tools:layout_editor_absoluteX="384dp"/>
+
+        <com.lucas.androidcharts.PieChart
+            android:id="@+id/timeframe_report_card_pie_chart"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginBottom="24dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/barrier4"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+    </android.support.constraint.ConstraintLayout>
+
+</android.support.v7.widget.CardView>

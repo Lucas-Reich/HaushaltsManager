@@ -36,6 +36,7 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Ex
 import com.example.lucas.haushaltsmanager.Dialogs.ChangeAccounts.ChooseAccountsDialogFragment;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+import com.example.lucas.haushaltsmanager.ExpenseFilter;
 import com.example.lucas.haushaltsmanager.MockDataCreator;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
@@ -228,7 +229,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
                 case 1:
                     return new TabTwoMonthlyReports();
                 case 2:
-                    return new TabThree();
+                    return new TabThreeYearlyReports();
                 default:
                     return null;
             }
@@ -268,13 +269,13 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
             switch (visibleTabPosition) {
 
                 case 0:
-                    ((TabOneBookings) fragment).updateListView();
+                    ((TabOneBookings) fragment).updateView();
                     break;
                 case 1:
                     ((TabTwoMonthlyReports) fragment).updateView();
                     break;
-                case 3:
-                    ((TabThree) fragment).updateView();
+                case 2:
+                    ((TabThreeYearlyReports) fragment).updateView();
                     break;
             }
         }
@@ -338,6 +339,10 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
      */
     List<ExpenseObject> getExpenses() {
         return mExpenses;
+    }
+
+    List<ExpenseObject> getVisibleExpenses() {
+        return new ExpenseFilter().byAccount(mExpenses, mActiveAccounts);
     }
 
     /**

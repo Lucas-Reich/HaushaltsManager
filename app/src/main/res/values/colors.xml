@@ -4,6 +4,7 @@
     <color name="colorPrimaryDark">#0D9690</color>
     <color name="colorAccent">#009688</color>
     <color name="mainColor">#ffffff</color>
+    <color name="primaryBackgroundColor">#ffffff</color>
     <color name="booking_expense">#bc0000</color>
     <color name="booking_income">#04925d</color>
     <color name="list_item_highlighted">#5CE675</color>
