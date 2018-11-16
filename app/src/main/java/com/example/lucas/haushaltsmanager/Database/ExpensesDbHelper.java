@@ -19,7 +19,7 @@ public class ExpensesDbHelper extends SQLiteOpenHelper {
     private static final String TAG = ExpensesDbHelper.class.getSimpleName();
 
     public static final String DB_NAME = "expenses.db";
-    private static final int DB_VERSION = 1;
+    public static final int DB_VERSION = 1;
 
     //define table Template_Bookings
     public static final String TABLE_TEMPLATE_BOOKINGS = "TEMPLATE_BOOKINGS";

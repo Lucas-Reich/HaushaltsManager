@@ -59,7 +59,7 @@ public class FileUtils {
             return false;
         } catch (IOException e) {
 
-            //wenn eine io exception ausgelöst wird weiß ich eh nicht genau was der Grund dafür war und kann auch einfach FALSE zurückgeben
+            //Wenn eine IOException ausgelöst wird, kann ich den Grund eh nicht genau ermitteln und somit auch einfach FALSE zurückgeben
             Log.e(TAG, "Something went wrong while copying", e);
             return false;
         }
@@ -78,7 +78,7 @@ public class FileUtils {
 
         File oldestFile = fileList.get(0);
         for (File file : fileList) {
-            if (file.lastModified() > oldestFile.lastModified())
+            if (file.lastModified() < oldestFile.lastModified())
                 oldestFile = file;
         }
 

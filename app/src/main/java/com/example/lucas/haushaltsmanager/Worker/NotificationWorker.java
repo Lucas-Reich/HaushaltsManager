@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager;
+package com.example.lucas.haushaltsmanager.Worker;
 
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -10,6 +10,7 @@ import android.util.Log;
 
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.AppInternalPreferences;
+import com.example.lucas.haushaltsmanager.R;
 
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -20,6 +21,7 @@ import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
 public class NotificationWorker extends Worker {
+    public static final String WORKER_ID = "notificationWorker";
 
     public NotificationWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
@@ -31,11 +33,11 @@ public class NotificationWorker extends Worker {
         PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0, new Intent(getApplicationContext(), ParentActivity.class), 0);
 
         Notification notification = new Notification.Builder(getApplicationContext())
-                .setContentTitle("Hier ist eine Notification")//TODO Notification titel anpassen
-                .setContentText("Hier ist die Nachricht der Notification die ich gerade gesendet habe")//TODO Notification body anpassen
+                .setContentTitle(getApplicationContext().getString(R.string.remind_notification_title))//TODO Notification titel anpassen
+                .setContentText(getApplicationContext().getString(R.string.remind_notification_body))
                 .setAutoCancel(true)
                 .setContentIntent(pi)
-                .setSmallIcon(R.mipmap.ic_launcher)//TODO Notification icon anpassen
+                .setSmallIcon(R.mipmap.ic_launcher)
                 .build();
 
         NotificationManagerCompat.from(getApplicationContext()).notify(getNotificationId(), notification);
@@ -58,14 +60,14 @@ public class NotificationWorker extends Worker {
         //CLEANUP Wenn man den ersten Worker schedulen kann diese Methodik entfernen
         OneTimeWorkRequest workRequest = new OneTimeWorkRequest
                 .Builder(NotificationWorker.class)
-                .setInitialDelay(24, TimeUnit.HOURS)
+                .setInitialDelay(1, TimeUnit.MINUTES)
                 .build();
 
         saveWorkerId(workRequest.getId().toString());
 
         WorkManager.getInstance().enqueue(workRequest);
 
-        Log.i(NotificationWorker.class.getSimpleName(), "Scheduling next worker");
+        Log.i(NotificationWorker.class.getSimpleName(), "Scheduling next NotificationJob");
     }
 
     private void saveWorkerId(String id) {

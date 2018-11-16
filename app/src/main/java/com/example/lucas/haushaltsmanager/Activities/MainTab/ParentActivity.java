@@ -336,7 +336,9 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
      * Methode für die KindFragments um alle anzuzeigenden Buchungen zu erhalten
      *
      * @return Anzuzeigende Buchungen
+     * TODO: Kann ich die Methode durch getVisibleExpenses ersetzen?
      */
+    @Deprecated
     List<ExpenseObject> getExpenses() {
         return mExpenses;
     }

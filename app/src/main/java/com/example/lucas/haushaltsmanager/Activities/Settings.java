@@ -2,14 +2,10 @@ package com.example.lucas.haushaltsmanager.Activities;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -17,17 +13,18 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.codekidlabs.storagechooser.StorageChooser;
-import com.example.lucas.haushaltsmanager.PreferencesHelper.AppInternalPreferences;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepository;
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.SingleChoiceDialog;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Directory;
 import com.example.lucas.haushaltsmanager.Entities.Time;
-import com.example.lucas.haushaltsmanager.NotificationWorker;
-import com.example.lucas.haushaltsmanager.R;
+import com.example.lucas.haushaltsmanager.PreferencesHelper.AppInternalPreferences;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
+import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.WeekdayUtils;
+import com.example.lucas.haushaltsmanager.Worker.BackupWorker;
+import com.example.lucas.haushaltsmanager.Worker.NotificationWorker;
 
 import java.util.Arrays;
 import java.util.List;
@@ -37,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 
-public class Settings extends AppCompatActivity {
+public class Settings extends AbstractAppCompatActivity {
 
     /**
      * Maximale Anzahl von gleichzeitig existierenden Backups.
@@ -295,32 +292,6 @@ public class Settings extends AppCompatActivity {
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-
-                onBackPressed();
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    /**
-     * Methode um eine Toolbar anzuzeigen die den Titel und einen Zurückbutton enthält.
-     */
-    private void initializeToolbar() {
-        Toolbar toolbar = findViewById(R.id.toolbar);
-
-        //schatten der toolbar
-        if (Build.VERSION.SDK_INT >= 21)
-            toolbar.setElevation(10.f);
-
-        setSupportActionBar(toolbar);
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-    }
-
     /**
      * Methode um ein String Array mit Zahlen zwischen 1 und DEFAULT_BACKUP_CAP zu füllen
      *
@@ -378,6 +349,26 @@ public class Settings extends AppCompatActivity {
         createBackupsChk.setChecked(backupAutomatically);
 
         setBackupSettingsClickable(backupAutomatically);
+
+        if (backupAutomatically && !mInternalPreferences.getBackupJobExecutionStatus())
+            startBackupWorker();
+
+        if (!backupAutomatically && mInternalPreferences.getBackupJobExecutionStatus())
+            stopBackupWorker(mInternalPreferences.getBackupJobId());
+    }
+
+    private void startBackupWorker() {
+        OneTimeWorkRequest workRequest = new OneTimeWorkRequest
+                .Builder(BackupWorker.class)
+                .build();
+
+        saveWorkerId(workRequest.getId().toString(), BackupWorker.WORKER_ID);
+        WorkManager.getInstance().enqueue(workRequest);
+    }
+
+    private void stopBackupWorker(String id) {
+        WorkManager.getInstance().cancelWorkById(UUID.fromString(id));
+        saveWorkerId("", BackupWorker.WORKER_ID);
     }
 
     /**
@@ -447,18 +438,16 @@ public class Settings extends AppCompatActivity {
      * @param remindUser TRUE wenn der User erinnert werden soll, FALSE wenn nicht
      */
     private void setReminderStatus(boolean remindUser) {
-        AppInternalPreferences internalPreferences = new AppInternalPreferences(this);
-
         mUserSettings.setReminderStatus(remindUser);
         allowReminderChk.setChecked(remindUser);
 
         setNotificationStatusClickable(remindUser);
 
-        if (remindUser && !internalPreferences.getNotificationStatus())
+        if (remindUser && !mInternalPreferences.getNotificationJobExecutionStatus())
             startNotificationWorker();
 
-        if (!remindUser && internalPreferences.getNotificationStatus())
-            stopNotificationWorker(internalPreferences.getNotificationJobId());
+        if (!remindUser && mInternalPreferences.getNotificationJobExecutionStatus())
+            stopNotificationWorker(mInternalPreferences.getNotificationJobId());
     }
 
     /**
@@ -466,10 +455,18 @@ public class Settings extends AppCompatActivity {
      *
      * @param id Zu speichernde Id
      */
-    private void saveWorkerId(String id) {
-
+    private void saveWorkerId(String id, String workerId) {
         mInternalPreferences = new AppInternalPreferences(getApplicationContext());
-        mInternalPreferences.setNotificationJobId(id);
+
+        switch (workerId) {
+            case NotificationWorker.WORKER_ID:
+                mInternalPreferences.setNotificationJobId(id);
+                break;
+            case BackupWorker.WORKER_ID:
+                mInternalPreferences.setBackupJobId(id);
+                break;
+            default:
+        }
     }
 
     /**
@@ -487,26 +484,22 @@ public class Settings extends AppCompatActivity {
 
         OneTimeWorkRequest workRequest = new OneTimeWorkRequest
                 .Builder(NotificationWorker.class)
-                .setInitialDelay(startInMillis, TimeUnit.MILLISECONDS)
+//                .setInitialDelay(startInMillis, TimeUnit.MILLISECONDS)
                 .build();
 
-        saveWorkerId(workRequest.getId().toString());
+        saveWorkerId(workRequest.getId().toString(), NotificationWorker.WORKER_ID);
         WorkManager.getInstance().enqueue(workRequest);
-
-        mInternalPreferences.setNotificationStatus(true);
     }
 
     /**
      * Methode um ein bestimmten Worker zu stoppen
      *
-     * @param id ID des Workers
+     * @param id WORKER_ID des Workers
      */
     private void stopNotificationWorker(String id) {
 
         WorkManager.getInstance().cancelWorkById(UUID.fromString(id));
-        saveWorkerId("");
-
-        mInternalPreferences.setNotificationStatus(false);
+        saveWorkerId("", NotificationWorker.WORKER_ID);
     }
 
     /**
@@ -537,7 +530,7 @@ public class Settings extends AppCompatActivity {
         mUserSettings.setReminderTime(time);
         notificationTimeTxt.setText(time.getTime());
 
-        if (mInternalPreferences.getNotificationStatus()) {
+        if (mInternalPreferences.getNotificationJobExecutionStatus()) {
             stopNotificationWorker(mInternalPreferences.getNotificationJobId());
             startNotificationWorker();
         }
