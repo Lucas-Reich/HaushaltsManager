@@ -232,4 +232,5 @@
     <string name="remind_notification_body">Do not forget to enter today\'s expenses.</string>
     <!-- TODO: bessere übersetzung einfallen lassen -->
     <string name="remind_notification_title">Reminder</string>
+    <string name="account_name">Account name</string>
 </resources>

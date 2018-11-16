@@ -214,4 +214,5 @@
     <string name="account_balance">Account balance</string>
     <string name="remind_notification_body">Do not forget to enter today\'s expenses.</string>
     <string name="remind_notification_title">Reminder</string>
+    <string name="account_name">Account name</string>
 </resources>

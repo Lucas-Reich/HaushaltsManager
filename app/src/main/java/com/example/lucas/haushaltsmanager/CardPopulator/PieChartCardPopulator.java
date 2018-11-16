@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager.Cards;
+package com.example.lucas.haushaltsmanager.CardPopulator;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;

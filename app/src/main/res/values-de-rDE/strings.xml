@@ -219,4 +219,5 @@
     <string name="account_balance">Kontostand</string>
     <string name="remind_notification_body">Nicht vergessen die heutigen Ausgaben einzutragen.</string>
     <string name="remind_notification_title">Erinnerung</string>
+    <string name="account_name">Kontoname</string>
 </resources>

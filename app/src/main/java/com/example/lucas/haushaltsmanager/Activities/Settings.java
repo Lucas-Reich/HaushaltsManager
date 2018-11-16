@@ -484,7 +484,7 @@ public class Settings extends AbstractAppCompatActivity {
 
         OneTimeWorkRequest workRequest = new OneTimeWorkRequest
                 .Builder(NotificationWorker.class)
-//                .setInitialDelay(startInMillis, TimeUnit.MILLISECONDS)
+                .setInitialDelay(startInMillis, TimeUnit.MILLISECONDS)
                 .build();
 
         saveWorkerId(workRequest.getId().toString(), NotificationWorker.WORKER_ID);

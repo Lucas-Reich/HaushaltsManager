@@ -33,7 +33,7 @@ public class NotificationWorker extends Worker {
         PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0, new Intent(getApplicationContext(), ParentActivity.class), 0);
 
         Notification notification = new Notification.Builder(getApplicationContext())
-                .setContentTitle(getApplicationContext().getString(R.string.remind_notification_title))//TODO Notification titel anpassen
+                .setContentTitle(getApplicationContext().getString(R.string.remind_notification_title))
                 .setContentText(getApplicationContext().getString(R.string.remind_notification_body))
                 .setAutoCancel(true)
                 .setContentIntent(pi)

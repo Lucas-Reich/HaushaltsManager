@@ -16,10 +16,10 @@ import android.widget.TextView;
 
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
+import com.example.lucas.haushaltsmanager.Utils.PriceUtils;
 import com.example.lucas.haushaltsmanager.Utils.ViewUtils;
 
 public class PriceInputDialog extends DialogFragment {
-    private static final String TAG = PriceInputDialog.class.getSimpleName();
     public static final String TITLE = "title";
     public static final String HINT = "hint";
 
@@ -44,8 +44,7 @@ public class PriceInputDialog extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         BundleUtils args = new BundleUtils(getArguments());
 
-        final EditText input = createInputView();
-        input.setHint(args.getString(HINT, "")); // TODO Formatierung anpassen
+        final EditText input = createInputView(args.getDouble(HINT, 0D));
 
         //wrapper für die text eingabe, sodass dieser eine padding gegeben werden kann
         //Quelle: http://android.pcsalt.com/create-alertdialog-with-custom-layout-programmatically/
@@ -109,10 +108,11 @@ public class PriceInputDialog extends DialogFragment {
      *
      * @return EditText
      */
-    private EditText createInputView() {
+    private EditText createInputView(double hint) {
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
         EditText input = new EditText(mContext);
+        input.setHint(PriceUtils.toHumanReadablePrice(hint));
         input.setLayoutParams(lp);
         input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
 

@@ -62,4 +62,8 @@ public class BundleUtils {
 
         return mBundle.containsKey(key) ? mBundle.getParcelable(key) : def;
     }
+
+    public double getDouble(String key, double def) {
+        return mBundle.containsKey(key) ? mBundle.getDouble(key) : def;
+    }
 }

@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager.Cards;
+package com.example.lucas.haushaltsmanager.CardPopulator;
 
 import android.content.res.Resources;
 import android.support.annotation.ColorRes;

@@ -21,7 +21,6 @@ import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 public class AccountAdapter extends ArrayAdapter<Account> {
@@ -140,7 +139,7 @@ public class AccountAdapter extends ArrayAdapter<Account> {
 
                             Intent updateAccountIntent = new Intent(mContext, CreateAccountActivity.class);
                             updateAccountIntent.putExtra(CreateAccountActivity.INTENT_MODE, CreateAccountActivity.INTENT_MODE_UPDATE);
-                            updateAccountIntent.putExtra(CreateAccountActivity.INTENT_ACCOUNT_ID, mAccount.getIndex());
+                            updateAccountIntent.putExtra(CreateAccountActivity.INTENT_ACCOUNT, mAccount);
                             mContext.startActivity(updateAccountIntent);
 
                             Log.d(TAG, "onMenuItemSelected: edit selected");

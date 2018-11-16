@@ -106,7 +106,9 @@ public class Account implements Parcelable {
      */
     public boolean isSet() {
 
-        return !this.mName.isEmpty() && this.mCurrency.isSet();
+        return !getTitle().equals(app.getContext().getString(R.string.no_name))
+                && !getTitle().equals("")
+                && this.mCurrency.isSet();
     }
 
     /**
