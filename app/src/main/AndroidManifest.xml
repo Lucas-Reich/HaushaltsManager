@@ -74,15 +74,6 @@
             android:name=".Activities.CategoryList.CategoryList"
             android:label="@string/activity_categories"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
-
-        <receiver
-            android:name=".MyAlarmReceiver"
-            android:process=":remote"/>
-        <service
-            android:name=".Services.BackupCreatorService"
-            android:exported="false"
-            android:label="BackupService"
-            android:permission="android.permission.BIND_JOB_SERVICE"/>
     </application>
 
 </manifest>

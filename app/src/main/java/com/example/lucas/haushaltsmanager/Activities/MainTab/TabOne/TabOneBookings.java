@@ -5,7 +5,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +15,7 @@ import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Activities.EditRecurringBooking;
 import com.example.lucas.haushaltsmanager.Activities.ExpenseScreen;
+import com.example.lucas.haushaltsmanager.Activities.MainTab.AbstractTab;
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.CannotDeleteExpenseException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
@@ -36,7 +36,7 @@ import com.github.fafaldo.fabtoolbar.widget.FABToolbarLayout;
 import java.util.Calendar;
 import java.util.List;
 
-public class TabOneBookings extends Fragment implements FABToolbar.OnFabToolbarMenuItemClicked {
+public class TabOneBookings extends AbstractTab implements FABToolbar.OnFabToolbarMenuItemClicked {
     private static final String TAG = TabOneBookings.class.getSimpleName();
 
     private ExpandableListAdapter mListAdapter;
@@ -79,7 +79,7 @@ public class TabOneBookings extends Fragment implements FABToolbar.OnFabToolbarM
 
         setOnItemLongClickListener();
 
-        updateListView();
+        updateView();
 
         mTabOneFabToolbar = new FABToolbar(
                 (FABToolbarLayout) rootView.findViewById(R.id.fabtoolbar),
@@ -226,12 +226,12 @@ public class TabOneBookings extends Fragment implements FABToolbar.OnFabToolbarM
     private void resetListView() {
         mListAdapter.unselectAll();
 
-        updateListView();
+        updateView();
 
         enableListViewLongClick();
     }
 
-    public void updateListView() {
+    public void updateView() {
 
         mListAdapter = new ExpandableListAdapterCreator(
                 mParent.getExpenses(getFirstOfMonth(), getLastOfMonth()),
@@ -359,7 +359,7 @@ public class TabOneBookings extends Fragment implements FABToolbar.OnFabToolbarM
                 //TODO Wenn die angegebene Buchung eine ParentBuchung ist müssen anstatt der Buchung die KindBuchungen zusammengefügt werden
                 for (ExpListViewSelectedItem selectedItem : selectedItems) {
                     try {
-                        if (selectedItem.isParent())
+                        if (selectedItem.isGroup())
                             mExpenseRepo.delete(selectedItem.getItem());
                         else
                             mChildExpenseRepo.delete(selectedItem.getItem());
@@ -442,7 +442,12 @@ public class TabOneBookings extends Fragment implements FABToolbar.OnFabToolbarM
     private void deleteBookingsAction(List<ExpListViewSelectedItem> selectedItems) {
         for (ExpListViewSelectedItem selectedItem : selectedItems) {
             try {
-                if (selectedItem.isParent()) {
+                // Wenn es nur ein Kind ist oder nur eine Group dann das hier
+                if (selectedItem.isGroup() && !selectedItem.hasChildren()) {
+                    mExpenseRepo.delete(selectedItem.getItem());
+                    mRevertDeletionSnackbar.addItem(selectedItem);
+                } else {
+                    // Wenn es eine Buchung mit Kindern ist dann diese hier
                     for (ExpenseObject child : selectedItem.getItem().getChildren()) {
                         mChildExpenseRepo.delete(child);
                         mRevertDeletionSnackbar.addItem(new ExpListViewSelectedItem(
@@ -450,9 +455,6 @@ public class TabOneBookings extends Fragment implements FABToolbar.OnFabToolbarM
                                 selectedItem.getItem()
                         ));
                     }
-                } else {
-                    mChildExpenseRepo.delete(selectedItem.getItem());
-                    mRevertDeletionSnackbar.addItem(selectedItem);
                 }
 
                 mRevertDeletionSnackbar.addItem(selectedItem);
@@ -461,6 +463,9 @@ public class TabOneBookings extends Fragment implements FABToolbar.OnFabToolbarM
 
                 //todo was soll ich machen wenn eine KindBuchung nicht gelöscht werden konnte
                 Log.e(TAG, "Could not delete ChildExpense " + selectedItem.getItem().getTitle(), e);
+            } catch (CannotDeleteExpenseException e) {
+
+                Log.e(TAG, "Could not delete Expense " + selectedItem.getItem().getTitle(), e);
             }
         }
 
@@ -485,22 +490,8 @@ public class TabOneBookings extends Fragment implements FABToolbar.OnFabToolbarM
 
                 mParent.updateExpenses();
 
-                updateListView();
+                updateView();
             }
         });
-    }
-
-    /**
-     * Methode um herauszufinden, ob der aktuelle tab gerade sichtbar geworden ist oder nicht.
-     * Quelle: https://stackoverflow.com/a/9779971
-     *
-     * @param isVisibleToUser Indikator ob die aktuelle UI für den User sichtbar ist. Default ist True.
-     */
-    @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-
-        if (isVisible() && isVisibleToUser)
-            updateListView();
     }
 }

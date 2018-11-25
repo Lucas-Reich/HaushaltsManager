@@ -13,8 +13,12 @@ public class ExpListViewSelectedItem {
         mItemParent = parent;
     }
 
-    public boolean isParent() {
+    public boolean isGroup() {
         return mItemParent == null;
+    }
+
+    public boolean hasChildren() {
+        return mSelectedItem.isParent();
     }
 
     public ExpenseObject getParent() {
@@ -32,7 +36,7 @@ public class ExpListViewSelectedItem {
 
         ExpListViewSelectedItem otherItem = (ExpListViewSelectedItem) obj;
 
-        boolean equals = otherItem.isParent() == isParent();
+        boolean equals = otherItem.isGroup() == isGroup();
         if (otherItem.getParent() == null)
             equals = equals && (getParent() == null);
         else

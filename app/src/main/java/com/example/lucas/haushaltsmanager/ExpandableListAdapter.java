@@ -2,7 +2,6 @@ package com.example.lucas.haushaltsmanager;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,8 +11,8 @@ import android.widget.TextView;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
-import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
 import com.example.lucas.haushaltsmanager.Utils.ViewUtils;
+import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
 import com.lucas.androidcharts.DataSet;
 import com.lucas.androidcharts.PieChart;
 
@@ -23,13 +22,11 @@ import java.util.List;
 import java.util.Map;
 
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
-    private static final String TAG = ExpandableListAdapter.class.getSimpleName();
-
     private Context mContext;
     private List<ExpenseObject> mGroupData;
     private HashMap<ExpenseObject, List<ExpenseObject>> mChildData;
-    private List<ExpListViewSelectedItem> mSelectedItems = new ArrayList<>();
     private int mRed, mGreen;
+    private ExpandableListItemSelector mItemSelector;
 
     ExpandableListAdapter(
             Context context,
@@ -40,6 +37,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         mContext = context;
         mGroupData = groupData;
         mChildData = childData;
+        mItemSelector = new ExpandableListItemSelector(this);
 
         mRed = context.getResources().getColor(R.color.booking_expense);
         mGreen = context.getResources().getColor(R.color.booking_income);
@@ -220,9 +218,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
      * @return MainCurrencySymbol
      */
     private String getMainCurrencySymbol() {
-        UserSettingsPreferences preferences = new UserSettingsPreferences(mContext);
-
-        return preferences.getMainCurrency().getSymbol();
+        return new UserSettingsPreferences(mContext).getMainCurrency().getSymbol();
     }
 
     /**
@@ -289,81 +285,36 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     }
 
     public void selectItem(int groupPosition, int childPosition) {
-        Log.i(TAG, "Selecting item at position " + groupPosition + " " + childPosition);
-
-        //Kindbuchungen und ParentBuchungen sollen nicht gleichzeitig markierbar sein
-        if (!(getSelectedGroupsCount() > 0 && childPosition != -1) && !(getSelectedChildrenCount() > 0 && childPosition == -1)) {
-            mSelectedItems.add(positionToSelectedItem(
-                    groupPosition,
-                    childPosition
-            ));
-
-            notifyDataSetChanged();
-        }
+        mItemSelector.selectItem(groupPosition, childPosition);
     }
 
     public void unselectItem(int groupPosition, int childPosition) {
-        Log.i(TAG, "Unselecting item at position " + groupPosition + " " + childPosition);
-
-        mSelectedItems.remove(positionToSelectedItem(
-                groupPosition,
-                childPosition
-        ));
+        mItemSelector.unselectItem(groupPosition, childPosition);
 
         notifyDataSetChanged();
     }
 
     public boolean isItemSelected(int groupPosition, int childPosition) {
-        return mSelectedItems.contains(positionToSelectedItem(
-                groupPosition,
-                childPosition
-        ));
-    }
-
-    private ExpListViewSelectedItem positionToSelectedItem(int groupPosition, int childPosition) {
-        ExpenseObject group = (ExpenseObject) getGroup(groupPosition);
-
-        if (-1 == childPosition)
-            return new ExpListViewSelectedItem(
-                    group,
-                    null
-            );
-        else
-            return new ExpListViewSelectedItem(
-                    (ExpenseObject) getChild(groupPosition, childPosition),
-                    group
-            );
+        return mItemSelector.isItemSelected(groupPosition, childPosition);
     }
 
     public int getSelectedGroupsCount() {
-        int counter = 0;
-        for (ExpListViewSelectedItem item : mSelectedItems) {
-            if (item.isParent())
-                counter++;
-        }
-
-        return counter;
+        return mItemSelector.getSelectedGroupsCount();
     }
 
     public int getSelectedChildrenCount() {
-        int counter = 0;
-        for (ExpListViewSelectedItem item : mSelectedItems) {
-            if (!item.isParent())
-                counter++;
-        }
-
-        return counter;
+        return mItemSelector.getSelectedChildrenCount();
     }
 
     public int getSelectedItemCount() {
-        return mSelectedItems.size();
+        return mItemSelector.getSelectedItemCount();
     }
 
     public List<ExpListViewSelectedItem> getSelectedItems() {
-        return mSelectedItems;
+        return mItemSelector.getSelectedItems();
     }
 
     public void unselectAll() {
-        mSelectedItems.clear();
+        mItemSelector.unselectAll();
     }
 }

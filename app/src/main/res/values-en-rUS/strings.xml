@@ -209,4 +209,10 @@
     <string name="expense">Expense</string>
     <string name="choose_parent_category_hint">Choose superordinate category</string>
     <string name="failed_to_delete_category">Could not delete Category</string>
+    <string name="no_bookings_in_year">No bookings this year</string>
+    <string name="bookings">Bookings</string>
+    <string name="account_balance">Account balance</string>
+    <string name="remind_notification_body">Do not forget to enter today\'s expenses.</string>
+    <string name="remind_notification_title">Reminder</string>
+    <string name="account_name">Account name</string>
 </resources>

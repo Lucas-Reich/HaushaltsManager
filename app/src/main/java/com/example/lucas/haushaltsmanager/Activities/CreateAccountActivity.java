@@ -2,7 +2,7 @@ package com.example.lucas.haushaltsmanager.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.design.widget.FloatingActionButton;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -11,32 +11,26 @@ import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
+import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
+import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
+import com.example.lucas.haushaltsmanager.Utils.PriceUtils;
 
 public class CreateAccountActivity extends AbstractAppCompatActivity {
-    private static final String TAG = CreateAccountActivity.class.getSimpleName();
-
     public static final String INTENT_MODE = "mode";
     public static final String INTENT_MODE_UPDATE = "update";
     public static final String INTENT_MODE_CREATE = "create";
-    public static final String INTENT_ACCOUNT_ID = "accountId";
+    public static final String INTENT_ACCOUNT = "accountId";
 
-    private Button mAccountNameBtn;
-    private Button mAccountBalanceBtn, mCreateAccountBtn;
+    private Button mAccountNameBtn, mAccountBalanceBtn, mAccountCurrencyBtn;
+    private FloatingActionButton mSaveFAB;
     private Account mAccount;
     private AccountRepository mAccountRepo;
-
-    private enum CREATION_MODES {
-        CREATE_ACCOUNT,
-        UPDATE_ACCOUNT
-    }
-
-    private CREATION_MODES mCreationMode;
 
     @Override
     @SuppressWarnings("ConstantConditions")
@@ -46,40 +40,33 @@ public class CreateAccountActivity extends AbstractAppCompatActivity {
 
         mAccountRepo = new AccountRepository(this);
 
-        resolveMode(getIntent().getExtras());
-
         mAccountNameBtn = findViewById(R.id.new_account_name);
         mAccountBalanceBtn = findViewById(R.id.new_account_balance);
-        mCreateAccountBtn = findViewById(R.id.new_account_create);
+        mAccountCurrencyBtn = findViewById(R.id.new_account_currency);
+        mSaveFAB = findViewById(R.id.new_account_save);
+
+        resolveMode(getIntent().getExtras());
 
         initializeToolbar();
     }
 
-    private void resolveMode(Bundle bundle) {
-        if (bundle == null || !bundle.containsKey(INTENT_MODE))
-            return;
+    private void resolveMode(Bundle args) {
+        BundleUtils bundle = new BundleUtils(args);
 
-        switch (bundle.getString(INTENT_MODE)) {
+        switch (bundle.getString(INTENT_MODE, INTENT_MODE_CREATE)) {
             case INTENT_MODE_UPDATE:
-                mCreationMode = CREATION_MODES.UPDATE_ACCOUNT;
 
-                try {
-                    long accountId = bundle.getLong(ACCOUNT_SERVICE);
-                    mAccount = mAccountRepo.get(accountId);
-                } catch (AccountNotFoundException e) {
-
-                    Toast.makeText(this, getString(R.string.account_not_found), Toast.LENGTH_SHORT).show();
-                    finish();
-                }
+                mAccount = (Account) bundle.getParcelable(INTENT_ACCOUNT, null);
+                runCrossToCheckAnimation();
                 break;
             case INTENT_MODE_CREATE:
-                mCreationMode = CREATION_MODES.CREATE_ACCOUNT;
 
                 mAccount = Account.createDummyAccount();
                 mAccount.setCurrency(getDefaultCurrency());
+                mAccount.setName("");
                 break;
             default:
-                break;
+                throw new UnsupportedOperationException("Could not handle intent mode " + bundle.getString(INTENT_MODE, null));
         }
     }
 
@@ -87,7 +74,8 @@ public class CreateAccountActivity extends AbstractAppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        mAccountNameBtn.setHint(mAccount.getTitle());
+        if (!mAccount.getTitle().equals(""))
+            mAccountNameBtn.setHint(mAccount.getTitle());
         mAccountNameBtn.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -107,14 +95,17 @@ public class CreateAccountActivity extends AbstractAppCompatActivity {
                         mAccount.setName(textInput);
                         mAccountNameBtn.setText(mAccount.getTitle());
 
-                        Log.d(TAG, "set Account name to" + mAccount.getTitle());
+                        if (mAccount.isSet())
+                            runCrossToCheckAnimation();
+                        else
+                            runCheckToCrossAnimation();
                     }
                 });
                 basicDialog.show(getFragmentManager(), "create_account_name");
             }
         });
 
-        mAccountBalanceBtn.setHint(String.format(this.getResources().getConfiguration().locale, "%.2f", mAccount.getBalance()));
+        mAccountBalanceBtn.setHint(PriceUtils.toHumanReadablePrice(mAccount.getBalance()));
         mAccountBalanceBtn.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -122,6 +113,7 @@ public class CreateAccountActivity extends AbstractAppCompatActivity {
 
                 Bundle args = new Bundle();
                 args.putString(PriceInputDialog.TITLE, getResources().getString(R.string.set_Account_balance));
+                args.putDouble(PriceInputDialog.HINT, mAccount.getBalance());
 
                 PriceInputDialog priceInputDialog = new PriceInputDialog();
                 priceInputDialog.setArguments(args);
@@ -130,21 +122,31 @@ public class CreateAccountActivity extends AbstractAppCompatActivity {
                     public void onPriceSelected(double price) {
 
                         mAccount.setBalance(price);
-                        mAccountBalanceBtn.setText(String.format(getResources().getConfiguration().locale, "%.2f", mAccount.getBalance()));
+                        mAccountBalanceBtn.setText(PriceUtils.toHumanReadablePrice(mAccount.getBalance()));
 
-                        Log.d(TAG, "set account balance to " + mAccount.getBalance());
+                        if (mAccount.isSet())
+                            runCrossToCheckAnimation();
+                        else
+                            runCheckToCrossAnimation();
                     }
                 });
                 priceInputDialog.show(getFragmentManager(), "create_account_price");
             }
         });
 
-        if (mCreationMode == CREATION_MODES.UPDATE_ACCOUNT)
-            mCreateAccountBtn.setText(R.string.update);
-        else
-            mCreateAccountBtn.setText(R.string.btn_save);
+        mAccountCurrencyBtn.setText(mAccount.getCurrency().getShortName().toUpperCase());
 
-        mCreateAccountBtn.setOnClickListener(createAccountClickListener);
+        mSaveFAB.setOnClickListener(createAccountClickListener);
+    }
+
+    private void runCheckToCrossAnimation() {
+        // TODO Der Übergang von dem Häkchen zum Kreuz soll animiert sein
+        mSaveFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_cross_white));
+    }
+
+    private void runCrossToCheckAnimation() {
+        // TODO Der Übergang von dem Kreuz zum Häkchen soll animiert sein
+        mSaveFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_check_white_24dp));
     }
 
     /**
@@ -155,20 +157,22 @@ public class CreateAccountActivity extends AbstractAppCompatActivity {
 
         @Override
         public void onClick(View v) {
-            if (!mAccount.isSet())
+            if (!mAccount.isSet()) {
+                showCloseScreenDialog();
                 return;
+            }
 
+            BundleUtils bundle = new BundleUtils(getIntent().getExtras());
 
-            switch (mCreationMode) {
-
-                case CREATE_ACCOUNT:
+            switch (bundle.getString(INTENT_MODE, INTENT_MODE_CREATE)) {
+                case INTENT_MODE_CREATE:
 
                     mAccount = mAccountRepo.create(mAccount);
 
                     addAccountToPreferences(mAccount);
                     setAsActiveAccount(mAccount);
                     break;
-                case UPDATE_ACCOUNT:
+                case INTENT_MODE_UPDATE:
 
                     try {
                         mAccountRepo.update(mAccount);
@@ -203,9 +207,7 @@ public class CreateAccountActivity extends AbstractAppCompatActivity {
      * @return Standartwährung
      */
     private Currency getDefaultCurrency() {
-        UserSettingsPreferences settings = new UserSettingsPreferences(this);
-
-        return settings.getMainCurrency();
+        return new UserSettingsPreferences(this).getMainCurrency();
     }
 
     /**
@@ -214,8 +216,23 @@ public class CreateAccountActivity extends AbstractAppCompatActivity {
      * @param account Neues Hauptkonto
      */
     private void setAsActiveAccount(Account account) {
-        UserSettingsPreferences preferences = new UserSettingsPreferences(this);
+        new UserSettingsPreferences(this).setActiveAccount(account);
+    }
 
-        preferences.setActiveAccount(account);
+    private void showCloseScreenDialog() {
+        Bundle bundle = new Bundle();
+        bundle.putString(ConfirmationDialog.TITLE, getString(R.string.attention));
+        bundle.putString(ConfirmationDialog.CONTENT, getString(R.string.abort_action_confirmation_text));
+
+        ConfirmationDialog confirmationDialog = new ConfirmationDialog();
+        confirmationDialog.setArguments(bundle);
+        confirmationDialog.setOnConfirmationListener(new ConfirmationDialog.OnConfirmationResult() {
+            @Override
+            public void onConfirmationResult(boolean closeScreen) {
+                if (closeScreen)
+                    finish();
+            }
+        });
+        confirmationDialog.show(getFragmentManager(), "new_account_exit");
     }
 }

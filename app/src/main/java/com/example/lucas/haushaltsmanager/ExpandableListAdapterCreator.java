@@ -1,7 +1,8 @@
 package com.example.lucas.haushaltsmanager;
 
 import android.content.Context;
-import android.support.annotation.*;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 
@@ -11,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class ExpandableListAdapterCreator {
+    // TODO: Wie den MonthlyReportAdapterCreator überarbeiten
     private static final String TAG = ExpandableListAdapterCreator.class.getSimpleName();
 
     private List<ExpenseObject> mExpenses;

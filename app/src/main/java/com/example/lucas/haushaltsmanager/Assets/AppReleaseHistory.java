@@ -3,6 +3,7 @@ package com.example.lucas.haushaltsmanager.Assets;
 import com.lucas.changelogdialog.ChangelogItem;
 import com.lucas.changelogdialog.Feature;
 import com.lucas.changelogdialog.Release;
+import com.lucas.changelogdialog.ReleaseHistory;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -29,7 +30,8 @@ import java.util.List;
 //
 //        </changelog>
 //        Last, if you would like a multi language changelog, you just have to put the translated files changelog.xml in the appropriate folders res/raw-xx/.
-public class ReleaseHistory implements com.lucas.changelogdialog.ReleaseHistory {
+public class AppReleaseHistory implements ReleaseHistory {
+    // TODO: Update mich bevor du mit der App live gehst
 
     @Override
     public List<com.lucas.changelogdialog.Release> getHistory() {
