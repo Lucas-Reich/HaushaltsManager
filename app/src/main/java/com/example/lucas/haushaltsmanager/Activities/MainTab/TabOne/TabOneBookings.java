@@ -359,7 +359,7 @@ public class TabOneBookings extends AbstractTab implements FABToolbar.OnFabToolb
                 //TODO Wenn die angegebene Buchung eine ParentBuchung ist müssen anstatt der Buchung die KindBuchungen zusammengefügt werden
                 for (ExpListViewSelectedItem selectedItem : selectedItems) {
                     try {
-                        if (selectedItem.isParent())
+                        if (selectedItem.isGroup())
                             mExpenseRepo.delete(selectedItem.getItem());
                         else
                             mChildExpenseRepo.delete(selectedItem.getItem());
@@ -442,7 +442,12 @@ public class TabOneBookings extends AbstractTab implements FABToolbar.OnFabToolb
     private void deleteBookingsAction(List<ExpListViewSelectedItem> selectedItems) {
         for (ExpListViewSelectedItem selectedItem : selectedItems) {
             try {
-                if (selectedItem.isParent()) {
+                // Wenn es nur ein Kind ist oder nur eine Group dann das hier
+                if (selectedItem.isGroup() && !selectedItem.hasChildren()) {
+                    mExpenseRepo.delete(selectedItem.getItem());
+                    mRevertDeletionSnackbar.addItem(selectedItem);
+                } else {
+                    // Wenn es eine Buchung mit Kindern ist dann diese hier
                     for (ExpenseObject child : selectedItem.getItem().getChildren()) {
                         mChildExpenseRepo.delete(child);
                         mRevertDeletionSnackbar.addItem(new ExpListViewSelectedItem(
@@ -450,9 +455,6 @@ public class TabOneBookings extends AbstractTab implements FABToolbar.OnFabToolb
                                 selectedItem.getItem()
                         ));
                     }
-                } else {
-                    mChildExpenseRepo.delete(selectedItem.getItem());
-                    mRevertDeletionSnackbar.addItem(selectedItem);
                 }
 
                 mRevertDeletionSnackbar.addItem(selectedItem);
@@ -461,6 +463,9 @@ public class TabOneBookings extends AbstractTab implements FABToolbar.OnFabToolb
 
                 //todo was soll ich machen wenn eine KindBuchung nicht gelöscht werden konnte
                 Log.e(TAG, "Could not delete ChildExpense " + selectedItem.getItem().getTitle(), e);
+            } catch (CannotDeleteExpenseException e) {
+
+                Log.e(TAG, "Could not delete Expense " + selectedItem.getItem().getTitle(), e);
             }
         }
 

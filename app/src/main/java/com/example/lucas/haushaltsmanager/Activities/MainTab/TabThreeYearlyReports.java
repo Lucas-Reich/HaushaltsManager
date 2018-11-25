@@ -73,7 +73,7 @@ public class TabThreeYearlyReports extends AbstractTab {
 
         mLineChartPopulator = new LineChartCardPopulator(
                 (CardView) rootView.findViewById(R.id.tab_three_line_chart),
-                mAccountBalanceYear.get(getCurrentYear() - 1)
+                getLastYearAccountBalance(getCurrentYear())
         );
         mLineChartPopulator.setResources(mParent.getResources(), getCurrentYear()); // TODO: Kann ich das mit dem Jahr anders machen. Es wird nur für die GroupFunkion benutzt
         mLineChartPopulator.setData(createReport(
@@ -98,6 +98,15 @@ public class TabThreeYearlyReports extends AbstractTab {
 
         report.setCardTitle(getString(R.string.expense));
         mExpenseCardPopulator.setData(report);
+    }
+
+    private double getLastYearAccountBalance(int currentYear) {
+        int lastYear = currentYear - 1;
+
+        if (mAccountBalanceYear.containsKey(lastYear))
+            return mAccountBalanceYear.get(lastYear);
+
+        return 0d;
     }
 
     private ReportInterface createReport(String title, List<ExpenseObject> expenses) {
