@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class ExpandableListItemSelector {
+    // TODO Kann ich aus dieser Klasse noch eine Unterklasse extrahieren
     private List<ExpListViewSelectedItem> mSelectedItems;
     private ExpandableListAdapter mAdapter;
 
@@ -20,7 +21,9 @@ public class ExpandableListItemSelector {
         if (!groupAndChildAreNotSimultaneouslySelected(childPosition))
             return false;
 
-        if (hasChildren(groupPosition))
+        // Wenn ich ein Kind markieren will, dann ist die hasChildren überprüfung des Parents immer true und ich markiere alle Kinder des Parents
+        // und nicht nur das eine Kind
+        if (-1 == childPosition && hasChildren(groupPosition))
             mSelectedItems.addAll(parentToSelectedItems(
                     groupPosition
             ));
