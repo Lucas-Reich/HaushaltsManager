@@ -286,6 +286,8 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
     public void selectItem(int groupPosition, int childPosition) {
         mItemSelector.selectItem(groupPosition, childPosition);
+
+        notifyDataSetChanged();
     }
 
     public void unselectItem(int groupPosition, int childPosition) {
