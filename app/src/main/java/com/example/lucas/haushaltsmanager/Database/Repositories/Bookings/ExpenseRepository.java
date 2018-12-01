@@ -289,7 +289,6 @@ public class ExpenseRepository {
             } catch (AccountNotFoundException e) {
 
                 //sollte das Konto aus irgendeinem Grund nicht mehr existieren, muss der Kontostand auch nicht mehr angepasst werden
-//                throw CannotDeleteExpenseException.RelatedAccountDoesNotExist(expense);
                 Log.e(TAG, "Could not delete Expense " + expense.getTitle() + " attached Account " + expense.getAccountId() + " does not exist");
             } catch (CannotDeleteChildExpenseException e) {
 
@@ -416,11 +415,11 @@ public class ExpenseRepository {
         return false;
     }
 
-    private boolean isTemplateBooking(ExpenseObject expense) {
+    public boolean isTemplateBooking(ExpenseObject expense) {
         return new TemplateRepository(app.getContext()).existsWithoutIndex(expense);//todo
     }
 
-    private boolean isRecurringBooking(ExpenseObject expense) {
+    public boolean isRecurringBooking(ExpenseObject expense) {
         return new RecurringBookingRepository(app.getContext()).exists(expense);//todo
     }
 

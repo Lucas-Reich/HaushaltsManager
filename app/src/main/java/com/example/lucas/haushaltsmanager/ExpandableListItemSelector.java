@@ -21,8 +21,6 @@ public class ExpandableListItemSelector {
         if (!groupAndChildAreNotSimultaneouslySelected(childPosition))
             return false;
 
-        // Wenn ich ein Kind markieren will, dann ist die hasChildren überprüfung des Parents immer true und ich markiere alle Kinder des Parents
-        // und nicht nur das eine Kind
         if (-1 == childPosition && hasChildren(groupPosition))
             mSelectedItems.addAll(parentToSelectedItems(
                     groupPosition
@@ -37,7 +35,7 @@ public class ExpandableListItemSelector {
     }
 
     public void unselectItem(int groupPosition, int childPosition) {
-        if (hasChildren(groupPosition))
+        if (-1 == childPosition && hasChildren(groupPosition))
             removeAllChildren(groupPosition);
         else
             removeItem(groupPosition, childPosition);
@@ -48,7 +46,7 @@ public class ExpandableListItemSelector {
     }
 
     public boolean isItemSelected(int groupPosition, int childPosition) {
-        if (hasChildren(groupPosition))
+        if (-1 == childPosition && hasChildren(groupPosition))
             return allChildrenSelected(groupPosition);
         else
             return isSelected(groupPosition, childPosition);
