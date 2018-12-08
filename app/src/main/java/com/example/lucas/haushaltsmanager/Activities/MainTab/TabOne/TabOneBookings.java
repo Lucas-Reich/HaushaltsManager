@@ -443,19 +443,10 @@ public class TabOneBookings extends AbstractTab implements FABToolbar.OnFabToolb
         for (ExpListViewSelectedItem selectedItem : selectedItems) {
             try {
                 // Wenn es nur ein Kind ist oder nur eine Group dann das hier
-                if (selectedItem.isGroup() && !selectedItem.hasChildren()) {
+                if (selectedItem.isGroup())
                     mExpenseRepo.delete(selectedItem.getItem());
-                    mRevertDeletionSnackbar.addItem(selectedItem);
-                } else {
-                    // Wenn es eine Buchung mit Kindern ist dann diese hier
-                    for (ExpenseObject child : selectedItem.getItem().getChildren()) {
-                        mChildExpenseRepo.delete(child);
-                        mRevertDeletionSnackbar.addItem(new ExpListViewSelectedItem(
-                                child,
-                                selectedItem.getItem()
-                        ));
-                    }
-                }
+                else
+                    mChildExpenseRepo.delete(selectedItem.getItem());
 
                 mRevertDeletionSnackbar.addItem(selectedItem);
 

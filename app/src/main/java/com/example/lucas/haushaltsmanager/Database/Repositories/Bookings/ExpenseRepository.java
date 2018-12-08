@@ -289,7 +289,6 @@ public class ExpenseRepository {
             } catch (AccountNotFoundException e) {
 
                 //sollte das Konto aus irgendeinem Grund nicht mehr existieren, muss der Kontostand auch nicht mehr angepasst werden
-//                throw CannotDeleteExpenseException.RelatedAccountDoesNotExist(expense);
                 Log.e(TAG, "Could not delete Expense " + expense.getTitle() + " attached Account " + expense.getAccountId() + " does not exist");
             } catch (CannotDeleteChildExpenseException e) {
 

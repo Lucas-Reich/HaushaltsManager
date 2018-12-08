@@ -13,7 +13,6 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.BookingTags.Book
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.CannotDeleteExpenseException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.AddChildToChildException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.CannotDeleteChildExpenseException;
@@ -322,10 +321,30 @@ public class ChildExpenseRepository {
         }
     }
 
+    private boolean isParentRecurringOrTemplate(ExpenseObject expense) {
+        try {
+            ExpenseObject parentExpense = getParent(expense);
+
+            return !mBookingRepo.isRecurringBooking(parentExpense)
+                    || !mBookingRepo.isTemplateBooking(parentExpense);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public void delete(ExpenseObject childExpense) throws CannotDeleteChildExpenseException {
 
-        if (isLastChildOfParent(childExpense)) {
+        if (!isParentRecurringOrTemplate(childExpense)) {
+            try {
+                hide(childExpense);
+            } catch (ChildExpenseNotFoundException e) {
 
+                // TODO Was soll passieren, wenn das Kind nicht gefunden wurde?
+            }
+            return;
+        }
+
+        if (isLastChildOfParent(childExpense)) {
             try {
                 ExpenseObject parentExpense = getParent(childExpense);
 
@@ -340,19 +359,21 @@ public class ChildExpenseRepository {
 
                 throw CannotDeleteChildExpenseException.RelatedExpenseNotFound(childExpense);
             }
-        } else {
 
-            try {
-                mDatabase.delete(ExpensesDbHelper.TABLE_BOOKINGS, ExpensesDbHelper.BOOKINGS_COL_ID + " = ?", new String[]{"" + childExpense.getIndex()});
-                updateAccountBalance(
-                        childExpense.getAccountId(),
-                        -childExpense.getSignedPrice()
-                );
+            return;
+        }
 
-            } catch (AccountNotFoundException e) {
 
-                //sollte nicht passieren können, da Konten erst gelöscht werden können wenn es keine Buchungen mehr mit diesem Konto gibt
-            }
+        try {
+            mDatabase.delete(ExpensesDbHelper.TABLE_BOOKINGS, ExpensesDbHelper.BOOKINGS_COL_ID + " = ?", new String[]{"" + childExpense.getIndex()});
+            updateAccountBalance(
+                    childExpense.getAccountId(),
+                    -childExpense.getSignedPrice()
+            );
+
+        } catch (AccountNotFoundException e) {
+
+            //sollte nicht passieren können, da Konten erst gelöscht werden können wenn es keine Buchungen mehr mit diesem Konto gibt
         }
     }
 
