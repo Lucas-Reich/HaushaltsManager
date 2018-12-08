@@ -8,7 +8,7 @@
   </component>
   <component name="TodoConfiguration">
     <pattern pattern="\btodo\b.*" />
-    <pattern pattern="\bfixme\b.*" />
-    <pattern pattern="\bcleanup\b.*" />
+    <pattern pattern="\brefactor\b.*" />
+    <pattern pattern="\bimprovement\b.*" />
   </component>
 </application>
