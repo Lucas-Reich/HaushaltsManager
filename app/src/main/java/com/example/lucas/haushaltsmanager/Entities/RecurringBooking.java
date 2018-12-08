@@ -73,7 +73,7 @@ public class RecurringBooking {
             temp.add(Calendar.HOUR, mFrequency);
         }
 
-        return null;//TODO kann ich auch was anderes außer null returnen?
+        return null;// IMPROVEMENT: Kann ich außer NULL auch was anderes zurückgeben?
     }
 
     private boolean isDateInRange(Calendar date, Calendar start, Calendar end) {

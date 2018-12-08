@@ -1,6 +1,9 @@
 package com.example.lucas.haushaltsmanager;
 
+import android.content.Context;
 import android.os.Environment;
+import android.support.annotation.StringRes;
+import android.support.v7.app.AppCompatActivity;
 
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
@@ -33,11 +36,11 @@ public class ExpenseObjectExporter {
      *
      * @param directory Verzeichniss in dem gespeichert werden soll.
      */
-    public ExpenseObjectExporter(File directory) {
+    public ExpenseObjectExporter(File directory, Context context) {
 
         assertDirectory(directory);
         mDirectory = directory;
-        initializeAccountList();
+        initializeAccountList(context);
     }
 
     /**
@@ -104,18 +107,18 @@ public class ExpenseObjectExporter {
      * @return StringHeader
      */
     private String getCsvHeader() {
+        return getStringResource(R.string.export_price) + "," +
+                getStringResource(R.string.export_expenditure) + "," +
+                getStringResource(R.string.export_title) + "," +
+                getStringResource(R.string.export_date) + "," +
+                getStringResource(R.string.export_notice) + "," +
+                getStringResource(R.string.export_currency_name) + "," +
+                getStringResource(R.string.export_category_name) + "," +
+                getStringResource(R.string.export_account_name) + "," + "\r\n";
+    }
 
-        return "Price" + "," +
-                "is expenditure" + "," +
-                "Title" + "," +
-                "Date" + "," +
-                //todo tags hinzufügen
-                "Notice" + "," +
-                //todo exchange rate hinzufügen
-                "Currency Name" + "," +
-                "Category Name" + "," +
-                "Account Name" + "," + "\r\n";
-        //todo Strings durch übersetzbare Strings ersetzen
+    private String getStringResource(@StringRes int id) {
+        return app.getContext().getString(id);
     }
 
     /**
@@ -125,16 +128,13 @@ public class ExpenseObjectExporter {
      * @return ExpenseObject mit allen Kindern als String
      */
     private String expenseToString(ExpenseObject expense) {
-
         StringBuilder expenseString = new StringBuilder();
 
         expenseString.append(expense.getUnsignedPrice()).append(",");
         expenseString.append(expense.isExpenditure()).append(",");
         expenseString.append(expense.getTitle()).append(",");
         expenseString.append(expense.getDate()).append(",");
-        //todo tags hinzufügen
         expenseString.append(expense.getNotice()).append(",");
-        //todo exchange ratehinzufügen
         expenseString.append(expense.getCurrency().getName());
         expenseString.append(expense.getCategory().getTitle()).append(",");
         Account account = getAccount(expense.getAccountId());
@@ -248,7 +248,7 @@ public class ExpenseObjectExporter {
     /**
      * Methode alle Konten in einer lokalen Liste zu speichern
      */
-    private void initializeAccountList() {
-        mAccounts = new AccountRepository(app.getContext()).getAll(); //todo durch einen ordentliche initialisierung austauschen
+    private void initializeAccountList(Context context) {
+        mAccounts = new AccountRepository(context).getAll();
     }
 }

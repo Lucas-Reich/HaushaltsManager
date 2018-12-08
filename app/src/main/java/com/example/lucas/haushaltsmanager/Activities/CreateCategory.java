@@ -225,8 +225,7 @@ public class CreateCategory extends AbstractAppCompatActivity {
             mCategoryRepo.update(mParentCategory);
         } catch (CategoryNotFoundException e) {
 
-            // TODO what should I do in this case?
-            // can this even happen?
+            // TODO: Was sollte passieren, wenn die ParentKategorie nicht gefunden werden konnte?
         }
     }
 

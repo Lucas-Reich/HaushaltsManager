@@ -26,12 +26,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LineChartCardPopulator {
-    // TODO: Ich kann die Linie, basierend auf dem Kontostand einfärben. Wenn der Kontostand kleiner als 0 ist Rot größer oder gleich 0 grün
+    // IMPROVEMENT: Ich kann die Linie, basierend auf dem Kontostand einfärben. Wenn der Kontostand kleiner als 0 ist Rot größer oder gleich 0 grün
     // Trello: https://trello.com/c/uAhKQUnK/62-farbe-des-linecharts-im-tabthree-basierend-auf-dem-kontostand-einfärben
     private CardView mRootView;
     private ViewHolder mViewHolder;
     private Resources mResources;
-    private double mLastYearAccountBalance; // TODO: Geht das auch anders?
+    private double mLastYearAccountBalance; // REFACTOR: Geht das auch anders?
     private int mCurrentYear;
 
     public LineChartCardPopulator(CardView rootView, double lastYearAccountBalance) {

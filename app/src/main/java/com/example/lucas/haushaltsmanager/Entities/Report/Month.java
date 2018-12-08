@@ -7,10 +7,11 @@ import com.example.lucas.haushaltsmanager.ExpenseGrouper;
 import java.util.List;
 
 public class Month extends AbstractReport {
+    private int month;
+    private int year;
 
     public Month(
             int month,
-            int year,
             List<ExpenseObject> expenses,
             Currency currency
     ) {
@@ -21,16 +22,21 @@ public class Month extends AbstractReport {
         );
     }
 
+    public static Month create(int month, int year, List<ExpenseObject> expenses, Currency currency) {
+        Month self = new Month(month, expenses, currency);
+        self.month = month;
+        self.year = year;
+
+        return self;
+    }
+
     @Override
     protected List<ExpenseObject> filterExpenses(List<ExpenseObject> expenses) {
-        int month = 0; // TODO: Wie bekomme ich die Werte von dem Konstruktor hierhien
-        int year = 0; // TODO: Wie bekomme ich die Werte von dem Konstruktor hierhien
-
         // TODO: Wie bekomme ich die Buchungen aussortieren, welche nicht benötigt werden
         return new ExpenseGrouper().byMonth(
                 expenses,
-                month,
-                year
+                this.month,
+                this.year
         );
     }
 }

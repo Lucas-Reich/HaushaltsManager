@@ -61,7 +61,7 @@ public class TemplatesActivity extends AppCompatActivity {
                     finish();
                 } else {
 
-                    //todo template soll bearbeitet werden können
+                    // IMPROVEMENT: Ein Template sollte bearbeitet werden können.
                 }
             }
         });

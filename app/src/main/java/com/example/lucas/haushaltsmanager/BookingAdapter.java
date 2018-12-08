@@ -54,7 +54,6 @@ public class BookingAdapter extends ArrayAdapter<ExpenseObject> {
 
         viewHolder.circleLetter.setText(category.substring(0, 1).toUpperCase());
         viewHolder.txtTitle.setText(expenseObject.getTitle());
-        //TODO wenn es eine Multiuser funktionalität muss hier der benutzer eingetragen werden, der das Geld ausgegeben hat
         viewHolder.txtPerson.setText("");
         viewHolder.txtPrice.setText(String.format("%s", expenseObject.getUnsignedPrice()));
         viewHolder.txtCurrencySymbol.setText(expenseObject.getCurrency().getSymbol());

@@ -140,7 +140,7 @@ public class UserSettingsPreferences {
             return mCurrencyRepo.get(index);
         } catch (CurrencyNotFoundException e) {
 
-            //todo sollte eigentlich nicht passieren können?
+            // TODO: Kann dieser Fall eintreten?
             return null;
         }
     }
@@ -151,7 +151,7 @@ public class UserSettingsPreferences {
             return mAccountRepo.get(index);
         } catch (AccountNotFoundException e) {
 
-            //todo wenn der user noch kein Konto erstellt hat dann wird null zurückgegeben
+            // TODO: Wenn der Benutzer noch kein Konto erstellt hat, dann wird NULL zurückgegeben.
             return null;
         }
     }

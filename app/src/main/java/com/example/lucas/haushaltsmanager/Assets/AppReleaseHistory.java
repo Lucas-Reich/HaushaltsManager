@@ -1,5 +1,9 @@
 package com.example.lucas.haushaltsmanager.Assets;
 
+import android.support.annotation.StringRes;
+
+import com.example.lucas.haushaltsmanager.App.app;
+import com.example.lucas.haushaltsmanager.R;
 import com.lucas.changelogdialog.ChangelogItem;
 import com.lucas.changelogdialog.Feature;
 import com.lucas.changelogdialog.Release;
@@ -31,16 +35,11 @@ import java.util.List;
 //        </changelog>
 //        Last, if you would like a multi language changelog, you just have to put the translated files changelog.xml in the appropriate folders res/raw-xx/.
 public class AppReleaseHistory implements ReleaseHistory {
-    // TODO: Update mich bevor du mit der App live gehst
 
     @Override
     public List<com.lucas.changelogdialog.Release> getHistory() {
         List<Release> releases = new ArrayList<>();
-        releases.add(getRelease100());
-        releases.add(getRelease200());
-        releases.add(getRelease300());
-        releases.add(getRelease400());
-        releases.add(getRelease500());
+        releases.add(getRealRelease100());
 
         return releases;
     }
@@ -50,89 +49,25 @@ public class AppReleaseHistory implements ReleaseHistory {
      *
      * @return Version 1.0.0
      */
-    private Release getRelease100() {
-        //zu diesem Release gibt es keine Information, da dieser geschah, bevor ich den ChangelogDialog implementiert habe
-
+    private Release getRealRelease100() {
         return new Release(
                 1,
                 null,
                 null,
-                Calendar.getInstance(),
-                "",
+                getDate(1, 1, 2019),
+                getString(R.string.release_notes_100),
                 new ArrayList<ChangelogItem>()
         );
     }
 
-    /**
-     * Methode welche die Änderungen der Version 2.0.0 zurückgibt.
-     *
-     * @return Version 2.0.0
-     */
-    private Release getRelease200() {
-        //zu diesem Release gibt es keine Information, da dieser geschah, bevor ich den ChangelogDialog implementiert habe
-
-        return new Release(
-                2,
-                null,
-                null,
-                Calendar.getInstance(),
-                "",
-                new ArrayList<ChangelogItem>()
-        );
+    private String getString(@StringRes int stringId) {
+        return app.getContext().getString(stringId);
     }
 
-    /**
-     * Methode welche die Änderungen der Version 3.0.0 zurückgibt.
-     *
-     * @return Version 3.0.0
-     */
-    private Release getRelease300() {
-        //zu diesem Release gibt es keine Information, da dieser geschah, bevor ich den ChangelogDialog implementiert habe
+    private Calendar getDate(int day, int month, int year) {
+        Calendar date = Calendar.getInstance();
+        date.set(year, month, day, 0, 0, 0);
 
-        return new Release(
-                3,
-                null,
-                null,
-                Calendar.getInstance(),
-                "",
-                new ArrayList<ChangelogItem>()
-        );
-    }
-
-    /**
-     * Methode welche die Änderungen der Version 4.0.0 zurückgibt.
-     *
-     * @return Version 4.0.0
-     */
-    private Release getRelease400() {
-        //zu diesem Release gibt es keine Information, da dieser geschah, bevor ich den ChangelogDialog implementiert habe
-
-        return new Release(
-                4,
-                null,
-                null,
-                Calendar.getInstance(),
-                "",
-                new ArrayList<ChangelogItem>()
-        );
-    }
-
-    /**
-     * Methode welche die Änderungen der Version 5.0.0 zurückgibt.
-     *
-     * @return Version 5.0.0
-     */
-    private Release getRelease500() {
-        List<ChangelogItem> items = new ArrayList<>();
-        items.add(new Feature("Über Uns Activity hinzugefügt"));
-
-        return new Release(
-                5,
-                null,
-                null,
-                Calendar.getInstance(),
-                "Tolle Neuigkeiten. Du kannst dir nun Information über uns und die App angucken. Besuche dafür einfach die \"Über Uns\" Seite in den Einstellungen.",
-                items
-        );
+        return date;
     }
 }

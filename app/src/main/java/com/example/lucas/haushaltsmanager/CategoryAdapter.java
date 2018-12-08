@@ -167,7 +167,7 @@ public class CategoryAdapter extends BaseExpandableListAdapter {
     }
 
     public void selectChild(Category category) {
-        // todo überprüfe ob die kategorie auch wirklich eine Kindkategorie ist
+        // TODO: Überprüfe ob die Kategorie auch wirklich eine KindKategorie ist
         mSelectedChildren.add(category);
     }
 

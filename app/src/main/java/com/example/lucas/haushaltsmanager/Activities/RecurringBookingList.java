@@ -12,8 +12,6 @@ import java.util.Calendar;
 import java.util.List;
 
 public class RecurringBookingList extends AbstractAppCompatActivity {
-    private static final String TAG = RecurringBookingList.class.getSimpleName();
-
     private ExpandableListView mExpListView;
     private RecurringBookingRepository mRecurringBookingRepo;
 

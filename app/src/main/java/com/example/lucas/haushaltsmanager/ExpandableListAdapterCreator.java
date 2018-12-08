@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class ExpandableListAdapterCreator {
-    // TODO: Wie den MonthlyReportAdapterCreator überarbeiten
+    // REFACTOR: Wie den MonthlyReportAdapterCreator überarbeiten
     private static final String TAG = ExpandableListAdapterCreator.class.getSimpleName();
 
     private List<ExpenseObject> mExpenses;

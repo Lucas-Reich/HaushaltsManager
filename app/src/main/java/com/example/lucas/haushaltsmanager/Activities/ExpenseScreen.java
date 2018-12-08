@@ -295,7 +295,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
                         } catch (ExpenseNotFoundException e) {
 
                             Toast.makeText(ExpenseScreen.this, R.string.could_not_update_booking, Toast.LENGTH_SHORT).show();
-                            //todo fehlerbehandlung
+                            // TODO: Was soll passieren, wenn die zu updatende Buchung nicht gefunden werden konnte?
                         }
                         break;
                     case INTENT_MODE_UPDATE_CHILD:
@@ -306,7 +306,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
                         } catch (ChildExpenseNotFoundException e) {
 
                             Toast.makeText(ExpenseScreen.this, R.string.could_not_update_booking, Toast.LENGTH_SHORT).show();
-                            //todo fehlerbehandlung
+                            // TODO: Was soll passieren, wenn die zu updatende KindBuchung nicht gefunden werden konnte?
                         }
                         break;
                     case INTENT_MODE_ADD_CHILD:
@@ -317,7 +317,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
                         } catch (AddChildToChildException e) {
 
                             Log.e(TAG, "Could not add Child " + mExpense.getTitle() + " to parent " + mParentBooking.getTitle(), e);
-                            //todo ferhlerbehandlung
+                            // TODO: Was soll passieren, wenn zu der ParentBuchung keine KindBuchung hinzugefügt werden kann?
                         }
                         break;
                     case INTENT_MODE_CREATE_BOOKING:

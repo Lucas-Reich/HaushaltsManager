@@ -1,7 +1,11 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions;
 
+import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+
 public class AddChildToChildException extends Exception {
-    public AddChildToChildException() {
-        super("It is not possible to add children to a ChildExpense.");//todo nachricht noch einmal überarbeiten (welches kind zu welchem parent zb)
+    public AddChildToChildException(ExpenseObject child, ExpenseObject parent) {
+        super(
+                String.format("It's not possible to add %s to %s, since %s is already a ChildExpense", child.getTitle(), parent.getTitle(), parent.getTitle())
+        );
     }
 }

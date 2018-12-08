@@ -173,7 +173,7 @@ public class CategoryList extends AbstractAppCompatActivity implements CategoryF
                     updateListView();
                 } catch (CannotDeleteChildCategoryException e) {
 
-                    //todo ich sollte den try catch nur um die for schleife machen und die categorien die nicht gelöscht werden konnten speichern und etwas mit ihnen machen
+                    // TODO: Ich sollte den Try-Catch Block nur um die for schleife machen und die Kategorien die nicht gelöscht werden konnten speichern und etwas mit ihnen machen
                     Toast.makeText(this, getString(R.string.failed_to_delete_category), Toast.LENGTH_SHORT).show();
                     Log.e(TAG, "Could not delete ChildCategory: " + e.getMessage());
                 }

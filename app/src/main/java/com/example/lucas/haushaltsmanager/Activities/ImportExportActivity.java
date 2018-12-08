@@ -88,7 +88,7 @@ public class ImportExportActivity extends AbstractAppCompatActivity {
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                todo Die Importierfunktion wieder aktivieren
+//                TODO: Die Importierfunktion wieder aktivieren
 //                final File selectedFile = mSelectableFileList.get(position);
 //
 //                Bundle bundle = new Bundle();
@@ -141,7 +141,7 @@ public class ImportExportActivity extends AbstractAppCompatActivity {
                     @Override
                     public void onConfirmationResult(boolean result) {
 
-                        ExpenseObjectExporter fileExporter = new ExpenseObjectExporter(mSelectedDirectory);
+                        ExpenseObjectExporter fileExporter = new ExpenseObjectExporter(mSelectedDirectory, ImportExportActivity.this);
                         fileExporter.convertAndExportExpenses(getAllExpenses());
 
                         updateListView(mSelectedDirectory);
@@ -198,7 +198,7 @@ public class ImportExportActivity extends AbstractAppCompatActivity {
      * @return Alle Buchungen
      */
     private List<ExpenseObject> getAllExpenses() {
-        //todo Den User fragen welche Buchune genau exportiert werden sollen (welches Konto, Zeitraum, ...)
+        // IMPROVEMENT: Den User fragen, welche Buchung genau exportiert werden sollen (welches Konto, Zeitraum, ...)
         ExpenseRepository repo = new ExpenseRepository(this);
 
         return repo.getAll();

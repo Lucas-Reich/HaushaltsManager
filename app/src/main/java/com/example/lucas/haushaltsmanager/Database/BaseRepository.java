@@ -13,7 +13,7 @@ public interface BaseRepository<T> {
 
     List<T> getAll();
 
-    void update(T entity) throws EntityNotExistingException;//todo oder sollte ich eine CouldNotUpdateEntityException zurückgeben?
+    void update(T entity) throws EntityNotExistingException;// TODO: Sollte ich eine CouldNotUpdateEntityException auslösen?
 
     void delete(T entity) throws CouldNotDeleteEntityException;
 

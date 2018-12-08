@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class BackupUtils {
-    // TODO: Tests für die Klasse erstellen
+    // IMPROVEMENT: Tests für die Klasse erstellen
     public static Directory getBackupDirectory(Context context) {
         return new AppInternalPreferences(context).getBackupDirectory();
     }
