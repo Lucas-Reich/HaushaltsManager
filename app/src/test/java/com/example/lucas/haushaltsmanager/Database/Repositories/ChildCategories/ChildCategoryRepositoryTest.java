@@ -153,7 +153,7 @@ public class ChildCategoryRepositoryTest {
 
     @Test
     public void testInsertWithInvalidInputShouldFail() {
-        //todo was sollte passieren wenn eine KindKategorie nicht richtig initialisiert wurde, zb kein name
+        // IMPROVEMENT: Was sollte passieren wenn eine KindKategorie nicht richtig initialisiert wurde, zb kein name
     }
 
     @Test

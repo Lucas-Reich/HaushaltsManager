@@ -167,7 +167,7 @@ public class RecurringBookingRepository {
 
         int frequencyInHours = c.getInt(c.getColumnIndex(ExpensesDbHelper.RECURRING_BOOKINGS_COL_FREQUENCY));
 
-        //TODO kann man das auch irgendwie anders handeln?
+        // TODO: Kann man das auch irgendwie anders lösen?
         ExpenseObject expense = null;
         long expenseId = c.getLong(c.getColumnIndex(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID));
         try {

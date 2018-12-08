@@ -367,11 +367,11 @@ public class TabOneBookings extends AbstractTab implements FABToolbar.OnFabToolb
                         parent.addChild(selectedItem.getItem());
                     } catch (CannotDeleteChildExpenseException e) {
 
-                        //TODO was soll passieren
+                        // TODO was soll passieren
                         Log.e(TAG, "Could not delete ChildExpense " + selectedItem.getItem().getTitle());
                     } catch (CannotDeleteExpenseException e) {
 
-                        //TODO was soll passieren
+                        // TODO was soll passieren
                         Log.e(TAG, "Could not delete Expense " + selectedItem.getItem().getTitle());
                     }
                 }
@@ -461,7 +461,7 @@ public class TabOneBookings extends AbstractTab implements FABToolbar.OnFabToolb
 
             } catch (CannotDeleteChildExpenseException e) {
 
-                //todo was soll ich machen wenn eine KindBuchung nicht gelöscht werden konnte
+                // TODO: Was soll ich machen wenn eine KindBuchung nicht gelöscht werden konnte?
                 Log.e(TAG, "Could not delete ChildExpense " + selectedItem.getItem().getTitle(), e);
             } catch (CannotDeleteExpenseException e) {
 

@@ -79,8 +79,6 @@ public class TransferActivity extends AppCompatActivity {
             mToExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.TRANSFER_EXPENSE);
         } catch (ChildCategoryNotFoundException e) {
 
-            //todo vor dem relase entfernen
-            Toast.makeText(this, "Überweisungskategorie wurde nicht gefunden", Toast.LENGTH_SHORT).show();
             finish();
         }
 
@@ -239,9 +237,8 @@ public class TransferActivity extends AppCompatActivity {
                         mBookingRepo.update(parent);
                     } catch (ExpenseNotFoundException e) {
 
-                        Toast.makeText(TransferActivity.this, "Titel konnte nicht geupdated werden", Toast.LENGTH_SHORT).show();
-                        //todo fehlerbehandlung
-                        //todo übersetzung
+                        Toast.makeText(TransferActivity.this, R.string.could_not_update_title, Toast.LENGTH_SHORT).show();
+                        // TODO: Was soll passieren, wenn der Titeln nich geupdated werden konnte?
                     }
 
                     Intent intent = new Intent(TransferActivity.this, ParentActivity.class);

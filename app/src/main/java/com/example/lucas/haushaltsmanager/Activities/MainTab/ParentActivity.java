@@ -71,18 +71,6 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
         setActiveAccounts();
         updateExpenses();
 
-        //TODO den test button entfernen
-        FloatingActionButton testService = findViewById(R.id.service_fab);
-        testService.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                MockDataCreator test = new MockDataCreator();
-                test.createBookings(100, ParentActivity.this);
-            }
-        });
-
-
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         // Create the mReportAdapter that will return a fragment for each of the three
@@ -164,10 +152,6 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
     private void setSharedPreferencesProperties() {
         UserSettingsPreferences preferences = new UserSettingsPreferences(this);
         preferences.setMaxBackupCount(20);
-
-        //TODO Die MainCurrency sollte bereits beim erstellen der Datenbank in den Preferences gespeichert worden sein
-//        SharedPreferences oldPreferences = this.getSharedPreferences("UserSettings", Context.MODE_PRIVATE);
-//        oldPreferences.edit().putLong("mainCurrencyIndex", 32L).apply();
     }
 
     @Override

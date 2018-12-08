@@ -64,8 +64,8 @@ public class ChildExpenseRepository2Test {
         try {
             mChildRepo.create(getSimpleExpense(), any(ExpenseObject.class));
 
-            //todo sollte ich überprüfen ob der Kontostand richtig geupdatet wurde
-            //todo der rückgabe wert von mChildRepo.create() sollte mit dem child übereinstimmen
+            // IMPROVEMENT: Sollte ich überprüfen ob der Kontostand richtig geupdatet wurde?
+            // TODO: Der Rückgabewert von mChildRepo.create() sollte mit dem child übereinstimmen
         } catch (ExpenseNotFoundException e) {
 
             Assert.fail(e.getMessage());
@@ -89,7 +89,7 @@ public class ChildExpenseRepository2Test {
             Assert.fail("Could save ChildExpense with invalid Parent");
         } catch (ExpenseNotFoundException e) {
 
-            assertEquals("Could not find Expense with id ", e.getMessage());//todo welche Id hat die ParentExpense
+            assertEquals("Could not find Expense with id ", e.getMessage());// IMPROVEMENT: Welche Id hat die ParentExpense
         }
     }
 
@@ -125,7 +125,7 @@ public class ChildExpenseRepository2Test {
         }
     }
 
-//    testGetWithNotExistingParentExpenseShouldThrowExpenseNotFoundException todo brauche ich diesen test auch?
+//    testGetWithNotExistingParentExpenseShouldThrowExpenseNotFoundException IMPROVEMENT: Brauche ich diesen Test?
 
     @Test
     public void testGetAllShouldReturnAllVisibleChildrenOfParent() {

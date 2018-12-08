@@ -128,7 +128,6 @@ public class BackupActivity extends AbstractAppCompatActivity {
 
                         BackupHandler backupHandler = new BackupHandler();
                         boolean successful = backupHandler.createBackup(backupName, mBackupDirectory, BackupActivity.this);
-                        backupHandler.deleteBackupsAboveThreshold(mBackupDirectory, 20); // TODO remove mich
 
                         if (successful)
                             showToast(R.string.created_backup);

@@ -17,8 +17,6 @@ import com.example.lucas.haushaltsmanager.R;
 import java.util.Calendar;
 
 public class EditRecurringBooking extends AbstractAppCompatActivity {
-    private static final String TAG = EditRecurringBooking.class.getSimpleName();
-
     public static final String INTENT_BOOKING = "recurringBooking";
 
     private ExpenseObject mExpense;
@@ -132,7 +130,7 @@ public class EditRecurringBooking extends AbstractAppCompatActivity {
     }
 
     private void setStartDate(Calendar startDate) {
-        //TODO error wenn versucht wird das Start date nach dem Enddate zu setzen?
+        // TODO: Sollte ich einen Fehler aausgeben, wenn der User versucht das StartDate nach dem EndDate ist?
 
         mStartDate = startDate;
         mStartDateBtn.setText(DateUtils.formatDateTime(

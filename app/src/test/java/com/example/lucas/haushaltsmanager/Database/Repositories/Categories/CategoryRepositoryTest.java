@@ -149,7 +149,7 @@ public class CategoryRepositoryTest {
 
     @Test
     public void testInsertWithInvalidCategoryShouldFail() {
-        //todo was sollte passieren wenn die Kategorie nicht richtig initialisiert wurde, zb kein name
+        // TODO: Was sollte passieren wenn die Kategorie nicht richtig initialisiert wurde, zb kein name
     }
 
     @Test

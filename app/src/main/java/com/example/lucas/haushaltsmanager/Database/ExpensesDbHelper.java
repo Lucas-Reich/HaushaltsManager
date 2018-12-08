@@ -261,7 +261,7 @@ public class ExpensesDbHelper extends SQLiteOpenHelper {
         UserSettingsPreferences preferences = new UserSettingsPreferences(app.getContext());
 
         //details from: https://developers.google.com/public-data/docs/canonical/currencies_csv
-        //TODO die Währungen sollten in einer XML datei gespeichert sein, dann kann man sie auch übersetzen
+        // IMPROVEMENT: Die Währungen sollten aus einer XML Datei ausgelesen werden
         List<Currency> currencies = new ArrayList<>();
         currencies.add(new Currency("Australian Dollar", "AUD", "$"));
         currencies.add(new Currency("Bulgarian Lev", "BGN", "лв"));
@@ -304,10 +304,10 @@ public class ExpensesDbHelper extends SQLiteOpenHelper {
             values.put(CURRENCIES_COL_SHORT_NAME, currency.getShortName());
             values.put(CURRENCIES_COL_SYMBOL, currency.getSymbol());
 
-            //todo das wählen der hauptwährung sollte auf dem Standort des Users passieren
+            // IMPROVEMENT: Das wählen der Hauptwährung sollte auf dem Standort des Users passieren.
             //android.icu.util.Currency currency = android.icu.util.Currency.getInstance(getResources().getConfiguration().locale);
             //Quelle: https://stackoverflow.com/questions/27228514/android-is-it-possible-to-get-the-currency-code-of-the-country-where-the-user-a
-            //todo wenn die Standartwährung nicht gesetzt werden kann, soll der User darauf hingewiesen werden und gefragt werden dies zu Tun
+            // TODO: Wenn die Standartwährung nicht gesetzt werden kann, soll der User darauf hingewiesen werden und gefragt werden dies zu tun
             long index = db.insert(TABLE_CURRENCIES, null, values);
             if (currency.getShortName().equals("EUR") && index != -1) {
                 preferences.setMainCurrency(new Currency(
@@ -326,7 +326,7 @@ public class ExpensesDbHelper extends SQLiteOpenHelper {
      * @param db Datenbank
      */
     private void insertHiddenCategories(SQLiteDatabase db) {
-        //TODO SystemKategorien sollten in einer XML Datei gespeichert sein, dann kann man sie einfacher übersetzen
+        // IMPROVEMENT: SystemKategorien sollten in einer XML Datei gespeichert sein, dann lassen sie sich auch einfacher übersetzen.
 
         ArrayList<Category> categories = new ArrayList<>();
         categories.add(new Category(

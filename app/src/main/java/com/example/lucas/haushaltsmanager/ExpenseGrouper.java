@@ -38,7 +38,7 @@ public class ExpenseGrouper {
         }
 
         return groupedExpenses;
-    } // TODO: Tests schreiben
+    } // IMPROVEMENT: Tests für Methode byYears() schreiben
 
     /**
      * Kindbuchungen werden von der Funktion nicht beachtet.

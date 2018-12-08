@@ -121,10 +121,10 @@ public class BookingTagRepository {
     public void insert(long bookingId, Tag tag) {
 
         ContentValues values = new ContentValues();
-        //todo ich muss überprüfen ob es das Tag auch wirklich gibt
+        // TODO: Ich muss überprüfen ob es das Tag auch wirklich gibt.
         values.put(ExpensesDbHelper.BOOKINGS_TAGS_COL_TAG_ID, tag.getIndex());
 
-        //todo ich muss überprüfen ob es die Buchung auch wirklich gibt
+        // TODO: Ich muss überprüfen ob es die Buchung auch wirklich gibt.
         values.put(ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_ID, bookingId);
 
         mDatabase.insert(ExpensesDbHelper.TABLE_BOOKINGS_TAGS, null, values);

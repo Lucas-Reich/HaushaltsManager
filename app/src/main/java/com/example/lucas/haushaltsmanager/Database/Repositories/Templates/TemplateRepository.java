@@ -53,11 +53,9 @@ public class TemplateRepository {
     }
 
     public boolean existsWithoutIndex(ExpenseObject expense) {
+        // IMPROVEMENT: Kann man irgendwie anders überprüfen ob eine ausgabe ein Template ist?
 
-        //todo kann man irgendwie anders überprüfen ob eine ausgabe ein Template ist?
-
-        String selectQuery;
-        selectQuery = "SELECT"
+        String selectQuery = "SELECT"
                 + " *"
                 + " FROM " + ExpensesDbHelper.TABLE_TEMPLATE_BOOKINGS
                 + " WHERE " + ExpensesDbHelper.TABLE_TEMPLATE_BOOKINGS + "." + ExpensesDbHelper.TEMPLATE_COL_BOOKING_ID + " = " + expense.getIndex()
@@ -135,7 +133,7 @@ public class TemplateRepository {
 
     public Template insert(Template template) {
 
-        //todo ich sollte überprüfen ob es die Buchung template.getTemplate() auch wirklich in der Buchungs Tabelle gibt
+        // TODO: Ich sollte überprüfen ob es die Buchung template.getTemplate() auch wirklich in der Buchungs Tabelle gibt
 
         mBookingRepo.assertSavableExpense(template.getTemplate());
 
@@ -185,7 +183,7 @@ public class TemplateRepository {
 
         return new Template(
                 index,
-                new ExpenseRepository(app.getContext()).get(expenseIndex) //todo
+                new ExpenseRepository(app.getContext()).get(expenseIndex) // TODO: Das ExpenseRepository als in die Klasse injecten.
         );
     }
 }

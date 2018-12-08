@@ -145,7 +145,6 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 roundedTextView.setCenterText(category.substring(0, 1).toUpperCase());
                 roundedTextView.setCircleColor(groupExpense.getCategory().getColorString());
                 txtTitle2.setText(groupExpense.getTitle());
-                //TODO wenn es eine Multiuser funktionalität muss hier der benutzer eingetragen werden, der das Geld ausgegeben hat
                 txtPerson.setText("");
                 txtPaidPrice.setText(String.format(mContext.getResources().getConfiguration().locale, "%.2f", groupExpense.getUnsignedPrice()));
                 txtPaidPrice.setTextColor(groupExpense.isExpenditure() ? mRed : mGreen);
@@ -155,7 +154,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
             case TRANSFER_EXPENSE:
 
-                //todo eigenes layout für tramsfer mExpenses definieren
+                // TODO: Eigenes Layout für transfer mExpenses definieren
                 convertView = inflater.inflate(R.layout.activity_exp_listview_group, parent, false);
                 if (isSelected)
                     convertView.setBackgroundColor(mContext.getResources().getColor(R.color.list_item_highlighted));
@@ -171,7 +170,6 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 roundedTextView3.setCenterText(category2.substring(0, 1).toUpperCase());
                 roundedTextView3.setCircleColor(groupExpense.getCategory().getColorString());
                 txtTitle3.setText(groupExpense.getTitle());
-                //TODO wenn es eine Multiuser funktionalität muss hier der benutzer eingetragen werden, der das Geld ausgegeben hat
                 txtPerson3.setText("");
                 txtPaidPrice3.setText(String.format(mContext.getResources().getConfiguration().locale, "%.2f", groupExpense.getUnsignedPrice()));
                 txtPaidPrice3.setTextColor(groupExpense.isExpenditure() ? mRed : mGreen);
@@ -269,7 +267,6 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         childViewHolder.roundedTextView.setCircleColor(childExpense.getCategory().getColorString());
         childViewHolder.roundedTextView.setCircleDiameter(33);
         childViewHolder.txtTitle.setText(childExpense.getTitle());
-        //TODO wenn es eine Multiuser funktionalität muss hier der benutzer eingetragen werden, der das Geld ausgegeben hat
         childViewHolder.txtPerson.setText("");
         childViewHolder.txtPaidPrice.setText(String.format(mContext.getResources().getConfiguration().locale, "%.2f", childExpense.getUnsignedPrice()));
         childViewHolder.txtPaidPrice.setTextColor(childExpense.isExpenditure() ? mRed : mGreen);

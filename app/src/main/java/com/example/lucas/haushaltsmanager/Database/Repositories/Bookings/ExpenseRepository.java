@@ -206,7 +206,7 @@ public class ExpenseRepository {
         );
 
         for (Tag tag : expense.getTags()) {
-            new BookingTagRepository(app.getContext()).insert(insertedExpense.getIndex(), tag);//todo kann ich die Tags hier zur buchung zuordnen anstatt durch expense.getTags()
+            new BookingTagRepository(app.getContext()).insert(insertedExpense.getIndex(), tag);// TODO: Kann ich die Tags hier zur Buchung zuordnen anstatt durch expense.getTags()
         }
 
         for (ExpenseObject child : expense.getChildren()) {
@@ -266,7 +266,7 @@ public class ExpenseRepository {
                 hide(expense);
             } catch (ExpenseNotFoundException e) {
 
-                //todo was soll passieren wenn eine Buchung nicht gefunden werden kann die als template buchung hinterlegt ist?
+                // TODO: Was soll passieren, wenn eine Buchung nicht gefunden werden kann, die als TemplateBuchung hinterlegt ist?
                 // --> eintrag aus der template tabelle löschen
                 // -->
                 Log.e(TAG, "Could not find Expense " + expense);
@@ -355,7 +355,7 @@ public class ExpenseRepository {
                 );
             } catch (AccountNotFoundException e) {
 
-                //todo die gesamte transaktion muss zurückgenommen werden und eine CannotDeleteExpenseException muss ausgelösct werden
+                // TODO: Die gesamte Transaktion muss zurückgenommen werden und eine CannotDeleteExpenseException muss ausgelösct werden
             }
         }
     }
@@ -388,14 +388,17 @@ public class ExpenseRepository {
      * @param amount    Betrag der angezogen oder hinzugefügt werden soll
      */
     private void updateAccountBalance(long accountId, double amount) throws AccountNotFoundException {
+        AccountRepository accountRepo = new AccountRepository(app.getContext()); // IMPROVEMENT: Das AccountRepository sollte inhected werden.
 
-        Account account1 = new AccountRepository(app.getContext()).get(accountId); //todo
-        account1.setBalance(account1.getBalance() + amount);
-        new AccountRepository(app.getContext()).update(account1); //todo
+        Account account = accountRepo.get(accountId);
+        account.setBalance(account.getBalance() + amount);
+        accountRepo.update(account);
+
+        accountRepo = null;
     }
 
     private boolean hasChildren(ExpenseObject expense) {
-        //todo kann ich auch durch ChildExpenseRepository.exists(expense) ersetzen
+        // TODO: Methode durch ChildExpenseRepository.exists(expense) ersetzen.
 
         String selectQuery;
         selectQuery = "SELECT"
@@ -417,11 +420,11 @@ public class ExpenseRepository {
     }
 
     private boolean isTemplateBooking(ExpenseObject expense) {
-        return new TemplateRepository(app.getContext()).existsWithoutIndex(expense);//todo
+        return new TemplateRepository(app.getContext()).existsWithoutIndex(expense);// IMPROVEMENT: Das TemplateRepository sollte injected werden.
     }
 
     private boolean isRecurringBooking(ExpenseObject expense) {
-        return new RecurringBookingRepository(app.getContext()).exists(expense);//todo
+        return new RecurringBookingRepository(app.getContext()).exists(expense);// IMPROVEMENT: Das RecurringBookingRepository sollte injected werden.
     }
 
     public static ExpenseObject cursorToExpense(Cursor c) {
@@ -457,15 +460,16 @@ public class ExpenseRepository {
         );
     }
 
+    @Deprecated
     public void assertSavableExpense(ExpenseObject expense) {
-        //todo funktion nicht mehr benutzen
+        // TODO Funktion nicht mehr benutzen
         switch (expense.getExpenseType()) {
             case PARENT_EXPENSE:
             case NORMAL_EXPENSE:
             case CHILD_EXPENSE:
                 break;
             case DATE_PLACEHOLDER:
-            case TRANSFER_EXPENSE://todo kann man transfer buchungen wirklich nicht speichern?
+            case TRANSFER_EXPENSE:
             case DUMMY_EXPENSE:
                 throw new UnsupportedOperationException("Booking type cannot be saved.");
         }

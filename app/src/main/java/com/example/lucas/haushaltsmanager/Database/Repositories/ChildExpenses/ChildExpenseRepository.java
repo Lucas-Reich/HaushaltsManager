@@ -84,7 +84,7 @@ public class ChildExpenseRepository {
      */
     public ExpenseObject addChildToBooking(ExpenseObject childExpense, ExpenseObject parentBooking) throws AddChildToChildException {
         if (exists(parentBooking))
-            throw new AddChildToChildException();
+            throw new AddChildToChildException(childExpense, parentBooking);
 
         if (parentBooking.isParent()) {
             parentBooking.addChild(insert(parentBooking, childExpense));
@@ -102,7 +102,8 @@ public class ChildExpenseRepository {
                 return mBookingRepo.insert(dummyParentExpense);
             } catch (CannotDeleteExpenseException e) {
                 //Kann nicht passieren, da nur Buchung mit Kindern nicht gelöscht werden können und ich hier vorher übeprüft habe ob die Buchung Kinder hat oder nicht
-                return null;//todo kann ich die isChild funktionalität so implementieren dass ich nicht null returnen muss?
+                // TODO: Die isChild funktionalität so implementieren, dass nich NULL zurückgegeben werden muss.
+                return null;
             }
         }
     }
@@ -125,7 +126,7 @@ public class ChildExpenseRepository {
                         delete(child);
                 } catch (CannotDeleteChildExpenseException e) {
 
-                    //todo was soll passieren wenn ein Kind nicht gelöscht werden kann
+                    // TODO: Was soll passieren wenn ein Kind nicht gelöscht werden kann?
                 }
             } else {
 
@@ -134,7 +135,7 @@ public class ChildExpenseRepository {
                     mBookingRepo.delete(expense);
                 } catch (CannotDeleteExpenseException e) {
 
-                    //todo kann eine ParentExpense nicht gefunden werden muss der gesamte vorgang abgebrochen werden
+                    // TODO: Kann eine ParentExpense nicht gefunden werden muss der gesamte vorgang abgebrochen werden
                     //Beispiel: https://stackoverflow.com/questions/6909221/android-sqlite-rollback
                 }
             }
@@ -164,7 +165,7 @@ public class ChildExpenseRepository {
             return mBookingRepo.insert(childExpense);
         } catch (Exception e) {
 
-            //todo was soll passieren wenn das Kind nicht gelöscht werden kann
+            // TODO: Was soll passieren, wenn das Kind nicht gelöscht werden kann?
             return null;
         }
     }
@@ -317,7 +318,7 @@ public class ChildExpenseRepository {
             throw new ChildExpenseNotFoundException(childExpense.getIndex());
         } catch (AccountNotFoundException e) {
 
-            //todo do nothing?
+            // TODO: Was sollte passieren?
         }
     }
 
@@ -356,7 +357,7 @@ public class ChildExpenseRepository {
     }
 
     public void hide(ExpenseObject childExpense) throws ChildExpenseNotFoundException {
-        //todo kann auch durch die Methode des parents ersetzt werden
+        // REFACTOR: Kann durch die Methode des parents ersetzt werden.
 
         try {
             if (isLastVisibleChildOfParent(childExpense)) {
@@ -380,11 +381,11 @@ public class ChildExpenseRepository {
                 );
             } catch (AccountNotFoundException e) {
 
-                //todo wenn der Kontostand nicht geupdated werden kann muss die gesamte transaktion zurückgenommen werden
+                // TODO: Wenn der Kontostand nicht geupdated werden kann muss die gesamte Transaktion zurückgenommen werden
             }
         } catch (ExpenseNotFoundException e) {
 
-            //todo dem aufrufenden code mitteilen dass die buchung nicht versteckt werden konnte
+            // TODO: Dem aufrufenden Code mitteilen dass die Buchung nicht versteckt werden konnte
         }
     }
 

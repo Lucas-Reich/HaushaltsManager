@@ -129,12 +129,12 @@ public class CourseActivity extends AppCompatActivity {
         switch (item.getItemId()) {
 
             case R.id.course_menu_sort:
-                //todo zeige einen AlertDialog an in dem sortier optionen (Datum, Betrag, Kategorie, Alphabetisch) angezeigt werden
-                Toast.makeText(this, "Huch das wurde wohl noch nicht implementiert", Toast.LENGTH_SHORT).show();
+                // TODO: Zeige einen AlertDialog an in dem sortier optionen (Datum, Betrag, Kategorie, Alphabetisch) angezeigt werden
+                Toast.makeText(this, R.string.not_implemented, Toast.LENGTH_SHORT).show();
                 break;
             case R.id.course_menu_filter:
-                //todo zeige einen alertdialog in dem filteroptionen (Ausgabe, Einnahme, Datum, ...) angezeigt werden
-                Toast.makeText(this, "Huch das wurde wohl noch nicht implementiert", Toast.LENGTH_SHORT).show();
+                // TODO: Zeige einen Alertdialog in dem filteroptionen (Ausgabe, Einnahme, Datum, ...) angezeigt werden
+                Toast.makeText(this, R.string.not_implemented, Toast.LENGTH_SHORT).show();
                 break;
             case android.R.id.home:
 
