@@ -5,6 +5,15 @@
     <string name="tab_two_title">Monthly Overview</string>
     <string name="tab_three_title">Report</string>
 
+    <string name="btn_reset">Restore default settings</string>
+    <string name="btn_new_acc">New Account</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_choose">Choose</string>
+    <string name="btn_save">Save</string>
+    <string name="btn_yes">Yes</string>
+    <string name="btn_ok">OK</string>
+    <string name="btn_no">No</string>
+
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="choose_account">Edit your accounts</string>
@@ -17,10 +26,7 @@
     <string name="left_slider_rate_the_app">Rate our App</string>
     <string name="left_slider_about">About</string>
     <string name="placeholder_amount">0.00</string>
-    <string name="btn_ok">OK</string>
-    <string name="btn_cancel">Cancel</string>
     <string name="input_account">Choose Account</string>
-    <string name="btn_new_acc">New Account</string>
     <string name="no_name">(Unnamed)</string>
     <string name="category_name">Enter a category name</string>
     <string name="error">Error</string>
@@ -30,7 +36,6 @@
     <string name="created_backup">Successfully created Backup</string>
     <!-- TODO: Bessere Übersetzung für "error_missing_content" einfallen lassen -->
     <string name="error_missing_content">You have to set all values</string>
-    <string name="btn_save">Save</string>
     <string name="input_title">Input Title</string>
     <string name="input_notice">Input Notice</string>
     <string name="transfer">Transfer</string>
@@ -57,8 +62,6 @@
     <!-- IMPROVEMENT: Das ausgewählte Verzeichniss mit in die Frage integrieren (export_directory_confirmation) -->
     <string name="export_directory_confirmation">Are you sure that you want to Export the bookings to the current directory?</string>
     <string name="create_export">Create Export</string>
-    <string name="btn_yes">Yes</string>
-    <string name="btn_no">No</string>
     <string name="error_no_directory_selected">You have to select a directory before continuing!</string>
     <string name="hint_choose_directory">Click here to Select a Directory</string>
     <string name="revert_action">Undo</string>
@@ -70,7 +73,6 @@
     <string name="could_not_create_backup">Backup could not be created</string>
     <string name="cannot_update_account">Cannot update Account, Account not found!</string>
     <string name="category_not_found">Cannot update category. Category not found</string>
-    <string name="btn_choose">Choose</string>
     <string name="select_currency">Choose a currency</string>
     <string name="choose_weekday">Select a Weekday</string>
     <string name="choose_backup_amount">Choose the amount of concurrent Backups</string>
@@ -84,7 +86,6 @@
     <string name="main_currency">Select your main currency</string>
     <string name="reminder_status">Remind me to create Bookings</string>
     <string name="reminder_time">Set reminder time</string>
-    <string name="btn_reset">Restore default settings</string>
     <string name="changelog_title">Changelog</string>
     <string name="error_no_mail_clients">There are no email clients installed.</string>
     <string name="contact">Contact</string>
@@ -121,7 +122,6 @@
     <string name="from">From</string>
     <string name="till">Till</string>
     <string name="could_not_save_recurring_booking">Cannot save RecurringBooking</string>
-    <string name="frequency_in_days">Frequency in days</string>
     <!-- IMPROVEMENT: "input_frequency_label" kann eventuell durch frequency_in_days ersetzen werden-->
     <string name="input_frequency_label">Frequency in days: </string>
     <string name="abort_action_confirmation_text">Unsaved data will be lost! Still close?</string>
@@ -151,4 +151,7 @@
     <string name="import_bookings_confirmation">Are you sure that you want to import this bookings?</string>
     <string name="release_notes_100">The first app version is now available for download.</string>
     <string name="could_not_update_title">Title could not be updated</string>
+    <string name="starts_at">starts at</string>
+    <string name="ends_at">ends at</string>
+    <string name="frequency_in_days">Frequency in days</string>
 </resources>

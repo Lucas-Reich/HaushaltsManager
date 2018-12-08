@@ -147,4 +147,6 @@
     <string name="export_category_name">Kategorie</string>
     <string name="release_notes_100">Die erste Version der App steht nun zum Download bereit.</string>
     <string name="could_not_update_title">Titel konnte nicht aktualisiert werden</string>
+    <string name="starts_at">Beginnt am</string>
+    <string name="ends_at">Endet am</string>
 </resources>

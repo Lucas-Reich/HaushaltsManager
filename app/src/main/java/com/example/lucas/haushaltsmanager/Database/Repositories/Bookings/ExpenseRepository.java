@@ -418,11 +418,11 @@ public class ExpenseRepository {
         return false;
     }
 
-    private boolean isTemplateBooking(ExpenseObject expense) {
+    public boolean isTemplateBooking(ExpenseObject expense) {
         return new TemplateRepository(app.getContext()).existsWithoutIndex(expense);// IMPROVEMENT: Das TemplateRepository sollte injected werden.
     }
 
-    private boolean isRecurringBooking(ExpenseObject expense) {
+    public boolean isRecurringBooking(ExpenseObject expense) {
         return new RecurringBookingRepository(app.getContext()).exists(expense);// IMPROVEMENT: Das RecurringBookingRepository sollte injected werden.
     }
 

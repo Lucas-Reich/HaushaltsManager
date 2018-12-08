@@ -146,4 +146,7 @@
     <string name="export_category_name">Category name</string>
     <string name="release_notes_100">The first app version is now available for download.</string>
     <string name="could_not_update_title">Title could not be updated</string>
+    <string name="starts_at">starts at</string>
+    <string name="ends_at">ends at</string>
+    <string name="frequency_in_days">Frequency in days</string>
 </resources>

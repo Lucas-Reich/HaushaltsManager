@@ -130,7 +130,7 @@ public class EditRecurringBooking extends AbstractAppCompatActivity {
     }
 
     private void setStartDate(Calendar startDate) {
-        // TODO: Sollte ich einen Fehler aausgeben, wenn der User versucht das StartDate nach dem EndDate ist?
+        // TODO: Sollte ich einen Fehler ausgeben, wenn der User versucht das StartDate nach dem EndDate zu setzen?
 
         mStartDate = startDate;
         mStartDateBtn.setText(DateUtils.formatDateTime(

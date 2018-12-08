@@ -1,101 +1,115 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical">
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <include
+        android:id="@+id/toolbar"
         layout="@layout/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:baselineAligned="false"
-        android:orientation="horizontal">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/textView5"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/from"
-                android:textAlignment="center"
-                android:textColor="@color/primary_text_color"
-                android:textSize="18sp"/>
-
-            <Button
-                android:id="@+id/edit_recurring_booking_from_date"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Datum"
-                android:textColor="@color/primary_text_color"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/Bis"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/till"
-                android:textAlignment="center"
-                android:textColor="@color/primary_text_color"
-                android:textSize="18sp"/>
-
-            <Button
-                android:id="@+id/edit_recurring_booking_end_date"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Datum"
-                android:textColor="@color/primary_text_color"/>
-        </LinearLayout>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/edit_recurring_booking_from_date"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:drawableStart="@drawable/ic_date"
+        android:hint="@string/starts_at"
+        android:textAlignment="textEnd"
+        android:textAllCaps="false"
+        android:textColor="@color/primary_text_color"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"/>
 
-        <TextView
-            android:id="@+id/textView7"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingStart="8dp"
-            android:text="@string/input_frequency_label"
-            android:textColor="@color/primary_text_color"
-            android:textSize="18sp"
-            tools:ignore="RtlSymmetry"/>
+    <View
+        android:id="@+id/from_date_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="48dp"
+        android:layout_marginEnd="8dp"
+        android:background="@color/colorPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edit_recurring_booking_from_date"/>
 
-        <Button
-            android:id="@+id/edit_recurring_booking_frequency"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Häufigkeit"
-            android:textColor="@color/primary_text_color"/>
+    <Button
+        android:id="@+id/edit_recurring_booking_end_date"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:drawableStart="@drawable/ic_end_date_range"
+        android:hint="@string/ends_at"
+        android:textAlignment="textEnd"
+        android:textAllCaps="false"
+        android:textColor="@color/primary_text_color"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/from_date_divider"/>
 
-    </LinearLayout>
+    <View
+        android:id="@+id/end_date_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="48dp"
+        android:layout_marginEnd="8dp"
+        android:background="@color/colorPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edit_recurring_booking_end_date"/>
+
+    <Button
+        android:id="@+id/edit_recurring_booking_frequency"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:drawableStart="@drawable/calendar_frequency"
+        android:hint="@string/frequency_in_days"
+        android:textAlignment="textEnd"
+        android:textAllCaps="false"
+        android:textColor="@color/primary_text_color"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/end_date_divider"/>
+
+    <View
+        android:id="@+id/frequency_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="48dp"
+        android:layout_marginEnd="8dp"
+        android:background="@color/colorPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edit_recurring_booking_frequency"/>
 
     <Button
         android:id="@+id/edit_recurring_booking_save"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="end"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
         android:text="@string/btn_save"
-        android:textColor="@color/primary_text_color"/>
-</LinearLayout>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/frequency_divider"/>
+
+</android.support.constraint.ConstraintLayout>

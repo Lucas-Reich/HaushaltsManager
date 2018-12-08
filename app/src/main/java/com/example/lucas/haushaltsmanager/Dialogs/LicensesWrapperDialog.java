@@ -8,6 +8,7 @@ import de.psdev.licensesdialog.LicensesDialog;
 import de.psdev.licensesdialog.licenses.ApacheSoftwareLicense20;
 import de.psdev.licensesdialog.licenses.MITLicense;
 import de.psdev.licensesdialog.licenses.MozillaPublicLicense20;
+import de.psdev.licensesdialog.licenses.SILOpenFontLicense11;
 import de.psdev.licensesdialog.model.Notice;
 import de.psdev.licensesdialog.model.Notices;
 
@@ -37,8 +38,24 @@ public class LicensesWrapperDialog {
         notices.addNotice(getWorkManagerNotice());
         notices.addNotice(getFABToolbarNotice());
         notices.addNotice(getMPAndroidChartNotice());
+        notices.addNotice(getAdditionalIconsNotice());
 
         return notices;
+    }
+
+    /**
+     * Methode um den Lizenzen Eintrag für das OpenSource Projekt MaterialDesign zu bekommen.
+     * Quelle: https://github.com/Templarian/MaterialDesign
+     *
+     * @return MaterialDesign Lizenz Eintrag
+     */
+    private Notice getAdditionalIconsNotice() {
+        return new Notice(
+                "MaterialDesign",
+                "https://materialdesignicons.com/",
+                "Copyright (c) 2014, Austin Andrews",
+                new SILOpenFontLicense11()
+        );
     }
 
     /**
