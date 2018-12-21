@@ -21,7 +21,7 @@ public class BackupWorker extends AbstractWorker {
     @Override
     public Result doWork() {
         if (!isEnabled())
-            return Result.SUCCESS;
+            return Result.success();
 
         BackupHandler backupHandler = new BackupHandler();
         boolean successful = backupHandler.createBackup(null, null, getApplicationContext());
@@ -29,7 +29,7 @@ public class BackupWorker extends AbstractWorker {
 
         scheduleNewWorker();
 
-        return successful ? Result.SUCCESS : Result.FAILURE;
+        return successful ? Result.success() : Result.failure();
     }
 
     @Override

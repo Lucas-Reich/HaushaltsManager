@@ -45,7 +45,7 @@ public class TabTwoMonthlyReports extends AbstractTab {
     public void updateView() {
 
         MonthlyReportAdapter adapter = new MonthlyReportAdapterCreator(
-                mParent.getExpenses(),
+                mParent.getVisibleExpenses(),
                 getContext(),
                 mParent.getActiveAccounts()
         ).getAdapter();

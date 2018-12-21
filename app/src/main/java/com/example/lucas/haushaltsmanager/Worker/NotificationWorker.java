@@ -37,7 +37,7 @@ public class NotificationWorker extends AbstractWorker {
 
         scheduleNewWorker();
 
-        return Result.SUCCESS;
+        return Result.success();
     }
 
     @Override

@@ -122,7 +122,6 @@
     <string name="from">From</string>
     <string name="till">Till</string>
     <string name="could_not_save_recurring_booking">Cannot save RecurringBooking</string>
-    <string name="frequency_in_days">Frequency in days</string>
     <string name="input_frequency_label">"Frequency in days: "</string>
     <string name="abort_action_confirmation_text">Unsaved data will be lost! Still close?</string>
     <string name="income">Income</string>

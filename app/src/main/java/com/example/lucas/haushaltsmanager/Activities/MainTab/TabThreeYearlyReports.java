@@ -37,7 +37,7 @@ public class TabThreeYearlyReports extends AbstractTab {
         mParent = (ParentActivity) getActivity();
         mUserPreferences = new UserSettingsPreferences(getContext());
 
-        mAccountBalanceYear = new ExpenseSum().byYear(mParent.getExpenses());
+        mAccountBalanceYear = new ExpenseSum().byYear(mParent.getVisibleExpenses());
     }
 
     @Override
@@ -50,7 +50,7 @@ public class TabThreeYearlyReports extends AbstractTab {
         );
         mTimeFrameCardPopulator.setData(createReport(
                 getStringifiedYear(),
-                mParent.getExpenses()
+                mParent.getVisibleExpenses()
         ));
 
         mIncomeCardPopulator = new PieChartCardPopulator(
@@ -59,7 +59,7 @@ public class TabThreeYearlyReports extends AbstractTab {
         mIncomeCardPopulator.showIncome();
         mIncomeCardPopulator.setData(createReport(
                 getString(R.string.income),
-                mParent.getExpenses()
+                mParent.getVisibleExpenses()
         ));
 
         mExpenseCardPopulator = new PieChartCardPopulator(
@@ -68,7 +68,7 @@ public class TabThreeYearlyReports extends AbstractTab {
         mExpenseCardPopulator.showExpense();
         mExpenseCardPopulator.setData(createReport(
                 getString(R.string.expense),
-                mParent.getExpenses()
+                mParent.getVisibleExpenses()
         ));
 
         mLineChartPopulator = new LineChartCardPopulator(
@@ -78,7 +78,7 @@ public class TabThreeYearlyReports extends AbstractTab {
         mLineChartPopulator.setResources(mParent.getResources(), getCurrentYear()); // TODO: Kann ich das mit dem Jahr anders machen. Es wird nur für die GroupFunkion benutzt
         mLineChartPopulator.setData(createReport(
                 getString(R.string.account_balance),
-                mParent.getExpenses()
+                mParent.getVisibleExpenses()
         ));
 
         return rootView;

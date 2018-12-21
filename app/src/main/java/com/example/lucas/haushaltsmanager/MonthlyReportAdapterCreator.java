@@ -96,6 +96,7 @@ public class MonthlyReportAdapterCreator {
         return new UserSettingsPreferences(mContext).getMainCurrency();
     }
 
+    // TODO Muss ich die Kinder noch überprüfen ob sie sichtbar sind, da eigentlicht nur sichtbare ausgaben in der klasse gespeichert werden?
     private Boolean isExpenseVisible(ExpenseObject expense) {
         return mActiveAccounts.contains(expense.getAccountId());
     }
