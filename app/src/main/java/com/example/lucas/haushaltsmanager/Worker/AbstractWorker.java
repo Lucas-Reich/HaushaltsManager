@@ -18,7 +18,7 @@ abstract class AbstractWorker extends Worker {
         super(context, workerParams);
     }
 
-    protected int getNotificationId() {
+    final int getNotificationId() {
         return new Random().nextInt();
     }
 
@@ -27,7 +27,7 @@ abstract class AbstractWorker extends Worker {
      * Da man mit dem aktuellen WorkManager noch keine Wiederkehrenden Worker erstellen kann,
      * bei denen der erste Worker zu einer bestimmten Zeit ausgelöst wird,ist das hier der Workaround.
      */
-    protected void scheduleNewWorker() {
+    final void scheduleNewWorker() {
         // REFACTOR: Wenn man den ersten Worker schedulen kann diese Methodik entfernen
         OneTimeWorkRequest workRequest = new OneTimeWorkRequest
                 .Builder(this.getClass())

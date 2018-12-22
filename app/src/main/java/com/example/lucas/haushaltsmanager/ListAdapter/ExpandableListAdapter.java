@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager;
+package com.example.lucas.haushaltsmanager.ListAdapter;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -10,7 +10,10 @@ import android.widget.TextView;
 
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+import com.example.lucas.haushaltsmanager.ExpListViewSelectedItem;
+import com.example.lucas.haushaltsmanager.ExpandableListItemSelector;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
+import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.ViewUtils;
 import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
 import com.lucas.androidcharts.DataSet;
@@ -28,7 +31,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     private int mRed, mGreen;
     private ExpandableListItemSelector mItemSelector;
 
-    ExpandableListAdapter(
+    public ExpandableListAdapter(
             Context context,
             List<ExpenseObject> groupData,
             HashMap<ExpenseObject, List<ExpenseObject>> childData

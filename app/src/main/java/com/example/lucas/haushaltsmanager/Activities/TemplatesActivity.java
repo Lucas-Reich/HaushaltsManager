@@ -12,7 +12,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.example.lucas.haushaltsmanager.BookingAdapter;
+import com.example.lucas.haushaltsmanager.ListAdapter.BookingAdapter;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Templates.TemplateRepository;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Template;

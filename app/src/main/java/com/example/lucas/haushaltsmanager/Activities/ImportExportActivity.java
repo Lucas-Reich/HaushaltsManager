@@ -21,7 +21,7 @@ import com.example.lucas.haushaltsmanager.Dialogs.ErrorAlertDialog;
 import com.example.lucas.haushaltsmanager.Entities.Directory;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.ExpenseObjectExporter;
-import com.example.lucas.haushaltsmanager.FileAdapter;
+import com.example.lucas.haushaltsmanager.ListAdapter.FileAdapter;
 import com.example.lucas.haushaltsmanager.Utils.FileUtils;
 import com.example.lucas.haushaltsmanager.R;
 

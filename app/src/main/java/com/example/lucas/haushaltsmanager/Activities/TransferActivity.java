@@ -51,8 +51,6 @@ public class TransferActivity extends AppCompatActivity {
     private ChildCategoryRepository mChildCategoryRepo;
     private ExpenseRepository mBookingRepo;
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-//fixme megadumm wenn ich unter dieser version bin dann kann ich die activity nicht aufrufen da die onCreate methode nicht aufgerufen wird
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -93,7 +91,6 @@ public class TransferActivity extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
         if (bundle != null && bundle.containsKey("from_account"))
             setFromAccount((Account) bundle.getParcelable("from_account"));
-
     }
 
     @Override

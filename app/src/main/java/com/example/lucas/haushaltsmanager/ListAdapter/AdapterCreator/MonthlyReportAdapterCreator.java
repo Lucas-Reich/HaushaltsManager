@@ -1,47 +1,37 @@
-package com.example.lucas.haushaltsmanager;
+package com.example.lucas.haushaltsmanager.ListAdapter.AdapterCreator;
 
-import android.content.Context;
-
+import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Report.Report;
 import com.example.lucas.haushaltsmanager.Entities.Report.ReportInterface;
+import com.example.lucas.haushaltsmanager.ExpenseGrouper;
+import com.example.lucas.haushaltsmanager.ListAdapter.MonthlyReportAdapter;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
+import com.example.lucas.haushaltsmanager.R;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
 public class MonthlyReportAdapterCreator {
-    private static final String TAG = MonthlyReportAdapterCreator.class.getSimpleName();
-
     private ExpenseGrouper mExpenseGrouper;
     private List<ExpenseObject> mExpenses;
-    private List<Long> mActiveAccounts;
-    private Context mContext;
 
-    public MonthlyReportAdapterCreator(List<ExpenseObject> expenses, Context context, List<Long> activeAccounts) {
+    public MonthlyReportAdapterCreator(List<ExpenseObject> expenses) {
 
         mExpenseGrouper = new ExpenseGrouper();
-        mActiveAccounts = activeAccounts;
         mExpenses = extractChildren(expenses);
-        mContext = context;
     }
 
     private List<ExpenseObject> extractChildren(List<ExpenseObject> expenses) {
         List<ExpenseObject> expensesWithExtractedChildren = new ArrayList<>();
 
         for (ExpenseObject expense : expenses) {
-            if (expense.isParent()) {
-                for (ExpenseObject child : expense.getChildren())
-                    if (isExpenseVisible(child)) {
-                        expensesWithExtractedChildren.add(child);
-                    }
-            } else {
-                if (isExpenseVisible(expense)) {
-                    expensesWithExtractedChildren.add(expense);
-                }
-            }
+            if (expense.isParent())
+                expensesWithExtractedChildren.addAll(expense.getChildren());
+            else
+                expensesWithExtractedChildren.add(expense);
         }
 
         return expensesWithExtractedChildren;
@@ -51,7 +41,6 @@ public class MonthlyReportAdapterCreator {
         List<ReportInterface> reports = createMonthlyReports();
 
         return new MonthlyReportAdapter(
-                mContext,
                 reports
         );
     }
@@ -83,7 +72,7 @@ public class MonthlyReportAdapterCreator {
     }
 
     private String getStringifiedMonth(int month) {
-        String[] months = mContext.getResources().getStringArray(R.array.months);
+        String[] months = app.getContext().getResources().getStringArray(R.array.months);
 
         return months[month];
     }
@@ -93,11 +82,6 @@ public class MonthlyReportAdapterCreator {
     }
 
     private Currency getMainCurrency() {
-        return new UserSettingsPreferences(mContext).getMainCurrency();
-    }
-
-    // TODO Muss ich die Kinder noch überprüfen ob sie sichtbar sind, da eigentlicht nur sichtbare ausgaben in der klasse gespeichert werden?
-    private Boolean isExpenseVisible(ExpenseObject expense) {
-        return mActiveAccounts.contains(expense.getAccountId());
+        return new UserSettingsPreferences(app.getContext()).getMainCurrency();
     }
 }

@@ -17,13 +17,11 @@ public class UserSettingsPreferences {
     private static final String USER_SETTINGS = "UserSettings";
 
     private static final String MAIN_CURRENCY_ID = "mainCurrencyIndex";
-    private static final String BACKUP_FREQUENCY = "backupFrequency";
     private static final String MAX_BACKUP_COUNT = "maxBackupCount";
     private static final String SEND_REMINDER_NOTIFICATIONS = "sendReminderNotification";
     private static final String FIRST_DAY_OF_WEEK = "firstDayOfWeek";
     private static final String AUTOMATIC_BACKUPS = "automaticBackups";
     private static final String REMINDER_TIME = "reminderTime";
-    private static final String ALLOW_NOTIFICATIONS = "allowNotifications";
     private static final String ACTIVE_ACCOUNT = "activeAccount";
 
     private SharedPreferences mPreferences;
@@ -48,16 +46,6 @@ public class UserSettingsPreferences {
     public void setMainCurrency(Currency mainCurrency) {
 
         mPreferences.edit().putLong(MAIN_CURRENCY_ID, mainCurrency.getIndex()).apply();
-    }
-
-    public int getBackupFrequency() {
-
-        return mPreferences.getInt(BACKUP_FREQUENCY, 1);
-    }
-
-    public void setBackupFrequency(int backupFrequency) {
-
-        mPreferences.edit().putInt(BACKUP_FREQUENCY, backupFrequency).apply();
     }
 
     public int getMaxBackupCount() {
@@ -110,16 +98,6 @@ public class UserSettingsPreferences {
     public void setReminderTime(Time reminderTime) {
 
         mPreferences.edit().putString(REMINDER_TIME, reminderTime.getTime()).apply();
-    }
-
-    public boolean getNotificationStatus() {
-
-        return mPreferences.getBoolean(ALLOW_NOTIFICATIONS, Settings.DEFAULT_REMINDER_STATUS);
-    }
-
-    public void setNotificationStatus(boolean notificationStatus) {
-
-        mPreferences.edit().putBoolean(ALLOW_NOTIFICATIONS, notificationStatus).apply();
     }
 
     public Account getActiveAccount() {

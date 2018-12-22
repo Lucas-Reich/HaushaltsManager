@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager;
+package com.example.lucas.haushaltsmanager.ListAdapter;
 
 import android.content.Context;
 import android.support.annotation.NonNull;

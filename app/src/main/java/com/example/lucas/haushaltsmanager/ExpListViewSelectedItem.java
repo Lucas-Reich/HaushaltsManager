@@ -17,10 +17,6 @@ public class ExpListViewSelectedItem {
         return mItemParent == null;
     }
 
-    public boolean hasChildren() {
-        return mSelectedItem.isParent();
-    }
-
     public ExpenseObject getParent() {
         return mItemParent;
     }

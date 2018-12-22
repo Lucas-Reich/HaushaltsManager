@@ -12,8 +12,6 @@ import com.example.lucas.haushaltsmanager.R;
 import java.util.List;
 
 public class SingleChoiceDialog<T> extends DialogFragment {
-    private static final String TAG = SingleChoiceDialog.class.getSimpleName();
-
     private SingleChoiceDialog.OnEntrySelected mCallback;
     private List<T> mEntrySet;
     private T mSelectedEntry;

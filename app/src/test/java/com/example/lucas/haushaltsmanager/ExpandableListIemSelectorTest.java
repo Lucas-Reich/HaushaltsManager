@@ -4,6 +4,7 @@ import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Tag;
+import com.example.lucas.haushaltsmanager.ListAdapter.ExpandableListAdapter;
 
 import org.junit.After;
 import org.junit.Before;

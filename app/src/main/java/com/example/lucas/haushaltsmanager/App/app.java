@@ -7,18 +7,21 @@ import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 
 public class app extends Application {
-    private static Context context;
-    private static ExpensesDbHelper dbHelper;
+    private static Context mContext;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        context = this.getApplicationContext();
-        dbHelper = new ExpensesDbHelper();
-        DatabaseManager.initializeInstance(dbHelper);
+        mContext = this.getApplicationContext();
+
+        initializeDatabase();
+    }
+
+    private void initializeDatabase() {
+        DatabaseManager.initializeInstance(new ExpensesDbHelper());
     }
 
     public static Context getContext() {
-        return context;
+        return mContext;
     }
 }

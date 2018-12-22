@@ -1,10 +1,12 @@
 package com.example.lucas.haushaltsmanager.CardPopulator;
 
-import android.content.Context;
+import android.content.res.Resources;
+import android.support.v4.os.ConfigurationCompat;
 import android.support.v7.widget.CardView;
 import android.view.View;
 import android.widget.TextView;
 
+import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
@@ -18,17 +20,16 @@ import com.lucas.androidcharts.PieChart;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class TimeFrameCardPopulator {
 
     private CardView mRootView;
     private ViewHolder mViewHolder;
-    private Context mContext;
 
-    public TimeFrameCardPopulator(CardView rootView, Context context) {
+    public TimeFrameCardPopulator(CardView rootView) {
         mRootView = rootView;
-        mContext = context;
 
         initializeViewHolder();
     }
@@ -48,7 +49,7 @@ public class TimeFrameCardPopulator {
 
         setTotalBookingsCount(report.getBookingCount());
 
-        setCategory(report.getMostStressedCategory(mContext));
+        setCategory(report.getMostStressedCategory());
 
         setPieChart(report);
     }
@@ -73,7 +74,7 @@ public class TimeFrameCardPopulator {
     }
 
     private void setTotalBookingsCount(int bookingsCount) {
-        mViewHolder.mBookingsCount.setText(String.format("%s %s", bookingsCount, mContext.getString(R.string.bookings)));
+        mViewHolder.mBookingsCount.setText(String.format("%s %s", bookingsCount, app.getContext().getString(R.string.bookings)));
     }
 
     private void setCategory(Category category) {
@@ -84,7 +85,6 @@ public class TimeFrameCardPopulator {
     private void setPieChart(ReportInterface data) {
         mViewHolder.mPieChart.setPieData(preparePieData(data));
         mViewHolder.mPieChart.setNoDataText(R.string.no_bookings_in_year);
-//        mViewHolder.mPieChart.useCompressedChart(true);
     }
 
     private List<DataSet> preparePieData(ReportInterface data) {
@@ -126,7 +126,11 @@ public class TimeFrameCardPopulator {
     }
 
     private String formatMoney(double money) {
-        return String.format(mContext.getResources().getConfiguration().locale, "%.2f", money);
+        return String.format(getDefaultLocale(), "%.2f", money);
+    }
+
+    private Locale getDefaultLocale() {
+        return ConfigurationCompat.getLocales(Resources.getSystem().getConfiguration()).get(0);
     }
 
     private void initializeViewHolder() {

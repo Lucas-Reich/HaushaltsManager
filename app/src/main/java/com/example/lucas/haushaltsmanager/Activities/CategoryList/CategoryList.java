@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Activities.AbstractAppCompatActivity;
 import com.example.lucas.haushaltsmanager.Activities.CreateCategory;
-import com.example.lucas.haushaltsmanager.CategoryAdapter;
+import com.example.lucas.haushaltsmanager.ListAdapter.CategoryAdapter;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.Exceptions.CannotDeleteChildCategoryException;
