@@ -62,7 +62,7 @@ public class SingleChoiceDialog<T> extends DialogFragment {
     public void setContent(List<T> content, int selectedEntry) {
         mEntrySet = content;
 
-        builder.setSingleChoiceItems(entriesToString(content), selectedEntry, new DialogInterface.OnClickListener() {
+        builder.setSingleChoiceItems(stringfy(content), selectedEntry, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
 
@@ -77,7 +77,7 @@ public class SingleChoiceDialog<T> extends DialogFragment {
      * @param entries Anzuzeigende Objekte
      * @return String repräsentation der anzuzigenden Objekte
      */
-    private String[] entriesToString(List<T> entries) {
+    private String[] stringfy(List<T> entries) {
         String[] stringEntries = new String[entries.size()];
 
         for (int i = 0; i < entries.size(); i++) {

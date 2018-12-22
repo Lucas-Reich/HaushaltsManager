@@ -12,9 +12,5 @@ public enum Month {
     SEPTEMBER,
     OCTOBER,
     NOVEMBER,
-    DECEMBER
-
-    public static toInt(Month month) {
-
-    }
+    DECEMBER,
 }

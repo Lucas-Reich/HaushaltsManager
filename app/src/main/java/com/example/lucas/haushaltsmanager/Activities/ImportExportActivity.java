@@ -89,7 +89,7 @@ public class ImportExportActivity extends AbstractAppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 //                TODO: Die Importierfunktion wieder aktivieren
-//                final File selectedFile = mSelectableFileList.get(position);
+//                final File selectedFile = mSelectableFileList.find(position);
 //
 //                Bundle bundle = new Bundle();
 //                bundle.putString(ConfirmationDialog.TITLE, getString(R.string.confirmation_dialog_title));

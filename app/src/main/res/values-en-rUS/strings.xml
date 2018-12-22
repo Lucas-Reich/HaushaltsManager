@@ -7,8 +7,8 @@
     <string name="tab_two_title">Monthly Overview</string>
 
     <string name="left_slider_categories">Categories</string>
-    <string name="left_slider_course">Course</string>
-    <string name="left_slider_standing_order">Standing Orders</string>
+    <string name="left_slider_course">Booking History</string>
+    <string name="left_slider_standing_order">Planned Bookings</string>
     <string name="left_slider_backup">Backup</string>
     <string name="left_slider_import_export">Import, Export</string>
     <string name="left_slider_preferences">Preferences</string>
@@ -102,7 +102,7 @@
     <string name="activity_new_category_name">Create a new category</string>
     <string name="activity_backups_name">Backups</string>
     <string name="activity_transfers_name">Transfer</string>
-    <string name="activity_course_name">Course</string>
+    <string name="activity_course_name">Booking History</string>
     <string name="activity_import_export_name">Import/ Export</string>
     <string name="activity_settings_name">Settings</string>
     <string name="activity_about_name">About</string>
@@ -120,7 +120,7 @@
     <string name="saved_as_template">Saved expense as template</string>
     <string name="activity_create_recurring_booking">Create recurring booking</string>
     <string name="from">From</string>
-    <string name="till">Till</string>
+    <string name="till">Until</string>
     <string name="could_not_save_recurring_booking">Cannot save RecurringBooking</string>
     <string name="input_frequency_label">"Frequency in days: "</string>
     <string name="abort_action_confirmation_text">Unsaved data will be lost! Still close?</string>
@@ -128,7 +128,7 @@
     <string name="expense">Expense</string>
     <string name="choose_parent_category_hint">Choose superordinate category</string>
     <string name="failed_to_delete_category">Could not delete Category</string>
-    <string name="no_bookings_in_year">No bookings this year</string>
+    <string name="no_bookings_in_year">No Data</string>
     <string name="bookings">Bookings</string>
     <string name="account_balance">Account balance</string>
     <string name="remind_notification_body">Do not forget to enter today\'s expenses.</string>
