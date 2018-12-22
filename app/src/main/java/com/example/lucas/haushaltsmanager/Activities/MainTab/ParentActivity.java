@@ -316,17 +316,6 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
         mExpenses = mBookingRepo.getAll();
     }
 
-    /**
-     * Methode für die KindFragments um alle anzuzeigenden Buchungen zu erhalten
-     *
-     * @return Anzuzeigende Buchungen
-     * TODO: Kann ich die Methode durch getVisibleExpenses ersetzen?
-     */
-    @Deprecated
-    List<ExpenseObject> getExpenses() {
-        return mExpenses;
-    }
-
     List<ExpenseObject> getVisibleExpenses() {
         return new ExpenseFilter().byAccount(mExpenses, mActiveAccounts);
     }

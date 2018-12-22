@@ -8,7 +8,7 @@
 
     <string name="left_slider_categories">Kategorien</string>
     <string name="left_slider_course">Verlauf</string>
-    <string name="left_slider_standing_order">Daueraufträge</string>
+    <string name="left_slider_standing_order">Geplante Buchungen</string>
     <string name="left_slider_backup">Sicherheitskopie</string>
     <string name="left_slider_import_export">Import, Export</string>
     <string name="left_slider_preferences">Einstellungen</string>
@@ -130,7 +130,7 @@
     <string name="expense">Ausgabe</string>
     <string name="choose_parent_category_hint">Wähle eine übergeordnete Kategorie</string>
     <string name="failed_to_delete_category">Kategorie konnte nicht gelöscht werden</string>
-    <string name="no_bookings_in_year">Keine Buchungen dieses Jahr</string>
+    <string name="no_bookings_in_year">Keine Daten</string>
     <string name="bookings">Buchungen</string>
     <string name="account_balance">Kontostand</string>
     <string name="remind_notification_body">Nicht vergessen die heutigen Ausgaben einzutragen.</string>

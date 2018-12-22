@@ -2,6 +2,7 @@ package com.example.lucas.haushaltsmanager;
 
 
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+import com.example.lucas.haushaltsmanager.ListAdapter.ExpandableListAdapter;
 
 import java.util.ArrayList;
 import java.util.Iterator;

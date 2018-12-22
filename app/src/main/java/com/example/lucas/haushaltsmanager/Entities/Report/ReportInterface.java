@@ -9,7 +9,6 @@ import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import java.util.List;
 
 public interface ReportInterface {
-    //hier sollen methode rein die für MonthlyReport, YearlyReport, ... benutzt werden
     double getTotal();
 
     double getIncoming();
@@ -18,7 +17,7 @@ public interface ReportInterface {
 
     int getBookingCount();
 
-    Category getMostStressedCategory(Context context);
+    Category getMostStressedCategory();
 
     String getCardTitle();
 

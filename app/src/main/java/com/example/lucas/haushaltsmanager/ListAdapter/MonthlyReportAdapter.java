@@ -1,6 +1,5 @@
-package com.example.lucas.haushaltsmanager;
+package com.example.lucas.haushaltsmanager.ListAdapter;
 
-import android.content.Context;
 import android.support.annotation.LayoutRes;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -11,6 +10,7 @@ import android.view.ViewGroup;
 import com.example.lucas.haushaltsmanager.CardPopulator.TimeFrameCardPopulator;
 import com.example.lucas.haushaltsmanager.Entities.Report.Report;
 import com.example.lucas.haushaltsmanager.Entities.Report.ReportInterface;
+import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.ViewUtils;
 
 import java.util.List;
@@ -20,7 +20,6 @@ import java.util.List;
  */
 public class MonthlyReportAdapter extends RecyclerView.Adapter<MonthlyReportAdapter.ViewHolder> {
 
-    private Context mContext;
     private List<ReportInterface> mReports;
 
     class ViewHolder extends RecyclerView.ViewHolder {
@@ -29,8 +28,7 @@ public class MonthlyReportAdapter extends RecyclerView.Adapter<MonthlyReportAdap
         }
     }
 
-    MonthlyReportAdapter(Context context, List<ReportInterface> reports) {
-        mContext = context;
+    public MonthlyReportAdapter(List<ReportInterface> reports) {
         mReports = reports;
     }
 
@@ -47,8 +45,7 @@ public class MonthlyReportAdapter extends RecyclerView.Adapter<MonthlyReportAdap
         Report month = (Report) mReports.get(position);
 
         TimeFrameCardPopulator timeFrameCardPopulator = new TimeFrameCardPopulator(
-                (CardView) viewHolder.itemView,
-                mContext
+                (CardView) viewHolder.itemView
         );
         timeFrameCardPopulator.setData(month);
     }

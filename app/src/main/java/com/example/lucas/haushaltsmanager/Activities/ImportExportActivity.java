@@ -21,7 +21,7 @@ import com.example.lucas.haushaltsmanager.Dialogs.ErrorAlertDialog;
 import com.example.lucas.haushaltsmanager.Entities.Directory;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.ExpenseObjectExporter;
-import com.example.lucas.haushaltsmanager.FileAdapter;
+import com.example.lucas.haushaltsmanager.ListAdapter.FileAdapter;
 import com.example.lucas.haushaltsmanager.Utils.FileUtils;
 import com.example.lucas.haushaltsmanager.R;
 
@@ -89,7 +89,7 @@ public class ImportExportActivity extends AbstractAppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 //                TODO: Die Importierfunktion wieder aktivieren
-//                final File selectedFile = mSelectableFileList.get(position);
+//                final File selectedFile = mSelectableFileList.find(position);
 //
 //                Bundle bundle = new Bundle();
 //                bundle.putString(ConfirmationDialog.TITLE, getString(R.string.confirmation_dialog_title));

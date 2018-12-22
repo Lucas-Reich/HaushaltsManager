@@ -6,21 +6,19 @@ import com.example.lucas.haushaltsmanager.ExpenseGrouper;
 
 import java.util.List;
 
-public class Month extends AbstractReport {
-    private int month;
+public class Year extends AbstractReport {
     private int year;
 
-    private Month(int month, List<ExpenseObject> expenses, Currency currency) {
+    private Year(String title, List<ExpenseObject> expenses, Currency currency) {
         super(
-                String.valueOf(month),
+                title,
                 expenses,
                 currency
         );
     }
 
-    public static Month create(int month, int year, List<ExpenseObject> expenses, Currency currency) {
-        Month self = new Month(month, expenses, currency);
-        self.month = month;
+    public static Year create(int year, String title, List<ExpenseObject> expenses, Currency currency) {
+        Year self = new Year(title, expenses, currency);
         self.year = year;
 
         return self;
@@ -28,11 +26,9 @@ public class Month extends AbstractReport {
 
     @Override
     protected List<ExpenseObject> filterExpenses(List<ExpenseObject> expenses) {
-
-        return new ExpenseGrouper().byMonth(
+        return new ExpenseGrouper().byYear(
                 expenses,
-                this.month,
-                this.year
+                year
         );
     }
 }

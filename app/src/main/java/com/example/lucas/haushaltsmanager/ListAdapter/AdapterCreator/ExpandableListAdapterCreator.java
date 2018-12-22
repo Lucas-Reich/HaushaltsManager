@@ -1,10 +1,11 @@
-package com.example.lucas.haushaltsmanager;
+package com.example.lucas.haushaltsmanager.ListAdapter.AdapterCreator;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+import com.example.lucas.haushaltsmanager.ListAdapter.ExpandableListAdapter;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -13,7 +14,6 @@ import java.util.List;
 
 public class ExpandableListAdapterCreator {
     // REFACTOR: Wie den MonthlyReportAdapterCreator überarbeiten
-    private static final String TAG = ExpandableListAdapterCreator.class.getSimpleName();
 
     private List<ExpenseObject> mExpenses;
     private List<Long> mActiveAccounts;

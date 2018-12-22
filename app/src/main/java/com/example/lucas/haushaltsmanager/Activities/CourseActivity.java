@@ -16,8 +16,8 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Account
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
-import com.example.lucas.haushaltsmanager.ExpandableListAdapter;
-import com.example.lucas.haushaltsmanager.ExpandableListAdapterCreator;
+import com.example.lucas.haushaltsmanager.ListAdapter.ExpandableListAdapter;
+import com.example.lucas.haushaltsmanager.ListAdapter.AdapterCreator.ExpandableListAdapterCreator;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.util.ArrayList;

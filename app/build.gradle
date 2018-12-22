@@ -39,12 +39,13 @@ dependencies {
     // Ein FAB der sich zu einer Toolbar werden kann
     implementation 'com.github.fafaldo:fab-toolbar:1.2.0'
     //API welche ich benutze um Hintergrundaufgaben laufen zu lassen
-    implementation "android.arch.work:work-runtime:1.0.0-alpha11"
+    implementation "android.arch.work:work-runtime:1.0.0-beta01"
     //Chart Views
     implementation 'com.github.LabberToasT:Android-Charts:1.0.3'
     //AlertDialog zum anzeigen von eines Changelogs
     implementation 'com.github.LabberToasT:Android-ChangelogDialog:1.0.3'
     //AlertDialog zum anzeigen der von mir genutzten OpenSource Pakete
+    // TODO: Kann irgendwie nicht weiter upgraden
     implementation 'de.psdev.licensesdialog:licensesdialog:1.8.3'
     //AlertDialog um den User ein Verzeichniss auswählen zu lassen
     implementation 'com.github.codekidX:storage-chooser:2.0.3'

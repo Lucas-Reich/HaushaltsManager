@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager;
+package com.example.lucas.haushaltsmanager.ListAdapter;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -10,6 +10,7 @@ import android.widget.ExpandableListView;
 import android.widget.TextView;
 
 import com.example.lucas.haushaltsmanager.Entities.Category;
+import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.ViewUtils;
 import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
 
