@@ -55,8 +55,6 @@
     <string name="transfer_from">Überweisung von</string>
     <string name="transfer_to">Überweisung nach</string>
     <!-- TODO: Bessere Übersetzung für "import_bookings_confirmation" einfallen lassen -->
-    <string name="import_bookings_confirmation">Bist du sicher, dass du die Ausgewählten Buchungen importieren möchtest?</string>
-    <string name="confirmation_dialog_title">Bestätige Auswahl</string>
     <string name="export_directory_confirmation">Bist du sicher, dass du die Buchungen in das aktuell ausgewählte Verzeichniss exportieren möchtest?</string>
     <string name="create_export">Erstelle Export</string>
     <string name="btn_yes">Ja</string>
@@ -120,11 +118,8 @@
     <string name="could_not_update_booking">Buchungsupdate fehlgeschlagen</string>
     <string name="saved_as_template">Buchung wurde als Template gespeichert</string>
     <string name="activity_create_recurring_booking">Erstelle wiederkehrende Buchung</string>
-    <string name="from">Von</string>
-    <string name="till">Bis</string>
     <string name="could_not_save_recurring_booking">Wiederkehrende Buchung konnte nicht gespeichert werden</string>
     <string name="frequency_in_days">Häufigkeit in Tagen</string>
-    <string name="input_frequency_label">"Häufigkeit in Tagen: "</string>
     <string name="abort_action_confirmation_text">Nicht gespeicherte Daten gehen verloren! Trotzdem schließen?</string>
     <string name="income">Einnahme</string>
     <string name="expense">Ausgabe</string>

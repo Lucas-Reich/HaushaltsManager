@@ -8,42 +8,42 @@ import com.example.lucas.haushaltsmanager.Entities.Tag;
 import java.util.List;
 
 public class Repository implements TagRepositoryInterface {
-    private DefaultDatabase database;
+    private DefaultDatabase mDatabase;
 
     Repository(DefaultDatabase database) {
-        this.database = database;
+        mDatabase = database;
     }
 
     @Override
     public Tag save(Tag tag) {
-        QueryResultInterface<Tag> result = database.query(new InsertQuery(tag));
+        QueryResultInterface<Tag> result = mDatabase.query(new InsertQuery(tag));
 
         return result.getSingleResult();
     }
 
     public Tag find(long id) {
-        QueryResultInterface<Tag> result = database.query(new GetQuery(id));
+        QueryResultInterface<Tag> result = mDatabase.query(new GetQuery(id));
 
         return result.getSingleResult();
     }
 
     @Override
     public List<Tag> getAll() {
-        QueryResultInterface<Tag> result = database.query(new GetAllQuery());
+        QueryResultInterface<Tag> result = mDatabase.query(new GetAllQuery());
 
         return result.getAll();
     }
 
     @Override
     public void update(Tag tag) {
-        QueryResultInterface<Tag> result = database.query(new UpdateQuery(tag));
+        QueryResultInterface<Tag> result = mDatabase.query(new UpdateQuery(tag));
 
         result.close();
     }
 
     @Override
     public void delete(Tag tag) {
-        QueryResultInterface<Tag> result = database.query(new DeleteQuery(tag));
+        QueryResultInterface<Tag> result = mDatabase.query(new DeleteQuery(tag));
 
         result.close();
     }
@@ -51,6 +51,5 @@ public class Repository implements TagRepositoryInterface {
     @Override
     public boolean exists(Tag tag) {
         return find(tag.getIndex()) == null;
-
     }
 }
