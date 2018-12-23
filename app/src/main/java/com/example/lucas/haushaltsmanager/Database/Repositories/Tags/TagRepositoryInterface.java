@@ -5,6 +5,7 @@ import com.example.lucas.haushaltsmanager.Entities.Tag;
 import java.util.List;
 
 public interface TagRepositoryInterface {
+
     Tag save(Tag tag);
 
     Tag find(long id);

@@ -8,7 +8,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 26
         versionCode 5
-        versionName "5.0"
+        versionName '6.0.0'
         testInstrumentationRunner "android.support.dialog_popup_edittext.runner.AndroidJUnitRunner"
     }
     testOptions {
@@ -21,6 +21,8 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+    productFlavors {
     }
 }
 
@@ -39,7 +41,7 @@ dependencies {
     // Ein FAB der sich zu einer Toolbar werden kann
     implementation 'com.github.fafaldo:fab-toolbar:1.2.0'
     //API welche ich benutze um Hintergrundaufgaben laufen zu lassen
-    implementation "android.arch.work:work-runtime:1.0.0-beta01"
+    implementation 'android.arch.work:work-runtime:1.0.0-beta01'
     //Chart Views
     implementation 'com.github.LabberToasT:Android-Charts:1.0.3'
     //AlertDialog zum anzeigen von eines Changelogs

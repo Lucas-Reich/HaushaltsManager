@@ -39,7 +39,7 @@
     <string name="make_main">Make main account</string>
     <string name="failed_to_delete_account">Failed to delete account, there are still Bookings with this account!</string>
     <string name="deleted_account">Deleted account</string>
-    <string name="changed_main_account">is now the main account.</string>
+    <string name="changed_main_account"> is now the main account.</string>
     <string name="input_price">Input price</string>
     <string name="input_frequency">Input frequency</string>
     <string name="most_bookings_in">Most Bookings in Category</string>
@@ -54,8 +54,6 @@
     <string name="set_Account_balance">Set account balance</string>
     <string name="transfer_from">Transfer from</string>
     <string name="transfer_to">Transfer to</string>
-    <string name="confirmation_dialog_title">Confirm Selection</string>
-    <string name="import_bookings_confirmation">Are you sure that you want to import this bookings?</string>
     <string name="export_directory_confirmation">Are you sure that you want to Export the bookings to the current directory?</string>
     <string name="create_export">Create Export</string>
     <string name="btn_yes">Yes</string>
@@ -119,10 +117,7 @@
     <string name="could_not_update_booking">Failed to update Expense</string>
     <string name="saved_as_template">Saved expense as template</string>
     <string name="activity_create_recurring_booking">Create recurring booking</string>
-    <string name="from">From</string>
-    <string name="till">Until</string>
     <string name="could_not_save_recurring_booking">Cannot save RecurringBooking</string>
-    <string name="input_frequency_label">"Frequency in days: "</string>
     <string name="abort_action_confirmation_text">Unsaved data will be lost! Still close?</string>
     <string name="income">Income</string>
     <string name="expense">Expense</string>
@@ -148,4 +143,8 @@
     <string name="starts_at">starts at</string>
     <string name="ends_at">ends at</string>
     <string name="frequency_in_days">Frequency in days</string>
+    <string name="notification">Notification</string>
+    <string name="currency">Currency</string>
+    <string name="backups">Backups</string>
+    <string name="general_settings">General Settings</string>
 </resources>

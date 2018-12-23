@@ -13,13 +13,11 @@ public interface BaseRepository<T> {
 
     List<T> getAll();
 
-    void update(T entity) throws EntityNotExistingException;// TODO: Sollte ich eine CouldNotUpdateEntityException auslösen?
+    void update(T entity) throws EntityNotExistingException;
 
     void delete(T entity) throws CouldNotDeleteEntityException;
 
-    boolean exists(T object);
+    boolean exists(T entity);
 
     void closeDatabase();
-
-//    T static fromCursor(Cursor c);
 }

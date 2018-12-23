@@ -216,43 +216,6 @@ public class ExpenseRepository {
         return insertedExpense;
     }
 
-    public void forceDelete(ExpenseObject expense) {
-        if (isRecurringBooking(expense) || isTemplateBooking(expense)) {
-            if (hasChildren(expense)) {
-                for (ExpenseObject child : expense.getChildren()) {
-                    try {
-                        hide(child);
-                    } catch (ExpenseNotFoundException e) {
-                        Log.e(TAG, "Failed to delete expense " + expense.getTitle(), e);
-                    }
-                }
-            } else {
-                try {
-                    hide(expense);
-                } catch (ExpenseNotFoundException e) {
-                    Log.e(TAG, "Failed to delete expense " + expense.getTitle(), e);
-                }
-            }
-        } else {
-            if (hasChildren(expense)) {
-                for (ExpenseObject child : expense.getChildren()) {
-                    try {
-                        delete(child);
-                    } catch (CannotDeleteExpenseException e) {
-                        Log.e(TAG, "Failed to delete expense " + expense.getTitle(), e);
-                    }
-                }
-            } else {
-
-                try {
-                    delete(expense);
-                } catch (CannotDeleteExpenseException e) {
-                    Log.e(TAG, "Failed to delete expense " + expense.getTitle(), e);
-                }
-            }
-        }
-    }
-
     public void delete(ExpenseObject expense) throws CannotDeleteExpenseException {
 
         if (isRecurringBooking(expense) || isTemplateBooking(expense)) {
@@ -387,7 +350,7 @@ public class ExpenseRepository {
      * @param amount    Betrag der angezogen oder hinzugefügt werden soll
      */
     private void updateAccountBalance(long accountId, double amount) throws AccountNotFoundException {
-        AccountRepository accountRepo = new AccountRepository(app.getContext()); // IMPROVEMENT: Das AccountRepository sollte inhected werden.
+        AccountRepository accountRepo = new AccountRepository(app.getContext()); // IMPROVEMENT: Das AccountRepository sollte injected werden.
 
         Account account = accountRepo.get(accountId);
         account.setBalance(account.getBalance() + amount);

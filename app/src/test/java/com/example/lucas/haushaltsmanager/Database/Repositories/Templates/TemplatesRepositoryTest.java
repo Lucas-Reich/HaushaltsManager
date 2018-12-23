@@ -205,7 +205,7 @@ public class TemplatesRepositoryTest {
 
     @Test
     public void testDeleteWithExistingTemplateAndReferencesChildExpenseIsHiddenShouldSucceedAndChildExpenseShouldBeDeleted() {
-        //fixme dieser test ist irgendwie kaputt gegangen
+        // REFACTOR: dieser test ist irgendwie kaputt gegangen
         ExpenseObject parentExpense = mock(ExpenseObject.class);
         when(parentExpense.getIndex()).thenReturn(465L);
         ExpenseObject relatedChildExpense = mChildExpenseRepo.insert(parentExpense, new ExpenseObject("Ausgabe", 897, true, category, account.getIndex(), currency));

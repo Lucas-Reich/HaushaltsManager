@@ -1,9 +1,9 @@
 package com.example.lucas.haushaltsmanager.Entities.Report;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 
+import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
@@ -63,11 +63,11 @@ public abstract class AbstractReport implements ReportInterface {
     }
 
     @Override
-    public Category getMostStressedCategory(Context context) {
+    public Category getMostStressedCategory() {
         HashMap<Category, Double> categories = sumExpensesByCategory();
 
         if (categories.isEmpty())
-            return getPlaceholderCategory(R.string.no_expenses, context);
+            return getPlaceholderCategory(R.string.no_expenses);
 
         return getMaxEntry(categories).getKey();
     }
@@ -87,13 +87,13 @@ public abstract class AbstractReport implements ReportInterface {
         mCardTitle = title;
     }
 
-    private String getResourceString(@StringRes int stringRes, Context context) {
-        return context.getResources().getString(stringRes);
+    private String getResourceString(@StringRes int stringRes) {
+        return app.getContext().getResources().getString(stringRes);
     }
 
-    private Category getPlaceholderCategory(@StringRes int titleRes, Context context) {
+    private Category getPlaceholderCategory(@StringRes int titleRes) {
         return new Category(
-                getResourceString(titleRes, context),
+                getResourceString(titleRes),
                 "#FFFFFF",
                 false,
                 new ArrayList<Category>()

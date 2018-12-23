@@ -1,6 +1,5 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.Tags;
 
-
 import android.database.Cursor;
 
 import com.example.lucas.haushaltsmanager.Database.QueryResultInterface;
@@ -11,19 +10,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Result implements QueryResultInterface<Tag> {
-    private Cursor c;
-    private TransformerInterface<Tag> transformer;
+    private Cursor mCursor;
+    private TransformerInterface<Tag> mTransformer;
 
     public Result(Cursor c, TransformerInterface<Tag> transformer) {
-        this.c = c;
-
-        this.transformer = transformer;
+        mCursor = c;
+        mTransformer = transformer;
     }
 
     public Tag getNextRow() {
-        c.moveToNext();
+        mCursor.moveToNext();
 
-        return transformer.transform(c);
+        return mTransformer.transform(mCursor);
     }
 
     public Tag getSingleResult() {
@@ -36,7 +34,7 @@ public class Result implements QueryResultInterface<Tag> {
     public List<Tag> getAll() {
         List<Tag> tags = new ArrayList<>();
 
-        while (!c.isAfterLast()) {
+        while (!mCursor.isAfterLast()) {
             tags.add(getNextRow());
         }
 
@@ -46,6 +44,6 @@ public class Result implements QueryResultInterface<Tag> {
     }
 
     public void close() {
-        c.close();
+        mCursor.close();
     }
 }

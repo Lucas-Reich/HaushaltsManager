@@ -4,10 +4,10 @@ import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.QueryInterface;
 
 public class GetQuery implements QueryInterface {
-    private long id;
+    private final long mId;
 
     public GetQuery(long id) {
-        this.id = id;
+        mId = id;
     }
 
     public String getQuery() {
@@ -21,7 +21,7 @@ public class GetQuery implements QueryInterface {
 
     public String[] getDefinition() {
         return new String[]{
-                Long.toString(id)
+                Long.toString(mId)
         };
     }
 }

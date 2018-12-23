@@ -64,7 +64,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:drawableStart="@drawable/ic_title_black"
+        android:drawableStart="@drawable/ic_title_dark"
         android:paddingEnd="16dp"
         android:textAlignment="textEnd"
         android:textAllCaps="false"
@@ -94,7 +94,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:drawableStart="@drawable/ic_folder_open_black_24dp"
+        android:drawableStart="@drawable/ic_folder_open_dark"
         android:paddingEnd="16dp"
         android:textAlignment="textEnd"
         android:textAllCaps="false"
@@ -124,7 +124,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:drawableStart="@drawable/ic_date"
+        android:drawableStart="@drawable/ic_date_dark"
         android:paddingEnd="16dp"
         android:textAlignment="textEnd"
         android:textAllCaps="false"
@@ -154,7 +154,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:drawableStart="@drawable/ic_notice"
+        android:drawableStart="@drawable/ic_notice_dark"
         android:paddingEnd="16dp"
         android:textAlignment="textEnd"
         android:textAllCaps="false"
@@ -184,7 +184,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:drawableStart="@drawable/ic_wallet_black"
+        android:drawableStart="@drawable/ic_wallet_dark"
         android:paddingEnd="16dp"
         android:textAlignment="textEnd"
         android:textAllCaps="false"
@@ -214,10 +214,10 @@
         android:layout_marginBottom="16dp"
         android:clickable="true"
         android:focusable="true"
+        android:src="@drawable/ic_cross_white"
         app:borderWidth="0dp"
         app:layout_constraintBottom_toTopOf="@+id/expense_screen_bottom_toolbar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/ic_cross_white"/>
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <!-- Da ich keine 2 Toolbars einfügen kann nehme ich eine LinearLayout welches mein "Menü enthält" -->
     <LinearLayout

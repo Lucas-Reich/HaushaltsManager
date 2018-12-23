@@ -33,7 +33,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
                     android:layout_marginBottom="10dp"
-                    android:text="Allgemeine Einstellungen"
+                    android:text="@string/general_settings"
                     android:textColor="@color/colorPrimary"
                     android:textSize="16sp"/>
 
@@ -58,7 +58,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:paddingBottom="4dp"
-                        android:text="-> Montag"
+                        android:text="@string/monday"
                         android:textColor="@color/primary_text_color"
                         android:textSize="14sp"
                         tools:ignore="SmallSp"/>
@@ -85,7 +85,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:layout_marginBottom="10dp"
-                    android:text="Backups"
+                    android:text="@string/backups"
                     android:textColor="@color/colorPrimary"
                     android:textSize="16sp"/>
 
@@ -140,7 +140,7 @@
                         android:id="@+id/settings_backups_location_location"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="-> Backups"
+                        android:text="@string/backups"
                         android:textColor="@color/primary_text_color"
                         android:textSize="14sp"/>
 
@@ -173,7 +173,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:paddingBottom="4dp"
-                        android:text="-> 10"
+                        android:text="10"
                         android:textColor="@color/primary_text_color"
                         android:textSize="14sp"
                         tools:ignore="SmallSp"/>
@@ -200,7 +200,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:layout_marginBottom="10dp"
-                    android:text="Währung"
+                    android:text="@string/currency"
                     android:textColor="@color/colorPrimary"
                     android:textSize="16sp"/>
 
@@ -253,7 +253,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:layout_marginBottom="10dp"
-                    android:text="Benachrichtigungen"
+                    android:text="@string/notification"
                     android:textColor="@color/colorPrimary"
                     android:textSize="16sp"/>
 
