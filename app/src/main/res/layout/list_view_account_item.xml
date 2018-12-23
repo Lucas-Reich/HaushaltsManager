@@ -68,5 +68,6 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="center"
-        app:srcCompat="@drawable/ic_three_dots_vertical_black"/>
+        android:tint="@color/drawable_color_dark"
+        android:src="@drawable/ic_three_dots_vertical_black"/>
 </LinearLayout>

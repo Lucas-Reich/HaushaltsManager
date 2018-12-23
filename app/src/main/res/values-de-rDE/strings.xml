@@ -149,4 +149,8 @@
     <string name="could_not_update_title">Titel konnte nicht aktualisiert werden</string>
     <string name="starts_at">Beginnt am</string>
     <string name="ends_at">Endet am</string>
+    <string name="notification">Benachrichtigung</string>
+    <string name="currency">Währung</string>
+    <string name="backups">Backups</string>
+    <string name="general_settings">Allgemeine Einstellungen</string>
 </resources>

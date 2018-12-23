@@ -154,4 +154,8 @@
     <string name="starts_at">starts at</string>
     <string name="ends_at">ends at</string>
     <string name="frequency_in_days">Frequency in days</string>
+    <string name="notification">Notification</string>
+    <string name="currency">Currency</string>
+    <string name="backups">Backups</string>
+    <string name="general_settings">General Settings</string>
 </resources>
