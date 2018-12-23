@@ -45,8 +45,7 @@ public class TabThreeYearlyReports extends AbstractTab {
         View rootView = inflater.inflate(R.layout.tab_three_yearly_reports, container, false);
 
         mTimeFrameCardPopulator = new TimeFrameCardPopulator(
-                (CardView) rootView.findViewById(R.id.tab_three_timeframe_report_card),
-                getContext()
+                (CardView) rootView.findViewById(R.id.tab_three_timeframe_report_card)
         );
         mTimeFrameCardPopulator.setData(createReport(
                 getStringifiedYear(),

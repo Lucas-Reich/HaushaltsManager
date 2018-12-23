@@ -44,7 +44,7 @@
     <string name="make_main">Make main account</string>
     <string name="failed_to_delete_account">Failed to delete account, there are still Bookings with this account!</string>
     <string name="deleted_account">Deleted account</string>
-    <string name="changed_main_account">is now the main account.</string>
+    <string name="changed_main_account"> is now the main account.</string>
     <string name="input_price">Input price</string>
     <string name="input_frequency">Input frequency</string>
     <string name="most_bookings_in">Most Bookings in Category</string>
