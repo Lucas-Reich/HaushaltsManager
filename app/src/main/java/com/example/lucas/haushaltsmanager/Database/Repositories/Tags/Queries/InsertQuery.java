@@ -5,7 +5,7 @@ import com.example.lucas.haushaltsmanager.Database.QueryInterface;
 import com.example.lucas.haushaltsmanager.Entities.Tag;
 
 public class InsertQuery implements QueryInterface {
-    private Tag mTag;
+    private final Tag mTag;
 
     public InsertQuery(Tag tag) {
         mTag = tag;

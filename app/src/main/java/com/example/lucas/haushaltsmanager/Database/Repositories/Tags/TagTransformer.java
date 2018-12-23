@@ -14,6 +14,10 @@ public class TagTransformer implements TransformerInterface<Tag> {
             return null;
         }
 
+        return fromCursor(c);
+    }
+
+    private Tag fromCursor(Cursor c) {
         return new Tag(
                 c.getLong(c.getColumnIndex(ExpensesDbHelper.TAGS_COL_ID)),
                 c.getString(c.getColumnIndex(ExpensesDbHelper.TAGS_COL_NAME))

@@ -10,7 +10,7 @@ import java.util.List;
 public class Repository implements TagRepositoryInterface {
     private DefaultDatabase database;
 
-    public Repository(DefaultDatabase database) {
+    Repository(DefaultDatabase database) {
         this.database = database;
     }
 
