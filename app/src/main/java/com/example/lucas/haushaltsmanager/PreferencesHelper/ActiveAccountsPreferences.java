@@ -2,6 +2,7 @@ package com.example.lucas.haushaltsmanager.PreferencesHelper;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
@@ -12,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 
 public class ActiveAccountsPreferences {
+    private static final String TAG = ActiveAccountsPreferences.class.getSimpleName();
+
     private static final String ACTIVE_ACCOUNTS = "ActiveAccounts";
 
     private SharedPreferences mPreferences;
@@ -33,42 +36,66 @@ public class ActiveAccountsPreferences {
         mPreferences.edit().remove(account.getIndex() + "").apply();
     }
 
-    //TODO sollte ich die Funktion so abändern dass nur konten die auch wirklich existieren angepasst werden können?
-    public void setVisibility(Account account, boolean visibility) {
+    public void changeVisibility(Account account, boolean visibility) {
+        //TODO sollte ich die Funktion so abändern dass nur konten die auch wirklich existieren angepasst werden können?
 
         mPreferences.edit().putBoolean(account.getIndex() + "", visibility).apply();
     }
 
-    // TODO sollte ich unterscheiden zwischen Konten die nicht gefunden werden konnten und Konten die es tatsächlich gibt?
     public boolean isActive(Account account) {
+        // TODO sollte ich unterscheiden zwischen Konten die nicht gefunden werden konnten und Konten die es tatsächlich gibt?
 
         return mPreferences.getBoolean(account.getIndex() + "", false);
     }
 
     public List<Account> getActiveAccounts() {
         Map<String, ?> allAccounts = mPreferences.getAll();
-        List<Account> activeAccounts = new ArrayList<>();
 
-        for (Map.Entry<String, ?> entry : allAccounts.entrySet()) {
-            boolean value = (Boolean) entry.getValue();
+        return getAccounts(allAccounts);
+    }
+
+    private List<Account> getAccounts(Map<String, ?> accounts) {
+
+        List<Account> activeAccounts = new ArrayList<>();
+        for (Map.Entry<String, ?> entry : accounts.entrySet()) {
             // TODO: Sollte ich eine Konto welches nicht in der Datenbank gefunden werden konnte einfach aus der liste der aktiven Konten löschen?
             // oder kann es dann sein dass dieses konto immer und immer wieder in die preferences geschrieben wird?
-            if (value)
-                activeAccounts.add(fetchAccount(Long.parseLong(entry.getKey())));
+            if (isAccountActive(entry)) {
+                Account account = entryToAccount(entry);
+                if (account != null) {
+                    activeAccounts.add(entryToAccount(entry));
+                }
+            }
         }
 
         return activeAccounts;
     }
 
-    private Account fetchAccount(long index) {
-
+    private long extractIdSafe(Map.Entry<String, ?> entry) {
         try {
 
-            return mAccountRepo.get(index);
-        } catch (AccountNotFoundException e) {
+            return Long.parseLong(entry.getKey());
+        } catch (NumberFormatException e) {
+            Log.e(TAG, String.format("Failed to convert '%s' to long.", entry.getKey()), e);
 
+            return -2;
+        }
+    }
+
+    private boolean isAccountActive(Map.Entry<String, ?> entry) {
+        return (Boolean) entry.getValue();
+    }
+
+    private Account entryToAccount(Map.Entry<String, ?> entry) {
+
+        try {
+            long accountId = extractIdSafe(entry);
+
+            return mAccountRepo.get(accountId);
+        } catch (AccountNotFoundException e) {
             // TODO: Wenn ein Konto nicht gefunden werden kann, dann kann man nicht mal mehr den TabOne öffnen.
-            // ich sollte hier also besser nicht null zurückgeben
+            Log.e(TAG, String.format("Failed to retrieve account %s from database", entry.getKey()), e);
+
             return null;
         }
     }

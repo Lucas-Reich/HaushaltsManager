@@ -7,8 +7,9 @@ android {
         applicationId "com.lucas.haushaltsmanager"
         minSdkVersion 19
         targetSdkVersion 26
-        versionCode 5
-        versionName '6.0.0'
+        versionCode 7
+        versionName '6.0.1'
+        // Wenn sich die Version der App ändert muss auch ein neuer Release angelegt werden
         testInstrumentationRunner "android.support.dialog_popup_edittext.runner.AndroidJUnitRunner"
     }
     testOptions {

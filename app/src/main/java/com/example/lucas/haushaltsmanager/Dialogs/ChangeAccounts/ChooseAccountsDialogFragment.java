@@ -232,7 +232,7 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Acco
      * @param isVisible Sichtabkeit. TRUE für sichtbar, FALSE für nicht sichtbar
      */
     private void setAccountVisibility(Account account, boolean isVisible) {
-        mAccountPreferences.setVisibility(account, isVisible);
+        mAccountPreferences.changeVisibility(account, isVisible);
 
         mCallback.onAccountSelected(account.getIndex(), isVisible);
     }

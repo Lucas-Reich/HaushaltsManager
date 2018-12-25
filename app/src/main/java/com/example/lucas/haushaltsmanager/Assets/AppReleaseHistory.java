@@ -4,6 +4,7 @@ import android.support.annotation.StringRes;
 
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.R;
+import com.lucas.changelogdialog.Bug;
 import com.lucas.changelogdialog.ChangelogItem;
 import com.lucas.changelogdialog.Feature;
 import com.lucas.changelogdialog.Release;
@@ -40,6 +41,7 @@ public class AppReleaseHistory implements ReleaseHistory {
     public List<com.lucas.changelogdialog.Release> getHistory() {
         List<Release> releases = new ArrayList<>();
         releases.add(getRealRelease100());
+        releases.add(getRealRelease601());
 
         return releases;
     }
@@ -57,6 +59,20 @@ public class AppReleaseHistory implements ReleaseHistory {
                 getDate(1, 1, 2019),
                 getString(R.string.release_notes_100),
                 new ArrayList<ChangelogItem>()
+        );
+    }
+
+    private Release getRealRelease601() {
+        List<ChangelogItem> changelog = new ArrayList<>();
+        changelog.add(new Bug("Fehler behoben, welcher zum Absturz der App beim öffnen fürte"));
+
+        return new Release(
+                6,
+                null,
+                1,
+                getDate(25, 12, 2018),
+                "Kleinere Fehlerbehebungen",
+                changelog
         );
     }
 
