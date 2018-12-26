@@ -15,7 +15,8 @@ import java.util.Map;
 public class ActiveAccountsPreferences {
     private static final String TAG = ActiveAccountsPreferences.class.getSimpleName();
 
-    private static final String ACTIVE_ACCOUNTS = "ActiveAccounts";
+    private static final String PREFERENCES_NAME = "ActiveAccounts";
+    private static boolean DEFAULT_ACCOUNT_STATUS = true;
 
     private SharedPreferences mPreferences;
     private AccountRepository mAccountRepo;
@@ -23,29 +24,33 @@ public class ActiveAccountsPreferences {
     public ActiveAccountsPreferences(Context context, AccountRepository accountRepository) {
 
         mAccountRepo = accountRepository;
-        mPreferences = context.getSharedPreferences(ACTIVE_ACCOUNTS, Context.MODE_PRIVATE);
+        mPreferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
     }
 
     public void addAccount(Account account) {
-
-        mPreferences.edit().putBoolean(account.getIndex() + "", true).apply();
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putBoolean(stringify(account.getIndex()), DEFAULT_ACCOUNT_STATUS);
+        editor.apply();
     }
 
     public void removeAccount(Account account) {
-
-        mPreferences.edit().remove(account.getIndex() + "").apply();
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.remove(stringify(account.getIndex()));
+        editor.apply();
     }
 
     public void changeVisibility(Account account, boolean visibility) {
-        //TODO sollte ich die Funktion so abändern dass nur konten die auch wirklich existieren angepasst werden können?
+        if (mPreferences.contains(stringify(account.getIndex()))) {
+            SharedPreferences.Editor editor = mPreferences.edit();
+            editor.putBoolean(stringify(account.getIndex()), visibility);
+            editor.apply();
+        }
 
-        mPreferences.edit().putBoolean(account.getIndex() + "", visibility).apply();
     }
 
     public boolean isActive(Account account) {
-        // TODO sollte ich unterscheiden zwischen Konten die nicht gefunden werden konnten und Konten die es tatsächlich gibt?
 
-        return mPreferences.getBoolean(account.getIndex() + "", false);
+        return mPreferences.getBoolean(stringify(account.getIndex()), false);
     }
 
     public List<Account> getActiveAccounts() {
@@ -54,32 +59,23 @@ public class ActiveAccountsPreferences {
         return getAccounts(allAccounts);
     }
 
+    private String stringify(long value) {
+        return value + "";
+    }
+
     private List<Account> getAccounts(Map<String, ?> accounts) {
 
         List<Account> activeAccounts = new ArrayList<>();
         for (Map.Entry<String, ?> entry : accounts.entrySet()) {
-            // TODO: Sollte ich eine Konto welches nicht in der Datenbank gefunden werden konnte einfach aus der liste der aktiven Konten löschen?
-            // oder kann es dann sein dass dieses konto immer und immer wieder in die preferences geschrieben wird?
             if (isAccountActive(entry)) {
                 Account account = entryToAccount(entry);
-                if (account != null) {
+                if (null != account) {
                     activeAccounts.add(entryToAccount(entry));
                 }
             }
         }
 
         return activeAccounts;
-    }
-
-    private long extractIdSafe(Map.Entry<String, ?> entry) {
-        try {
-
-            return Long.parseLong(entry.getKey());
-        } catch (NumberFormatException e) {
-            Log.e(TAG, String.format("Failed to convert '%s' to long.", entry.getKey()), e);
-
-            return -2;
-        }
     }
 
     private boolean isAccountActive(Map.Entry<String, ?> entry) {
@@ -89,14 +85,27 @@ public class ActiveAccountsPreferences {
     private Account entryToAccount(Map.Entry<String, ?> entry) {
 
         try {
-            long accountId = extractIdSafe(entry);
+            long accountId = Long.parseLong(entry.getKey());
 
             return mAccountRepo.get(accountId);
         } catch (AccountNotFoundException e) {
-            // TODO: Wenn ein Konto nicht gefunden werden kann, dann kann man nicht mal mehr den TabOne öffnen.
             Log.e(TAG, String.format("Failed to retrieve account %s from database", entry.getKey()), e);
+
+            forceRemoveEntry(entry);
+
+            return null;
+        } catch (NumberFormatException e) {
+            Log.e(TAG, String.format("Failed to convert '%s' to long.", entry.getKey()), e);
+
+            forceRemoveEntry(entry);
 
             return null;
         }
+    }
+
+    private void forceRemoveEntry(Map.Entry<String, ?> entry) {
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.remove(entry.getKey());
+        editor.apply();
     }
 }

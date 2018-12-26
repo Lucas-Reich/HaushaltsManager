@@ -43,6 +43,7 @@ public class AppReleaseHistory implements ReleaseHistory {
         releases.add(getRealRelease100());
         releases.add(getRealRelease601());
         releases.add(getRelease602());
+        releases.add(getRelease603());
 
         return releases;
     }
@@ -89,7 +90,23 @@ public class AppReleaseHistory implements ReleaseHistory {
                 null,
                 2,
                 getDate(26, 12, 2018),
+                "",
+                changelog
+        );
+    }
+
+    private Release getRelease603() {
+        List<ChangelogItem> changelog = new ArrayList<>();
+        changelog.add(new Bug("Fehler behoben, welcher zum Absturz der App führte, wenn man ein PopUp öffnete"));
+        changelog.add(new Bug("Fehler behoben, welcher zum Absturz der App führte, wenn man ein Backup erstellen wollte"));
+        changelog.add(new Improvement("Kleinere Anpassungen im Quellcode, sodass die App nun ein wenig besser funktioniert"));
+
+        return new Release(
+                6,
                 null,
+                3,
+                getDate(26, 12, 2018),
+                "",
                 changelog
         );
     }

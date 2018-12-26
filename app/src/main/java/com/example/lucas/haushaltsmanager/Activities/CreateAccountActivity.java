@@ -195,9 +195,7 @@ public class CreateAccountActivity extends AbstractAppCompatActivity {
      * @param account Zu speicherndes Konto
      */
     private void addAccountToPreferences(Account account) {
-        ActiveAccountsPreferences accountsPreferences = new ActiveAccountsPreferences(CreateAccountActivity.this, new AccountRepository(this));
-
-        accountsPreferences.addAccount(account);
+        new ActiveAccountsPreferences(this, new AccountRepository(this)).addAccount(account);
     }
 
     /**
