@@ -14,6 +14,14 @@
     <string name="btn_ok">OK</string>
     <string name="btn_no">No</string>
 
+    <string name="accessibility_create_expense">Create new expense</string>
+    <string name="accessibility_create_backup">Create new backup</string>
+    <string name="accessibility_select_category_color">Select category color</string>
+    <string name="accessibility_create_category">Save new category</string>
+    <string name="accessibility_create_export">Export data to csv</string>
+    <string name="accessibility_create_account">Save new account</string>
+    <string name="accessibility_choose_directory">Choose a directory</string>
+
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="choose_account">Edit your accounts</string>

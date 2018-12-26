@@ -8,7 +8,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 26
         versionCode 8
-        versionName '6.0.4'
+        versionName '6.0.2'
         // Wenn sich die Version der App ändert muss auch ein neuer Release angelegt werden
         testInstrumentationRunner "android.support.dialog_popup_edittext.runner.AndroidJUnitRunner"
     }

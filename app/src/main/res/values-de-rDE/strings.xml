@@ -148,4 +148,11 @@
     <string name="currency">Währung</string>
     <string name="backups">Backups</string>
     <string name="general_settings">Allgemeine Einstellungen</string>
+    <string name="accessibility_create_expense">Speichern Sie eine neue Buchung</string>
+    <string name="accessibility_create_backup">Speichern Sie ein neues Backup</string>
+    <string name="accessibility_select_category_color">Wählen Sie die Farbe der Kategorie</string>
+    <string name="accessibility_create_category">Speichern Sie die Kategorie</string>
+    <string name="accessibility_create_export">Exportiere Daten in eine CSV Datei</string>
+    <string name="accessibility_create_account">Speichern Sie das Konto</string>
+    <string name="accessibility_choose_directory">Wählen Sie ein Verzeichnis</string>
 </resources>
