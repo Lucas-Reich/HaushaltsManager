@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.StringRes;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.widget.AdapterView;
@@ -25,42 +26,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ChooseAccountsDialogFragment extends DialogFragment implements AccountAdapter.OnDeleteAccountSelected {
-    private static final String TAG = ChooseAccountsDialogFragment.class.getSimpleName();
-
     private OnSelectedAccount mCallback;
     private ListView mListView;
-    private Context mContext;
     private Map<Account, Boolean> mInitialAccountState;
     private AccountRepository mAccountRepo;
     private ActiveAccountsPreferences mAccountPreferences;
     private UserSettingsPreferences mUserPreferences;
 
-    /**
-     * Standart Fragment Methode die genutzt wird, um zu checken ob die aufrufende Activity auch das interface inplementiert.
-     *
-     * @param context Kontext
-     */
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-        try {
-
-            mCallback = (OnSelectedAccount) context;
-            mContext = context;
-        } catch (ClassCastException e) {
-
-            throw new ClassCastException(context.toString() + " must implement OnSelectedAccountListener");
-        }
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mAccountRepo = new AccountRepository(mContext);
+        mAccountRepo = new AccountRepository(getActivity());
 
-        mAccountPreferences = new ActiveAccountsPreferences(mContext, mAccountRepo);
-        mUserPreferences = new UserSettingsPreferences(mContext);
+        mAccountPreferences = new ActiveAccountsPreferences(getActivity(), mAccountRepo);
+        mUserPreferences = new UserSettingsPreferences(getActivity());
 
         mInitialAccountState = new HashMap<>();
 
@@ -110,15 +89,19 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Acco
         return builder.create();
     }
 
+    public void setOnAccountSelectedListener(OnSelectedAccount listener) {
+        mCallback = listener;
+    }
+
     /**
      * Methode um die ListView zu erzeugen und mit Funktionalität zu versorgen.
      */
     private void prepareListView() {
 
-        AccountAdapter adapter = new AccountAdapter(mInitialAccountState, mContext);
+        AccountAdapter adapter = new AccountAdapter(mInitialAccountState, getActivity());
         adapter.setOnDeleteAccountListener(this);
 
-        mListView = new ListView(mContext);
+        mListView = new ListView(getActivity());
         mListView.setAdapter(adapter);
         mListView.setDivider(null);
         mListView.setDividerHeight(0);
@@ -167,10 +150,10 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Acco
                 deleteAccount(account);
             }
 
-            Toast.makeText(mContext, mContext.getResources().getString(R.string.deleted_account), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), getString(R.string.deleted_account), Toast.LENGTH_SHORT).show();
         } catch (CannotDeleteAccountException e) {
 
-            Toast.makeText(mContext, mContext.getResources().getString(R.string.failed_to_delete_account), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), getString(R.string.failed_to_delete_account), Toast.LENGTH_SHORT).show();
         }
 
         dismiss();
@@ -214,7 +197,7 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Acco
     @Override
     public void onAccountSetMain(Account account) {
         makeAccountMain(account);
-        Toast.makeText(mContext, account.getTitle() + mContext.getResources().getString(R.string.changed_main_account), Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), account.getTitle() + getString(R.string.changed_main_account), Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -244,7 +227,8 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Acco
     private void setAccountVisibility(Account account, boolean isVisible) {
         mAccountPreferences.changeVisibility(account, isVisible);
 
-        mCallback.onAccountSelected(account.getIndex(), isVisible);
+        if (null != mCallback)
+            mCallback.onAccountSelected(account.getIndex(), isVisible);
     }
 
     @Override

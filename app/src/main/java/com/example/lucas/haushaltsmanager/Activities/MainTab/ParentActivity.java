@@ -183,6 +183,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
             case R.id.choose_account:
 
                 ChooseAccountsDialogFragment chooseAccountFragment = new ChooseAccountsDialogFragment();
+                chooseAccountFragment.setOnAccountSelectedListener(this);
                 chooseAccountFragment.show(getFragmentManager(), "alterVisibleAccounts");
                 break;
 

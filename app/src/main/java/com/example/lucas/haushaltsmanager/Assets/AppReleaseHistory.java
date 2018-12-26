@@ -43,6 +43,7 @@ public class AppReleaseHistory implements ReleaseHistory {
         releases.add(getRealRelease601());
         releases.add(getRelease602());
         releases.add(getRelease603());
+        releases.add(getRelease604());
 
         return releases;
     }
@@ -93,12 +94,26 @@ public class AppReleaseHistory implements ReleaseHistory {
 
     private Release getRelease603() {
         List<ChangelogItem> changelog = new ArrayList<>();
-        changelog.add(new Bug("Fehler behoben, welcher die App aucf alten Geräten zum abstürzen bringt, wenn ein neues Backup erstellt wurde"));
+        changelog.add(new Bug("Fehler behoben, welcher die App auf alten Geräten zum abstürzen bringt, wenn ein neues Backup erstellt wurde"));
 
         return new Release(
                 6,
                 null,
                 3,
+                getDate(26, 12, 2018),
+                null,
+                changelog
+        );
+    }
+
+    private Release getRelease604() {
+        List<ChangelogItem> changelog = new ArrayList<>();
+        changelog.add(new Bug("Fehler behoben welcher die App zum Absturz gebracht hat, wenn die Kontenliste aufgerufen wurde"));
+
+        return new Release(
+                6,
+                null,
+                4,
                 getDate(26, 12, 2018),
                 null,
                 changelog
