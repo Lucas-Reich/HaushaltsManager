@@ -18,14 +18,6 @@ public class FrequencyInputDialog extends DialogFragment {
     public static final String TITLE = "title";
 
     private OnFrequencySet mCallback;
-    private Context mContext;
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-        mContext = context;
-    }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -34,7 +26,7 @@ public class FrequencyInputDialog extends DialogFragment {
         LayoutInflater inflater = getActivity().getLayoutInflater();
         final View frequencyInput = inflater.inflate(R.layout.frequency_input, null);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         builder.setTitle(args.getString("title", ""));
 

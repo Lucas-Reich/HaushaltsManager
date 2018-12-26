@@ -15,20 +15,11 @@ public class ErrorAlertDialog extends DialogFragment {
     public static final String TITLE = "title";
     public static final String CONTENT = "content";
 
-    private Context mContext;
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-        mContext = context;
-    }
-
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         BundleUtils args = new BundleUtils(getArguments());
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         builder.setTitle(args.getString(TITLE, "Error"));
 

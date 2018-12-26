@@ -18,22 +18,14 @@ public class RecurringBookingTimeFrameDialog extends DialogFragment {
     public static final String TITLE = "title";
 
     private OnConfirmationListener mListener;
-    private Context mContext;
     private int mFrequency;
     private Calendar mEndDate;
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-        mContext = context;
-    }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         BundleUtils args = new BundleUtils(getArguments());
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         builder.setTitle(args.getString(TITLE, ""));
 
@@ -63,10 +55,9 @@ public class RecurringBookingTimeFrameDialog extends DialogFragment {
     }
 
     private LinearLayout getDialogView() {
-        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        LinearLayout ll = (LinearLayout) inflater.inflate(R.layout.frequency_dialog_input, null);
+        LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        return ll;
+        return (LinearLayout) inflater.inflate(R.layout.frequency_dialog_input, null);
     }
 
     private long getEndInMillis() {

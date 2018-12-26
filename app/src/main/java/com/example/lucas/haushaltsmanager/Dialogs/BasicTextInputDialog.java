@@ -26,16 +26,8 @@ public class BasicTextInputDialog extends DialogFragment {
     public static final String HINT = "hint";
 
     private OnTextInput mCallback;
-    private Context mContext;
     private String mDialogHint;
     private EditText mTextInput;
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-        mContext = context;
-    }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -50,7 +42,7 @@ public class BasicTextInputDialog extends DialogFragment {
 
         mDialogHint = args.getString(HINT, "");
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         builder.setTitle(args.getString(TITLE, ""));
 
@@ -71,7 +63,7 @@ public class BasicTextInputDialog extends DialogFragment {
      */
     private LinearLayout prepareLayout() {
 
-        LinearLayout linearLayout = new LinearLayout(mContext);
+        LinearLayout linearLayout = new LinearLayout(getActivity());
         linearLayout.setPadding(ViewUtils.dpToPx(23), 0, 0, 0);
         linearLayout.addView(prepareTextInput());
 
@@ -86,7 +78,7 @@ public class BasicTextInputDialog extends DialogFragment {
     private EditText prepareTextInput() {
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
-        EditText editText = new EditText(mContext);
+        EditText editText = new EditText(getActivity());
         editText.setLayoutParams(lp);
         editText.setMaxLines(1);
         editText.setHint(mDialogHint);
@@ -140,7 +132,7 @@ public class BasicTextInputDialog extends DialogFragment {
 
             if (mDialogHint.length() == 0) {
 
-                Toast.makeText(mContext, mContext.getResources().getString(R.string.error_name_missing), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), getString(R.string.error_name_missing), Toast.LENGTH_SHORT).show();
             } else {
 
                 if (mCallback != null)

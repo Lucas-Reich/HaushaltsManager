@@ -20,14 +20,12 @@ public class DatePickerDialog extends DialogFragment implements DatePicker.OnDat
     public static final String MIN_DATE_IN_MILLIS = "min_date";
 
     private OnDateSelected mCallback;
-    private Context mContext;
     private Calendar mCalendar;
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        mContext = context;
         mCalendar = Calendar.getInstance();
     }
 
@@ -37,11 +35,11 @@ public class DatePickerDialog extends DialogFragment implements DatePicker.OnDat
 
         mCalendar.setTimeInMillis(args.getLong(CURRENT_DAY_IN_MILLIS, Calendar.getInstance().getTimeInMillis()));
 
-        DatePicker datePicker = new DatePicker(mContext);
+        DatePicker datePicker = new DatePicker(getActivity());
         datePicker.init(mCalendar.get(Calendar.YEAR), mCalendar.get(Calendar.MONTH), mCalendar.get(Calendar.DAY_OF_MONTH), this);
         datePicker.setMinDate(args.getLong(MIN_DATE_IN_MILLIS, 0L));
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         builder.setTitle(args.getString(TITLE, ""));
 

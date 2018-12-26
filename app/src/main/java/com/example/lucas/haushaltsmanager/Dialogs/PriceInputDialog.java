@@ -23,15 +23,7 @@ public class PriceInputDialog extends DialogFragment {
     public static final String TITLE = "title";
     public static final String HINT = "hint";
 
-    private Context mContext;
     private OnPriceSelected mCallback;
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-        mContext = context;
-    }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -48,12 +40,12 @@ public class PriceInputDialog extends DialogFragment {
 
         //wrapper für die text eingabe, sodass dieser eine padding gegeben werden kann
         //Quelle: http://android.pcsalt.com/create-alertdialog-with-custom-layout-programmatically/
-        LinearLayout layout = new LinearLayout(mContext);
+        LinearLayout layout = new LinearLayout(getActivity());
         layout.setPadding(ViewUtils.dpToPx(23), 0, 0, 0);
         layout.addView(input);
 
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         builder.setTitle(args.getString(TITLE, ""));
 
@@ -111,7 +103,7 @@ public class PriceInputDialog extends DialogFragment {
     private EditText createInputView(double hint) {
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
-        EditText input = new EditText(mContext);
+        EditText input = new EditText(getActivity());
         input.setHint(PriceUtils.toHumanReadablePrice(hint));
         input.setLayoutParams(lp);
         input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
