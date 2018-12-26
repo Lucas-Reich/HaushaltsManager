@@ -30,6 +30,6 @@ public class BackupUtils {
     }
 
     public static String getDefaultBackupName() {
-        return new SimpleDateFormat("YYYYMMdd", Locale.US).format(Calendar.getInstance().getTime()).concat("_Backup");
+        return new SimpleDateFormat("yyyyMMdd", Locale.US).format(Calendar.getInstance().getTime()).concat("_Backup");
     }
 }

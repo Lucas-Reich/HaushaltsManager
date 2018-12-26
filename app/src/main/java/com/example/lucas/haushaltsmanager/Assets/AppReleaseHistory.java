@@ -6,7 +6,6 @@ import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.R;
 import com.lucas.changelogdialog.Bug;
 import com.lucas.changelogdialog.ChangelogItem;
-import com.lucas.changelogdialog.Feature;
 import com.lucas.changelogdialog.Release;
 import com.lucas.changelogdialog.ReleaseHistory;
 
@@ -42,6 +41,8 @@ public class AppReleaseHistory implements ReleaseHistory {
         List<Release> releases = new ArrayList<>();
         releases.add(getRealRelease100());
         releases.add(getRealRelease601());
+        releases.add(getRelease602());
+        releases.add(getRelease603());
 
         return releases;
     }
@@ -72,6 +73,34 @@ public class AppReleaseHistory implements ReleaseHistory {
                 1,
                 getDate(25, 12, 2018),
                 "Kleinere Fehlerbehebungen",
+                changelog
+        );
+    }
+
+    private Release getRelease602() {
+        List<ChangelogItem> changelog = new ArrayList<>();
+        changelog.add(new Bug("Fehler behoben, welcher die App zum Absturz gebracht hat, wenn das letzte Konto gelöscht wurde"));
+
+        return new Release(
+                6,
+                null,
+                2,
+                getDate(26, 12, 2018),
+                null,
+                changelog
+        );
+    }
+
+    private Release getRelease603() {
+        List<ChangelogItem> changelog = new ArrayList<>();
+        changelog.add(new Bug("Fehler behoben, welcher die App aucf alten Geräten zum abstürzen bringt, wenn ein neues Backup erstellt wurde"));
+
+        return new Release(
+                6,
+                null,
+                3,
+                getDate(26, 12, 2018),
+                null,
                 changelog
         );
     }
