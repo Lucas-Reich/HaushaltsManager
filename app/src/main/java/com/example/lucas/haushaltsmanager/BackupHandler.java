@@ -154,6 +154,6 @@ public class BackupHandler {
     }
 
     private String getDefaultBackupName() {
-        return new SimpleDateFormat("YYYYMMdd", Locale.US).format(Calendar.getInstance().getTime()) + "_Backup";
+        return new SimpleDateFormat("yyyyMMdd", Locale.US).format(Calendar.getInstance().getTime()) + "_Backup";
     }
 }
