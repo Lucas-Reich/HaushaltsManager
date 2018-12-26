@@ -158,7 +158,10 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Acco
             if (isCurrentMainAccount(account)) {
 
                 deleteAccount(account);
-                makeAccountMain((Account) mInitialAccountState.keySet().toArray()[0]);
+
+                Account newMainAccount = getNewMainAccountSafe();
+                if (newMainAccount != null)
+                    makeAccountMain(newMainAccount);
             } else {
 
                 deleteAccount(account);
@@ -171,6 +174,13 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Acco
         }
 
         dismiss();
+    }
+
+    private Account getNewMainAccountSafe() {
+        if (mInitialAccountState.size() == 0)
+            return null;
+
+        return (Account) mInitialAccountState.keySet().toArray()[0];
     }
 
     /**
