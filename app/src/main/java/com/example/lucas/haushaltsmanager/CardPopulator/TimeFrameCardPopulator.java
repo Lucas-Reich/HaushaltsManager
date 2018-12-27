@@ -6,6 +6,8 @@ import android.support.v7.widget.CardView;
 import android.view.View;
 import android.widget.TextView;
 
+import com.example.lucas.androidcharts.DataSet;
+import com.example.lucas.androidcharts.PieChart;
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
@@ -14,8 +16,6 @@ import com.example.lucas.haushaltsmanager.Entities.Report.ReportInterface;
 import com.example.lucas.haushaltsmanager.ExpenseSum;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
-import com.lucas.androidcharts.DataSet;
-import com.lucas.androidcharts.PieChart;
 
 import java.util.ArrayList;
 import java.util.HashMap;

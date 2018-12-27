@@ -43,10 +43,6 @@ dependencies {
     implementation 'com.github.fafaldo:fab-toolbar:1.2.0'
     //API welche ich benutze um Hintergrundaufgaben laufen zu lassen
     implementation 'android.arch.work:work-runtime:1.0.0-beta01'
-    //Chart Views
-    implementation 'com.github.LabberToasT:Android-Charts:1.0.3'
-    //AlertDialog zum anzeigen von eines Changelogs
-//    implementation 'com.github.LabberToasT:Android-ChangelogDialog:1.0.3'
     //AlertDialog zum anzeigen der von mir genutzten OpenSource Pakete
     // TODO: Kann irgendwie nicht weiter upgraden
     implementation 'de.psdev.licensesdialog:licensesdialog:1.8.3'
@@ -59,4 +55,5 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:2.20.0'
     testImplementation 'junit:junit:4.12'
     implementation project(path: ':changelogdialog')
+    implementation project(path: ':androidcharts')
 }
