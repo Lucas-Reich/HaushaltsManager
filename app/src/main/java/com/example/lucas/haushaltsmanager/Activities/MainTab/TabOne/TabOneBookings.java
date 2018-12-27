@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,9 +30,9 @@ import com.example.lucas.haushaltsmanager.ListAdapter.ExpandableListAdapter;
 import com.example.lucas.haushaltsmanager.ListAdapter.AdapterCreator.ExpandableListAdapterCreator;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
+import com.example.lucas.haushaltsmanager.Utils.CalendarUtils;
 import com.github.fafaldo.fabtoolbar.widget.FABToolbarLayout;
 
-import java.util.Calendar;
 import java.util.List;
 
 public class TabOneBookings extends AbstractTab implements FABToolbar.OnFabToolbarMenuItemClicked {
@@ -234,7 +233,7 @@ public class TabOneBookings extends AbstractTab implements FABToolbar.OnFabToolb
     public void updateView() {
 
         mListAdapter = new ExpandableListAdapterCreator(
-                mParent.getExpenses(getFirstOfMonth(), getLastOfMonth()),
+                mParent.getVisibleExpensesInTimeFrame(CalendarUtils.getFirstOfCurrentMonth(), CalendarUtils.getLastOfCurrentMonth()),
                 mParent.getActiveAccounts(),
                 getContext()
         ).getExpandableListAdapter();
@@ -242,24 +241,6 @@ public class TabOneBookings extends AbstractTab implements FABToolbar.OnFabToolb
         mExpListView.setAdapter(mListAdapter);
 
         mListAdapter.notifyDataSetChanged();
-    }
-
-    private Calendar getFirstOfMonth() {
-        Calendar firstOfMonth = Calendar.getInstance();
-        firstOfMonth.set(Calendar.HOUR_OF_DAY, 0);
-        firstOfMonth.set(Calendar.MINUTE, 0);
-        firstOfMonth.set(Calendar.SECOND, 1);
-        firstOfMonth.set(Calendar.DAY_OF_MONTH, 1);
-
-        return firstOfMonth;
-    }
-
-    private Calendar getLastOfMonth() {
-        int lastDayMonth = Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH);
-        Calendar lastOfMonth = Calendar.getInstance();
-        lastOfMonth.set(Calendar.DAY_OF_MONTH, lastDayMonth);
-
-        return lastOfMonth;
     }
 
     private void updateToolbarItemOne(int selectedParentCount, int selectedChildCount) {
@@ -326,10 +307,7 @@ public class TabOneBookings extends AbstractTab implements FABToolbar.OnFabToolb
                 saveAsTemplateAction(selectedItems.get(0).getItem());
                 break;
             case FABToolbar.MENU_DELETE_ACTION:
-                initializeRevertDeletionSnackbar(
-                        R.string.revert_deletion,
-                        R.string.bookings_successfully_restored
-                );
+                initializeRevertDeletionSnackbar();
                 deleteBookingsAction(selectedItems);
                 break;
             default:
@@ -471,13 +449,13 @@ public class TabOneBookings extends AbstractTab implements FABToolbar.OnFabToolb
         mTabOneFabToolbar.hideToolbar();
     }
 
-    private void initializeRevertDeletionSnackbar(@StringRes int message, @StringRes final int successMessage) {
+    private void initializeRevertDeletionSnackbar() {
         mRevertDeletionSnackbar = new RevertExpenseDeletionSnackbar(getContext());
-        mRevertDeletionSnackbar.setMessage(getString(message));
+        mRevertDeletionSnackbar.setMessage(getString(R.string.revert_deletion));
         mRevertDeletionSnackbar.setOnRestoredActionListener(new RevertExpenseDeletionSnackbar.OnRestoredActionListener() {
             @Override
             public void onExpensesRestored() {
-                Toast.makeText(getContext(), successMessage, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), R.string.bookings_successfully_restored, Toast.LENGTH_SHORT).show();
 
                 mParent.updateExpenses();
 

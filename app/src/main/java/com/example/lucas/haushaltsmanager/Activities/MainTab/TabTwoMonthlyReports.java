@@ -39,9 +39,6 @@ public class TabTwoMonthlyReports extends AbstractTab {
         super.onDestroy();
     }
 
-    /**
-     * Methode um die ExpandableListView nach eine Änderung neu anzuzeigen
-     */
     public void updateView() {
 
         MonthlyReportAdapter adapter = new MonthlyReportAdapterCreator(

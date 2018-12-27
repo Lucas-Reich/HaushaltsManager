@@ -19,11 +19,9 @@ public class ActiveAccountsPreferences {
     private static boolean DEFAULT_ACCOUNT_STATUS = true;
 
     private SharedPreferences mPreferences;
-    private AccountRepository mAccountRepo;
 
-    public ActiveAccountsPreferences(Context context, AccountRepository accountRepository) {
+    public ActiveAccountsPreferences(Context context) {
 
-        mAccountRepo = accountRepository;
         mPreferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
     }
 
@@ -53,54 +51,40 @@ public class ActiveAccountsPreferences {
         return mPreferences.getBoolean(stringify(account.getIndex()), false);
     }
 
-    public List<Account> getActiveAccounts() {
-        Map<String, ?> allAccounts = mPreferences.getAll();
+    public List<Long> getActiveAccounts2() {
+        Map<String, ?> map = mPreferences.getAll();
 
-        return getAccounts(allAccounts);
+        return toLongList(map);
     }
 
-    private String stringify(long value) {
-        return value + "";
-    }
+    private List<Long> toLongList(Map<String, ?> map) {
+        List<Long> idList = new ArrayList<>();
 
-    private List<Account> getAccounts(Map<String, ?> accounts) {
+        for (Map.Entry<String, ?> entry : map.entrySet()) {
+            long id = getId(entry);
 
-        List<Account> activeAccounts = new ArrayList<>();
-        for (Map.Entry<String, ?> entry : accounts.entrySet()) {
-            if (isAccountActive(entry)) {
-                Account account = entryToAccount(entry);
-                if (null != account) {
-                    activeAccounts.add(entryToAccount(entry));
-                }
-            }
+            if (-1 != id)
+                idList.add(id);
         }
 
-        return activeAccounts;
+        return idList;
     }
 
-    private boolean isAccountActive(Map.Entry<String, ?> entry) {
-        return (Boolean) entry.getValue();
-    }
-
-    private Account entryToAccount(Map.Entry<String, ?> entry) {
-
+    private long getId(Map.Entry<String, ?> entry) {
         try {
-            long accountId = Long.parseLong(entry.getKey());
 
-            return mAccountRepo.get(accountId);
-        } catch (AccountNotFoundException e) {
-            Log.e(TAG, String.format("Failed to retrieve account %s from database", entry.getKey()), e);
-
-            forceRemoveEntry(entry);
-
-            return null;
+            return Long.parseLong(entry.getKey());
         } catch (NumberFormatException e) {
             Log.e(TAG, String.format("Failed to convert '%s' to long.", entry.getKey()), e);
 
             forceRemoveEntry(entry);
 
-            return null;
+            return -1;
         }
+    }
+
+    private String stringify(long value) {
+        return value + "";
     }
 
     private void forceRemoveEntry(Map.Entry<String, ?> entry) {

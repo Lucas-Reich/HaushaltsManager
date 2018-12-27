@@ -38,7 +38,7 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Acco
         super.onCreate(savedInstanceState);
         mAccountRepo = new AccountRepository(getActivity());
 
-        mAccountPreferences = new ActiveAccountsPreferences(getActivity(), mAccountRepo);
+        mAccountPreferences = new ActiveAccountsPreferences(getActivity());
         mUserPreferences = new UserSettingsPreferences(getActivity());
 
         mInitialAccountState = new HashMap<>();
