@@ -14,11 +14,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.lucas.changelogdialog.ChangelogDialog;
 import com.example.lucas.haushaltsmanager.Assets.AppReleaseHistory;
 import com.example.lucas.haushaltsmanager.BuildConfig;
 import com.example.lucas.haushaltsmanager.Dialogs.LicensesWrapperDialog;
 import com.example.lucas.haushaltsmanager.R;
-import com.lucas.changelogdialog.ChangelogDialog;
 
 public class AboutUsActivity extends AppCompatActivity {
     private static final String SUPPORT_MAIL = "ausgabenmanager@outlook.com";

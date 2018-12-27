@@ -46,7 +46,7 @@ dependencies {
     //Chart Views
     implementation 'com.github.LabberToasT:Android-Charts:1.0.3'
     //AlertDialog zum anzeigen von eines Changelogs
-    implementation 'com.github.LabberToasT:Android-ChangelogDialog:1.0.3'
+//    implementation 'com.github.LabberToasT:Android-ChangelogDialog:1.0.3'
     //AlertDialog zum anzeigen der von mir genutzten OpenSource Pakete
     // TODO: Kann irgendwie nicht weiter upgraden
     implementation 'de.psdev.licensesdialog:licensesdialog:1.8.3'
@@ -58,4 +58,5 @@ dependencies {
     //Mockito siehe PowerMockito
     testImplementation 'org.mockito:mockito-core:2.20.0'
     testImplementation 'junit:junit:4.12'
+    implementation project(path: ':changelogdialog')
 }

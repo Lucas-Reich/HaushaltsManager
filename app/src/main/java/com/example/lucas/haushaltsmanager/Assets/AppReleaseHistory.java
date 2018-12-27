@@ -2,13 +2,13 @@ package com.example.lucas.haushaltsmanager.Assets;
 
 import android.support.annotation.StringRes;
 
+import com.example.lucas.changelogdialog.Bug;
+import com.example.lucas.changelogdialog.ChangelogItem;
+import com.example.lucas.changelogdialog.Improvement;
+import com.example.lucas.changelogdialog.Release;
+import com.example.lucas.changelogdialog.ReleaseHistory;
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.R;
-import com.lucas.changelogdialog.Bug;
-import com.lucas.changelogdialog.ChangelogItem;
-import com.lucas.changelogdialog.Improvement;
-import com.lucas.changelogdialog.Release;
-import com.lucas.changelogdialog.ReleaseHistory;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -38,7 +38,7 @@ import java.util.List;
 public class AppReleaseHistory implements ReleaseHistory {
 
     @Override
-    public List<com.lucas.changelogdialog.Release> getHistory() {
+    public List<Release> getHistory() {
         List<Release> releases = new ArrayList<>();
         releases.add(getRealRelease100());
         releases.add(getRealRelease601());
