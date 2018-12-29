@@ -48,12 +48,12 @@ dependencies {
     implementation 'de.psdev.licensesdialog:licensesdialog:1.8.3'
     //AlertDialog um den User ein Verzeichniss auswählen zu lassen
     implementation 'com.github.codekidX:storage-chooser:2.0.3'
+    implementation project(path: ':androidcharts')
+    implementation project(path: ':changelogdialog')
     //todo replace ColorPicker with one of https://android-arsenal.com/tag/18?sort=created
     //Robolectric wird benötigt um einen Context zu erstellen, ohne dass die Tests auf einem Emulator ausgeführt werden müssen
     testImplementation 'org.robolectric:robolectric:3.8'
     //Mockito siehe PowerMockito
     testImplementation 'org.mockito:mockito-core:2.20.0'
     testImplementation 'junit:junit:4.12'
-    implementation project(path: ':changelogdialog')
-    implementation project(path: ':androidcharts')
 }

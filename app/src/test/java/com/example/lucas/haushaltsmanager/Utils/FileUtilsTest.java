@@ -1,9 +1,5 @@
 package com.example.lucas.haushaltsmanager.Utils;
 
-import android.content.res.Resources;
-
-import com.example.lucas.haushaltsmanager.R;
-
 import org.junit.Test;
 
 import java.io.File;

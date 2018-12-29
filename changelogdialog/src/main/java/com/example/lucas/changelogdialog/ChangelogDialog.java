@@ -6,22 +6,15 @@ import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.view.View;
 import android.widget.ListView;
 
 public class ChangelogDialog extends DialogFragment {
     private AlertDialog.Builder mBuilder;
-    private Context mContext;
     private ReleaseHistory mReleaseHistory;
-    private String mPositiveBtnText = "Close";
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-        mContext = context;
-    }
+    @StringRes
+    private int mCloseBtnTxt = R.string.close;
 
     public void createBuilder(Context context) {
 
@@ -31,13 +24,13 @@ public class ChangelogDialog extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-        View view = getActivity().getLayoutInflater().inflate(R.layout.changelog_dialog, null, false);
+        View view = View.inflate(getActivity(), R.layout.changelog_dialog, null);
         ListView releaseListView = view.findViewById(R.id.changelog_list);
         releaseListView.setAdapter(getReleaseAdapter());
 
         mBuilder.setView(view);
 
-        mBuilder.setPositiveButton(mPositiveBtnText, new DialogInterface.OnClickListener() {
+        mBuilder.setPositiveButton(mCloseBtnTxt, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
 
@@ -48,9 +41,9 @@ public class ChangelogDialog extends DialogFragment {
         return mBuilder.create();
     }
 
-    public void setCloseBtnText(@NonNull String btnText) {
+    public void setCloseBtnText(@StringRes int btnText) {
 
-        mPositiveBtnText = btnText;
+        mCloseBtnTxt = btnText;
     }
 
     /**
@@ -69,6 +62,6 @@ public class ChangelogDialog extends DialogFragment {
 
     private ChangelogAdapter getReleaseAdapter() {
 
-        return new ChangelogAdapter(mReleaseHistory.getHistory(), mContext);
+        return new ChangelogAdapter(mReleaseHistory.getHistory(), getActivity());
     }
 }
