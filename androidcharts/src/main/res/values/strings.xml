@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Android Charts</string>
+    <string name="others">Other</string>
+    <string name="no_data">No Data Available</string>
+</resources>

@@ -323,7 +323,6 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
                     case INTENT_MODE_CREATE_BOOKING:
 
                         mExpense = mExpenseRepo.insert(mExpense);
-                        Toast.makeText(ExpenseScreen.this, "Created Booking \"" + mExpense.getTitle() + "\"", Toast.LENGTH_SHORT).show();
                         break;
                     default:
                         throw new UnsupportedOperationException("Could not handle intent mode " + bundle.getString(INTENT_MODE, null));

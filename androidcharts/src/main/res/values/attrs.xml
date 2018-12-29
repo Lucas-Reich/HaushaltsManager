@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="PieChart">
+        <attr name="draw_hole" format="boolean"/>
+        <attr name="hole_size" format="integer"/>
+        <attr name="hole_color" format="color"/>
+        <attr name="no_data_text" format="string"/>
+        <attr name="use_legend" format="boolean"/>
+        <attr name="use_transparent_circle" format="boolean"/>
+        <attr name="use_compressed" format="boolean"/>
+        <attr name="layer_depth" format="integer"/>
+        <attr name="draw_slice_margin" format="boolean"/>
+        <attr name="center_text" format="string"/>
+        <attr name="numerator_color" format="color"/>
+    </declare-styleable>
+</resources>

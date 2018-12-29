@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 
+import com.example.lucas.androidcharts.DataSet;
+import com.example.lucas.androidcharts.PieChart;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
@@ -18,8 +20,6 @@ import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferen
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
 import com.example.lucas.haushaltsmanager.Utils.ViewUtils;
-import com.lucas.androidcharts.DataSet;
-import com.lucas.androidcharts.PieChart;
 
 import java.util.ArrayList;
 import java.util.HashMap;
