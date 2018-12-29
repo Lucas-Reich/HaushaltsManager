@@ -82,15 +82,19 @@ public class ExpandableListItemSelector {
     }
 
     private boolean allChildrenSelected(int groupPosition) {
-        ExpenseObject group = (ExpenseObject) mAdapter.getGroup(groupPosition);
+        ExpenseObject parent = (ExpenseObject) mAdapter.getGroup(groupPosition);
 
         int selectedChildrenCount = 0;
         for (ExpListViewSelectedItem selectedItem : mSelectedItems) {
-            if (selectedItem.getParent().equals(group))
+            if (isSelectedItemChildOfParent(selectedItem, parent))
                 selectedChildrenCount++;
         }
 
         return selectedChildrenCount == mAdapter.getChildrenCount(groupPosition);
+    }
+
+    private boolean isSelectedItemChildOfParent(ExpListViewSelectedItem selectedItem, ExpenseObject parent) {
+        return parent.equals(selectedItem.getParent());
     }
 
     private boolean isSelected(int groupPosition, int childPosition) {

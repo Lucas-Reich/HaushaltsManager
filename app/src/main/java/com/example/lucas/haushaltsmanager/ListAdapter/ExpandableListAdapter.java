@@ -91,8 +91,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
         ExpenseObject groupExpense = (ExpenseObject) getGroup(groupPosition);
-        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        boolean isSelected = isItemSelected(groupPosition, -1);
+        LayoutInflater inflater = LayoutInflater.from(mContext);
 
         switch (groupExpense.getExpenseType()) {
 
@@ -102,7 +101,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 if (isExpanded)
                     convertView.findViewById(R.id.exp_listview_paren_divider).setVisibility(View.GONE);
 
-                if (isSelected)
+                if (isItemSelected(groupPosition, -1))
                     convertView.setBackgroundColor(mContext.getResources().getColor(R.color.list_item_highlighted));
 
                 PieChart pieChart = convertView.findViewById(R.id.exp_listview_parent_pie_chart);
@@ -129,7 +128,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             case NORMAL_EXPENSE:
 
                 convertView = inflater.inflate(R.layout.activity_exp_listview_group, parent, false);
-                if (isSelected)
+                if (isItemSelected(groupPosition, -1))
                     convertView.setBackgroundColor(mContext.getResources().getColor(R.color.list_item_highlighted));
 
                 RoundedTextView roundedTextView = convertView.findViewById(R.id.exp_listview_group_rounded_textview);
@@ -159,7 +158,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
                 // TODO: Eigenes Layout für transfer mExpenses definieren
                 convertView = inflater.inflate(R.layout.activity_exp_listview_group, parent, false);
-                if (isSelected)
+                if (isItemSelected(groupPosition, -1))
                     convertView.setBackgroundColor(mContext.getResources().getColor(R.color.list_item_highlighted));
 
                 RoundedTextView roundedTextView3 = convertView.findViewById(R.id.exp_listview_group_rounded_textview);
@@ -242,7 +241,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         if (convertView == null) {
 
             childViewHolder = new ChildViewHolder();
-            LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater inflater = LayoutInflater.from(mContext);
             convertView = inflater.inflate(R.layout.activity_exp_listview_child, parent, false);
 
             childViewHolder.roundedTextView = convertView.findViewById(R.id.exp_list_view_item_circle);

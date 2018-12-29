@@ -5,8 +5,8 @@ import android.widget.ExpandableListView;
 
 import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.RecurringBookingRepository;
 import com.example.lucas.haushaltsmanager.Entities.RecurringBooking;
-import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.ListAdapter.RecurringBookingAdapter;
+import com.example.lucas.haushaltsmanager.R;
 
 import java.util.Calendar;
 import java.util.List;

@@ -1,7 +1,5 @@
 package com.example.lucas.haushaltsmanager.Entities.Report;
 
-import android.content.Context;
-
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;

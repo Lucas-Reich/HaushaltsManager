@@ -82,7 +82,7 @@ public class CreateAccountActivity extends AbstractAppCompatActivity {
             public void onClick(View v) {
 
                 Bundle args = new Bundle();
-                args.putString(BasicTextInputDialog.TITLE, getResources().getString(R.string.set_account_title));
+                args.putString(BasicTextInputDialog.TITLE, getString(R.string.set_account_title));
                 args.putString(BasicTextInputDialog.HINT, mAccount.getTitle());
 
                 BasicTextInputDialog basicDialog = new BasicTextInputDialog();
@@ -112,7 +112,7 @@ public class CreateAccountActivity extends AbstractAppCompatActivity {
             public void onClick(View v) {
 
                 Bundle args = new Bundle();
-                args.putString(PriceInputDialog.TITLE, getResources().getString(R.string.set_Account_balance));
+                args.putString(PriceInputDialog.TITLE, getString(R.string.set_Account_balance));
                 args.putDouble(PriceInputDialog.HINT, mAccount.getBalance());
 
                 PriceInputDialog priceInputDialog = new PriceInputDialog();
@@ -141,12 +141,12 @@ public class CreateAccountActivity extends AbstractAppCompatActivity {
 
     private void runCheckToCrossAnimation() {
         // TODO Der Übergang von dem Häkchen zum Kreuz soll animiert sein
-        mSaveFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_cross_white));
+        mSaveFAB.setImageDrawable(getDrawableRes(R.drawable.ic_cross_white));
     }
 
     private void runCrossToCheckAnimation() {
         // TODO Der Übergang von dem Kreuz zum Häkchen soll animiert sein
-        mSaveFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_check_white_24dp));
+        mSaveFAB.setImageDrawable(getDrawableRes(R.drawable.ic_check_white_24dp));
     }
 
     /**

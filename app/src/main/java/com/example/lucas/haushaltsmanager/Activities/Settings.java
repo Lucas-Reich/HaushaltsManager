@@ -392,21 +392,21 @@ public class Settings extends AbstractAppCompatActivity {
         if (clickable) {
 
             backupLocationLayout.setClickable(true);
-            backupLocationHeadingTxt.setTextColor(getResources().getColor(R.color.primary_text_color));
-            backupLocationTxt.setTextColor(getResources().getColor(R.color.primary_text_color));
+            backupLocationHeadingTxt.setTextColor(getColorRes(R.color.primary_text_color));
+            backupLocationTxt.setTextColor(getColorRes(R.color.primary_text_color));
 
             concurrentBackupsLayout.setClickable(true);
-            backupCountTextTxt.setTextColor(getResources().getColor(R.color.primary_text_color));
-            maxBackupCountTxt.setTextColor(getResources().getColor(R.color.primary_text_color));
+            backupCountTextTxt.setTextColor(getColorRes(R.color.primary_text_color));
+            maxBackupCountTxt.setTextColor(getColorRes(R.color.primary_text_color));
         } else {
 
             backupLocationLayout.setClickable(false);
-            backupLocationHeadingTxt.setTextColor(getResources().getColor(R.color.text_color_disabled));
-            backupLocationTxt.setTextColor(getResources().getColor(R.color.text_color_disabled));
+            backupLocationHeadingTxt.setTextColor(getColorRes(R.color.text_color_disabled));
+            backupLocationTxt.setTextColor(getColorRes(R.color.text_color_disabled));
 
             concurrentBackupsLayout.setClickable(false);
-            backupCountTextTxt.setTextColor(getResources().getColor(R.color.text_color_disabled));
-            maxBackupCountTxt.setTextColor(getResources().getColor(R.color.text_color_disabled));
+            backupCountTextTxt.setTextColor(getColorRes(R.color.text_color_disabled));
+            maxBackupCountTxt.setTextColor(getColorRes(R.color.text_color_disabled));
         }
     }
 
@@ -511,13 +511,13 @@ public class Settings extends AbstractAppCompatActivity {
 
         if (clickable) {
 
-            notificationTimeTextTxt.setTextColor(getResources().getColor(R.color.primary_text_color));
-            notificationTimeTxt.setTextColor(getResources().getColor(R.color.primary_text_color));
+            notificationTimeTextTxt.setTextColor(getColorRes(R.color.primary_text_color));
+            notificationTimeTxt.setTextColor(getColorRes(R.color.primary_text_color));
             notificationTimeLayout.setClickable(true);
         } else {
 
-            notificationTimeTextTxt.setTextColor(getResources().getColor(R.color.text_color_disabled));
-            notificationTimeTxt.setTextColor(getResources().getColor(R.color.text_color_disabled));
+            notificationTimeTextTxt.setTextColor(getColorRes(R.color.text_color_disabled));
+            notificationTimeTxt.setTextColor(getColorRes(R.color.text_color_disabled));
             notificationTimeLayout.setClickable(false);
         }
     }

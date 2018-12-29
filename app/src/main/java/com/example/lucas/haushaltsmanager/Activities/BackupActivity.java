@@ -117,7 +117,7 @@ public class BackupActivity extends AbstractAppCompatActivity {
             @Override
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
-                bundle.putString(BasicTextInputDialog.TITLE, getResources().getString(R.string.choose_new_backup_name));
+                bundle.putString(BasicTextInputDialog.TITLE, getString(R.string.choose_new_backup_name));
                 bundle.putString(BasicTextInputDialog.HINT, BackupUtils.getDefaultBackupName());
 
                 BasicTextInputDialog basicDialog = new BasicTextInputDialog();

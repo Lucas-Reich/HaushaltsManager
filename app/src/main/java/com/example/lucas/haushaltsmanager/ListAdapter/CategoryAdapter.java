@@ -78,11 +78,11 @@ public class CategoryAdapter extends BaseExpandableListAdapter {
         if (convertView == null) {
 
             groupViewHolder = new ViewHolder();
-            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater inflater = LayoutInflater.from(mContext);
             convertView = inflater.inflate(R.layout.category_group_item, null);
 
-            groupViewHolder.roundedTextView = (RoundedTextView) convertView.findViewById(R.id.category_item_rounded_text_view);
-            groupViewHolder.txtCategoryName = (TextView) convertView.findViewById(R.id.category_item_name);
+            groupViewHolder.roundedTextView = convertView.findViewById(R.id.category_item_rounded_text_view);
+            groupViewHolder.txtCategoryName = convertView.findViewById(R.id.category_item_name);
 
             convertView.setTag(groupViewHolder);
         } else {
@@ -114,11 +114,11 @@ public class CategoryAdapter extends BaseExpandableListAdapter {
         if (convertView == null) {
 
             childViewHolder = new ViewHolder();
-            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater inflater = LayoutInflater.from(mContext);
             convertView = inflater.inflate(R.layout.category_child_item, null);
 
-            childViewHolder.roundedTextView = (RoundedTextView) convertView.findViewById(R.id.category_item_rounded_text_view);
-            childViewHolder.txtCategoryName = (TextView) convertView.findViewById(R.id.category_item_name);
+            childViewHolder.roundedTextView = convertView.findViewById(R.id.category_item_rounded_text_view);
+            childViewHolder.txtCategoryName = convertView.findViewById(R.id.category_item_name);
 
             convertView.setTag(childViewHolder);
         } else {

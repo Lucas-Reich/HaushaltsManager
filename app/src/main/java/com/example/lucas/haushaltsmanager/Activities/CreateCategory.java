@@ -11,6 +11,7 @@ import android.widget.Toast;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.Exceptions.CategoryNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.Exceptions.ChildCategoryNotFoundException;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ColorPickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
@@ -37,6 +38,7 @@ public class CreateCategory extends AbstractAppCompatActivity {
     private boolean parentCategoryCreated = false;
 
     private CategoryRepository mCategoryRepo;
+    private ChildCategoryRepository mChildCategoryRepo;
 
     @Override
     protected void onCreate(Bundle savedInstances) {
@@ -44,6 +46,7 @@ public class CreateCategory extends AbstractAppCompatActivity {
         setContentView(R.layout.activity_new_category);
 
         mCategoryRepo = new CategoryRepository(this);
+        mChildCategoryRepo = new ChildCategoryRepository(this);
 
         initializeToolbar();
 
@@ -86,7 +89,7 @@ public class CreateCategory extends AbstractAppCompatActivity {
             @Override
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
-                bundle.putString(BasicTextInputDialog.TITLE, getResources().getString(R.string.category_name));
+                bundle.putString(BasicTextInputDialog.TITLE, getString(R.string.category_name));
                 bundle.putString(BasicTextInputDialog.HINT, mCategory.getTitle());
 
                 BasicTextInputDialog nameDialog = new BasicTextInputDialog();
@@ -198,14 +201,13 @@ public class CreateCategory extends AbstractAppCompatActivity {
                         if (parentCategoryCreated)
                             setParentCategoryColor();
 
-                        ChildCategoryRepository childRepo = new ChildCategoryRepository(CreateCategory.this);
-                        childRepo.insert(mParentCategory, mCategory);
+                        mChildCategoryRepo.insert(mParentCategory, mCategory);
                         break;
                     case INTENT_MODE_UPDATE:
 
                         try {
-                            mCategoryRepo.update(mCategory);
-                        } catch (CategoryNotFoundException e) {
+                            mChildCategoryRepo.update(mCategory);
+                        } catch (ChildCategoryNotFoundException e) {
 
                             Toast.makeText(CreateCategory.this, getString(R.string.category_not_found), Toast.LENGTH_SHORT).show();
                             // TODO: Fehlerbehandlung wenn versucht wird eine nicht existierende Kategorie zu updaten
@@ -276,19 +278,19 @@ public class CreateCategory extends AbstractAppCompatActivity {
 
         LinearLayout ll = findViewById(R.id.create_category_bottom_bar);
         ll.setBackgroundColor(expenditureType
-                ? getResources().getColor(R.color.booking_expense)
-                : getResources().getColor(R.color.booking_income)
+                ? getColorRes(R.color.booking_expense)
+                : getColorRes(R.color.booking_income)
         );
     }
 
     private void runCrossToCheckAnimation() {
         // TODO animate transition
-        mSaveFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_check_white_24dp));
+        mSaveFAB.setImageDrawable(getDrawableRes(R.drawable.ic_check_white_24dp));
     }
 
     private void runCheckToCrossAnimation() {
         // TODO animate transition
-        mSaveFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_cross_white));
+        mSaveFAB.setImageDrawable(getDrawableRes(R.drawable.ic_cross_white));
     }
 
     private boolean isCategorySavable() {

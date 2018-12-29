@@ -3,12 +3,11 @@ package com.example.lucas.haushaltsmanager.Dialogs;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
-import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
 import com.example.lucas.haushaltsmanager.R;
+import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
 
 public class ErrorAlertDialog extends DialogFragment {
     private static final String TAG = ErrorAlertDialog.class.getSimpleName();

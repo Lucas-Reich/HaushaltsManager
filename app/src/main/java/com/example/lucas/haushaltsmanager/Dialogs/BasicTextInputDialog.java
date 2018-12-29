@@ -3,7 +3,6 @@ package com.example.lucas.haushaltsmanager.Dialogs;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.content.Context;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.KeyEvent;
@@ -21,7 +20,6 @@ import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
 import com.example.lucas.haushaltsmanager.Utils.ViewUtils;
 
 public class BasicTextInputDialog extends DialogFragment {
-    private static final String TAG = BasicTextInputDialog.class.getSimpleName();
     public static final String TITLE = "title";
     public static final String HINT = "hint";
 
@@ -82,6 +80,7 @@ public class BasicTextInputDialog extends DialogFragment {
         editText.setLayoutParams(lp);
         editText.setMaxLines(1);
         editText.setHint(mDialogHint);
+        // Sollte ich noch eine ContentDescription hinzufügen, sodass das InputFeld auch duch ScreemReader lesbar ist?
         editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
