@@ -4,8 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingLeft="?android:attr/expandableListPreferredChildPaddingLeft"
+    android:background="@color/primaryBackgroundColorBright"
     android:paddingStart="?android:attr/expandableListPreferredChildPaddingLeft"
+    android:paddingLeft="?android:attr/expandableListPreferredChildPaddingLeft"
     android:paddingTop="5dp"
     tools:ignore="RtlSymmetry">
 

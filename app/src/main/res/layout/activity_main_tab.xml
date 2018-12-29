@@ -6,6 +6,7 @@
     android:id="@+id/main_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/primaryBackgroundColorBright"
     android:fitsSystemWindows="true"
     tools:context="com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity">
 
@@ -30,7 +31,7 @@
             android:id="@+id/tabs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:tabIndicatorColor="@color/mainColor"/>
+            app:tabIndicatorColor="@color/white"/>
 
     </android.support.design.widget.AppBarLayout>
 

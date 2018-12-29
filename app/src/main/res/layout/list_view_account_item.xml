@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/listview_account_item_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingEnd="35dp"
-    android:paddingLeft="20dp"
-    android:paddingRight="35dp"
+    android:background="@color/primaryBackgroundColorBright"
     android:paddingStart="20dp"
-    android:paddingTop="10dp">
+    android:paddingLeft="20dp"
+    android:paddingTop="10dp"
+    android:paddingEnd="35dp"
+    android:paddingRight="35dp">
 
     <CheckBox
         android:id="@+id/listview_account_item_chkbox"
@@ -24,8 +24,8 @@
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
         android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp"
         android:layout_weight="1"
         android:orientation="vertical">
 
@@ -68,6 +68,6 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="center"
-        android:tint="@color/drawable_color_dark"
-        android:src="@drawable/ic_three_dots_vertical_black"/>
+        android:src="@drawable/ic_three_dots_vertical_black"
+        android:tint="@color/drawable_color_dark"/>
 </LinearLayout>

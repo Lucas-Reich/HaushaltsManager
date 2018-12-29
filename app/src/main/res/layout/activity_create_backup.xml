@@ -3,7 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/primaryBackgroundColorBright">
 
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -18,10 +19,10 @@
 
         <Button
             android:id="@+id/create_backup_directory_btn"
-            android:contentDescription="@string/accessibility_choose_directory"
             style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:contentDescription="@string/accessibility_choose_directory"
             android:textAlignment="center"
             android:textAllCaps="false"/>
 
@@ -53,13 +54,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        android:contentDescription="@string/accessibility_create_backup"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:layout_marginEnd="18dp"
         android:layout_marginRight="18dp"
         android:layout_marginBottom="18dp"
         android:clickable="true"
+        android:contentDescription="@string/accessibility_create_backup"
         android:focusable="true"
         android:src="@drawable/ic_add_white"
         tools:ignore="RtlHardcoded"/>
