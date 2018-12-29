@@ -24,6 +24,7 @@ import com.example.lucas.androidcharts.Legend.LegendItem;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class PieChart extends ViewUtils {
     private final static String TAG = PieChart.class.getSimpleName();
@@ -934,7 +935,7 @@ public class PieChart extends ViewUtils {
         else
             mAnimator = ValueAnimator.ofFloat(0f, slice.getAbsValue());
 
-        mAnimator.setDuration(1000); // 1 sekunde
+        mAnimator.setDuration(timeToMillis(1, TimeUnit.SECONDS));
         mAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
 
         mAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -950,6 +951,10 @@ public class PieChart extends ViewUtils {
             }
         });
         mAnimator.start();
+    }
+
+    private long timeToMillis(int value, TimeUnit unit) {
+        return TimeUnit.MILLISECONDS.convert(value, unit);
     }
 
     /**

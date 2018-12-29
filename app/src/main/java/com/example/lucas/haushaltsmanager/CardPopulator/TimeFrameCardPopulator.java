@@ -120,9 +120,7 @@ public class TimeFrameCardPopulator {
     }
 
     private HashMap<Category, Double> sumByCategory(List<ExpenseObject> expenses) {
-        ExpenseSum expenseSum = new ExpenseSum();
-
-        return expenseSum.byCategory(expenses);
+        return new ExpenseSum().byCategory(expenses);
     }
 
     private String formatMoney(double money) {
