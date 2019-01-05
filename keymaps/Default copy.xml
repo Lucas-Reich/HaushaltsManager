@@ -4,6 +4,10 @@
   </action>
   <action id="ActivateTODOToolWindow" />
   <action id="CIDR.Lang.Cpp.GenerateDefinitions" />
+  <action id="CloseActiveTab">
+    <keyboard-shortcut first-keystroke="shift ctrl f4" />
+    <keyboard-shortcut first-keystroke="ctrl w" />
+  </action>
   <action id="CommentByLineComment">
     <keyboard-shortcut first-keystroke="shift ctrl d" />
   </action>
@@ -13,4 +17,5 @@
     <keyboard-shortcut first-keystroke="ctrl back_space" />
   </action>
   <action id="EditorDeleteToWordStart" />
+  <action id="EditorSelectWord" />
 </keymap>
