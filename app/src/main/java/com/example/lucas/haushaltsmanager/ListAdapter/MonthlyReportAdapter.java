@@ -1,5 +1,6 @@
 package com.example.lucas.haushaltsmanager.ListAdapter;
 
+import android.content.res.Resources;
 import android.support.annotation.LayoutRes;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -21,6 +22,7 @@ import java.util.List;
 public class MonthlyReportAdapter extends RecyclerView.Adapter<MonthlyReportAdapter.ViewHolder> {
 
     private List<ReportInterface> mReports;
+    private Resources mResources;
 
     class ViewHolder extends RecyclerView.ViewHolder {
         ViewHolder(View view) {
@@ -28,8 +30,9 @@ public class MonthlyReportAdapter extends RecyclerView.Adapter<MonthlyReportAdap
         }
     }
 
-    public MonthlyReportAdapter(List<ReportInterface> reports) {
+    public MonthlyReportAdapter(List<ReportInterface> reports, Resources resources) {
         mReports = reports;
+        mResources = resources;
     }
 
     @Override
@@ -45,7 +48,8 @@ public class MonthlyReportAdapter extends RecyclerView.Adapter<MonthlyReportAdap
         Report month = (Report) mReports.get(position);
 
         TimeFrameCardPopulator timeFrameCardPopulator = new TimeFrameCardPopulator(
-                (CardView) viewHolder.itemView
+                (CardView) viewHolder.itemView,
+                mResources
         );
         timeFrameCardPopulator.setData(month);
     }

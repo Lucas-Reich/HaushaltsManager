@@ -1,6 +1,10 @@
 package com.example.lucas.haushaltsmanager.CardPopulator;
 
 import android.content.res.Resources;
+import android.support.annotation.ColorInt;
+import android.support.annotation.ColorRes;
+import android.support.annotation.StringRes;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.os.ConfigurationCompat;
 import android.support.v7.widget.CardView;
 import android.view.View;
@@ -27,9 +31,12 @@ public class TimeFrameCardPopulator {
 
     private CardView mRootView;
     private ViewHolder mViewHolder;
+    private Resources mResources;
 
-    public TimeFrameCardPopulator(CardView rootView) {
+    public TimeFrameCardPopulator(CardView rootView, Resources resources) {
         mRootView = rootView;
+        mResources = resources;
+
 
         initializeViewHolder();
     }
@@ -95,15 +102,32 @@ public class TimeFrameCardPopulator {
 
         List<ExpenseObject> test = flattenExpenses(data.getExpenses());
 
-        for (Map.Entry<Category, Double> set : sumByCategory(test).entrySet()) {
-            pieData.add(new DataSet(
-                    set.getValue().floatValue(),
-                    set.getKey().getColorInt(),
-                    set.getKey().getTitle()
-            ));
+        for (Map.Entry<Boolean, Double> entry : sumByExpenseType(test).entrySet()) {
+            pieData.add(dataSetFrom(entry));
         }
 
         return pieData;
+    }
+
+    private DataSet dataSetFrom(Map.Entry<Boolean, Double> entry) {
+        int color = entry.getKey() ? getColor(R.color.booking_expense) : getColor(R.color.booking_income);
+        String label = entry.getKey() ? getString(R.string.expense) : getString(R.string.income);
+        float value = Math.abs(entry.getValue().floatValue());
+
+        return new DataSet(
+                value,
+                color,
+                label
+        );
+    }
+
+    @ColorInt
+    private int getColor(@ColorRes int color) {
+        return mResources.getColor(color);
+    }
+
+    private String getString(@StringRes int string) {
+        return mResources.getString(string);
     }
 
     private List<ExpenseObject> flattenExpenses(List<ExpenseObject> expenses) {
@@ -119,8 +143,14 @@ public class TimeFrameCardPopulator {
         return extractedChildren;
     }
 
-    private HashMap<Category, Double> sumByCategory(List<ExpenseObject> expenses) {
-        return new ExpenseSum().byCategory(expenses);
+    private HashMap<Boolean, Double> sumByExpenseType(List<ExpenseObject> expenses) {
+        ExpenseSum expenseSum = new ExpenseSum();
+
+        HashMap<Boolean, Double> summedExpenses = new HashMap<>();
+        summedExpenses.put(true, expenseSum.byExpenditureType(true, expenses));
+        summedExpenses.put(false, expenseSum.byExpenditureType(false, expenses));
+
+        return summedExpenses;
     }
 
     private String formatMoney(double money) {

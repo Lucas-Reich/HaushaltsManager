@@ -44,7 +44,8 @@ public class TabThreeYearlyReports extends AbstractTab {
         List<ExpenseObject> expenses = mParent.getVisibleExpenses();
 
         mTimeFrameCardPopulator = new TimeFrameCardPopulator(
-                (CardView) rootView.findViewById(R.id.tab_three_timeframe_report_card)
+                (CardView) rootView.findViewById(R.id.tab_three_timeframe_report_card),
+                getResources()
         );
         mTimeFrameCardPopulator.setData(createReport(
                 getStringifiedYear(),

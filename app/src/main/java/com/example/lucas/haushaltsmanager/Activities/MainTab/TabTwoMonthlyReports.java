@@ -42,7 +42,8 @@ public class TabTwoMonthlyReports extends AbstractTab {
     public void updateView() {
 
         MonthlyReportAdapter adapter = new MonthlyReportAdapterCreator(
-                mParent.getVisibleExpenses()
+                mParent.getVisibleExpenses(),
+                getResources()
         ).getAdapter();
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
