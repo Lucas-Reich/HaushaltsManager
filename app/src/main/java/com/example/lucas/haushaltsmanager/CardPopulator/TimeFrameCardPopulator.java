@@ -4,14 +4,15 @@ import android.content.res.Resources;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.StringRes;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.os.ConfigurationCompat;
 import android.support.v7.widget.CardView;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.lucas.androidcharts.DataSet;
 import com.example.lucas.androidcharts.PieChart;
+import com.example.lucas.androidcharts.PieSlice;
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
@@ -91,6 +92,12 @@ public class TimeFrameCardPopulator {
 
     private void setPieChart(ReportInterface data) {
         mViewHolder.mPieChart.setPieData(preparePieData(data));
+        mViewHolder.mPieChart.setOnPieChartClickListener(new PieChart.OnPieChartClickListener() {
+            @Override
+            public void onSliceClick(PieSlice slice) {
+                Toast.makeText(app.getContext(), slice.getLabel(), Toast.LENGTH_SHORT).show();
+            }
+        });
         mViewHolder.mPieChart.setNoDataText(R.string.no_bookings_in_year);
     }
 

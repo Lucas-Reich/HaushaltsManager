@@ -85,6 +85,8 @@ public class PieChart extends ViewUtils {
 
     private ValueAnimator mAnimator;
 
+    private OnPieChartClickListener mCallback;
+
     public PieChart(Context context) {
         super(context);
         init(context, null, 0);
@@ -258,6 +260,10 @@ public class PieChart extends ViewUtils {
 
     public void setNoDataText(@StringRes int noDataText) {
         mNoDataText = getContext().getResources().getString(noDataText);
+    }
+
+    public void setOnPieChartClickListener(OnPieChartClickListener listener) {
+        mCallback = listener;
     }
 
 
@@ -799,6 +805,10 @@ public class PieChart extends ViewUtils {
 
                             Log.d(TAG, "Du bist auf Ebene " + mVisibleLayer + " und hast gerade in den Bereich mit dem Wert " + slice.getAbsValue() + " geklickt!");
 
+                            if (null != mCallback) {
+                                mCallback.onSliceClick(slice);
+                            }
+
                             if (slice.getWeight() != mVisibleLayer && mCompressed) {
                                 mVisibleLayer++;
                                 createLegendItems(getVisibleSlices());
@@ -963,5 +973,9 @@ public class PieChart extends ViewUtils {
     private void stopOngoingAnimations() {
         if (mAnimator != null)
             mAnimator.end();
+    }
+
+    public interface OnPieChartClickListener {
+        void onSliceClick(PieSlice slice);
     }
 }
