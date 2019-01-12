@@ -10,11 +10,11 @@ import android.view.ViewGroup;
 import com.example.lucas.haushaltsmanager.CardPopulator.LineChartCardPopulator;
 import com.example.lucas.haushaltsmanager.CardPopulator.PieChartCardPopulator;
 import com.example.lucas.haushaltsmanager.CardPopulator.TimeFrameCardPopulator;
-import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Report.Report;
 import com.example.lucas.haushaltsmanager.Entities.Report.ReportInterface;
-import com.example.lucas.haushaltsmanager.ExpenseGrouper;
-import com.example.lucas.haushaltsmanager.ExpenseSum;
+import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseGrouper;
+import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSum;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.CalendarUtils;
@@ -83,7 +83,7 @@ public class TabThreeYearlyReports extends AbstractTab {
         return rootView;
     }
 
-    public void updateView() {
+    public void updateView(View rootView) {
         ReportInterface report = createReport("", mParent.getVisibleExpenses());
 
         report.setCardTitle(getStringifiedYear());

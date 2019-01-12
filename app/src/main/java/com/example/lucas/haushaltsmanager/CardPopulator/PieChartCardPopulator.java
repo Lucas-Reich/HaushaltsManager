@@ -8,10 +8,10 @@ import android.widget.TextView;
 import com.example.lucas.androidcharts.DataSet;
 import com.example.lucas.androidcharts.PieChart;
 import com.example.lucas.haushaltsmanager.Entities.Category;
-import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Report.ReportInterface;
-import com.example.lucas.haushaltsmanager.ExpenseFilter;
-import com.example.lucas.haushaltsmanager.ExpenseSum;
+import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseFilter;
+import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSum;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.util.ArrayList;

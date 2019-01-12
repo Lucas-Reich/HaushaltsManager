@@ -133,7 +133,7 @@ public class AccountAdapter extends ArrayAdapter<Account> {
                             //user wird nicht noch einmal um bestätigung gefragt!
                             mCallback.onDeleteAccountSelected(mAccount);
 
-                            Log.d(TAG, "onMenuItemClick: deleteAll selected");
+                            Log.d(TAG, "onFABMenuItemClick: deleteAll selected");
                             return true;
                         case R.id.edit_account_edit:
 
@@ -156,7 +156,7 @@ public class AccountAdapter extends ArrayAdapter<Account> {
 
                             mCallback.onAccountSetMain(mAccount);
 
-                            Log.d(TAG, "onMenuItemClick: make main selected");
+                            Log.d(TAG, "onFABMenuItemClick: make main selected");
                             return true;
                         default:
                             return false;

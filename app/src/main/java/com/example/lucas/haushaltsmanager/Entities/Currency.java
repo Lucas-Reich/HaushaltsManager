@@ -9,6 +9,7 @@ import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.R;
 
 public class Currency implements Parcelable {
+    // TODO: Kann ich die Currency durch die Java.util implementierung der Currency austauschen?
     private static final String TAG = Currency.class.getSimpleName();
 
     private long index;
@@ -122,20 +123,15 @@ public class Currency implements Parcelable {
 
     @Override
     public boolean equals(Object obj) {
-
-        if (obj instanceof Currency) {
-
-            Currency otherCurrency = (Currency) obj;
-
-            boolean result = getName().equals(otherCurrency.getName());
-            result = result && getShortName().equals(otherCurrency.getShortName());
-            result = result && getSymbol().equals(otherCurrency.getSymbol());
-
-            return result;
-        } else {
-
+        if (!(obj instanceof Currency)) {
             return false;
         }
+
+        Currency other = (Currency) obj;
+
+        return getName().equals(other.getName())
+                && getShortName().equals(other.getShortName())
+                && getSymbol().equals(other.getSymbol());
     }
 
     public String toString() {

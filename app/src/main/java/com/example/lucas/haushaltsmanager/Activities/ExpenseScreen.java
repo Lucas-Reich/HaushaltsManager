@@ -29,7 +29,7 @@ import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.SingleChoiceDialog;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
-import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
@@ -316,7 +316,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
                             Toast.makeText(ExpenseScreen.this, "Added Booking \"" + mExpense.getTitle() + "\" to parent Booking " + mParentBooking.getTitle(), Toast.LENGTH_SHORT).show();
                         } catch (AddChildToChildException e) {
 
-                            Log.e(TAG, "Could not add Child " + mExpense.getTitle() + " to parent " + mParentBooking.getTitle(), e);
+                            Log.e(TAG, "Could not addItem Child " + mExpense.getTitle() + " to parent " + mParentBooking.getTitle(), e);
                             // TODO: Was soll passieren, wenn zu der ParentBuchung keine KindBuchung hinzugefügt werden kann?
                         }
                         break;

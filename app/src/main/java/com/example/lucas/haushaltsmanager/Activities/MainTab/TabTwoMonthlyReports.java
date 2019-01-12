@@ -29,7 +29,7 @@ public class TabTwoMonthlyReports extends AbstractTab {
 
         mRecyclerView = rootView.findViewById(R.id.tab_two_recycler_view);
 
-        updateView();
+        updateView(rootView);
 
         return rootView;
     }
@@ -39,7 +39,7 @@ public class TabTwoMonthlyReports extends AbstractTab {
         super.onDestroy();
     }
 
-    public void updateView() {
+    public void updateView(View rootView) {
 
         MonthlyReportAdapter adapter = new MonthlyReportAdapterCreator(
                 mParent.getVisibleExpenses(),

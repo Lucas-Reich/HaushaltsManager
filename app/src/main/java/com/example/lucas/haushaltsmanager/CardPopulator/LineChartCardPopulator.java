@@ -8,10 +8,10 @@ import android.support.v7.widget.CardView;
 import android.view.View;
 import android.widget.TextView;
 
-import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Report.ReportInterface;
-import com.example.lucas.haushaltsmanager.ExpenseGrouper;
-import com.example.lucas.haushaltsmanager.ExpenseSum;
+import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseGrouper;
+import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSum;
 import com.example.lucas.haushaltsmanager.R;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;

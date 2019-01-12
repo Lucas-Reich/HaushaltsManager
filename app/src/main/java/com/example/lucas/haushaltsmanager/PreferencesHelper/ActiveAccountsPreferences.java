@@ -49,7 +49,7 @@ public class ActiveAccountsPreferences {
         return mPreferences.getBoolean(stringify(account.getIndex()), false);
     }
 
-    public List<Long> getActiveAccounts2() {
+    public List<Long> getActiveAccounts() {
         Map<String, ?> map = mPreferences.getAll();
 
         return toLongList(map);

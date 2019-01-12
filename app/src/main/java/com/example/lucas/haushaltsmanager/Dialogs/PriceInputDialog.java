@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
-import com.example.lucas.haushaltsmanager.Utils.PriceUtils;
+import com.example.lucas.haushaltsmanager.Utils.MoneyUtils;
 import com.example.lucas.haushaltsmanager.Utils.ViewUtils;
 
 public class PriceInputDialog extends DialogFragment {
@@ -103,7 +103,7 @@ public class PriceInputDialog extends DialogFragment {
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
         EditText input = new EditText(getActivity());
-        input.setHint(PriceUtils.toHumanReadablePrice(hint));
+        input.setHint(MoneyUtils.toHumanReadablePrice(hint));
         input.setLayoutParams(lp);
         input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
 

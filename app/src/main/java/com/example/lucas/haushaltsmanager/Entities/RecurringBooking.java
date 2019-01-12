@@ -1,5 +1,7 @@
 package com.example.lucas.haushaltsmanager.Entities;
 
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+
 import java.util.Calendar;
 
 public class RecurringBooking {
