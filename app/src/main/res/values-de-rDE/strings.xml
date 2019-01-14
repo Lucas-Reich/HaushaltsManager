@@ -49,7 +49,7 @@
     <string name="sort">Sortiere</string>
     <string name="no_account">Erstelle zuerst ein Konto bevor du Buchungen erstellst</string>
     <string name="not_implemented">Oops! Es sieht so aus, als ob du etwas gefunden hast was du eigentlich noch nicht sehen solltest.</string>
-    <string name="set_Account_balance">Gebe den Eröffnungsgetrag ein</string>
+    <string name="set_Account_balance">Gebe den Eröffnungsbetrag ein</string>
     <string name="set_account_title">Gib einen Kontonamen ein</string>
     <string name="category_transfer">Überweisung</string>
     <string name="transfer_from">Überweisung von</string>
