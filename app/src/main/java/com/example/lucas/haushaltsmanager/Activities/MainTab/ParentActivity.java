@@ -26,14 +26,11 @@ import com.example.lucas.haushaltsmanager.Activities.ImportExportActivity;
 import com.example.lucas.haushaltsmanager.Activities.MainTab.TabOne.TabOneBookings;
 import com.example.lucas.haushaltsmanager.Activities.RecurringBookingList;
 import com.example.lucas.haushaltsmanager.Activities.Settings;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Dialogs.ChangeAccounts.ChooseAccountsDialogFragment;
-import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.ExpenseFilter;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences;
-import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.util.ArrayList;

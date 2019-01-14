@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CategoryRepository {
+    // REFACTOR: Versuchen das Repo so wie das TagRepo zu bauen
     private SQLiteDatabase mDatabase;
 
     public CategoryRepository(Context context) {
@@ -120,7 +121,6 @@ public class CategoryRepository {
     }
 
     public void update(Category category) throws CategoryNotFoundException {
-
         ContentValues updatedCategory = new ContentValues();
         updatedCategory.put(ExpensesDbHelper.CATEGORIES_COL_NAME, category.getTitle());
         updatedCategory.put(ExpensesDbHelper.CATEGORIES_COL_COLOR, category.getColorString());

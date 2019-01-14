@@ -3,7 +3,6 @@ package com.example.lucas.haushaltsmanager;
 import android.content.Context;
 import android.os.Environment;
 import android.support.annotation.StringRes;
-import android.support.v7.app.AppCompatActivity;
 
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;

@@ -7,7 +7,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.lucas.haushaltsmanager.CardPopulator.*;
+import com.example.lucas.haushaltsmanager.CardPopulator.LineChartCardPopulator;
+import com.example.lucas.haushaltsmanager.CardPopulator.PieChartCardPopulator;
+import com.example.lucas.haushaltsmanager.CardPopulator.TimeFrameCardPopulator;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Report.Report;
 import com.example.lucas.haushaltsmanager.Entities.Report.ReportInterface;
@@ -42,7 +44,8 @@ public class TabThreeYearlyReports extends AbstractTab {
         List<ExpenseObject> expenses = mParent.getVisibleExpenses();
 
         mTimeFrameCardPopulator = new TimeFrameCardPopulator(
-                (CardView) rootView.findViewById(R.id.tab_three_timeframe_report_card)
+                (CardView) rootView.findViewById(R.id.tab_three_timeframe_report_card),
+                getResources()
         );
         mTimeFrameCardPopulator.setData(createReport(
                 getStringifiedYear(),

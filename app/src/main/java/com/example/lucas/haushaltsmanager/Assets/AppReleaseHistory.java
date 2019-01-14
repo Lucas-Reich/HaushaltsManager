@@ -2,9 +2,7 @@ package com.example.lucas.haushaltsmanager.Assets;
 
 import android.support.annotation.StringRes;
 
-import com.example.lucas.changelogdialog.Bug;
 import com.example.lucas.changelogdialog.ChangelogItem;
-import com.example.lucas.changelogdialog.Improvement;
 import com.example.lucas.changelogdialog.Release;
 import com.example.lucas.changelogdialog.ReleaseHistory;
 import com.example.lucas.haushaltsmanager.App.app;
@@ -40,10 +38,7 @@ public class AppReleaseHistory implements ReleaseHistory {
     @Override
     public List<Release> getHistory() {
         List<Release> releases = new ArrayList<>();
-        releases.add(getRealRelease100());
-        releases.add(getRealRelease601());
-        releases.add(getRelease602());
-        releases.add(getRelease603());
+        releases.add(getRelease100());
 
         return releases;
     }
@@ -53,7 +48,7 @@ public class AppReleaseHistory implements ReleaseHistory {
      *
      * @return Version 1.0.0
      */
-    private Release getRealRelease100() {
+    private Release getRelease100() {
         return new Release(
                 1,
                 null,
@@ -61,53 +56,6 @@ public class AppReleaseHistory implements ReleaseHistory {
                 getDate(1, 1, 2019),
                 getString(R.string.release_notes_100),
                 new ArrayList<ChangelogItem>()
-        );
-    }
-
-    private Release getRealRelease601() {
-        List<ChangelogItem> changelog = new ArrayList<>();
-        changelog.add(new Bug("Fehler behoben, welcher zum Absturz der App beim öffnen fürte"));
-
-        return new Release(
-                6,
-                null,
-                1,
-                getDate(25, 12, 2018),
-                "Kleinere Fehlerbehebungen",
-                changelog
-        );
-    }
-
-    private Release getRelease602() {
-        List<ChangelogItem> changelog = new ArrayList<>();
-        changelog.add(new Bug("Fehler behoben, welcher die App zum Absturz gebracht hat, wenn das letzte Konto gelöscht wurde"));
-        changelog.add(new Bug("Fehler behoben, welcher die App auf alten Geräten zum abstürzen bringt, wenn ein neues Backup erstellt wurde"));
-        changelog.add(new Bug("Fehler behoben welcher die App zum Absturz gebracht hat, wenn die Kontenliste aufgerufen wurde"));
-        changelog.add(new Improvement("Die Barrierefreiheit der App verbessert"));
-
-        return new Release(
-                6,
-                null,
-                2,
-                getDate(26, 12, 2018),
-                "",
-                changelog
-        );
-    }
-
-    private Release getRelease603() {
-        List<ChangelogItem> changelog = new ArrayList<>();
-        changelog.add(new Bug("Fehler behoben, welcher zum Absturz der App führte, wenn man ein PopUp öffnete"));
-        changelog.add(new Bug("Fehler behoben, welcher zum Absturz der App führte, wenn man ein Backup erstellen wollte"));
-        changelog.add(new Improvement("Kleinere Anpassungen im Quellcode, sodass die App nun ein wenig besser funktioniert"));
-
-        return new Release(
-                6,
-                null,
-                3,
-                getDate(26, 12, 2018),
-                "",
-                changelog
         );
     }
 

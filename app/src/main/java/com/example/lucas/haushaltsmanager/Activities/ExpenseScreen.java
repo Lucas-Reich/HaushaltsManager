@@ -336,12 +336,12 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
 
     private void runCheckToCrossAnimation() {
         // TODO Der Übergang von dem Häkchen zum Kreuz soll animiert sein
-        mSaveFab.setImageDrawable(getResources().getDrawable(R.drawable.ic_cross_white));
+        mSaveFab.setImageDrawable(getDrawableRes(R.drawable.ic_cross_white));
     }
 
     private void runCrossToCheckAnimation() {
         // TODO Der Übergang von dem Kreuz zum Häkchen soll animiert sein
-        mSaveFab.setImageDrawable(getResources().getDrawable(R.drawable.ic_check_white_24dp));
+        mSaveFab.setImageDrawable(getDrawableRes(R.drawable.ic_check_white_24dp));
     }
 
     @Override
@@ -416,8 +416,8 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
         LinearLayout ll = findViewById(R.id.expense_screen_bottom_toolbar);
         ll.setBackgroundColor(
                 expenditure
-                        ? getResources().getColor(R.color.booking_expense)
-                        : getResources().getColor(R.color.booking_income)
+                        ? getColorRes(R.color.booking_expense)
+                        : getColorRes(R.color.booking_income)
         );
     }
 

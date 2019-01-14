@@ -62,7 +62,7 @@ public class LineChartCardPopulator {
 
     private void setLineChart(ReportInterface report) {
         mViewHolder.mLineChart.setData(prepareLineData(report));
-        mViewHolder.mLineChart.setBackgroundColor(getColorResource(R.color.primaryBackgroundColor));
+        mViewHolder.mLineChart.setBackgroundColor(getColorResource(R.color.primaryBackgroundColorBright));
 
         mViewHolder.mLineChart.setNoDataText(getStringResource(R.string.no_bookings_in_year));
         mViewHolder.mLineChart.setNoDataTextColor(getColorResource(R.color.booking_expense));
@@ -96,7 +96,7 @@ public class LineChartCardPopulator {
     private LineData prepareLineData(ReportInterface report) {
         LineDataSet lds = new LineDataSet(getChartEntries(report.getExpenses()), "");
         lds.setColor(getColorResource(R.color.colorPrimary));
-        lds.setCircleColor(getColorResource(R.color.colorAccent));
+        lds.setCircleColor(getColorResource(R.color.colorPrimary));
         lds.setValueTextColor(getColorResource(R.color.primary_text_color));
 
         return new LineData(lds);

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/test"
+    android:id="@+id/activity_import_export_root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/primaryBackgroundColorBright">
 
     <LinearLayout
         android:id="@+id/linearLayout2"
@@ -25,7 +25,7 @@
             android:textAllCaps="false"/>
 
         <View
-            android:id="@+id/activity_impot_divider"
+            android:id="@+id/activity_import_divider"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/colorPrimary"/>
@@ -49,13 +49,13 @@
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/activity_import_add_export_btn"
-        android:contentDescription="@string/accessibility_create_export"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="18dp"
         android:layout_marginBottom="18dp"
         android:clickable="true"
+        android:contentDescription="@string/accessibility_create_export"
         android:focusable="true"
         android:src="@drawable/ic_add_white"/>
 

@@ -2,19 +2,16 @@ package com.example.lucas.haushaltsmanager.Dialogs;
 
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 
-import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
 import com.example.lucas.haushaltsmanager.R;
+import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
 
 public class FrequencyInputDialog extends DialogFragment {
-    private static final String TAG = FrequencyInputDialog.class.getSimpleName();
     public static final String TITLE = "title";
 
     private OnFrequencySet mCallback;
@@ -23,8 +20,7 @@ public class FrequencyInputDialog extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         BundleUtils args = new BundleUtils(getArguments());
 
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-        final View frequencyInput = inflater.inflate(R.layout.frequency_input, null);
+        final View frequencyInput = View.inflate(getActivity(), R.layout.frequency_input, null);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 

@@ -80,6 +80,7 @@ public class AboutUsActivity extends AppCompatActivity {
                 ChangelogDialog changelogDialog = new ChangelogDialog();
                 changelogDialog.createBuilder(AboutUsActivity.this);
                 changelogDialog.setTitle(getString(R.string.changelog_title));
+                changelogDialog.setCloseBtnText(R.string.btn_dismiss);
                 changelogDialog.setReleaseHistory(new AppReleaseHistory());
                 changelogDialog.show(getFragmentManager(), "about_us_changelog");
             }

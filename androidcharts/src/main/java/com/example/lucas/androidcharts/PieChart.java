@@ -24,6 +24,7 @@ import com.example.lucas.androidcharts.Legend.LegendItem;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class PieChart extends ViewUtils {
     private final static String TAG = PieChart.class.getSimpleName();
@@ -83,6 +84,8 @@ public class PieChart extends ViewUtils {
     private Paint mTransparentPaint;
 
     private ValueAnimator mAnimator;
+
+    private OnPieChartClickListener mCallback;
 
     public PieChart(Context context) {
         super(context);
@@ -257,6 +260,10 @@ public class PieChart extends ViewUtils {
 
     public void setNoDataText(@StringRes int noDataText) {
         mNoDataText = getContext().getResources().getString(noDataText);
+    }
+
+    public void setOnPieChartClickListener(OnPieChartClickListener listener) {
+        mCallback = listener;
     }
 
 
@@ -798,6 +805,10 @@ public class PieChart extends ViewUtils {
 
                             Log.d(TAG, "Du bist auf Ebene " + mVisibleLayer + " und hast gerade in den Bereich mit dem Wert " + slice.getAbsValue() + " geklickt!");
 
+                            if (null != mCallback) {
+                                mCallback.onSliceClick(slice);
+                            }
+
                             if (slice.getWeight() != mVisibleLayer && mCompressed) {
                                 mVisibleLayer++;
                                 createLegendItems(getVisibleSlices());
@@ -934,7 +945,7 @@ public class PieChart extends ViewUtils {
         else
             mAnimator = ValueAnimator.ofFloat(0f, slice.getAbsValue());
 
-        mAnimator.setDuration(1000); // 1 sekunde
+        mAnimator.setDuration(timeToMillis(1, TimeUnit.SECONDS));
         mAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
 
         mAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -952,11 +963,19 @@ public class PieChart extends ViewUtils {
         mAnimator.start();
     }
 
+    private long timeToMillis(int value, TimeUnit unit) {
+        return TimeUnit.MILLISECONDS.convert(value, unit);
+    }
+
     /**
      * Methode um alle laufenden Animationen anzuhalten
      */
     private void stopOngoingAnimations() {
         if (mAnimator != null)
             mAnimator.end();
+    }
+
+    public interface OnPieChartClickListener {
+        void onSliceClick(PieSlice slice);
     }
 }

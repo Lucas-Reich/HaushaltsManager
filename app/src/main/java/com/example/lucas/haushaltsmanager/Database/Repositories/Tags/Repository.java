@@ -2,7 +2,11 @@ package com.example.lucas.haushaltsmanager.Database.Repositories.Tags;
 
 import com.example.lucas.haushaltsmanager.Database.DefaultDatabase;
 import com.example.lucas.haushaltsmanager.Database.QueryResultInterface;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Tags.Queries.*;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Tags.Queries.DeleteQuery;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Tags.Queries.GetAllQuery;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Tags.Queries.GetQuery;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Tags.Queries.InsertQuery;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Tags.Queries.UpdateQuery;
 import com.example.lucas.haushaltsmanager.Entities.Tag;
 
 import java.util.List;

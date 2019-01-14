@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.ColorRes;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
@@ -13,11 +14,11 @@ import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Activities.AbstractAppCompatActivity;
 import com.example.lucas.haushaltsmanager.Activities.CreateCategory;
-import com.example.lucas.haushaltsmanager.ListAdapter.CategoryAdapter;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.Exceptions.CannotDeleteChildCategoryException;
 import com.example.lucas.haushaltsmanager.Entities.Category;
+import com.example.lucas.haushaltsmanager.ListAdapter.CategoryAdapter;
 import com.example.lucas.haushaltsmanager.R;
 import com.github.fafaldo.fabtoolbar.widget.FABToolbarLayout;
 
@@ -56,7 +57,6 @@ public class CategoryList extends AbstractAppCompatActivity implements CategoryF
         super.onStart();
         updateListView();
 
-        mExpListView.setBackgroundColor(Color.WHITE);
         mExpListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View view, int groupPosition, int childPosition, long id) {
@@ -123,7 +123,7 @@ public class CategoryList extends AbstractAppCompatActivity implements CategoryF
 
     private void selectCategory(Category category, View categoryView) {
         mCategoryAdapter.selectChild(category);
-        categoryView.setBackgroundColor(getResources().getColor(R.color.list_item_highlighted));
+        categoryView.setBackgroundColor(getColorRes(R.color.list_item_highlighted));
     }
 
     private Category getCategory(long id) {

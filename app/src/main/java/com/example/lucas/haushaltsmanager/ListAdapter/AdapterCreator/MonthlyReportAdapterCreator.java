@@ -1,5 +1,7 @@
 package com.example.lucas.haushaltsmanager.ListAdapter.AdapterCreator;
 
+import android.content.res.Resources;
+
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
@@ -17,11 +19,12 @@ import java.util.List;
 public class MonthlyReportAdapterCreator {
     private ExpenseGrouper mExpenseGrouper;
     private List<ExpenseObject> mExpenses;
+    private Resources mResources;
 
-    public MonthlyReportAdapterCreator(List<ExpenseObject> expenses) {
-
+    public MonthlyReportAdapterCreator(List<ExpenseObject> expenses, Resources resources) {
         mExpenseGrouper = new ExpenseGrouper();
         mExpenses = extractChildren(expenses);
+        mResources = resources;
     }
 
     private List<ExpenseObject> extractChildren(List<ExpenseObject> expenses) {
@@ -41,7 +44,8 @@ public class MonthlyReportAdapterCreator {
         List<ReportInterface> reports = createMonthlyReports();
 
         return new MonthlyReportAdapter(
-                reports
+                reports,
+                mResources
         );
     }
 

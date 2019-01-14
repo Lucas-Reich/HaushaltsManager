@@ -8,8 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.lucas.haushaltsmanager.ListAdapter.MonthlyReportAdapter;
 import com.example.lucas.haushaltsmanager.ListAdapter.AdapterCreator.MonthlyReportAdapterCreator;
+import com.example.lucas.haushaltsmanager.ListAdapter.MonthlyReportAdapter;
 import com.example.lucas.haushaltsmanager.R;
 
 public class TabTwoMonthlyReports extends AbstractTab {
@@ -42,7 +42,8 @@ public class TabTwoMonthlyReports extends AbstractTab {
     public void updateView() {
 
         MonthlyReportAdapter adapter = new MonthlyReportAdapterCreator(
-                mParent.getVisibleExpenses()
+                mParent.getVisibleExpenses(),
+                getResources()
         ).getAdapter();
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
