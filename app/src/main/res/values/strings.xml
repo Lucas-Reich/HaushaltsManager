@@ -1,9 +1,11 @@
 <resources>
-    <string name="app_name">FinanceManager</string>
+    <string name="app_name">Finance Manager</string>
+
 
     <string name="tab_one_title">Bookings</string>
     <string name="tab_two_title">Monthly Overview</string>
     <string name="tab_three_title">Report</string>
+
 
     <string name="btn_reset">Restore default settings</string>
     <string name="btn_new_acc">New Account</string>
@@ -14,6 +16,7 @@
     <string name="btn_ok">OK</string>
     <string name="btn_no">No</string>
 
+
     <string name="accessibility_create_expense">Create new expense</string>
     <string name="accessibility_create_backup">Create new backup</string>
     <string name="accessibility_select_category_color">Select category color</string>
@@ -22,6 +25,25 @@
     <string name="accessibility_create_account">Save new account</string>
     <string name="accessibility_choose_directory">Choose a directory</string>
     <string name="accessibility_select_category_title">Insert category title</string>
+
+
+    <string name="release_notes_100">The first app version is now available for download.</string>
+
+    <string name="release_notes_110">There are improvements in the booking overview.\nYou can now view all the bookings in the booking overview. Just scroll down to see older bookings. There are also new animations that improve working with the booking overview.</string>
+    <string name="release_notes_110_tab_one_feature_recycler_view">"Infinite booking overview "</string>
+    <string name="release_notes_110_tab_one_feature_animations">Animations in the booking overview</string>
+    <string name="release_notes_110_code_improvements">Adjustments in the code of the booking overview</string>
+
+
+    <string name="export_price">Price</string>
+    <string name="export_expenditure">is Expenditure</string>
+    <string name="export_title">Title</string>
+    <string name="export_date">Date</string>
+    <string name="export_notice">Notice</string>
+    <string name="export_currency_name">Currency Name</string>
+    <string name="export_category_name">Category Name</string>
+    <string name="export_account_name">Account Name</string>
+
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -143,17 +165,7 @@
     <string name="remind_notification_title">Reminder</string>
     <string name="account_name">Account name</string>
 
-    <!-- CSV export column names -->
-    <string name="export_price">Price</string>
-    <string name="export_expenditure">is Expenditure</string>
-    <string name="export_title">Title</string>
-    <string name="export_date">Date</string>
-    <string name="export_notice">Notice</string>
-    <string name="export_currency_name">Currency Name</string>
-    <string name="export_category_name">Category Name</string>
-    <string name="export_account_name">Account Name</string>
 
-    <string name="release_notes_100">The first app version is now available for download.</string>
     <string name="could_not_update_title">Title could not be updated</string>
     <string name="starts_at">starts at</string>
     <string name="ends_at">ends at</string>
@@ -163,4 +175,12 @@
     <string name="backups">Backups</string>
     <string name="general_settings">General Settings</string>
     <string name="accessibility_create_category">Create new Category</string>
+    <string name="failed_to_create_template">Error while creating the Template, please try again!</string>
+    <string name="fab_menu_item_add_child_hin">Add child to selected booking</string>
+    <string name="fab_menu_item_combine_hint">Combine selected Bookings</string>
+    <string name="fab_menu_item_delete_hint">Delete selected bookings</string>
+    <string name="fab_menu_item_extract_hint">Extract selected children</string>
+    <string name="fab_menu_item_recurring_hint">Save as recurring Booking</string>
+    <string name="fab_menu_item_template_hint">Save as template</string>
+    <string name="expenses_empty_list">No Expenses created</string>
 </resources>

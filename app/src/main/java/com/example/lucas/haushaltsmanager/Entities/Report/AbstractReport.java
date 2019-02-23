@@ -6,8 +6,8 @@ import android.support.annotation.StringRes;
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
-import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
-import com.example.lucas.haushaltsmanager.ExpenseSum;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSum;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.util.ArrayList;

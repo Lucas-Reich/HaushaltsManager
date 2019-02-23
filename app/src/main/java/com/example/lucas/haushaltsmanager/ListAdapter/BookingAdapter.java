@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.util.List;

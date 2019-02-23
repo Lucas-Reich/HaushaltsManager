@@ -17,7 +17,7 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.Curre
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
-import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 
 import junit.framework.Assert;
 
@@ -144,7 +144,7 @@ public class ChildExpenseRepositoryTest {
             );
         } catch (AddChildToChildException e) {
 
-            Assert.fail("Could not add ChildExpense to ParentExpense");
+            Assert.fail("Could not addItem ChildExpense to ParentExpense");
         }
     }
 
@@ -186,7 +186,7 @@ public class ChildExpenseRepositoryTest {
 
         } catch (AddChildToChildException e) {
 
-            assertEquals("It is not possible to add children to a ChildExpense.", e.getMessage());
+            assertEquals("It is not possible to addItem children to a ChildExpense.", e.getMessage());
         }
     }
 
@@ -259,7 +259,7 @@ public class ChildExpenseRepositoryTest {
 
         } catch (ChildExpenseNotFoundException e) {
 
-            assertEquals(String.format("Could not find Child Expense with id %s.", childExpense.getIndex()), e.getMessage());
+            assertEquals(String.format("Could not find Child Booking with id %s.", childExpense.getIndex()), e.getMessage());
             assertEqualAccountBalance(
                     account.getBalance(),
                     account.getIndex()
@@ -292,7 +292,7 @@ public class ChildExpenseRepositoryTest {
 
         } catch (ChildExpenseNotFoundException e) {
 
-            assertEquals(String.format("Could not find Child Expense with id %s.", notExistingChildExpenseId), e.getMessage());
+            assertEquals(String.format("Could not find Child Booking with id %s.", notExistingChildExpenseId), e.getMessage());
         }
     }
 
@@ -348,7 +348,7 @@ public class ChildExpenseRepositoryTest {
 
         } catch (ChildExpenseNotFoundException e) {
 
-            assertEquals(String.format("Could not find Child Expense with id %s.", childExpense.getIndex()), e.getMessage());
+            assertEquals(String.format("Could not find Child Booking with id %s.", childExpense.getIndex()), e.getMessage());
         }
     }
 
@@ -432,7 +432,7 @@ public class ChildExpenseRepositoryTest {
             Assert.fail("Existierende ParentBuchung konnte nicht gefunden werden");
         } catch (ChildExpenseNotFoundException e) {
 
-            assertEquals(String.format("Could not find Child Expense with id %s.", childExpense.getIndex()), e.getMessage());
+            assertEquals(String.format("Could not find Child Booking with id %s.", childExpense.getIndex()), e.getMessage());
         }
     }
 
@@ -615,7 +615,7 @@ public class ChildExpenseRepositoryTest {
 
         } catch (ChildExpenseNotFoundException e) {
 
-            assertEquals(String.format("Could not find Child Expense with id %s.", childExpense.getIndex()), e.getMessage());
+            assertEquals(String.format("Could not find Child Booking with id %s.", childExpense.getIndex()), e.getMessage());
             assertEqualAccountBalance(
                     account.getBalance(),
                     account.getIndex()
@@ -656,7 +656,7 @@ public class ChildExpenseRepositoryTest {
 
         } catch (ChildExpenseNotFoundException e) {
 
-            assertEquals(String.format("Could not find Child Expense with id %s.", childExpense.getIndex()), e.getMessage());
+            assertEquals(String.format("Could not find Child Booking with id %s.", childExpense.getIndex()), e.getMessage());
             assertEqualAccountBalance(
                     account.getBalance(),
                     account.getIndex()

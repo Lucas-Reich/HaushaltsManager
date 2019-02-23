@@ -2,8 +2,9 @@ package com.example.lucas.haushaltsmanager;
 
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
-import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Tag;
+import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSum;
 
 import org.junit.After;
 import org.junit.Before;

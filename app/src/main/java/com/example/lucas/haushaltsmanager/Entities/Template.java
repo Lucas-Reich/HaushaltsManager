@@ -4,6 +4,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+
 public class Template implements Parcelable {
     private static final String TAG = Template.class.getSimpleName();
 

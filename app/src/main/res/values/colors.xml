@@ -10,6 +10,7 @@
     <color name="booking_income">#04925d</color>
 
     <color name="list_item_highlighted">#5CE675</color>
+    <color name="list_item_background">@color/white</color>
 
     <color name="transfer_booking_color">#0033cc</color>
 

@@ -25,7 +25,7 @@ import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.SingleChoiceDialog;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
-import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
 

@@ -1,6 +1,7 @@
 package com.example.lucas.haushaltsmanager.Activities.MainTab;
 
 import android.support.v4.app.Fragment;
+import android.view.View;
 
 public abstract class AbstractTab extends Fragment {
 
@@ -15,12 +16,12 @@ public abstract class AbstractTab extends Fragment {
         super.setUserVisibleHint(isVisibleToUser);
 
         if (this.isVisible() && isVisibleToUser)
-            updateView();
+            updateView(getView());
     }
 
     /**
      * Methode, welche aufgerufen wird, wenn sich die Liste der Buchungen im ParentTab geändert hat.
      * Mit dem Aufruf dieser Methode, wird der Tab aufgefordert seinen Inhalt mit den neuen Buchungen zu aktualisieren.
      */
-    public abstract void updateView();
+    public abstract void updateView(View rootView);
 }

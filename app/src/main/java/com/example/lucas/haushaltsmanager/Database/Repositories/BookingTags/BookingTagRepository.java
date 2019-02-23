@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Tags.TagRepository;
-import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Tag;
 
 import java.util.ArrayList;

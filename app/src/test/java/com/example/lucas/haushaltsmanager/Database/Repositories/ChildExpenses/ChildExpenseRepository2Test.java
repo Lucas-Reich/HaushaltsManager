@@ -5,7 +5,7 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Expense
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.ChildExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
-import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 
 import junit.framework.Assert;
 
@@ -89,7 +89,7 @@ public class ChildExpenseRepository2Test {
             Assert.fail("Could save ChildExpense with invalid Parent");
         } catch (ExpenseNotFoundException e) {
 
-            assertEquals("Could not find Expense with id ", e.getMessage());// IMPROVEMENT: Welche Id hat die ParentExpense
+            assertEquals("Could not find Booking with id ", e.getMessage());// IMPROVEMENT: Welche Id hat die ParentExpense
         }
     }
 

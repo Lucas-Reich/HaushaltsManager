@@ -1,6 +1,6 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions;
 
-import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 
 public class CannotDeleteChildExpenseException extends Exception {
     private CannotDeleteChildExpenseException(String message) {
@@ -8,6 +8,6 @@ public class CannotDeleteChildExpenseException extends Exception {
     }
 
     public static CannotDeleteChildExpenseException RelatedExpenseNotFound(ExpenseObject childExpense) {
-        return new CannotDeleteChildExpenseException(String.format("Could not find Parent for Child Expense %s.", childExpense.getTitle()));
+        return new CannotDeleteChildExpenseException(String.format("Could not find Parent for Child Booking %s.", childExpense.getTitle()));
     }
 }

@@ -11,7 +11,7 @@ import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.Exceptions.RecurringBookingNotFoundException;
-import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.RecurringBooking;
 
 import java.util.ArrayList;
@@ -175,7 +175,7 @@ public class RecurringBookingRepository {
             expense = mBookingRepo.get(expenseId);
         } catch (ExpenseNotFoundException e) {
 
-            Log.e(TAG, "Failed to fetch Expense " + expenseId, e);
+            Log.e(TAG, "Failed to fetch Booking " + expenseId, e);
         }
 
         if (c.isLast())

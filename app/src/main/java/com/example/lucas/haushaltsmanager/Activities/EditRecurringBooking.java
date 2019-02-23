@@ -10,7 +10,7 @@ import android.widget.Toast;
 import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.RecurringBookingRepository;
 import com.example.lucas.haushaltsmanager.Dialogs.DatePickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
-import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.RecurringBooking;
 import com.example.lucas.haushaltsmanager.R;
 

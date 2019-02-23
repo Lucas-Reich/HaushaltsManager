@@ -21,20 +21,17 @@ import android.widget.Toast;
 import com.example.lucas.haushaltsmanager.Activities.AboutUsActivity;
 import com.example.lucas.haushaltsmanager.Activities.BackupActivity;
 import com.example.lucas.haushaltsmanager.Activities.CategoryList.CategoryList;
-import com.example.lucas.haushaltsmanager.Activities.CourseActivity;
 import com.example.lucas.haushaltsmanager.Activities.ImportExportActivity;
-import com.example.lucas.haushaltsmanager.Activities.MainTab.TabOne.TabOneBookings;
 import com.example.lucas.haushaltsmanager.Activities.RecurringBookingList;
 import com.example.lucas.haushaltsmanager.Activities.Settings;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Dialogs.ChangeAccounts.ChooseAccountsDialogFragment;
-import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
-import com.example.lucas.haushaltsmanager.ExpenseFilter;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences;
 import com.example.lucas.haushaltsmanager.R;
+import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseFilter;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 public class ParentActivity extends AppCompatActivity implements ChooseAccountsDialogFragment.OnSelectedAccount {
@@ -87,11 +84,6 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
                         Intent categoryIntent = new Intent(ParentActivity.this, CategoryList.class);
                         ParentActivity.this.startActivity(categoryIntent);
                         break;
-                    case R.id.course:
-
-                        Intent courseIntent = new Intent(ParentActivity.this, CourseActivity.class);
-                        ParentActivity.this.startActivity(courseIntent);
-                        break;
                     case R.id.standing_orders:
 
                         Intent recurringBookingIntent = new Intent(ParentActivity.this, RecurringBookingList.class);
@@ -141,70 +133,27 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-
         getMenuInflater().inflate(R.menu.menu_main_activity_tab, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         switch (item.getItemId()) {
-
             case R.id.choose_account:
 
                 ChooseAccountsDialogFragment chooseAccountFragment = new ChooseAccountsDialogFragment();
                 chooseAccountFragment.setOnAccountSelectedListener(this);
                 chooseAccountFragment.show(getFragmentManager(), "alterVisibleAccounts");
                 break;
-
             default:
-
-                Toast.makeText(this, "This should never happen!", Toast.LENGTH_SHORT).show();
                 break;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * /**
-     * Methode um die Daten des aktuell sichtbaren Tabs upzudaten.
-     * Quelle: https://stackoverflow.com/a/27211004
-     */
-    public void updateChildView() {
-
-        int visibleTabPosition = mTabLayout.getSelectedTabPosition();
-        Fragment fragment = getSupportFragmentManager().findFragmentByTag("android:switcher:" + mViewPager.getId() + ":" + visibleTabPosition);
-
-        if (fragment != null) {
-
-            switch (visibleTabPosition) {
-
-                case 0:
-                    ((TabOneBookings) fragment).updateView();
-                    break;
-                case 1:
-                    ((TabTwoMonthlyReports) fragment).updateView();
-                    break;
-                case 2:
-                    ((TabThreeYearlyReports) fragment).updateView();
-                    break;
-            }
-        }
-    }
-
-    public List<Long> getActiveAccounts() {
-        return mActiveAccounts;
-    }
-
-    /**
-     * Anleitung von: https://stackoverflow.com/questions/27204409/android-calling-a-function-inside-a-fragment-from-a-custom-action-bar
-     * Der User hat im ChooseAccountDialogFragment ein Konto angewählt.
-     *
-     * @param accountId Id des angewählten Kontos.
-     * @param isChecked Status des Kontos (aktiv - true oder inaktiv - false)
-     */
+    @Override
     public void onAccountSelected(long accountId, boolean isChecked) {
         if (mActiveAccounts.contains(accountId) == isChecked)
             return;
@@ -214,49 +163,63 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
         else
             mActiveAccounts.add(accountId);
 
-        updateChildView();
+        updateVisibleTab();
     }
 
     public void updateExpenses() {
         mExpenses = mBookingRepo.getAll();
     }
 
-    List<ExpenseObject> getVisibleExpenses() {
+    public List<ExpenseObject> getVisibleExpenses() {
         return new ExpenseFilter().byAccountWithChildren(mExpenses, mActiveAccounts);
     }
 
-    public ArrayList<ExpenseObject> getVisibleExpensesInTimeFrame(Calendar timeFrameStart, Calendar timeFrameEnd) {
-        ArrayList<ExpenseObject> bookingsWithinTimeFrame = new ArrayList<>();
-        for (ExpenseObject expense : mExpenses) {
+    public List<ExpenseObject> getVisibleExpensesByOffsetWithParents(int offset, int batchSize) {
+        List<ExpenseObject> visibleExpenses = new ExpenseFilter().byAccountWithParents(mExpenses, mActiveAccounts);
 
-            if (isInTimeFrame(expense, timeFrameStart, timeFrameEnd)) {
-                bookingsWithinTimeFrame.add(expense);
-            }
+        if (visibleExpenses.size() <= offset) {
+            return new ArrayList<>();
         }
 
-        return bookingsWithinTimeFrame;
-    }
+        if (visibleExpenses.size() < (offset + batchSize)) {
+            return visibleExpenses.subList(offset, visibleExpenses.size());
+        }
 
-    private boolean isInTimeFrame(ExpenseObject expense, Calendar start, Calendar end) {
-        if (expense.getDateTime().before(start))
-            return false;
-
-        if (expense.getDateTime().after(end))
-            return false;
-
-        return true;
+        return visibleExpenses.subList(offset, batchSize);
     }
 
     private void initializeActiveAccounts() {
         ActiveAccountsPreferences preferences = new ActiveAccountsPreferences(this);
 
-        mActiveAccounts = preferences.getActiveAccounts2();
+        mActiveAccounts = preferences.getActiveAccounts();
     }
 
     /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
+     * Method to refresh data in the currently visible Tab.
+     * Source: https://stackoverflow.com/a/27211004
      */
+    private void updateVisibleTab() {
+
+        int visibleTabPosition = mTabLayout.getSelectedTabPosition();
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag("android:switcher:" + mViewPager.getId() + ":" + visibleTabPosition);
+
+        if (fragment != null) {
+
+            switch (visibleTabPosition) {
+
+                case 0:
+                    ((TabOneBookings) fragment).updateView(fragment.getView());
+                    break;
+                case 1:
+                    ((TabTwoMonthlyReports) fragment).updateView(fragment.getView());
+                    break;
+                case 2:
+                    ((TabThreeYearlyReports) fragment).updateView(fragment.getView());
+                    break;
+            }
+        }
+    }
+
     private class SectionsPagerAdapter extends FragmentPagerAdapter {
 
         SectionsPagerAdapter(FragmentManager fm) {

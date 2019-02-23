@@ -47,10 +47,6 @@
             android:label="@string/activity_transfers_name"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
         <activity
-            android:name=".Activities.CourseActivity"
-            android:label="@string/activity_course_name"
-            android:parentActivityName=".Activities.MainTab.ParentActivity"/>
-        <activity
             android:name=".Activities.ImportExportActivity"
             android:label="@string/activity_import_export_name"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>

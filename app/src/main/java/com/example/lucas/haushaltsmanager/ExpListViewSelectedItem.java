@@ -2,7 +2,7 @@ package com.example.lucas.haushaltsmanager;
 
 import android.support.annotation.Nullable;
 
-import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 
 public class ExpListViewSelectedItem {
     private ExpenseObject mSelectedItem;

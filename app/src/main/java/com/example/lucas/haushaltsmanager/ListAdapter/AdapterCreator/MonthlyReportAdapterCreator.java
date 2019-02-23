@@ -4,10 +4,10 @@ import android.content.res.Resources;
 
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
-import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Report.Report;
 import com.example.lucas.haushaltsmanager.Entities.Report.ReportInterface;
-import com.example.lucas.haushaltsmanager.ExpenseGrouper;
+import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseGrouper;
 import com.example.lucas.haushaltsmanager.ListAdapter.MonthlyReportAdapter;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;

@@ -12,11 +12,12 @@ import com.example.lucas.haushaltsmanager.R;
 import com.github.fafaldo.fabtoolbar.widget.FABToolbarLayout;
 
 class CategoryFABToolbar {
+    // TODO: Diese FABToolbar durch die neue Implementierung ersetzen
     public static final String MENU_DELETE_ACTION = "delete_action";
 
     private FABToolbarLayout mFabToolbar;
     private LinearLayout mFabToolbarToolbar;
-    private OnCategoryFABToolbarMenuItemClicked mLIstener;
+    private OnCategoryFABToolbarMenuItemClicked mListener;
     private Context mContext;
 
     CategoryFABToolbar(
@@ -27,7 +28,7 @@ class CategoryFABToolbar {
         mFabToolbar = fabToolbarLayout;
         mFabToolbarToolbar = mFabToolbar.findViewById(R.id.category_list_fab_toolbar_toolbar);
         mContext = context;
-        mLIstener = listener;
+        mListener = listener;
 
         populateToolbar();
 
@@ -61,7 +62,7 @@ class CategoryFABToolbar {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mLIstener.onFabClicked();
+                mListener.onFabClicked();
             }
         };
     }
@@ -70,7 +71,7 @@ class CategoryFABToolbar {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mLIstener.onToolbarMenuItemClicked((String) v.getTag());
+                mListener.onToolbarMenuItemClicked((String) v.getTag());
             }
         };
     }

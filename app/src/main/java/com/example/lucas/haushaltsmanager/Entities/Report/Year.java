@@ -1,8 +1,8 @@
 package com.example.lucas.haushaltsmanager.Entities.Report;
 
 import com.example.lucas.haushaltsmanager.Entities.Currency;
-import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
-import com.example.lucas.haushaltsmanager.ExpenseGrouper;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseGrouper;
 
 import java.util.List;
 
