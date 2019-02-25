@@ -35,6 +35,11 @@ public class AppInternalPreferences {
         return !getNotificationJobId().equals("");
     }
 
+
+    /**
+     * todo: Durch einen getaggten Job austauschen
+     */
+    @Deprecated
     public void setNotificationJobId(String id) {
 
         mPreferences.edit().putString(NOTIFICATION_JOB_ID, id).apply();
@@ -45,6 +50,10 @@ public class AppInternalPreferences {
         return mPreferences.getString(NOTIFICATION_JOB_ID, "");
     }
 
+    /**
+     * todo: Durch einen getaggten Job austauschen
+     */
+    @Deprecated
     public void setBackupJobId(String id) {
 
         mPreferences.edit().putString(BACKUP_JOB_ID, id).apply();

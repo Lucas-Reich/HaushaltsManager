@@ -51,21 +51,22 @@ public class ExpenseObject implements Parcelable, Booking {
      */
     private String title;
 
+    // TODO: Price und Expenditure in eine ValueObject "Price" extrahieren, welches dann von den PriceUtils.formatHumanReadable() lesbar gemacht wird
     /**
      * Price by user
      */
     private double price;
 
     /**
-     * Date of expense
-     */
-    private Calendar date;
-
-    /**
      * Type of expense
      * (true = expense, false = income)
      */
     private boolean expenditure;
+
+    /**
+     * Date of expense
+     */
+    private Calendar date;
 
     /**
      * Category of expense

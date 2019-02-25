@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager.Worker;
+package com.example.lucas.haushaltsmanager.Worker.PeriodicWorker;
 
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -13,7 +13,7 @@ import com.example.lucas.haushaltsmanager.R;
 
 import androidx.work.WorkerParameters;
 
-public class NotificationWorker extends AbstractWorker {
+public class NotificationWorker extends AbstractRecurringWorker {
     public static final String WORKER_ID = "notificationWorker";
 
     public NotificationWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {

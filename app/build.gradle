@@ -1,15 +1,15 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 27
     buildToolsVersion '28.0.3'
     defaultConfig {
         applicationId "com.lucas.ausgabenmanager"
         minSdkVersion 19
-        targetSdkVersion 26
-        versionCode 3
-        versionName '1.1.0'
-        testInstrumentationRunner "android.support.dialog_popup_edittext.runner.AndroidJUnitRunner"
+        targetSdkVersion 27
+        versionCode 4
+        versionName '1.2.0'
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     testOptions {
         unitTests {
@@ -32,27 +32,38 @@ repositories {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.android.support:appcompat-v7:26.1.0'
-    implementation 'com.android.support:cardview-v7:26.1.0'
-    implementation 'com.android.support:design:26.1.0'
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:cardview-v7:27.1.1'
+    implementation 'com.android.support:design:27.1.1'
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
     // Charting Library
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0-alpha'
     // Ein FAB der sich zu einer Toolbar werden kann
     implementation 'com.github.fafaldo:fab-toolbar:1.2.0'
-    //API welche ich benutze um Hintergrundaufgaben laufen zu lassen
-    implementation 'android.arch.work:work-runtime:1.0.0-beta01'
-    //AlertDialog zum anzeigen der von mir genutzten OpenSource Pakete
+    // API welche ich benutze um Hintergrundaufgaben laufen zu lassen
+    implementation 'android.arch.work:work-runtime:1.0.0'
+    // AlertDialog zum anzeigen der von mir genutzten OpenSource Pakete
     // TODO: Kann irgendwie nicht weiter upgraden
     implementation 'de.psdev.licensesdialog:licensesdialog:1.8.3'
     //AlertDialog um den User ein Verzeichniss auswählen zu lassen
     implementation 'com.github.codekidX:storage-chooser:2.0.3'
     implementation project(path: ':androidcharts')
     implementation project(path: ':changelogdialog')
-    //todo replace ColorPicker with one of https://android-arsenal.com/tag/18?sort=created
-    //Robolectric wird benötigt um einen Context zu erstellen, ohne dass die Tests auf einem Emulator ausgeführt werden müssen
+
+
+    // Dependencies welche benötigt werden, um die AndroidTests auszuführen
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation "android.arch.work:work-testing:1.0.0"
+
+
+    // TODO: Replace ColorPicker with one of https://android-arsenal.com/tag/18?sort=created
+    // Robolectric wird benötigt um einen Context zu erstellen, ohne dass die Tests auf einem Emulator ausgeführt werden müssen
     testImplementation 'org.robolectric:robolectric:3.8'
-    //Mockito siehe PowerMockito
+    // Zum mocken einzelener Klassen
     testImplementation 'org.mockito:mockito-core:2.20.0'
     testImplementation 'junit:junit:4.12'
+
+
+    // Mit dieser Library kann ich mit die Datenbank live im Browser anzeigen lassen
+    debugImplementation 'com.amitshekhar.android:debug-db:1.0.6'
 }

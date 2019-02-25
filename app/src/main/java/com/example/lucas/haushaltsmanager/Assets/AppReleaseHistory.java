@@ -2,6 +2,7 @@ package com.example.lucas.haushaltsmanager.Assets;
 
 import android.support.annotation.StringRes;
 
+import com.example.lucas.changelogdialog.Bug;
 import com.example.lucas.changelogdialog.ChangelogItem;
 import com.example.lucas.changelogdialog.Feature;
 import com.example.lucas.changelogdialog.Improvement;
@@ -42,6 +43,7 @@ public class AppReleaseHistory implements ReleaseHistory {
         List<Release> releases = new ArrayList<>();
         releases.add(getRelease100());
         releases.add(getRelease110());
+        releases.add(getRelease120());
 
         return releases;
     }
@@ -56,7 +58,7 @@ public class AppReleaseHistory implements ReleaseHistory {
                 1,
                 null,
                 null,
-                getDate(1, 1, 2019),
+                getDate(1, Calendar.JANUARY, 2019),
                 getString(R.string.release_notes_100),
                 new ArrayList<ChangelogItem>()
         );
@@ -77,8 +79,29 @@ public class AppReleaseHistory implements ReleaseHistory {
                 1,
                 1,
                 null,
-                getDate(1, 3, 2019),
+                getDate(1, Calendar.MARCH, 2019),
                 getString(R.string.release_notes_110),
+                changelog
+        );
+    }
+
+    /**
+     * Methode, welche die Änderungen der Version 1.2.0 zurückgibt.
+     *
+     * @return Version 1.2.0
+     */
+    private Release getRelease120() {
+        List<ChangelogItem> changelog = new ArrayList<>();
+        changelog.add(new Bug(getString(R.string.release_notes_120_correct_scheuduling)));
+        changelog.add(new Improvement(getString(R.string.release_notes_120_improved_scheduling))); // RecurringBookings lassen sich nun einfacher planen
+
+
+        return new Release(
+                1,
+                2,
+                0,
+                getDate(1, Calendar.APRIL, 2019),
+                getString(R.string.release_notes_120),
                 changelog
         );
     }

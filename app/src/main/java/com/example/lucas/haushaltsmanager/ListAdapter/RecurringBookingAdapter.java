@@ -53,7 +53,7 @@ public class RecurringBookingAdapter extends BaseExpandableListAdapter {
     public int getChildrenCount(int groupPosition) {
         int counter = 0;
         for (RecurringBooking booking : mRecurringBookings)
-            counter += booking.getExpense().getChildren().size();
+            counter += booking.getBooking().getChildren().size();
 
         return counter;
     }
@@ -65,7 +65,7 @@ public class RecurringBookingAdapter extends BaseExpandableListAdapter {
 
     @Override
     public Object getChild(int groupPosition, int childPosition) {
-        return mRecurringBookings.get(groupPosition).getExpense().getChildren().get(childPosition);
+        return mRecurringBookings.get(groupPosition).getBooking().getChildren().get(childPosition);
     }
 
     @Override
@@ -86,7 +86,7 @@ public class RecurringBookingAdapter extends BaseExpandableListAdapter {
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
         RecurringBooking recurringBooking = (RecurringBooking) getGroup(groupPosition);
-        ExpenseObject groupExpense = recurringBooking.getExpense();
+        ExpenseObject groupExpense = recurringBooking.getBooking();
 
         switch (groupExpense.getExpenseType()) {
 
@@ -100,7 +100,7 @@ public class RecurringBookingAdapter extends BaseExpandableListAdapter {
                 TextView txtCurrencySymbol = convertView.findViewById(R.id.exp_listview_parent_currency_symbol);
                 TextView txtPerson2 = convertView.findViewById(R.id.exp_listview_parent_person);
 
-                pieChart.setPieData(preparePieData(recurringBooking.getExpense().getChildren()));
+                pieChart.setPieData(preparePieData(recurringBooking.getBooking().getChildren()));
                 txtTitle22.setText(groupExpense.getTitle());
                 txtPrice.setText(String.format(getDefaultLocale(), "%.2f", groupExpense.getSignedPrice()));
                 txtPrice.setTextColor(groupExpense.getSignedPrice() < 0 ? mRed : mGreen);

@@ -1,84 +1,137 @@
 package com.example.lucas.haushaltsmanager.Entities;
 
+import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
+import com.example.lucas.haushaltsmanager.Entities.Expense.Booking;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 
 import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
+
+import javax.annotation.Nullable;
 
 public class RecurringBooking {
-    private Calendar mStart, mEnd;
-    /**
-     * Frequency in hours
-     */
-    private int mFrequency;
-    private long mIndex;
-    private ExpenseObject mExpense;//TODO kann ich die Buchung nur als referenz speichern (nur als id)?
+    private final long mIndex;
 
-    public RecurringBooking(
-            long index,
-            Calendar start,
-            Calendar end,
-            int frequency,
-            ExpenseObject expense
-    ) {
-        mStart = start;
-        mEnd = end;
-        mFrequency = frequency;
+    private Calendar executionDate, endDate;
+    private Frequency frequency;
+    private Booking templateBooking;
+
+    private RecurringBooking(long index, Calendar executionDate, Calendar end, Frequency frequency, Booking booking) {
         mIndex = index;
-        mExpense = expense;
+
+        setBooking(booking);
+        setExecutionDate(executionDate);
+        setEnd(end);
+        setFrequency(frequency);
     }
 
-    public RecurringBooking(Calendar start, Calendar end, int frequency, ExpenseObject expense) {
-        this(-1, start, end, frequency, expense);
+    public static RecurringBooking load(long id, Calendar executionDate, Calendar end, Frequency frequency, Booking booking) {
+        return new RecurringBooking(
+                id,
+                executionDate,
+                end,
+                frequency,
+                booking
+        );
+    }
+
+    public static RecurringBooking create(Calendar executionDate, Calendar end, Frequency frequency, Booking booking) {
+        return new RecurringBooking(
+                ExpensesDbHelper.INVALID_INDEX,
+                executionDate,
+                end,
+                frequency,
+                booking
+        );
+    }
+
+    /**
+     * Method which creates the next RecurringBooking based on the Frequency information within it.
+     *
+     * @param recurringBooking Base RecurringBooking
+     * @return RecurringBooking with next schedule date. NULL if time frame ended.
+     */
+    @Nullable
+    public static RecurringBooking createNextRecurringBooking(RecurringBooking recurringBooking) {
+        Calendar nextOccurrence = recurringBooking.getNextOccurrence();
+        if (nextOccurrence.after(recurringBooking.getEnd())) {
+            return null;
+        }
+
+        return new RecurringBooking(
+                recurringBooking.getIndex(),
+                nextOccurrence,
+                recurringBooking.getEnd(),
+                recurringBooking.getFrequency(),
+                ExpenseObject.copy(recurringBooking.getBooking())
+        );
     }
 
     public long getIndex() {
         return mIndex;
     }
 
-    public ExpenseObject getExpense() {
-        return mExpense;
+    public ExpenseObject getBooking() {
+        return (ExpenseObject) templateBooking;
     }
 
-    public Calendar getStart() {
-        return mStart;
+    private void setBooking(Booking booking) {
+        templateBooking = booking;
+    }
+
+    public Frequency getFrequency() {
+        return frequency;
+    }
+
+    public void setFrequency(Frequency frequency) {
+        this.frequency = frequency;
+    }
+
+    public Calendar getExecutionDate() {
+        return executionDate;
+    }
+
+    public void setExecutionDate(Calendar executionDate) {
+        this.executionDate = executionDate;
+        ((ExpenseObject) templateBooking).setDateTime(executionDate);
     }
 
     public Calendar getEnd() {
-        return mEnd;
+        return endDate;
     }
 
-    public int getFrequency() {
-        return mFrequency;
+    public void setEnd(Calendar end) {
+        // TODO: Solle ich hier noch einen check einführen, welcher garantiert, dass das EndDatum auch nach dem start ist?
+        endDate = end;
     }
 
-    public boolean occursInRange(Calendar start, Calendar end) {
-        if (start.after(mEnd) || end.before(mStart))
-            return false;
-
-        Calendar temp = mStart;
-        while (temp.before(end)) {
-            if (isDateInRange(temp, start, end))
-                return true;
-
-            temp.add(Calendar.HOUR, getFrequency());
+    public Delay getDelayUntilNextExecution() {
+        long timeBetween = getTimeBetweenNowAnd(executionDate);
+        if (timeBetween < 0) {
+            timeBetween = getTimeBetweenNowAnd(getNextOccurrence());
         }
 
-        return false;
+        return new Delay(
+                TimeUnit.MILLISECONDS,
+                timeBetween
+        );
     }
 
-    public Calendar getNextOccurrenceAfter(Calendar date) {
-        Calendar temp = Calendar.getInstance();
-        while (temp.before(mEnd)) {
-            if (temp.after(date))
-                return temp;
+    private Calendar getNextOccurrence() {
+        Calendar nextOccurrence = (Calendar) executionDate.clone();
 
-            temp.add(Calendar.HOUR, mFrequency);
-        }
+        increaseByFrequency(nextOccurrence, frequency);
 
-        return null;// IMPROVEMENT: Kann ich außer NULL auch was anderes zurückgeben?
+        return nextOccurrence;
     }
 
-    private boolean isDateInRange(Calendar date, Calendar start, Calendar end) {
-        return date.after(start) && date.before(end);
+    private long getTimeBetweenNowAnd(Calendar otherDate) {
+        Calendar now = Calendar.getInstance();
+
+        return otherDate.getTimeInMillis() - now.getTimeInMillis();
+    }
+
+    private void increaseByFrequency(Calendar date, Frequency frequency) {
+        date.add(frequency.getCalendarField(), frequency.getAmount());
     }
 }

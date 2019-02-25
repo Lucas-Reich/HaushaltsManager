@@ -45,6 +45,7 @@ public class CalendarUtils {
 
     public static String formatHumanReadable(Calendar date) {
         // TODO: Formatierung sollte basierend auf der Locale des Users sein
+        // DateUtils.formatDateTime könnte man benutzen
         return new SimpleDateFormat("dd.MM.yyyy", getUserLocale()).format(date.getTime());
     }
 
