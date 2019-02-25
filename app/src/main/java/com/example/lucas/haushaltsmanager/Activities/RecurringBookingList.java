@@ -1,19 +1,23 @@
 package com.example.lucas.haushaltsmanager.Activities;
 
 import android.os.Bundle;
-import android.widget.ExpandableListView;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 
 import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.RecurringBookingRepository;
 import com.example.lucas.haushaltsmanager.Entities.RecurringBooking;
-import com.example.lucas.haushaltsmanager.ListAdapter.RecurringBookingAdapter;
 import com.example.lucas.haushaltsmanager.R;
+import com.example.lucas.haushaltsmanager.RecyclerView.ExpenseListRecyclerViewAdapter;
+import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.IRecyclerItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.RecurringBookingItem;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
 public class RecurringBookingList extends AbstractAppCompatActivity {
-    private ExpandableListView mExpListView;
     private RecurringBookingRepository mRecurringBookingRepo;
+    private RecyclerView mRecyclerView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -22,8 +26,8 @@ public class RecurringBookingList extends AbstractAppCompatActivity {
 
         initializeToolbar();
 
-        mExpListView = findViewById(R.id.booking_list_view);
-        mExpListView.setEmptyView(findViewById(R.id.empty_list_view));
+        mRecyclerView = findViewById(R.id.recurring_bookings_rec_view);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         mRecurringBookingRepo = new RecurringBookingRepository(this);
     }
@@ -36,21 +40,27 @@ public class RecurringBookingList extends AbstractAppCompatActivity {
     }
 
     private void updateListView() {
-        RecurringBookingAdapter recurringBookingAdapter = new RecurringBookingAdapter(
-                this,
-                getRecurringBookings()
-        );
+        ExpenseListRecyclerViewAdapter mAdapter = new ExpenseListRecyclerViewAdapter(loadData());
 
-        mExpListView.setAdapter(recurringBookingAdapter);
-
-        recurringBookingAdapter.notifyDataSetChanged();
+        mRecyclerView.setAdapter(mAdapter);
     }
 
-    private List<RecurringBooking> getRecurringBookings() {
-        return mRecurringBookingRepo.getAll(
+    private List<IRecyclerItem> loadData() {
+        List<RecurringBooking> recurringBookings = mRecurringBookingRepo.getAll(
                 getFirstOfMonth(),
                 getLastOfMonth()
         );
+
+        return transform(recurringBookings);
+    }
+
+    private List<IRecyclerItem> transform(List<RecurringBooking> recurringBookings) {
+        List<IRecyclerItem> items = new ArrayList<>();
+        for (RecurringBooking recurringBooking : recurringBookings) {
+            items.add(new RecurringBookingItem(recurringBooking));
+        }
+
+        return items;
     }
 
     private Calendar getFirstOfMonth() {

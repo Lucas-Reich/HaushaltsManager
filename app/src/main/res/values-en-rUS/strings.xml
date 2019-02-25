@@ -41,7 +41,7 @@
     <string name="deleted_account">Deleted account</string>
     <string name="changed_main_account"> is now the main account.</string>
     <string name="input_price">Input price</string>
-    <string name="input_frequency">Input frequency</string>
+    <string name="input_frequency">Frequency</string>
     <string name="most_bookings_in">Most Bookings in Category</string>
     <string name="no_expenses">No Expenses</string>
     <string name="show_templates">Templates</string>
@@ -142,7 +142,7 @@
     <string name="could_not_update_title">Title could not be updated</string>
     <string name="starts_at">starts at</string>
     <string name="ends_at">ends at</string>
-    <string name="frequency_in_days">Frequency in days</string>
+    <string name="frequency">Frequency</string>
     <string name="notification">Notification</string>
     <string name="currency">Currency</string>
     <string name="backups">Backups</string>
@@ -168,4 +168,8 @@
     <string name="release_notes_110_tab_one_feature_animations">Animations in the booking overview</string>
     <string name="release_notes_110_code_improvements">Adjustments in the code of the booking overview</string>
     <string name="release_notes_110">There are improvements in the booking overview.\nYou can now view all the bookings in the booking overview. Just scroll down to see older bookings. There are also new animations that improve working with the booking overview.</string>
+    <string name="release_notes_120">There were some issues with recurring bookings that will be fixed in this release. In addition to that, the scheduling of recurring bookings has been simplified.</string>
+    <string name="release_notes_120_correct_scheuduling">Recurring bookings were not executed correctly</string>
+    <string name="release_notes_120_improved_scheduling">The recurring booking list has been revised</string>
+    <string name="cannot_create_recurring_booking">Please fill in all fields to schedule a recurring booking</string>
 </resources>

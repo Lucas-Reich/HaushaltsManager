@@ -1,0 +1,27 @@
+// TODO: Create Booking reference
+{
+  "recurringBookings": [
+    {
+      "start": "",
+      "end": "",
+      "frequency": {
+        "calendarField": "2",
+        "amount": "1"
+      },
+      "booking": {
+
+      }
+    },
+    {
+      "start": "",
+      "end": "",
+      "frequency": {
+        "calendarField": "2",
+        "amount": "1"
+      },
+      "booking": {
+
+      }
+    }
+  ]
+}

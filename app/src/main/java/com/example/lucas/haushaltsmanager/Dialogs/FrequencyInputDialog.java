@@ -5,35 +5,45 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
-import android.view.View;
-import android.widget.EditText;
 
+import com.example.lucas.haushaltsmanager.Entities.Frequency;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
+
+import java.util.Calendar;
 
 public class FrequencyInputDialog extends DialogFragment {
     public static final String TITLE = "title";
 
-    private OnFrequencySet mCallback;
+    private OnFrequencySelected mCallback;
+    private int mSelectedRecurrence;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         BundleUtils args = new BundleUtils(getArguments());
 
-        final View frequencyInput = View.inflate(getActivity(), R.layout.frequency_input, null);
-
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-        builder.setTitle(args.getString("title", ""));
+        builder.setTitle(args.getString("title", "Frequency"));
 
-        builder.setView(frequencyInput);
+        final String[] items = getActivity().getResources().getStringArray(R.array.recurrence_options);
+
+        builder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                mSelectedRecurrence = which;
+            }
+        });
 
         builder.setPositiveButton(R.string.btn_ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                if (mCallback != null)
-                    mCallback.onFrequencySet(getFrequencyFromInput(frequencyInput));
+                if (mCallback != null) {
+                    int field = recurrenceToField(mSelectedRecurrence);
+
+                    mCallback.onFrequencySet(new Frequency(field, 1), items[mSelectedRecurrence]);
+                }
 
                 dismiss();
             }
@@ -50,30 +60,27 @@ public class FrequencyInputDialog extends DialogFragment {
         return builder.create();
     }
 
-    /**
-     * Methode um die vom user eingegebene Häufigkeit aus dem Inputfeld auszulesen
-     *
-     * @param view View, in dem sich das Inputfeld befindet
-     * @return Häufigkeit in Stunden
-     */
-    private int getFrequencyFromInput(View view) {
-
-        EditText numberInput = view.findViewById(R.id.input_number);
-        String frequency = numberInput.getText().toString();
-
-        return Integer.parseInt(frequency) * 24;
+    private int recurrenceToField(int selectedRecurrence) {
+        switch (selectedRecurrence) {
+            case 0:
+                return Calendar.DATE;
+            case 1:
+                return Calendar.WEEK_OF_YEAR;
+            case 2:
+                return Calendar.MONTH;
+            case 3:
+                return Calendar.YEAR;
+            default:
+                return Calendar.MONTH;
+        }
     }
 
-    /**
-     * Methode um einen Listener zu registrieren, welcher aufgerufen wird, wenn der User eine Häufigkeit angegeben hat.
-     *
-     * @param listener Listener
-     */
-    public void setOnFrequencySet(FrequencyInputDialog.OnFrequencySet listener) {
+    public void setOnFrequencySet(OnFrequencySelected listener) {
         mCallback = listener;
     }
 
-    public interface OnFrequencySet {
-        void onFrequencySet(int frequencyInHours);
+    public interface OnFrequencySelected {
+        void onFrequencySet(Frequency frequency, String text);
     }
+
 }

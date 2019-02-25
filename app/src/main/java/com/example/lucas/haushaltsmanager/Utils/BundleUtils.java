@@ -66,4 +66,8 @@ public class BundleUtils {
     public double getDouble(String key, double def) {
         return mBundle.containsKey(key) ? mBundle.getDouble(key) : def;
     }
+
+    public boolean hasMapping(String key) {
+        return mBundle.containsKey(key);
+    }
 }

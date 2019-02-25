@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager.Worker;
+package com.example.lucas.haushaltsmanager.Worker.PeriodicWorker;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -10,7 +10,7 @@ import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferen
 
 import androidx.work.WorkerParameters;
 
-public class BackupWorker extends AbstractWorker {
+public class BackupWorker extends AbstractRecurringWorker {
     public static final String WORKER_ID = "backupWorker";
 
     public BackupWorker(@NonNull Context context, @NonNull WorkerParameters workerParameters) {

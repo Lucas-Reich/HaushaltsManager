@@ -23,8 +23,8 @@ import com.example.lucas.haushaltsmanager.PreferencesHelper.AppInternalPreferenc
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.WeekdayUtils;
-import com.example.lucas.haushaltsmanager.Worker.BackupWorker;
-import com.example.lucas.haushaltsmanager.Worker.NotificationWorker;
+import com.example.lucas.haushaltsmanager.Worker.PeriodicWorker.BackupWorker;
+import com.example.lucas.haushaltsmanager.Worker.PeriodicWorker.NotificationWorker;
 
 import java.util.Arrays;
 import java.util.List;

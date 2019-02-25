@@ -43,7 +43,7 @@
     <string name="most_bookings_in">Die meisten Ausgaben in</string>
     <string name="no_expenses">Keine Ausgaben</string>
     <string name="input_price">Geben Sie den Preis ein</string>
-    <string name="input_frequency">Geben Sie die Häufigkeit an</string>
+    <string name="input_frequency">Häufigkeit</string>
     <string name="show_templates">Vorlagen</string>
     <string name="filter">Filter</string>
     <string name="sort">Sortiere</string>
@@ -118,7 +118,7 @@
     <string name="saved_as_template">Buchung wurde als Template gespeichert</string>
     <string name="activity_create_recurring_booking">Erstelle wiederkehrende Buchung</string>
     <string name="could_not_save_recurring_booking">Wiederkehrende Buchung konnte nicht gespeichert werden</string>
-    <string name="frequency_in_days">Häufigkeit in Tagen</string>
+    <string name="frequency">Häufigkeit</string>
     <string name="abort_action_confirmation_text">Nicht gespeicherte Daten gehen verloren! Trotzdem schließen?</string>
     <string name="income">Einnahme</string>
     <string name="expense">Ausgabe</string>
@@ -168,4 +168,8 @@
     <string name="release_notes_110_tab_one_feature_animations">Animationen in der Buchungsübersicht</string>
     <string name="release_notes_110_code_improvements">Anpassungen im Code der Buchungsübersicht</string>
     <string name="release_notes_110">Es gibt Verbesserungen in der Buchungsübersicht.\nDu kannst dir nun alle Buchungen in der Buchungsübersicht anzeigen lassen. Scrolle einfach nach unten, um ältere Buchungen angezeigt zu bekommen. Ebenfalls gibt es neue Animationen, welche das Arbeiten mit der Buchungsübersicht verbessern.</string>
+    <string name="release_notes_120">Es gab einige Probleme mit Wiederkehrenden Buchungen, die in diesem Release gefixt werden. Zusätzlich wurde das planen von Wiederkehrenden Buchungen vereinfacht.</string>
+    <string name="release_notes_120_correct_scheuduling">Wiederkehrende Buchungen wurden nicht korrekt ausgeführt</string>
+    <string name="release_notes_120_improved_scheduling">Die wiederkehrende Buchungsliste wurde überarbeitet</string>
+    <string name="cannot_create_recurring_booking">Fülle alle Felder aus um eine wiederkerhende Buchung zu planen</string>
 </resources>
