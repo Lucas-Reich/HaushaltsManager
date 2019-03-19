@@ -18,6 +18,7 @@ import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Price;
 
 import junit.framework.Assert;
 
@@ -83,22 +84,23 @@ public class ChildExpenseRepositoryTest {
     }
 
     private ExpenseObject getSimpleExpense() {
-        Currency currency = new Currency("Euro", "EUR", "€");
-        currency = mCurrencyRepo.create(currency);
-
         return new ExpenseObject(
                 "Ausgabe",
-                new Random().nextInt(1000),
-                false,
+                new Price(new Random().nextInt(1000), false, getDefaultCurrency()),
                 category,
                 account.getIndex(),
-                currency
+                getDefaultCurrency()
         );
+    }
+
+    private Currency getDefaultCurrency() {
+        Currency currency = new Currency("Euro", "EUR", "€");
+        return mCurrencyRepo.create(currency);
     }
 
     private ExpenseObject getParentExpenseWithChildren() {
         ExpenseObject parentExpense = getSimpleExpense();
-        parentExpense.setPrice(0);
+        parentExpense.setPrice(new Price(0, getDefaultCurrency()));
 
         parentExpense.addChild(getSimpleExpense());
         parentExpense.addChild(getSimpleExpense());
@@ -129,8 +131,7 @@ public class ChildExpenseRepositoryTest {
         ExpenseObject parentExpense = getParentExpenseWithChildren();
 
         ExpenseObject childExpense = getSimpleExpense();
-        childExpense.setExpenditure(false);
-        childExpense.setPrice(133);
+        childExpense.setPrice(new Price(133, false, getDefaultCurrency()));
 
         try {
             ExpenseObject actualExpense = mChildExpenseRepo.addChildToBooking(childExpense, parentExpense);
@@ -151,13 +152,11 @@ public class ChildExpenseRepositoryTest {
     @Test
     public void testAddChildToBookingWithExistingParentThatHasNoChildrenShouldSucceed() {
         ExpenseObject parentExpense = getSimpleExpense();
-        parentExpense.setExpenditure(true);
-        parentExpense.setPrice(144);
+        parentExpense.setPrice(new Price(144, true, getDefaultCurrency()));
         parentExpense = mBookingRepo.insert(parentExpense);
 
         ExpenseObject childExpense = getSimpleExpense();
-        childExpense.setExpenditure(true);
-        childExpense.setPrice(177);
+        childExpense.setPrice(new Price(177, true, getDefaultCurrency()));
 
         try {
             ExpenseObject actualParentExpense = mChildExpenseRepo.addChildToBooking(childExpense, parentExpense);
@@ -186,7 +185,7 @@ public class ChildExpenseRepositoryTest {
 
         } catch (AddChildToChildException e) {
 
-            assertEquals("It is not possible to addItem children to a ChildExpense.", e.getMessage());
+            assertEquals("It's not possible to addItem Ausgabe to Ausgabe, since Ausgabe is already a ChildExpense", e.getMessage());
         }
     }
 
@@ -320,8 +319,7 @@ public class ChildExpenseRepositoryTest {
         ExpenseObject expectedChildExpense = mChildExpenseRepo.insert(parentExpense, parentExpense.getChildren().get(0));
 
         try {
-            expectedChildExpense.setPrice(13);
-            expectedChildExpense.setExpenditure(true);
+            expectedChildExpense.setPrice(new Price(13, true, getDefaultCurrency()));
 
             mChildExpenseRepo.update(expectedChildExpense);
             ExpenseObject actualChildExpense = mChildExpenseRepo.get(expectedChildExpense.getIndex());
@@ -673,26 +671,6 @@ public class ChildExpenseRepositoryTest {
         } catch (AccountNotFoundException e) {
 
             Assert.fail("Konto wurde nicht gefunden");
-        }
-    }
-
-    /**
-     * Methode um ein Feld einer Klasse durch ein anderes, mit injection, auszutauschen.
-     *
-     * @param obj       Objekt welches angepasst werden soll
-     * @param value     Neuer Wert des Felds
-     * @param fieldName Name des Feldes
-     */
-    private void injectMock(Object obj, Object value, String fieldName) {
-        try {
-            Class cls = obj.getClass();
-
-            Field field = cls.getDeclaredField(fieldName);
-            field.setAccessible(true);
-            field.set(obj, value);
-        } catch (Exception e) {
-
-            Assert.fail(String.format("Could not find field %s in class %s", fieldName, obj.getClass().getSimpleName()));
         }
     }
 }

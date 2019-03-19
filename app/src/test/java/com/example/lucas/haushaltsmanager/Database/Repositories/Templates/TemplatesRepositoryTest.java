@@ -18,6 +18,7 @@ import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.Entities.Template;
 
 import junit.framework.Assert;
@@ -81,7 +82,7 @@ public class TemplatesRepositoryTest {
     }
 
     private Template getSimpleTemplate() {
-        ExpenseObject expense = mBookingRepo.insert(new ExpenseObject("Ausgabe", new Random().nextInt(1000), true, category, account.getIndex(), currency));
+        ExpenseObject expense = mBookingRepo.insert(getSimpleExpense());
 
         return new Template(
                 expense
@@ -184,7 +185,7 @@ public class TemplatesRepositoryTest {
 
     @Test
     public void testDeleteWithExistingTemplateAndReferencedExpenseIsHiddenShouldSucceedAndExpenseShouldBeDeleted() {
-        ExpenseObject relatedParentExpense = mBookingRepo.insert(new ExpenseObject("Ausgabe", 897, true, category, account.getIndex(), currency));
+        ExpenseObject relatedParentExpense = mBookingRepo.insert(getSimpleExpense());
         Template template = mTemplateRepo.insert(new Template(relatedParentExpense));
 
         try {
@@ -208,7 +209,7 @@ public class TemplatesRepositoryTest {
         // REFACTOR: dieser test ist irgendwie kaputt gegangen
         ExpenseObject parentExpense = mock(ExpenseObject.class);
         when(parentExpense.getIndex()).thenReturn(465L);
-        ExpenseObject relatedChildExpense = mChildExpenseRepo.insert(parentExpense, new ExpenseObject("Ausgabe", 897, true, category, account.getIndex(), currency));
+        ExpenseObject relatedChildExpense = mChildExpenseRepo.insert(parentExpense, getSimpleExpense());
         Template template = mTemplateRepo.insert(new Template(relatedChildExpense));
 
         try {
@@ -227,19 +228,22 @@ public class TemplatesRepositoryTest {
         }
     }
 
+    private ExpenseObject getSimpleExpense() {
+        return new ExpenseObject(
+                "Ausgabe",
+                new Price(1337, true, currency),
+                category,
+                account.getIndex(),
+                currency
+        );
+    }
+
     @Test
     public void testUpdateWithExistingTemplateShouldSucceed() {
         Template expectedTemplate = mTemplateRepo.insert(getSimpleTemplate());
 
         try {
-            ExpenseObject newTemplateExpense = mBookingRepo.insert(new ExpenseObject(
-                    "Neue Ausgabe",
-                    312,
-                    true,
-                    category,
-                    account.getIndex(),
-                    currency
-            ));
+            ExpenseObject newTemplateExpense = mBookingRepo.insert(getSimpleExpense());
             expectedTemplate.setTemplate(newTemplateExpense);
             mTemplateRepo.update(expectedTemplate);
             Template fetchedTemplate = mTemplateRepo.get(expectedTemplate.getIndex());

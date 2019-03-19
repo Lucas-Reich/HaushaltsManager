@@ -25,7 +25,9 @@ import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.SingleChoiceDialog;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
+import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
 
@@ -64,14 +66,12 @@ public class TransferActivity extends AppCompatActivity {
 
         try {
             mFromExpense = ExpenseObject.createDummyExpense();
-            mFromExpense.setPrice(0);
-            mFromExpense.setExpenditure(true);
+            mFromExpense.setPrice(new Price(0, true, getDefaultCurrency()));
             mFromExpense.setCategory(getTransferCategory());
             mFromExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.TRANSFER_EXPENSE);
 
             mToExpense = ExpenseObject.createDummyExpense();
-            mToExpense.setPrice(0);
-            mToExpense.setExpenditure(false);
+            mToExpense.setPrice(new Price(0, false, getDefaultCurrency()));
             mToExpense.setCategory(getTransferCategory());
             mToExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.TRANSFER_EXPENSE);
         } catch (ChildCategoryNotFoundException e) {
@@ -90,6 +90,10 @@ public class TransferActivity extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
         if (bundle != null && bundle.containsKey("from_account"))
             setFromAccount((Account) bundle.getParcelable("from_account"));
+    }
+
+    private Currency getDefaultCurrency() {
+        return new UserSettingsPreferences(this).getMainCurrency();
     }
 
     @Override
@@ -112,8 +116,7 @@ public class TransferActivity extends AppCompatActivity {
                     public void onPriceSelected(double price) {
                         UserSettingsPreferences preferences = new UserSettingsPreferences(TransferActivity.this);
 
-                        mFromExpense.setPrice(price);
-                        mFromExpense.setExpenditure(true);
+                        mFromExpense.setPrice(new Price(price, true, getDefaultCurrency()));
                         mAmountBtn.setText(String.format(
                                 getResources().getConfiguration().locale, "%.2f %s",
                                 mFromExpense.getUnsignedPrice(),
@@ -346,8 +349,10 @@ public class TransferActivity extends AppCompatActivity {
      * @param newPrice Den Preis, welcher umgerechnet werden muss
      */
     private void setToExpense(double newPrice) {
-
-        mToExpense.setPrice(newPrice);
-        mToExpense.setExpenditure(false);
+        mToExpense.setPrice(new Price(
+                newPrice,
+                false,
+                getDefaultCurrency())
+        );
     }
 }

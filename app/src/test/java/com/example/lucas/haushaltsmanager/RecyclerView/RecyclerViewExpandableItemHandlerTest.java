@@ -6,6 +6,7 @@ import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ParentExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.Entities.Tag;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ChildItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ExpenseItem;
@@ -201,19 +202,20 @@ public class RecyclerViewExpandableItemHandlerTest {
     }
 
     private ExpenseObject createSimpleExpense() {
+        Currency currency = new Currency("Euro", "EUR", "€");
+
         return new ExpenseObject(
                 -1,
                 "Ich bin eine Ausgabe",
-                new Random().nextInt(),
+                new Price(new Random().nextInt(), true, currency),
                 Calendar.getInstance(),
-                true,
                 new Category("Kategorie", "#000000", true, new ArrayList<Category>()),
                 "",
                 -1,
                 ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE,
                 new ArrayList<Tag>(),
                 new ArrayList<ExpenseObject>(),
-                new Currency("Euro", "EUR", "€")
+                currency
         );
     }
 }

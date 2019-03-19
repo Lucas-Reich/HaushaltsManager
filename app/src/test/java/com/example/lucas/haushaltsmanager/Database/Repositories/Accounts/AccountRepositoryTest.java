@@ -13,6 +13,7 @@ import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Price;
 
 import junit.framework.Assert;
 
@@ -59,7 +60,7 @@ public class AccountRepositoryTest {
         mDatabaseManagerInstance.closeDatabase();
     }
 
-    public Account getSimpleAccount() {
+    private Account getSimpleAccount() {
         Currency localCurrency = mock(Currency.class);
 
         return new Account(
@@ -145,15 +146,7 @@ public class AccountRepositoryTest {
     public void testDeleteWithExistingAccountAttachedToParentExpenseShouldFailWithCannotDeleteAccountException() {
         Account account = mAccountRepo.create(getSimpleAccount());
 
-        Category mockCategory = mock(Category.class);
-        Currency mockCurrency = mock(Currency.class);
-
-        ExpenseObject parentExpense = new ExpenseObject("Ausgabe", 0, false, mockCategory, account.getIndex(), mockCurrency);
-        mBookingRepo.insert(parentExpense);
-
-//        ExpenseRepository mockExpenseRepo = mock(ExpenseRepository.class);
-//        when(mockExpenseRepo.exists()).thenReturn(true);
-//        injectMock(mAccountRepo, mockExpenseRepo, "mBookingRepo");
+        ExpenseObject parentExpense = mBookingRepo.insert(getSimpleExpense());
 
         try {
             mAccountRepo.delete(account);
@@ -171,15 +164,9 @@ public class AccountRepositoryTest {
         Account account = mAccountRepo.create(getSimpleAccount());
 
         ExpenseObject mockParentExpense = mock(ExpenseObject.class);
-        Category mockCategory = mock(Category.class);
-        Currency mockCurrency = mock(Currency.class);
 
-        ExpenseObject childExpense = new ExpenseObject("Ausgabe", 0, false, mockCategory, account.getIndex(), mockCurrency);
+        ExpenseObject childExpense = getSimpleExpense();
         mChildExpenseRepo.insert(mockParentExpense, childExpense);
-
-//        ChildExpenseRepository mockChildExpenseRepo = mock(ChildExpenseRepository.class);
-//        when(mockChildExpenseRepo.exists()).thenReturn(true);
-//        injectMock(mAccountRepo, mockChildExpenseRepo, "mChildExpenseRepo");
 
         try {
             mAccountRepo.delete(account);
@@ -291,23 +278,13 @@ public class AccountRepositoryTest {
         }
     }
 
-    /**
-     * Methode um ein Feld einer Klasse durch ein anderes, mit injection, auszutauschen.
-     *
-     * @param obj       Objekt welches angepasst werden soll
-     * @param value     Neuer Wert des Felds
-     * @param fieldName Name des Feldes
-     */
-    private void injectMock(Object obj, Object value, String fieldName) {
-        try {
-            Class cls = obj.getClass();
-
-            Field field = cls.getDeclaredField(fieldName);
-            field.setAccessible(true);
-            field.set(obj, value);
-        } catch (Exception e) {
-
-            Assert.fail(String.format("Could not find field %s in class %s", fieldName, obj.getClass().getSimpleName()));
-        }
+    private ExpenseObject getSimpleExpense() {
+        return new ExpenseObject(
+                "Ich bin eine Ausgabe",
+                new Price(0, mock(Currency.class)),
+                mock(Category.class),
+                getSimpleAccount().getIndex(),
+                mock(Currency.class)
+        );
     }
 }
