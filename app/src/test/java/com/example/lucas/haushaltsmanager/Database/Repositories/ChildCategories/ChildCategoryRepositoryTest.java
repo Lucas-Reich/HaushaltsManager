@@ -12,6 +12,7 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Ch
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Price;
 
 import junit.framework.Assert;
 
@@ -227,7 +228,7 @@ public class ChildCategoryRepositoryTest {
         Category parentCategory = getCategoryWithChild();
         Category childCategory = mChildCategoryRepo.insert(parentCategory, parentCategory.getChildren().get(0));
 
-        ExpenseObject expense = new ExpenseObject("Ausgabe", 100, true, childCategory, -1, new Currency("Währung", "WÄH", "W"));
+        ExpenseObject expense = getSimpleExpense(childCategory);
         mBookingRepo.insert(expense);
 
         try {
@@ -250,7 +251,7 @@ public class ChildCategoryRepositoryTest {
         ExpenseObject parentExpense = mock(ExpenseObject.class);
         when(parentExpense.getIndex()).thenReturn(100L);
 
-        ExpenseObject childExpense = new ExpenseObject("Ausgabe", 100, false, childCategory, -1, new Currency("Euro", "EUR", "€"));
+        ExpenseObject childExpense = getSimpleExpense(childCategory);
         mChildExpenseRepo.insert(parentExpense, childExpense);
         try {
             mChildCategoryRepo.delete(childCategory);
@@ -357,5 +358,17 @@ public class ChildCategoryRepositoryTest {
 
             //do nothing
         }
+    }
+
+    private ExpenseObject getSimpleExpense(Category category) {
+        Currency currency = new Currency("Euro", "EUR", "€");
+
+        return new ExpenseObject(
+                "Ausgabe",
+                new Price(100, false, currency),
+                category,
+                ExpensesDbHelper.INVALID_INDEX,
+                currency
+        );
     }
 }

@@ -17,6 +17,7 @@ import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.Booking;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Frequency;
+import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.Entities.RecurringBooking;
 import com.example.lucas.haushaltsmanager.Worker.PeriodicWorker.RecurringBookingWorker;
 import com.example.lucas.haushaltsmanager.Worker.WorkRequestBuilder;
@@ -179,13 +180,14 @@ public class RecurringBookingWorkerTest extends DatabaseTest {
     }
 
     private Booking createBooking() {
+        Currency currency = new Currency("Euro", "EUR", "€");
+
         ExpenseObject booking = new ExpenseObject(
                 "Ich bin eine Ausgabe",
-                150,
-                true,
+                new Price(150, true, currency),
                 createDefaultCategory(InstrumentationRegistry.getTargetContext()),
                 createDefaultAccount(InstrumentationRegistry.getTargetContext()).getIndex(),
-                new Currency(32, "Euro", "EUR", "€")
+                currency
         );
 
         return mExpenseRepo.insert(booking);

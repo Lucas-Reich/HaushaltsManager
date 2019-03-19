@@ -3,6 +3,7 @@ package com.example.lucas.haushaltsmanager;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.Entities.Tag;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseGrouper;
 
@@ -117,9 +118,8 @@ public class ExpenseGrouperTest {
         return new ExpenseObject(
                 new Random().nextLong(),
                 "Ausgabe",
-                778.4,
+                new Price(778.4, false, mock(Currency.class)),
                 date,
-                false,
                 category,
                 "",
                 1,

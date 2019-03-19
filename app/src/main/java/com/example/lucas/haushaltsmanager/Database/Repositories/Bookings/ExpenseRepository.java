@@ -24,6 +24,7 @@ import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.Entities.Tag;
 
 import java.util.ArrayList;
@@ -232,9 +233,8 @@ public class ExpenseRepository {
         ExpenseObject insertedExpense = new ExpenseObject(
                 insertedExpenseId,
                 expense.getTitle(),
-                expense.getUnsignedPrice(),
+                expense.getPrice(),
                 expense.getDateTime(),
-                expense.isExpenditure(),
                 expense.getCategory(),
                 expense.getNotice(),
                 expense.getAccountId(),
@@ -448,9 +448,8 @@ public class ExpenseRepository {
         return new ExpenseObject(
                 expenseId,
                 title,
-                price,
+                new Price(price, expenditure, currency),
                 date,
-                expenditure,
                 expenseCategory,
                 notice,
                 accountId,

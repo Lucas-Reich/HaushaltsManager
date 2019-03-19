@@ -8,6 +8,7 @@ import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.Booking;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Frequency;
+import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.Entities.RecurringBooking;
 
 import org.junit.Assert;
@@ -86,13 +87,14 @@ public class RecurringBookingRepositoryTest {
     }
 
     private Booking createBooking() {
+        Currency currency = new Currency("Euro", "EUR", "€");
+
         return new ExpenseObject(
                 "Ausgabe",
-                150,
-                true,
+                new Price(150, true, currency),
                 new Category("Kategorie", "#000000", true, new ArrayList<Category>()),
                 ExpensesDbHelper.INVALID_INDEX,
-                new Currency("Euro", "EUR", "€")
+                currency
         );
     }
 

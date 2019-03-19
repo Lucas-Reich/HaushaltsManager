@@ -29,10 +29,13 @@ import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.SingleChoiceDialog;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
+import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
+import com.example.lucas.haushaltsmanager.Utils.MoneyUtils;
 
 import java.util.Calendar;
 import java.util.List;
@@ -99,8 +102,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
             case INTENT_MODE_CREATE_BOOKING:
                 mExpense = new ExpenseObject(
                         getString(R.string.no_name),
-                        0D,
-                        true,
+                        new Price(0D, true, mUserPreferences.getMainCurrency()),
                         Category.createDummyCategory(),
                         mUserPreferences.getActiveAccount().getIndex(),
                         mUserPreferences.getMainCurrency()
@@ -139,7 +141,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
                 priceInput.setOnPriceSelectedListener(new PriceInputDialog.OnPriceSelected() {
                     @Override
                     public void onPriceSelected(double price) {
-                        setPrice(price);
+                        setPrice(new Price(price, true, getDefaultCurrency()));
                     }
                 });
                 priceInput.show(getFragmentManager(), "expense_screen_price");
@@ -242,18 +244,18 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
         mSaveFab.setOnClickListener(getSaveClickListener());
 
 
-        setExpenditureType(mExpense.isExpenditure());
+        showExpenditureType();
         mIncomeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setExpenditureType(false);
+                setPrice(new Price(mExpense.getUnsignedPrice(), false, getDefaultCurrency()));
             }
         });
 
         mExpenseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setExpenditureType(true);
+                setPrice(new Price(mExpense.getUnsignedPrice(), true, getDefaultCurrency()));
             }
         });
     }
@@ -391,7 +393,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
     }
 
     private void showExpenseOnScreen(ExpenseObject expense) {
-        setPrice(expense.getUnsignedPrice());
+        setPrice(expense.getPrice());
         setTitle(expense.getTitle());
         setCategory(expense.getCategory());
         setDate(expense.getDateTime());
@@ -400,9 +402,15 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
         setExpenseCurrency();
     }
 
-    private void setPrice(double price) {
+    private void setPrice(Price price) {
         mExpense.setPrice(price);
-        mPriceBtn.setText(String.format(getResources().getConfiguration().locale, "%.2f", mExpense.getUnsignedPrice()));
+
+        showPrice();
+        showExpenditureType();
+    }
+
+    private void showPrice() {
+        mPriceBtn.setText(MoneyUtils.formatHumanReadable(mExpense.getPrice()));
 
         if (mExpense.isSet())
             runCrossToCheckAnimation();
@@ -410,12 +418,10 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
             runCheckToCrossAnimation();
     }
 
-    private void setExpenditureType(boolean expenditure) {
-        mExpense.setExpenditure(expenditure);
-
+    private void showExpenditureType() {
         LinearLayout ll = findViewById(R.id.expense_screen_bottom_toolbar);
         ll.setBackgroundColor(
-                expenditure
+                mExpense.isExpenditure()
                         ? getColorRes(R.color.booking_expense)
                         : getColorRes(R.color.booking_income)
         );
@@ -424,7 +430,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
     private void setCategory(Category category) {
         mExpense.setCategory(category);
         mCategoryTxt.setText(mExpense.getCategory().getTitle());
-        setExpenditureType(mExpense.getCategory().getDefaultExpenseType());
+        setPrice(new Price(mExpense.getPrice().getUnsignedValue(), mExpense.getCategory().getDefaultExpenseType(), getDefaultCurrency()));
 
         if (mExpense.isSet())
             runCrossToCheckAnimation();
@@ -460,5 +466,9 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
     private void setExpenseCurrency() {
         mExpense.setCurrency(mUserPreferences.getMainCurrency());
         mCurrencyBtn.setText(mExpense.getCurrency().getShortName());
+    }
+
+    private Currency getDefaultCurrency() {
+        return new UserSettingsPreferences(this).getMainCurrency();
     }
 }

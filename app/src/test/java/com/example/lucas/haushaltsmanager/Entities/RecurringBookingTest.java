@@ -284,19 +284,20 @@ public class RecurringBookingTest {
     }
 
     private Booking getBooking() {
+        Currency currency = new Currency("Euro", "EUR", "€");
+
         return new ExpenseObject(
                 ExpensesDbHelper.INVALID_INDEX,
                 "Ausgabe",
-                150,
+                new Price(150, true, currency),
                 getDate(1, Calendar.JANUARY, 2019),
-                true,
                 new Category("Kategorie", "#000000", true, new ArrayList<Category>()),
                 "",
                 ExpensesDbHelper.INVALID_INDEX,
                 ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE,
                 new ArrayList<Tag>(),
                 new ArrayList<ExpenseObject>(),
-                new Currency("Euro", "EUR", "€")
+                currency
         );
     }
 

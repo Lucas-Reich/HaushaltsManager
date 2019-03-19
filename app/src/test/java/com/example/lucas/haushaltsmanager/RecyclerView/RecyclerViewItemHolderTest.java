@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.Entities.Tag;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.DateItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ExpenseItem;
@@ -29,6 +30,36 @@ import static org.junit.Assert.fail;
 @RunWith(RobolectricTestRunner.class)
 public class RecyclerViewItemHolderTest {
     private ExpenseListRecyclerViewAdapter mItemHandler;
+
+    private static Calendar createSimpleDate(int year, int month, int day) {
+        Calendar secureDate = Calendar.getInstance();
+        secureDate.set(Calendar.YEAR, year);
+        secureDate.set(Calendar.MONTH, month);
+        secureDate.set(Calendar.DAY_OF_MONTH, day);
+        secureDate.set(Calendar.HOUR_OF_DAY, 0);
+        secureDate.set(Calendar.MINUTE, 0);
+        secureDate.set(Calendar.SECOND, 0);
+        secureDate.set(Calendar.MILLISECOND, 0);
+
+        return secureDate;
+    }
+
+    private static ExpenseObject createSimpleExpense(Calendar expenseDate) {
+        Currency currency = new Currency("Euro", "EUR", "€");
+
+        return new ExpenseObject(
+                -1,
+                "Ich bin eine Ausgabe",
+                new Price(105, true, currency),
+                expenseDate,
+                new Category("Kategorie", "#000000", true, new ArrayList<Category>()),
+                "",
+                -1,
+                ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE,
+                new ArrayList<Tag>(),
+                new ArrayList<ExpenseObject>(),
+                currency);
+    }
 
     @Before
     public void setUp() {
@@ -245,35 +276,5 @@ public class RecyclerViewItemHolderTest {
                     new ExpenseItem(createSimpleExpense(itemDate))
             );
         }
-    }
-
-    private static Calendar createSimpleDate(int year, int month, int day) {
-        Calendar secureDate = Calendar.getInstance();
-        secureDate.set(Calendar.YEAR, year);
-        secureDate.set(Calendar.MONTH, month);
-        secureDate.set(Calendar.DAY_OF_MONTH, day);
-        secureDate.set(Calendar.HOUR_OF_DAY, 0);
-        secureDate.set(Calendar.MINUTE, 0);
-        secureDate.set(Calendar.SECOND, 0);
-        secureDate.set(Calendar.MILLISECOND, 0);
-
-        return secureDate;
-    }
-
-    private static ExpenseObject createSimpleExpense(Calendar expenseDate) {
-        return new ExpenseObject(
-                -1,
-                "Ich bin eine Ausgabe",
-                105,
-                expenseDate,
-                true,
-                new Category("Kategorie", "#000000", true, new ArrayList<Category>()),
-                "",
-                -1,
-                ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE,
-                new ArrayList<Tag>(),
-                new ArrayList<ExpenseObject>(),
-                new Currency("Euro", "EUR", "€")
-        );
     }
 }

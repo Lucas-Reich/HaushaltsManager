@@ -10,6 +10,7 @@ import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.Entities.Tag;
 import com.example.lucas.haushaltsmanager.Utils.CalendarUtils;
 
@@ -64,9 +65,8 @@ public class RandomExpenseGenerator {
         return new ExpenseObject(
                 -1,
                 String.format("%s", CalendarUtils.formatHumanReadable(date)),
-                random.nextInt(500),
+                new Price(random.nextInt(500), random.nextBoolean(), currency),
                 date,
-                random.nextBoolean(),
                 category,
                 "",
                 account.getIndex(),

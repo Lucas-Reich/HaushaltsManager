@@ -1,6 +1,6 @@
 package com.example.lucas.haushaltsmanager.Utils;
 
-import com.example.lucas.haushaltsmanager.Entities.Currency;
+import com.example.lucas.haushaltsmanager.Entities.Price;
 
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -11,15 +11,19 @@ public class MoneyUtils {
         return String.format(Locale.getDefault(), "%.2f", price);
     }
 
-    public static String toHumanReadablePriceWithCurrency(double price, Currency currency) {
-        return String.format(Locale.getDefault(), "%.2f %s", price, currency.getSymbol());
-    }
-
     @Deprecated
     public static String toHumanReadablePriceDeprecated(double price) {
         // IMPROVEMENT: NumberFormater hängt an die Zahl auch noch das Währungszeichen.
         NumberFormat formatter = NumberFormat.getCurrencyInstance(Locale.getDefault());
 
         return formatter.format(price);
+    }
+
+    public static String formatHumanReadable(Price price) {
+        NumberFormat formatter = NumberFormat.getNumberInstance(Locale.getDefault());
+        formatter.setMinimumFractionDigits(2);
+        formatter.setMaximumFractionDigits(2);
+
+        return formatter.format(price.getSignedValue());
     }
 }

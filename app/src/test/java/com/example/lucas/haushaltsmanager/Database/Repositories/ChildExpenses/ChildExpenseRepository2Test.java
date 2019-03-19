@@ -6,6 +6,7 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Ex
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Price;
 
 import junit.framework.Assert;
 
@@ -42,8 +43,7 @@ public class ChildExpenseRepository2Test {
     private ExpenseObject getSimpleExpense() {
         return new ExpenseObject(
                 "KindBuchung",
-                37.25,
-                true,
+                new Price(32.55, false, mock(Currency.class)),
                 mock(Category.class),
                 1L,
                 mock(Currency.class)

@@ -18,6 +18,7 @@ import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.Entities.Tag;
 import com.example.lucas.haushaltsmanager.Entities.Template;
 
@@ -82,8 +83,7 @@ public class ExpenseRepositoryTest {
     private ExpenseObject getSimpleExpense() {
         return new ExpenseObject(
                 "Ausgabe",
-                new Random().nextInt(1000),
-                true,
+                new Price(new Random().nextInt(1000), true, getDefaultCurrency()),
                 category,
                 account.getIndex(),
                 currency
@@ -94,19 +94,20 @@ public class ExpenseRepositoryTest {
         ExpenseObject parentExpense = getSimpleExpense();
         ExpenseObject childExpense = getSimpleExpense();
 
-        childExpense.setExpenditure(false);
-        childExpense.setPrice(33);
+        childExpense.setPrice(new Price(33, false, getDefaultCurrency()));
         parentExpense.addChild(childExpense);
 
-        childExpense.setExpenditure(false);
-        childExpense.setPrice(768);
+        childExpense.setPrice(new Price(768, false, getDefaultCurrency()));
         parentExpense.addChild(childExpense);
 
-        childExpense.setExpenditure(true);
-        childExpense.setPrice(324);
+        childExpense.setPrice(new Price(324, true, getDefaultCurrency()));
         parentExpense.addChild(childExpense);
 
         return parentExpense;
+    }
+
+    private Currency getDefaultCurrency() {
+        return null;
     }
 
     private ExpenseObject getExpenseWithTags() {
@@ -430,7 +431,7 @@ public class ExpenseRepositoryTest {
 
         try {
             expectedExpense.setTitle("New Booking Name");
-            expectedExpense.setPrice(30);
+            expectedExpense.setPrice(new Price(30, expectedExpense.getPrice().isNegative(), expectedExpense.getPrice().getCurrency()));
             mBookingRepo.update(expectedExpense);
 
             ExpenseObject fetchedExpense = mBookingRepo.get(expectedExpense.getIndex());
