@@ -8,37 +8,32 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
+import com.example.lucas.haushaltsmanager.Entities.Backup;
 import com.example.lucas.haushaltsmanager.Entities.Directory;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.AppInternalPreferences;
 import com.example.lucas.haushaltsmanager.Utils.FileUtils;
 
 import java.io.File;
 import java.io.FileReader;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
 
 public class BackupHandler {
+    public static final String AUTOMATIC_BACKUP_REGEX = String.format("([12]\\d{3}(0[1-9]|1[0-2])(0[1-9]|[12]\\d|3[01]))_Backup.%s", Backup.BACKUP_FILE_EXTENSION);
+    public static final String BACKUP_EXTENSION_REGEX = String.format(".*.%s", Backup.BACKUP_FILE_EXTENSION);
     private static final String TAG = BackupHandler.class.getSimpleName();
-    //.SaveDataFile
-    private static final String mBackupFileExtension = "sdf";
 
-    public static final String AUTOMATIC_BACKUP_REGEX = String.format("([12]\\d{3}(0[1-9]|1[0-2])(0[1-9]|[12]\\d|3[01]))_Backup.%s", mBackupFileExtension);
-    public static final String BACKUP_EXTENSION_REGEX = String.format(".*.%s", mBackupFileExtension);
-
-    public boolean createBackup(
-            @Nullable String backupName,
+    public boolean saveBackup(
+            Backup backup,
             @Nullable Directory backupDir,
             Context context
     ) {
-        Log.i(TAG, String.format("Creating Backup: %s", backupName));
+        Log.i(TAG, String.format("Creating Backup: %s", backup.getTitle()));
 
         return FileUtils.copy(
                 getDatabasePath(context),
                 backupDir == null ? getBackupDirectory(context) : backupDir,
-                createBackupFileName(backupName)
+                backup.getTitle()
         );
     }
 
@@ -144,16 +139,5 @@ public class BackupHandler {
 
     private Directory getBackupDirectory(Context context) {
         return new AppInternalPreferences(context).getBackupDirectory();
-    }
-
-    private String createBackupFileName(@Nullable String backupName) {
-        return String.format("%s.%s",
-                backupName == null ? getDefaultBackupName() : backupName,
-                mBackupFileExtension
-        );
-    }
-
-    private String getDefaultBackupName() {
-        return new SimpleDateFormat("yyyyMMdd", Locale.US).format(Calendar.getInstance().getTime()) + "_Backup";
     }
 }

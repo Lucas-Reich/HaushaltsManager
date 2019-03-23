@@ -92,7 +92,7 @@ public class AppReleaseHistory implements ReleaseHistory {
      */
     private Release getRelease120() {
         List<ChangelogItem> changelog = new ArrayList<>();
-        changelog.add(new Bug(getString(R.string.release_notes_120_correct_scheuduling)));
+        changelog.add(new Bug(getString(R.string.release_notes_120_correct_scheduling)));
         changelog.add(new Improvement(getString(R.string.release_notes_120_improved_scheduling))); // RecurringBookings lassen sich nun einfacher planen
 
 

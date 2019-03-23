@@ -169,7 +169,9 @@
     <string name="release_notes_110_code_improvements">Adjustments in the code of the booking overview</string>
     <string name="release_notes_110">There are improvements in the booking overview.\nYou can now view all the bookings in the booking overview. Just scroll down to see older bookings. There are also new animations that improve working with the booking overview.</string>
     <string name="release_notes_120">There were some issues with recurring bookings that will be fixed in this release. In addition to that, the scheduling of recurring bookings has been simplified.</string>
-    <string name="release_notes_120_correct_scheuduling">Recurring bookings were not executed correctly</string>
+    <string name="release_notes_120_correct_scheduling">Recurring bookings were not executed correctly</string>
     <string name="release_notes_120_improved_scheduling">The recurring booking list has been revised</string>
     <string name="cannot_create_recurring_booking">Please fill in all fields to schedule a recurring booking</string>
+    <string name="channel_name">Reminder</string>
+    <string name="channel_description">All reminder Notifications from this app are in this channel.</string>
 </resources>

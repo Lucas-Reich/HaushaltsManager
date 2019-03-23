@@ -127,7 +127,7 @@
     <string name="no_bookings_in_year">Keine Daten</string>
     <string name="bookings">Buchungen</string>
     <string name="account_balance">Kontostand</string>
-    <string name="remind_notification_body">Nicht vergessen die heutigen Ausgaben einzutragen.</string>
+    <string name="remind_notification_body">Vergiss nicht alle heutigen Buchungen einzutragen.</string>
     <string name="remind_notification_title">Erinnerung</string>
     <string name="account_name">Kontoname</string>
 
@@ -169,7 +169,9 @@
     <string name="release_notes_110_code_improvements">Anpassungen im Code der Buchungsübersicht</string>
     <string name="release_notes_110">Es gibt Verbesserungen in der Buchungsübersicht.\nDu kannst dir nun alle Buchungen in der Buchungsübersicht anzeigen lassen. Scrolle einfach nach unten, um ältere Buchungen angezeigt zu bekommen. Ebenfalls gibt es neue Animationen, welche das Arbeiten mit der Buchungsübersicht verbessern.</string>
     <string name="release_notes_120">Es gab einige Probleme mit Wiederkehrenden Buchungen, die in diesem Release gefixt werden. Zusätzlich wurde das planen von Wiederkehrenden Buchungen vereinfacht.</string>
-    <string name="release_notes_120_correct_scheuduling">Wiederkehrende Buchungen wurden nicht korrekt ausgeführt</string>
+    <string name="release_notes_120_correct_scheduling">Wiederkehrende Buchungen wurden nicht korrekt ausgeführt</string>
     <string name="release_notes_120_improved_scheduling">Die wiederkehrende Buchungsliste wurde überarbeitet</string>
     <string name="cannot_create_recurring_booking">Fülle alle Felder aus um eine wiederkerhende Buchung zu planen</string>
+    <string name="channel_name">Erinnerungen</string>
+    <string name="channel_description">Alle Push-Benachrichtigungen Erinnerungen sind in diesem Kanal.</string>
 </resources>

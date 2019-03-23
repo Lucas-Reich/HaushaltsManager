@@ -26,8 +26,8 @@ public class RecurringBookingWorker extends AbstractRecurringWorker {
     }
 
     @Override
-    void saveWorkerId(String workerId) {
-
+    String getTag() {
+        return "RecurringBookingWorker";
     }
 
     @NonNull
@@ -45,7 +45,7 @@ public class RecurringBookingWorker extends AbstractRecurringWorker {
         if (hasNextRecurringBooking(mRecurringBooking)) {
             updateExecutionDateOfRecurringBooking(nextRecurringBooking);
 
-            scheduleNewWorkerWithWorkRequestBuilder(nextRecurringBooking);
+            scheduleNextWorker(nextRecurringBooking);
         } else {
             deleteFinishedRecurringBooking();
         }
