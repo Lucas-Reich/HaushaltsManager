@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -36,6 +35,7 @@ import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferen
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
 import com.example.lucas.haushaltsmanager.Utils.MoneyUtils;
+import com.example.lucas.haushaltsmanager.Views.SaveFloatingActionButton;
 
 import java.util.Calendar;
 import java.util.List;
@@ -52,7 +52,6 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
 
     private Button mPriceBtn, mTitleTxt, mNoticeTxt, mAccountTxt, mCategoryTxt, mDateTxt, mIncomeBtn, mExpenseBtn, mCurrencyBtn;
     private ExpenseObject mExpense, mParentBooking;
-    private FloatingActionButton mSaveFab;
 
     private UserSettingsPreferences mUserPreferences;
 
@@ -83,8 +82,6 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
 
         mIncomeBtn = findViewById(R.id.expense_screen_income);
         mExpenseBtn = findViewById(R.id.expense_screen_expense);
-
-        mSaveFab = findViewById(R.id.expense_screen_save);
 
         resolveIntent();
     }
@@ -241,8 +238,8 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
             }
         });
 
-        mSaveFab.setOnClickListener(getSaveClickListener());
-
+        SaveFloatingActionButton saveFab = findViewById(R.id.expense_screen_save);
+        saveFab.setOnClickListener(getOnSaveClickListener());
 
         showExpenditureType();
         mIncomeBtn.setOnClickListener(new View.OnClickListener() {
@@ -258,6 +255,8 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
                 setPrice(new Price(mExpense.getUnsignedPrice(), true, getDefaultCurrency()));
             }
         });
+
+        enableFabIfBookingIsSaveable();
     }
 
     private void showCloseScreenDialog() {
@@ -277,15 +276,15 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
         confirmationDialog.show(getFragmentManager(), "expense_screen_exit");
     }
 
-    private View.OnClickListener getSaveClickListener() {
-        return new View.OnClickListener() {
+    private SaveFloatingActionButton.OnClickListener getOnSaveClickListener() {
+        return new SaveFloatingActionButton.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                if (!mExpense.isSet()) {
-                    showCloseScreenDialog();
-                    return;
-                }
+            public void onCrossClick() {
+                showCloseScreenDialog();
+            }
 
+            @Override
+            public void onCheckClick() {
                 BundleUtils bundle = new BundleUtils(getIntent().getExtras());
 
                 switch (bundle.getString(INTENT_MODE, INTENT_MODE_CREATE_BOOKING)) {
@@ -334,16 +333,6 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
                 startActivity(intent);
             }
         };
-    }
-
-    private void runCheckToCrossAnimation() {
-        // TODO Der Übergang von dem Häkchen zum Kreuz soll animiert sein
-        mSaveFab.setImageDrawable(getDrawableRes(R.drawable.ic_cross_white));
-    }
-
-    private void runCrossToCheckAnimation() {
-        // TODO Der Übergang von dem Kreuz zum Häkchen soll animiert sein
-        mSaveFab.setImageDrawable(getDrawableRes(R.drawable.ic_check_white_24dp));
     }
 
     @Override
@@ -412,10 +401,12 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
     private void showPrice() {
         mPriceBtn.setText(MoneyUtils.formatHumanReadable(mExpense.getPrice()));
 
-        if (mExpense.isSet())
-            runCrossToCheckAnimation();
-        else
-            runCheckToCrossAnimation();
+        enableFabIfBookingIsSaveable();
+    }
+
+    private void setExpenseCurrency() {
+        mExpense.setCurrency(mUserPreferences.getMainCurrency());
+        mCurrencyBtn.setText(mExpense.getCurrency().getShortName());
     }
 
     private void showExpenditureType() {
@@ -430,22 +421,18 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
     private void setCategory(Category category) {
         mExpense.setCategory(category);
         mCategoryTxt.setText(mExpense.getCategory().getTitle());
+
+        // Es kann sein, dass der DefaultExpenseType der Kategorie anders ist, als der der Buchung, von daher muss hier der Preis neu gesetzt werden
         setPrice(new Price(mExpense.getPrice().getUnsignedValue(), mExpense.getCategory().getDefaultExpenseType(), getDefaultCurrency()));
 
-        if (mExpense.isSet())
-            runCrossToCheckAnimation();
-        else
-            runCheckToCrossAnimation();
+        enableFabIfBookingIsSaveable();
     }
 
     private void setTitle(String title) {
         mExpense.setTitle(title);
         mTitleTxt.setText(mExpense.getTitle());
 
-        if (mExpense.isSet())
-            runCrossToCheckAnimation();
-        else
-            runCheckToCrossAnimation();
+        enableFabIfBookingIsSaveable();
     }
 
     private void setDate(Calendar date) {
@@ -463,12 +450,21 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
         mAccountTxt.setText(account.getTitle());
     }
 
-    private void setExpenseCurrency() {
-        mExpense.setCurrency(mUserPreferences.getMainCurrency());
-        mCurrencyBtn.setText(mExpense.getCurrency().getShortName());
-    }
-
     private Currency getDefaultCurrency() {
         return new UserSettingsPreferences(this).getMainCurrency();
+    }
+
+    private void enableFabIfBookingIsSaveable() {
+        SaveFloatingActionButton saveFab = findViewById(R.id.expense_screen_save);
+
+        if (isBookingSaveable()) {
+            saveFab.enable();
+        } else {
+            saveFab.disable();
+        }
+    }
+
+    private boolean isBookingSaveable() {
+        return mExpense.isSet();
     }
 }
