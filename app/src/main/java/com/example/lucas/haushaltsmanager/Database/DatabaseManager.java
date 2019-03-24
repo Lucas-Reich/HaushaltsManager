@@ -4,10 +4,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseManager {
-    private Integer mOpenCounter = 0;
-
     private static DatabaseManager instance;
     private static SQLiteOpenHelper mDatabaseHelper;
+    private Integer mOpenCounter = 0;
     private SQLiteDatabase mDatabase;
 
     public static synchronized void initializeInstance(ExpensesDbHelper helper) {
@@ -23,6 +22,14 @@ public class DatabaseManager {
         }
 
         return instance;
+    }
+
+    public static synchronized void clearInstance() {
+        if (instance != null) {
+            instance = null;
+
+            mDatabaseHelper.close();
+        }
     }
 
     public synchronized SQLiteDatabase openDatabase() {

@@ -23,7 +23,8 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Templates.Templa
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
-import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.Entities.Tag;
 
 import java.util.ArrayList;
@@ -40,12 +41,51 @@ public class ExpenseRepository {
         mDatabase = DatabaseManager.getInstance().openDatabase();
     }
 
+    public List<ExpenseObject> getList(int offset, int batchSize) {
+
+        String selectQuery = "SELECT "
+                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_ID + ", "
+                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_EXPENSE_TYPE + ", "
+                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_PRICE + ", "
+                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_EXPENDITURE + ", "
+                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_TITLE + ", "
+                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_DATE + ", "
+                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_NOTICE + ", "
+                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID + ", "
+                + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_ID + ", "
+                + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_NAME + ", "
+                + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME + ", "
+                + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SYMBOL + ", "
+                + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CHILD_CATEGORIES_COL_ID + ", "
+                + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CHILD_CATEGORIES_COL_NAME + ", "
+                + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CHILD_CATEGORIES_COL_COLOR + ", "
+                + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CHILD_CATEGORIES_COL_DEFAULT_EXPENSE_TYPE
+                + " FROM " + ExpensesDbHelper.TABLE_BOOKINGS
+                + " LEFT JOIN " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + " ON " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID + " = " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CHILD_CATEGORIES_COL_ID
+                + " LEFT JOIN " + ExpensesDbHelper.TABLE_CURRENCIES + " ON " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_CURRENCY_ID + " = " + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_ID
+                + " ORDER BY " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_DATE + " DESC"
+                + " LIMIT " + batchSize + " OFFSET " + offset +  ";";
+
+        Cursor c = mDatabase.rawQuery(selectQuery, null);
+
+        c.moveToFirst();
+        ArrayList<ExpenseObject> bookings = new ArrayList<>();
+        while (!c.isAfterLast()) {
+
+            bookings.add(cursorToExpense(c));
+            c.moveToNext();
+        }
+
+        c.close();
+
+        return bookings;
+    }
+
     public boolean exists(ExpenseObject expense) {
         String selectQuery = "SELECT"
                 + " *"
                 + " FROM " + ExpensesDbHelper.TABLE_BOOKINGS
-                + " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_ID + " = " + expense.getIndex()
-                + " AND " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_TITLE + " = '" + expense.getTitle() + "'"
+                + " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_TITLE + " = '" + expense.getTitle() + "'"
                 + " AND " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_PRICE + " = " + expense.getUnsignedPrice()
                 + " AND " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_EXPENSE_TYPE + " = '" + expense.getExpenseType() + "'"
                 + " AND " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID + " = " + expense.getCategory().getIndex()
@@ -193,9 +233,8 @@ public class ExpenseRepository {
         ExpenseObject insertedExpense = new ExpenseObject(
                 insertedExpenseId,
                 expense.getTitle(),
-                expense.getUnsignedPrice(),
+                expense.getPrice(),
                 expense.getDateTime(),
-                expense.isExpenditure(),
                 expense.getCategory(),
                 expense.getNotice(),
                 expense.getAccountId(),
@@ -232,7 +271,7 @@ public class ExpenseRepository {
                 // TODO: Was soll passieren, wenn eine Buchung nicht gefunden werden kann, die als TemplateBuchung hinterlegt ist?
                 // --> eintrag aus der template tabelle löschen
                 // -->
-                Log.e(TAG, "Could not find Expense " + expense);
+                Log.e(TAG, "Could not find Booking " + expense);
             }
         } else {
 
@@ -252,7 +291,7 @@ public class ExpenseRepository {
             } catch (AccountNotFoundException e) {
 
                 //sollte das Konto aus irgendeinem Grund nicht mehr existieren, muss der Kontostand auch nicht mehr angepasst werden
-                Log.e(TAG, "Could not delete Expense " + expense.getTitle() + " attached Account " + expense.getAccountId() + " does not exist");
+                Log.e(TAG, "Could not delete Booking " + expense.getTitle() + " attached Account " + expense.getAccountId() + " does not exist");
             } catch (CannotDeleteChildExpenseException e) {
 
                 Log.e(TAG, e.getMessage());
@@ -409,9 +448,8 @@ public class ExpenseRepository {
         return new ExpenseObject(
                 expenseId,
                 title,
-                price,
+                new Price(price, expenditure, currency),
                 date,
-                expenditure,
                 expenseCategory,
                 notice,
                 accountId,

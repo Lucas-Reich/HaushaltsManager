@@ -1,7 +1,7 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions;
 
 import com.example.lucas.haushaltsmanager.Database.Exceptions.EntityNotExistingException;
-import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 
 public class ExpenseNotFoundException extends EntityNotExistingException {
     private ExpenseNotFoundException(String message) {
@@ -9,7 +9,7 @@ public class ExpenseNotFoundException extends EntityNotExistingException {
     }
 
     public static ExpenseNotFoundException expenseNotFoundException(long expenseId) {
-        return new ExpenseNotFoundException("Could not find Expense with id " + expenseId + ".");
+        return new ExpenseNotFoundException("Could not find Booking with id " + expenseId + ".");
     }
 
     public static ExpenseNotFoundException parentExpenseNotFoundException(ExpenseObject childExpense) {

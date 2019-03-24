@@ -6,10 +6,6 @@
         android:icon="@drawable/ic_import_export_white"
         android:title="@string/left_slider_import_export" />
     <item
-        android:id="@+id/course"
-        android:icon="@drawable/ic_course_white"
-        android:title="@string/left_slider_course" />
-    <item
         android:id="@+id/standing_orders"
         android:icon="@drawable/ic_standing_order_white"
         android:title="@string/left_slider_standing_order" />

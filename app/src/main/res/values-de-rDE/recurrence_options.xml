@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="daily">Täglich</string>
+    <string name="weekly">Wöchentlich</string>
+    <string name="monthly">Monatlich</string>
+    <string name="yearly">Jährlich</string>
+
+    <string-array name="recurrence_options">
+        <item name="day">@string/daily</item>
+        <item name="week">@string/weekly</item>
+        <item name="month">@string/monthly</item>
+        <item name="year">@string/yearly</item>
+    </string-array>
+</resources>

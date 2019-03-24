@@ -19,7 +19,7 @@ import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPrefer
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
-import com.example.lucas.haushaltsmanager.Utils.PriceUtils;
+import com.example.lucas.haushaltsmanager.Utils.MoneyUtils;
 
 public class CreateAccountActivity extends AbstractAppCompatActivity {
     public static final String INTENT_MODE = "mode";
@@ -105,7 +105,7 @@ public class CreateAccountActivity extends AbstractAppCompatActivity {
             }
         });
 
-        mAccountBalanceBtn.setHint(PriceUtils.toHumanReadablePrice(mAccount.getBalance()));
+        mAccountBalanceBtn.setHint(MoneyUtils.toHumanReadablePrice(mAccount.getBalance()));
         mAccountBalanceBtn.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -122,7 +122,7 @@ public class CreateAccountActivity extends AbstractAppCompatActivity {
                     public void onPriceSelected(double price) {
 
                         mAccount.setBalance(price);
-                        mAccountBalanceBtn.setText(PriceUtils.toHumanReadablePrice(mAccount.getBalance()));
+                        mAccountBalanceBtn.setText(MoneyUtils.toHumanReadablePrice(mAccount.getBalance()));
 
                         if (mAccount.isSet())
                             runCrossToCheckAnimation();

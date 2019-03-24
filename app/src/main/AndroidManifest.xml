@@ -27,10 +27,6 @@
             android:label="@string/activity_template_name"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
         <activity
-            android:name=".Activities.RecurringBookingList"
-            android:label="@string/activity_recurring_bookings_name"
-            android:parentActivityName=".Activities.MainTab.ParentActivity"/>
-        <activity
             android:name=".Activities.CreateAccountActivity"
             android:label="@string/activity_new_account_name"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
@@ -45,10 +41,6 @@
         <activity
             android:name=".Activities.TransferActivity"
             android:label="@string/activity_transfers_name"
-            android:parentActivityName=".Activities.MainTab.ParentActivity"/>
-        <activity
-            android:name=".Activities.CourseActivity"
-            android:label="@string/activity_course_name"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
         <activity
             android:name=".Activities.ImportExportActivity"
@@ -73,6 +65,10 @@
         <activity
             android:name=".Activities.CategoryList.CategoryList"
             android:label="@string/activity_categories"
+            android:parentActivityName=".Activities.MainTab.ParentActivity"/>
+        <activity
+            android:name=".Activities.RecurringBookingList"
+            android:label="@string/activity_create_recurring_booking"
             android:parentActivityName=".Activities.MainTab.ParentActivity"/>
     </application>
 

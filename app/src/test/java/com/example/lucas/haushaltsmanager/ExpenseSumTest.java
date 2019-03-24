@@ -2,8 +2,10 @@ package com.example.lucas.haushaltsmanager;
 
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
-import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.Entities.Tag;
+import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSum;
 
 import org.junit.After;
 import org.junit.Before;
@@ -280,9 +282,8 @@ public class ExpenseSumTest {
         return new ExpenseObject(
                 2,
                 "Buchung",
-                Math.abs(price),
+                new Price(price, mock(Currency.class)),
                 date,
-                price < 0,
                 category,
                 "",
                 6,

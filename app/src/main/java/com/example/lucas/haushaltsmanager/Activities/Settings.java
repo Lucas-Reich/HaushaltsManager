@@ -16,23 +16,26 @@ import com.codekidlabs.storagechooser.StorageChooser;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepository;
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.SingleChoiceDialog;
+import com.example.lucas.haushaltsmanager.Entities.Backup;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Directory;
+import com.example.lucas.haushaltsmanager.Entities.NotificationVO;
 import com.example.lucas.haushaltsmanager.Entities.Time;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.AppInternalPreferences;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.WeekdayUtils;
-import com.example.lucas.haushaltsmanager.Worker.BackupWorker;
-import com.example.lucas.haushaltsmanager.Worker.NotificationWorker;
+import com.example.lucas.haushaltsmanager.Worker.PeriodicWorker.BackupWorker;
+import com.example.lucas.haushaltsmanager.Worker.PeriodicWorker.NotificationWorker;
+import com.example.lucas.haushaltsmanager.Worker.WorkRequestBuilder;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
+import androidx.work.ExistingWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
+import androidx.work.WorkRequest;
 
 public class Settings extends AbstractAppCompatActivity {
 
@@ -341,34 +344,35 @@ public class Settings extends AbstractAppCompatActivity {
      * Methode um den automatischen Backupstatus anzupassen.
      * TRUE steht dabei für automatische Backups, FALSE steht für manuelle.
      *
-     * @param backupAutomatically Neuer Backup status
+     * @param shouldBackup Neuer Backup status
      */
-    private void setAutomaticBackupStatus(boolean backupAutomatically) {
+    private void setAutomaticBackupStatus(boolean shouldBackup) {
 
-        mUserSettings.setAutomaticBackupStatus(backupAutomatically);
-        createBackupsChk.setChecked(backupAutomatically);
+        mUserSettings.setAutomaticBackupStatus(shouldBackup);
+        createBackupsChk.setChecked(shouldBackup);
 
-        setBackupSettingsClickable(backupAutomatically);
+        setBackupSettingsClickable(shouldBackup);
 
-        if (backupAutomatically && !mInternalPreferences.getBackupJobExecutionStatus())
-            startBackupWorker();
+        if (shouldBackup)
+            scheduleBackupWorker();
 
-        if (!backupAutomatically && mInternalPreferences.getBackupJobExecutionStatus())
-            stopBackupWorker(mInternalPreferences.getBackupJobId());
+        if (!shouldBackup)
+            stopBackupWorker();
     }
 
-    private void startBackupWorker() {
-        OneTimeWorkRequest workRequest = new OneTimeWorkRequest
-                .Builder(BackupWorker.class)
-                .build();
+    private void scheduleBackupWorker() {
+        Backup backup = new Backup(null);
 
-        saveWorkerId(workRequest.getId().toString(), BackupWorker.WORKER_ID);
-        WorkManager.getInstance().enqueue(workRequest);
+        WorkRequest backupWorkRequest = WorkRequestBuilder.from(backup);
+        WorkManager.getInstance().enqueueUniqueWork(
+                BackupWorker.WORKER_TAG,
+                ExistingWorkPolicy.REPLACE,
+                (OneTimeWorkRequest) backupWorkRequest
+        );
     }
 
-    private void stopBackupWorker(String id) {
-        WorkManager.getInstance().cancelWorkById(UUID.fromString(id));
-        saveWorkerId("", BackupWorker.WORKER_ID);
+    private void stopBackupWorker() {
+        BackupWorker.cancelWorker();
     }
 
     /**
@@ -435,81 +439,54 @@ public class Settings extends AbstractAppCompatActivity {
     /**
      * Methode um den Status der Erinnerungs Push Notifications anzupassen.
      *
-     * @param remindUser TRUE wenn der User erinnert werden soll, FALSE wenn nicht
+     * @param shouldRemindUser TRUE wenn der User erinnert werden soll, FALSE wenn nicht
      */
-    private void setReminderStatus(boolean remindUser) {
-        mUserSettings.setReminderStatus(remindUser);
-        allowReminderChk.setChecked(remindUser);
+    private void setReminderStatus(boolean shouldRemindUser) {
+        mUserSettings.setReminderStatus(shouldRemindUser);
+        allowReminderChk.setChecked(shouldRemindUser);
 
-        setNotificationStatusClickable(remindUser);
+        setNotificationStatusClickable(shouldRemindUser);
 
-        if (remindUser && !mInternalPreferences.getNotificationJobExecutionStatus())
-            startNotificationWorker();
+        if (shouldRemindUser)
+            scheduleNotificationWorker();
 
-        if (!remindUser && mInternalPreferences.getNotificationJobExecutionStatus())
-            stopNotificationWorker(mInternalPreferences.getNotificationJobId());
-    }
-
-    /**
-     * Methode welche die WorkerId des NotificationWorkers in den InternalPreferences speichert.
-     *
-     * @param id Zu speichernde Id
-     */
-    private void saveWorkerId(String id, String workerId) {
-        mInternalPreferences = new AppInternalPreferences(getApplicationContext());
-
-        switch (workerId) {
-            case NotificationWorker.WORKER_ID:
-                mInternalPreferences.setNotificationJobId(id);
-                break;
-            case BackupWorker.WORKER_ID:
-                mInternalPreferences.setBackupJobId(id);
-                break;
-            default:
-        }
+        if (!shouldRemindUser)
+            stopNotificationWorker();
     }
 
     /**
      * Methode um den NotificationWorker zu starten
      */
-    private void startNotificationWorker() {
-        long startInMillis;
-        if (System.currentTimeMillis() > mUserSettings.getReminderTime().inMillis()) {
+    private void scheduleNotificationWorker() {
+        NotificationVO notification = new NotificationVO(
+                getString(R.string.remind_notification_title),
+                getString(R.string.remind_notification_body),
+                R.mipmap.ic_launcher
+        );
 
-            startInMillis = mUserSettings.getReminderTime().inMillis() + TimeUnit.MILLISECONDS.convert(24, TimeUnit.HOURS) + System.currentTimeMillis();
-        } else {
-
-            startInMillis = mUserSettings.getReminderTime().inMillis() - System.currentTimeMillis();
-        }
-
-        OneTimeWorkRequest workRequest = new OneTimeWorkRequest
-                .Builder(NotificationWorker.class)
-                .setInitialDelay(startInMillis, TimeUnit.MILLISECONDS)
-                .build();
-
-        saveWorkerId(workRequest.getId().toString(), NotificationWorker.WORKER_ID);
-        WorkManager.getInstance().enqueue(workRequest);
+        WorkRequest notificationWorkRequest = WorkRequestBuilder.from(notification);
+        WorkManager.getInstance().enqueueUniqueWork(
+                NotificationWorker.WORKER_TAG,
+                ExistingWorkPolicy.REPLACE,
+                (OneTimeWorkRequest) notificationWorkRequest
+        );
     }
 
     /**
-     * Methode um ein bestimmten Worker zu stoppen
-     *
-     * @param id WORKER_ID des Workers
-     */
-    private void stopNotificationWorker(String id) {
-
-        WorkManager.getInstance().cancelWorkById(UUID.fromString(id));
-        saveWorkerId("", NotificationWorker.WORKER_ID);
+     * Methode um den NotificationWorker zu stoppen
+     **/
+    private void stopNotificationWorker() {
+        NotificationWorker.stopWorker();
     }
 
     /**
      * Methode um die Sichtbarkeit der Einträge im Notificationbereich anzupassen.
      *
-     * @param clickable Sind die Einträge anwählbra oder nicht
+     * @param setClickable Sind die Einträge anwählbar oder nicht
      */
-    private void setNotificationStatusClickable(boolean clickable) {
+    private void setNotificationStatusClickable(boolean setClickable) {
 
-        if (clickable) {
+        if (setClickable) {
 
             notificationTimeTextTxt.setTextColor(getColorRes(R.color.primary_text_color));
             notificationTimeTxt.setTextColor(getColorRes(R.color.primary_text_color));
@@ -526,13 +503,11 @@ public class Settings extends AbstractAppCompatActivity {
      * Methode um die Zeit anzupassen wenn der User die "Buchungen eintragen" Benachrichtigunge bekommen soll.
      */
     private void setReminderTime(Time time) {
-
         mUserSettings.setReminderTime(time);
-        notificationTimeTxt.setText(time.getTime());
+        notificationTimeTxt.setText(time.toString());
 
-        if (mInternalPreferences.getNotificationJobExecutionStatus()) {
-            stopNotificationWorker(mInternalPreferences.getNotificationJobId());
-            startNotificationWorker();
+        if (NotificationWorker.isRunning()) {
+            scheduleNotificationWorker();
         }
     }
 }

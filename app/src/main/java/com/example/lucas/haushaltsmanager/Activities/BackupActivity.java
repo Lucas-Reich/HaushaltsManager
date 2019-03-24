@@ -19,6 +19,7 @@ import com.codekidlabs.storagechooser.StorageChooser;
 import com.example.lucas.haushaltsmanager.BackupHandler;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
+import com.example.lucas.haushaltsmanager.Entities.Backup;
 import com.example.lucas.haushaltsmanager.Entities.Directory;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.BackupUtils;
@@ -127,7 +128,7 @@ public class BackupActivity extends AbstractAppCompatActivity {
                     public void onTextInput(String backupName) {
 
                         BackupHandler backupHandler = new BackupHandler();
-                        boolean successful = backupHandler.createBackup(backupName, mBackupDirectory, BackupActivity.this);
+                        boolean successful = backupHandler.saveBackup(new Backup(backupName), mBackupDirectory, BackupActivity.this);
 
                         if (successful)
                             showToast(R.string.created_backup);

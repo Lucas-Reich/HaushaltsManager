@@ -4,6 +4,6 @@ import com.example.lucas.haushaltsmanager.Database.Exceptions.EntityNotExistingE
 
 public class ChildExpenseNotFoundException extends EntityNotExistingException {
     public ChildExpenseNotFoundException(long childId) {
-        super(String.format("Could not find Child Expense with id %s.", childId));
+        super(String.format("Could not find Child Booking with id %s.", childId));
     }
 }

@@ -21,7 +21,8 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.Curre
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
-import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.Entities.Tag;
 
 import java.util.ArrayList;
@@ -86,9 +87,8 @@ public class ChildExpenseRepository {
             throw new AddChildToChildException(childExpense, parentBooking);
 
         if (parentBooking.isParent()) {
-            parentBooking.addChild(insert(parentBooking, childExpense));
 
-            return parentBooking;
+            return insert(parentBooking, childExpense);
         } else {
 
             try {
@@ -96,9 +96,9 @@ public class ChildExpenseRepository {
 
                 ExpenseObject dummyParentExpense = ExpenseObject.createDummyExpense();
                 dummyParentExpense.addChild(parentBooking);
-                dummyParentExpense.addChild(childExpense);
+                dummyParentExpense = mBookingRepo.insert(dummyParentExpense);
 
-                return mBookingRepo.insert(dummyParentExpense);
+                return insert(dummyParentExpense, childExpense);
             } catch (CannotDeleteExpenseException e) {
                 //Kann nicht passieren, da nur Buchung mit Kindern nicht gelöscht werden können und ich hier vorher übeprüft habe ob die Buchung Kinder hat oder nicht
                 // TODO: Die isChild funktionalität so implementieren, dass nich NULL zurückgegeben werden muss.
@@ -270,9 +270,8 @@ public class ChildExpenseRepository {
         return new ExpenseObject(
                 insertedChildId,
                 childExpense.getTitle(),
-                childExpense.getUnsignedPrice(),
+                childExpense.getPrice(),
                 childExpense.getDateTime(),
-                childExpense.isExpenditure(),
                 childExpense.getCategory(),
                 childExpense.getNotice(),
                 childExpense.getAccountId(),
@@ -537,9 +536,8 @@ public class ChildExpenseRepository {
         return new ExpenseObject(
                 expenseId,
                 title,
-                price,
+                new Price(price, expenditure, expenseCurrency),
                 date,
-                expenditure,
                 expenseCategory,
                 notice,
                 accountId,

@@ -2,8 +2,10 @@ package com.example.lucas.haushaltsmanager;
 
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
-import com.example.lucas.haushaltsmanager.Entities.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.Entities.Tag;
+import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseFilter;
 
 import org.junit.After;
 import org.junit.Before;
@@ -194,9 +196,8 @@ public class ExpenseFilterTest {
         return new ExpenseObject(
                 32,
                 "Ausgabe",
-                12,
+                new Price(12, isExpenditure, mock(Currency.class)),
                 date,
-                isExpenditure,
                 mock(Category.class),
                 "",
                 accountId,

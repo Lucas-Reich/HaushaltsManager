@@ -43,7 +43,7 @@
     <string name="most_bookings_in">Die meisten Ausgaben in</string>
     <string name="no_expenses">Keine Ausgaben</string>
     <string name="input_price">Geben Sie den Preis ein</string>
-    <string name="input_frequency">Geben Sie die Häufigkeit an</string>
+    <string name="input_frequency">Häufigkeit</string>
     <string name="show_templates">Vorlagen</string>
     <string name="filter">Filter</string>
     <string name="sort">Sortiere</string>
@@ -54,8 +54,7 @@
     <string name="category_transfer">Überweisung</string>
     <string name="transfer_from">Überweisung von</string>
     <string name="transfer_to">Überweisung nach</string>
-    <!-- TODO: Bessere Übersetzung für "import_bookings_confirmation" einfallen lassen -->
-    <string name="export_directory_confirmation">Bist du sicher, dass du die Buchungen in das aktuell ausgewählte Verzeichniss exportieren möchtest?</string>
+    <string name="export_directory_confirmation">Sollen die Buchungen in das aktuelle Verzeichniss exportiert werden?</string>
     <string name="create_export">Erstelle Export</string>
     <string name="btn_yes">Ja</string>
     <string name="btn_no">Nein</string>
@@ -119,7 +118,7 @@
     <string name="saved_as_template">Buchung wurde als Template gespeichert</string>
     <string name="activity_create_recurring_booking">Erstelle wiederkehrende Buchung</string>
     <string name="could_not_save_recurring_booking">Wiederkehrende Buchung konnte nicht gespeichert werden</string>
-    <string name="frequency_in_days">Häufigkeit in Tagen</string>
+    <string name="frequency">Häufigkeit</string>
     <string name="abort_action_confirmation_text">Nicht gespeicherte Daten gehen verloren! Trotzdem schließen?</string>
     <string name="income">Einnahme</string>
     <string name="expense">Ausgabe</string>
@@ -128,7 +127,7 @@
     <string name="no_bookings_in_year">Keine Daten</string>
     <string name="bookings">Buchungen</string>
     <string name="account_balance">Kontostand</string>
-    <string name="remind_notification_body">Nicht vergessen die heutigen Ausgaben einzutragen.</string>
+    <string name="remind_notification_body">Vergiss nicht alle heutigen Buchungen einzutragen.</string>
     <string name="remind_notification_title">Erinnerung</string>
     <string name="account_name">Kontoname</string>
 
@@ -157,4 +156,22 @@
     <string name="accessibility_choose_directory">Wählen Sie ein Verzeichnis</string>
     <string name="accessibility_select_category_title">Erstellen Sie ein Titel für das Verzeichnis</string>
     <string name="accessibility_create_category">Erstellen Sie einen neue Kategorie</string>
+    <string name="failed_to_create_template">Fehler beim erstellen des Templates, bitte versuche es noch einmal!</string>
+    <string name="fab_menu_item_delete_hint">Ausgewählte Buchungen löschen</string>
+    <string name="fab_menu_item_combine_hint">Ausgewählte Buchungen zusammenfügen</string>
+    <string name="fab_menu_item_add_child_hin">Unterbuchung zu ausgeählter Buchung hinzugfügen</string>
+    <string name="fab_menu_item_extract_hint">Unterbuchungen extrahieren</string>
+    <string name="fab_menu_item_recurring_hint">Ausgewählte Buchung als wiederkehrende Buchung speichern</string>
+    <string name="fab_menu_item_template_hint">Ausgewählte Buchung als Template speichern</string>
+    <string name="expenses_empty_list">Keine Buchungen erstellt</string>
+    <string name="release_notes_110_tab_one_feature_recycler_view">Unendliche Buchungsübersicht</string>
+    <string name="release_notes_110_tab_one_feature_animations">Animationen in der Buchungsübersicht</string>
+    <string name="release_notes_110_code_improvements">Anpassungen im Code der Buchungsübersicht</string>
+    <string name="release_notes_110">Es gibt Verbesserungen in der Buchungsübersicht.\nDu kannst dir nun alle Buchungen in der Buchungsübersicht anzeigen lassen. Scrolle einfach nach unten, um ältere Buchungen angezeigt zu bekommen. Ebenfalls gibt es neue Animationen, welche das Arbeiten mit der Buchungsübersicht verbessern.</string>
+    <string name="release_notes_120">Es gab einige Probleme mit Wiederkehrenden Buchungen, die in diesem Release gefixt werden. Zusätzlich wurde das planen von Wiederkehrenden Buchungen vereinfacht.</string>
+    <string name="release_notes_120_correct_scheduling">Wiederkehrende Buchungen wurden nicht korrekt ausgeführt</string>
+    <string name="release_notes_120_improved_scheduling">Die wiederkehrende Buchungsliste wurde überarbeitet</string>
+    <string name="cannot_create_recurring_booking">Fülle alle Felder aus um eine wiederkerhende Buchung zu planen</string>
+    <string name="channel_name">Erinnerungen</string>
+    <string name="channel_description">Alle Push-Benachrichtigungen Erinnerungen sind in diesem Kanal.</string>
 </resources>

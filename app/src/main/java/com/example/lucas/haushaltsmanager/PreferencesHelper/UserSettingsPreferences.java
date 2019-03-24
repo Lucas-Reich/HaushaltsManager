@@ -91,13 +91,13 @@ public class UserSettingsPreferences {
 
     public Time getReminderTime() {
 
-        String reminderTime = mPreferences.getString(REMINDER_TIME, Settings.DEFAULT_REMINDER_TIME.getTime());
+        String reminderTime = mPreferences.getString(REMINDER_TIME, Settings.DEFAULT_REMINDER_TIME.toString());
         return Time.fromString(reminderTime);
     }
 
     public void setReminderTime(Time reminderTime) {
 
-        mPreferences.edit().putString(REMINDER_TIME, reminderTime.getTime()).apply();
+        mPreferences.edit().putString(REMINDER_TIME, reminderTime.toString()).apply();
     }
 
     public Account getActiveAccount() {

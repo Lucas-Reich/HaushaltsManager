@@ -41,7 +41,7 @@
     <string name="deleted_account">Deleted account</string>
     <string name="changed_main_account"> is now the main account.</string>
     <string name="input_price">Input price</string>
-    <string name="input_frequency">Input frequency</string>
+    <string name="input_frequency">Frequency</string>
     <string name="most_bookings_in">Most Bookings in Category</string>
     <string name="no_expenses">No Expenses</string>
     <string name="show_templates">Templates</string>
@@ -142,7 +142,7 @@
     <string name="could_not_update_title">Title could not be updated</string>
     <string name="starts_at">starts at</string>
     <string name="ends_at">ends at</string>
-    <string name="frequency_in_days">Frequency in days</string>
+    <string name="frequency">Frequency</string>
     <string name="notification">Notification</string>
     <string name="currency">Currency</string>
     <string name="backups">Backups</string>
@@ -156,4 +156,22 @@
     <string name="accessibility_choose_directory">Choose a directory</string>
     <string name="accessibility_select_category_title">Insert category title</string>
     <string name="accessibility_create_category">Create new Category</string>
+    <string name="failed_to_create_template">Error while creating the Template, please try again!</string>
+    <string name="fab_menu_item_delete_hint">Delete selected bookings</string>
+    <string name="fab_menu_item_add_child_hin">Add child to selected Booking</string>
+    <string name="fab_menu_item_combine_hint">Combine selected Bookings</string>
+    <string name="fab_menu_item_extract_hint">Extract selected children</string>
+    <string name="fab_menu_item_recurring_hint">Save as recurring Booking</string>
+    <string name="fab_menu_item_template_hint">Save as template</string>
+    <string name="expenses_empty_list">No Expenses created</string>
+    <string name="release_notes_110_tab_one_feature_recycler_view">"Infinite booking overview "</string>
+    <string name="release_notes_110_tab_one_feature_animations">Animations in the booking overview</string>
+    <string name="release_notes_110_code_improvements">Adjustments in the code of the booking overview</string>
+    <string name="release_notes_110">There are improvements in the booking overview.\nYou can now view all the bookings in the booking overview. Just scroll down to see older bookings. There are also new animations that improve working with the booking overview.</string>
+    <string name="release_notes_120">There were some issues with recurring bookings that will be fixed in this release. In addition to that, the scheduling of recurring bookings has been simplified.</string>
+    <string name="release_notes_120_correct_scheduling">Recurring bookings were not executed correctly</string>
+    <string name="release_notes_120_improved_scheduling">The recurring booking list has been revised</string>
+    <string name="cannot_create_recurring_booking">Please fill in all fields to schedule a recurring booking</string>
+    <string name="channel_name">Reminder</string>
+    <string name="channel_description">All reminder Notifications from this app are in this channel.</string>
 </resources>

@@ -4,14 +4,13 @@ import java.util.Calendar;
 import java.util.Locale;
 
 public class Time {
-
-    private int mHour;
-    private int mMinute;
+    private int hour;
+    private int minute;
 
     public Time(int hour, int minute) {
 
-        mHour = hour;
-        mMinute = minute;
+        this.hour = hour;
+        this.minute = minute;
     }
 
     public static Time fromString(String stringTime) {
@@ -21,24 +20,25 @@ public class Time {
         return new Time(hour, minute);
     }
 
-    public String getTime() {
-        return String.format(Locale.US, "%02d:%02d", mHour, mMinute);
-    }
-
     public int getHour() {
-        return mHour;
+        return hour;
     }
 
     public int getMinute() {
-        return mMinute;
+        return minute;
     }
 
-    public long inMillis() {
+    public long toMillis() {
         Calendar time = Calendar.getInstance();
-        time.set(Calendar.HOUR_OF_DAY, mHour);
-        time.set(Calendar.MINUTE, mMinute);
+        time.set(Calendar.HOUR_OF_DAY, hour);
+        time.set(Calendar.MINUTE, minute);
         time.set(Calendar.SECOND, 0);
 
         return time.getTimeInMillis();
+    }
+
+    @Override
+    public String toString() {
+        return String.format(Locale.US, "%02d:%02d", hour, minute);
     }
 }

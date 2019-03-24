@@ -1,9 +1,24 @@
 <resources>
-    <string name="app_name">FinanceManager</string>
+    <string name="app_name">Finance Manager</string>
+
+
+    <string name="activity_template_name">Templates</string>
+    <string name="activity_categories">Categories</string>
+    <string name="activity_expense_screen_name">Create a Expense</string>
+    <string name="activity_recurring_bookings_name">Recurring Bookings</string>
+    <string name="activity_new_account_name">Create a new account</string>
+    <string name="activity_new_category_name">Create a new category</string>
+    <string name="activity_backups_name">Backups</string>
+    <string name="activity_transfers_name">Transfer</string>
+    <string name="activity_course_name">Booking History</string>
+    <string name="activity_import_export_name">Import/ Export</string>
+    <string name="activity_settings_name">Settings</string>
+
 
     <string name="tab_one_title">Bookings</string>
     <string name="tab_two_title">Monthly Overview</string>
     <string name="tab_three_title">Report</string>
+
 
     <string name="btn_reset">Restore default settings</string>
     <string name="btn_new_acc">New Account</string>
@@ -14,6 +29,7 @@
     <string name="btn_ok">OK</string>
     <string name="btn_no">No</string>
 
+
     <string name="accessibility_create_expense">Create new expense</string>
     <string name="accessibility_create_backup">Create new backup</string>
     <string name="accessibility_select_category_color">Select category color</string>
@@ -22,6 +38,35 @@
     <string name="accessibility_create_account">Save new account</string>
     <string name="accessibility_choose_directory">Choose a directory</string>
     <string name="accessibility_select_category_title">Insert category title</string>
+
+
+    <string name="release_notes_100">The first app version is now available for download.</string>
+
+    <string name="release_notes_110">There are improvements in the booking overview.\nYou can now view all the bookings in the booking overview. Just scroll down to see older bookings. There are also new animations that improve working with the booking overview.</string>
+    <string name="release_notes_110_tab_one_feature_recycler_view">"Infinite booking overview "</string>
+    <string name="release_notes_110_tab_one_feature_animations">Animations in the booking overview</string>
+    <string name="release_notes_110_code_improvements">Adjustments in the code of the booking overview</string>
+    <string name="release_notes_120">There were some issues with recurring bookings that will be fixed in this release. In addition to that, the scheduling of recurring bookings has been simplified.</string>
+    <string name="release_notes_120_correct_scheduling">Recurring bookings were not executed correctly</string>
+    <string name="release_notes_120_improved_scheduling">The recurring booking list has been revised</string>
+
+
+    <string name="export_price">Price</string>
+    <string name="export_expenditure">is Expenditure</string>
+    <string name="export_title">Title</string>
+    <string name="export_date">Date</string>
+    <string name="export_notice">Notice</string>
+    <string name="export_currency_name">Currency Name</string>
+    <string name="export_category_name">Category Name</string>
+    <string name="export_account_name">Account Name</string>
+
+
+
+    <string name="channel_name">Reminder</string>
+    <string name="channel_description">All reminder Notifications from this app are in this channel.</string>
+    <string name="remind_notification_title">Reminder</string>
+    <string name="remind_notification_body">Do not forget to enter today\'s expenses.</string>
+
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -55,7 +100,7 @@
     <string name="deleted_account">Deleted account</string>
     <string name="changed_main_account"> is now the main account.</string>
     <string name="input_price">Input price</string>
-    <string name="input_frequency">Input frequency</string>
+    <string name="input_frequency">Frequency</string>
     <string name="most_bookings_in">Most Bookings in Category</string>
     <string name="no_expenses">No Expenses</string>
     <string name="show_templates">Templates</string>
@@ -103,17 +148,6 @@
     <string name="suggest_feature">Suggest new feature</string>
     <string name="app_version">App Version</string>
     <string name="licenses">Licenses</string>
-    <string name="activity_template_name">Templates</string>
-    <string name="activity_categories">Categories</string>
-    <string name="activity_expense_screen_name">Create a Expense</string>
-    <string name="activity_recurring_bookings_name">Recurring Bookings</string>
-    <string name="activity_new_account_name">Create a new account</string>
-    <string name="activity_new_category_name">Create a new category</string>
-    <string name="activity_backups_name">Backups</string>
-    <string name="activity_transfers_name">Transfer</string>
-    <string name="activity_course_name">Booking History</string>
-    <string name="activity_import_export_name">Import/ Export</string>
-    <string name="activity_settings_name">Settings</string>
     <string name="activity_about_name">About</string>
     <string name="template_empty_list">No templates created</string>
     <string name="course_empty_list">No bookings created</string>
@@ -138,29 +172,25 @@
     <string name="no_bookings_in_year">No Data</string>
     <string name="bookings">Bookings</string>
     <string name="account_balance">Account balance</string>
-    <string name="remind_notification_body">Do not forget to enter today\'s expenses.</string>
-    <!-- TODO: Bessere Übersetzung für "remind_notification_title" einfallen lassen -->
-    <string name="remind_notification_title">Reminder</string>
     <string name="account_name">Account name</string>
 
-    <!-- CSV export column names -->
-    <string name="export_price">Price</string>
-    <string name="export_expenditure">is Expenditure</string>
-    <string name="export_title">Title</string>
-    <string name="export_date">Date</string>
-    <string name="export_notice">Notice</string>
-    <string name="export_currency_name">Currency Name</string>
-    <string name="export_category_name">Category Name</string>
-    <string name="export_account_name">Account Name</string>
 
-    <string name="release_notes_100">The first app version is now available for download.</string>
     <string name="could_not_update_title">Title could not be updated</string>
     <string name="starts_at">starts at</string>
     <string name="ends_at">ends at</string>
-    <string name="frequency_in_days">Frequency in days</string>
+    <string name="frequency">Frequency</string>
     <string name="notification">Notification</string>
     <string name="currency">Currency</string>
     <string name="backups">Backups</string>
     <string name="general_settings">General Settings</string>
     <string name="accessibility_create_category">Create new Category</string>
+    <string name="failed_to_create_template">Error while creating the Template, please try again!</string>
+    <string name="fab_menu_item_add_child_hin">Add child to selected booking</string>
+    <string name="fab_menu_item_combine_hint">Combine selected Bookings</string>
+    <string name="fab_menu_item_delete_hint">Delete selected bookings</string>
+    <string name="fab_menu_item_extract_hint">Extract selected children</string>
+    <string name="fab_menu_item_recurring_hint">Save as recurring Booking</string>
+    <string name="fab_menu_item_template_hint">Save as template</string>
+    <string name="expenses_empty_list">No Expenses created</string>
+    <string name="cannot_create_recurring_booking">Please fill in all fields to schedule a recurring booking</string>
 </resources>
