@@ -3,57 +3,50 @@ package com.example.lucas.haushaltsmanager.CardPopulator;
 import android.content.res.Resources;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
-import android.support.annotation.StringRes;
-import android.support.v4.os.ConfigurationCompat;
 import android.support.v7.widget.CardView;
-import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.lucas.androidcharts.DataSet;
-import com.example.lucas.androidcharts.PieChart;
-import com.example.lucas.androidcharts.PieSlice;
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Entities.Category;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.Entities.Report.ReportInterface;
-import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSum;
 import com.example.lucas.haushaltsmanager.R;
+import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSum;
+import com.example.lucas.haushaltsmanager.Utils.MoneyUtils;
 import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 public class TimeFrameCardPopulator {
-
-    private CardView mRootView;
     private ViewHolder mViewHolder;
     private Resources mResources;
 
     public TimeFrameCardPopulator(CardView rootView, Resources resources) {
-        mRootView = rootView;
+        initializeViewHolder(rootView);
+
         mResources = resources;
-
-
-        initializeViewHolder();
-    }
-
-    public void setOnClickListener(View.OnClickListener listener) {
-        mRootView.setOnClickListener(listener);
     }
 
     public void setData(ReportInterface report) {
         setCardTitle(report.getCardTitle());
 
-        setIncome(report.getIncoming(), report.getCurrency());
+        setIncome(new Price(report.getIncoming(), report.getCurrency()));
 
-        setOutgoing(report.getOutgoing(), report.getCurrency());
+        setOutgoing(new Price(report.getOutgoing(), report.getCurrency()));
 
-        setTotal(report.getTotal(), report.getCurrency());
+        setTotal(new Price(report.getTotal(), report.getCurrency()));
 
         setTotalBookingsCount(report.getBookingCount());
 
@@ -66,19 +59,31 @@ public class TimeFrameCardPopulator {
         mViewHolder.mTitle.setText(title);
     }
 
-    private void setIncome(double income, Currency currency) {
-        mViewHolder.mInbound.setText(formatMoney(income));
-        mViewHolder.mInboundCurrency.setText(currency.getSymbol());
+    private void setIncome(Price income) {
+        mViewHolder.mInbound.setText(MoneyUtils.formatHumanReadable(income));
+        mViewHolder.mInbound.setTextColor(getColor(R.color.booking_income));
+
+        mViewHolder.mInboundCurrency.setText(income.getCurrency().getSymbol());
+        mViewHolder.mInboundCurrency.setTextColor(getColor(R.color.booking_income));
     }
 
-    private void setOutgoing(double outgoing, Currency currency) {
-        mViewHolder.mOutbound.setText(formatMoney(outgoing));
-        mViewHolder.mOutboundCurrency.setText(currency.getSymbol());
+    private void setOutgoing(Price outgoing) {
+        mViewHolder.mOutbound.setText(MoneyUtils.formatHumanReadable(outgoing));
+        mViewHolder.mOutbound.setTextColor(getColor(R.color.booking_expense));
+
+        mViewHolder.mOutboundCurrency.setText(outgoing.getCurrency().getSymbol());
+        mViewHolder.mOutboundCurrency.setTextColor(getColor(R.color.booking_expense));
     }
 
-    private void setTotal(double total, Currency currency) {
-        mViewHolder.mTotal.setText(formatMoney(total));
-        mViewHolder.mTotalCurrency.setText(currency.getSymbol());
+    private void setTotal(Price total) {
+        // TODO: sollte ich den Preis in normaler Farbe anzeigen, wenn er 0 ist?
+        int color = total.getSignedValue() >= 0 ? R.color.booking_income : R.color.booking_expense;
+
+        mViewHolder.mTotal.setText(MoneyUtils.formatHumanReadable(total));
+        mViewHolder.mTotal.setTextColor(getColor(color));
+
+        mViewHolder.mTotalCurrency.setText(total.getCurrency().getSymbol());
+        mViewHolder.mTotalCurrency.setTextColor(getColor(color));
     }
 
     private void setTotalBookingsCount(int bookingsCount) {
@@ -90,51 +95,55 @@ public class TimeFrameCardPopulator {
         mViewHolder.mCategoryTitle.setText(category.getTitle());
     }
 
-    private void setPieChart(ReportInterface data) {
-        mViewHolder.mPieChart.setPieData(preparePieData(data));
-        mViewHolder.mPieChart.setOnPieChartClickListener(new PieChart.OnPieChartClickListener() {
+    private void setPieChart(ReportInterface report) {
+        mViewHolder.mPieChart.setData(preparePieData(report));
+        mViewHolder.mPieChart.setDrawHoleEnabled(false);
+        mViewHolder.mPieChart.getLegend().setEnabled(false);
+        mViewHolder.mPieChart.getDescription().setEnabled(false);
+        mViewHolder.mPieChart.setNoDataText(mResources.getString(R.string.no_bookings_in_year));
+        mViewHolder.mPieChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override
-            public void onSliceClick(PieSlice slice) {
-                Toast.makeText(app.getContext(), slice.getLabel(), Toast.LENGTH_SHORT).show();
+            public void onValueSelected(Entry e, Highlight h) {
+                Toast.makeText(app.getContext(), "" + e.getY(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onNothingSelected() {
+                // Do nothing
             }
         });
-        mViewHolder.mPieChart.setNoDataText(R.string.no_bookings_in_year);
     }
 
-    private List<DataSet> preparePieData(ReportInterface data) {
-        if (data.getBookingCount() == 0)
-            return new ArrayList<>();
+    private PieData preparePieData(ReportInterface report) {
+        if (report.getBookingCount() == 0) {
+            return new PieData(new PieDataSet(new ArrayList<PieEntry>(), ""));
+        }
 
-        List<DataSet> pieData = new ArrayList<>();
-
-        List<ExpenseObject> test = flattenExpenses(data.getExpenses());
-
-        for (Map.Entry<Boolean, Double> entry : sumByExpenseType(test).entrySet()) {
+        List<PieEntry> pieData = new ArrayList<>();
+        List<ExpenseObject> expenses = flattenExpenses(report.getExpenses());
+        for (Map.Entry<Boolean, Double> entry : sumByExpenseType(expenses).entrySet()) {
             pieData.add(dataSetFrom(entry));
         }
 
-        return pieData;
+        PieDataSet pds = new PieDataSet(pieData, "");
+        pds.setColors(getColor(R.color.booking_income), getColor(R.color.booking_expense));
+        pds.setDrawValues(false);
+
+        return new PieData(pds);
     }
 
-    private DataSet dataSetFrom(Map.Entry<Boolean, Double> entry) {
-        int color = entry.getKey() ? getColor(R.color.booking_expense) : getColor(R.color.booking_income);
-        String label = entry.getKey() ? getString(R.string.expense) : getString(R.string.income);
+    private PieEntry dataSetFrom(Map.Entry<Boolean, Double> entry) {
         float value = Math.abs(entry.getValue().floatValue());
 
-        return new DataSet(
+        return new PieEntry(
                 value,
-                color,
-                label
+                "" // Es sollen keine Labels angezeigt werden
         );
     }
 
     @ColorInt
     private int getColor(@ColorRes int color) {
         return mResources.getColor(color);
-    }
-
-    private String getString(@StringRes int string) {
-        return mResources.getString(string);
     }
 
     private List<ExpenseObject> flattenExpenses(List<ExpenseObject> expenses) {
@@ -160,34 +169,26 @@ public class TimeFrameCardPopulator {
         return summedExpenses;
     }
 
-    private String formatMoney(double money) {
-        return String.format(getDefaultLocale(), "%.2f", money);
-    }
-
-    private Locale getDefaultLocale() {
-        return ConfigurationCompat.getLocales(Resources.getSystem().getConfiguration()).get(0);
-    }
-
-    private void initializeViewHolder() {
+    private void initializeViewHolder(CardView rootView) {
         mViewHolder = new ViewHolder();
 
-        mViewHolder.mTitle = mRootView.findViewById(R.id.timeframe_report_card_title);
+        mViewHolder.mTitle = rootView.findViewById(R.id.timeframe_report_card_title);
 
-        mViewHolder.mInbound = mRootView.findViewById(R.id.timeframe_report_card_income);
-        mViewHolder.mInboundCurrency = mRootView.findViewById(R.id.timeframe_report_card_income_currency);
+        mViewHolder.mInbound = rootView.findViewById(R.id.timeframe_report_card_income);
+        mViewHolder.mInboundCurrency = rootView.findViewById(R.id.timeframe_report_card_income_currency);
 
-        mViewHolder.mOutbound = mRootView.findViewById(R.id.timeframe_report_card_expense);
-        mViewHolder.mOutboundCurrency = mRootView.findViewById(R.id.timeframe_report_card_expense_currency);
+        mViewHolder.mOutbound = rootView.findViewById(R.id.timeframe_report_card_expense);
+        mViewHolder.mOutboundCurrency = rootView.findViewById(R.id.timeframe_report_card_expense_currency);
 
-        mViewHolder.mTotal = mRootView.findViewById(R.id.timeframe_report_card_total);
-        mViewHolder.mTotalCurrency = mRootView.findViewById(R.id.timeframe_report_card_total_currency);
+        mViewHolder.mTotal = rootView.findViewById(R.id.timeframe_report_card_total);
+        mViewHolder.mTotalCurrency = rootView.findViewById(R.id.timeframe_report_card_total_currency);
 
-        mViewHolder.mBookingsCount = mRootView.findViewById(R.id.timeframe_report_card_total_bookings);
+        mViewHolder.mBookingsCount = rootView.findViewById(R.id.timeframe_report_card_total_bookings);
 
-        mViewHolder.mCategoryColor = mRootView.findViewById(R.id.timeframe_report_card_category_color);
-        mViewHolder.mCategoryTitle = mRootView.findViewById(R.id.timeframe_report_card_category_title);
+        mViewHolder.mCategoryColor = rootView.findViewById(R.id.timeframe_report_card_category_color);
+        mViewHolder.mCategoryTitle = rootView.findViewById(R.id.timeframe_report_card_category_title);
 
-        mViewHolder.mPieChart = mRootView.findViewById(R.id.timeframe_report_card_pie_chart);
+        mViewHolder.mPieChart = rootView.findViewById(R.id.timeframe_report_card_pie_chart);
     }
 
     private class ViewHolder {
