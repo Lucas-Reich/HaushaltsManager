@@ -34,11 +34,6 @@ public class TabTwoMonthlyReports extends AbstractTab {
         return rootView;
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
     public void updateView(View rootView) {
 
         MonthlyReportAdapter adapter = new MonthlyReportAdapterCreator(
