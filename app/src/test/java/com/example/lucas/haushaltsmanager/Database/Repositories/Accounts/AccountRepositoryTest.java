@@ -240,7 +240,7 @@ public class AccountRepositoryTest {
         };
 
         MatrixCursor cursor = new MatrixCursor(columns);
-        cursor.addRow(new Object[]{expectedAccount.getIndex(), expectedAccount.getTitle(), expectedAccount.getBalance(), expectedAccount.getCurrency().getIndex(), expectedAccount.getCurrency().getName(), expectedAccount.getCurrency().getShortName(), expectedAccount.getCurrency().getSymbol()});
+        cursor.addRow(new Object[]{expectedAccount.getIndex(), expectedAccount.getTitle(), expectedAccount.getBalance(), expectedAccount.getBalance().getCurrency().getIndex(), expectedAccount.getBalance().getCurrency().getName(), expectedAccount.getBalance().getCurrency().getShortName(), expectedAccount.getBalance().getCurrency().getSymbol()});
         cursor.moveToFirst();
 
         try {
@@ -265,7 +265,7 @@ public class AccountRepositoryTest {
         };
 
         MatrixCursor cursor = new MatrixCursor(columns);
-        cursor.addRow(new Object[]{expectedAccount.getIndex(), expectedAccount.getTitle(), expectedAccount.getCurrency().getIndex()});
+        cursor.addRow(new Object[]{expectedAccount.getIndex(), expectedAccount.getTitle(), expectedAccount.getBalance().getCurrency().getIndex()});
         cursor.moveToFirst();
 
         try {

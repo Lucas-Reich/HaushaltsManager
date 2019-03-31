@@ -140,7 +140,7 @@ public class ChildExpenseRepositoryTest {
             assertEquals(parentExpense.getChildren().get(1), actualExpense.getChildren().get(1));
             assertEquals(parentExpense.getChildren().get(2), actualExpense.getChildren().get(2));
             assertEqualAccountBalance(
-                    account.getBalance() + childExpense.getSignedPrice(),
+                    account.getBalance().getSignedValue() + childExpense.getSignedPrice(),
                     account.getIndex()
             );
         } catch (AddChildToChildException e) {
@@ -164,7 +164,7 @@ public class ChildExpenseRepositoryTest {
             assertEquals(parentExpense, actualParentExpense.getChildren().get(0));
             assertEquals(childExpense, actualParentExpense.getChildren().get(1));
             assertEqualAccountBalance(
-                    account.getBalance() + parentExpense.getSignedPrice() + childExpense.getSignedPrice(),
+                    account.getBalance().getSignedValue() + parentExpense.getSignedPrice() + childExpense.getSignedPrice(),
                     actualParentExpense.getChildren().get(0).getAccountId()
             );
 
@@ -201,7 +201,7 @@ public class ChildExpenseRepositoryTest {
         assertTrue("ChildExpense 1 wurde nicht erstellt", mChildExpenseRepo.exists(parentExpense.getChildren().get(0)));
         assertTrue("ChildExpense 2 wurde nicht erstellt", mChildExpenseRepo.exists(parentExpense.getChildren().get(1)));
         assertEqualAccountBalance(
-                account.getBalance() + expenses.get(0).getSignedPrice() + expenses.get(1).getSignedPrice(),
+                account.getBalance().getSignedValue() + expenses.get(0).getSignedPrice() + expenses.get(1).getSignedPrice(),
                 account.getIndex()
         );
     }
@@ -216,7 +216,7 @@ public class ChildExpenseRepositoryTest {
             assertTrue("Die KindBuchung wurde nicht zu einer ParentBuchung konvertiert", mBookingRepo.exists(extractedChildExpense));
             assertFalse("Die extrahierte KindBuchung wurde nicht gelöscht", mChildExpenseRepo.exists(extractedChildExpense));
             assertEqualAccountBalance(
-                    account.getBalance() + parentExpense.getChildren().get(0).getSignedPrice() + parentExpense.getChildren().get(1).getSignedPrice(),
+                    account.getBalance().getSignedValue() + parentExpense.getChildren().get(0).getSignedPrice() + parentExpense.getChildren().get(1).getSignedPrice(),
                     account.getIndex()
             );
 
@@ -238,7 +238,7 @@ public class ChildExpenseRepositoryTest {
             assertTrue("KindBuchung wurde nicht in eine ParentBuchung konvertiert", mBookingRepo.exists(extractedChildExpense));
             assertFalse("ParentBuchung ohne Kinder wurde nicht gelöscht", mBookingRepo.exists(parentExpense));
             assertEqualAccountBalance(
-                    account.getBalance() + parentExpense.getChildren().get(0).getSignedPrice(),
+                    account.getBalance().getSignedValue() + parentExpense.getChildren().get(0).getSignedPrice(),
                     account.getIndex()
             );
 
@@ -260,7 +260,7 @@ public class ChildExpenseRepositoryTest {
 
             assertEquals(String.format("Could not find Child Booking with id %s.", childExpense.getIndex()), e.getMessage());
             assertEqualAccountBalance(
-                    account.getBalance(),
+                    account.getBalance().getSignedValue(),
                     account.getIndex()
             );
         }
@@ -326,7 +326,7 @@ public class ChildExpenseRepositoryTest {
 
             assertEquals(expectedChildExpense, actualChildExpense);
             assertEqualAccountBalance(
-                    account.getBalance() + expectedChildExpense.getSignedPrice(),
+                    account.getBalance().getSignedValue() + expectedChildExpense.getSignedPrice(),
                     account.getIndex()
             );
 
@@ -360,7 +360,7 @@ public class ChildExpenseRepositoryTest {
 
             assertFalse("Buchung wurde nicht gelöscht", mChildExpenseRepo.exists(childExpense));
             assertEqualAccountBalance(
-                    account.getBalance() + parentExpense.getChildren().get(1).getSignedPrice(),
+                    account.getBalance().getSignedValue() + parentExpense.getChildren().get(1).getSignedPrice(),
                     childExpense.getAccountId()
             );
 
@@ -568,7 +568,7 @@ public class ChildExpenseRepositoryTest {
             assertTrue("KindBuchung wurde gelöscht", mChildExpenseRepo.exists(hiddenChild));
             assertFalse("Versteckte Buchung wurde aus der Datenbank geholt", mChildExpenseRepo.getAll(parentExpense.getIndex()).contains(hiddenChild));
             assertEqualAccountBalance(
-                    account.getBalance() + parentExpense.getChildren().get(1).getSignedPrice(),
+                    account.getBalance().getSignedValue() + parentExpense.getChildren().get(1).getSignedPrice(),
                     account.getIndex()
             );
 
@@ -591,7 +591,7 @@ public class ChildExpenseRepositoryTest {
             assertTrue("ParentBuchung wurde nicht versteckt", mBookingRepo.isHidden(parentExpense));
             assertFalse("KindBuchung wurde nicht versteckt", mChildExpenseRepo.getAll(parentExpense.getIndex()).contains(hiddenChildExpense));
             assertEqualAccountBalance(
-                    account.getBalance(),
+                    account.getBalance().getSignedValue(),
                     account.getIndex()
             );
         } catch (ChildExpenseNotFoundException e) {
@@ -615,7 +615,7 @@ public class ChildExpenseRepositoryTest {
 
             assertEquals(String.format("Could not find Child Booking with id %s.", childExpense.getIndex()), e.getMessage());
             assertEqualAccountBalance(
-                    account.getBalance(),
+                    account.getBalance().getSignedValue(),
                     account.getIndex()
             );
         }
@@ -656,7 +656,7 @@ public class ChildExpenseRepositoryTest {
 
             assertEquals(String.format("Could not find Child Booking with id %s.", childExpense.getIndex()), e.getMessage());
             assertEqualAccountBalance(
-                    account.getBalance(),
+                    account.getBalance().getSignedValue(),
                     account.getIndex()
             );
         }
@@ -665,7 +665,7 @@ public class ChildExpenseRepositoryTest {
     private void assertEqualAccountBalance(double expectedAmount, long accountId) {
 
         try {
-            double actualBalance = mAccountRepo.get(accountId).getBalance();
+            double actualBalance = mAccountRepo.get(accountId).getBalance().getSignedValue();
             assertEquals("Konto wurde nicht geupdated", expectedAmount, actualBalance);
 
         } catch (AccountNotFoundException e) {

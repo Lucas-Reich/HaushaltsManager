@@ -257,7 +257,7 @@ public class ExpenseRepositoryTest {
 
             assertEquals(expectedExpense, fetchedExpense);
             assertEqualAccountBalance(
-                    account.getBalance() + expectedExpense.getSignedPrice(),
+                    account.getBalance().getSignedValue() + expectedExpense.getSignedPrice(),
                     account
             );
 
@@ -277,7 +277,7 @@ public class ExpenseRepositoryTest {
 
             assertEquals(expectedExpenseWithChildren, fetchedExpense);
             assertEqualAccountBalance(
-                    account.getBalance() + expectedExpenseWithChildren.getChildren().get(0).getSignedPrice() + expectedExpenseWithChildren.getChildren().get(1).getSignedPrice() + expectedExpenseWithChildren.getChildren().get(2).getSignedPrice(),
+                    account.getBalance().getSignedValue() + expectedExpenseWithChildren.getChildren().get(0).getSignedPrice() + expectedExpenseWithChildren.getChildren().get(1).getSignedPrice() + expectedExpenseWithChildren.getChildren().get(2).getSignedPrice(),
                     account
             );
 
@@ -301,7 +301,7 @@ public class ExpenseRepositoryTest {
             assertTrue("Tag 2 wurde der Buchung nicht zugewiesen", mBookingTagRepo.exists(expectedExpenseWithTags, expectedExpenseWithTags.getTags().get(1)));
             assertTrue("Tag 3 wurde der Buchung nicht zugewiesen", mBookingTagRepo.exists(expectedExpenseWithTags, expectedExpenseWithTags.getTags().get(2)));
             assertEqualAccountBalance(
-                    account.getBalance() + expectedExpenseWithTags.getSignedPrice(),
+                    account.getBalance().getSignedValue() + expectedExpenseWithTags.getSignedPrice(),
                     account
             );
 
@@ -320,7 +320,7 @@ public class ExpenseRepositoryTest {
 
             assertFalse("Buchung wurde nicht gelöscht", mBookingRepo.exists(expense));
             assertEqualAccountBalance(
-                    account.getBalance(),
+                    account.getBalance().getSignedValue(),
                     account
             );
 
@@ -341,7 +341,7 @@ public class ExpenseRepositoryTest {
             assertTrue("Versteckte Buchung wurde aus der Datenbank geholt", mBookingRepo.isHidden(expense));
             assertTrue("Buchung wurde nicht als Versteckt markiert", mBookingRepo.exists(expense));
             assertEqualAccountBalance(
-                    account.getBalance(),
+                    account.getBalance().getSignedValue(),
                     account
             );
 
@@ -366,7 +366,7 @@ public class ExpenseRepositoryTest {
             assertFalse("Versteckte Buchung wurde aus der Datenbank geholt", mBookingRepo.getAll().contains(expense));
             assertTrue("Buchung wurde nicht als Versteckt markiert", mBookingRepo.exists(expense));
             assertEqualAccountBalance(
-                    account.getBalance(),
+                    account.getBalance().getSignedValue(),
                     account
             );
 
@@ -388,7 +388,7 @@ public class ExpenseRepositoryTest {
             assertTrue("Die Relation zu Tag 2 wurde nicht gelöscht", mBookingTagRepo.exists(expenseWithTags, expenseWithTags.getTags().get(1)));
             assertTrue("Die Relation zu Tag 3 wurde nicht gelöscht", mBookingTagRepo.exists(expenseWithTags, expenseWithTags.getTags().get(2)));
             assertEqualAccountBalance(
-                    account.getBalance(),
+                    account.getBalance().getSignedValue(),
                     account
             );
         } catch (CannotDeleteExpenseException e) {
@@ -438,7 +438,7 @@ public class ExpenseRepositoryTest {
 
             assertEquals(expectedExpense, fetchedExpense);
             assertEqualAccountBalance(
-                    account.getBalance() + expectedExpense.getSignedPrice(),
+                    account.getBalance().getSignedValue() + expectedExpense.getSignedPrice(),
                     account
             );
 
@@ -628,7 +628,7 @@ public class ExpenseRepositoryTest {
             assertTrue("Buchung wurde gelöscht", mBookingRepo.exists(expense));
             assertFalse("Versteckte Buchung wurde aus der Datenbank geholt", mBookingRepo.getAll().contains(expense));
             assertEqualAccountBalance(
-                    account.getBalance(),
+                    account.getBalance().getSignedValue(),
                     account
             );
 
@@ -650,7 +650,7 @@ public class ExpenseRepositoryTest {
 
             assertEquals(String.format("Could not find Booking with id %s.", expense.getIndex()), e.getMessage());
             assertEqualAccountBalance(
-                    account.getBalance(),
+                    account.getBalance().getSignedValue(),
                     account
             );
         }
@@ -691,7 +691,7 @@ public class ExpenseRepositoryTest {
     private void assertEqualAccountBalance(double expectedAmount, Account account) {
 
         try {
-            double actualBalance = mAccountRepo.get(account.getIndex()).getBalance();
+            double actualBalance = mAccountRepo.get(account.getIndex()).getBalance().getSignedValue();
             assertEquals("Konto wurde nicht geupdated", expectedAmount, actualBalance);
 
         } catch (AccountNotFoundException e) {

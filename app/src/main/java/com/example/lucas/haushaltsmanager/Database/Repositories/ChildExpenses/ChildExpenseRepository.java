@@ -566,7 +566,8 @@ public class ChildExpenseRepository {
     private void updateAccountBalance(long accountId, double amount) throws AccountNotFoundException {
 
         Account account = mAccountRepo.get(accountId);
-        account.setBalance(account.getBalance() + amount);
+        double newBalance = account.getBalance().getSignedValue() + amount;
+        account.setBalance(new Price(newBalance, account.getBalance().getCurrency()));
         mAccountRepo.update(account);
     }
 }

@@ -27,6 +27,7 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class TimeFrameCardPopulator {
@@ -60,7 +61,7 @@ public class TimeFrameCardPopulator {
     }
 
     private void setIncome(Price income) {
-        mViewHolder.mInbound.setText(MoneyUtils.formatHumanReadable(income));
+        mViewHolder.mInbound.setText(MoneyUtils.formatHumanReadable(income, Locale.getDefault()));
         mViewHolder.mInbound.setTextColor(getColor(R.color.booking_income));
 
         mViewHolder.mInboundCurrency.setText(income.getCurrency().getSymbol());
@@ -68,7 +69,7 @@ public class TimeFrameCardPopulator {
     }
 
     private void setOutgoing(Price outgoing) {
-        mViewHolder.mOutbound.setText(MoneyUtils.formatHumanReadable(outgoing));
+        mViewHolder.mOutbound.setText(MoneyUtils.formatHumanReadable(outgoing, Locale.getDefault()));
         mViewHolder.mOutbound.setTextColor(getColor(R.color.booking_expense));
 
         mViewHolder.mOutboundCurrency.setText(outgoing.getCurrency().getSymbol());
@@ -79,7 +80,7 @@ public class TimeFrameCardPopulator {
         // TODO: sollte ich den Preis in normaler Farbe anzeigen, wenn er 0 ist?
         int color = total.getSignedValue() >= 0 ? R.color.booking_income : R.color.booking_expense;
 
-        mViewHolder.mTotal.setText(MoneyUtils.formatHumanReadable(total));
+        mViewHolder.mTotal.setText(MoneyUtils.formatHumanReadable(total, Locale.getDefault()));
         mViewHolder.mTotal.setTextColor(getColor(color));
 
         mViewHolder.mTotalCurrency.setText(total.getCurrency().getSymbol());

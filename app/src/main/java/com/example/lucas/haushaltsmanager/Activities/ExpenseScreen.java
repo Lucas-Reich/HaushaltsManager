@@ -39,6 +39,7 @@ import com.example.lucas.haushaltsmanager.Views.SaveFloatingActionButton;
 
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 public class ExpenseScreen extends AbstractAppCompatActivity {
     private static final String TAG = ExpenseScreen.class.getSimpleName();
@@ -131,14 +132,14 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
                 bundle.putString(PriceInputDialog.TITLE, getString(R.string.input_price));
-                bundle.putString(PriceInputDialog.HINT, mExpense.getUnsignedPrice() + "");
+                bundle.putParcelable(PriceInputDialog.HINT, mExpense.getPrice());
 
                 PriceInputDialog priceInput = new PriceInputDialog();
                 priceInput.setArguments(bundle);
                 priceInput.setOnPriceSelectedListener(new PriceInputDialog.OnPriceSelected() {
                     @Override
-                    public void onPriceSelected(double price) {
-                        setPrice(new Price(price, true, getDefaultCurrency()));
+                    public void onPriceSelected(Price price) {
+                        setPrice(price);
                     }
                 });
                 priceInput.show(getFragmentManager(), "expense_screen_price");
@@ -399,7 +400,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
     }
 
     private void showPrice() {
-        mPriceBtn.setText(MoneyUtils.formatHumanReadable(mExpense.getPrice()));
+        mPriceBtn.setText(MoneyUtils.formatHumanReadable(mExpense.getPrice(), Locale.getDefault()));
 
         enableFabIfBookingIsSaveable();
     }

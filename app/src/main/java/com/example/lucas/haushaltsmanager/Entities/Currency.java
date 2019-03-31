@@ -1,11 +1,13 @@
 package com.example.lucas.haushaltsmanager.Entities;
 
+import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.example.lucas.haushaltsmanager.App.app;
+import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
 
 public class Currency implements Parcelable {
@@ -30,6 +32,10 @@ public class Currency implements Parcelable {
         setName(currencyName);
         setShortName(shortName);
         setSymbol(symbol);
+    }
+
+    public static Currency getDefault(Context context) {
+        return new UserSettingsPreferences(context).getMainCurrency();
     }
 
     /**
@@ -108,17 +114,6 @@ public class Currency implements Parcelable {
     public boolean isSet() {
 
         return !this.name.isEmpty() && !this.shortName.isEmpty() && !this.symbol.isEmpty();
-    }
-
-    /**
-     * Wenn der index der Währung größer als null ist, dann gibt es die Währung bereits in der Datenbank
-     * und man kann sie sicher verwenden.
-     *
-     * @return boolean
-     */
-    public boolean isValid() {
-
-        return getIndex() > -1;
     }
 
     @Override

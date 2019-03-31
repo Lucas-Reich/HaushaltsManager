@@ -390,12 +390,11 @@ public class ExpenseRepository {
      */
     private void updateAccountBalance(long accountId, double amount) throws AccountNotFoundException {
         AccountRepository accountRepo = new AccountRepository(app.getContext()); // IMPROVEMENT: Das AccountRepository sollte injected werden.
-
         Account account = accountRepo.get(accountId);
-        account.setBalance(account.getBalance() + amount);
-        accountRepo.update(account);
 
-        accountRepo = null;
+        double newBalance = account.getBalance().getSignedValue() + amount;
+        account.setBalance(new Price(newBalance, account.getBalance().getCurrency()));
+        accountRepo.update(account);
     }
 
     private boolean hasChildren(ExpenseObject expense) {
