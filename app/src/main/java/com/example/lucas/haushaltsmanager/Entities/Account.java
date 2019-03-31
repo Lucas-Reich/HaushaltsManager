@@ -11,17 +11,15 @@ import com.example.lucas.haushaltsmanager.R;
 public class Account implements Parcelable {
     private static final String TAG = Account.class.getSimpleName();
 
-    private long mIndex;
-    private String mName;
-    private double mBalance;
-    private Currency mCurrency;
+    private long index;
+    private String name;
+    private Price balance;
 
     public Account(long index, @NonNull String accountName, double balance, @NonNull Currency currency) {
 
         setIndex(index);
         setName(accountName);
-        setBalance(balance);
-        setCurrency(currency);
+        setBalance(new Price(balance, currency));
     }
 
     public Account(@NonNull String accountName, double balance, @NonNull Currency currency) {
@@ -42,8 +40,7 @@ public class Account implements Parcelable {
         Log.v(TAG, "Recreating Account from parcel data");
         setIndex(source.readLong());
         setName(source.readString());
-        setBalance(source.readDouble());
-        setCurrency((Currency) source.readParcelable(Currency.class.getClassLoader()));
+        setBalance((Price) source.readParcelable(Price.class.getClassLoader()));
     }
 
     /**
@@ -58,44 +55,31 @@ public class Account implements Parcelable {
 
     public long getIndex() {
 
-        return mIndex;
+        return index;
     }
 
     private void setIndex(long index) {
 
-        this.mIndex = index;
+        this.index = index;
     }
 
     @NonNull
     public String getTitle() {
 
-        return mName;
+        return name;
     }
 
     public void setName(@NonNull String accountName) {
 
-        this.mName = accountName;
+        this.name = accountName;
     }
 
-    public double getBalance() {
-
-        return mBalance;
+    public Price getBalance() {
+        return balance;
     }
 
-    public void setBalance(double balance) {
-
-        this.mBalance = balance;
-    }
-
-    @NonNull
-    public Currency getCurrency() {
-
-        return mCurrency;
-    }
-
-    public void setCurrency(@NonNull Currency currency) {
-
-        this.mCurrency = currency;
+    public void setBalance(Price balance) {
+        this.balance = balance;
     }
 
     /**
@@ -108,36 +92,18 @@ public class Account implements Parcelable {
 
         return !getTitle().equals(app.getContext().getString(R.string.no_name))
                 && !getTitle().equals("")
-                && this.mCurrency.isSet();
-    }
-
-    /**
-     * Wenn der mIndex des Kontos größer als null ist, dann gibt es das Konto bereits in der Datenbank
-     * und man kann es sicher verwenden.
-     *
-     * @return boolean
-     */
-    public boolean isValid() {
-
-        return getIndex() > -1 && getCurrency().isValid();
+                && balance.getCurrency().isSet();
     }
 
     @Override
     public boolean equals(Object obj) {
-
-        if (obj instanceof Account) {
-
-            Account otherAccount = (Account) obj;
-
-            boolean result;
-            result = this.mName.equals(otherAccount.getTitle());
-            result = result && (this.mIndex == otherAccount.getIndex());
-
-            return result;
-        } else {
-
+        if (!(obj instanceof Account)) {
             return false;
         }
+
+        Account otherAccount = (Account) obj;
+        return name.equals(otherAccount.getTitle())
+                && index == otherAccount.getIndex();
     }
 
     @Override
@@ -145,7 +111,6 @@ public class Account implements Parcelable {
 
         return getTitle();
     }
-
 
     @Override
     public int describeContents() {
@@ -163,10 +128,9 @@ public class Account implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
 
         Log.v(TAG, "write to parcel..." + flags);
-        dest.writeLong(mIndex);
-        dest.writeString(mName);
-        dest.writeDouble(mBalance);
-        dest.writeParcelable(mCurrency, flags);
+        dest.writeLong(index);
+        dest.writeString(name);
+        dest.writeParcelable(balance, flags);
     }
 
     /**

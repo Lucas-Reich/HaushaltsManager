@@ -113,17 +113,17 @@ public class TransferActivity extends AppCompatActivity {
                 expenseInput.setArguments(bundle);
                 expenseInput.setOnPriceSelectedListener(new PriceInputDialog.OnPriceSelected() {
                     @Override
-                    public void onPriceSelected(double price) {
+                    public void onPriceSelected(Price price) {
                         UserSettingsPreferences preferences = new UserSettingsPreferences(TransferActivity.this);
 
-                        mFromExpense.setPrice(new Price(price, true, getDefaultCurrency()));
+                        mFromExpense.setPrice(price);
                         mAmountBtn.setText(String.format(
                                 getResources().getConfiguration().locale, "%.2f %s",
                                 mFromExpense.getUnsignedPrice(),
                                 preferences.getMainCurrency().getSymbol())
                         );
 
-                        setToExpense(price);
+                        setToExpense(price.getUnsignedValue());
                     }
                 });
                 expenseInput.show(getFragmentManager(), "transfers_amount_input");

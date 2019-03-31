@@ -85,15 +85,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"/>
 
-    <android.support.design.widget.FloatingActionButton
+    <com.example.lucas.haushaltsmanager.Views.SaveFloatingActionButton
         android:id="@+id/new_account_save"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         android:clickable="true"
-        android:contentDescription="@string/accessibility_create_account"
         android:focusable="true"
+        android:contentDescription="@string/accessibility_create_account"
         android:src="@drawable/ic_cross_white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>

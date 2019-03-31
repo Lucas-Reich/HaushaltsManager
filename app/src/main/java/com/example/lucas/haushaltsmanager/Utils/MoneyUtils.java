@@ -6,24 +6,32 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 public class MoneyUtils {
-    public static String toHumanReadablePrice(double price) {
-        // REFACTOR: Die andere toHumandReadablePrice benutzen, wenn sie nicht mehr Deprecated ist.
-        return String.format(Locale.getDefault(), "%.2f", price);
+    private static final String DEFAULT_PRICE = "-,--";
+
+    // Falls ich mal eine Formatierung brauche mit dem Währungszeichen, kann ich die NumberFormat.getCurrencyInstance dafür nutzen.
+
+    public static String formatHumanReadableOmitCents(Price price, Locale locale) {
+        String priceString = formatHumanReadable(price, locale);
+        return priceString.substring(0, priceString.length() - 3);
     }
 
-    @Deprecated
-    public static String toHumanReadablePriceDeprecated(double price) {
-        // IMPROVEMENT: NumberFormater hängt an die Zahl auch noch das Währungszeichen.
-        NumberFormat formatter = NumberFormat.getCurrencyInstance(Locale.getDefault());
+    public static String formatHumanReadable(Price price, Locale locale) {
+        if (isNullOrEmpty(price)) {
+            return DEFAULT_PRICE;
+        }
 
-        return formatter.format(price);
-    }
-
-    public static String formatHumanReadable(Price price) {
-        NumberFormat formatter = NumberFormat.getNumberInstance(Locale.getDefault());
+        NumberFormat formatter = NumberFormat.getNumberInstance(locale);
         formatter.setMinimumFractionDigits(2);
         formatter.setMaximumFractionDigits(2);
 
         return formatter.format(price.getSignedValue());
+    }
+
+    private static boolean isNullOrEmpty(Price price) {
+        if (null == price) {
+            return true;
+        }
+
+        return 0 == price.getUnsignedValue();
     }
 }

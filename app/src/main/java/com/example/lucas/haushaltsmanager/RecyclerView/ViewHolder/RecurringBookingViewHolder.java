@@ -7,6 +7,7 @@ import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.Entities.RecurringBooking;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.IRecyclerItem;
@@ -14,6 +15,8 @@ import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.Recurri
 import com.example.lucas.haushaltsmanager.Utils.MoneyUtils;
 import com.example.lucas.haushaltsmanager.Utils.ViewUtils;
 import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
+
+import java.util.Locale;
 
 import androidx.annotation.ColorRes;
 
@@ -48,7 +51,7 @@ public class RecurringBookingViewHolder extends AbstractViewHolder {
 
         setRoundedTextViewText(expense.getCategory());
         setTitle(expense.getTitle());
-        setPrice(expense.getUnsignedPrice(), expense.isExpenditure());
+        setPrice(expense.getPrice());
         setCurrency(expense.getCurrency(), expense.isExpenditure());
         setPerson("");
 
@@ -76,10 +79,10 @@ public class RecurringBookingViewHolder extends AbstractViewHolder {
         mTitle.setText(title);
     }
 
-    private void setPrice(double price, boolean isExpenditure) {
-        mPrice.setText(MoneyUtils.toHumanReadablePrice(price));
+    private void setPrice(Price price) {
+        mPrice.setText(MoneyUtils.formatHumanReadable(price, Locale.getDefault()));
 
-        if (isExpenditure)
+        if (price.isNegative())
             mPrice.setTextColor(getColor(R.color.booking_expense));
         else
             mPrice.setTextColor(getColor(R.color.booking_income));

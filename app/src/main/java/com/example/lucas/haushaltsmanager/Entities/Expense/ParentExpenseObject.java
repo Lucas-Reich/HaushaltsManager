@@ -2,6 +2,7 @@ package com.example.lucas.haushaltsmanager.Entities.Expense;
 
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
+import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 
 import java.util.Calendar;
@@ -65,30 +66,12 @@ public class ParentExpenseObject implements Booking {
         return mCurrency;
     }
 
-    public double getUnsignedPrice() {
-
-        double calcPrice = 0;
-        for (ExpenseObject child : mChildren) {
-
-            calcPrice += child.getUnsignedPrice();
-        }
-
-        return calcPrice;
-    }
-
-    public double getSignedPrice() {
-
-        double calcPrice = 0;
-        for (ExpenseObject child : mChildren) {
-
-            calcPrice += child.getSignedPrice();
-        }
-
-        return calcPrice;
+    public Price getPrice() {
+        return new Price(calcChildrenPrice(), mCurrency);
     }
 
     public boolean isExpenditure() {
-        return 0 > getSignedPrice();
+        return getPrice().isNegative();
     }
 
     @Override
@@ -103,5 +86,15 @@ public class ParentExpenseObject implements Booking {
                 && other.getTitle().equals(getTitle())
                 && other.getCurrency().equals(getCurrency())
                 && other.getChildren().equals(getChildren());
+    }
+
+    private double calcChildrenPrice() {
+        double calcPrice = 0;
+        for (ExpenseObject child : mChildren) {
+
+            calcPrice += child.getSignedPrice();
+        }
+
+        return calcPrice;
     }
 }

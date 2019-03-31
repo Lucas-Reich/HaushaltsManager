@@ -19,8 +19,10 @@ import com.example.lucas.haushaltsmanager.Activities.CreateAccountActivity;
 import com.example.lucas.haushaltsmanager.Activities.TransferActivity;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.R;
+import com.example.lucas.haushaltsmanager.Utils.MoneyUtils;
 
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Map;
 
 public class AccountAdapter extends ArrayAdapter<Account> {
@@ -56,11 +58,11 @@ public class AccountAdapter extends ArrayAdapter<Account> {
             LayoutInflater inflater = LayoutInflater.from(getContext());
             convertView = inflater.inflate(R.layout.list_view_account_item, parent, false);
 
-            viewHolder.layout = (LinearLayout) convertView.findViewById(R.id.listview_account_item_layout);
-            viewHolder.account_chk = (CheckBox) convertView.findViewById(R.id.listview_account_item_chkbox);
-            viewHolder.account_name = (TextView) convertView.findViewById(R.id.listview_account_item_name);
-            viewHolder.account_balance = (TextView) convertView.findViewById(R.id.listview_account_item_balance);
-            viewHolder.account_overflow_menu = (ImageView) convertView.findViewById(R.id.listview_account_item_overflow_menu);
+            viewHolder.layout = convertView.findViewById(R.id.listview_account_item_layout);
+            viewHolder.account_chk = convertView.findViewById(R.id.listview_account_item_chkbox);
+            viewHolder.account_name = convertView.findViewById(R.id.listview_account_item_name);
+            viewHolder.account_balance = convertView.findViewById(R.id.listview_account_item_balance);
+            viewHolder.account_overflow_menu = convertView.findViewById(R.id.listview_account_item_overflow_menu);
 
             convertView.setTag(viewHolder);
         } else {
@@ -70,7 +72,7 @@ public class AccountAdapter extends ArrayAdapter<Account> {
 
         viewHolder.account_chk.setChecked(mAccountStates.get(account));
         viewHolder.account_name.setText(account.getTitle());
-        viewHolder.account_balance.setText(String.format(getContext().getResources().getConfiguration().locale, "%.2f", account.getBalance()));
+        viewHolder.account_balance.setText(MoneyUtils.formatHumanReadable(account.getBalance(), Locale.getDefault()));
         viewHolder.account_overflow_menu.setOnClickListener(new OnAccountOverflowSelectedListener(getContext(), account));
 
         return convertView;

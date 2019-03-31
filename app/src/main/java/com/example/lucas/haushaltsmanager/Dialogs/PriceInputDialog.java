@@ -13,10 +13,15 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.lucas.haushaltsmanager.Entities.Currency;
+import com.example.lucas.haushaltsmanager.Entities.Price;
+import com.example.lucas.haushaltsmanager.PriceFormatTextWatcher;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
 import com.example.lucas.haushaltsmanager.Utils.MoneyUtils;
 import com.example.lucas.haushaltsmanager.Utils.ViewUtils;
+
+import java.util.Locale;
 
 public class PriceInputDialog extends DialogFragment {
     public static final String TITLE = "title";
@@ -28,14 +33,15 @@ public class PriceInputDialog extends DialogFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+        getDialog().getWindow()
+                .setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
     }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         BundleUtils args = new BundleUtils(getArguments());
 
-        final EditText input = createInputView(args.getDouble(HINT, 0D));
+        final EditText input = createInputView((Price) args.getParcelable(HINT, null));
 
         //wrapper für die text eingabe, sodass dieser eine padding gegeben werden kann
         //Quelle: http://android.pcsalt.com/create-alertdialog-with-custom-layout-programmatically/
@@ -54,12 +60,11 @@ public class PriceInputDialog extends DialogFragment {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                String priceString = input.getText().toString();
 
-                String price = input.getText().toString();
-                if (price.isEmpty())
-                    mCallback.onPriceSelected(0);
-                else
-                    mCallback.onPriceSelected(Double.parseDouble(price));
+                if (null != mCallback) {
+                    mCallback.onPriceSelected(createPrice(priceString));
+                }
 
             }
         });
@@ -78,20 +83,22 @@ public class PriceInputDialog extends DialogFragment {
 
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (hasUserConfirmed(event, actionId)) {
+                    String priceString = input.getText().toString();
 
-                if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || actionId == EditorInfo.IME_ACTION_DONE) {
-
-                    mCallback.onPriceSelected(Double.parseDouble(input.getText().toString()));
+                    mCallback.onPriceSelected(createPrice(priceString));
                     dismiss();
-                    return false;
                 }
 
                 return false;
             }
         });
 
-
         return builder.create();
+    }
+
+    private boolean hasUserConfirmed(KeyEvent keyEvent, int actionId) {
+        return (keyEvent != null && (keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || actionId == EditorInfo.IME_ACTION_DONE;
     }
 
     /**
@@ -99,15 +106,26 @@ public class PriceInputDialog extends DialogFragment {
      *
      * @return EditText
      */
-    private EditText createInputView(double hint) {
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+    private EditText createInputView(Price price) {
+        EditText editText = new EditText(getActivity());
+        editText.setHint(MoneyUtils.formatHumanReadableOmitCents(price, Locale.getDefault()));
+        editText.setLayoutParams(createLayoutParams());
+        editText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        editText.addTextChangedListener(new PriceFormatTextWatcher(editText));
 
-        EditText input = new EditText(getActivity());
-        input.setHint(MoneyUtils.toHumanReadablePrice(hint));
-        input.setLayoutParams(lp);
-        input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        return editText;
+    }
 
-        return input;
+    private LinearLayout.LayoutParams createLayoutParams() {
+        return new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+    }
+
+    private Price createPrice(String value) {
+        return new Price(value, getDefaultCurrency(), Locale.getDefault());
+    }
+
+    private Currency getDefaultCurrency() {
+        return Currency.getDefault(getActivity());
     }
 
     /**
@@ -120,6 +138,7 @@ public class PriceInputDialog extends DialogFragment {
     }
 
     public interface OnPriceSelected {
-        void onPriceSelected(double price);
+        // TODO: Hier sollte ich ein Price argument übergeben
+        void onPriceSelected(Price price);
     }
 }

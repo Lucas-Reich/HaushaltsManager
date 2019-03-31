@@ -5,6 +5,10 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.Locale;
+
 public class Price implements Parcelable {
     private static final String TAG = Price.class.getSimpleName();
 
@@ -14,6 +18,20 @@ public class Price implements Parcelable {
 
     public Price(double value, boolean isNegative, @NonNull Currency currency) {
         setPrice(value, isNegative);
+        setCurrency(currency);
+    }
+
+    public Price(String value, boolean isNegative, @NonNull Currency currency, Locale locale) {
+        double parsedPrice = localeAwareDoubleParser(value, locale);
+
+        setPrice(parsedPrice, isNegative);
+        setCurrency(currency);
+    }
+
+    public Price(String value, @NonNull Currency currency, Locale locale) {
+        double parsedPrice = localeAwareDoubleParser(value, locale);
+
+        setPrice(parsedPrice);
         setCurrency(currency);
     }
 
@@ -93,14 +111,12 @@ public class Price implements Parcelable {
 
     private void setPrice(double price) {
         if (price >= 0) {
-            this.value = price;
-            isNegative = false;
+            setPrice(price, false);
 
             return;
         }
 
-        value = Math.abs(price);
-        isNegative = true;
+        setPrice(Math.abs(price), true);
     }
 
     private void setPrice(double price, boolean isNegative) {
@@ -110,5 +126,15 @@ public class Price implements Parcelable {
 
     private void setCurrency(Currency currency) {
         this.currency = currency;
+    }
+
+    private double localeAwareDoubleParser(String doubleString, Locale locale) {
+        try {
+            return NumberFormat.getInstance(locale)
+                    .parse(doubleString)
+                    .doubleValue();
+        } catch(ParseException e) {
+            return 0D;
+        }
     }
 }

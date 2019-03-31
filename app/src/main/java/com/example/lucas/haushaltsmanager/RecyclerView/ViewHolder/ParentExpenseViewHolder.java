@@ -10,6 +10,7 @@ import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ParentExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ParentExpenseItem;
@@ -18,6 +19,7 @@ import com.example.lucas.haushaltsmanager.Utils.MoneyUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import androidx.annotation.ColorRes;
@@ -50,7 +52,7 @@ public class ParentExpenseViewHolder extends AbstractViewHolder {
 
         setPieChart(createPieData(parent.getChildren()));
         setTitle(parent.getTitle());
-        setPrice(parent.getSignedPrice(), parent.isExpenditure());
+        setPrice(parent.getPrice());
         setCurrency(parent.getCurrency(), parent.isExpenditure());
         setUser("");
         setDivider(item.isExpanded());
@@ -85,10 +87,10 @@ public class ParentExpenseViewHolder extends AbstractViewHolder {
         mTitle.setText(title);
     }
 
-    private void setPrice(double price, boolean isExpenditure) {
-        mPrice.setText(MoneyUtils.toHumanReadablePrice(price));
+    private void setPrice(Price price) {
+        mPrice.setText(MoneyUtils.formatHumanReadable(price, Locale.getDefault()));
 
-        if (isExpenditure)
+        if (price.isNegative())
             mPrice.setTextColor(getColor(R.color.booking_expense));
         else
             mPrice.setTextColor(getColor(R.color.booking_income));

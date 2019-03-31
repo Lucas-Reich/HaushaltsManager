@@ -2,7 +2,6 @@ package com.example.lucas.haushaltsmanager.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -15,11 +14,15 @@ import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
+import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
 import com.example.lucas.haushaltsmanager.Utils.MoneyUtils;
+import com.example.lucas.haushaltsmanager.Views.SaveFloatingActionButton;
+
+import java.util.Locale;
 
 public class CreateAccountActivity extends AbstractAppCompatActivity {
     public static final String INTENT_MODE = "mode";
@@ -28,7 +31,6 @@ public class CreateAccountActivity extends AbstractAppCompatActivity {
     public static final String INTENT_ACCOUNT = "accountId";
 
     private Button mAccountNameBtn, mAccountBalanceBtn, mAccountCurrencyBtn;
-    private FloatingActionButton mSaveFAB;
     private Account mAccount;
     private AccountRepository mAccountRepo;
 
@@ -43,7 +45,6 @@ public class CreateAccountActivity extends AbstractAppCompatActivity {
         mAccountNameBtn = findViewById(R.id.new_account_name);
         mAccountBalanceBtn = findViewById(R.id.new_account_balance);
         mAccountCurrencyBtn = findViewById(R.id.new_account_currency);
-        mSaveFAB = findViewById(R.id.new_account_save);
 
         resolveMode(getIntent().getExtras());
 
@@ -57,12 +58,12 @@ public class CreateAccountActivity extends AbstractAppCompatActivity {
             case INTENT_MODE_UPDATE:
 
                 mAccount = (Account) bundle.getParcelable(INTENT_ACCOUNT, null);
-                runCrossToCheckAnimation();
+                enableFabIfAccountIsSaveable(mAccount);
                 break;
             case INTENT_MODE_CREATE:
 
                 mAccount = Account.createDummyAccount();
-                mAccount.setCurrency(getDefaultCurrency());
+                mAccount.setBalance(new Price(0, getDefaultCurrency()));
                 mAccount.setName("");
                 break;
             default:
@@ -95,17 +96,14 @@ public class CreateAccountActivity extends AbstractAppCompatActivity {
                         mAccount.setName(textInput);
                         mAccountNameBtn.setText(mAccount.getTitle());
 
-                        if (mAccount.isSet())
-                            runCrossToCheckAnimation();
-                        else
-                            runCheckToCrossAnimation();
+                        enableFabIfAccountIsSaveable(mAccount);
                     }
                 });
                 basicDialog.show(getFragmentManager(), "create_account_name");
             }
         });
 
-        mAccountBalanceBtn.setHint(MoneyUtils.toHumanReadablePrice(mAccount.getBalance()));
+        mAccountBalanceBtn.setHint(MoneyUtils.formatHumanReadable(mAccount.getBalance(), Locale.getDefault()));
         mAccountBalanceBtn.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -113,55 +111,43 @@ public class CreateAccountActivity extends AbstractAppCompatActivity {
 
                 Bundle args = new Bundle();
                 args.putString(PriceInputDialog.TITLE, getString(R.string.set_Account_balance));
-                args.putDouble(PriceInputDialog.HINT, mAccount.getBalance());
+                args.putParcelable(PriceInputDialog.HINT, mAccount.getBalance());
 
                 PriceInputDialog priceInputDialog = new PriceInputDialog();
                 priceInputDialog.setArguments(args);
                 priceInputDialog.setOnPriceSelectedListener(new PriceInputDialog.OnPriceSelected() {
                     @Override
-                    public void onPriceSelected(double price) {
+                    public void onPriceSelected(Price price) {
 
                         mAccount.setBalance(price);
-                        mAccountBalanceBtn.setText(MoneyUtils.toHumanReadablePrice(mAccount.getBalance()));
+                        mAccountBalanceBtn.setText(MoneyUtils.formatHumanReadable(mAccount.getBalance(), Locale.getDefault()));
 
-                        if (mAccount.isSet())
-                            runCrossToCheckAnimation();
-                        else
-                            runCheckToCrossAnimation();
+                        enableFabIfAccountIsSaveable(mAccount);
                     }
                 });
                 priceInputDialog.show(getFragmentManager(), "create_account_price");
             }
         });
 
-        mAccountCurrencyBtn.setText(mAccount.getCurrency().getShortName().toUpperCase());
+        mAccountCurrencyBtn.setText(mAccount.getBalance().getCurrency().getShortName().toUpperCase());
 
-        mSaveFAB.setOnClickListener(createAccountClickListener);
-    }
-
-    private void runCheckToCrossAnimation() {
-        // TODO Der Übergang von dem Häkchen zum Kreuz soll animiert sein
-        mSaveFAB.setImageDrawable(getDrawableRes(R.drawable.ic_cross_white));
-    }
-
-    private void runCrossToCheckAnimation() {
-        // TODO Der Übergang von dem Kreuz zum Häkchen soll animiert sein
-        mSaveFAB.setImageDrawable(getDrawableRes(R.drawable.ic_check_white_24dp));
+        SaveFloatingActionButton saveFloatingActionButton = findViewById(R.id.new_account_save);
+        saveFloatingActionButton.setOnClickListener(createAccountClickListener);
     }
 
     /**
      * OnClickListener der unterscheidet ob ein Konto neu erstellt oder nur geupdated werden soll
      * und die dementsprechende Aktion ausfüht.
      */
-    private View.OnClickListener createAccountClickListener = new View.OnClickListener() {
+    private SaveFloatingActionButton.OnClickListener createAccountClickListener = new SaveFloatingActionButton.OnClickListener() {
 
         @Override
-        public void onClick(View v) {
-            if (!mAccount.isSet()) {
-                showCloseScreenDialog();
-                return;
-            }
+        public void onCrossClick() {
+            showCloseScreenDialog();
+        }
 
+        @Override
+        public void onCheckClick() {
             BundleUtils bundle = new BundleUtils(getIntent().getExtras());
 
             switch (bundle.getString(INTENT_MODE, INTENT_MODE_CREATE)) {
@@ -231,5 +217,15 @@ public class CreateAccountActivity extends AbstractAppCompatActivity {
             }
         });
         confirmationDialog.show(getFragmentManager(), "new_account_exit");
+    }
+
+    private void enableFabIfAccountIsSaveable(Account account) {
+        SaveFloatingActionButton saveFloatingActionButton = findViewById(R.id.new_account_save);
+
+        if (account.isSet()) {
+            saveFloatingActionButton.enable();
+        } else {
+            saveFloatingActionButton.disable();
+        }
     }
 }

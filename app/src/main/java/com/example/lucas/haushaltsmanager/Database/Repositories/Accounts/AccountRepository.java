@@ -32,8 +32,8 @@ public class AccountRepository implements AccountRepositoryInterface {
                 + " FROM " + ExpensesDbHelper.TABLE_ACCOUNTS
                 + " WHERE " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_ID + " = " + account.getIndex()
                 + " AND " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_NAME + " = '" + account.getTitle() + "'"
-                + " AND " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_BALANCE + " = " + account.getBalance()
-                + " AND " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID + " = " + account.getCurrency().getIndex()
+                + " AND " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_BALANCE + " = " + account.getBalance().getSignedValue()
+                + " AND " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID + " = " + account.getBalance().getCurrency().getIndex()
                 + " LIMIT 1;";
 
         Cursor c = mDatabase.rawQuery(selectQuery, null);
@@ -94,16 +94,16 @@ public class AccountRepository implements AccountRepositoryInterface {
     public Account create(Account account) {
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.ACCOUNTS_COL_NAME, account.getTitle());
-        values.put(ExpensesDbHelper.ACCOUNTS_COL_BALANCE, account.getBalance());
-        values.put(ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID, account.getCurrency().getIndex());
+        values.put(ExpensesDbHelper.ACCOUNTS_COL_BALANCE, account.getBalance().getSignedValue());
+        values.put(ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID, account.getBalance().getCurrency().getIndex());
 
         long insertedAccountId = mDatabase.insert(ExpensesDbHelper.TABLE_ACCOUNTS, null, values);
 
         return new Account(
                 insertedAccountId,
                 account.getTitle(),
-                account.getBalance(),
-                account.getCurrency()
+                account.getBalance().getSignedValue(),
+                account.getBalance().getCurrency()
         );
     }
 
@@ -117,8 +117,8 @@ public class AccountRepository implements AccountRepositoryInterface {
     public void update(Account account) throws AccountNotFoundException {
         ContentValues updatedAccount = new ContentValues();
         updatedAccount.put(ExpensesDbHelper.ACCOUNTS_COL_NAME, account.getTitle());
-        updatedAccount.put(ExpensesDbHelper.ACCOUNTS_COL_BALANCE, account.getBalance());
-        updatedAccount.put(ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID, account.getCurrency().getIndex());
+        updatedAccount.put(ExpensesDbHelper.ACCOUNTS_COL_BALANCE, account.getBalance().getSignedValue());
+        updatedAccount.put(ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID, account.getBalance().getCurrency().getIndex());
 
         int affectedRows = mDatabase.update(ExpensesDbHelper.TABLE_ACCOUNTS, updatedAccount, ExpensesDbHelper.ACCOUNTS_COL_ID + " = ?", new String[]{account.getIndex() + ""});
 
@@ -152,6 +152,7 @@ public class AccountRepository implements AccountRepositoryInterface {
     }
 
     public Account fromCursor(Cursor c) {
+        // TODO: Extract into transformer class
         long accountId = c.getLong(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_ID));
         String accountName = c.getString(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_NAME));
         double accountBalance = c.getDouble(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_BALANCE));
