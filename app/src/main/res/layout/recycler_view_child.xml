@@ -8,7 +8,7 @@
     android:focusable="true">
 
     <com.example.lucas.haushaltsmanager.Views.RoundedTextView
-        android:id="@+id/recycler_view_child_rounded_textview"
+        android:id="@+id/recycler_view_expense_rounded_text_view"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_marginStart="24dp"
@@ -27,27 +27,16 @@
         android:text="Kategorie"
         android:textColor="@color/primary_text_color"
         android:textSize="21sp"
-        app:layout_constraintStart_toEndOf="@+id/recycler_view_child_rounded_textview"
+        app:layout_constraintStart_toEndOf="@+id/recycler_view_expense_rounded_text_view"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
+    <com.example.lucas.haushaltsmanager.Views.MoneyTextView
         android:id="@+id/recycler_view_child_price"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="100"
-        android:textColor="@color/secondary_text_color"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toStartOf="@+id/recycler_view_child_currency"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/recycler_view_child_currency"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:text="€"
+        android:text="100 €"
         android:textColor="@color/secondary_text_color"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -62,7 +51,7 @@
         android:text="Person"
         android:textColor="@color/primary_text_color"
         android:textSize="12sp"
-        app:layout_constraintStart_toEndOf="@+id/recycler_view_child_rounded_textview"
+        app:layout_constraintStart_toEndOf="@+id/recycler_view_expense_rounded_text_view"
         app:layout_constraintTop_toBottomOf="@+id/recycler_view_child_title" />
 
     <View
@@ -75,7 +64,7 @@
         android:background="@color/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/recycler_view_child_rounded_textview"
-        app:layout_constraintTop_toBottomOf="@+id/recycler_view_child_rounded_textview" />
+        app:layout_constraintStart_toEndOf="@+id/recycler_view_expense_rounded_text_view"
+        app:layout_constraintTop_toBottomOf="@+id/recycler_view_expense_rounded_text_view" />
 
 </android.support.constraint.ConstraintLayout>

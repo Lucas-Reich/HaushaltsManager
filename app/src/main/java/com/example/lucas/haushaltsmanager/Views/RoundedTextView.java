@@ -24,6 +24,7 @@ public class RoundedTextView extends ViewUtils {
     private String mCenterText = "";
     private float mTextSize = 62f;//todo schriftgröße des angezeigten Buchstabens soll abhängig von der viewgröße sein
 
+    // TODO: Hier sollte ich die Logik implementieren welche die Farbe der Schrift ändert basierend auf der BackgroundColor
     public RoundedTextView(Context context) {
         super(context);
         init(context, null, 0);

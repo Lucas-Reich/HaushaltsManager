@@ -2,8 +2,11 @@ package com.example.lucas.haushaltsmanager.Entities;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
 import android.util.Log;
+
+import com.example.lucas.haushaltsmanager.R;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -66,6 +69,19 @@ public class Price implements Parcelable {
 
     public Currency getCurrency() {
         return currency;
+    }
+
+    @ColorRes
+    public int getColor() {
+        if (getSignedValue() > 0) {
+            return R.color.booking_income;
+        }
+
+        if (getSignedValue() < 0) {
+            return R.color.booking_expense;
+        }
+
+        return R.color.primary_text_color;
     }
 
     @Override

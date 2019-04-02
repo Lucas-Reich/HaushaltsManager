@@ -15,6 +15,7 @@
     <color name="transfer_booking_color">#0033cc</color>
 
     <color name="text_color_disabled">#808080</color>
+    <color name="text_color_alert">#eb3323</color>
     <color name="primary_text_color">#222222</color>
     <color name="primary_text_color_bright">@color/white</color>
     <color name="primary_text_color_dark">#bcbcbc</color>

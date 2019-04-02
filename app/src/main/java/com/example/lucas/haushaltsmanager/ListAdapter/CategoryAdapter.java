@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CategoryAdapter extends BaseExpandableListAdapter {
+    // TODO: Durch RecyclerView ersetzen
 
     private List<Category> mCategoryData;
     private Context mContext;
