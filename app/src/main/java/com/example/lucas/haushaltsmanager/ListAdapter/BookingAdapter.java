@@ -10,16 +10,17 @@ import android.widget.TextView;
 
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.R;
+import com.example.lucas.haushaltsmanager.Views.MoneyTextView;
 
 import java.util.List;
 
 public class BookingAdapter extends ArrayAdapter<ExpenseObject> {
+    // TODO: Durch RecyclerView ersetzen
 
     private static class ViewHolder {
         TextView circleLetter;
         TextView txtTitle;
-        TextView txtPrice;
-        TextView txtCurrencySymbol;
+        MoneyTextView price;
         TextView txtPerson;
     }
 
@@ -38,11 +39,9 @@ public class BookingAdapter extends ArrayAdapter<ExpenseObject> {
             LayoutInflater inflater = LayoutInflater.from(getContext());
             convertView = inflater.inflate(R.layout.booking_item, parent, false);
 
-
             viewHolder.circleLetter = convertView.findViewById(R.id.exp_listview_group_rounded_textview);
             viewHolder.txtTitle = convertView.findViewById(R.id.exp_listview_group_title);
-            viewHolder.txtPrice = convertView.findViewById(R.id.exp_listview_group_price);
-            viewHolder.txtCurrencySymbol = convertView.findViewById(R.id.exp_listview_group_currency_symbol);
+            viewHolder.price = convertView.findViewById(R.id.exp_listview_group_price);
             viewHolder.txtPerson = convertView.findViewById(R.id.exp_listview_group_person);
 
             convertView.setTag(viewHolder);
@@ -56,8 +55,7 @@ public class BookingAdapter extends ArrayAdapter<ExpenseObject> {
         viewHolder.circleLetter.setText(category.substring(0, 1).toUpperCase());
         viewHolder.txtTitle.setText(expenseObject.getTitle());
         viewHolder.txtPerson.setText("");
-        viewHolder.txtPrice.setText(String.format("%s", expenseObject.getUnsignedPrice()));
-        viewHolder.txtCurrencySymbol.setText(expenseObject.getCurrency().getSymbol());
+        viewHolder.price.bind(expenseObject.getPrice());
 
         return convertView;
     }

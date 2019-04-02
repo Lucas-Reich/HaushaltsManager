@@ -3,6 +3,7 @@ package com.example.lucas.haushaltsmanager.CardPopulator;
 import android.content.res.Resources;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
+import android.support.annotation.StringRes;
 import android.support.v7.widget.CardView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -14,7 +15,7 @@ import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.Entities.Report.ReportInterface;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSum;
-import com.example.lucas.haushaltsmanager.Utils.MoneyUtils;
+import com.example.lucas.haushaltsmanager.Views.MoneyTextView;
 import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.Entry;
@@ -27,7 +28,6 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 public class TimeFrameCardPopulator {
@@ -61,34 +61,19 @@ public class TimeFrameCardPopulator {
     }
 
     private void setIncome(Price income) {
-        mViewHolder.mInbound.setText(MoneyUtils.formatHumanReadable(income, Locale.getDefault()));
-        mViewHolder.mInbound.setTextColor(getColor(R.color.booking_income));
-
-        mViewHolder.mInboundCurrency.setText(income.getCurrency().getSymbol());
-        mViewHolder.mInboundCurrency.setTextColor(getColor(R.color.booking_income));
+        mViewHolder.income.bind(income);
     }
 
     private void setOutgoing(Price outgoing) {
-        mViewHolder.mOutbound.setText(MoneyUtils.formatHumanReadable(outgoing, Locale.getDefault()));
-        mViewHolder.mOutbound.setTextColor(getColor(R.color.booking_expense));
-
-        mViewHolder.mOutboundCurrency.setText(outgoing.getCurrency().getSymbol());
-        mViewHolder.mOutboundCurrency.setTextColor(getColor(R.color.booking_expense));
+        mViewHolder.expense.bind(outgoing);
     }
 
     private void setTotal(Price total) {
-        // TODO: sollte ich den Preis in normaler Farbe anzeigen, wenn er 0 ist?
-        int color = total.getSignedValue() >= 0 ? R.color.booking_income : R.color.booking_expense;
-
-        mViewHolder.mTotal.setText(MoneyUtils.formatHumanReadable(total, Locale.getDefault()));
-        mViewHolder.mTotal.setTextColor(getColor(color));
-
-        mViewHolder.mTotalCurrency.setText(total.getCurrency().getSymbol());
-        mViewHolder.mTotalCurrency.setTextColor(getColor(color));
+        mViewHolder.total.bind(total);
     }
 
     private void setTotalBookingsCount(int bookingsCount) {
-        mViewHolder.mBookingsCount.setText(String.format("%s %s", bookingsCount, app.getContext().getString(R.string.bookings)));
+        mViewHolder.mBookingsCount.setText(String.format("%s %s", bookingsCount, getString(R.string.bookings)));
     }
 
     private void setCategory(Category category) {
@@ -101,7 +86,10 @@ public class TimeFrameCardPopulator {
         mViewHolder.mPieChart.setDrawHoleEnabled(false);
         mViewHolder.mPieChart.getLegend().setEnabled(false);
         mViewHolder.mPieChart.getDescription().setEnabled(false);
-        mViewHolder.mPieChart.setNoDataText(mResources.getString(R.string.no_bookings_in_year));
+        mViewHolder.mPieChart.setNoDataText(getString(R.string.no_bookings_in_year));
+        mViewHolder.mPieChart.setNoDataTextColor(getColor(R.color.text_color_alert));
+        mViewHolder.mPieChart.setRotationEnabled(false);
+        mViewHolder.mPieChart.setHighlightPerTapEnabled(true); // Muss aktiviert seint, sonst kann ich den Listener nicht setzen
         mViewHolder.mPieChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override
             public void onValueSelected(Entry e, Highlight h) {
@@ -117,7 +105,7 @@ public class TimeFrameCardPopulator {
 
     private PieData preparePieData(ReportInterface report) {
         if (report.getBookingCount() == 0) {
-            return new PieData(new PieDataSet(new ArrayList<PieEntry>(), ""));
+            return null;
         }
 
         List<PieEntry> pieData = new ArrayList<>();
@@ -145,6 +133,10 @@ public class TimeFrameCardPopulator {
     @ColorInt
     private int getColor(@ColorRes int color) {
         return mResources.getColor(color);
+    }
+
+    private String getString(@StringRes int string) {
+        return mResources.getString(string);
     }
 
     private List<ExpenseObject> flattenExpenses(List<ExpenseObject> expenses) {
@@ -175,14 +167,11 @@ public class TimeFrameCardPopulator {
 
         mViewHolder.mTitle = rootView.findViewById(R.id.timeframe_report_card_title);
 
-        mViewHolder.mInbound = rootView.findViewById(R.id.timeframe_report_card_income);
-        mViewHolder.mInboundCurrency = rootView.findViewById(R.id.timeframe_report_card_income_currency);
+        mViewHolder.income = rootView.findViewById(R.id.time_frame_report_card_income);
 
-        mViewHolder.mOutbound = rootView.findViewById(R.id.timeframe_report_card_expense);
-        mViewHolder.mOutboundCurrency = rootView.findViewById(R.id.timeframe_report_card_expense_currency);
+        mViewHolder.expense = rootView.findViewById(R.id.time_frame_report_card_expense);
 
-        mViewHolder.mTotal = rootView.findViewById(R.id.timeframe_report_card_total);
-        mViewHolder.mTotalCurrency = rootView.findViewById(R.id.timeframe_report_card_total_currency);
+        mViewHolder.total = rootView.findViewById(R.id.time_frame_report_card_total);
 
         mViewHolder.mBookingsCount = rootView.findViewById(R.id.timeframe_report_card_total_bookings);
 
@@ -194,12 +183,9 @@ public class TimeFrameCardPopulator {
 
     private class ViewHolder {
         TextView mTitle;
-        TextView mInbound;
-        TextView mInboundCurrency;
-        TextView mOutbound;
-        TextView mOutboundCurrency;
-        TextView mTotal;
-        TextView mTotalCurrency;
+        MoneyTextView income;
+        MoneyTextView expense;
+        MoneyTextView total;
         TextView mBookingsCount;
         RoundedTextView mCategoryColor;
         TextView mCategoryTitle;

@@ -34,8 +34,8 @@ public class RecurringBookingViewHolder extends AbstractViewHolder {
     public RecurringBookingViewHolder(View itemView) {
         super(itemView);
 
-        mRoundedTextView = itemView.findViewById(R.id.recycler_view_child_rounded_textview);
-        mTitle = itemView.findViewById(R.id.recycler_view_child_title);
+        mRoundedTextView = itemView.findViewById(R.id.recycler_view_expense_rounded_text_view);
+        mTitle = itemView.findViewById(R.id.recycler_view_expense_title);
         mPrice = itemView.findViewById(R.id.recycler_view_expense_price);
         mCurrency = itemView.findViewById(R.id.recycler_view_expense_currency);
         mPerson = itemView.findViewById(R.id.recycler_view_expense_person);
