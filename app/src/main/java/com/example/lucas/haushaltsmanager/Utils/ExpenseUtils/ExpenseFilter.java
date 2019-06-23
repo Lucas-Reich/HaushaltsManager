@@ -107,11 +107,11 @@ public class ExpenseFilter {
     }
 
     private boolean isInMonth(ExpenseObject expense, int month) {
-        return expense.getDateTime().get(Calendar.MONTH) == month;
+        return expense.getDate().get(Calendar.MONTH) == month;
     }
 
     private boolean isInYear(ExpenseObject expense, int year) {
-        return expense.getDateTime().get(Calendar.YEAR) == year;
+        return expense.getDate().get(Calendar.YEAR) == year;
     }
 
     private boolean matchesFilter(ExpenseObject expense, boolean filter) {

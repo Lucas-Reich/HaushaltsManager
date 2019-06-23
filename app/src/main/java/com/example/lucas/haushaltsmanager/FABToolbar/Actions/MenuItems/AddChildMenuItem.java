@@ -42,7 +42,7 @@ public class AddChildMenuItem implements IMenuItem {
 
     @Override
     public void handleClick(ActionPayload payload, Context context) {
-        ExpenseObject parent = (ExpenseObject) payload.getItem().getItem().getContent();
+        ExpenseObject parent = (ExpenseObject) payload.getFirstItem().getContent();
 
         context.startActivity(createIntent(parent, context));
     }

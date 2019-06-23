@@ -217,7 +217,7 @@ public class ExpenseRepositoryTest {
     @Test
     public void testGetAllInSpecifiedTimeFrameShouldReturnBookingsInThisTimeFrame() {
         //fixme
-        //todo den Test noch einmal ausführen, wenn es einen Test für ExpenseObject.setDateTime() und ExpenseObject.getDateTime() gibt
+        //todo den Test noch einmal ausführen, wenn es einen Test für ExpenseObject.setDateTime() und ExpenseObject.getDate() gibt
         //das Verhalten vom Calendar ist unerwartet
         Calendar date = Calendar.getInstance();
         ExpenseObject expenseBeforeTimeFrame = getSimpleExpense();
@@ -488,7 +488,7 @@ public class ExpenseRepositoryTest {
         MatrixCursor cursor = new MatrixCursor(columns);
         cursor.addRow(new Object[]{
                 expectedExpense.getIndex(),
-                expectedExpense.getDateTime().getTimeInMillis(),
+                expectedExpense.getDate().getTimeInMillis(),
                 expectedExpense.getTitle(),
                 expectedExpense.getUnsignedPrice(),
                 expectedExpense.isExpenditure() ? 1 : 0,
@@ -501,7 +501,7 @@ public class ExpenseRepositoryTest {
                 expectedExpense.getCurrency().getSymbol(),
                 expectedExpense.getCategory().getIndex(),
                 expectedExpense.getCategory().getTitle(),
-                expectedExpense.getCategory().getColorString(),
+                expectedExpense.getCategory().getColor().getColorString(),
                 expectedExpense.getCategory().getDefaultExpenseType() ? 1 : 0
         });
         cursor.moveToFirst();
@@ -542,7 +542,7 @@ public class ExpenseRepositoryTest {
         MatrixCursor cursor = new MatrixCursor(columns);
         cursor.addRow(new Object[]{
                 expectedExpense.getIndex(),
-                expectedExpense.getDateTime().getTimeInMillis(),
+                expectedExpense.getDate().getTimeInMillis(),
                 expectedExpense.getTitle(),
                 expectedExpense.isExpenditure() ? 1 : 0,
                 expectedExpense.getNotice(),
@@ -554,7 +554,7 @@ public class ExpenseRepositoryTest {
                 expectedExpense.getCurrency().getSymbol(),
                 expectedExpense.getCategory().getIndex(),
                 expectedExpense.getCategory().getTitle(),
-                expectedExpense.getCategory().getColorString(),
+                expectedExpense.getCategory().getColor().getColorString(),
                 expectedExpense.getCategory().getDefaultExpenseType() ? 1 : 0
         });
         cursor.moveToFirst();

@@ -1,6 +1,5 @@
 package com.example.lucas.haushaltsmanager.Activities;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.view.View;
@@ -17,6 +16,7 @@ import com.example.lucas.haushaltsmanager.Dialogs.ColorPickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.SingleChoiceDialog;
 import com.example.lucas.haushaltsmanager.Entities.Category;
+import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
 import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
@@ -104,7 +104,7 @@ public class CreateCategory extends AbstractAppCompatActivity {
             }
         });
 
-        setColor(mCategory.getColorInt());
+        setColor(mCategory.getColor());
         mColorView.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -112,7 +112,7 @@ public class CreateCategory extends AbstractAppCompatActivity {
                 ColorPickerDialog colorPickerDialog = new ColorPickerDialog(CreateCategory.this, Color.WHITE);
                 colorPickerDialog.setOnColorSelectedListener(new ColorPickerDialog.OnColorSelectedListener() {
                     @Override
-                    public void onColorSelected(int color) {
+                    public void onColorSelected(Color color) {
                         setColor(color);
                     }
                 });
@@ -223,7 +223,7 @@ public class CreateCategory extends AbstractAppCompatActivity {
     private void setParentCategoryColor() {
         try {
 
-            mParentCategory.setColor(mCategory.getColorInt());
+            mParentCategory.setColor(mCategory.getColor());
             mCategoryRepo.update(mParentCategory);
         } catch (CategoryNotFoundException e) {
 
@@ -268,9 +268,9 @@ public class CreateCategory extends AbstractAppCompatActivity {
             runCheckToCrossAnimation();
     }
 
-    private void setColor(int color) {
+    private void setColor(Color color) {
         mCategory.setColor(color);
-        mColorView.setCircleColor(mCategory.getColorString());
+        mColorView.setCircleColor(mCategory.getColor().getColorString());
     }
 
     private void setExpenditureType(boolean expenditureType) {

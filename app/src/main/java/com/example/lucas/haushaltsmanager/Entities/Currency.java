@@ -4,16 +4,27 @@ import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
 
 public class Currency implements Parcelable {
-    // TODO: Kann ich die Currency durch die Java.util implementierung der Currency austauschen?
-    private static final String TAG = Currency.class.getSimpleName();
+    public static final Parcelable.Creator<Currency> CREATOR = new Parcelable.Creator<Currency>() {
 
+        @Override
+        public Currency createFromParcel(Parcel in) {
+
+            return new Currency(in);
+        }
+
+        @Override
+        public Currency[] newArray(int size) {
+
+            return new Currency[size];
+        }
+    };
+    // TODO: Kann ich die Currency durch die Java.util implementierung der Currency austauschen?
     private long index;
     private String name;
     private String shortName;
@@ -34,22 +45,20 @@ public class Currency implements Parcelable {
         setSymbol(symbol);
     }
 
-    public static Currency getDefault(Context context) {
-        return new UserSettingsPreferences(context).getMainCurrency();
-    }
-
     /**
      * Parcelable Constructor
      *
      * @param source Parceldata
      */
     public Currency(Parcel source) {
-
-        Log.v(TAG, "Recreating Currency from parcel data");
         setIndex(source.readLong());
         setName(source.readString());
         setShortName(source.readString());
         setSymbol(source.readString());
+    }
+
+    public static Currency getDefault(Context context) {
+        return new UserSettingsPreferences(context).getMainCurrency();
     }
 
     /**
@@ -60,6 +69,38 @@ public class Currency implements Parcelable {
     public static Currency createDummyCurrency() {
 
         return new Currency(-1, app.getContext().getString(R.string.no_name), "NON", "");
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Currency)) {
+            return false;
+        }
+
+        Currency other = (Currency) obj;
+
+        return getName().equals(other.getName())
+                && getShortName().equals(other.getShortName())
+                && getSymbol().equals(other.getSymbol());
+    }
+
+    public String toString() {
+
+        return getName();
+    }
+
+    @Override
+    public int describeContents() {
+
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(index);
+        dest.writeString(name);
+        dest.writeString(shortName);
+        dest.writeString(symbol);
     }
 
     public long getIndex() {
@@ -94,6 +135,9 @@ public class Currency implements Parcelable {
         this.shortName = shortName;
     }
 
+
+    // making class parcelable
+
     public @NonNull
     String getSymbol() {
 
@@ -115,56 +159,4 @@ public class Currency implements Parcelable {
 
         return !this.name.isEmpty() && !this.shortName.isEmpty() && !this.symbol.isEmpty();
     }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof Currency)) {
-            return false;
-        }
-
-        Currency other = (Currency) obj;
-
-        return getName().equals(other.getName())
-                && getShortName().equals(other.getShortName())
-                && getSymbol().equals(other.getSymbol());
-    }
-
-    public String toString() {
-
-        return getName();
-    }
-
-
-    // making class parcelable
-
-    @Override
-    public int describeContents() {
-
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-
-        Log.v(TAG, "write to parcel..." + flags);
-        dest.writeLong(index);
-        dest.writeString(name);
-        dest.writeString(shortName);
-        dest.writeString(symbol);
-    }
-
-    public static final Parcelable.Creator<Currency> CREATOR = new Parcelable.Creator<Currency>() {
-
-        @Override
-        public Currency createFromParcel(Parcel in) {
-
-            return new Currency(in);
-        }
-
-        @Override
-        public Currency[] newArray(int size) {
-
-            return new Currency[size];
-        }
-    };
 }

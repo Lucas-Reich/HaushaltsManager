@@ -132,7 +132,7 @@ public class ExpenseObjectExporter {
         expenseString.append(expense.getUnsignedPrice()).append(",");
         expenseString.append(expense.isExpenditure()).append(",");
         expenseString.append(expense.getTitle()).append(",");
-        expenseString.append(expense.getDate()).append(",");
+        expenseString.append(expense.getDateString()).append(",");
         expenseString.append(expense.getNotice()).append(",");
         expenseString.append(expense.getCurrency().getName());
         expenseString.append(expense.getCategory().getTitle()).append(",");

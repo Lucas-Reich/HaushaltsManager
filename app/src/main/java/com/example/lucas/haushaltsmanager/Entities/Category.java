@@ -1,13 +1,11 @@
 package com.example.lucas.haushaltsmanager.Entities;
 
-import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.example.lucas.haushaltsmanager.App.app;
+import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.util.ArrayList;
@@ -15,26 +13,43 @@ import java.util.List;
 import java.util.Objects;
 
 public class Category implements Parcelable {
-    private static final String TAG = Category.class.getSimpleName();
+    public static final Creator<Category> CREATOR = new Creator<Category>() {
+
+        @Override
+        public Category createFromParcel(Parcel in) {
+
+            return new Category(in);
+        }
+
+        @Override
+        public Category[] newArray(int size) {
+
+            return new Category[size];
+        }
+    };
 
     private long mIndex;
     private String mName;
-    private String mColor;
     private boolean mDefaultExpenseType;
     private List<Category> mChildren;
+    private Color color;
 
-    public Category(long index, @NonNull String categoryName, @NonNull String color, boolean defaultExpenseType, List<Category> children) {
-
+    public Category(long index, @NonNull String name, Color color, boolean defaultExpenseType, List<Category> children) {
         setIndex(index);
-        setName(categoryName);
+        setName(name);
         setColor(color);
         setDefaultExpenseType(defaultExpenseType);
         addChildren(children);
     }
 
+    @Deprecated
     public Category(@NonNull String categoryName, @NonNull String color, @NonNull Boolean defaultExpenseType, @NonNull List<Category> children) {
 
-        this(-1L, categoryName, color, defaultExpenseType, children);
+        this(ExpensesDbHelper.INVALID_INDEX, categoryName, new Color(color), defaultExpenseType, children);
+    }
+
+    public Category(@NonNull String name, @NonNull Color color, @NonNull Boolean defaultExpenseType, @NonNull List<Category> children) {
+        this(ExpensesDbHelper.INVALID_INDEX, name, color, defaultExpenseType, children);
     }
 
     /**
@@ -44,13 +59,12 @@ public class Category implements Parcelable {
      *
      * @param source .
      */
-    public Category(Parcel source) {
-
-        Log.v(TAG, "Recreating Category from parcel data");
+    private Category(Parcel source) {
         setIndex(source.readLong());
         setName(source.readString());
-        setColor(source.readString());
+        setColor((Color) source.readParcelable(Color.class.getClassLoader()));
         setDefaultExpenseType(source.readInt() == 1);
+        // TODO: Müssten hier nicht noch die Kinder initialisiert werden
     }
 
     /**
@@ -60,7 +74,62 @@ public class Category implements Parcelable {
      */
     public static Category createDummyCategory() {
 
-        return new Category(-1L, app.getContext().getString(R.string.no_name), "#000000", false, new ArrayList<Category>());
+        return new Category(-1L, app.getContext().getString(R.string.no_name), new Color(Color.BLACK), false, new ArrayList<Category>());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Category)) {
+            return false;
+        }
+
+        Category otherCategory = (Category) obj;
+
+        return getTitle().equals(otherCategory.getTitle())
+                && otherCategory.getColor().equals(color)
+                && (getDefaultExpenseType() == otherCategory.getDefaultExpenseType())
+                && mChildren.equals(otherCategory.getChildren());
+    }
+
+    public String toString() {
+
+        return getTitle();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                getIndex(),
+                getTitle(),
+                getColor(),
+                getDefaultExpenseType(),
+                getChildren()
+        );
+    }
+
+    /**
+     * can be ignored mostly
+     *
+     * @return int
+     */
+    @Override
+    public int describeContents() {
+
+        return 0;
+    }
+
+    /**
+     * converting the custom object into an parcelable object
+     *
+     * @param dest  destination Parcel
+     * @param flags flags
+     */
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(mIndex);
+        dest.writeString(mName);
+        dest.writeParcelable(color, flags);
+        dest.writeInt(mDefaultExpenseType ? 1 : 0);
     }
 
     public long getIndex() {
@@ -84,30 +153,12 @@ public class Category implements Parcelable {
         mName = name;
     }
 
-    public String getColorString() {
-
-        return mColor;
+    public Color getColor() {
+        return color;
     }
 
-    /**
-     * Methode um den Integerwert der Farbe zu ermitteln.
-     *
-     * @return ColorInt
-     */
-    @ColorInt
-    public int getColorInt() {
-
-        return Color.parseColor(mColor);
-    }
-
-    public void setColor(@NonNull String color) {
-
-        mColor = color;
-    }
-
-    public void setColor(@ColorInt int color) {
-
-        mColor = "#" + Integer.toHexString(color);
+    public void setColor(Color color) {
+        this.color = color;
     }
 
     public boolean getDefaultExpenseType() {
@@ -135,8 +186,9 @@ public class Category implements Parcelable {
     }
 
     public void addChildren(List<Category> children) {
-        if (mChildren == null)
+        if (mChildren == null) {
             mChildren = new ArrayList<>();
+        }
 
         mChildren.addAll(children);
     }
@@ -144,83 +196,4 @@ public class Category implements Parcelable {
     public List<Category> getChildren() {
         return mChildren;
     }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof Category))
-            return false;
-
-        Category otherCategory = (Category) obj;
-
-        boolean result = getTitle().equals(otherCategory.getTitle());
-        result = result && getColorString().equals(otherCategory.getColorString());
-        result = result && (getDefaultExpenseType() == otherCategory.getDefaultExpenseType());
-
-        for (int i = 0; i < mChildren.size(); i++) {
-            result = result && mChildren.get(i).equals(otherCategory.getChildren().get(i));
-        }
-
-        return result;
-    }
-
-    public String toString() {
-
-        return getTitle();
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(
-                getIndex(),
-                getTitle(),
-                getColorString(),
-                getDefaultExpenseType(),
-                getChildren()
-        );
-    }
-
-    /**
-     * can be ignored mostly
-     *
-     * @return int
-     */
-    @Override
-    public int describeContents() {
-
-        return 0;
-    }
-
-    /**
-     * converting the custom object into an parcelable object
-     *
-     * @param dest  destination Parcel
-     * @param flags flags
-     */
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-
-        Log.v(TAG, "write to parcel..." + flags);
-        dest.writeLong(mIndex);
-        dest.writeString(mName);
-        dest.writeString(mColor);
-        dest.writeInt(mDefaultExpenseType ? 1 : 0);
-    }
-
-    /**
-     * regenerating the parcelable object back into our Category object
-     */
-    public static final Creator<Category> CREATOR = new Creator<Category>() {
-
-        @Override
-        public Category createFromParcel(Parcel in) {
-
-            return new Category(in);
-        }
-
-        @Override
-        public Category[] newArray(int size) {
-
-            return new Category[size];
-        }
-    };
 }

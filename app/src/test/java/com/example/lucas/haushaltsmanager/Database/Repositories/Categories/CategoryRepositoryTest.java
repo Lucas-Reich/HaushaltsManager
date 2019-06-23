@@ -195,7 +195,7 @@ public class CategoryRepositoryTest {
         };
 
         MatrixCursor cursor = new MatrixCursor(columns);
-        cursor.addRow(new Object[]{expectedCategory.getIndex(), expectedCategory.getTitle(), expectedCategory.getColorString(), expectedCategory.getDefaultExpenseType() ? 1 : 0});
+        cursor.addRow(new Object[]{expectedCategory.getIndex(), expectedCategory.getTitle(), expectedCategory.getColor().getColorString(), expectedCategory.getDefaultExpenseType() ? 1 : 0});
         cursor.moveToFirst();
 
         try {

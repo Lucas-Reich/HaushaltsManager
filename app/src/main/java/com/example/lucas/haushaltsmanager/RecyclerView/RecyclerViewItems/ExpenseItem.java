@@ -3,14 +3,21 @@ package com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 public class ExpenseItem implements IRecyclerItem {
-    private static final String TAG = ExpenseItem.class.getSimpleName();
     public static final int VIEW_TYPE = 1;
-    private ExpenseObject mExpense;
+    private static final String TAG = ExpenseItem.class.getSimpleName();
 
+    private ExpenseObject mExpense;
+    private DateItem mParent;
+
+    public ExpenseItem(ExpenseObject expense, DateItem parent) {
+        mExpense = expense;
+        mParent = parent;
+    }
+
+    @Deprecated
     public ExpenseItem(ExpenseObject expense) {
         mExpense = expense;
     }
@@ -46,11 +53,6 @@ public class ExpenseItem implements IRecyclerItem {
     }
 
     @Override
-    public Calendar getDate() {
-        return mExpense.getDateTime();
-    }
-
-    @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof ExpenseItem)) {
             return false;
@@ -59,5 +61,15 @@ public class ExpenseItem implements IRecyclerItem {
         ExpenseItem other = (ExpenseItem) obj;
 
         return other.getContent().equals(getContent());
+    }
+
+    @Override
+    public void addChild(IRecyclerItem item) {
+        // Do nothing
+    }
+
+    @Override
+    public DateItem getParent() {
+        return mParent;
     }
 }

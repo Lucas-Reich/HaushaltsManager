@@ -13,6 +13,7 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBooking
 import com.example.lucas.haushaltsmanager.DatabaseTest;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
+import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.Booking;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
@@ -164,12 +165,12 @@ public class RecurringBookingWorkerTest extends DatabaseTest {
     private Category createDefaultCategory(Context context) {
         Category category = new Category(
                 "Kategorie",
-                "#000000",
+                new Color(Color.BLACK),
                 true,
                 new ArrayList<Category>() {{
                     add(new Category(
                             "Kategorie",
-                            "#FFFFFF",
+                            new Color(Color.WHITE),
                             true,
                             new ArrayList<Category>()
                     ));

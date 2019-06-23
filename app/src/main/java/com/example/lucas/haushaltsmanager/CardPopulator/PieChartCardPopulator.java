@@ -90,7 +90,7 @@ public class PieChartCardPopulator {
     private DataSet toDataSet(Map.Entry<Category, Double> entry) {
         return new DataSet(
                 entry.getValue().floatValue(),
-                entry.getKey().getColorInt(),
+                entry.getKey().getColor().getColorInt(),
                 entry.getKey().getTitle()
         );
     }

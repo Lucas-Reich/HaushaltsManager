@@ -12,7 +12,6 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.example.lucas.haushaltsmanager.Activities.CategoryList.CategoryList;
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
@@ -293,7 +292,6 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
 
                         try {
                             mExpenseRepo.update(mExpense);
-                            Toast.makeText(ExpenseScreen.this, "Updated Booking " + mExpense.getTitle(), Toast.LENGTH_SHORT).show();
                         } catch (ExpenseNotFoundException e) {
 
                             Toast.makeText(ExpenseScreen.this, R.string.could_not_update_booking, Toast.LENGTH_SHORT).show();
@@ -304,7 +302,6 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
 
                         try {
                             mChildExpenseRepo.update(mExpense);
-                            Toast.makeText(ExpenseScreen.this, "Updated Booking " + mExpense.getTitle(), Toast.LENGTH_SHORT).show();
                         } catch (ChildExpenseNotFoundException e) {
 
                             Toast.makeText(ExpenseScreen.this, R.string.could_not_update_booking, Toast.LENGTH_SHORT).show();
@@ -313,9 +310,9 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
                         break;
                     case INTENT_MODE_ADD_CHILD:
 
+                        mExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.CHILD_EXPENSE);
                         try {
                             mChildExpenseRepo.addChildToBooking(mExpense, mParentBooking);
-                            Toast.makeText(ExpenseScreen.this, "Added Booking \"" + mExpense.getTitle() + "\" to parent Booking " + mParentBooking.getTitle(), Toast.LENGTH_SHORT).show();
                         } catch (AddChildToChildException e) {
 
                             Log.e(TAG, "Could not addItem Child " + mExpense.getTitle() + " to parent " + mParentBooking.getTitle(), e);
@@ -386,7 +383,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
         setPrice(expense.getPrice());
         setTitle(expense.getTitle());
         setCategory(expense.getCategory());
-        setDate(expense.getDateTime());
+        setDate(expense.getDate());
         setNotice(expense.getNotice());
         setAccount(getExpenseAccount(expense.getAccountId()));
         setExpenseCurrency();

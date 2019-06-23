@@ -5,6 +5,7 @@ import android.support.annotation.StringRes;
 
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Entities.Category;
+import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSum;
@@ -94,7 +95,7 @@ public abstract class AbstractReport implements ReportInterface {
     private Category getPlaceholderCategory(@StringRes int titleRes) {
         return new Category(
                 getResourceString(titleRes),
-                "#FFFFFF",
+                new Color(Color.WHITE),
                 false,
                 new ArrayList<Category>()
         );

@@ -16,6 +16,35 @@ public class CalendarUtils {
         return new SimpleDateFormat("dd.MM.yyyy", getUserLocale()).format(date.getTime());
     }
 
+    public static boolean beforeByDate(Calendar one, Calendar two) {
+        Calendar date1 = prepareDate(one);
+        Calendar date2 = prepareDate(two);
+
+        return date1.before(date2);
+    }
+
+    public static boolean afterByDate(Calendar one, Calendar two) {
+        Calendar date1 = prepareDate(one);
+        Calendar date2 = prepareDate(two);
+
+        return date1.after(date2);
+    }
+
+    private static Calendar prepareDate(Calendar date) {
+        Calendar preparedDate = Calendar.getInstance();
+
+        preparedDate.set(
+                date.get(Calendar.YEAR),
+                date.get(Calendar.MONTH),
+                date.get(Calendar.DATE),
+                0,
+                0,
+                0
+        );
+
+        return preparedDate;
+    }
+
     private static Locale getUserLocale() {
         return Locale.getDefault();
     }

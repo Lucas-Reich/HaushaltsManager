@@ -8,11 +8,11 @@ import android.database.sqlite.SQLiteDatabase;
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.Exceptions.CannotDeleteCategoryException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.Exceptions.CategoryNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.Exceptions.CannotDeleteChildCategoryException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.Exceptions.ChildCategoryNotFoundException;
 import com.example.lucas.haushaltsmanager.Entities.Category;
+import com.example.lucas.haushaltsmanager.Entities.Color;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +34,7 @@ public class ChildCategoryRepository {
                 + " FROM " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES
                 + " WHERE " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CHILD_CATEGORIES_COL_ID + " = " + category.getIndex()
                 + " AND " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CHILD_CATEGORIES_COL_NAME + " = '" + category.getTitle() + "'"
-                + " AND " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CHILD_CATEGORIES_COL_COLOR + " = '" + category.getColorString() + "'"
+                + " AND " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CHILD_CATEGORIES_COL_COLOR + " = '" + category.getColor().getColorString() + "'"
                 + " AND " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CHILD_CATEGORIES_COL_DEFAULT_EXPENSE_TYPE + " = " + (category.getDefaultExpenseType() ? 1 : 0)
                 + " LIMIT 1;";
 
@@ -102,7 +102,7 @@ public class ChildCategoryRepository {
 
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.CHILD_CATEGORIES_COL_NAME, childCategory.getTitle());
-        values.put(ExpensesDbHelper.CHILD_CATEGORIES_COL_COLOR, childCategory.getColorString());
+        values.put(ExpensesDbHelper.CHILD_CATEGORIES_COL_COLOR, childCategory.getColor().getColorString());
         values.put(ExpensesDbHelper.CHILD_CATEGORIES_COL_HIDDEN, 0);
         values.put(ExpensesDbHelper.CHILD_CATEGORIES_COL_PARENT_ID, parentCategory.getIndex());
         values.put(ExpensesDbHelper.CHILD_CATEGORIES_COL_DEFAULT_EXPENSE_TYPE, childCategory.getDefaultExpenseType() ? 1 : 0);
@@ -112,7 +112,7 @@ public class ChildCategoryRepository {
         return new Category(
                 insertedCategoryId,
                 childCategory.getTitle(),
-                childCategory.getColorString(),
+                childCategory.getColor(),
                 childCategory.getDefaultExpenseType(),
                 childCategory.getChildren()
         );
@@ -126,30 +126,29 @@ public class ChildCategoryRepository {
         if (isAttachedToChildBooking(category))
             throw CannotDeleteChildCategoryException.childCategoryAttachedToChildExpenseException(category);
 
-        if (isLastChildOfParent(category)) {
+        try {
+            Category parentCategory = getParent(category);
 
-            try {
+            mDatabase.delete(ExpensesDbHelper.TABLE_CHILD_CATEGORIES, ExpensesDbHelper.CHILD_CATEGORIES_COL_ID + " = ?", new String[]{"" + category.getIndex()});
 
-                Category parentCategory = getParent(category);
+            // TODO: Wenn der Parent nicht gelöscht werden konnte und eine Exception ausgelöst wurde,
+            //  ist an dieser Stelle die KindKategorie bereits gelöscht.
+            //  Man müsste beides also in einer Transaktion laufen lassen.
 
-                mDatabase.delete(ExpensesDbHelper.TABLE_CHILD_CATEGORIES, ExpensesDbHelper.CHILD_CATEGORIES_COL_ID + " = ?", new String[]{"" + category.getIndex()});
+            if (!hasParentChildren(parentCategory)) {
                 deleteParentCategory(parentCategory);
-
-            } catch (CannotDeleteCategoryException e) {
-                throw CannotDeleteChildCategoryException.childCategoryParentCannotBeDeleted(category);
-            } catch (CategoryNotFoundException e) {
-                throw CannotDeleteChildCategoryException.childCategoryParentNotFoundException(category);
             }
-        }
 
-        mDatabase.delete(ExpensesDbHelper.TABLE_CHILD_CATEGORIES, ExpensesDbHelper.CHILD_CATEGORIES_COL_ID + " = ?", new String[]{"" + category.getIndex()});
+        } catch (CategoryNotFoundException e) {
+            throw CannotDeleteChildCategoryException.childCategoryParentNotFoundException(category);
+        }
     }
 
     public void update(Category category) throws ChildCategoryNotFoundException {
 
         ContentValues updatedCategory = new ContentValues();
         updatedCategory.put(ExpensesDbHelper.CHILD_CATEGORIES_COL_NAME, category.getTitle());
-        updatedCategory.put(ExpensesDbHelper.CHILD_CATEGORIES_COL_COLOR, category.getColorString());
+        updatedCategory.put(ExpensesDbHelper.CHILD_CATEGORIES_COL_COLOR, category.getColor().getColorString());
         updatedCategory.put(ExpensesDbHelper.CHILD_CATEGORIES_COL_DEFAULT_EXPENSE_TYPE, category.getDefaultExpenseType());
 
         int affectedRows = mDatabase.update(ExpensesDbHelper.TABLE_CHILD_CATEGORIES, updatedCategory, ExpensesDbHelper.CHILD_CATEGORIES_COL_ID + " = ?", new String[]{"" + category.getIndex()});
@@ -167,6 +166,21 @@ public class ChildCategoryRepository {
 
         if (affectedRows == 0)
             throw new ChildCategoryNotFoundException(category.getIndex());
+    }
+
+    public static Category cursorToChildCategory(Cursor c) {
+        long categoryIndex = c.getLong(c.getColumnIndex(ExpensesDbHelper.CHILD_CATEGORIES_COL_ID));
+        String categoryName = c.getString(c.getColumnIndex(ExpensesDbHelper.CHILD_CATEGORIES_COL_NAME));
+        String categoryColor = c.getString(c.getColumnIndex(ExpensesDbHelper.CHILD_CATEGORIES_COL_COLOR));
+        boolean defaultExpenseType = c.getInt(c.getColumnIndex(ExpensesDbHelper.CHILD_CATEGORIES_COL_DEFAULT_EXPENSE_TYPE)) == 1;
+
+        return new Category(
+                categoryIndex,
+                categoryName,
+                new Color(categoryColor),
+                defaultExpenseType,
+                new ArrayList<Category>()
+        );
     }
 
     private Category getParent(Category childCategory) throws CategoryNotFoundException {
@@ -242,25 +256,15 @@ public class ChildCategoryRepository {
         return false;
     }
 
-    private boolean isLastChildOfParent(Category category) {
-
-        String subSelectQuery;
-        subSelectQuery = "(SELECT"
-                + " " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CHILD_CATEGORIES_COL_PARENT_ID
+    private boolean hasParentChildren(Category parentCategory) {
+        String selectQuery = "SELECT *"
                 + " FROM " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES
-                + " WHERE " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CHILD_CATEGORIES_COL_ID + " = " + category.getIndex()
-                + ");";
-
-        String selectQuery;
-        selectQuery = "SELECT"
-                + " *"
-                + " FROM " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES
-                + " WHERE " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CHILD_CATEGORIES_COL_PARENT_ID + " = " + subSelectQuery
+                + " WHERE " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CHILD_CATEGORIES_COL_PARENT_ID + " = " + parentCategory.getIndex()
                 + ";";
 
         Cursor c = mDatabase.rawQuery(selectQuery, null);
 
-        if (c.getCount() == 1) {
+        if (c.getCount() >= 1) {
 
             c.close();
             return true;
@@ -270,27 +274,11 @@ public class ChildCategoryRepository {
         return false;
     }
 
-    private void deleteParentCategory(Category parentCategory) throws CannotDeleteCategoryException {
-
-        if (!isLastChildOfParent(parentCategory))
-            throw new CannotDeleteCategoryException(parentCategory);
-
-        mDatabase.delete(ExpensesDbHelper.TABLE_CATEGORIES, ExpensesDbHelper.CATEGORIES_COL_ID + " = ?", new String[]{"" + parentCategory.getIndex()});
-        DatabaseManager.getInstance().closeDatabase();
-    }
-
-    public static Category cursorToChildCategory(Cursor c) {
-        long categoryIndex = c.getLong(c.getColumnIndex(ExpensesDbHelper.CHILD_CATEGORIES_COL_ID));
-        String categoryName = c.getString(c.getColumnIndex(ExpensesDbHelper.CHILD_CATEGORIES_COL_NAME));
-        String categoryColor = c.getString(c.getColumnIndex(ExpensesDbHelper.CHILD_CATEGORIES_COL_COLOR));
-        boolean defaultExpenseType = c.getInt(c.getColumnIndex(ExpensesDbHelper.CHILD_CATEGORIES_COL_DEFAULT_EXPENSE_TYPE)) == 1;
-
-        return new Category(
-                categoryIndex,
-                categoryName,
-                categoryColor,
-                defaultExpenseType,
-                new ArrayList<Category>()
+    private void deleteParentCategory(Category parentCategory) {
+        mDatabase.delete(
+                ExpensesDbHelper.TABLE_CATEGORIES,
+                ExpensesDbHelper.CATEGORIES_COL_ID + " = ?",
+                new String[]{"" + parentCategory.getIndex()}
         );
     }
 }

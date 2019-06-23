@@ -1,6 +1,7 @@
 package com.example.lucas.haushaltsmanager;
 
 import com.example.lucas.haushaltsmanager.Entities.Category;
+import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Price;
@@ -143,7 +144,7 @@ public class ExpenseGrouperTest {
         return new Category(
                 index,
                 name,
-                "#000000",
+                new Color(Color.BLACK),
                 false,
                 new ArrayList<Category>()
         );

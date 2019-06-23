@@ -11,6 +11,7 @@ import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.Exceptions.CategoryNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepository;
 import com.example.lucas.haushaltsmanager.Entities.Category;
+import com.example.lucas.haushaltsmanager.Entities.Color;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,21 @@ public class CategoryRepository {
         mDatabase = DatabaseManager.getInstance().openDatabase();
     }
 
+    public static Category cursorToCategory(Cursor c) {
+        long categoryIndex = c.getLong(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_ID));
+        String categoryName = c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_NAME));
+        String categoryColor = c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_COLOR));
+        boolean defaultExpenseType = c.getInt(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE)) == 1;
+
+        return new Category(
+                categoryIndex,
+                categoryName,
+                new Color(categoryColor),
+                defaultExpenseType,
+                new ChildCategoryRepository(app.getContext()).getAll(categoryIndex)
+        );
+    }
+
     public boolean exists(Category category) {
         String selectQuery;
 
@@ -33,7 +49,7 @@ public class CategoryRepository {
                 + " FROM " + ExpensesDbHelper.TABLE_CATEGORIES
                 + " WHERE " + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_ID + " = " + category.getIndex()
                 + " AND " + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_NAME + " = '" + category.getTitle() + "'"
-                + " AND " + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_COLOR + " = '" + category.getColorString() + "'"
+                + " AND " + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_COLOR + " = '" + category.getColor().getColorString() + "'"
                 + " AND " + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE + " = " + (category.getDefaultExpenseType() ? 1 : 0)
                 + " LIMIT 1;";
 
@@ -100,7 +116,7 @@ public class CategoryRepository {
 
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.CATEGORIES_COL_NAME, category.getTitle());
-        values.put(ExpensesDbHelper.CATEGORIES_COL_COLOR, category.getColorString());
+        values.put(ExpensesDbHelper.CATEGORIES_COL_COLOR, category.getColor().getColorString());
         values.put(ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE, category.getDefaultExpenseType() ? 1 : 0);
 
         long insertedCategoryId = mDatabase.insert(ExpensesDbHelper.TABLE_CATEGORIES, null, values);
@@ -108,7 +124,7 @@ public class CategoryRepository {
         Category parentCategory = new Category(
                 insertedCategoryId,
                 category.getTitle(),
-                category.getColorString(),
+                category.getColor(),
                 category.getDefaultExpenseType(),
                 new ArrayList<Category>()
         );
@@ -123,27 +139,12 @@ public class CategoryRepository {
     public void update(Category category) throws CategoryNotFoundException {
         ContentValues updatedCategory = new ContentValues();
         updatedCategory.put(ExpensesDbHelper.CATEGORIES_COL_NAME, category.getTitle());
-        updatedCategory.put(ExpensesDbHelper.CATEGORIES_COL_COLOR, category.getColorString());
+        updatedCategory.put(ExpensesDbHelper.CATEGORIES_COL_COLOR, category.getColor().getColorString());
         updatedCategory.put(ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE, (category.getDefaultExpenseType() ? 1 : 0));
 
         int affectedRows = mDatabase.update(ExpensesDbHelper.TABLE_CATEGORIES, updatedCategory, ExpensesDbHelper.CATEGORIES_COL_ID + " = ?", new String[]{category.getIndex() + ""});
 
         if (affectedRows == 0)
             throw new CategoryNotFoundException(category.getIndex());
-    }
-
-    public static Category cursorToCategory(Cursor c) {
-        long categoryIndex = c.getLong(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_ID));
-        String categoryName = c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_NAME));
-        String categoryColor = c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_COLOR));
-        boolean defaultExpenseType = c.getInt(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE)) == 1;
-
-        return new Category(
-                categoryIndex,
-                categoryName,
-                categoryColor,
-                defaultExpenseType,
-                new ChildCategoryRepository(app.getContext()).getAll(categoryIndex)
-        );
     }
 }

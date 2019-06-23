@@ -47,7 +47,7 @@ public class RecurringMenuItem implements IMenuItem {
     }
 
     private ExpenseObject extractExpenseFromPayload(ActionPayload actionPayload) {
-        return (ExpenseObject) actionPayload.getItem().getItem().getContent();
+        return (ExpenseObject) actionPayload.getFirstItem().getContent();
     }
 
     private Intent getIntent(ExpenseObject recurringExpense, Context context) {

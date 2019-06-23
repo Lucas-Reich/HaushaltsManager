@@ -12,14 +12,13 @@ import com.example.lucas.haushaltsmanager.FABToolbar.Actions.ActionPayload;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.ActionKey;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.IActionKey;
 import com.example.lucas.haushaltsmanager.R;
-import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.SelectedRecyclerItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ChildItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ChildExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.IRecyclerItem;
 
-public class DeleteMenuItem implements IMenuItem {
+public class DeleteExpenseMenuItem implements IMenuItem {
     public static final String ACTION_KEY = "deleteAction";
-    private static final String TAG = DeleteMenuItem.class.getSimpleName();
+    private static final String TAG = DeleteExpenseMenuItem.class.getSimpleName();
 
     private final IActionKey mActionKey;
 
@@ -27,7 +26,7 @@ public class DeleteMenuItem implements IMenuItem {
     private ExpenseRepository mExpenseRepo;
     private ChildExpenseRepository mChildExpenseRepo;
 
-    public DeleteMenuItem(OnSuccessCallback callback) {
+    public DeleteExpenseMenuItem(OnSuccessCallback callback) {
         mCallback = callback;
         mActionKey = new ActionKey(ACTION_KEY);
     }
@@ -56,22 +55,16 @@ public class DeleteMenuItem implements IMenuItem {
     public void handleClick(ActionPayload actionPayload, Context context) {
         initRepos(context);
 
-        for (SelectedRecyclerItem selectedExpense : actionPayload.getItems()) {
+        for (IRecyclerItem selectedExpense : actionPayload.getItems()) {
 
-            if (selectedExpense.getItem() instanceof ExpenseItem) {
-                deleteExpense(
-                        (ExpenseItem) selectedExpense.getItem(),
-                        selectedExpense.getPosition()
-                );
+            if (selectedExpense instanceof ExpenseItem) {
+                deleteExpense((ExpenseItem) selectedExpense);
 
                 continue;
             }
 
-            if (selectedExpense.getItem() instanceof ChildItem) {
-                deleteChild(
-                        (ChildItem) selectedExpense.getItem(),
-                        selectedExpense.getPosition()
-                );
+            if (selectedExpense instanceof ChildExpenseItem) {
+                deleteChild((ChildExpenseItem) selectedExpense);
             }
         }
     }
@@ -81,14 +74,14 @@ public class DeleteMenuItem implements IMenuItem {
         mChildExpenseRepo = new ChildExpenseRepository(context);
     }
 
-    private void deleteChild(ChildItem item, int listPosition) {
+    private void deleteChild(ChildExpenseItem item) {
         ExpenseObject child = item.getContent();
 
         try {
             mChildExpenseRepo.delete(child);
 
             if (null != mCallback) {
-                mCallback.onSuccess(item, listPosition);
+                mCallback.onSuccess(item);
             }
         } catch (CannotDeleteChildExpenseException e) {
 
@@ -96,14 +89,14 @@ public class DeleteMenuItem implements IMenuItem {
         }
     }
 
-    private void deleteExpense(ExpenseItem item, int listPosition) {
+    private void deleteExpense(ExpenseItem item) {
         ExpenseObject expense = item.getContent();
 
         try {
             mExpenseRepo.delete(expense);
 
             if (null != mCallback) {
-                mCallback.onSuccess(item, listPosition);
+                mCallback.onSuccess(item);
             }
 
         } catch (CannotDeleteExpenseException e) {
@@ -113,6 +106,6 @@ public class DeleteMenuItem implements IMenuItem {
     }
 
     public interface OnSuccessCallback {
-        void onSuccess(IRecyclerItem deletedItem, int deletedItemPosition);
+        void onSuccess(IRecyclerItem deletedItem);
     }
 }

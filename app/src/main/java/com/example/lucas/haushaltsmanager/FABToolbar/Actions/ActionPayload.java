@@ -1,22 +1,22 @@
 package com.example.lucas.haushaltsmanager.FABToolbar.Actions;
 
-import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.SelectedRecyclerItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.IRecyclerItem;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ActionPayload {
-    private List<SelectedRecyclerItem> mList = new ArrayList<>();
+    private List<IRecyclerItem> items = new ArrayList<>();
 
-    public void setPayload(List<SelectedRecyclerItem> items) {
-        mList.addAll(items);
+    public void setPayload(List<IRecyclerItem> items) {
+        this.items.addAll(items);
     }
 
-    public List<SelectedRecyclerItem> getItems() {
-        return mList;
+    public List<IRecyclerItem> getItems() {
+        return items;
     }
 
-    public SelectedRecyclerItem getItem() {
-        return mList.get(0);
+    public IRecyclerItem getFirstItem() {
+        return items.get(0);
     }
 }

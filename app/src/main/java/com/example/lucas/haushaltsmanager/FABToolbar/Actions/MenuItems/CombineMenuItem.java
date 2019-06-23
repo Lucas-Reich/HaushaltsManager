@@ -5,6 +5,8 @@ import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 
+import androidx.annotation.StringRes;
+
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.CannotDeleteExpenseException;
@@ -17,16 +19,14 @@ import com.example.lucas.haushaltsmanager.Entities.Expense.ParentExpenseObject;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.ActionPayload;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.ActionKey;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.IActionKey;
+import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
-import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.SelectedRecyclerItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ChildItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ChildExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.IRecyclerItem;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import androidx.annotation.StringRes;
 
 public class CombineMenuItem implements IMenuItem {
     public static final String ACTION_KEY = "combineBookingsAction";
@@ -91,49 +91,57 @@ public class CombineMenuItem implements IMenuItem {
         return app.getContext().getString(stringRes);
     }
 
-    private BasicTextInputDialog.OnTextInput getOnTextInputListener(final List<SelectedRecyclerItem> selectedItems) {
+    private BasicTextInputDialog.OnTextInput getOnTextInputListener(final List<IRecyclerItem> selectedItems) {
         return new BasicTextInputDialog.OnTextInput() {
 
             @Override
             public void onTextInput(String combinedExpenseTitle) {
-                List<Integer> removedItemPositionsList = new ArrayList<>();
+                List<IRecyclerItem> removedItems = new ArrayList<>();
 
-                ExpenseObject parent = ExpenseObject.createDummyExpense();
-                parent.setTitle(combinedExpenseTitle);
+                ExpenseObject parent = createParentExpenseWithTitle(combinedExpenseTitle);
 
-                for (SelectedRecyclerItem selectedItem : selectedItems) {
-                    ExpenseObject deletedChild = deleteItem(selectedItem.getItem());
+                for (IRecyclerItem deletedChildItem : selectedItems) {
+                    IRecyclerItem deletedChild = deleteItem(deletedChildItem);
 
                     if (null != deletedChild) {
-                        removedItemPositionsList.add(selectedItem.getPosition());
-                        parent.addChild(deletedChild);
+                        removedItems.add(deletedChild);
+                        parent.addChild((ExpenseObject) deletedChild.getContent());
                     }
                 }
 
+                parent.setCategory(parent.getChildren().get(0).getCategory());
                 parent = mExpenseRepo.insert(parent);
 
                 if (null != mCallback) {
                     mCallback.onSuccess(
                             ParentExpenseObject.fromParentExpense(parent),
-                            removedItemPositionsList
+                            removedItems
                     );
                 }
+            }
+
+            private ExpenseObject createParentExpenseWithTitle(String title) {
+                ExpenseObject parent = ExpenseObject.createDummyExpense();
+                parent.setTitle(title);
+                parent.setCurrency(new UserSettingsPreferences(app.getContext()).getMainCurrency());
+
+                return parent;
             }
         };
     }
 
-    private ExpenseObject deleteItem(IRecyclerItem item) {
+    private IRecyclerItem deleteItem(IRecyclerItem item) {
         try {
             if (item instanceof ExpenseItem) {
                 mExpenseRepo.delete(((ExpenseItem) item).getContent());
 
-                return ((ExpenseItem) item).getContent();
+                return item;
             }
 
-            if (item instanceof ChildItem) {
-                mChildExpenseRepo.delete(((ChildItem) item).getContent());
+            if (item instanceof ChildExpenseItem) {
+                mChildExpenseRepo.delete(((ChildExpenseItem) item).getContent());
 
-                return ((ChildItem) item).getContent();
+                return item;
             }
         } catch (CannotDeleteChildExpenseException e) {
 
@@ -149,6 +157,6 @@ public class CombineMenuItem implements IMenuItem {
     }
 
     public interface OnSuccessCallback {
-        void onSuccess(ParentExpenseObject combinedExpense, List<Integer> removedItemPositions);
+        void onSuccess(ParentExpenseObject combinedExpense, List<IRecyclerItem> removedItems);
     }
 }

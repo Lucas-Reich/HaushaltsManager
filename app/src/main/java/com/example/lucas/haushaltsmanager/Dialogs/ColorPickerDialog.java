@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 
+import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.Views.ColorPicker;
 
 public class ColorPickerDialog extends AlertDialog {
@@ -41,7 +42,7 @@ public class ColorPickerDialog extends AlertDialog {
                 case BUTTON_POSITIVE:
 
                     if (mCallback != null)
-                        mCallback.onColorSelected(colorPickerView.getColor());
+                        mCallback.onColorSelected(new Color(colorPickerView.getColor()));
                     break;
                 case BUTTON_NEGATIVE:
 
@@ -56,7 +57,7 @@ public class ColorPickerDialog extends AlertDialog {
     }
 
     public interface OnColorSelectedListener {
-        void onColorSelected(int color);
+        void onColorSelected(Color color);
     }
 
 }

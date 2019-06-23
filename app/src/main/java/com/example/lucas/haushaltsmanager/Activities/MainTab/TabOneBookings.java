@@ -19,7 +19,7 @@ import com.example.lucas.haushaltsmanager.Entities.Template;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.ActionPayload;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.AddChildMenuItem;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.CombineMenuItem;
-import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.DeleteMenuItem;
+import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.DeleteExpenseMenuItem;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ExtractMenuItem;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.IMenuItem;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.RecurringMenuItem;
@@ -30,11 +30,11 @@ import com.example.lucas.haushaltsmanager.FABToolbar.OnFABToolbarItemClickListen
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.RecyclerItemClickListener;
-import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.SelectedRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.EndlessRecyclerViewScrollListener;
 import com.example.lucas.haushaltsmanager.RecyclerView.ExpenseListRecyclerViewAdapter;
+import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.ItemCreator;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.AdItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ChildItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ChildExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.DateItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.IRecyclerItem;
@@ -42,16 +42,15 @@ import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ParentE
 import com.example.lucas.haushaltsmanager.RevertExpenseDeletionSnackbar.RevertExpenseDeletionSnackbar;
 import com.github.fafaldo.fabtoolbar.widget.FABToolbarLayout;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
-public class TabOneBookings
-        extends AbstractTab
-        implements RecyclerItemClickListener.OnItemClickListener, OnFABToolbarItemClickListener, OnFABToolbarFABClickListener {
+public class TabOneBookings extends AbstractTab implements
+        RecyclerItemClickListener.OnItemClickListener,
+        OnFABToolbarItemClickListener,
+        OnFABToolbarFABClickListener {
 
     private static final String TAG = TabOneBookings.class.getSimpleName();
+    private static final int BATCH_SIZE = 30;
 
     private RecyclerView mRecyclerView;
     private ExpenseListRecyclerViewAdapter mAdapter;
@@ -85,7 +84,7 @@ public class TabOneBookings
 
         mFABToolbar.setOnFabClickListener(this);
 
-        setActionHandler();
+        configureFabToolbar();
 
         return rootView;
     }
@@ -115,59 +114,10 @@ public class TabOneBookings
     }
 
     @Override
-    public void onItemClick(View view, int position) {
-        IRecyclerItem item = mAdapter.getItem(position);
-
-        if (item instanceof DateItem || item instanceof AdItem)
-            return;
-
-        if (item instanceof ParentExpenseItem) {
-            mAdapter.toggleExpansion(position);
-            return;
-        }
-
-        if (mAdapter.getSelectedItemCount() == 0) {
-            if (item instanceof ExpenseItem || item instanceof ChildItem) {
-                updateItem(item);
-            }
-        } else {
-            // If Item is an ExpenseItem and no Children are selected
-            if (item instanceof ExpenseItem && mAdapter.getSelectedChildCount() == 0) {
-                mAdapter.toggleSelection(item, position);
-            }
-
-            // If item is an ChildItem and no Expenses are selected
-            if (item instanceof ChildItem && mAdapter.getSelectedItemsCount() == 0) {
-                mAdapter.toggleSelection(item, position);
-            }
-
-            updateFABToolbar();
-        }
-    }
-
-    @Override
-    public void onItemLongClick(View view, int position) {
-        IRecyclerItem item = mAdapter.getItem(position);
-
-        if (item instanceof DateItem || mAdapter.getSelectedItemCount() != 0)
-            return;
-
-        if (item instanceof ParentExpenseItem) {
-            mAdapter.toggleExpansion(position);
-
-            return;
-        }
-
-        mAdapter.toggleSelection(item, position);
-
-        updateFABToolbar();
-    }
-
-    @Override
     public void onFabClick() {
         if (noAccountExists()) {
             Toast.makeText(getContext(), getString(R.string.no_account), Toast.LENGTH_SHORT).show();
-            // TODO: Open dialog which prompts the user to create an account
+            // TODO: Open dialog which prompts the user to createExpenseItems an account
 
             return;
         }
@@ -179,33 +129,25 @@ public class TabOneBookings
 
     @Override
     public void onFABMenuItemClick(IMenuItem actionHandler) {
-        List<SelectedRecyclerItem> selectedItems = mAdapter.getSelectedItems();
-        Collections.sort(selectedItems, new Comparator<SelectedRecyclerItem>() {
-            @Override
-            public int compare(SelectedRecyclerItem o1, SelectedRecyclerItem o2) {
-                return Integer.compare(o2.getPosition(), o1.getPosition());
-            }
-        });
-
         ActionPayload actionPayload = new ActionPayload();
-        actionPayload.setPayload(selectedItems);
+        actionPayload.setPayload(mAdapter.getSelectedItems());
 
-        switch (actionHandler.getActionKey().getActionKey()) {
+        switch (actionHandler.getActionKey().toString()) {
             case RecurringMenuItem.ACTION_KEY:
             case AddChildMenuItem.ACTION_KEY:
             case TemplateMenuItem.ACTION_KEY:
             case CombineMenuItem.ACTION_KEY:
             case ExtractMenuItem.ACTION_KEY:
-                Log.i(TAG, String.format("Der ActionHandler %s wurde aufgerufen", actionHandler.getActionKey().getActionKey()));
+                Log.i(TAG, String.format("Der ActionHandler '%s' wurde aufgerufen", actionHandler.getActionKey().toString()));
 
                 actionHandler.handleClick(actionPayload, mParent);
                 break;
-            case DeleteMenuItem.ACTION_KEY:
-                Log.i(TAG, String.format("Der ActionHandler %s wurde aufgerufen", actionHandler.getActionKey().getActionKey()));
+            case DeleteExpenseMenuItem.ACTION_KEY:
+                Log.i(TAG, String.format("Der ActionHandler '%s' wurde aufgerufen", actionHandler.getActionKey().toString()));
 
                 initializeRevertDeletionSnackbar();
 
-                DeleteMenuItem deleteAction = (DeleteMenuItem) actionHandler;
+                DeleteExpenseMenuItem deleteAction = (DeleteExpenseMenuItem) actionHandler;
                 deleteAction.handleClick(actionPayload, getContext());
 
                 mRevertDeletionSnackbar.showSnackbar(
@@ -223,39 +165,83 @@ public class TabOneBookings
         mFABToolbar.toggleToolbarVisibility(false);
     }
 
-    private List<IRecyclerItem> loadData(int offset) {
-        List<ExpenseObject> visibleExpenses = mParent.getVisibleExpensesByOffsetWithParents(offset, 30);
+    @Override
+    public void onItemClick(IRecyclerItem item, int position) {
+        if (item instanceof DateItem || item instanceof AdItem) {
+            return;
+        }
 
-        return transformExpenses(visibleExpenses);
+        if (item instanceof ParentExpenseItem) {
+            mAdapter.toggleExpansion(position);
+            return;
+        }
+
+        if (mAdapter.getSelectedItemCount() == 0) {
+            if (item instanceof ExpenseItem || item instanceof ChildExpenseItem) {
+                updateItem(item);
+            }
+        } else {
+            if (mAdapter.isItemSelected(item)) {
+                mAdapter.unselectItem(item, position);
+            } else {
+                mAdapter.selectItem(item, position);
+            }
+
+            updateFABToolbar();
+        }
     }
 
-    private void setActionHandler() {
+    @Override
+    public void onItemLongClick(IRecyclerItem item, int position) {
+        if (item instanceof DateItem || mAdapter.getSelectedItemCount() != 0)
+            return;
+
+        if (item instanceof ParentExpenseItem) {
+            mAdapter.toggleExpansion(position);
+
+            return;
+        }
+
+        mAdapter.selectItem(item, position);
+
+        updateFABToolbar();
+    }
+
+    private List<IRecyclerItem> loadData(int offset) {
+        List<ExpenseObject> visibleExpenses = mParent.getVisibleExpensesByOffsetWithParents(offset, BATCH_SIZE);
+
+        return ItemCreator.createExpenseItems(visibleExpenses);
+    }
+
+    private void configureFabToolbar() {
         mFABToolbar.addMenuItem(new ExtractMenuItem(new ExtractMenuItem.OnSuccessCallback() {
             @Override
-            public void onSuccess(int extractedItemPosition, ExpenseObject extractedExpense) {
-                mAdapter.removeItem(extractedItemPosition);
+            public void onSuccess(IRecyclerItem extractedItem, ExpenseObject extractedExpense) {
+                mAdapter.removeItem(extractedItem);
 
-                mAdapter.insertItem(new ExpenseItem(extractedExpense));
+                mAdapter.insertItem(new ExpenseItem(extractedExpense, (DateItem) extractedItem.getParent().getParent()));
             }
         }), this);
 
         mFABToolbar.addMenuItem(new CombineMenuItem(new CombineMenuItem.OnSuccessCallback() {
             @Override
-            public void onSuccess(ParentExpenseObject combinedExpense, List<Integer> removedItemPositions) {
-                for (Integer removedItemPosition : removedItemPositions) {
-                    mAdapter.removeItem(removedItemPosition);
+            public void onSuccess(ParentExpenseObject combinedExpense, List<IRecyclerItem> removedItems) {
+                for (IRecyclerItem removedItem : removedItems) {
+                    mAdapter.removeItem(removedItem);
                 }
 
-                mAdapter.insertItem(new ParentExpenseItem(combinedExpense));
+                mAdapter.insertItem(new ParentExpenseItem(combinedExpense, (DateItem) removedItems.get(0).getParent()));
+
+                mParent.updateExpenses();
             }
         }), this);
 
         mFABToolbar.addMenuItem(new AddChildMenuItem(), this);
 
-        mFABToolbar.addMenuItem(new DeleteMenuItem(new DeleteMenuItem.OnSuccessCallback() {
+        mFABToolbar.addMenuItem(new DeleteExpenseMenuItem(new DeleteExpenseMenuItem.OnSuccessCallback() {
             @Override
-            public void onSuccess(IRecyclerItem deletedItem, int deletedItemPosition) {
-                mAdapter.removeItem(deletedItemPosition);
+            public void onSuccess(IRecyclerItem deletedItem) {
+                mAdapter.removeItem(deletedItem);
 
                 mRevertDeletionSnackbar.addItem(deletedItem);
             }
@@ -273,6 +259,8 @@ public class TabOneBookings
     }
 
     private void updateFABToolbar() {
+        // TODO: Kann ich hierfür eine smarte Lösung finden.
+        //  Kann ich das auch mit SelectionRules machen, wie sie schon für die RecyclerView genutzt werden.
         int selectedChildren = mAdapter.getSelectedChildCount();
         int selectedItems = mAdapter.getSelectedItemsCount();
 
@@ -313,14 +301,14 @@ public class TabOneBookings
     }
 
     private boolean noAccountExists() {
-        UserSettingsPreferences userSettings = new UserSettingsPreferences(getContext());
+        UserSettingsPreferences userSettings = new UserSettingsPreferences(mParent);
 
         return null == userSettings.getActiveAccount();
     }
 
     private void updateItem(IRecyclerItem item) {
-        if (item instanceof ChildItem || item instanceof ExpenseItem) {
-            String intentMode = item instanceof ChildItem ? ExpenseScreen.INTENT_MODE_UPDATE_CHILD : ExpenseScreen.INTENT_MODE_UPDATE_PARENT;
+        if (item instanceof ChildExpenseItem || item instanceof ExpenseItem) {
+            String intentMode = item instanceof ChildExpenseItem ? ExpenseScreen.INTENT_MODE_UPDATE_CHILD : ExpenseScreen.INTENT_MODE_UPDATE_PARENT;
 
             Intent updateBookingIntent = new Intent(getContext(), ExpenseScreen.class);
             updateBookingIntent.putExtra(ExpenseScreen.INTENT_MODE, intentMode);
@@ -328,20 +316,6 @@ public class TabOneBookings
 
             startActivity(updateBookingIntent);
         }
-    }
-
-    private List<IRecyclerItem> transformExpenses(List<ExpenseObject> expenses) {
-        List<IRecyclerItem> items = new ArrayList<>();
-
-        for (ExpenseObject expense : expenses) {
-            if (expense.isParent()) {
-                items.add(new ParentExpenseItem(new ParentExpenseObject(expense, expense.getChildren())));
-            } else {
-                items.add(new ExpenseItem(expense));
-            }
-        }
-
-        return items;
     }
 
     private void initializeRevertDeletionSnackbar() {

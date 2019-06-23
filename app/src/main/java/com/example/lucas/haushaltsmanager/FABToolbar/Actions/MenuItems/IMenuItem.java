@@ -2,34 +2,34 @@ package com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems;
 
 import android.content.Context;
 
-import com.example.lucas.haushaltsmanager.FABToolbar.Actions.ActionPayload;
-import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.IActionKey;
-
 import androidx.annotation.DrawableRes;
 import androidx.annotation.StringRes;
 
+import com.example.lucas.haushaltsmanager.FABToolbar.Actions.ActionPayload;
+import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.IActionKey;
+
 /**
- * Dieses Interface dient dazu Die action handler für die FABToolbar zu definieren.
+ * Dieses Interface dient dazu die ActionHandler für die FABToolbar zu definieren.
  * Klassen die dieses Interface implementieren können der FABToolbar hinzugefügt werden
  */
 public interface IMenuItem {
     /**
-     * The icon which will be shown for this MenuItem.
+     * Das Icon, welches für dieses MenuItem angezeigt wird.
      *
-     * @return Icon of MenuItem
+     * @return Icon des MenuItem
      */
     @DrawableRes
     int getIconRes();
 
     /**
-     * The title is the visible name of the MenuItem.
+     * Der Anzeigename für dieses MenuItem. Er wird unter dem Icon angezeigt.
      *
-     * @return Title of MenuItem
+     * @return Anzeigenamen des MenuItem
      */
     String getTitle();
 
     /**
-     * The hint will be used for accessibility applications.
+     * Ein Hinweis, welcher für Zugänglichkeitsapplikationen genutzt wird.
      *
      * @return Hint of MenuItem
      */
@@ -37,18 +37,19 @@ public interface IMenuItem {
     int getHintRes();
 
     /**
-     * Key that identifies the concrete MenuItem.
-     * This key should be unique compared to other MenuItems.
+     * Key, welcher diese konkrete MenuItem identifiziert.
+     * Dieses Key muss, verglichen mit den anderen MenuItems, einzigartig sein.
      *
-     * @return ActionKey of MenuItem
+     * @return ActionKey des MenuItem
      */
     IActionKey getActionKey();
 
     /**
-     * This Method defines the behaviour of the MenuItem when its clicked.
+     * In dieser Methode wird das Verhalten des MenuItem definiert.
+     * Sie wird aufgerufen, sobald der User auf das MenuItem klickt.
      *
-     * @param actionPayload Payload which contains Data to process
-     * @param context       Context
+     * @param actionPayload Payload, welche die zu verarbeitenden Daten enthält
+     * @param context       Kontext
      */
     void handleClick(ActionPayload actionPayload, Context context);
 }

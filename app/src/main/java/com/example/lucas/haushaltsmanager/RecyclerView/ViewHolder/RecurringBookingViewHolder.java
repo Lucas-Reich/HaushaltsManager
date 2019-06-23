@@ -3,22 +3,18 @@ package com.example.lucas.haushaltsmanager.RecyclerView.ViewHolder;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.ColorRes;
+
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Entities.Category;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.Entities.RecurringBooking;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.RecurringBookingItem;
-import com.example.lucas.haushaltsmanager.Utils.MoneyUtils;
-import com.example.lucas.haushaltsmanager.Utils.ViewUtils;
+import com.example.lucas.haushaltsmanager.Views.MoneyTextView;
 import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
-
-import java.util.Locale;
-
-import androidx.annotation.ColorRes;
 
 public class RecurringBookingViewHolder extends AbstractViewHolder {
     // TODO: Dieser ViewHolder hat exakt die gleiche Struktur die auch der ExpenseViewHolder hat
@@ -27,8 +23,7 @@ public class RecurringBookingViewHolder extends AbstractViewHolder {
 
     private RoundedTextView mRoundedTextView;
     private TextView mTitle;
-    private TextView mPrice;
-    private TextView mCurrency;
+    private MoneyTextView mPrice;
     private TextView mPerson;
 
     public RecurringBookingViewHolder(View itemView) {
@@ -37,14 +32,13 @@ public class RecurringBookingViewHolder extends AbstractViewHolder {
         mRoundedTextView = itemView.findViewById(R.id.recycler_view_expense_rounded_text_view);
         mTitle = itemView.findViewById(R.id.recycler_view_expense_title);
         mPrice = itemView.findViewById(R.id.recycler_view_expense_price);
-        mCurrency = itemView.findViewById(R.id.recycler_view_expense_currency);
         mPerson = itemView.findViewById(R.id.recycler_view_expense_person);
     }
 
     @Override
     public void bind(IRecyclerItem item) {
         if (!(item instanceof RecurringBookingItem)) {
-            throw new IllegalArgumentException(String.format("Wrong type given in %s", TAG));
+            throw new IllegalArgumentException(String.format("Could not attach %s to %s", item.getClass().getSimpleName(), TAG));
         }
 
         ExpenseObject expense = ((RecurringBooking) item.getContent()).getBooking();
@@ -52,7 +46,6 @@ public class RecurringBookingViewHolder extends AbstractViewHolder {
         setRoundedTextViewText(expense.getCategory());
         setTitle(expense.getTitle());
         setPrice(expense.getPrice());
-        setCurrency(expense.getCurrency(), expense.isExpenditure());
         setPerson("");
 
         setBackgroundColor();
@@ -66,13 +59,8 @@ public class RecurringBookingViewHolder extends AbstractViewHolder {
     }
 
     private void setRoundedTextViewText(Category category) {
-        if (ViewUtils.getColorBrightness(category.getColorString()) > 0.5) {
-            mRoundedTextView.setTextColor(getColor(R.color.primary_text_color_dark));
-        } else {
-            mRoundedTextView.setTextColor(getColor(R.color.primary_text_color_bright));
-        }
+        mRoundedTextView.setCircleColorConsiderBrightness(category.getColor().getColorInt());
         mRoundedTextView.setCenterText(category.getTitle().charAt(0) + "");
-        mRoundedTextView.setCircleColor(category.getColorInt());
     }
 
     private void setTitle(String title) {
@@ -80,21 +68,7 @@ public class RecurringBookingViewHolder extends AbstractViewHolder {
     }
 
     private void setPrice(Price price) {
-        mPrice.setText(MoneyUtils.formatHumanReadable(price, Locale.getDefault()));
-
-        if (price.isNegative())
-            mPrice.setTextColor(getColor(R.color.booking_expense));
-        else
-            mPrice.setTextColor(getColor(R.color.booking_income));
-    }
-
-    private void setCurrency(Currency currency, boolean isExpenditure) {
-        mCurrency.setText(currency.getSymbol());
-
-        if (isExpenditure)
-            mCurrency.setTextColor(getColor(R.color.booking_expense));
-        else
-            mCurrency.setTextColor(getColor(R.color.booking_income));
+        mPrice.bind(price);
     }
 
     private void setPerson(String person) {

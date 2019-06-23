@@ -20,6 +20,11 @@ public class Time {
         return new Time(hour, minute);
     }
 
+    @Override
+    public String toString() {
+        return String.format(Locale.US, "%02d:%02d", hour, minute);
+    }
+
     public int getHour() {
         return hour;
     }
@@ -35,10 +40,5 @@ public class Time {
         time.set(Calendar.SECOND, 0);
 
         return time.getTimeInMillis();
-    }
-
-    @Override
-    public String toString() {
-        return String.format(Locale.US, "%02d:%02d", hour, minute);
     }
 }

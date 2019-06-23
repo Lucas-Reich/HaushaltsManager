@@ -322,7 +322,7 @@ public class ChildCategoryRepositoryTest {
         };
 
         MatrixCursor cursor = new MatrixCursor(columns);
-        cursor.addRow(new Object[]{expectedChildCategory.getIndex(), expectedChildCategory.getTitle(), expectedChildCategory.getColorString(), expectedChildCategory.getDefaultExpenseType() ? 1 : 0});
+        cursor.addRow(new Object[]{expectedChildCategory.getIndex(), expectedChildCategory.getTitle(), expectedChildCategory.getColor().getColorString(), expectedChildCategory.getDefaultExpenseType() ? 1 : 0});
         cursor.moveToFirst();
 
         try {

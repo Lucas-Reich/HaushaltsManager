@@ -1,50 +1,70 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality;
 
-import android.support.v7.widget.RecyclerView;
-import android.util.SparseArray;
-
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ChildItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.InsertStrategy.InsertStrategy;
+import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.SelectionRules.SelectionRules;
+import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ChildExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.IRecyclerItem;
 
 import java.util.ArrayList;
 import java.util.List;
 
-// REFACTORING: Ich kann die Selection implementierung hiermit https://proandroiddev.com/a-guide-to-recyclerview-selection-3ed9f2381504 austauschen
-public abstract class RecyclerViewSelectedItemHandler extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private SparseArray<SelectedRecyclerItem> mSelectedItems;
+// REFACTORING: Ich kann die Selection Implementierung hiermit https://proandroiddev.com/a-guide-to-recyclerview-selection-3ed9f2381504 austauschen
+public abstract class RecyclerViewSelectedItemHandler extends RecyclerViewExpandableItemHandler {
+    private SelectionRules selectionRules;
+    private List<IRecyclerItem> selectedItems;
 
-    RecyclerViewSelectedItemHandler() {
-        mSelectedItems = new SparseArray<>();
+    public RecyclerViewSelectedItemHandler(List<IRecyclerItem> items, InsertStrategy insertStrategy, SelectionRules selectionRules) {
+        super(items, insertStrategy);
+
+        this.selectionRules = selectionRules;
+        selectedItems = new ArrayList<>();
     }
 
-    public void toggleSelection(IRecyclerItem item, int itemPosition) {
-        if (isItemSelected(itemPosition)) {
-            removeItem(itemPosition);
-        } else {
-            addItem(item, itemPosition);
+    @Override
+    public void removeItem(IRecyclerItem item) {
+        if (isItemSelected(item)) {
+            selectedItems.remove(item);
         }
 
-        notifyItemChanged(itemPosition);
+        super.removeItem(item);
+    }
+
+    public void selectItem(IRecyclerItem item, int position) {
+        if (!selectionRules.canBeSelected(item, selectedItems)) {
+            return;
+        }
+
+        selectedItems.add(item);
+        notifyItemChanged(position);
+    }
+
+    public void unselectItem(IRecyclerItem item, int position) {
+        if (!selectedItems.contains(item)) {
+            return;
+        }
+
+        selectedItems.remove(item);
+        notifyItemChanged(position);
     }
 
     public void clearSelections() {
-        if (mSelectedItems.size() > 0) {
-            mSelectedItems.clear();
-            notifyDataSetChanged();
+        if (selectedItems.isEmpty()) {
+            return;
         }
+
+        selectedItems.clear();
+        notifyDataSetChanged();
     }
 
     public int getSelectedItemCount() {
-        return mSelectedItems.size();
+        return selectedItems.size();
     }
 
     public int getSelectedItemsCount() {
         int itemCount = 0;
 
-        for (int i = 0; i < mSelectedItems.size(); i++) {
-            SelectedRecyclerItem item = mSelectedItems.get(mSelectedItems.keyAt(i));
-
-            if (!(item.getItem() instanceof ChildItem)) {
+        for (IRecyclerItem item : selectedItems) {
+            if (!(item instanceof ChildExpenseItem)) {
                 itemCount++;
             }
         }
@@ -55,10 +75,8 @@ public abstract class RecyclerViewSelectedItemHandler extends RecyclerView.Adapt
     public int getSelectedChildCount() {
         int childCount = 0;
 
-        for (int i = 0; i < mSelectedItems.size(); i++) {
-            SelectedRecyclerItem item = mSelectedItems.get(mSelectedItems.keyAt(i));
-
-            if (item.getItem() instanceof ChildItem) {
+        for (IRecyclerItem item : selectedItems) {
+            if (item instanceof ChildExpenseItem) {
                 childCount++;
             }
         }
@@ -66,25 +84,11 @@ public abstract class RecyclerViewSelectedItemHandler extends RecyclerView.Adapt
         return childCount;
     }
 
-    public List<SelectedRecyclerItem> getSelectedItems() {
-        List<SelectedRecyclerItem> selectedItems = new ArrayList<>();
-
-        for (int i = 0; i < mSelectedItems.size(); i++) {
-            selectedItems.add(mSelectedItems.get(mSelectedItems.keyAt(i)));
-        }
-
+    public List<IRecyclerItem> getSelectedItems() {
         return selectedItems;
     }
 
-    protected boolean isItemSelected(int position) {
-        return mSelectedItems.get(position) != null;
-    }
-
-    private void removeItem(int position) {
-        mSelectedItems.remove(position);
-    }
-
-    private void addItem(IRecyclerItem item, int position) {
-        mSelectedItems.put(position, new SelectedRecyclerItem(item, position));
+    public boolean isItemSelected(IRecyclerItem item) {
+        return selectedItems.contains(item);
     }
 }

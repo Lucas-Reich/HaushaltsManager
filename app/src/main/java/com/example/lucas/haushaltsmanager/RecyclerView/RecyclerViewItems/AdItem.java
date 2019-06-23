@@ -1,13 +1,11 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 public class AdItem implements IRecyclerItem {
-    private static final String TAG = AdItem.class.getSimpleName();
-
     public static final int VIEW_TYPE = 3;
+    private static final String TAG = AdItem.class.getSimpleName();
 
     @Override
     public int getViewType() {
@@ -39,8 +37,22 @@ public class AdItem implements IRecyclerItem {
         return new ArrayList<>();
     }
 
-    public Calendar getDate() {
-        // TODO: Was soll ich als Datum zurückgeben
+    @Override
+    public IRecyclerItem getParent() {
         return null;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof AdItem)) {
+            return false;
+        }
+
+        return false;
+    }
+
+    @Override
+    public void addChild(IRecyclerItem item) {
+        // Do nothing
     }
 }

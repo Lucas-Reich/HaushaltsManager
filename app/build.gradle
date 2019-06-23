@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 28
     buildToolsVersion '28.0.3'
     defaultConfig {
         applicationId "com.lucas.ausgabenmanager"
@@ -24,6 +24,9 @@ android {
     }
     productFlavors {
     }
+    packagingOptions {
+        exclude 'META-INF/proguard/androidx-annotations.pro'
+    }
 }
 
 repositories {
@@ -32,16 +35,16 @@ repositories {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'com.android.support:cardview-v7:27.1.1'
-    implementation 'com.android.support:design:27.1.1'
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support:cardview-v7:28.0.0'
+    implementation 'com.android.support:design:28.0.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
     // Charting Library
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0-alpha'
     // Ein FAB der sich zu einer Toolbar werden kann
     implementation 'com.github.fafaldo:fab-toolbar:1.2.0'
     // API welche ich benutze um Hintergrundaufgaben laufen zu lassen
-    implementation 'android.arch.work:work-runtime:1.0.0'
+    implementation 'android.arch.work:work-runtime:1.0.1'
     // AlertDialog zum anzeigen der von mir genutzten OpenSource Pakete
     // TODO: Kann irgendwie nicht weiter upgraden
     implementation 'de.psdev.licensesdialog:licensesdialog:1.8.3'
@@ -53,7 +56,7 @@ dependencies {
 
     // Dependencies welche benötigt werden, um die AndroidTests auszuführen
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation "android.arch.work:work-testing:1.0.0"
+    androidTestImplementation "android.arch.work:work-testing:1.0.1"
 
 
     // TODO: Replace ColorPicker with one of https://android-arsenal.com/tag/18?sort=created
