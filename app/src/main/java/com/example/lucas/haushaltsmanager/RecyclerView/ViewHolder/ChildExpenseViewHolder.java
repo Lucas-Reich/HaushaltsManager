@@ -3,28 +3,27 @@ package com.example.lucas.haushaltsmanager.RecyclerView.ViewHolder;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.ColorRes;
+
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.R;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ChildItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ChildExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.IRecyclerItem;
-import com.example.lucas.haushaltsmanager.Utils.ViewUtils;
 import com.example.lucas.haushaltsmanager.Views.MoneyTextView;
 import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
 
-import androidx.annotation.ColorRes;
-
-public class ChildViewHolder extends AbstractViewHolder {
-    private static final String TAG = ChildViewHolder.class.getSimpleName();
+public class ChildExpenseViewHolder extends AbstractViewHolder {
+    private static final String TAG = ChildExpenseViewHolder.class.getSimpleName();
 
     private RoundedTextView roundedTextView;
     private TextView title;
     private MoneyTextView price;
     private TextView person;
 
-    public ChildViewHolder(View itemView) {
+    public ChildExpenseViewHolder(View itemView) {
         super(itemView);
 
         roundedTextView = itemView.findViewById(R.id.recycler_view_expense_rounded_text_view);
@@ -35,8 +34,8 @@ public class ChildViewHolder extends AbstractViewHolder {
 
     @Override
     public void bind(IRecyclerItem item) {
-        if (!(item instanceof ChildItem)) {
-            throw new IllegalArgumentException(String.format("Wrong type given in %s", TAG));
+        if (!(item instanceof ChildExpenseItem)) {
+            throw new IllegalArgumentException(String.format("Could not attach %s to %s", item.getClass().getSimpleName(), TAG));
         }
 
         ExpenseObject expense = (ExpenseObject) item.getContent();
@@ -57,13 +56,8 @@ public class ChildViewHolder extends AbstractViewHolder {
     }
 
     private void setRoundedTextViewText(Category category) {
-        if (ViewUtils.getColorBrightness(category.getColorString()) > 0.5) {
-            roundedTextView.setTextColor(getColor(R.color.primary_text_color_dark));
-        } else {
-            roundedTextView.setTextColor(getColor(R.color.primary_text_color_bright));
-        }
         roundedTextView.setCenterText(category.getTitle().charAt(0) + "");
-        roundedTextView.setCircleColor(category.getColorInt());
+        roundedTextView.setCircleColorConsiderBrightness(category.getColor().getColorInt());
     }
 
     private void setTitle(String title) {

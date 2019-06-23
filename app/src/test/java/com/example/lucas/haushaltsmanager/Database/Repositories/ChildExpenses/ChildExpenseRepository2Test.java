@@ -65,7 +65,7 @@ public class ChildExpenseRepository2Test {
             mChildRepo.create(getSimpleExpense(), any(ExpenseObject.class));
 
             // IMPROVEMENT: Sollte ich überprüfen ob der Kontostand richtig geupdatet wurde?
-            // TODO: Der Rückgabewert von mChildRepo.create() sollte mit dem child übereinstimmen
+            // TODO: Der Rückgabewert von mChildRepo.createExpenseItems() sollte mit dem child übereinstimmen
         } catch (ExpenseNotFoundException e) {
 
             Assert.fail(e.getMessage());

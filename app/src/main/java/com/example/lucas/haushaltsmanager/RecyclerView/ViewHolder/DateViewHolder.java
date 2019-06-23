@@ -24,7 +24,7 @@ public class DateViewHolder extends AbstractViewHolder {
     @Override
     public void bind(IRecyclerItem item) {
         if (!(item instanceof DateItem)) {
-            throw new IllegalArgumentException(String.format("Wrong type given in %s", TAG));
+            throw new IllegalArgumentException(String.format("Could not attach %s to %s", item.getClass().getSimpleName(), TAG));
         }
 
         setDateText(((DateItem) item).getContent());

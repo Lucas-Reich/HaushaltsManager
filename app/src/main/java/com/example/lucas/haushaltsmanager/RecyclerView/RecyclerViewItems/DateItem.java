@@ -33,7 +33,7 @@ public class DateItem implements IRecyclerItem {
 
     @Override
     public boolean isExpanded() {
-        return false;
+        return true;
     }
 
     @Override
@@ -47,13 +47,8 @@ public class DateItem implements IRecyclerItem {
     }
 
     @Override
-    public Calendar getDate() {
-        return mDate;
-    }
-
-    @Override
     public String toString() {
-        return CalendarUtils.formatHumanReadable(getDate());
+        return CalendarUtils.formatHumanReadable(getContent());
     }
 
     @Override
@@ -64,7 +59,17 @@ public class DateItem implements IRecyclerItem {
 
         DateItem other = (DateItem) obj;
 
-        return other.getDate() == getDate();
+        return other.getContent() == getContent();
 
+    }
+
+    @Override
+    public void addChild(IRecyclerItem item) {
+        // Do nothing
+    }
+
+    @Override
+    public IRecyclerItem getParent() {
+        return null;
     }
 }

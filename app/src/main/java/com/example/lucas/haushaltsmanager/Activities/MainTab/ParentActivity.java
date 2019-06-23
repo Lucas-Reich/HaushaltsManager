@@ -20,7 +20,7 @@ import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Activities.AboutUsActivity;
 import com.example.lucas.haushaltsmanager.Activities.BackupActivity;
-import com.example.lucas.haushaltsmanager.Activities.CategoryList.CategoryList;
+import com.example.lucas.haushaltsmanager.Activities.CategoryList;
 import com.example.lucas.haushaltsmanager.Activities.ImportExportActivity;
 import com.example.lucas.haushaltsmanager.Activities.RecurringBookingList;
 import com.example.lucas.haushaltsmanager.Activities.Settings;

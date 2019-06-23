@@ -77,7 +77,7 @@ public class TimeFrameCardPopulator {
     }
 
     private void setCategory(Category category) {
-        mViewHolder.mCategoryColor.setCircleColor(category.getColorString());
+        mViewHolder.mCategoryColor.setCircleColor(category.getColor().getColorString());
         mViewHolder.mCategoryTitle.setText(category.getTitle());
     }
 

@@ -29,7 +29,7 @@ public class ExpenseGrouper {
         HashMap<Integer, List<ExpenseObject>> groupedExpenses = new HashMap<>();
 
         for (ExpenseObject expense : expenses) {
-            int expenseYear = expense.getDateTime().get(Calendar.YEAR);
+            int expenseYear = expense.getDate().get(Calendar.YEAR);
 
             if (!groupedExpenses.containsKey(expenseYear))
                 groupedExpenses.put(expenseYear, new ArrayList<ExpenseObject>());
@@ -86,14 +86,14 @@ public class ExpenseGrouper {
     }
 
     private int extractMonth(ExpenseObject expense) {
-        return expense.getDateTime().get(Calendar.MONTH);
+        return expense.getDate().get(Calendar.MONTH);
     }
 
     private boolean isInMonth(ExpenseObject expense, int month) {
-        return expense.getDateTime().get(Calendar.MONTH) == month;
+        return expense.getDate().get(Calendar.MONTH) == month;
     }
 
     private boolean isInYear(ExpenseObject expense, int year) {
-        return expense.getDateTime().get(Calendar.YEAR) == year;
+        return expense.getDate().get(Calendar.YEAR) == year;
     }
 }

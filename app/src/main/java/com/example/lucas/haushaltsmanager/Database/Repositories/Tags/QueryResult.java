@@ -9,11 +9,11 @@ import com.example.lucas.haushaltsmanager.Entities.Tag;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Result implements QueryResultInterface<Tag> {
+public class QueryResult implements QueryResultInterface<Tag> {
     private Cursor mCursor;
     private TransformerInterface<Tag> mTransformer;
 
-    public Result(Cursor c, TransformerInterface<Tag> transformer) {
+    public QueryResult(Cursor c, TransformerInterface<Tag> transformer) {
         mCursor = c;
         mTransformer = transformer;
     }

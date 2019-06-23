@@ -50,7 +50,7 @@ public class TemplateMenuItem implements IMenuItem {
     }
 
     private ExpenseObject extractExpenseFromPayload(ActionPayload actionPayload) {
-        return (ExpenseObject) actionPayload.getItem().getItem().getContent();
+        return (ExpenseObject) actionPayload.getFirstItem().getContent();
     }
 
     private void saveAsTemplate(ExpenseObject templateExpense, Context context) {

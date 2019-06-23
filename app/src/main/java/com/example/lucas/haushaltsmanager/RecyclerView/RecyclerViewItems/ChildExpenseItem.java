@@ -3,19 +3,18 @@ package com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
-public class ChildItem implements IRecyclerItem {
-    private static final String TAG = ChildItem.class.getSimpleName();
-
+public class ChildExpenseItem implements IRecyclerItem {
     public static final int VIEW_TYPE = 4;
-    private ExpenseObject mExpense;
-    private long mParentId;
+    private static final String TAG = ChildExpenseItem.class.getSimpleName();
 
-    public ChildItem(ExpenseObject expense, long parentId) {
+    private ExpenseObject mExpense;
+    private IRecyclerItem mParent;
+
+    public ChildExpenseItem(ExpenseObject expense, IRecyclerItem parent) {
         mExpense = expense;
-        mParentId = parentId;
+        mParent = parent;
     }
 
     @Override
@@ -49,24 +48,23 @@ public class ChildItem implements IRecyclerItem {
     }
 
     @Override
-    public Calendar getDate() {
-        return mExpense.getDateTime();
-    }
-
-    @Deprecated
-    // Kann ich die Methode Deprecaten? Sie wird nur für die RevertExpenseDeletionSnackbar benötigt
-    public long getParentId() {
-        return mParentId;
-    }
-
-    @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof ChildItem)) {
+        if (!(obj instanceof ChildExpenseItem)) {
             return false;
         }
 
-        ChildItem other = (ChildItem) obj;
+        ChildExpenseItem other = (ChildExpenseItem) obj;
 
         return other.getContent().equals(getContent());
+    }
+
+    @Override
+    public void addChild(IRecyclerItem item) {
+        // Do nothing
+    }
+
+    @Override
+    public IRecyclerItem getParent() {
+        return mParent;
     }
 }

@@ -4,7 +4,6 @@ import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ParentExpenseObject;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 public class ParentExpenseItem implements IRecyclerItem {
@@ -13,10 +12,13 @@ public class ParentExpenseItem implements IRecyclerItem {
     private ParentExpenseObject mParentExpense;
     private boolean mIsExpanded = false;
     private List<IRecyclerItem> mChildItems;
+    private DateItem mParent;
 
-    public ParentExpenseItem(ParentExpenseObject parentExpense) {
+    public ParentExpenseItem(ParentExpenseObject parentExpense, DateItem parent) {
         mParentExpense = parentExpense;
         mChildItems = createChildItems(parentExpense.getChildren());
+
+        mParent = parent;
     }
 
     @Override
@@ -39,20 +41,9 @@ public class ParentExpenseItem implements IRecyclerItem {
         return mChildItems;
     }
 
-    public boolean isExpanded() {
-        return mIsExpanded;
-    }
-
-    public void setExpanded(boolean isExpanded) {
-        mIsExpanded = isExpanded;
-    }
-
-    public Calendar getDate() {
-        return mParentExpense.getDate();
-    }
-
-    public boolean hasChild(ExpenseObject expense) {
-        return mParentExpense.getChildren().contains(expense);
+    @Override
+    public DateItem getParent() {
+        return mParent;
     }
 
     @Override
@@ -67,11 +58,39 @@ public class ParentExpenseItem implements IRecyclerItem {
                 && other.getChildren().equals(getChildren());
     }
 
+    @Override
+    public boolean isExpanded() {
+        return mIsExpanded;
+    }
+
+    @Override
+    public void setExpanded(boolean isExpanded) {
+        mIsExpanded = isExpanded;
+    }
+
+    @Override
+    public void addChild(IRecyclerItem child) {
+        if (mChildItems.contains(child)) {
+            return;
+        }
+
+        mChildItems.add(child);
+    }
+
+    public void removeChild(IRecyclerItem child) {
+        if (!mChildItems.contains(child)) {
+            return;
+        }
+
+        mChildItems.remove(child);
+        mParentExpense.getChildren().remove(child.getContent());
+    }
+
     private List<IRecyclerItem> createChildItems(List<ExpenseObject> children) {
         List<IRecyclerItem> childItems = new ArrayList<>();
 
         for (ExpenseObject child : children) {
-            childItems.add(new ChildItem(child, mParentExpense.getParent().getIndex()));
+            childItems.add(new ChildExpenseItem(child, this));
         }
 
         return childItems;

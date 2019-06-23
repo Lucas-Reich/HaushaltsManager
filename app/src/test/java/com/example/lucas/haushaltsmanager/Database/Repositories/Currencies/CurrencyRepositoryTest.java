@@ -237,7 +237,7 @@ public class CurrencyRepositoryTest {
 
         try {
             CurrencyRepository.fromCursor(cursor);
-            Assert.fail("Could create Currency from incomplete Cursor");
+            Assert.fail("Could createExpenseItems Currency from incomplete Cursor");
 
         } catch (CursorIndexOutOfBoundsException e) {
 

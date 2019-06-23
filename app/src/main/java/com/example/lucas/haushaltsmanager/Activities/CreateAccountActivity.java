@@ -27,7 +27,7 @@ import java.util.Locale;
 public class CreateAccountActivity extends AbstractAppCompatActivity {
     public static final String INTENT_MODE = "mode";
     public static final String INTENT_MODE_UPDATE = "update";
-    public static final String INTENT_MODE_CREATE = "create";
+    public static final String INTENT_MODE_CREATE = "createExpenseItems";
     public static final String INTENT_ACCOUNT = "accountId";
 
     private Button mAccountNameBtn, mAccountBalanceBtn, mAccountCurrencyBtn;

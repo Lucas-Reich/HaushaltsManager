@@ -5,10 +5,11 @@ import android.support.annotation.StringRes;
 
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Entities.Category;
+import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
-import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSum;
 import com.example.lucas.haushaltsmanager.R;
+import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSum;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -76,13 +77,13 @@ public class Report implements ReportInterface {
     }
 
     @Override
-    public Currency getCurrency() {
-        return mCurrency;
+    public void setCardTitle(String title) {
+        mCardTitle = title;
     }
 
     @Override
-    public void setCardTitle(String title) {
-        mCardTitle = title;
+    public Currency getCurrency() {
+        return mCurrency;
     }
 
     private String getResourceString(@StringRes int stringRes) {
@@ -92,7 +93,7 @@ public class Report implements ReportInterface {
     private Category getPlaceholderCategory(@StringRes int titleRes) {
         return new Category(
                 getResourceString(titleRes),
-                "#FFFFFF",
+                new Color(Color.WHITE),
                 false,
                 new ArrayList<Category>()
         );

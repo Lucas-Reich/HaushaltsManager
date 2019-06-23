@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
+import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
@@ -28,32 +29,6 @@ public abstract class ViewUtils extends View {
     public ViewUtils(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context, attrs, defStyleAttr);
-    }
-
-    protected abstract void init(Context context, AttributeSet attrs, int defStyleAttr);
-
-    /**
-     * Methode um herauszufinden wie viel Platz maximal zur verfügung steht
-     *
-     * @param desiredSize Optimale Größe
-     * @param measureSpec Kombinierter Wert aus Platz und Layout verhalten
-     * @return Int
-     */
-    protected int reconcileSize(int desiredSize, int measureSpec) {
-
-        int mode = MeasureSpec.getMode(measureSpec);
-        int sizeInPx = MeasureSpec.getSize(measureSpec);
-
-        switch (mode) {
-            case MeasureSpec.EXACTLY:
-                return sizeInPx;
-            case MeasureSpec.AT_MOST:
-                return Math.min(sizeInPx, desiredSize);
-            case MeasureSpec.UNSPECIFIED:
-                return desiredSize;
-            default:
-                return -1;
-        }
     }
 
     /**
@@ -92,6 +67,41 @@ public abstract class ViewUtils extends View {
         int blue = Color.blue(Color.parseColor(color));
 
         return (0.2126 * Math.pow((red / 255), 2.2)) + (0.7152 * Math.pow((green / 255), 2.2)) + (0.0722 * Math.pow((blue / 255), 2.2));
+    }
+
+    /**
+     * Methode um ein ColorInt in einen String zu wandeln, um dann die Helligkeit zu ermitteln.
+     */
+    public static double getColorBrightness(@ColorInt int color) {
+        return getColorBrightness(
+                String.format("#%06X", (0xFFFFFF & color))
+        );
+    }
+
+    protected abstract void init(Context context, AttributeSet attrs, int defStyleAttr);
+
+    /**
+     * Methode um herauszufinden wie viel Platz maximal zur verfügung steht
+     *
+     * @param desiredSize Optimale Größe
+     * @param measureSpec Kombinierter Wert aus Platz und Layout verhalten
+     * @return Int
+     */
+    protected int reconcileSize(int desiredSize, int measureSpec) {
+
+        int mode = MeasureSpec.getMode(measureSpec);
+        int sizeInPx = MeasureSpec.getSize(measureSpec);
+
+        switch (mode) {
+            case MeasureSpec.EXACTLY:
+                return sizeInPx;
+            case MeasureSpec.AT_MOST:
+                return Math.min(sizeInPx, desiredSize);
+            case MeasureSpec.UNSPECIFIED:
+                return desiredSize;
+            default:
+                return -1;
+        }
     }
 
     /**

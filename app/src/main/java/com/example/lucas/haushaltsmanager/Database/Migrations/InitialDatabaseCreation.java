@@ -234,7 +234,7 @@ final class InitialDatabaseCreation implements IMigration {
 
             ContentValues values = new ContentValues();
             values.put(CHILD_CATEGORIES_COL_NAME, category.getTitle());
-            values.put(CHILD_CATEGORIES_COL_COLOR, category.getColorString());
+            values.put(CHILD_CATEGORIES_COL_COLOR, category.getColor().getColorString());
             values.put(CHILD_CATEGORIES_COL_HIDDEN, 1);
             values.put(CHILD_CATEGORIES_COL_PARENT_ID, -1);
             values.put(CHILD_CATEGORIES_COL_DEFAULT_EXPENSE_TYPE, category.getDefaultExpenseType());

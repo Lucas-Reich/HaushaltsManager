@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager.RecyclerView;
+package com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality;
 
 import android.support.v7.widget.RecyclerView;
 
@@ -8,7 +8,9 @@ import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ParentExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.Entities.Tag;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ChildItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.ExpenseListRecyclerViewAdapter;
+import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ChildExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.DateItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ParentExpenseItem;
@@ -49,8 +51,10 @@ public class RecyclerViewExpandableItemHandlerTest {
 
     @Test
     public void testInsertChildToExistingAndCollapsedParent() {
-        ParentExpenseItem parentExpenseItem = new ParentExpenseItem(getParentExpenseObject(2));
-        ChildItem expectedChildItem = new ChildItem(parentExpenseItem.getContent().getChildren().get(1), parentExpenseItem.getContent().getParent().getIndex());
+        DateItem parent = new DateItem(createSimpleDate(10, Calendar.JUNE, 2019));
+
+        ParentExpenseItem parentExpenseItem = new ParentExpenseItem(getParentExpenseObject(2), parent);
+        ChildExpenseItem expectedChildItem = new ChildExpenseItem(parentExpenseItem.getContent().getChildren().get(1), parentExpenseItem);
         parentExpenseItem.getChildren().remove(1);
 
         mItemHandler.insertItem(parentExpenseItem);
@@ -64,8 +68,10 @@ public class RecyclerViewExpandableItemHandlerTest {
 
     @Test
     public void testInsertChildToExistingAndExpandedParent() {
-        ParentExpenseItem parentExpenseItem = new ParentExpenseItem(getParentExpenseObject(2));
-        ChildItem expectedChildItem = new ChildItem(parentExpenseItem.getContent().getChildren().get(1), parentExpenseItem.getContent().getParent().getIndex());
+        DateItem parent = new DateItem(createSimpleDate(10, Calendar.JUNE, 2019));
+
+        ParentExpenseItem parentExpenseItem = new ParentExpenseItem(getParentExpenseObject(2), parent);
+        ChildExpenseItem expectedChildItem = new ChildExpenseItem(parentExpenseItem.getContent().getChildren().get(1), parentExpenseItem);
         parentExpenseItem.getChildren().remove(1);
 
         mItemHandler.insertItem(parentExpenseItem);
@@ -80,24 +86,27 @@ public class RecyclerViewExpandableItemHandlerTest {
 
     @Test
     public void testInsertChildToNotExistingParentShouldInsertChildAsExpenseItem() {
+        DateItem date = new DateItem(createSimpleDate(10, Calendar.JUNE, 2019));
         ParentExpenseObject parentExpense = getParentExpenseObject(1);
-        ChildItem childItem = new ChildItem(parentExpense.getChildren().get(0), parentExpense.getParent().getIndex());
+        ChildExpenseItem childItem = new ChildExpenseItem(parentExpense.getChildren().get(0), new ParentExpenseItem(parentExpense, date));
 
         mItemHandler.insertItem(childItem);
 
         assertEquals(2, mItemHandler.getItemCount());
-        assertTrue(mItemHandler.getItem(1) instanceof ExpenseItem);
+        assertTrue(mItemHandler.getItem(1) instanceof ParentExpenseItem);
     }
 
     @Test
     public void testRemoveChildItemShouldSucceed() {
-        ParentExpenseItem expectedParentExpenseItem = new ParentExpenseItem(getParentExpenseObject(3));
+        DateItem parent = new DateItem(createSimpleDate(10, Calendar.JUNE, 2019));
+
+        ParentExpenseItem expectedParentExpenseItem = new ParentExpenseItem(getParentExpenseObject(3), parent);
 
         mItemHandler.insertItem(expectedParentExpenseItem);
         mItemHandler.toggleExpansion(1);
         assertSame(5, mItemHandler.getItemCount());
 
-        mItemHandler.removeItem(2);
+        mItemHandler.removeItem(mItemHandler.getItem(2));
 
         assertSame(4, mItemHandler.getItemCount());
         assertSame(2, mItemHandler.getItem(1).getChildren().size());
@@ -109,30 +118,38 @@ public class RecyclerViewExpandableItemHandlerTest {
 
     @Test
     public void testRemoveLastChildOfParentShouldRemoveParent() {
-        mItemHandler.insertItem(new ExpenseItem(createSimpleExpense()));
-        mItemHandler.insertItem(new ParentExpenseItem(getParentExpenseObject(1)));
+        DateItem date = new DateItem(createSimpleDate(10, Calendar.MAY, 2019));
+
+        mItemHandler.insertItem(new ParentExpenseItem(getParentExpenseObject(1), date));
+        mItemHandler.insertItem(new ExpenseItem(createSimpleExpense(date.getContent()), date));
         mItemHandler.toggleExpansion(2);
         assertSame(4, mItemHandler.getItemCount());
 
-        mItemHandler.removeItem(3);
+        mItemHandler.removeItem(mItemHandler.getItem(3));
 
         assertSame(2, mItemHandler.getItemCount());
     }
 
     @Test
     public void testRemoveLastChildOfParentAsLastItemOfDateShouldRemoveAll() {
-        mItemHandler.insertItem(new ParentExpenseItem(getParentExpenseObject(1)));
+        ParentExpenseObject parentExpenseObject = getParentExpenseObject(1);
+
+        DateItem parent = new DateItem(createSimpleDate(10, Calendar.JUNE, 2019));
+
+        mItemHandler.insertItem(new ParentExpenseItem(parentExpenseObject, parent));
         mItemHandler.toggleExpansion(1);
         assertSame(3, mItemHandler.getItemCount());
 
-        mItemHandler.removeItem(2);
+        mItemHandler.removeItem(mItemHandler.getItem(2));
 
         assertSame(0, mItemHandler.getItemCount());
     }
 
     @Test
     public void testToggleExpansionShouldOpenParentAndAddChildren() {
-        ParentExpenseItem expectedParentExpenseItem = new ParentExpenseItem(getParentExpenseObject(2));
+        DateItem parent = new DateItem(createSimpleDate(10, Calendar.JUNE, 2019));
+
+        ParentExpenseItem expectedParentExpenseItem = new ParentExpenseItem(getParentExpenseObject(2), parent);
 
         mItemHandler.insertItem(expectedParentExpenseItem);
         assertSame(2, mItemHandler.getItemCount());
@@ -148,7 +165,9 @@ public class RecyclerViewExpandableItemHandlerTest {
 
     @Test
     public void testToggleExpansionShouldCloseParentAndRemoveChildren() {
-        ParentExpenseItem expectedParentExpenseItem = new ParentExpenseItem(getParentExpenseObject(2));
+        DateItem parent = new DateItem(createSimpleDate(10, Calendar.JUNE, 2019));
+
+        ParentExpenseItem expectedParentExpenseItem = new ParentExpenseItem(getParentExpenseObject(2), parent);
 
         mItemHandler.insertItem(expectedParentExpenseItem);
         mItemHandler.toggleExpansion(1);
@@ -170,13 +189,14 @@ public class RecyclerViewExpandableItemHandlerTest {
             fail("Could toggle expansion of not existing Item");
         } catch (IndexOutOfBoundsException e) {
 
-            assertEquals("Could not find Item at position 1337", e.getMessage());
+            assertEquals("Index: 1337, Size: 0", e.getMessage());
         }
     }
 
     @Test
     public void testToggleExpansionOfItemWhichIsNotParentShouldBeIgnored() {
-        ExpenseItem expenseItem = new ExpenseItem(createSimpleExpense());
+        DateItem date = new DateItem(createSimpleDate(10, Calendar.JUNE, 2019));
+        ExpenseItem expenseItem = new ExpenseItem(createSimpleExpense(date.getContent()), date);
 
         mItemHandler.insertItem(expenseItem);
         assertSame(2, mItemHandler.getItemCount());
@@ -188,27 +208,36 @@ public class RecyclerViewExpandableItemHandlerTest {
     private ParentExpenseObject getParentExpenseObject(int childCount) {
         ExpenseObject parentExpense = getParentExpenseWithChildren(childCount);
 
-        return new ParentExpenseObject(parentExpense, parentExpense.getChildren());
+        return ParentExpenseObject.fromParentExpense(parentExpense);
     }
 
     private ExpenseObject getParentExpenseWithChildren(int childrenCount) {
-        ExpenseObject parent = createSimpleExpense();
+        Calendar date = createSimpleDate(11, Calendar.JUNE, 2019);
+
+        ExpenseObject parent = createSimpleExpense(date);
 
         for (int i = 0; i < childrenCount; i++) {
-            parent.addChild(createSimpleExpense());
+            parent.addChild(createSimpleExpense(date));
         }
 
         return parent;
     }
 
-    private ExpenseObject createSimpleExpense() {
+    private Calendar createSimpleDate(int day, int month, int year) {
+        Calendar date = Calendar.getInstance();
+        date.set(year, month, day);
+
+        return date;
+    }
+
+    private ExpenseObject createSimpleExpense(Calendar date) {
         Currency currency = new Currency("Euro", "EUR", "€");
 
         return new ExpenseObject(
                 -1,
                 "Ich bin eine Ausgabe",
                 new Price(new Random().nextInt(), true, currency),
-                Calendar.getInstance(),
+                date,
                 new Category("Kategorie", "#000000", true, new ArrayList<Category>()),
                 "",
                 -1,

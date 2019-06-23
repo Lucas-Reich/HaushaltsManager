@@ -3,14 +3,28 @@ package com.example.lucas.haushaltsmanager.Entities;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.R;
 
 public class Account implements Parcelable {
-    private static final String TAG = Account.class.getSimpleName();
+    /**
+     * regenerating the parcelable object back into our Category object
+     */
+    public static final Parcelable.Creator<Account> CREATOR = new Parcelable.Creator<Account>() {
 
+        @Override
+        public Account createFromParcel(Parcel in) {
+
+            return new Account(in);
+        }
+
+        @Override
+        public Account[] newArray(int size) {
+
+            return new Account[size];
+        }
+    };
     private long index;
     private String name;
     private Price balance;
@@ -36,8 +50,6 @@ public class Account implements Parcelable {
      * @param source .
      */
     public Account(Parcel source) {
-
-        Log.v(TAG, "Recreating Account from parcel data");
         setIndex(source.readLong());
         setName(source.readString());
         setBalance((Price) source.readParcelable(Price.class.getClassLoader()));
@@ -51,6 +63,43 @@ public class Account implements Parcelable {
     public static Account createDummyAccount() {
 
         return new Account(-1, app.getContext().getString(R.string.no_name), 0, Currency.createDummyCurrency());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Account)) {
+            return false;
+        }
+
+        Account otherAccount = (Account) obj;
+        return name.equals(otherAccount.getTitle())
+                && index == otherAccount.getIndex();
+    }
+
+    @Override
+    public String toString() {
+
+        return getTitle();
+    }
+
+    @Override
+    public int describeContents() {
+
+        return 0;
+    }
+
+    /**
+     * converting the custom object into an parcelable object
+     *
+     * @param dest  destination Parcel
+     * @param flags flags
+     */
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+
+        dest.writeLong(index);
+        dest.writeString(name);
+        dest.writeParcelable(balance, flags);
     }
 
     public long getIndex() {
@@ -94,60 +143,4 @@ public class Account implements Parcelable {
                 && !getTitle().equals("")
                 && balance.getCurrency().isSet();
     }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof Account)) {
-            return false;
-        }
-
-        Account otherAccount = (Account) obj;
-        return name.equals(otherAccount.getTitle())
-                && index == otherAccount.getIndex();
-    }
-
-    @Override
-    public String toString() {
-
-        return getTitle();
-    }
-
-    @Override
-    public int describeContents() {
-
-        return 0;
-    }
-
-    /**
-     * converting the custom object into an parcelable object
-     *
-     * @param dest  destination Parcel
-     * @param flags flags
-     */
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-
-        Log.v(TAG, "write to parcel..." + flags);
-        dest.writeLong(index);
-        dest.writeString(name);
-        dest.writeParcelable(balance, flags);
-    }
-
-    /**
-     * regenerating the parcelable object back into our Category object
-     */
-    public static final Parcelable.Creator<Account> CREATOR = new Parcelable.Creator<Account>() {
-
-        @Override
-        public Account createFromParcel(Parcel in) {
-
-            return new Account(in);
-        }
-
-        @Override
-        public Account[] newArray(int size) {
-
-            return new Account[size];
-        }
-    };
 }

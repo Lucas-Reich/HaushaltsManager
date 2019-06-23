@@ -15,7 +15,7 @@ public class AdViewHolder extends AbstractViewHolder {
     @Override
     public void bind(IRecyclerItem item) {
         if (!(item instanceof AdItem)) {
-            throw new IllegalArgumentException(String.format("Wrong type given in %s", TAG));
+            throw new IllegalArgumentException(String.format("Could not attach %s to %s", item.getClass().getSimpleName(), TAG));
         }
     }
 }

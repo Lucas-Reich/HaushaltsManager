@@ -3,14 +3,15 @@ package com.example.lucas.haushaltsmanager.Entities.Expense;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.example.lucas.haushaltsmanager.App.app;
+import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.Entities.Tag;
+import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.text.DateFormat;
@@ -39,7 +40,7 @@ public class ExpenseObject implements Parcelable, Booking {
             return new ExpenseObject[size];
         }
     };
-    private static final String TAG = ExpenseObject.class.getSimpleName();
+
     private EXPENSE_TYPES expenseType;
 
     /**
@@ -130,11 +131,9 @@ public class ExpenseObject implements Parcelable, Booking {
      *
      * @param source .
      */
-    public ExpenseObject(Parcel source) {
+    private ExpenseObject(Parcel source) {
 
         Calendar cal = Calendar.getInstance();
-
-        Log.v(TAG, "Recreating ExpenseObject from parcel data");
         cal.setTimeInMillis(source.readLong());
         setDateTime(cal);
         setTitle(source.readString());
@@ -155,18 +154,20 @@ public class ExpenseObject implements Parcelable, Booking {
      * @return dummy Booking
      */
     public static ExpenseObject createDummyExpense() {
+        Currency mainCurrency = new UserSettingsPreferences(app.getContext()).getMainCurrency();
+
         return new ExpenseObject(
-                -1,
+                ExpensesDbHelper.INVALID_INDEX,
                 app.getContext().getString(R.string.no_name),
-                new Price(0, false, Currency.createDummyCurrency()),
+                new Price(0, false, mainCurrency),
                 Calendar.getInstance(),
                 Category.createDummyCategory(),
                 null,
-                -1,
+                ExpensesDbHelper.INVALID_INDEX,
                 EXPENSE_TYPES.DUMMY_EXPENSE,
                 new ArrayList<Tag>(),
                 new ArrayList<ExpenseObject>(),
-                Currency.createDummyCurrency()
+                mainCurrency
         );
     }
 
@@ -175,7 +176,7 @@ public class ExpenseObject implements Parcelable, Booking {
                 other.getIndex(),
                 other.getTitle(),
                 other.getPrice(),
-                other.getDateTime(),
+                other.getDate(),
                 other.getCategory(),
                 other.getNotice(),
                 other.getAccountId(),
@@ -187,26 +188,9 @@ public class ExpenseObject implements Parcelable, Booking {
     }
 
     @NonNull
-    public Calendar getDateTime() {
+    public Calendar getDate() {
 
         return this.date;
-    }
-
-    public void setDateTime(@NonNull Calendar date) {
-
-        this.date = date;
-    }
-
-    @NonNull
-    public String getDate() {
-
-        return new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(getDateTime().getTime());
-    }
-
-    @NonNull
-    public String getDisplayableDateTime() {
-
-        return DateFormat.getDateInstance(DateFormat.SHORT).format(new Date(getDateTime().getTimeInMillis()));
     }
 
     @NonNull
@@ -218,6 +202,90 @@ public class ExpenseObject implements Parcelable, Booking {
     public void setTitle(@NonNull String title) {
 
         this.title = title;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof ExpenseObject))
+            return false;
+
+        ExpenseObject otherExpense = (ExpenseObject) obj;
+
+        boolean result = getTitle().equals(otherExpense.getTitle());
+        result = result && (getUnsignedPrice() == otherExpense.getUnsignedPrice());
+        result = result && getAccountId() == otherExpense.getAccountId();
+        result = result && getExpenseType().equals(otherExpense.getExpenseType());
+        result = result && getDate().getTimeInMillis() == otherExpense.getDate().getTimeInMillis();
+        result = result && getNotice().equals(otherExpense.getNotice());
+        result = result && getCategory().getIndex() == otherExpense.getCategory().getIndex();//ich kann die objekte nicht vergleichen da parent buchungen nur dummies bekommen
+        result = result && getCurrency().getIndex() == otherExpense.getCurrency().getIndex();//ich kann die objekte nicht vergleichen da parent buchungen nur dummies bekommen
+
+        for (Tag tag : getTags()) {
+            for (Tag otherTag : otherExpense.getTags()) {
+                result = result && tag.equals(otherTag);
+            }
+        }
+
+        for (ExpenseObject child : getChildren()) {
+            result = result && otherExpense.getChildren().contains(child);
+        }
+
+        return result;
+    }
+
+    @Override
+    public String toString() {
+
+        return getIndex() + " " + getTitle() + " " + getUnsignedPrice();
+    }
+
+    /**
+     * can be ignored mostly
+     *
+     * @return int
+     */
+    @Override
+    public int describeContents() {
+
+        return 0;
+    }
+
+    /**
+     * converting the custom object into an parcelable object
+     *
+     * @param dest  destination Parcel
+     * @param flags flags
+     */
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(date.getTimeInMillis());
+        dest.writeString(title);
+        dest.writeLong(index);
+        dest.writeParcelable(price, flags);
+        dest.writeParcelable(category, flags);
+        dest.writeList(tags);
+        dest.writeString(notice);
+        dest.writeLong(mAccountId);
+        dest.writeList(children);
+        dest.writeString(expenseType.name());
+        dest.writeParcelable(mCurrency, flags);
+    }
+
+    public void setDateTime(@NonNull Calendar date) {
+
+        this.date = date;
+    }
+
+    @NonNull
+    public String getDateString() {
+
+        return new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(getDate().getTime());
+    }
+
+    @NonNull
+    public String getDisplayableDateTime() {
+
+        return DateFormat.getDateInstance(DateFormat.SHORT).format(new Date(getDate().getTimeInMillis()));
     }
 
     public double getUnsignedPrice() {
@@ -245,10 +313,6 @@ public class ExpenseObject implements Parcelable, Booking {
         return calcPrice;
     }
 
-    public void setPrice(Price price) {
-        this.price = price;
-    }
-
     public long getIndex() {
 
         return index;
@@ -266,6 +330,10 @@ public class ExpenseObject implements Parcelable, Booking {
 
     public Price getPrice() {
         return price;
+    }
+
+    public void setPrice(Price price) {
+        this.price = price;
     }
 
     @NonNull
@@ -387,41 +455,6 @@ public class ExpenseObject implements Parcelable, Booking {
                 && this.mAccountId != -1;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof ExpenseObject))
-            return false;
-
-        ExpenseObject otherExpense = (ExpenseObject) obj;
-
-        boolean result = getTitle().equals(otherExpense.getTitle());
-        result = result && (getUnsignedPrice() == otherExpense.getUnsignedPrice());
-        result = result && getAccountId() == otherExpense.getAccountId();
-        result = result && getExpenseType().equals(otherExpense.getExpenseType());
-        result = result && getDateTime().getTimeInMillis() == otherExpense.getDateTime().getTimeInMillis();
-        result = result && getNotice().equals(otherExpense.getNotice());
-        result = result && getCategory().getIndex() == otherExpense.getCategory().getIndex();//ich kann die objekte nicht vergleichen da parent buchungen nur dummies bekommen
-        result = result && getCurrency().getIndex() == otherExpense.getCurrency().getIndex();//ich kann die objekte nicht vergleichen da parent buchungen nur dummies bekommen
-
-        for (Tag tag : getTags()) {
-            for (Tag otherTag : otherExpense.getTags()) {
-                result = result && tag.equals(otherTag);
-            }
-        }
-
-        for (ExpenseObject child : getChildren()) {
-            result = result && otherExpense.getChildren().contains(child);
-        }
-
-        return result;
-    }
-
-    @Override
-    public String toString() {
-
-        return getIndex() + " " + getTitle() + " " + getUnsignedPrice();
-    }
-
     @NonNull
     public EXPENSE_TYPES getExpenseType() {
 
@@ -431,40 +464,6 @@ public class ExpenseObject implements Parcelable, Booking {
     public void setExpenseType(@NonNull EXPENSE_TYPES expenseType) {
 
         this.expenseType = expenseType;
-    }
-
-    /**
-     * can be ignored mostly
-     *
-     * @return int
-     */
-    @Override
-    public int describeContents() {
-
-        return 0;
-    }
-
-    /**
-     * converting the custom object into an parcelable object
-     *
-     * @param dest  destination Parcel
-     * @param flags flags
-     */
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        Log.v(TAG, "Writing ExpenseObject to parcel" + flags);
-
-        dest.writeLong(date.getTimeInMillis());
-        dest.writeString(title);
-        dest.writeLong(index);
-        dest.writeParcelable(price, flags);
-        dest.writeParcelable(category, flags);
-        dest.writeList(tags);
-        dest.writeString(notice);
-        dest.writeLong(mAccountId);
-        dest.writeList(children);
-        dest.writeString(expenseType.name());
-        dest.writeParcelable(mCurrency, flags);
     }
 
     public enum EXPENSE_TYPES {

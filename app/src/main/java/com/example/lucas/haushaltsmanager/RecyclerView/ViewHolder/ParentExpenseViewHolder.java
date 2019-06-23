@@ -40,7 +40,7 @@ public class ParentExpenseViewHolder extends AbstractViewHolder {
     @Override
     public void bind(IRecyclerItem item) {
         if (!(item instanceof ParentExpenseItem)) {
-            throw new IllegalArgumentException(String.format("Wrong type given in %s", TAG));
+            throw new IllegalArgumentException(String.format("Could not attach %s to %s", item.getClass().getSimpleName(), TAG));
         }
 
         ParentExpenseObject parent = (ParentExpenseObject) item.getContent();
@@ -67,7 +67,7 @@ public class ParentExpenseViewHolder extends AbstractViewHolder {
         }
 
         for (Map.Entry<Category, Integer> category : summedCategories.entrySet()) {
-            dataSets.add(new DataSet(category.getValue(), category.getKey().getColorInt(), category.getKey().getTitle()));
+            dataSets.add(new DataSet(category.getValue(), category.getKey().getColor().getColorInt(), category.getKey().getTitle()));
         }
 
         return dataSets;

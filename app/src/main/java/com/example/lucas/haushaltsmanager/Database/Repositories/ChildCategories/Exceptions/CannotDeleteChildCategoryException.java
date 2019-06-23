@@ -17,10 +17,6 @@ public class CannotDeleteChildCategoryException extends CouldNotDeleteEntityExce
         return new CannotDeleteChildCategoryException("Child category " + category.getTitle() + " is attached to a ChildExpense and cannot be deleted.");
     }
 
-    public static CannotDeleteChildCategoryException childCategoryParentCannotBeDeleted(Category category) {
-        return new CannotDeleteChildCategoryException("Parent of the Child category " + category.getTitle() + " cannot be deleted.");
-    }
-
     public static CannotDeleteChildCategoryException childCategoryParentNotFoundException(Category category) {
         return new CannotDeleteChildCategoryException("Parent of the Child category " + category.getTitle() + " was not found.");
     }

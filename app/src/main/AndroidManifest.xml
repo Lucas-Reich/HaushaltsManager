@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.lucas.haushaltsmanager">
 
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:name=".App.app"
@@ -18,58 +17,58 @@
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".Activities.TemplatesActivity"
             android:label="@string/activity_template_name"
-            android:parentActivityName=".Activities.MainTab.ParentActivity"/>
+            android:parentActivityName=".Activities.MainTab.ParentActivity" />
         <activity
             android:name=".Activities.CreateAccountActivity"
             android:label="@string/activity_new_account_name"
-            android:parentActivityName=".Activities.MainTab.ParentActivity"/>
+            android:parentActivityName=".Activities.MainTab.ParentActivity" />
         <activity
             android:name=".Activities.CreateCategory"
             android:label="@string/activity_new_category_name"
-            android:parentActivityName=".Activities.MainTab.ParentActivity"/>
+            android:parentActivityName=".Activities.MainTab.ParentActivity" />
         <activity
             android:name=".Activities.BackupActivity"
             android:label="@string/activity_backups_name"
-            android:parentActivityName=".Activities.MainTab.ParentActivity"/>
+            android:parentActivityName=".Activities.MainTab.ParentActivity" />
         <activity
             android:name=".Activities.TransferActivity"
             android:label="@string/activity_transfers_name"
-            android:parentActivityName=".Activities.MainTab.ParentActivity"/>
+            android:parentActivityName=".Activities.MainTab.ParentActivity" />
         <activity
             android:name=".Activities.ImportExportActivity"
             android:label="@string/activity_import_export_name"
-            android:parentActivityName=".Activities.MainTab.ParentActivity"/>
+            android:parentActivityName=".Activities.MainTab.ParentActivity" />
         <activity
             android:name=".Activities.Settings"
             android:label="@string/activity_settings_name"
-            android:parentActivityName=".Activities.MainTab.ParentActivity"/>
+            android:parentActivityName=".Activities.MainTab.ParentActivity" />
         <activity
             android:name=".Activities.AboutUsActivity"
             android:label="@string/activity_about_name"
-            android:parentActivityName=".Activities.MainTab.ParentActivity"/>
+            android:parentActivityName=".Activities.MainTab.ParentActivity" />
         <activity
             android:name=".Activities.EditRecurringBooking"
             android:label="@string/activity_create_recurring_booking"
-            android:parentActivityName=".Activities.MainTab.ParentActivity"/>
+            android:parentActivityName=".Activities.MainTab.ParentActivity" />
         <activity
             android:name=".Activities.ExpenseScreen"
             android:label="@string/activity_expense_screen_name"
-            android:parentActivityName=".Activities.MainTab.ParentActivity"/>
+            android:parentActivityName=".Activities.MainTab.ParentActivity" />
         <activity
-            android:name=".Activities.CategoryList.CategoryList"
+            android:name=".Activities.CategoryList"
             android:label="@string/activity_categories"
-            android:parentActivityName=".Activities.MainTab.ParentActivity"/>
+            android:parentActivityName=".Activities.MainTab.ParentActivity" />
         <activity
             android:name=".Activities.RecurringBookingList"
             android:label="@string/activity_create_recurring_booking"
-            android:parentActivityName=".Activities.MainTab.ParentActivity"/>
+            android:parentActivityName=".Activities.MainTab.ParentActivity" />
     </application>
 
 </manifest>

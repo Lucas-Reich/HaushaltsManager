@@ -64,7 +64,7 @@ public class FABToolbarWithActionHandler {
         ImageView imageView = new ImageView(mRootLayout.getContext());
         imageView.setImageResource(actionHandler.getIconRes());
         imageView.setContentDescription("");
-        imageView.setTag(actionHandler.getActionKey().getActionKey());
+        imageView.setTag(actionHandler.getActionKey().toString());
         imageView.setLayoutParams(layoutParams);
         imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
         imageView.setOnClickListener(new View.OnClickListener() {

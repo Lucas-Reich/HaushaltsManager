@@ -38,7 +38,7 @@ public class UserSettingsPreferences {
     }
 
     public Currency getMainCurrency() {
-        long mainCurrencyId = mPreferences.getLong(MAIN_CURRENCY_ID, -1);
+        long mainCurrencyId = mPreferences.getLong(MAIN_CURRENCY_ID, 1);
 
         return fetchCurrency(mainCurrencyId);
     }

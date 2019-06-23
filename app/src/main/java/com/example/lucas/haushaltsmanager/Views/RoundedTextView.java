@@ -7,10 +7,13 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.support.annotation.ColorInt;
+import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 
+import com.example.lucas.haushaltsmanager.App.app;
+import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.ViewUtils;
 
 public class RoundedTextView extends ViewUtils {
@@ -89,10 +92,6 @@ public class RoundedTextView extends ViewUtils {
         canvas.drawText(mCenterText, mViewBounds.centerX() - (mTextBounds.width() / 2), mViewBounds.centerY() + (mTextBounds.height() / 2), mTextPaint);
     }
 
-    public void setCenterText(@NonNull String centerText) {
-        mCenterText = centerText.toUpperCase();
-    }
-
     public void setTextColor(@ColorInt int textColor) {
         mTextPaint.setColor(textColor);
     }
@@ -102,10 +101,24 @@ public class RoundedTextView extends ViewUtils {
         return mCenterText;
     }
 
+    public void setCenterText(@NonNull String centerText) {
+        mCenterText = centerText.toUpperCase();
+    }
+
     public void setCircleColor(@NonNull String circleColor) {
         mCirclePaint.setColor(Color.parseColor(circleColor));
 
         this.invalidate();
+    }
+
+    public void setCircleColorConsiderBrightness(@ColorInt int color) {
+        if (ViewUtils.getColorBrightness(color) > 0.5) {
+            mTextPaint.setColor(getColor(R.color.primary_text_color_dark));
+        } else {
+            mTextPaint.setColor(getColor(R.color.primary_text_color_bright));
+        }
+
+        setCircleColor(color);
     }
 
     public void setCircleColor(@ColorInt int color) {
@@ -122,5 +135,9 @@ public class RoundedTextView extends ViewUtils {
     public void setCircleDiameter(int diameterInPixels) {
         mDesiredSize = ViewUtils.dpToPx(diameterInPixels);
         invalidate();
+    }
+
+    private int getColor(@ColorRes int color) {
+        return app.getContext().getResources().getColor(color);
     }
 }

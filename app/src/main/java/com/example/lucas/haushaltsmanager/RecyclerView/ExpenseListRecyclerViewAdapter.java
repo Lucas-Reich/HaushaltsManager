@@ -1,14 +1,17 @@
 package com.example.lucas.haushaltsmanager.RecyclerView;
 
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.lucas.haushaltsmanager.R;
-import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.RecyclerViewExpandableItemHandler;
+import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.InsertStrategy.ExpenseListInsertStrategy;
+import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.RecyclerViewSelectedItemHandler;
+import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.SelectionRules.ExpenseListSelectionRules;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.AdItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ChildItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ChildExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.DateItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.IRecyclerItem;
@@ -16,7 +19,7 @@ import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ParentE
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.RecurringBookingItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.ViewHolder.AbstractViewHolder;
 import com.example.lucas.haushaltsmanager.RecyclerView.ViewHolder.AdViewHolder;
-import com.example.lucas.haushaltsmanager.RecyclerView.ViewHolder.ChildViewHolder;
+import com.example.lucas.haushaltsmanager.RecyclerView.ViewHolder.ChildExpenseViewHolder;
 import com.example.lucas.haushaltsmanager.RecyclerView.ViewHolder.DateViewHolder;
 import com.example.lucas.haushaltsmanager.RecyclerView.ViewHolder.ExpenseItemViewHolder;
 import com.example.lucas.haushaltsmanager.RecyclerView.ViewHolder.GenericViewHolder;
@@ -25,15 +28,16 @@ import com.example.lucas.haushaltsmanager.RecyclerView.ViewHolder.RecurringBooki
 
 import java.util.List;
 
-public class ExpenseListRecyclerViewAdapter extends RecyclerViewExpandableItemHandler {
+public class ExpenseListRecyclerViewAdapter extends RecyclerViewSelectedItemHandler {
     public ExpenseListRecyclerViewAdapter(List<IRecyclerItem> items) {
-        super(items);
+        super(items, new ExpenseListInsertStrategy(), new ExpenseListSelectionRules());
     }
 
     // TODO Der GenericViewHolder sollte hier in dem Adapter definiert werden
 
+    @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 
         switch (viewType) {
@@ -43,23 +47,23 @@ public class ExpenseListRecyclerViewAdapter extends RecyclerViewExpandableItemHa
                 return new DateViewHolder(dateView);
             case ExpenseItem.VIEW_TYPE:
 
-                View expenseView = inflater.inflate(R.layout.recycler_view_expense, parent, false);
+                View expenseView = inflater.inflate(R.layout.recycler_view_child_expense, parent, false);
                 return new ExpenseItemViewHolder(expenseView);
             case ParentExpenseItem.VIEW_TYPE:
 
-                View parentExpenseView = inflater.inflate(R.layout.recycler_view_parent, parent, false);
+                View parentExpenseView = inflater.inflate(R.layout.recycler_view_parent_expense, parent, false);
                 return new ParentExpenseViewHolder(parentExpenseView);
             case AdItem.VIEW_TYPE:
 
-                View AdView = inflater.inflate(R.layout.recycler_view_expense, parent, false);
+                View AdView = inflater.inflate(R.layout.recycler_view_child_expense, parent, false);
                 return new AdViewHolder(AdView);
-            case ChildItem.VIEW_TYPE:
+            case ChildExpenseItem.VIEW_TYPE:
 
-                View childView = inflater.inflate(R.layout.recycler_view_child, parent, false);
-                return new ChildViewHolder(childView);
+                View childExpenseView = inflater.inflate(R.layout.recycler_view_child, parent, false);
+                return new ChildExpenseViewHolder(childExpenseView);
             case RecurringBookingItem.VIEW_TYPE:
 
-                View recurringBookingView = inflater.inflate(R.layout.recycler_view_expense, parent, false);
+                View recurringBookingView = inflater.inflate(R.layout.recycler_view_child_expense, parent, false);
                 return new RecurringBookingViewHolder(recurringBookingView);
             default:
 
@@ -69,11 +73,11 @@ public class ExpenseListRecyclerViewAdapter extends RecyclerViewExpandableItemHa
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         IRecyclerItem item = getItem(position);
 
         AbstractViewHolder viewHolder = (AbstractViewHolder) holder;
-        viewHolder.itemView.setSelected(isItemSelected(position));
+        viewHolder.itemView.setSelected(isItemSelected(item));
         viewHolder.bind(item);
     }
 

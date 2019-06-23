@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/category_list_root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/primaryBackgroundColorBright">
+    android:layout_height="match_parent">
 
     <include
         android:id="@+id/toolbar"
@@ -13,47 +12,51 @@
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <include
-        android:id="@+id/category_list_exp_list_view"
-        layout="@layout/exp_list_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/category_list_recycler_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar"/>
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
     <com.github.fafaldo.fabtoolbar.widget.FABToolbarLayout
         android:id="@+id/category_list_fab_toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:containerId="@+id/category_list_fab_toolbar_container"
-        app:fabId="@+id/category_list_fab_toolbar_fab"
-        app:fabToolbarId="@+id/category_list_fab_toolbar_toolbar">
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:containerId="@+id/fabtoolbar_container"
+        app:fabId="@+id/fabtoolbar_fab"
+        app:fabToolbarId="@+id/fabtoolbar_toolbar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <RelativeLayout
-            android:id="@+id/category_list_fab_toolbar_container"
+            android:id="@+id/fabtoolbar_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <android.support.design.widget.FloatingActionButton
-                android:id="@+id/category_list_fab_toolbar_fab"
+                android:id="@+id/fabtoolbar_fab"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/accessibility_create_category"
+                android:paddingStart="0dp"
+                android:paddingEnd="16dp"
                 android:src="@drawable/ic_add_white"
-                app:fabSize="normal"/>
+                app:fabSize="normal" />
         </RelativeLayout>
 
         <LinearLayout
-            android:id="@+id/category_list_fab_toolbar_toolbar"
+            android:id="@+id/fabtoolbar_toolbar"
             android:layout_width="match_parent"
             android:layout_height="70dp"
             android:layout_alignParentBottom="true"
-            android:layout_marginBottom="0dp"
+            android:layout_marginBottom="22dp"
             android:orientation="horizontal">
 
             <!--Die Toolbar wird von der activity aus befüllt!-->

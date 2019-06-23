@@ -4,7 +4,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.example.lucas.haushaltsmanager.R;
 
@@ -13,7 +12,20 @@ import java.text.ParseException;
 import java.util.Locale;
 
 public class Price implements Parcelable {
-    private static final String TAG = Price.class.getSimpleName();
+    public static final Parcelable.Creator<Price> CREATOR = new Parcelable.Creator<Price>() {
+
+        @Override
+        public Price createFromParcel(Parcel in) {
+
+            return new Price(in);
+        }
+
+        @Override
+        public Price[] newArray(int size) {
+
+            return new Price[size];
+        }
+    };
 
     private double value;
     private boolean isNegative;
@@ -44,11 +56,33 @@ public class Price implements Parcelable {
     }
 
     private Price(Parcel source) {
-        Log.v(TAG, "ParcelData (Parcel Source): time to put back parcel data");
-
         value = source.readDouble();
         isNegative = source.readByte() != 0;
         currency = source.readParcelable(Currency.class.getClassLoader());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Price)) {
+            return false;
+        }
+
+        Price other = (Price) obj;
+
+        return other.getSignedValue() == getSignedValue()
+                && other.getCurrency().equals(getCurrency());
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeDouble(value);
+        dest.writeByte((byte) (isNegative ? 1 : 0));
+        dest.writeParcelable(currency, flags);
     }
 
     public double getUnsignedValue() {
@@ -71,6 +105,10 @@ public class Price implements Parcelable {
         return currency;
     }
 
+    private void setCurrency(Currency currency) {
+        this.currency = currency;
+    }
+
     @ColorRes
     public int getColor() {
         if (getSignedValue() > 0) {
@@ -83,47 +121,6 @@ public class Price implements Parcelable {
 
         return R.color.primary_text_color;
     }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof Price)) {
-            return false;
-        }
-
-        Price other = (Price) obj;
-
-        return other.getSignedValue() == getSignedValue()
-                && other.getCurrency().equals(getCurrency());
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        Log.v(TAG, " write to Parcel..." + flags);
-
-        dest.writeDouble(value);
-        dest.writeByte((byte) (isNegative ? 1 : 0));
-        dest.writeParcelable(currency, flags);
-    }
-
-    public static final Parcelable.Creator<Price> CREATOR = new Parcelable.Creator<Price>() {
-
-        @Override
-        public Price createFromParcel(Parcel in) {
-
-            return new Price(in);
-        }
-
-        @Override
-        public Price[] newArray(int size) {
-
-            return new Price[size];
-        }
-    };
 
     private void setPrice(double price) {
         if (price >= 0) {
@@ -140,16 +137,12 @@ public class Price implements Parcelable {
         this.value = price;
     }
 
-    private void setCurrency(Currency currency) {
-        this.currency = currency;
-    }
-
     private double localeAwareDoubleParser(String doubleString, Locale locale) {
         try {
             return NumberFormat.getInstance(locale)
                     .parse(doubleString)
                     .doubleValue();
-        } catch(ParseException e) {
+        } catch (ParseException e) {
             return 0D;
         }
     }

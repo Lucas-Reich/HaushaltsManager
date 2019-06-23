@@ -10,8 +10,8 @@ import com.example.lucas.haushaltsmanager.FABToolbar.Actions.ActionPayload;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.ActionKey;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.IActionKey;
 import com.example.lucas.haushaltsmanager.R;
-import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.SelectedRecyclerItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ChildItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ChildExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.IRecyclerItem;
 
 public class ExtractMenuItem implements IMenuItem {
     public static final String ACTION_KEY = "extractAction";
@@ -51,8 +51,8 @@ public class ExtractMenuItem implements IMenuItem {
     public void handleClick(ActionPayload actionPayload, Context context) {
         initRepo(context);
 
-        for (SelectedRecyclerItem selectedItem : actionPayload.getItems()) {
-            extractChild((ChildItem) selectedItem.getItem(), selectedItem.getPosition());
+        for (IRecyclerItem selectedItem : actionPayload.getItems()) {
+            extractChild((ChildExpenseItem) selectedItem);
         }
     }
 
@@ -60,12 +60,12 @@ public class ExtractMenuItem implements IMenuItem {
         mChildExpenseRepo = new ChildExpenseRepository(context);
     }
 
-    private void extractChild(ChildItem child, int position) {
+    private void extractChild(ChildExpenseItem child) {
         try {
             ExpenseObject newExpense = mChildExpenseRepo.extractChildFromBooking(child.getContent());
 
             if (null != mCallback) {
-                mCallback.onSuccess(position, newExpense);
+                mCallback.onSuccess(child, newExpense);
             }
         } catch (ChildExpenseNotFoundException e) {
 
@@ -74,6 +74,6 @@ public class ExtractMenuItem implements IMenuItem {
     }
 
     public interface OnSuccessCallback {
-        void onSuccess(int oldPosition, ExpenseObject newExpense);
+        void onSuccess(IRecyclerItem extractedItem, ExpenseObject newExpense);
     }
 }

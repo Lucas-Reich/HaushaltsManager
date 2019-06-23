@@ -1,67 +1,25 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality;
 
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.DateItem;
+import android.support.v7.widget.RecyclerView;
+
+import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.InsertStrategy.InsertStrategy;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.IRecyclerItem;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
+public abstract class RecyclerViewItemHandler extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    private ListHandler listHandler;
 
-public abstract class RecyclerViewItemHandler extends RecyclerViewSelectedItemHandler {
-    TreeMap<Calendar, List<IRecyclerItem>> mItems;
-    private TreeMap<Calendar, Integer> mItemCount;
-
-    RecyclerViewItemHandler(List<IRecyclerItem> items) {
-        mItems = new TreeMap<>(Collections.<Calendar>reverseOrder());
-        mItemCount = new TreeMap<>(Collections.<Calendar>reverseOrder());
+    RecyclerViewItemHandler(List<IRecyclerItem> items, InsertStrategy insertStrategy) {
+        listHandler = new ListHandler(insertStrategy);
 
         insertAll(items);
     }
 
     @Override
     public int getItemCount() {
-        int counter = 0;
-
-        for (Integer itemCount : mItemCount.values()) {
-            counter += itemCount;
-
-            if (0 != itemCount) {
-                counter++;
-            }
-        }
-
-        return counter;
-    }
-
-    public void insertItem(final IRecyclerItem item) {
-        PositionHolder newItemIndex = addToItems(item);
-
-        if (mItemCount.get(newItemIndex.datePos) == 1) {
-            notifyItemInserted(newItemIndex.absPos - 1);
-        }
-
-        notifyItemInserted(newItemIndex.absPos);
-    }
-
-    private PositionHolder addToItems(final IRecyclerItem item) {
-        Calendar secureDate = secureDate(item.getDate());
-
-        if (mItems.containsKey(secureDate)) {
-            mItems.get(secureDate).add(item);
-        } else {
-            mItemCount.put(secureDate, 0);
-            mItems.put(secureDate, new ArrayList<IRecyclerItem>() {{
-                add(item);
-            }});
-        }
-
-        increaseItemCount(secureDate);
-
-        return toInternalPosition(item);
+        return listHandler.count();
     }
 
     public void insertAll(List<IRecyclerItem> items) {
@@ -70,90 +28,116 @@ public abstract class RecyclerViewItemHandler extends RecyclerViewSelectedItemHa
         }
     }
 
-    public void removeItem(int position) {
-        PositionHolder index = toInternalPosition(position);
+    public void insertItem(IRecyclerItem item) {
+        IRecyclerItem parent = item.getParent();
 
-        if (!index.isInvalid) {
-            mItems.get(index.datePos).remove(index.relPos);
+        if (null == parent) {
 
-            decreaseItemCount(index.datePos);
-
-            notifyItemRemoved(index.absPos);
-
-            if (mItemCount.get(index.datePos) == 0) {
-                notifyItemRemoved(index.absPos - 1);
-            }
+            listHandler.insertParent(item);
+            return;
         }
+
+        if (listHandler.parentExists(parent)) {
+
+            listHandler.addItemToParent(item);
+            return;
+        }
+
+        insertItem(parent);
+        listHandler.addItemToParent(item);
+    }
+
+    /**
+     * Diese Funktion wird genutzt, wenn ein Item aus der Liste gelöscht werden soll.
+     */
+    public void removeItem(IRecyclerItem item) {
+        IRecyclerItem parent = item.getParent();
+
+        listHandler.remove(item);
+
+        if (parent != null && !hasChildren(parent)) {
+            removeItem(parent);
+        }
+    }
+
+    /**
+     * Diese Funktion wird genutzt, wenn ein Parent zusammengeklappt wird.
+     */
+    public void deleteItem(IRecyclerItem item) {
+        listHandler.remove(item);
     }
 
     public IRecyclerItem getItem(int position) {
-        PositionHolder index = toInternalPosition(position);
+        return listHandler.getItems().get(position);
+    }
 
-        if (!index.isInvalid) {
-            if (index.relPos == -1) {
-                return new DateItem(index.datePos);
-            } else {
-                return mItems.get(index.datePos).get(index.relPos);
-            }
+    public void updateItem(IRecyclerItem item) {
+        notifyItemChanged(listHandler.indexOf(item));
+    }
+
+    private boolean hasChildren(IRecyclerItem parent) {
+        int children = listHandler.getChildrenCount(parent);
+
+        return 0 < children;
+    }
+
+    private class ListHandler {
+        private List<IRecyclerItem> mItems;
+        private InsertStrategy mInsertStrategy;
+
+        public ListHandler(InsertStrategy insertStrategy) {
+            mItems = new ArrayList<>();
+            mInsertStrategy = insertStrategy;
         }
 
-        throw new IndexOutOfBoundsException(String.format("Could not find Item at position %d", position));
-    }
-
-    void increaseItemCount(Calendar date) {
-        mItemCount.put(date, mItemCount.get(date) + 1);
-    }
-
-    void decreaseItemCount(Calendar date) {
-        mItemCount.put(date, mItemCount.get(date) - 1);
-    }
-
-    PositionHolder toInternalPosition(int position) {
-        int relPos = position;
-
-        for (Map.Entry<Calendar, Integer> entry : mItemCount.entrySet()) {
-            if (entry.getValue() == 0) {
-                continue;
-            }
-
-            if (entry.getValue() < relPos) {
-                relPos -= entry.getValue() + 1;
-                continue;
-            }
-
-            return new PositionHolder(entry.getKey(), relPos - 1, position);
+        public boolean parentExists(IRecyclerItem parent) {
+            return mItems.contains(parent);
         }
 
-        return PositionHolder.createInvalidPosition();
-    }
-
-    private PositionHolder toInternalPosition(IRecyclerItem item) {
-        Calendar secureDate = secureDate(item.getDate());
-
-        int relPos = mItems.get(secureDate).indexOf(item);
-        int absPos = relPos;
-        for (Map.Entry<Calendar, Integer> entry : mItemCount.entrySet()) {
-            if (entry.getKey().equals(secureDate)) {
-                absPos++;
-                break;
-            }
-
-            absPos += entry.getValue() + 1;
+        public List<IRecyclerItem> getItems() {
+            return mItems;
         }
 
-        return new PositionHolder(secureDate, relPos, absPos);
-    }
+        public int getChildrenCount(IRecyclerItem parent) {
+            int index = mItems.indexOf(parent) + 1;
+            int childrenCount = 0;
 
-    private Calendar secureDate(Calendar date) {
-        Calendar secureDate = Calendar.getInstance();
-        secureDate.set(Calendar.YEAR, date.get(Calendar.YEAR));
-        secureDate.set(Calendar.MONTH, date.get(Calendar.MONTH));
-        secureDate.set(Calendar.DAY_OF_MONTH, date.get(Calendar.DAY_OF_MONTH));
-        secureDate.set(Calendar.HOUR_OF_DAY, 0);
-        secureDate.set(Calendar.MINUTE, 0);
-        secureDate.set(Calendar.SECOND, 0);
-        secureDate.set(Calendar.MILLISECOND, 0);
+            while (index < mItems.size() && parent.equals(mItems.get(index).getParent())) {
+                childrenCount++;
+                index++;
+            }
 
-        return secureDate;
+            return childrenCount;
+        }
+
+        public int count() {
+            return mItems.size();
+        }
+
+        public void remove(IRecyclerItem item) {
+            int itemIndex = mItems.indexOf(item);
+
+            mItems.remove(item);
+
+            notifyItemRemoved(itemIndex);
+        }
+
+        public void insertParent(IRecyclerItem parent) {
+            int insertedIndex = mInsertStrategy.insert(parent, mItems);
+
+            notifyItemInserted(insertedIndex);
+        }
+
+        public int indexOf(IRecyclerItem item) {
+            return mItems.indexOf(item);
+        }
+
+        private void addItemToParent(IRecyclerItem item) {
+            int insertedIndex = mInsertStrategy.insert(item, mItems);
+
+            if (insertedIndex != InsertStrategy.INVALID_INDEX) {
+                notifyItemInserted(insertedIndex);
+            }
+        }
     }
 }

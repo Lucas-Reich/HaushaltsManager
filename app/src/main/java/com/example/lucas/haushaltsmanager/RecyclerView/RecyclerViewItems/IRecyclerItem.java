@@ -1,6 +1,5 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems;
 
-import java.util.Calendar;
 import java.util.List;
 
 public interface IRecyclerItem {
@@ -14,7 +13,16 @@ public interface IRecyclerItem {
 
     void setExpanded(boolean isExpanded);
 
+    IRecyclerItem getParent();
+
+    boolean equals(Object obj);
+
+    // TODO: Sollte ich noch ein SubInterface erstellen, welches für ParentItems genutzt werden kann
+    //  und folgende Methoden enthält:
+
     List<IRecyclerItem> getChildren();
 
-    Calendar getDate();
+    void addChild(IRecyclerItem item);
+
+    // void removeChild(IRecyclerItem item);
 }

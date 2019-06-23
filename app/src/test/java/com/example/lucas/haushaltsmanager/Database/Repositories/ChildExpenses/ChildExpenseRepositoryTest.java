@@ -29,7 +29,6 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -478,7 +477,7 @@ public class ChildExpenseRepositoryTest {
         MatrixCursor cursor = new MatrixCursor(columns);
         cursor.addRow(new Object[]{
                 expectedChildExpense.getIndex(),
-                expectedChildExpense.getDateTime().getTimeInMillis(),
+                expectedChildExpense.getDate().getTimeInMillis(),
                 expectedChildExpense.getTitle(),
                 expectedChildExpense.getUnsignedPrice(),
                 expectedChildExpense.isExpenditure() ? 1 : 0,
@@ -490,7 +489,7 @@ public class ChildExpenseRepositoryTest {
                 expectedChildExpense.getCurrency().getSymbol(),
                 expectedChildExpense.getCategory().getIndex(),
                 expectedChildExpense.getCategory().getTitle(),
-                expectedChildExpense.getCategory().getColorString(),
+                expectedChildExpense.getCategory().getColor().getColorString(),
                 expectedChildExpense.getCategory().getDefaultExpenseType() ? 1 : 0
         });
         cursor.moveToFirst();
@@ -531,7 +530,7 @@ public class ChildExpenseRepositoryTest {
         MatrixCursor cursor = new MatrixCursor(columns);
         cursor.addRow(new Object[]{
                 expectedChildExpense.getIndex(),
-                expectedChildExpense.getDateTime().getTimeInMillis(),
+                expectedChildExpense.getDate().getTimeInMillis(),
                 expectedChildExpense.getTitle(),
                 expectedChildExpense.isExpenditure() ? 1 : 0,
                 expectedChildExpense.getNotice(),
@@ -542,7 +541,7 @@ public class ChildExpenseRepositoryTest {
                 expectedChildExpense.getCurrency().getSymbol(),
                 expectedChildExpense.getCategory().getIndex(),
                 expectedChildExpense.getCategory().getTitle(),
-                expectedChildExpense.getCategory().getColorString(),
+                expectedChildExpense.getCategory().getColor().getColorString(),
                 expectedChildExpense.getCategory().getDefaultExpenseType() ? 1 : 0
         });
         cursor.moveToFirst();
