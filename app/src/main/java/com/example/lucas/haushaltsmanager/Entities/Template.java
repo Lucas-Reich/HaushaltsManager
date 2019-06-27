@@ -40,19 +40,14 @@ public class Template implements Parcelable {
 
     @Override
     public boolean equals(Object obj) {
-
-        if (obj instanceof Template) {
-            Template template = (Template) obj;
-
-            boolean result;
-            result = getIndex() == template.getIndex();
-            result = result && getTemplate().equals(template.getTemplate());
-
-            return result;
-        } else {
-
+        if (!(obj instanceof Template)) {
             return false;
         }
+
+        Template template = (Template) obj;
+
+        return getIndex() == template.getIndex()
+                && getTemplate().equals(template.getTemplate());
     }
 
     @Override
@@ -80,5 +75,17 @@ public class Template implements Parcelable {
 
     public void setTemplate(ExpenseObject template) {
         mTemplate = template;
+    }
+
+    public String getTitle() {
+        return mTemplate.getTitle();
+    }
+
+    public Category getCategory() {
+        return mTemplate.getCategory();
+    }
+
+    public Price getPrice() {
+        return mTemplate.getPrice();
     }
 }

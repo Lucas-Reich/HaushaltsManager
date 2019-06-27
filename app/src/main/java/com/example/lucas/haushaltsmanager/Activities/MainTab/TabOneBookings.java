@@ -68,7 +68,7 @@ public class TabOneBookings extends AbstractTab implements
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.activity_recycler_view, container, false);
+        View rootView = inflater.inflate(R.layout.tab_one_bookings, container, false);
 
         mRecyclerView = rootView.findViewById(R.id.recycler_view_view);
 

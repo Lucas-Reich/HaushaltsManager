@@ -9,11 +9,12 @@
     android:focusableInTouchMode="true"
     android:orientation="vertical">
 
-    <include
+    <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
-        layout="@layout/toolbar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:theme="@style/toolbarStyle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

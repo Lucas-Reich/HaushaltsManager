@@ -7,8 +7,8 @@
     android:clickable="true"
     android:focusable="true">
 
-    <com.example.lucas.androidcharts.PieChart
-        android:id="@+id/recycler_view_parent_chart"
+    <com.example.lucas.haushaltsmanager.Views.RoundedTextView
+        android:id="@+id/recycler_view_template_rounded_text_view"
         android:layout_width="45dp"
         android:layout_height="45dp"
         android:layout_marginStart="8dp"
@@ -19,19 +19,19 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/recycler_view_parent_title"
+        android:id="@+id/recycler_view_template_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="Buchungstitel"
+        android:text="Template Titel"
         android:textColor="@color/primary_text_color"
         android:textSize="21sp"
-        app:layout_constraintStart_toEndOf="@+id/recycler_view_parent_chart"
+        app:layout_constraintStart_toEndOf="@+id/recycler_view_template_rounded_text_view"
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.example.lucas.haushaltsmanager.Views.MoneyTextView
-        android:id="@+id/recycler_view_parent_price"
+        android:id="@+id/recycler_view_template_price"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -43,18 +43,18 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/recycler_view_parent_user"
+        android:id="@+id/recycler_view_template_user"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="4dp"
         android:text="TextView"
         android:textColor="@color/secondary_text_color"
-        app:layout_constraintStart_toEndOf="@+id/recycler_view_parent_chart"
-        app:layout_constraintTop_toBottomOf="@+id/recycler_view_parent_title" />
+        app:layout_constraintStart_toEndOf="@+id/recycler_view_template_rounded_text_view"
+        app:layout_constraintTop_toBottomOf="@+id/recycler_view_template_title" />
 
     <View
-        android:id="@+id/recycler_view_parent_divider"
+        android:id="@+id/recycler_view_template_divider"
         android:layout_width="0dp"
         android:layout_height="1dp"
         android:layout_marginStart="8dp"
@@ -62,6 +62,7 @@
         android:background="@color/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/recycler_view_parent_chart"
-        app:layout_constraintTop_toBottomOf="@+id/recycler_view_parent_user" />
+        app:layout_constraintStart_toEndOf="@+id/recycler_view_template_rounded_text_view"
+        app:layout_constraintTop_toBottomOf="@+id/recycler_view_template_user" />
+
 </android.support.constraint.ConstraintLayout>
