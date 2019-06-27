@@ -4,11 +4,13 @@ import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Expense.Booking;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ParentExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Template;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.DateItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ParentCategoryItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ParentExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.TemplateItem;
 import com.example.lucas.haushaltsmanager.Utils.CalendarUtils;
 
 import java.util.ArrayList;
@@ -61,6 +63,19 @@ public class ItemCreator {
         }
 
         return categoryItems;
+    }
+
+    public static List<IRecyclerItem> createTemplateItems(List<Template> templates) {
+        if (templates.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<IRecyclerItem> templateItems = new ArrayList<>();
+        for (Template template : templates) {
+            templateItems.add(new TemplateItem(template));
+        }
+
+        return templateItems;
     }
 
     private boolean changeDate(Booking booking, DateItem currentDate, String order) {

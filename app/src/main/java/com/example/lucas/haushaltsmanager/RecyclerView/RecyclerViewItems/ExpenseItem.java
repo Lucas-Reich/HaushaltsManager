@@ -17,11 +17,6 @@ public class ExpenseItem implements IRecyclerItem {
         mParent = parent;
     }
 
-    @Deprecated
-    public ExpenseItem(ExpenseObject expense) {
-        mExpense = expense;
-    }
-
     @Override
     public int getViewType() {
         return VIEW_TYPE;

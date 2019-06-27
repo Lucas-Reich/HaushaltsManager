@@ -2,112 +2,82 @@ package com.example.lucas.haushaltsmanager.Activities;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 
 import com.example.lucas.haushaltsmanager.Database.Repositories.Templates.TemplateRepository;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Template;
-import com.example.lucas.haushaltsmanager.ListAdapter.BookingAdapter;
 import com.example.lucas.haushaltsmanager.R;
+import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.RecyclerItemClickListener;
+import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.ItemCreator;
+import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.IRecyclerItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.TemplateItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.TemplateListRecyclerViewAdapter;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class TemplatesActivity extends AppCompatActivity {
-    private static final String TAG = TemplatesActivity.class.getSimpleName();
-
-    private List<ExpenseObject> mTemplates = new ArrayList<>();
-    private ListView mListView;
+public class TemplatesActivity extends AbstractAppCompatActivity implements RecyclerItemClickListener.OnItemClickListener {
     private TemplateRepository mTemplateRepo;
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_template_bookings);
-
-        initializeToolbar();
-
-        mListView = findViewById(R.id.booking_list_view);
-
-        mTemplateRepo = new TemplateRepository(this);
-    }
+    private RecyclerView recyclerView;
 
     @Override
     protected void onStart() {
         super.onStart();
 
-        TextView emptyText = findViewById(R.id.empty_list_view);
-        emptyText.setText(R.string.template_empty_list);
-        mListView.setEmptyView(emptyText);
+        mTemplateRepo = new TemplateRepository(this);
 
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                if (getCallingActivity() != null) {
-
-                    Intent returnTemplateIntent = new Intent();
-                    returnTemplateIntent.putExtra("templateObj", mTemplates.get(position));
-                    setResult(Activity.RESULT_OK, returnTemplateIntent);
-                    finish();
-                } else {
-
-                    // IMPROVEMENT: Ein Template sollte bearbeitet werden können.
-                }
-            }
-        });
         updateListView();
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_template_list);
 
-        if (id == android.R.id.home) {
-            finish();
-        }
+        recyclerView = findViewById(R.id.template_list_recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, recyclerView, this));
 
-        return super.onOptionsItemSelected(item);
+        initializeToolbar();
+
     }
 
-    /**
-     * Methode um eine Toolbar anzuzeigen die den Titel und einen Zurückbutton enthält.
-     */
-    private void initializeToolbar() {
-        Toolbar toolbar = findViewById(R.id.toolbar);
+    @Override
+    public void onItemClick(IRecyclerItem item, int position) {
+        if (getCallingActivity() == null) {
+            return;
+        }
 
-        //schatten der toolbar
-        if (Build.VERSION.SDK_INT >= 21)
-            toolbar.setElevation(10.f);
+        if (!(item instanceof TemplateItem)) {
+            return;
+        }
 
-        setSupportActionBar(toolbar);
+        // TODO: Ich sollte Templates bearbeitbar machen.
+        //  Außerdem sollte man Templates auch löschen können.
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Intent returnTemplateIntent = new Intent();
+        returnTemplateIntent.putExtra("templateObj", ((Template) item.getContent()).getTemplate());
+        setResult(Activity.RESULT_OK, returnTemplateIntent);
+        finish();
+    }
+
+    @Override
+    public void onItemLongClick(IRecyclerItem item, int position) {
+        // Do nothing
     }
 
     private void updateListView() {
-        prepareListData();
+        TemplateListRecyclerViewAdapter adapter = new TemplateListRecyclerViewAdapter(
+                loadData()
+        );
 
-        BookingAdapter bookingAdapter = new BookingAdapter(mTemplates, this);
-
-        mListView.setAdapter(bookingAdapter);
-
-        bookingAdapter.notifyDataSetChanged();
+        recyclerView.setAdapter(adapter);
     }
 
-    private void prepareListData() {
+    private List<IRecyclerItem> loadData() {
         List<Template> templates = mTemplateRepo.getAll();
-        for (Template template : templates) {
-            mTemplates.add(template.getTemplate());
-        }
+
+        return ItemCreator.createTemplateItems(templates);
     }
 }
