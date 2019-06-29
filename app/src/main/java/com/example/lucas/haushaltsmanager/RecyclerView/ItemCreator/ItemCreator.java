@@ -7,12 +7,14 @@ import com.example.lucas.haushaltsmanager.Entities.Expense.ParentExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Template;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.DateItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.FileItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ParentCategoryItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ParentExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.TemplateItem;
 import com.example.lucas.haushaltsmanager.Utils.CalendarUtils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -76,6 +78,19 @@ public class ItemCreator {
         }
 
         return templateItems;
+    }
+
+    public static List<IRecyclerItem> createFileItems(List<File> files) {
+        if (files.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<IRecyclerItem> fileItems = new ArrayList<>();
+        for (File file : files) {
+            fileItems.add(new FileItem(file));
+        }
+
+        return fileItems;
     }
 
     private boolean changeDate(Booking booking, DateItem currentDate, String order) {

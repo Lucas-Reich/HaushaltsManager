@@ -3,19 +3,18 @@ package com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.example.lucas.haushaltsmanager.Entities.Template;
-
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TemplateItem implements IRecyclerItem {
-    public static final int VIEW_TYPE = 8;
-    private static final String TAG = TemplateItem.class.getSimpleName();
+public class FileItem implements IRecyclerItem {
+    public static final int VIEW_TYPE = 9;
+    private static final String TAG = FileItem.class.getSimpleName();
 
-    private Template template;
+    private File file;
 
-    public TemplateItem(Template template) {
-        this.template = template;
+    public FileItem(File file) {
+        this.file = file;
     }
 
     @Override
@@ -24,8 +23,8 @@ public class TemplateItem implements IRecyclerItem {
     }
 
     @Override
-    public Object getContent() {
-        return template;
+    public File getContent() {
+        return file;
     }
 
     @Override
@@ -61,16 +60,16 @@ public class TemplateItem implements IRecyclerItem {
     @NonNull
     @Override
     public String toString() {
-        return template.toString();
+        return file.toString();
     }
 
     @Override
     public boolean equals(@Nullable Object obj) {
-        if (!(obj instanceof TemplateItem)) {
+        if (!(obj instanceof FileItem)) {
             return false;
         }
 
-        TemplateItem other = (TemplateItem) obj;
+        FileItem other = (FileItem) obj;
 
         return other.getContent().equals(getContent());
     }

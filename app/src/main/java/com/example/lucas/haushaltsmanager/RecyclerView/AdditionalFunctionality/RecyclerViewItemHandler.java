@@ -11,7 +11,7 @@ import java.util.List;
 public abstract class RecyclerViewItemHandler extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private ListHandler listHandler;
 
-    RecyclerViewItemHandler(List<IRecyclerItem> items, InsertStrategy insertStrategy) {
+    public RecyclerViewItemHandler(List<IRecyclerItem> items, InsertStrategy insertStrategy) {
         listHandler = new ListHandler(insertStrategy);
 
         insertAll(items);
@@ -63,7 +63,7 @@ public abstract class RecyclerViewItemHandler extends RecyclerView.Adapter<Recyc
     /**
      * Diese Funktion wird genutzt, wenn ein Parent zusammengeklappt wird.
      */
-    public void deleteItem(IRecyclerItem item) {
+    void deleteItem(IRecyclerItem item) {
         listHandler.remove(item);
     }
 
@@ -71,7 +71,7 @@ public abstract class RecyclerViewItemHandler extends RecyclerView.Adapter<Recyc
         return listHandler.getItems().get(position);
     }
 
-    public void updateItem(IRecyclerItem item) {
+    void updateItem(IRecyclerItem item) {
         notifyItemChanged(listHandler.indexOf(item));
     }
 

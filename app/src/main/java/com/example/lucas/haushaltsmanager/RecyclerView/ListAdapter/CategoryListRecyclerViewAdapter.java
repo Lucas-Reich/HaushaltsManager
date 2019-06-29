@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager.RecyclerView;
+package com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;

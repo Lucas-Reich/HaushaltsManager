@@ -1,4 +1,8 @@
 <resources>
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="appbar_padding_top">8dp</dimen>
+    <dimen name="primary_text_size">18dp</dimen>
+
+    <dimen name="fab_padding_bottom">18dp</dimen>
+    <dimen name="fab_padding_right">18dp</dimen>
 </resources>

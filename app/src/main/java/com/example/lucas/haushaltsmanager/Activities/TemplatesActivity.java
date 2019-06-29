@@ -13,7 +13,7 @@ import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.R
 import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.ItemCreator;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.TemplateItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.TemplateListRecyclerViewAdapter;
+import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.TemplateListRecyclerViewAdapter;
 
 import java.util.List;
 
