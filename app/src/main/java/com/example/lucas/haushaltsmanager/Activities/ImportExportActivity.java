@@ -7,11 +7,10 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.codekidlabs.storagechooser.StorageChooser;
@@ -21,32 +20,38 @@ import com.example.lucas.haushaltsmanager.Dialogs.ErrorAlertDialog;
 import com.example.lucas.haushaltsmanager.Entities.Directory;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.ExpenseObjectExporter;
-import com.example.lucas.haushaltsmanager.ListAdapter.FileAdapter;
 import com.example.lucas.haushaltsmanager.R;
+import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.RecyclerItemClickListener;
+import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.ItemCreator;
+import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.FileListRecyclerViewAdapter;
+import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.FileItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.Utils.FileUtils;
 
 import java.io.File;
 import java.util.List;
 
-public class ImportExportActivity extends AbstractAppCompatActivity {
-    private static final String TAG = ImportExportActivity.class.getSimpleName();
+public class ImportExportActivity extends AbstractAppCompatActivity implements RecyclerItemClickListener.OnItemClickListener {
     private static final String IMPORTABLE_FILE_CSV_REGEX = ".*.csv";
 
-    private ListView mListView;
-    private FloatingActionButton mAddExportFab;
-    private Button mSelectDirectoryBtn;
-    private Directory mSelectedDirectory;
+    private FloatingActionButton exportBookingsFab;
+    private Button selectDirectoryBtn;
+    private Directory selectedDirectory;
+
+    private RecyclerView recyclerView;
+    private FileListRecyclerViewAdapter adapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_import_export);
 
-        mListView = findViewById(R.id.activity_import_importable_files_list);
-        mListView.setEmptyView(findViewById(R.id.empty_list_view));
+        recyclerView = findViewById(R.id.activity_import_export_recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, recyclerView, this));
 
-        mAddExportFab = findViewById(R.id.activity_import_add_export_btn);
-        mSelectDirectoryBtn = findViewById(R.id.activity_import_directory_picker);
+        exportBookingsFab = findViewById(R.id.activity_import_export_add_export_btn);
+        selectDirectoryBtn = findViewById(R.id.activity_import_export_directory_picker);
 
         initializeToolbar();
     }
@@ -55,8 +60,8 @@ public class ImportExportActivity extends AbstractAppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        mSelectDirectoryBtn.setHint(R.string.hint_choose_directory);
-        mSelectDirectoryBtn.setOnClickListener(new View.OnClickListener() {
+        selectDirectoryBtn.setHint(R.string.hint_choose_directory);
+        selectDirectoryBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!hasFilePermission())
@@ -76,49 +81,20 @@ public class ImportExportActivity extends AbstractAppCompatActivity {
 
                     @Override
                     public void onSelect(String directory) {
-                        mSelectedDirectory = new Directory(directory);
-                        mSelectDirectoryBtn.setText(mSelectedDirectory.getName());
+                        selectedDirectory = new Directory(directory);
+                        selectDirectoryBtn.setText(selectedDirectory.getName());
 
-                        updateListView(mSelectedDirectory);
+                        updateListView(selectedDirectory);
                     }
                 });
             }
         });
 
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                TODO: Die Importierfunktion wieder aktivieren
-//                final File selectedFile = mSelectableFileList.find(position);
-//
-//                Bundle bundle = new Bundle();
-//                bundle.putString(ConfirmationDialog.TITLE, getString(R.string.confirmation_dialog_title));
-//                bundle.putString(ConfirmationDialog.CONTENT, getString(R.string.import_bookings_confirmation));
-//
-//                ConfirmationDialog confirmationDialog = new ConfirmationDialog();
-//                confirmationDialog.setArguments(bundle);
-//                confirmationDialog.setOnConfirmationListener(new ConfirmationDialog.OnConfirmationResult() {
-//
-//                    @Override
-//                    public void onConfirmationResult(boolean importExpenses) {
-//                        if (importExpenses) {
-//
-//                            ExpenseObjectImporter fileImporter = new ExpenseObjectImporter(selectedFile, ImportExportActivity.this);
-//                            fileImporter.readAndSaveExpenseObjects();
-//                        }
-//                    }
-//                });
-//                confirmationDialog.show(getFragmentManager(), "import_confirm_import");
-
-                Toast.makeText(ImportExportActivity.this, R.string.importing_not_yet_supported, Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        mAddExportFab.setOnClickListener(new View.OnClickListener() {
+        exportBookingsFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                if (mSelectedDirectory == null) {
+                if (selectedDirectory == null) {
 
                     Bundle bundle = new Bundle();
                     bundle.putString(ErrorAlertDialog.TITLE, getString(R.string.error));
@@ -141,10 +117,10 @@ public class ImportExportActivity extends AbstractAppCompatActivity {
                     @Override
                     public void onConfirmationResult(boolean result) {
 
-                        ExpenseObjectExporter fileExporter = new ExpenseObjectExporter(mSelectedDirectory, ImportExportActivity.this);
-                        fileExporter.convertAndExportExpenses(getAllExpenses());
+                        ExpenseObjectExporter fileExporter = new ExpenseObjectExporter(selectedDirectory, ImportExportActivity.this);
+                        File createdFile = fileExporter.convertAndExportExpenses(getAllExpenses());
 
-                        updateListView(mSelectedDirectory);
+                        adapter.insertItem(new FileItem(createdFile));
                     }
                 });
                 confirmationDialog.show(getFragmentManager(), "import_confirm_export");
@@ -152,6 +128,39 @@ public class ImportExportActivity extends AbstractAppCompatActivity {
         });
 
         updateListView(new Directory(getFilesDir().toString()));
+    }
+
+    @Override
+    public void onItemClick(IRecyclerItem item, int position) {
+
+//        TODO: Die Importierfunktion wieder aktivieren
+//        final File selectedFile = mSelectableFileList.find(position);
+//
+//        Bundle bundle = new Bundle();
+//        bundle.putString(ConfirmationDialog.TITLE, getString(R.string.confirmation_dialog_title));
+//        bundle.putString(ConfirmationDialog.CONTENT, getString(R.string.import_bookings_confirmation));
+//
+//        ConfirmationDialog confirmationDialog = new ConfirmationDialog();
+//        confirmationDialog.setArguments(bundle);
+//        confirmationDialog.setOnConfirmationListener(new ConfirmationDialog.OnConfirmationResult() {
+//
+//            @Override
+//            public void onConfirmationResult(boolean importExpenses) {
+//                if (importExpenses) {
+//
+//                    ExpenseObjectImporter fileImporter = new ExpenseObjectImporter(selectedFile, ImportExportActivity.this);
+//                    fileImporter.readAndSaveExpenseObjects();
+//                }
+//            }
+//        });
+//        confirmationDialog.show(getFragmentManager(), "import_confirm_import");
+
+        Toast.makeText(ImportExportActivity.this, R.string.importing_not_yet_supported, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onItemLongClick(IRecyclerItem item, int position) {
+        // Do Nothing
     }
 
     private boolean hasFilePermission() {
@@ -169,27 +178,26 @@ public class ImportExportActivity extends AbstractAppCompatActivity {
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
     }
 
+    private void updateListView(Directory selectedDirectory) {
+        adapter = new FileListRecyclerViewAdapter(
+                loadData(selectedDirectory)
+        );
+
+        recyclerView.setAdapter(adapter);
+    }
+
+    private List<IRecyclerItem> loadData(Directory selectedDirectory) {
+        List<File> importableFileList = getImportableFilesInDirectory(selectedDirectory);
+
+        return ItemCreator.createFileItems(importableFileList);
+    }
+
     private List<File> getImportableFilesInDirectory(Directory dir) {
         return FileUtils.listFiles(
                 dir,
                 false,
                 IMPORTABLE_FILE_CSV_REGEX
         );
-    }
-
-    /**
-     * Methode um die ListView nach einer Änderung anzuzeigen.
-     */
-    private void updateListView(Directory selectedDirectory) {
-        Log.i(TAG, "Refreshing ListView");
-
-        List<File> importableFileList = getImportableFilesInDirectory(selectedDirectory);
-
-        FileAdapter fileAdapter = new FileAdapter(importableFileList, this);
-
-        mListView.setAdapter(fileAdapter);
-
-        fileAdapter.notifyDataSetChanged();
     }
 
     /**

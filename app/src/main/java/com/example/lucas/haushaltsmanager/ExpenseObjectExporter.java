@@ -21,7 +21,7 @@ import java.util.List;
 public class ExpenseObjectExporter {
 
     /**
-     * Verzeichniss in dem die Exportierte Datei gespeichert werden soll
+     * Verzeichnis in dem die Exportierte Datei gespeichert werden soll
      */
     private File mDirectory;
 
@@ -43,6 +43,22 @@ public class ExpenseObjectExporter {
     }
 
     /**
+     * Methode die eine Liste von Buchungen nimmt und diese in eine Datei schreibt.
+     *
+     * @param expenses Buchungen die in eine Datei geschrieben werden sollen.
+     * @return Die erstellte Datei wird zurückgegeben. Falls die Datei nicht erstellt werden konnte wird NULL zurückgegeben.
+     */
+    public File convertAndExportExpenses(List<ExpenseObject> expenses) {
+        File file = createFile(mDirectory);
+
+        if (file != null && writeExpensesToFile(expenses, file)) {
+            return file;
+        }
+
+        return null;
+    }
+
+    /**
      * Methode um zu überprüfen ob das angegebene Verzeichniss auch wirklich ein Verzeichniss ist.
      * Falls nicht wird eine Exception ausgelöst.
      *
@@ -51,18 +67,6 @@ public class ExpenseObjectExporter {
     private void assertDirectory(File directory) throws IllegalArgumentException {
         if (directory != null && !directory.isDirectory())
             throw new IllegalArgumentException("The given object is not a Directory!");
-    }
-
-    /**
-     * Methode die eine Liste von Buchungen nimmt und diese in eine Datei schreibt.
-     *
-     * @param expenses Buchungen die in eine Datei geschrieben werden sollen.
-     * @return True bei Erfolg, False bei Misserfolg.
-     */
-    public boolean convertAndExportExpenses(List<ExpenseObject> expenses) {
-        File file = createFile(mDirectory);
-
-        return file != null && writeExpensesToFile(expenses, file);
     }
 
     /**

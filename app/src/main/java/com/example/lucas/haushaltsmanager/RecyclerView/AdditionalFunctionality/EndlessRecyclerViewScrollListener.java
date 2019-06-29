@@ -1,5 +1,6 @@
-package com.example.lucas.haushaltsmanager.RecyclerView;
+package com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality;
 
+import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,12 +18,12 @@ public abstract class EndlessRecyclerViewScrollListener extends RecyclerView.OnS
     private boolean mIsLoading = true;
     private RecyclerView.LayoutManager mLayoutManager;
 
-    public EndlessRecyclerViewScrollListener(RecyclerView.LayoutManager layoutManager) {
+    protected EndlessRecyclerViewScrollListener(RecyclerView.LayoutManager layoutManager) {
         mLayoutManager = layoutManager;
     }
 
     @Override
-    public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+    public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
         int lastVisibleItemPosition = getLastVisibleItemPosition();
         int totalItemCount = mLayoutManager.getItemCount();
 
@@ -56,6 +57,8 @@ public abstract class EndlessRecyclerViewScrollListener extends RecyclerView.OnS
         mCurrentItemCount = 0;
         mIsLoading = true;
     }
+
+    public abstract void onLoadMore(int page, int totalItemsCount, RecyclerView view);
 
     private boolean belowVisibleThreshold(int lastVisibleItemPosition, int totalItemCount) {
         return !mIsLoading && (lastVisibleItemPosition + VISIBLE_THRESHOLD) > totalItemCount;
@@ -94,6 +97,4 @@ public abstract class EndlessRecyclerViewScrollListener extends RecyclerView.OnS
         }
         return maxSize;
     }
-
-    public abstract void onLoadMore(int page, int totalItemsCount, RecyclerView view);
 }
