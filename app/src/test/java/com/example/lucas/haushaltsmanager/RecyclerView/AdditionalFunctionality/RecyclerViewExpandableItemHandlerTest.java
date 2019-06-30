@@ -62,8 +62,8 @@ public class RecyclerViewExpandableItemHandlerTest {
 
         mItemHandler.insertItem(expectedChildItem);
         assertEquals(2, mItemHandler.getItemCount());
-        assertEquals(2, mItemHandler.getItem(1).getChildren().size());
-        assertTrue(mItemHandler.getItem(1).getChildren().contains(expectedChildItem));
+        assertEquals(2, ((ParentExpenseItem) mItemHandler.getItem(1)).getChildren().size());
+        assertTrue(((ParentExpenseItem) mItemHandler.getItem(1)).getChildren().contains(expectedChildItem));
     }
 
     @Test
@@ -80,8 +80,8 @@ public class RecyclerViewExpandableItemHandlerTest {
 
         mItemHandler.insertItem(expectedChildItem);
         assertEquals(4, mItemHandler.getItemCount());
-        assertEquals(2, mItemHandler.getItem(1).getChildren().size());
-        assertTrue(mItemHandler.getItem(1).getChildren().contains(expectedChildItem));
+        assertEquals(2, ((ParentExpenseItem) mItemHandler.getItem(1)).getChildren().size());
+        assertTrue(((ParentExpenseItem) mItemHandler.getItem(1)).getChildren().contains(expectedChildItem));
     }
 
     @Test
@@ -109,7 +109,7 @@ public class RecyclerViewExpandableItemHandlerTest {
         mItemHandler.removeItem(mItemHandler.getItem(2));
 
         assertSame(4, mItemHandler.getItemCount());
-        assertSame(2, mItemHandler.getItem(1).getChildren().size());
+        assertSame(2, ((ParentExpenseItem) mItemHandler.getItem(1)).getChildren().size());
 
         assertEquals(expectedParentExpenseItem, mItemHandler.getItem(1));
         assertEquals(expectedParentExpenseItem.getChildren().get(0).getContent(), mItemHandler.getItem(2).getContent());
@@ -157,7 +157,7 @@ public class RecyclerViewExpandableItemHandlerTest {
         mItemHandler.toggleExpansion(1);
         assertSame(4, mItemHandler.getItemCount());
 
-        assertTrue(mItemHandler.getItem(1).isExpanded());
+        assertTrue(((ParentExpenseItem) mItemHandler.getItem(1)).isExpanded());
         assertEquals(expectedParentExpenseItem, mItemHandler.getItem(1));
         assertEquals(expectedParentExpenseItem.getChildren().get(0), mItemHandler.getItem(2));
         assertEquals(expectedParentExpenseItem.getChildren().get(1), mItemHandler.getItem(3));
@@ -175,7 +175,7 @@ public class RecyclerViewExpandableItemHandlerTest {
 
         mItemHandler.toggleExpansion(1);
 
-        assertFalse(mItemHandler.getItem(1).isExpanded());
+        assertFalse(((ParentExpenseItem) mItemHandler.getItem(1)).isExpanded());
         assertEquals(expectedParentExpenseItem, mItemHandler.getItem(1));
     }
 

@@ -1,6 +1,7 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.InsertStrategy;
 
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.DateItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.IParentRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.IRecyclerItem;
 
 import java.util.List;
@@ -9,7 +10,7 @@ public class ExpenseListInsertStrategy implements InsertStrategy {
 
     @Override
     public int insert(IRecyclerItem item, List<IRecyclerItem> items) {
-        IRecyclerItem parentItem = item.getParent();
+        IParentRecyclerItem parentItem = item.getParent();
 
         if (null == parentItem) {
             return insertParent(item, items);

@@ -1,7 +1,10 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality;
 
+import android.util.Log;
+
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.InsertStrategy.InsertStrategy;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ChildExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.IParentRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ParentExpenseItem;
 
@@ -10,7 +13,9 @@ import java.util.Collections;
 import java.util.List;
 
 public abstract class RecyclerViewExpandableItemHandler extends RecyclerViewItemHandler {
-    public RecyclerViewExpandableItemHandler(List<IRecyclerItem> items, InsertStrategy insertStrategy) {
+    private static final String TAG = RecyclerViewExpandableItemHandler.class.getSimpleName();
+
+    RecyclerViewExpandableItemHandler(List<IRecyclerItem> items, InsertStrategy insertStrategy) {
         super(items, insertStrategy);
     }
 
@@ -28,17 +33,21 @@ public abstract class RecyclerViewExpandableItemHandler extends RecyclerViewItem
     }
 
     public void toggleExpansion(int position) {
-        IRecyclerItem parent = getItem(position);
+        IRecyclerItem item = getItem(position);
 
-        if (parent.canExpand()) {
-            handleExpansion(parent);
+        if (!(item instanceof IParentRecyclerItem)) {
+
+            Log.i(TAG, String.format("Tried to toggle expansion for not expandable item: %s", item.getClass().getSimpleName()));
+            return;
         }
+
+        handleExpansion((IParentRecyclerItem) item);
     }
 
-    private void handleExpansion(IRecyclerItem expandableItem) {
+    private void handleExpansion(IParentRecyclerItem expandableItem) {
         // TODO: Expansion strategie, ohne auch immer den Parent updaten zu müssen:
-        //  Expand: Children des Parents werden eglsöcht und in die Liste eingefügt.
-        //  Collapse: Children werden aus der Liste gelöscht und dem Parent hizugefügt.
+        //  Expand: Children des Parents werden gelöscht und in die Liste eingefügt.
+        //  Collapse: Children werden aus der Liste gelöscht und dem Parent hinzugefügt.
         List<IRecyclerItem> children = expandableItem.getChildren();
 
         if (expandableItem.isExpanded()) {

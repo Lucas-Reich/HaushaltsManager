@@ -6,15 +6,15 @@ import com.example.lucas.haushaltsmanager.Entities.RecurringBooking;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RecurringBookingItem implements IRecyclerItem {
+public class RecurringBookingItem implements IParentRecyclerItem {
     public static final int VIEW_TYPE = 5;
 
-    private RecurringBooking mRecurringBooking;
-    private List<IRecyclerItem> mChildren;
+    private RecurringBooking recurringBooking;
+    private List<IRecyclerItem> children;
     private boolean mIsExpanded;
 
     public RecurringBookingItem(RecurringBooking recurringBooking) {
-        mRecurringBooking = recurringBooking;
+        this.recurringBooking = recurringBooking;
         mIsExpanded = false;
 
         createChildren(recurringBooking.getBooking().getChildren());
@@ -27,12 +27,7 @@ public class RecurringBookingItem implements IRecyclerItem {
 
     @Override
     public RecurringBooking getContent() {
-        return mRecurringBooking;
-    }
-
-    @Override
-    public boolean canExpand() {
-        return mRecurringBooking.getBooking().isParent();
+        return recurringBooking;
     }
 
     @Override
@@ -47,11 +42,11 @@ public class RecurringBookingItem implements IRecyclerItem {
 
     @Override
     public List<IRecyclerItem> getChildren() {
-        return mChildren;
+        return children;
     }
 
     @Override
-    public IRecyclerItem getParent() {
+    public IParentRecyclerItem getParent() {
         return null;
     }
 
@@ -60,11 +55,16 @@ public class RecurringBookingItem implements IRecyclerItem {
         // Do nothing
     }
 
+    @Override
+    public void removeChild(IRecyclerItem item) {
+        // Do nothing
+    }
+
     private void createChildren(List<ExpenseObject> children) {
-        mChildren = new ArrayList<>();
+        this.children = new ArrayList<>();
 
         for (ExpenseObject child : children) {
-            mChildren.add(new ChildExpenseItem(child, this));
+            this.children.add(new ChildExpenseItem(child, this));
         }
     }
 }

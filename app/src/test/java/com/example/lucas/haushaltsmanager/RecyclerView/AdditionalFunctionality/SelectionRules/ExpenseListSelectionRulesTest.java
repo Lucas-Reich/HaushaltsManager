@@ -101,12 +101,23 @@ public class ExpenseListSelectionRulesTest {
     }
 
     @Test
-    public void childCategoryItemWithADifferentParentCannotBeSelected() {
+    public void childItemWithADifferentParentCannotBeSelected() {
         List<IRecyclerItem> selectedItems = new ArrayList<>();
         selectedItems.add(new ChildExpenseItem(getDummyExpense(), getDummyParentItem()));
 
         ChildExpenseItem child = new ChildExpenseItem(getDummyExpense(), getDummyParentItem());
         boolean canBeSelected = selectionRules.canBeSelected(child, selectedItems);
+
+        assertFalse(canBeSelected);
+    }
+
+    @Test
+    public void cannotSelectExpenseItemWhenChildIsSelected() {
+        List<IRecyclerItem> selectedItems = new ArrayList<>();
+        selectedItems.add(new ChildExpenseItem(getDummyExpense(), getDummyParentItem()));
+
+        ExpenseItem expenseItem = new ExpenseItem(getDummyExpense(), getDummyDateItem());
+        boolean canBeSelected = selectionRules.canBeSelected(expenseItem, selectedItems);
 
         assertFalse(canBeSelected);
     }

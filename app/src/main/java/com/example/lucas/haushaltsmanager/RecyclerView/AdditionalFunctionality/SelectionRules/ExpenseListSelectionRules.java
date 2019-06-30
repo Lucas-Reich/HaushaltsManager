@@ -1,6 +1,7 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.SelectionRules;
 
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.AdItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ChildExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.DateItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.IRecyclerItem;
@@ -15,7 +16,7 @@ public class ExpenseListSelectionRules implements SelectionRules {
             return false;
         }
 
-        if (item instanceof ExpenseItem) {
+        if (item instanceof ExpenseItem && noChildrenAreSelected(otherSelectedItems)) { // ExpenseItem cannot be selected if ChildItem is selected as well
             return true;
         }
 
@@ -25,6 +26,16 @@ public class ExpenseListSelectionRules implements SelectionRules {
 
         if (isAlreadySelected(item, otherSelectedItems)) {
             return false;
+        }
+
+        return true;
+    }
+
+    private boolean noChildrenAreSelected(List<IRecyclerItem> selectedItems) {
+        for (IRecyclerItem selectedItem : selectedItems) {
+            if (selectedItem instanceof ChildExpenseItem) {
+                return false;
+            }
         }
 
         return true;

@@ -49,7 +49,7 @@ public class ParentExpenseViewHolder extends AbstractViewHolder {
         setTitle(parent.getTitle());
         setPrice(parent.getPrice());
         setUser("");
-        setDivider(item.isExpanded());
+        setDivider(((ParentExpenseItem) item).isExpanded());
     }
 
     private List<DataSet> createPieData(List<ExpenseObject> expenses) {

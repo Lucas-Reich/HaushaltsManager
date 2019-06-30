@@ -1,7 +1,7 @@
 package com.example.lucas.haushaltsmanager.ListAdapter;
 
 import android.content.res.Resources;
-import android.support.annotation.LayoutRes;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,7 +12,6 @@ import com.example.lucas.haushaltsmanager.CardPopulator.TimeFrameCardPopulator;
 import com.example.lucas.haushaltsmanager.Entities.Report.Report;
 import com.example.lucas.haushaltsmanager.Entities.Report.ReportInterface;
 import com.example.lucas.haushaltsmanager.R;
-import com.example.lucas.haushaltsmanager.Utils.ViewUtils;
 
 import java.util.List;
 
@@ -24,27 +23,22 @@ public class MonthlyReportAdapter extends RecyclerView.Adapter<MonthlyReportAdap
     private List<ReportInterface> mReports;
     private Resources mResources;
 
-    class ViewHolder extends RecyclerView.ViewHolder {
-        ViewHolder(View view) {
-            super(view);
-        }
-    }
-
     public MonthlyReportAdapter(List<ReportInterface> reports, Resources resources) {
         mReports = reports;
         mResources = resources;
     }
 
+    @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView = inflateRootView(parent, R.layout.timeframe_report_card);
-
-        applyMargin(itemView);
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        View itemView = inflater.inflate(R.layout.timeframe_report_card, parent, false);
 
         return new ViewHolder(itemView);
     }
 
-    public void onBindViewHolder(final ViewHolder viewHolder, int position) {
+    @Override
+    public void onBindViewHolder(@NonNull final ViewHolder viewHolder, int position) {
         Report month = (Report) mReports.get(position);
 
         TimeFrameCardPopulator timeFrameCardPopulator = new TimeFrameCardPopulator(
@@ -59,22 +53,9 @@ public class MonthlyReportAdapter extends RecyclerView.Adapter<MonthlyReportAdap
         return mReports.size();
     }
 
-    private void applyMargin(View view) {
-        CardView.LayoutParams clp = new CardView.LayoutParams(
-                CardView.LayoutParams.MATCH_PARENT,
-                CardView.LayoutParams.WRAP_CONTENT
-        );
-        clp.setMargins(
-                ViewUtils.dpToPx(16),
-                ViewUtils.dpToPx(16),
-                ViewUtils.dpToPx(16),
-                0
-        );
-
-        view.setLayoutParams(clp);
-    }
-
-    private View inflateRootView(ViewGroup parent, @LayoutRes int layout) {
-        return LayoutInflater.from(parent.getContext()).inflate(layout, parent, false);
+    class ViewHolder extends RecyclerView.ViewHolder {
+        ViewHolder(View view) {
+            super(view);
+        }
     }
 }

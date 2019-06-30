@@ -1,19 +1,20 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems;
 
+import android.support.annotation.NonNull;
+
 import com.example.lucas.haushaltsmanager.Utils.CalendarUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class DateItem implements IRecyclerItem {
-    public static final String TAG = DateItem.class.getSimpleName();
-
+public class DateItem implements IParentRecyclerItem {
     public static final int VIEW_TYPE = 0;
-    private Calendar mDate;
+
+    private Calendar date;
 
     public DateItem(Calendar date) {
-        mDate = date;
+        this.date = date;
     }
 
     @Override
@@ -23,29 +24,10 @@ public class DateItem implements IRecyclerItem {
 
     @Override
     public Calendar getContent() {
-        return mDate;
+        return date;
     }
 
-    @Override
-    public boolean canExpand() {
-        return false;
-    }
-
-    @Override
-    public boolean isExpanded() {
-        return true;
-    }
-
-    @Override
-    public void setExpanded(boolean isExpanded) {
-        throw new IllegalStateException(String.format("setExpanded method called on a Object that cannot expand: %s", TAG));
-    }
-
-    @Override
-    public List<IRecyclerItem> getChildren() {
-        return new ArrayList<>();
-    }
-
+    @NonNull
     @Override
     public String toString() {
         return CalendarUtils.formatHumanReadable(getContent());
@@ -64,12 +46,33 @@ public class DateItem implements IRecyclerItem {
     }
 
     @Override
+    public IParentRecyclerItem getParent() {
+        return null;
+    }
+
+    @Override
+    public List<IRecyclerItem> getChildren() {
+        return new ArrayList<>();
+    }
+
+    @Override
     public void addChild(IRecyclerItem item) {
         // Do nothing
     }
 
     @Override
-    public IRecyclerItem getParent() {
-        return null;
+    public void removeChild(IRecyclerItem item) {
+        // Do nothing
+    }
+
+    @Override
+    public boolean isExpanded() {
+        // DateItem is always expanded and cannot be collapsed
+        return true;
+    }
+
+    @Override
+    public void setExpanded(boolean isExpanded) {
+        // DateItem is always expanded and cannot be collapsed
     }
 }
