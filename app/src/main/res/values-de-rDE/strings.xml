@@ -176,4 +176,7 @@
     <string name="channel_description">Alle Push-Benachrichtigungen Erinnerungen sind in diesem Kanal.</string>
     <string name="fab_menu_item_delete_category_hint">Ausgewählte Kategorie löschen</string>
     <string name="could_not_delete_child_category">Kategorie konnte nicht gelöscht werden, da es noch Buchungen mit dieser Kategorie gibt.</string>
+    <string name="release_notes_130">Dieses mal gibt es nur kleine Updates in den Listenansichten der App. Der Großteil der Änderungen befindet sich im Hintergrund und verbessert die Geschwindigkeit der App.</string>
+    <string name="release_notes_130_list_improvements">Listen in „Ausgaben“, „Kategorien“, „wiederkehrende Buchungen“ und „Import/Export“ angepasst</string>
+    <string name="release_notes_130_tab_two_space">Ein wenig Platz am ende der “Monatliche Übersicht“ Liste hinzugefügt</string>
 </resources>
