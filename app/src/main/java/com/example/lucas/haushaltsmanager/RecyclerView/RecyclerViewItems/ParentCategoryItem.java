@@ -5,17 +5,17 @@ import com.example.lucas.haushaltsmanager.Entities.Category;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ParentCategoryItem implements IRecyclerItem {
+public class ParentCategoryItem implements IParentRecyclerItem {
     public static final int VIEW_TYPE = 7;
 
-    private Category mParentCategory;
-    private List<IRecyclerItem> mChildren;
+    private Category category;
+    private List<IRecyclerItem> children;
     private boolean mIsExpanded = false;
 
     public ParentCategoryItem(Category category) {
-        mParentCategory = category;
+        this.category = category;
 
-        mChildren = createChildItems(category.getChildren());
+        children = createChildItems(category.getChildren());
     }
 
     @Override
@@ -25,12 +25,7 @@ public class ParentCategoryItem implements IRecyclerItem {
 
     @Override
     public Category getContent() {
-        return mParentCategory;
-    }
-
-    @Override
-    public boolean canExpand() {
-        return true;
+        return category;
     }
 
     @Override
@@ -45,21 +40,26 @@ public class ParentCategoryItem implements IRecyclerItem {
 
     @Override
     public List<IRecyclerItem> getChildren() {
-        return mChildren;
-    }
-
-    @Override
-    public IRecyclerItem getParent() {
-        return null;
+        return children;
     }
 
     @Override
     public void addChild(IRecyclerItem item) {
-        if (mChildren.contains(item)) {
+        if (children.contains(item)) {
             return;
         }
 
-        mChildren.add(item);
+        children.add(item);
+    }
+
+    @Override
+    public void removeChild(IRecyclerItem item) {
+
+    }
+
+    @Override
+    public IParentRecyclerItem getParent() {
+        return null;
     }
 
     private List<IRecyclerItem> createChildItems(List<Category> children) {

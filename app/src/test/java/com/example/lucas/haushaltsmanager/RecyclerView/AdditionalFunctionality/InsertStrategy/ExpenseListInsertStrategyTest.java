@@ -90,7 +90,7 @@ public class ExpenseListInsertStrategyTest {
 
         assertEquals(2, items.size());
         assertEquals(insertIndex, InsertStrategy.INVALID_INDEX);
-        assertTrue(items.get(1).getChildren().contains(childItem));
+        assertTrue(((ParentExpenseItem) items.get(1)).getChildren().contains(childItem));
     }
 
     @Test
@@ -113,7 +113,7 @@ public class ExpenseListInsertStrategyTest {
         assertEquals(insertIndex, items.indexOf(childItem));
         assertEquals(childItem, items.get(2));
 
-        assertTrue(items.get(1).getChildren().contains(childItem));
+        assertTrue(((ParentExpenseItem) items.get(1)).getChildren().contains(childItem));
     }
 
     @Test

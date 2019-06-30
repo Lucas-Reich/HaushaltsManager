@@ -73,7 +73,7 @@ public class CategoryListInsertStrategyTest {
 
         assertEquals(1, items.size());
         assertEquals(insertIndex, InsertStrategy.INVALID_INDEX);
-        assertTrue(items.get(0).getChildren().contains(childCategory));
+        assertTrue(((ParentCategoryItem) items.get(0)).getChildren().contains(childCategory));
     }
 
     @Test

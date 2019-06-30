@@ -1,20 +1,18 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems;
 
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import androidx.annotation.NonNull;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 
 public class ExpenseItem implements IRecyclerItem {
     public static final int VIEW_TYPE = 1;
-    private static final String TAG = ExpenseItem.class.getSimpleName();
 
-    private ExpenseObject mExpense;
-    private DateItem mParent;
+    private ExpenseObject expense;
+    private DateItem parent;
 
     public ExpenseItem(ExpenseObject expense, DateItem parent) {
-        mExpense = expense;
-        mParent = parent;
+        this.expense = expense;
+        this.parent = parent;
     }
 
     @Override
@@ -24,27 +22,7 @@ public class ExpenseItem implements IRecyclerItem {
 
     @Override
     public ExpenseObject getContent() {
-        return mExpense;
-    }
-
-    @Override
-    public boolean canExpand() {
-        return false;
-    }
-
-    @Override
-    public boolean isExpanded() {
-        return false;
-    }
-
-    @Override
-    public void setExpanded(boolean isExpanded) {
-        throw new IllegalStateException(String.format("setExpanded method called on a Object that cannot expand: %s", TAG));
-    }
-
-    @Override
-    public List<IRecyclerItem> getChildren() {
-        return new ArrayList<>();
+        return expense;
     }
 
     @Override
@@ -58,13 +36,14 @@ public class ExpenseItem implements IRecyclerItem {
         return other.getContent().equals(getContent());
     }
 
+    @NonNull
     @Override
-    public void addChild(IRecyclerItem item) {
-        // Do nothing
+    public String toString() {
+        return expense.toString();
     }
 
     @Override
     public DateItem getParent() {
-        return mParent;
+        return parent;
     }
 }

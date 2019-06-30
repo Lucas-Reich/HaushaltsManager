@@ -34,7 +34,7 @@ public class ParentCategoryViewHolder extends AbstractViewHolder {
 
         setRoundedTextView(category.getColor().getColorInt(), category.getTitle().charAt(0));
         setTitle(category.getTitle());
-        setDivider(item.isExpanded());
+        setDivider(((ParentCategoryItem) item).isExpanded());
     }
 
     private void setRoundedTextView(int color, char character) {
