@@ -8,6 +8,7 @@ import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.Repositories.BookingTags.BookingTagRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Tags.Exceptions.CannotDeleteTagException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Tags.Exceptions.TagNotFoundException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Tags.TagRepository;
 import com.example.lucas.haushaltsmanager.Entities.Tag;
 
 import junit.framework.Assert;

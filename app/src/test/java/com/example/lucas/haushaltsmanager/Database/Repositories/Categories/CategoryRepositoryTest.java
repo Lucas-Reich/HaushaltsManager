@@ -5,6 +5,7 @@ import android.database.MatrixCursor;
 
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.Exceptions.CategoryNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepository;
 import com.example.lucas.haushaltsmanager.Entities.Category;

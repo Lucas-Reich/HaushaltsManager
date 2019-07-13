@@ -1,9 +1,9 @@
 package com.example.lucas.haushaltsmanager.Fixtures;
 
-import android.content.ContentValues;
-
-import java.util.List;
+import android.database.sqlite.SQLiteDatabase;
 
 public interface IFixtures {
-    List<ContentValues> getContentValues();
+    void apply(SQLiteDatabase db);
+
+    void revert(SQLiteDatabase db);
 }

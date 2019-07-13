@@ -54,6 +54,6 @@ public class app extends Application {
     }
 
     private void initializeDatabase() {
-        DatabaseManager.initializeInstance(new ExpensesDbHelper());
+        DatabaseManager.initializeInstance(new ExpensesDbHelper(context));
     }
 }

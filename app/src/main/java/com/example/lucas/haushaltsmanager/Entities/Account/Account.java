@@ -1,16 +1,15 @@
-package com.example.lucas.haushaltsmanager.Entities;
+package com.example.lucas.haushaltsmanager.Entities.Account;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import com.example.lucas.haushaltsmanager.App.app;
+import com.example.lucas.haushaltsmanager.Entities.Currency;
+import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.R;
 
 public class Account implements Parcelable {
-    /**
-     * regenerating the parcelable object back into our Category object
-     */
     public static final Parcelable.Creator<Account> CREATOR = new Parcelable.Creator<Account>() {
 
         @Override
@@ -49,7 +48,7 @@ public class Account implements Parcelable {
      *
      * @param source .
      */
-    public Account(Parcel source) {
+    private Account(Parcel source) {
         setIndex(source.readLong());
         setName(source.readString());
         setBalance((Price) source.readParcelable(Price.class.getClassLoader()));

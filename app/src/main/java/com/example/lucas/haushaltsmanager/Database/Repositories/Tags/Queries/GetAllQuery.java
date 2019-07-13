@@ -1,9 +1,9 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.Tags.Queries;
 
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
-import com.example.lucas.haushaltsmanager.Database.QueryInterface;
+import com.example.lucas.haushaltsmanager.Database.Common.IQuery;
 
-public class GetAllQuery implements QueryInterface {
+public class GetAllQuery implements IQuery {
 
     @Override
     public String getQuery() {

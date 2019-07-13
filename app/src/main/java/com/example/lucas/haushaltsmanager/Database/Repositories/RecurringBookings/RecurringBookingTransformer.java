@@ -5,25 +5,35 @@ import android.util.Log;
 
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
+import com.example.lucas.haushaltsmanager.Database.Common.IQueryResult;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
-import com.example.lucas.haushaltsmanager.Database.TransformerInterface;
+import com.example.lucas.haushaltsmanager.Database.Common.ITransformer;
 import com.example.lucas.haushaltsmanager.Entities.Expense.Booking;
 import com.example.lucas.haushaltsmanager.Entities.Frequency;
 import com.example.lucas.haushaltsmanager.Entities.RecurringBooking;
 
 import java.util.Calendar;
 
-public class RecurringBookingTransformer implements TransformerInterface<RecurringBooking> {
+public class RecurringBookingTransformer implements ITransformer<RecurringBooking> {
     private static final String TAG = RecurringBookingTransformer.class.getSimpleName();
 
     @Override
-    public RecurringBooking transform(Cursor c) {
-        if (c.isAfterLast()) {
+    public RecurringBooking transform(IQueryResult queryResult) {
+        if (!queryResult.moveToNext()) {
             return null;
         }
 
-        return fromCursor(c);
+        return fromCursor(queryResult.getCurrent());
+    }
+
+    @Override
+    public RecurringBooking transformAndClose(IQueryResult queryResult) {
+        RecurringBooking recurringBooking = transform(queryResult);
+
+        queryResult.close();
+
+        return recurringBooking;
     }
 
     private RecurringBooking fromCursor(Cursor c) {

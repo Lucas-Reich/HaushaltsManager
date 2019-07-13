@@ -10,8 +10,6 @@ public interface TagRepositoryInterface {
 
     Tag find(long id);
 
-    List<Tag> getAll();
-
     void update(Tag tag);
 
     void delete(Tag tag);

@@ -10,7 +10,7 @@ import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.CannotDeleteAccountException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepository;
-import com.example.lucas.haushaltsmanager.Entities.Account;
+import com.example.lucas.haushaltsmanager.Entities.Account.Account;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 
 import java.util.ArrayList;

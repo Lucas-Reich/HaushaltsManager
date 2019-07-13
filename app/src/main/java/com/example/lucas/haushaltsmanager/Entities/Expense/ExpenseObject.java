@@ -6,7 +6,7 @@ import android.support.annotation.NonNull;
 
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
-import com.example.lucas.haushaltsmanager.Entities.Account;
+import com.example.lucas.haushaltsmanager.Entities.Account.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Price;

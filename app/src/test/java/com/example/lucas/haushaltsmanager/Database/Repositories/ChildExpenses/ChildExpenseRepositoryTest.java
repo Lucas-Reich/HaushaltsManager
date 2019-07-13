@@ -14,7 +14,7 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Ex
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.CannotDeleteChildExpenseException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.ChildExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepository;
-import com.example.lucas.haushaltsmanager.Entities.Account;
+import com.example.lucas.haushaltsmanager.Entities.Account.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;

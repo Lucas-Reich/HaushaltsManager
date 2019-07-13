@@ -1,5 +1,7 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.BookingTags;
 
+import com.example.lucas.haushaltsmanager.Database.Repositories.BookingTags.BookingTagRepository;
+
 import org.junit.Before;
 import org.robolectric.RuntimeEnvironment;
 

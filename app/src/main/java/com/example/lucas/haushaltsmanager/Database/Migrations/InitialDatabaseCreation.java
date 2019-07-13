@@ -13,7 +13,59 @@ import com.example.lucas.haushaltsmanager.R;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.*;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.ACCOUNTS_COL_BALANCE;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.ACCOUNTS_COL_ID;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.ACCOUNTS_COL_NAME;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.BOOKINGS_COL_CREATED_AT;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.BOOKINGS_COL_CURRENCY_ID;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.BOOKINGS_COL_DATE;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.BOOKINGS_COL_EXPENDITURE;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.BOOKINGS_COL_EXPENSE_TYPE;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.BOOKINGS_COL_HIDDEN;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.BOOKINGS_COL_ID;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.BOOKINGS_COL_NOTICE;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.BOOKINGS_COL_PARENT_ID;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.BOOKINGS_COL_PRICE;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.BOOKINGS_COL_TITLE;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.BOOKINGS_TAGS_COL_BOOKING_ID;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.BOOKINGS_TAGS_COL_ID;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.BOOKINGS_TAGS_COL_TAG_ID;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.CATEGORIES_COL_COLOR;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.CATEGORIES_COL_ID;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.CATEGORIES_COL_NAME;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.CHILD_CATEGORIES_COL_COLOR;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.CHILD_CATEGORIES_COL_DEFAULT_EXPENSE_TYPE;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.CHILD_CATEGORIES_COL_HIDDEN;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.CHILD_CATEGORIES_COL_ID;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.CHILD_CATEGORIES_COL_NAME;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.CHILD_CATEGORIES_COL_PARENT_ID;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.CURRENCIES_COL_CREATED_AT;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.CURRENCIES_COL_ID;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.CURRENCIES_COL_NAME;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.CURRENCIES_COL_SYMBOL;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.RECURRING_BOOKINGS_COL_END;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.RECURRING_BOOKINGS_COL_FREQUENCY;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.RECURRING_BOOKINGS_COL_ID;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.RECURRING_BOOKINGS_COL_OCCURRENCE;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.TABLE_ACCOUNTS;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.TABLE_BOOKINGS;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.TABLE_BOOKINGS_TAGS;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.TABLE_CATEGORIES;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.TABLE_CHILD_CATEGORIES;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.TABLE_CURRENCIES;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.TABLE_RECURRING_BOOKINGS;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.TABLE_TAGS;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.TABLE_TEMPLATE_BOOKINGS;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.TAGS_COL_ID;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.TAGS_COL_NAME;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.TEMPLATE_COL_BOOKING_ID;
+import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.TEMPLATE_COL_ID;
 
 final class InitialDatabaseCreation implements IMigration {
     private static final String TAG = InitialDatabaseCreation.class.getSimpleName();
@@ -151,6 +203,7 @@ final class InitialDatabaseCreation implements IMigration {
      * @param db reference to editable mDatabase
      */
     private static void insertCurrencies(SQLiteDatabase db) {
+        // TODO: Diese Methode könnte ich durch Fixtures ersetzen
         UserSettingsPreferences preferences = new UserSettingsPreferences(app.getContext());
 
         //details from: https://developers.google.com/public-data/docs/canonical/currencies_csv

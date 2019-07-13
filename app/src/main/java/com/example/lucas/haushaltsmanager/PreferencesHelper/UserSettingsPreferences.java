@@ -8,7 +8,7 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Account
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.Exceptions.CurrencyNotFoundException;
-import com.example.lucas.haushaltsmanager.Entities.Account;
+import com.example.lucas.haushaltsmanager.Entities.Account.Account;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Time;
 import com.example.lucas.haushaltsmanager.Utils.WeekdayUtils;

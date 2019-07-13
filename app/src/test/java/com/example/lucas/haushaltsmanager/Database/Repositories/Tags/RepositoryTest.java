@@ -1,8 +1,10 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.Tags;
 
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
-import com.example.lucas.haushaltsmanager.Database.DefaultDatabase;
+import com.example.lucas.haushaltsmanager.Database.Common.DefaultDatabase;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Tags.Repository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Tags.TagRepositoryInterface;
 import com.example.lucas.haushaltsmanager.Entities.Tag;
 
 import org.junit.After;

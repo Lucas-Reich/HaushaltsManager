@@ -1,10 +1,10 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.Tags.Queries;
 
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
-import com.example.lucas.haushaltsmanager.Database.QueryInterface;
+import com.example.lucas.haushaltsmanager.Database.Common.IQuery;
 import com.example.lucas.haushaltsmanager.Entities.Tag;
 
-public class DeleteQuery implements QueryInterface {
+public class DeleteQuery implements IQuery {
     private final Tag mTag;
 
     public DeleteQuery(Tag tag) {

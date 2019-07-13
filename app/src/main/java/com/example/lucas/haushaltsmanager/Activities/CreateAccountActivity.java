@@ -7,12 +7,14 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
+import com.example.lucas.haushaltsmanager.Database.Common.DefaultDatabase;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Repository;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
-import com.example.lucas.haushaltsmanager.Entities.Account;
+import com.example.lucas.haushaltsmanager.Entities.Account.Account;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences;
@@ -34,6 +36,8 @@ public class CreateAccountActivity extends AbstractAppCompatActivity {
     private Account mAccount;
     private AccountRepository mAccountRepo;
 
+    private Repository accountRepository;
+
     @Override
     @SuppressWarnings("ConstantConditions")
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +45,7 @@ public class CreateAccountActivity extends AbstractAppCompatActivity {
         setContentView(R.layout.activity_new_account);
 
         mAccountRepo = new AccountRepository(this);
+        accountRepository = new Repository(new DefaultDatabase(this));
 
         mAccountNameBtn = findViewById(R.id.new_account_name);
         mAccountBalanceBtn = findViewById(R.id.new_account_balance);
@@ -160,13 +165,14 @@ public class CreateAccountActivity extends AbstractAppCompatActivity {
                     break;
                 case INTENT_MODE_UPDATE:
 
-                    try {
-                        mAccountRepo.update(mAccount);
+//                    try {
+//                        mAccountRepo.update(mAccount);
+                        accountRepository.update(mAccount);
 
-                    } catch (AccountNotFoundException e) {
-
-                        Toast.makeText(CreateAccountActivity.this, getString(R.string.cannot_update_account), Toast.LENGTH_SHORT).show();
-                    }
+//                    } catch (AccountNotFoundException e) {
+//
+//                        Toast.makeText(CreateAccountActivity.this, getString(R.string.cannot_update_account), Toast.LENGTH_SHORT).show();
+//                    }
                     break;
             }
 

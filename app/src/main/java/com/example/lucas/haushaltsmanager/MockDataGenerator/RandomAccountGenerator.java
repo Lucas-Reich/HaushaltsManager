@@ -4,7 +4,7 @@ package com.example.lucas.haushaltsmanager.MockDataGenerator;
 import android.content.Context;
 
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
-import com.example.lucas.haushaltsmanager.Entities.Account;
+import com.example.lucas.haushaltsmanager.Entities.Account.Account;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences;
 
