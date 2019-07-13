@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.ExpenseImporter.Common.ImportableEntities.ExpenseMap;
 
 import java.io.BufferedReader;
 import java.io.File;

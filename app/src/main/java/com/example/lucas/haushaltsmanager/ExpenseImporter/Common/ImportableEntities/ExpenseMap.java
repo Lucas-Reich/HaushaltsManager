@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager.ExpenseImporter;
+package com.example.lucas.haushaltsmanager.ExpenseImporter.Common.ImportableEntities;
 
 import java.util.HashMap;
 
