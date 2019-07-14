@@ -5,5 +5,7 @@ public interface Field {
 
     Object getFieldClass();
 
+    void set(String value);
+
 //    String getDatabaseField(); // TODO: Kann ich das gebrauchen? Hier würde dann TABLE_COL_... returned
 }

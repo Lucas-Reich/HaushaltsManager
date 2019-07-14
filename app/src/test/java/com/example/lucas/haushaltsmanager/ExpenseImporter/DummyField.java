@@ -1,8 +1,8 @@
-package com.example.lucas.haushaltsmanager.ExpenseImporter.Common.ImportableEntities.Account;
+package com.example.lucas.haushaltsmanager.ExpenseImporter;
 
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Common.ImportableEntities.Common.Field;
 
-public class Balance implements Field {
+public class DummyField implements Field {
     @Override
     public void validate(String field) {
 
@@ -10,7 +10,7 @@ public class Balance implements Field {
 
     @Override
     public Object getFieldClass() {
-        return Double.class;
+        return null;
     }
 
     @Override
