@@ -13,7 +13,7 @@ public class FileImporter {
     private IDatabaseInserter inserter;
 
     public FileImporter(File file) {
-        fileReader = new FileReader(file);
+//        fileReader = new FileReader(file);
     }
 
     public void importFile() {
