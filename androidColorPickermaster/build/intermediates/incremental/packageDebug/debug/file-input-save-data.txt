@@ -1,4 +1,4 @@
-#Internal package file, do not edit.
+#Internal package fileReader, do not edit.
 #Sat Dec 23 15:07:33 CET 2017
 2.base=C\:\\Users\\LabberToasT\\StudioProjects\\HaushaltsManager\\androidColorPickermaster\\build\\intermediates\\transforms\\dexMerger\\debug\\12
 5.set=DEX

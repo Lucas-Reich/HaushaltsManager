@@ -18,6 +18,10 @@ public class app extends Application {
         return context;
     }
 
+    public static String getApplicationName() {
+        return context.getPackageName();
+    }
+
     /**
      * Es ist kein Problem NotificationChannels mehrfach zu erstellen.
      * Sollte ich einen Channel erneut erstellen, passiert einfach nichts.

@@ -23,8 +23,9 @@ public class FileUtils {
     public static List<File> listFiles(Directory dir, boolean invertList, @RegEx String regex) {
         List<File> files = new ArrayList<>();
         for (File file : dir.listFiles()) {
-            if (file.getName().matches(regex))
+            if (file.getName().matches(regex)) {
                 files.add(file);
+            }
         }
 
         if (invertList)
@@ -55,7 +56,7 @@ public class FileUtils {
             return true;
         } catch (FileNotFoundException e) {
 
-            Log.e(TAG, file.toString() + " does not exist.", e);
+            Log.e(TAG, "Could not copy file. " + file.toString() + " does not exist.", e);
             return false;
         } catch (IOException e) {
 
@@ -63,6 +64,16 @@ public class FileUtils {
             Log.e(TAG, "Something went wrong while copying", e);
             return false;
         }
+    }
+
+    public static boolean remove(String fileName, Directory dir) {
+        for (File file : dir.listFiles()) {
+            if (file.getName().equals(fileName)) {
+                return file.delete();
+            }
+        }
+
+        return false;
     }
 
 

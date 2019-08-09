@@ -60,7 +60,7 @@
     </option>
   </JavaCodeStyleSettings>
   <Objective-C-extensions>
-    <file>
+    <fileReader>
       <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Import" />
       <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Macro" />
       <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Typedef" />
@@ -70,7 +70,7 @@
       <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Struct" />
       <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="FunctionPredecl" />
       <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Function" />
-    </file>
+    </fileReader>
     <class>
       <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Property" />
       <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Synthesize" />

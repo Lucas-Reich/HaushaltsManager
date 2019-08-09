@@ -1,6 +1,7 @@
 package com.example.lucas.haushaltsmanager.Activities;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,7 +12,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.codekidlabs.storagechooser.StorageChooser;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
@@ -115,7 +115,10 @@ public class ImportExportActivity extends AbstractAppCompatActivity implements R
                 confirmationDialog.setArguments(bundle);
                 confirmationDialog.setOnConfirmationListener(new ConfirmationDialog.OnConfirmationResult() {
                     @Override
-                    public void onConfirmationResult(boolean result) {
+                    public void onConfirmationResult(boolean actionConfirmed) {
+                        if (!actionConfirmed) {
+                            return;
+                        }
 
                         ExpenseObjectExporter fileExporter = new ExpenseObjectExporter(selectedDirectory, ImportExportActivity.this);
                         File createdFile = fileExporter.convertAndExportExpenses(getAllExpenses());
@@ -132,35 +135,15 @@ public class ImportExportActivity extends AbstractAppCompatActivity implements R
 
     @Override
     public void onItemClick(IRecyclerItem item, int position) {
+        Intent expenseImporterIntent = new Intent(ImportExportActivity.this, ExpenseImporterActivity.class);
+        expenseImporterIntent.putExtras(createBundleWithSelectedFile(item));
 
-//        TODO: Die Importierfunktion wieder aktivieren
-//        final File selectedFile = mSelectableFileList.find(position);
-//
-//        Bundle bundle = new Bundle();
-//        bundle.putString(ConfirmationDialog.TITLE, getString(R.string.confirmation_dialog_title));
-//        bundle.putString(ConfirmationDialog.CONTENT, getString(R.string.import_bookings_confirmation));
-//
-//        ConfirmationDialog confirmationDialog = new ConfirmationDialog();
-//        confirmationDialog.setArguments(bundle);
-//        confirmationDialog.setOnConfirmationListener(new ConfirmationDialog.OnConfirmationResult() {
-//
-//            @Override
-//            public void onConfirmationResult(boolean importExpenses) {
-//                if (importExpenses) {
-//
-//                    ExpenseObjectImporter fileImporter = new ExpenseObjectImporter(selectedFile, ImportExportActivity.this);
-//                    fileImporter.readAndSaveExpenseObjects();
-//                }
-//            }
-//        });
-//        confirmationDialog.show(getFragmentManager(), "import_confirm_import");
-
-        Toast.makeText(ImportExportActivity.this, R.string.importing_not_yet_supported, Toast.LENGTH_SHORT).show();
+        ImportExportActivity.this.startActivity(expenseImporterIntent);
     }
 
     @Override
     public void onItemLongClick(IRecyclerItem item, int position) {
-        // Do Nothing
+        // If item (importable file) is long clicked nothing should happen
     }
 
     private boolean hasFilePermission() {
@@ -169,6 +152,13 @@ public class ImportExportActivity extends AbstractAppCompatActivity implements R
         int result = ContextCompat.checkSelfPermission(this, permission);
 
         return result == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private Bundle createBundleWithSelectedFile(IRecyclerItem item) {
+        Bundle bundle = new Bundle();
+        bundle.putString(ExpenseImporterActivity.INTENT_FILE_PATH, item.getContent().toString());
+
+        return bundle;
     }
 
     /**

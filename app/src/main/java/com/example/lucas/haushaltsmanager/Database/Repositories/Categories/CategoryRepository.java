@@ -16,7 +16,7 @@ import com.example.lucas.haushaltsmanager.Entities.Color;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CategoryRepository {
+public class CategoryRepository implements CategoryRepositoryInterface {
     // REFACTOR: Versuchen das Repo so wie das TagRepo zu bauen
     private SQLiteDatabase mDatabase;
 
@@ -113,7 +113,6 @@ public class CategoryRepository {
     }
 
     public Category insert(Category category) {
-
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.CATEGORIES_COL_NAME, category.getTitle());
         values.put(ExpensesDbHelper.CATEGORIES_COL_COLOR, category.getColor().getColorString());

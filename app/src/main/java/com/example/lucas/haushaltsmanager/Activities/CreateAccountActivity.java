@@ -16,6 +16,7 @@ import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences;
+import com.example.lucas.haushaltsmanager.PreferencesHelper.AddAndSetDefaultDecorator;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
@@ -24,7 +25,7 @@ import com.example.lucas.haushaltsmanager.Views.SaveFloatingActionButton;
 
 import java.util.Locale;
 
-public class CreateAccountActivity extends AbstractAppCompatActivity {
+public class CreateAccountActivity extends AbstractAppCompatActivity implements SaveFloatingActionButton.OnClickListener {
     public static final String INTENT_MODE = "mode";
     public static final String INTENT_MODE_UPDATE = "update";
     public static final String INTENT_MODE_CREATE = "createExpenseItems";
@@ -35,7 +36,6 @@ public class CreateAccountActivity extends AbstractAppCompatActivity {
     private AccountRepository mAccountRepo;
 
     @Override
-    @SuppressWarnings("ConstantConditions")
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_account);
@@ -49,26 +49,6 @@ public class CreateAccountActivity extends AbstractAppCompatActivity {
         resolveMode(getIntent().getExtras());
 
         initializeToolbar();
-    }
-
-    private void resolveMode(Bundle args) {
-        BundleUtils bundle = new BundleUtils(args);
-
-        switch (bundle.getString(INTENT_MODE, INTENT_MODE_CREATE)) {
-            case INTENT_MODE_UPDATE:
-
-                mAccount = (Account) bundle.getParcelable(INTENT_ACCOUNT, null);
-                enableFabIfAccountIsSaveable(mAccount);
-                break;
-            case INTENT_MODE_CREATE:
-
-                mAccount = Account.createDummyAccount();
-                mAccount.setBalance(new Price(0, getDefaultCurrency()));
-                mAccount.setName("");
-                break;
-            default:
-                throw new UnsupportedOperationException("Could not handle intent mode " + bundle.getString(INTENT_MODE, null));
-        }
     }
 
     @Override
@@ -132,56 +112,59 @@ public class CreateAccountActivity extends AbstractAppCompatActivity {
         mAccountCurrencyBtn.setText(mAccount.getBalance().getCurrency().getShortName().toUpperCase());
 
         SaveFloatingActionButton saveFloatingActionButton = findViewById(R.id.new_account_save);
-        saveFloatingActionButton.setOnClickListener(createAccountClickListener);
+        saveFloatingActionButton.setOnClickListener(this);
     }
 
-    /**
-     * OnClickListener der unterscheidet ob ein Konto neu erstellt oder nur geupdated werden soll
-     * und die dementsprechende Aktion ausfüht.
-     */
-    private SaveFloatingActionButton.OnClickListener createAccountClickListener = new SaveFloatingActionButton.OnClickListener() {
+    public void onCrossClick() {
+        showCloseScreenDialog();
+    }
 
-        @Override
-        public void onCrossClick() {
-            showCloseScreenDialog();
+    @Override
+    public void onCheckClick() {
+        BundleUtils bundle = new BundleUtils(getIntent().getExtras());
+
+        switch (bundle.getString(INTENT_MODE, INTENT_MODE_CREATE)) {
+            case INTENT_MODE_CREATE:
+
+                mAccount = mAccountRepo.create(mAccount);
+
+                new AddAndSetDefaultDecorator(new ActiveAccountsPreferences(this), this)
+                        .addAccount(mAccount);
+                break;
+            case INTENT_MODE_UPDATE:
+
+                try {
+                    mAccountRepo.update(mAccount);
+
+                } catch (AccountNotFoundException e) {
+
+                    Toast.makeText(CreateAccountActivity.this, getString(R.string.cannot_update_account), Toast.LENGTH_SHORT).show();
+                }
+                break;
         }
 
-        @Override
-        public void onCheckClick() {
-            BundleUtils bundle = new BundleUtils(getIntent().getExtras());
+        Intent startMainTab = new Intent(CreateAccountActivity.this, ParentActivity.class);
+        startActivity(startMainTab);
+    }
 
-            switch (bundle.getString(INTENT_MODE, INTENT_MODE_CREATE)) {
-                case INTENT_MODE_CREATE:
+    private void resolveMode(Bundle args) {
+        BundleUtils bundle = new BundleUtils(args);
 
-                    mAccount = mAccountRepo.create(mAccount);
+        switch (bundle.getString(INTENT_MODE, INTENT_MODE_CREATE)) {
+            case INTENT_MODE_UPDATE:
 
-                    addAccountToPreferences(mAccount);
-                    setAsActiveAccount(mAccount);
-                    break;
-                case INTENT_MODE_UPDATE:
+                mAccount = (Account) bundle.getParcelable(INTENT_ACCOUNT, null);
+                enableFabIfAccountIsSaveable(mAccount);
+                break;
+            case INTENT_MODE_CREATE:
 
-                    try {
-                        mAccountRepo.update(mAccount);
-
-                    } catch (AccountNotFoundException e) {
-
-                        Toast.makeText(CreateAccountActivity.this, getString(R.string.cannot_update_account), Toast.LENGTH_SHORT).show();
-                    }
-                    break;
-            }
-
-            Intent startMainTab = new Intent(CreateAccountActivity.this, ParentActivity.class);
-            startActivity(startMainTab);
+                mAccount = Account.createDummyAccount();
+                mAccount.setBalance(new Price(0, getDefaultCurrency()));
+                mAccount.setName("");
+                break;
+            default:
+                throw new UnsupportedOperationException("Could not handle intent mode " + bundle.getString(INTENT_MODE, null));
         }
-    };
-
-    /**
-     * Methode um das neu erstellte Konto in der Liste der Aktiven Konten zu speichern.
-     *
-     * @param account Zu speicherndes Konto
-     */
-    private void addAccountToPreferences(Account account) {
-        new ActiveAccountsPreferences(this).addAccount(account);
     }
 
     /**
@@ -191,15 +174,6 @@ public class CreateAccountActivity extends AbstractAppCompatActivity {
      */
     private Currency getDefaultCurrency() {
         return new UserSettingsPreferences(this).getMainCurrency();
-    }
-
-    /**
-     * Methode um das angebene Konto ala das aktuelle Hauptkonto auszuwählen.
-     *
-     * @param account Neues Hauptkonto
-     */
-    private void setAsActiveAccount(Account account) {
-        new UserSettingsPreferences(this).setActiveAccount(account);
     }
 
     private void showCloseScreenDialog() {

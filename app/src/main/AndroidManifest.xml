@@ -67,8 +67,9 @@
             android:parentActivityName=".Activities.MainTab.ParentActivity" />
         <activity
             android:name=".Activities.RecurringBookingList"
-            android:label="@string/activity_create_recurring_booking"
+            android:label="@string/activity_show_recurring_bookings"
             android:parentActivityName=".Activities.MainTab.ParentActivity" />
+        <activity android:name=".Activities.ExpenseImporterActivity" />
     </application>
 
 </manifest>

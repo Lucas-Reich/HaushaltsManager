@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.ColorInt;
 
+import java.util.Random;
 import java.util.regex.Pattern;
 
 public class Color extends android.graphics.Color implements Parcelable {
@@ -21,8 +22,7 @@ public class Color extends android.graphics.Color implements Parcelable {
             return new Color[size];
         }
     };
-    private static final String VALID_COLOR_PATTERN2 = "#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})";
-
+    static final String VALID_COLOR_PATTERN = "#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})";
     private String color;
 
     public Color(String color) {
@@ -39,6 +39,14 @@ public class Color extends android.graphics.Color implements Parcelable {
 
     private Color(Parcel source) {
         color = source.readString();
+    }
+
+    public static Color random() {
+        Random random = new Random();
+
+        int nextInt = random.nextInt(0xffffff + 1);
+
+        return new Color(String.format("#%06x", nextInt));
     }
 
     @Override
@@ -74,7 +82,7 @@ public class Color extends android.graphics.Color implements Parcelable {
     // TODO: Könnte getBrightness Funktion enthalten
 
     private boolean assertIsColorString(String color) {
-        return Pattern.compile(VALID_COLOR_PATTERN2)
+        return Pattern.compile(VALID_COLOR_PATTERN)
                 .matcher(color)
                 .matches();
     }

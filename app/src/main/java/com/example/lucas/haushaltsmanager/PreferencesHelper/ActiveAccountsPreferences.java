@@ -10,11 +10,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class ActiveAccountsPreferences {
+public class ActiveAccountsPreferences implements ActiveAccountsPreferencesInterface{
     private static final String TAG = ActiveAccountsPreferences.class.getSimpleName();
 
-    private static final String PREFERENCES_NAME = "ActiveAccounts";
-    private static boolean DEFAULT_ACCOUNT_STATUS = true;
+    public static final String PREFERENCES_NAME = "ActiveAccounts";
+    private static boolean DEFAULT_ACCOUNT_VISIBILITY = true;
 
     private SharedPreferences mPreferences;
 
@@ -25,7 +25,7 @@ public class ActiveAccountsPreferences {
 
     public void addAccount(Account account) {
         SharedPreferences.Editor editor = mPreferences.edit();
-        editor.putBoolean(stringify(account.getIndex()), DEFAULT_ACCOUNT_STATUS);
+        editor.putBoolean(stringify(account.getIndex()), DEFAULT_ACCOUNT_VISIBILITY);
         editor.apply();
     }
 

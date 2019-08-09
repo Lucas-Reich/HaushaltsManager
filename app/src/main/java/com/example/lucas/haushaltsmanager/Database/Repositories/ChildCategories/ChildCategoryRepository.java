@@ -17,7 +17,7 @@ import com.example.lucas.haushaltsmanager.Entities.Color;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChildCategoryRepository {
+public class ChildCategoryRepository implements ChildCategoryRepositoryInterface{
     private SQLiteDatabase mDatabase;
 
     public ChildCategoryRepository(Context context) {
@@ -182,6 +182,7 @@ public class ChildCategoryRepository {
                 new ArrayList<Category>()
         );
     }
+
 
     private Category getParent(Category childCategory) throws CategoryNotFoundException {
 

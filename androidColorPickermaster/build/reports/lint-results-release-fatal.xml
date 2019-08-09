@@ -9,10 +9,11 @@
         priority="7"
         summary="Wrong Resource Type"
         explanation="Ensures that resource id&apos;s passed to APIs are of the right type; for example, calling `Resources.getColor(R.string.name)` is wrong."
-        errorLine1="        colorPickerView = new ColorPicker(getContext());"
+        errorLine1="        colorPickerView = new ColorPicker(getContext());
+"
         errorLine2="                                                        ^">
         <location
-            file="C:\Users\LabberToasT\StudioProjects\HaushaltsManager\androidColorPickermaster\src\main\java\com\chiralcode\colorpicker\ColorPickerPreference.java"
+            fileReader="C:\Users\LabberToasT\StudioProjects\HaushaltsManager\androidColorPickermaster\src\main\java\com\chiralcode\colorpicker\ColorPickerPreference.java"
             line="32"
             column="57"/>
     </issue>

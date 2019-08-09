@@ -182,4 +182,18 @@
     <string name="release_notes_131_cent_fix">Eingabe von Cents war nicht möglich</string>
     <string name="release_notes_132_fixed_strings">Kleinere Formulierungsprobleme behoben</string>
     <string name="release_notes_133_infinite_scroll_fix">Fix eines Absturzes, wenn in der Ausgabenübersicht zu weit gescrollt wurde</string>
+    <string name="generic_file_open_error">Fehler beim öffnen der Datei.</string>
+    <string name="btn_abort">Abbrechen</string>
+    <string name="click_on_button_similar_to_word">Bitte klicke auf den Button, der dem folgenden Begriff am ehesten entspricht:</string>
+    <string name="import_file_sub_title_reading_content">Inhalt der Datei wird gelesen</string>
+    <string name="import_file_title">Datei wird importiert</string>
+    <string name="imported_categories_parent_name">Importierte Kategorien</string>
+    <string name="mapping_account_title">Kontoname</string>
+    <string name="mapping_price_value">Betrag</string>
+    <string name="mapping_category_title">Kategorie</string>
+    <string name="mapping_booking_date">Datum</string>
+    <string name="mapping_booking_notice">Notiz</string>
+    <string name="mapping_booking_title">Titel</string>
+    <string name="activity_show_recurring_bookings">Wiederkehrende Buchungen</string>
+    <string name="mapping_price_type">Ausgabentyp</string>
 </resources>
