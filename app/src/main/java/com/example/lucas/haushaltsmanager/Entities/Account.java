@@ -72,6 +72,7 @@ public class Account implements Parcelable {
         }
 
         Account otherAccount = (Account) obj;
+
         return name.equals(otherAccount.getTitle())
                 && index == otherAccount.getIndex();
     }

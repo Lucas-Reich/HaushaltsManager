@@ -3,7 +3,7 @@ package com.example.lucas.haushaltsmanager.Worker.PeriodicWorker;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.example.lucas.haushaltsmanager.BackupHandler;
+import com.example.lucas.haushaltsmanager.Backup.BackupHandler;
 import com.example.lucas.haushaltsmanager.Entities.Backup;
 import com.example.lucas.haushaltsmanager.Entities.Directory;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.AppInternalPreferences;

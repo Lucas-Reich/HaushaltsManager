@@ -37,7 +37,7 @@ public class DatabaseUpgradeTest {
 
     /**
      * This test runs through all the database versions from the /androidTest/assets/ folder.
-     * File has to be in format database_v<VERSION_NUMBER>.db
+     * FileReader has to be in format database_v<VERSION_NUMBER>.db
      *
      * @throws IOException if the database cannot be copied.
      */

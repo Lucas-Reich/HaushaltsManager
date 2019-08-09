@@ -1,10 +1,11 @@
-package com.example.lucas.haushaltsmanager.Utils;
+package com.example.lucas.haushaltsmanager.Backup;
 
 import android.content.Context;
 
-import com.example.lucas.haushaltsmanager.BackupHandler;
+import com.example.lucas.haushaltsmanager.Backup.BackupHandler;
 import com.example.lucas.haushaltsmanager.Entities.Directory;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.AppInternalPreferences;
+import com.example.lucas.haushaltsmanager.Utils.FileUtils;
 
 import java.io.File;
 import java.text.SimpleDateFormat;

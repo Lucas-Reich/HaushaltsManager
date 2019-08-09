@@ -10,7 +10,6 @@ import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
 
 public class ConfirmationDialog extends DialogFragment {
-    private static final String TAG = ConfirmationDialog.class.getSimpleName();
     public static final String TITLE = "title";
     public static final String CONTENT = "content";
 

@@ -108,7 +108,7 @@ public class ExpenseObject implements Parcelable, Booking {
     public ExpenseObject(@NonNull String title, Price price, @NonNull Category category, long accountId, Currency currency) {
 
         this(
-                -1,
+                ExpensesDbHelper.INVALID_INDEX,
                 title,
                 price,
                 Calendar.getInstance(),
@@ -233,6 +233,7 @@ public class ExpenseObject implements Parcelable, Booking {
         return result;
     }
 
+    @NonNull
     @Override
     public String toString() {
 

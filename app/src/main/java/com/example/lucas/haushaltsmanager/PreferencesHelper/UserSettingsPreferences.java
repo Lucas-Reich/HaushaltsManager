@@ -90,8 +90,11 @@ public class UserSettingsPreferences {
     }
 
     public Time getReminderTime() {
+        String reminderTime = mPreferences.getString(
+                REMINDER_TIME,
+                Settings.DEFAULT_REMINDER_TIME.toString()
+        );
 
-        String reminderTime = mPreferences.getString(REMINDER_TIME, Settings.DEFAULT_REMINDER_TIME.toString());
         return Time.fromString(reminderTime);
     }
 

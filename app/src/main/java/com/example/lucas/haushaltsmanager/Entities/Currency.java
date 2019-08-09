@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import com.example.lucas.haushaltsmanager.App.app;
+import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
 
@@ -31,7 +32,6 @@ public class Currency implements Parcelable {
     private String symbol;
 
     public Currency(long index, @NonNull String currencyName, @NonNull String currencyShortName, @NonNull String currencySymbol) {
-
         setIndex(index);
         setName(currencyName);
         setShortName(currencyShortName);
@@ -39,22 +39,20 @@ public class Currency implements Parcelable {
     }
 
     public Currency(@NonNull String currencyName, @NonNull String shortName, @NonNull String symbol) {
-
-        setName(currencyName);
-        setShortName(shortName);
-        setSymbol(symbol);
+        this(ExpensesDbHelper.INVALID_INDEX, currencyName, shortName, symbol);
     }
 
     /**
      * Parcelable Constructor
      *
-     * @param source Parceldata
+     * @param source ParcelData
      */
-    public Currency(Parcel source) {
-        setIndex(source.readLong());
-        setName(source.readString());
-        setShortName(source.readString());
-        setSymbol(source.readString());
+    private Currency(Parcel source) {
+        this(source.readLong(),
+                source.readString(),
+                source.readString(),
+                source.readString()
+        );
     }
 
     public static Currency getDefault(Context context) {
@@ -67,8 +65,7 @@ public class Currency implements Parcelable {
      * @return dummy Category
      */
     public static Currency createDummyCurrency() {
-
-        return new Currency(-1, app.getContext().getString(R.string.no_name), "NON", "");
+        return new Currency(app.getContext().getString(R.string.no_name), "NON", "");
     }
 
     @Override
@@ -85,13 +82,11 @@ public class Currency implements Parcelable {
     }
 
     public String toString() {
-
         return getName();
     }
 
     @Override
     public int describeContents() {
-
         return 0;
     }
 
@@ -104,48 +99,37 @@ public class Currency implements Parcelable {
     }
 
     public long getIndex() {
-
         return index;
     }
 
     private void setIndex(long index) {
-
         this.index = index;
     }
 
     @NonNull
     public String getName() {
-
         return name;
     }
 
     public void setName(@NonNull String name) {
-
         this.name = name;
     }
 
     @NonNull
     public String getShortName() {
-
         return shortName;
     }
 
     public void setShortName(@NonNull String shortName) {
-
         this.shortName = shortName;
     }
 
-
-    // making class parcelable
-
-    public @NonNull
-    String getSymbol() {
-
+    @NonNull
+    public String getSymbol() {
         return symbol != null ? symbol : shortName;
     }
 
     public void setSymbol(@NonNull String symbol) {
-
         this.symbol = symbol;
     }
 
@@ -155,8 +139,8 @@ public class Currency implements Parcelable {
      *
      * @return Ob die Währung in die Datenbank geschrieben werden kann
      */
+    @Deprecated
     public boolean isSet() {
-
         return !this.name.isEmpty() && !this.shortName.isEmpty() && !this.symbol.isEmpty();
     }
 }

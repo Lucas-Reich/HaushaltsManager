@@ -182,4 +182,18 @@
     <string name="release_notes_131_cent_fix">Input of cents was not possible</string>
     <string name="release_notes_132_fixed_strings">Minor wording issues fixed</string>
     <string name="release_notes_133_infinite_scroll_fix">Fixed a crash when scrolling too far in the expenditure overview</string>
+    <string name="generic_file_open_error">Error while opening file.</string>
+    <string name="btn_abort">Abort</string>
+    <string name="import_file_title">Importing File</string>
+    <string name="import_file_sub_title_reading_content">Reading content of fileReader</string>
+    <string name="click_on_button_similar_to_word">Please click on the button that most closely corresponds to the following term:</string>
+    <string name="imported_categories_parent_name">Imported Categories</string>
+    <string name="mapping_account_title">Account</string>
+    <string name="mapping_price_value">Amount</string>
+    <string name="mapping_category_title">Category</string>
+    <string name="mapping_booking_date">Date</string>
+    <string name="mapping_booking_notice">Notice</string>
+    <string name="mapping_booking_title">Title</string>
+    <string name="activity_show_recurring_bookings">Recurring bookings</string>
+    <string name="mapping_price_type">Booking type</string>
 </resources>
