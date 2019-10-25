@@ -45,6 +45,7 @@ public class AppReleaseHistory implements ReleaseHistory {
         releases.add(getRelease110());
         releases.add(getRelease120());
         releases.add(getRelease130());
+        releases.add(getRelease131());
 
         return releases;
     }
@@ -125,6 +126,26 @@ public class AppReleaseHistory implements ReleaseHistory {
                 getString(R.string.release_notes_130),
                 changelog
         );
+    }
+
+    /**
+     * Method, welche die Änderungen der Version 1.3.1 zurückgibt.
+     *
+     * @return Version 1.3.1
+     */
+    private Release getRelease131() {
+        List<ChangelogItem> changelog = new ArrayList<>();
+        changelog.add(new Bug(getString(R.string.release_notes_131_cent_fix)));
+
+        return new Release(
+                1,
+                3,
+                1,
+                getDate(25, Calendar.OCTOBER, 2019),
+                "",
+                changelog
+        );
+
     }
 
     private String getString(@StringRes int stringId) {

@@ -5,7 +5,6 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
-import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
@@ -15,11 +14,10 @@ import android.widget.TextView;
 
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Price;
-import com.example.lucas.haushaltsmanager.PriceFormatTextWatcher;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
-import com.example.lucas.haushaltsmanager.Utils.MoneyUtils;
 import com.example.lucas.haushaltsmanager.Utils.ViewUtils;
+import com.example.lucas.haushaltsmanager.Views.MoneyEditText;
 
 import java.util.Locale;
 
@@ -39,6 +37,8 @@ public class PriceInputDialog extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        // TODO: Als User kann ich kein Kommata eingeben, weil das irgendwie geblockt ist.
+        //  Wenn ich diesen Bug fixe, dann muss ich auch die Locale bei createPrice(Price price) fixen, da der User als separator beides eingeben kann
         BundleUtils args = new BundleUtils(getArguments());
 
         final EditText input = createInputView((Price) args.getParcelable(HINT, null));
@@ -97,37 +97,6 @@ public class PriceInputDialog extends DialogFragment {
         return builder.create();
     }
 
-    private boolean hasUserConfirmed(KeyEvent keyEvent, int actionId) {
-        return (keyEvent != null && (keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || actionId == EditorInfo.IME_ACTION_DONE;
-    }
-
-    /**
-     * Methode um ein EditText mit einer margin links und rechts von 75 pixeln zu erstellen.
-     *
-     * @return EditText
-     */
-    private EditText createInputView(Price price) {
-        EditText editText = new EditText(getActivity());
-        editText.setHint(MoneyUtils.formatHumanReadableOmitCents(price, Locale.getDefault()));
-        editText.setLayoutParams(createLayoutParams());
-        editText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
-        editText.addTextChangedListener(new PriceFormatTextWatcher(editText));
-
-        return editText;
-    }
-
-    private LinearLayout.LayoutParams createLayoutParams() {
-        return new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-    }
-
-    private Price createPrice(String value) {
-        return new Price(value, getDefaultCurrency(), Locale.getDefault());
-    }
-
-    private Currency getDefaultCurrency() {
-        return Currency.getDefault(getActivity());
-    }
-
     /**
      * Methode um einen Listener zu registrieren, welcher aufgerufen wird, wenn der User einen Preis eingegeben hat.
      *
@@ -137,8 +106,39 @@ public class PriceInputDialog extends DialogFragment {
         mCallback = listener;
     }
 
+    private boolean hasUserConfirmed(KeyEvent keyEvent, int actionId) {
+        return (keyEvent != null && (keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || actionId == EditorInfo.IME_ACTION_DONE;
+    }
+
+    /**
+     * Methode um ein EditText mit einer margin links und rechts von 75 pixeln zu erstellen.
+     *
+     * @return EditText
+     */
+    private EditText createInputView(Price priceHint) {
+        MoneyEditText editText = new MoneyEditText(getActivity(), priceHint);
+        editText.setLayoutParams(createLayoutParams());
+
+        return editText;
+    }
+
+    private LinearLayout.LayoutParams createLayoutParams() {
+        return new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+    }
+
+    private Price createPrice(String value) {
+        return new Price(
+                value,
+                getDefaultCurrency(),
+                Locale.US // TODO: Locale auf Locale.getDefault() wechseln, wenn ich den PriceFormatTextWatcher gefixt habe.
+        );
+    }
+
+    private Currency getDefaultCurrency() {
+        return Currency.getDefault(getActivity());
+    }
+
     public interface OnPriceSelected {
-        // TODO: Hier sollte ich ein Price argument übergeben
         void onPriceSelected(Price price);
     }
 }

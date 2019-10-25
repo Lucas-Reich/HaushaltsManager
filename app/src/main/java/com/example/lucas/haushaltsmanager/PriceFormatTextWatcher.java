@@ -12,9 +12,15 @@ import java.util.Locale;
 
 public class PriceFormatTextWatcher implements TextWatcher {
     private EditText editText;
+    private Currency defaultCurrency;
+    private Locale defaultLocale;
 
-    public PriceFormatTextWatcher(EditText editText) {
+    private int cursorOffset = 0;
+
+    public PriceFormatTextWatcher(EditText editText, Currency defaultCurrency, Locale defaultLocale) {
         this.editText = editText;
+        this.defaultCurrency = defaultCurrency;
+        this.defaultLocale = defaultLocale;
     }
 
     @Override
@@ -24,6 +30,7 @@ public class PriceFormatTextWatcher implements TextWatcher {
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
+        cursorOffset = start;
         // Do nothing
     }
 
@@ -35,7 +42,15 @@ public class PriceFormatTextWatcher implements TextWatcher {
 
         showFormattedMoneyString(formattedMoneyString);
 
-        moveCursorToPosition(formattedMoneyString.length());
+        moveCursorToPosition(determineCursorPosition(cursorOffset, unformattedMoneyString, formattedMoneyString));
+    }
+
+    private int determineCursorPosition(int currentOffset, String unformattedText, String formattedText) {
+        if (unformattedText.length() == 1 || unformattedText.length() == formattedText.length()) {
+            return currentOffset + 1;
+        }
+
+        return currentOffset + 2;
     }
 
     private void moveCursorToPosition(int position) {
@@ -49,20 +64,12 @@ public class PriceFormatTextWatcher implements TextWatcher {
     }
 
     private String formatMoneyString(String moneyString) {
-        Price mPrice = new Price(
+        Price price = new Price(
                 moneyString,
-                getDefaultCurrency(),
-                getDefaultLocale()
+                defaultCurrency,
+                defaultLocale
         );
 
-        return MoneyUtils.formatHumanReadableOmitCents(mPrice, getDefaultLocale());
-    }
-
-    private Currency getDefaultCurrency() {
-        return Currency.getDefault(editText.getContext());
-    }
-
-    private Locale getDefaultLocale() {
-        return Locale.getDefault();
+        return MoneyUtils.formatHumanReadable(price, defaultLocale);
     }
 }

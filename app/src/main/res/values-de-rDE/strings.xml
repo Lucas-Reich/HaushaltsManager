@@ -179,4 +179,5 @@
     <string name="release_notes_130">Dieses mal gibt es nur kleine Updates in den Listenansichten der App. Der Großteil der Änderungen befindet sich im Hintergrund und verbessert die Geschwindigkeit der App.</string>
     <string name="release_notes_130_list_improvements">Listen in „Ausgaben“, „Kategorien“, „wiederkehrende Buchungen“ und „Import/Export“ angepasst</string>
     <string name="release_notes_130_tab_two_space">Ein wenig Platz am ende der “Monatliche Übersicht“ Liste hinzugefügt</string>
+    <string name="release_notes_131_cent_fix">Eingabe von Cents war nicht möglich</string>
 </resources>

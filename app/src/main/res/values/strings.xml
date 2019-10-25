@@ -201,4 +201,5 @@
     <string name="cannot_create_recurring_booking">Please fill in all fields to schedule a recurring booking</string>
     <string name="fab_menu_item_delete_category_hint">Delete selected Category</string>
     <string name="could_not_delete_child_category">Category could not be deleted, because there are still bookings with this category.</string>
+    <string name="release_notes_131_cent_fix">Input of cents was not possible</string>
 </resources>
