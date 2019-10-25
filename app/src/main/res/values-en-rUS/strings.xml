@@ -180,4 +180,5 @@
     <string name="release_notes_130_list_improvements">Adapted lists in \"Bookings\", \"Categories\", \"Recurring Bookings\" and \"Import/Export\"</string>
     <string name="release_notes_130_tab_two_space">Added a little space at the end of the \"Monthly Overview\" list</string>
     <string name="release_notes_131_cent_fix">Input of cents was not possible</string>
+    <string name="release_notes_132_fixed_strings">Minor wording issues fixed</string>
 </resources>

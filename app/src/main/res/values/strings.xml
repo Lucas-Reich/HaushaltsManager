@@ -202,4 +202,5 @@
     <string name="fab_menu_item_delete_category_hint">Delete selected Category</string>
     <string name="could_not_delete_child_category">Category could not be deleted, because there are still bookings with this category.</string>
     <string name="release_notes_131_cent_fix">Input of cents was not possible</string>
+    <string name="release_notes_132_fixed_strings">Minor wording issues fixed</string>
 </resources>

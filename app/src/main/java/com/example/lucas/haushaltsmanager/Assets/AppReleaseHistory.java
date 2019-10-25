@@ -145,7 +145,25 @@ public class AppReleaseHistory implements ReleaseHistory {
                 "",
                 changelog
         );
+    }
 
+    /**
+     * Methode, welche die Änderungen der Version 1.3.2 zurückgibt.
+     *
+     * @return Version 1.3.2
+     */
+    private Release getRelease132() {
+        List<ChangelogItem> changelog = new ArrayList<>();
+        changelog.add(new Improvement(getString(R.string.release_notes_132_fixed_strings)));
+
+        return new Release(
+                1,
+                3,
+                2,
+                getDate(25, Calendar.OCTOBER, 2019),
+                "",
+                changelog
+        );
     }
 
     private String getString(@StringRes int stringId) {
