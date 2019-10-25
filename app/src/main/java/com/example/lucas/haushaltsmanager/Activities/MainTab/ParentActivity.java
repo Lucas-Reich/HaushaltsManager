@@ -185,7 +185,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
             return visibleExpenses.subList(offset, visibleExpenses.size());
         }
 
-        return visibleExpenses.subList(offset, batchSize);
+        return visibleExpenses.subList(offset, offset + batchSize);
     }
 
     private void initializeActiveAccounts() {

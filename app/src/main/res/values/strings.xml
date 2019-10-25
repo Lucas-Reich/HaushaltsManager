@@ -203,4 +203,5 @@
     <string name="could_not_delete_child_category">Category could not be deleted, because there are still bookings with this category.</string>
     <string name="release_notes_131_cent_fix">Input of cents was not possible</string>
     <string name="release_notes_132_fixed_strings">Minor wording issues fixed</string>
+    <string name="release_notes_133_infinite_scroll_fix">Fixed a crash when scrolling too far in the expenditure overview</string>
 </resources>
