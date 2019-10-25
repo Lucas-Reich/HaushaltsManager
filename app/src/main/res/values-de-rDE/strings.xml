@@ -181,4 +181,5 @@
     <string name="release_notes_130_tab_two_space">Ein wenig Platz am ende der “Monatliche Übersicht“ Liste hinzugefügt</string>
     <string name="release_notes_131_cent_fix">Eingabe von Cents war nicht möglich</string>
     <string name="release_notes_132_fixed_strings">Kleinere Formulierungsprobleme behoben</string>
+    <string name="release_notes_133_infinite_scroll_fix">Fix eines Absturzes, wenn in der Ausgabenübersicht zu weit gescrollt wurde</string>
 </resources>
