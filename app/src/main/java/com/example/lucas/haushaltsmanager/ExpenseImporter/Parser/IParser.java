@@ -1,13 +1,14 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.Parser;
 
-import com.example.lucas.haushaltsmanager.Entities.Account;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.InvalidInputException;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.NoMappingFoundException;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Line.Line;
+import com.example.lucas.haushaltsmanager.ExpenseImporter.MappingList;
 
-public interface IParser {
-    Account parseAccount(Line line) throws NoMappingFoundException, InvalidInputException;
+import java.util.List;
 
-    ExpenseObject parseBooking(Line line) throws NoMappingFoundException, InvalidInputException;
+public interface IParser<T> {
+    List<IRequiredField> getRequiredFields();
+
+    T parse(Line line, MappingList mappings) throws NoMappingFoundException, InvalidInputException;
 }

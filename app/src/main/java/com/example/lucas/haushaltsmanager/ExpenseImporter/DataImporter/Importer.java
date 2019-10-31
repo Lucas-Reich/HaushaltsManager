@@ -1,68 +1,53 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.DataImporter;
 
-import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.InvalidLineException;
-import com.example.lucas.haushaltsmanager.ExpenseImporter.Files.FileReader.IFileReader;
+import com.example.lucas.haushaltsmanager.ExpenseImporter.DataImporter.ImportStrategies.IImportStrategy;
+import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.InvalidInputException;
+import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.NoMappingFoundException;
+import com.example.lucas.haushaltsmanager.ExpenseImporter.FileReader.IFileReader;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.ISub;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Line.Line;
-import com.example.lucas.haushaltsmanager.ExpenseImporter.SavingService.ISaver;
-import com.example.lucas.haushaltsmanager.ExpenseImporter.Transformer.CSVTransformer;
-import com.example.lucas.haushaltsmanager.ExpenseImporter.Transformer.ITransformer;
+import com.example.lucas.haushaltsmanager.ExpenseImporter.MappingList;
+import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.IRequiredField;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Importer implements IImporter {
+    private List<ISub> subs = new ArrayList<>();
+
     private IFileReader fileReader;
-    private ISaver saver;
-    private List<ISub> subs;
-    private ITransformer transformer;
+    private MappingList mappingList;
 
-    private boolean abortExecution = false;
+    private IImportStrategy importStrategy;
 
-    Importer(IFileReader fileReader, ISaver saver, ITransformer transformer) {
+    public Importer(IFileReader fileReader, IImportStrategy strategy) {
         this.fileReader = fileReader;
-        this.saver = saver;
-        this.transformer = transformer;
-
-        subs = new ArrayList<>();
-    }
-
-    public static Importer createCSVImporter(IFileReader fileReader, ISaver saver) {
-        String headerLine = fileReader.getHeaderLine();
-
-        return new Importer(
-                fileReader,
-                saver,
-                new CSVTransformer(headerLine)
-        );
+        this.importStrategy = strategy;
     }
 
     @Override
     public void run() {
-        while (fileReader.moveToNext() && !abortExecution) {
+        while (fileReader.moveToNext()) {
             try {
-                Line line = getCurrentLine(fileReader);
+                Line line = fileReader.getCurrentLine();
 
-                boolean lineImportResult = saver.save(line); // TODO: Sollte ich die Exceptions dieser Methode auch hier abfangen?
+                importStrategy.handle(line, mappingList);
 
-                notifySubs(lineImportResult);
-            } catch (InvalidLineException e) {
+                notifySubs(true);
+            } catch (NoMappingFoundException | InvalidInputException e) {
                 notifySubs(false);
             }
         }
 
-        saver.finish();
-        fileReader.close();
+        releaseResources();
     }
 
     @Override
     public void abort() {
-        abortExecution = true;
-
-        saver.revert();
-
-        saver.finish();
         fileReader.close();
+        importStrategy.abort();
+
+        releaseResources();
     }
 
     @Override
@@ -80,10 +65,18 @@ public class Importer implements IImporter {
         return fileReader.getLineCount();
     }
 
-    private Line getCurrentLine(IFileReader fileReader) throws InvalidLineException {
-        String currentLine = fileReader.getCurrentLine();
+    public List<IRequiredField> getRequiredFields() {
+        return importStrategy.getRequiredFields();
+    }
 
-        return transformer.transform(currentLine);
+    public void setMapping(MappingList mapping) {
+        this.mappingList = mapping;
+    }
+
+    private void releaseResources() {
+        fileReader.close();
+
+        importStrategy.finish();
     }
 
     private void notifySubs(boolean successful) {

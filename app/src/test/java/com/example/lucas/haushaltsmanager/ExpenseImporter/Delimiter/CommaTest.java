@@ -7,7 +7,7 @@ import static org.junit.Assert.assertEquals;
 public class CommaTest {
     @Test
     public void shouldReturnCommaAsDelimiter() {
-        DelimiterInterface delimiter = new Comma();
+        IDelimiter delimiter = new Comma();
 
         assertEquals(",", delimiter.getDelimiter());
     }

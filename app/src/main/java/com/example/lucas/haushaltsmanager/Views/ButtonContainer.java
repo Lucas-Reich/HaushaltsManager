@@ -19,8 +19,8 @@ public class ButtonContainer {
     public void createButtons(String[] text) {
         Button button;
 
-        for (String field : text) {
-            button = generateButton(field);
+        for (int i = 0; i < text.length; i++) {
+            button = generateButton(text[i], i);
 
             container.addView(button);
         }
@@ -42,10 +42,11 @@ public class ButtonContainer {
         view.setEnabled(false);
     }
 
-    private Button generateButton(String buttonText) {
+    private Button generateButton(String buttonText, int index) {
         Button button = new Button(container.getContext());
 
         button.setText(buttonText);
+        button.setTag(index);
 
         button.setOnClickListener(createOnButtonClickListener());
 
@@ -60,13 +61,13 @@ public class ButtonContainer {
 
                 if (null != listener) {
                     String buttonText = ((Button) button).getText().toString();
-                    listener.onClick(buttonText);
+                    listener.onClick(buttonText, (int) button.getTag());
                 }
             }
         };
     }
 
     public interface OnButtonContainerClick {
-        void onClick(String buttonText);
+        void onClick(String buttonText, int buttonIndex);
     }
 }
