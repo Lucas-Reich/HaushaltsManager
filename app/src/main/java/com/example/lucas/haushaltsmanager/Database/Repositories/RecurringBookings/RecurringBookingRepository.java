@@ -5,10 +5,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.example.lucas.haushaltsmanager.Database.Common.ITransformer;
+import com.example.lucas.haushaltsmanager.Database.Common.QueryResult;
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.Exceptions.RecurringBookingNotFoundException;
-import com.example.lucas.haushaltsmanager.Database.TransformerInterface;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.RecurringBooking;
 
@@ -18,7 +19,7 @@ import java.util.List;
 
 public class RecurringBookingRepository {
     private SQLiteDatabase mDatabase;
-    private TransformerInterface<RecurringBooking> transformer;
+    private ITransformer<RecurringBooking> transformer;
 
     public RecurringBookingRepository(Context context) {
         // TODO: Kann ich hier eine Default database injecten, sodass es mit dem testen einfacher wird
@@ -106,7 +107,7 @@ public class RecurringBookingRepository {
         if (!c.moveToFirst())
             throw new RecurringBookingNotFoundException(index);
 
-        return transformer.transform(c);
+        return transformer.transform(new QueryResult(c));
     }
 
     public List<RecurringBooking> getAll(Calendar start, Calendar end) {
@@ -125,7 +126,7 @@ public class RecurringBookingRepository {
 
         List<RecurringBooking> recurringBookings = new ArrayList<>();
         while (c.moveToNext()) {
-            recurringBookings.add(transformer.transform(c));
+            recurringBookings.add(transformer.transform(new QueryResult(c)));
         }
 
         c.close();

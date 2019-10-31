@@ -4,7 +4,7 @@ package com.example.lucas.haushaltsmanager.PreferencesHelper;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.example.lucas.haushaltsmanager.Entities.Account;
+import com.example.lucas.haushaltsmanager.Entities.Account.Account;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 
 import org.junit.After;

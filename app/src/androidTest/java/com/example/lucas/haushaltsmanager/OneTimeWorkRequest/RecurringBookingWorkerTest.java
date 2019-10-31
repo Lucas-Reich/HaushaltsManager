@@ -5,13 +5,21 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 import android.util.Log;
 
-import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
+import androidx.work.Configuration;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
+import androidx.work.WorkRequest;
+import androidx.work.testing.SynchronousExecutor;
+import androidx.work.testing.TestDriver;
+import androidx.work.testing.WorkManagerTestInitHelper;
+
+import com.example.lucas.haushaltsmanager.Database.DatabaseTest;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.RecurringBookingRepository;
-import com.example.lucas.haushaltsmanager.DatabaseTest;
-import com.example.lucas.haushaltsmanager.Entities.Account;
+import com.example.lucas.haushaltsmanager.Entities.Account.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
@@ -33,15 +41,6 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import androidx.work.Configuration;
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkInfo;
-import androidx.work.WorkManager;
-import androidx.work.WorkRequest;
-import androidx.work.testing.SynchronousExecutor;
-import androidx.work.testing.TestDriver;
-import androidx.work.testing.WorkManagerTestInitHelper;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -51,10 +50,13 @@ public class RecurringBookingWorkerTest extends DatabaseTest {
     private ExpenseRepository mExpenseRepo;
     private RecurringBookingRepository mRecurringBookingRepo;
 
+    @Override
+    public Context getContext() {
+        return InstrumentationRegistry.getContext();
+    }
+
     @Before
     public void setup() {
-        clearTables();
-
         Context context = InstrumentationRegistry.getTargetContext();
 
         Configuration config = new Configuration.Builder()
@@ -223,15 +225,5 @@ public class RecurringBookingWorkerTest extends DatabaseTest {
         }
 
         return false;
-    }
-
-    private void clearTables() {
-        clearTable(ExpensesDbHelper.TABLE_RECURRING_BOOKINGS);
-
-        clearTable(ExpensesDbHelper.TABLE_BOOKINGS);
-
-        clearTable(ExpensesDbHelper.TABLE_CATEGORIES);
-
-        clearTable(ExpensesDbHelper.TABLE_ACCOUNTS);
     }
 }
