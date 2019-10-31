@@ -1,38 +1,19 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.Line;
 
-import com.example.lucas.haushaltsmanager.ExpenseImporter.Delimiter.DelimiterInterface;
-import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.InvalidLineException;
-
-import java.util.HashMap;
+import com.example.lucas.haushaltsmanager.ExpenseImporter.Delimiter.IDelimiter;
 
 public class Line {
-    private HashMap<String, String> fields = new HashMap<>();
+    private String[] values;
 
-    public Line(String header, String line, DelimiterInterface delimiter) throws InvalidLineException {
-        String[] keys = header.split(delimiter.getDelimiter());
-        String[] values = line.split(delimiter.getDelimiter(), -1);
-
-        assertLessKeysThanFields(keys, values);
-
-        for (int i = 0; i < keys.length; i++) {
-            fields.put(keys[i], values[i]);
-        }
+    public Line(String line, IDelimiter delimiter) {
+        values = line.split(delimiter.getDelimiter(), -1);
     }
 
-    public String getAsString(String key) {
-        if (fields.containsKey(key)) {
-            return fields.get(key);
+    public String getAsString(int index) {
+        if (index < values.length) {
+            return values[index];
         }
 
-        return "";
-    }
-
-    private void assertLessKeysThanFields(String[] keys, String[] fields) throws InvalidLineException {
-        int keyCount = keys.length;
-        int fieldCount = fields.length;
-
-        if (keyCount > fieldCount) {
-            throw InvalidLineException.withInvalidEntryCount(keyCount, fieldCount);
-        }
+        return ""; // TODO: Sollte ich hier eine Exception auslösen oder vielleicht mit einem default Wert arbeiten?
     }
 }

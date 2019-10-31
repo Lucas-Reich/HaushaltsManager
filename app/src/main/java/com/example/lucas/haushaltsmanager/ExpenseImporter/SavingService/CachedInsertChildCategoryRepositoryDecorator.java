@@ -15,7 +15,7 @@ public class CachedInsertChildCategoryRepositoryDecorator implements ChildCatego
     private ChildCategoryRepositoryInterface repository;
     private HashMap<Category, List<Category>> cachedCategories = new HashMap<>();
 
-    public CachedInsertChildCategoryRepositoryDecorator(ChildCategoryRepositoryInterface repository) {
+    CachedInsertChildCategoryRepositoryDecorator(ChildCategoryRepositoryInterface repository) {
         this.repository = repository;
     }
 

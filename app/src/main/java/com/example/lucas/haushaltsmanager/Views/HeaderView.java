@@ -3,10 +3,10 @@ package com.example.lucas.haushaltsmanager.Views;
 import android.content.Context;
 import android.util.AttributeSet;
 
-import com.example.lucas.haushaltsmanager.ExpenseImporter.HeaderHolder;
+import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.IRequiredField;
 
 public class HeaderView extends android.support.v7.widget.AppCompatTextView {
-    private HeaderHolder currentVisibleHeader;
+    private IRequiredField boundField;
 
     public HeaderView(Context context) {
         super(context);
@@ -20,13 +20,13 @@ public class HeaderView extends android.support.v7.widget.AppCompatTextView {
         super(context, attrs, defStyleAttr);
     }
 
-    public void bindHeader(HeaderHolder holder) {
-        setText(holder.getHeaderField());
+    public void bind(IRequiredField field) {
+        setText(field.getTranslationKey());
 
-        currentVisibleHeader = holder;
+        boundField = field;
     }
 
-    public HeaderHolder getCurrentlyVisibleHeader() {
-        return currentVisibleHeader;
+    public IRequiredField getBoundField() {
+        return boundField;
     }
 }

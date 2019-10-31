@@ -1,11 +1,12 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.SavingService;
 
-import com.example.lucas.haushaltsmanager.ExpenseImporter.Line.Line;
+import com.example.lucas.haushaltsmanager.Entities.Account;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 
 public interface ISaver {
-    boolean save(Line line);
-
     void revert();
 
     void finish();
+
+    void persist(ExpenseObject booking, Account account);
 }

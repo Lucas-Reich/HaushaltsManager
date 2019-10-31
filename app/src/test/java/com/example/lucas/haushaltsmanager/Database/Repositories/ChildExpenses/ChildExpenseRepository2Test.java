@@ -86,7 +86,7 @@ public class ChildExpenseRepository2Test {
         try {
             mChildRepo.create(getSimpleExpense(), any(ExpenseObject.class));
 
-            Assert.fail("Could save ChildExpense with invalid Parent");
+            Assert.fail("Could persist ChildExpense with invalid Parent");
         } catch (ExpenseNotFoundException e) {
 
             assertEquals("Could not find Booking with id ", e.getMessage());// IMPROVEMENT: Welche Id hat die ParentExpense

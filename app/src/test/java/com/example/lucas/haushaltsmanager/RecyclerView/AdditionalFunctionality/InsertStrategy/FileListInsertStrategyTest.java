@@ -43,7 +43,7 @@ public class FileListInsertStrategyTest {
     }
 
     // insertItemAtCorrectPosition
-    // Den Test kann ich nicht machen, da ich den timestamp für lastModified bei einem FileReader nicht richtig ändern kann.
+    // Den Test kann ich nicht machen, da ich den timestamp für lastModified bei einem CSVFileReader nicht richtig ändern kann.
 
     private File getDummyFile(int hour, int minute, int second) {
         File file = new File("the/path/does/not/matter");

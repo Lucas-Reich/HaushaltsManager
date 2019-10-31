@@ -13,10 +13,6 @@ import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
-import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.InvalidInputException;
-import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.NoMappingFoundException;
-import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.IParser;
-import com.example.lucas.haushaltsmanager.ExpenseImporter.Line.Line;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferencesInterface;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.AddAndSetDefaultDecorator;
@@ -25,8 +21,6 @@ import com.example.lucas.haushaltsmanager.R;
 import java.util.ArrayList;
 
 public class Saver implements ISaver {
-    private static final String TAG = Saver.class.getSimpleName();
-
     private AccountRepositoryInterface accountRepository;
     private ChildCategoryRepositoryInterface childCategoryRepository;
     private ExpenseRepository bookingRepository;
@@ -34,7 +28,6 @@ public class Saver implements ISaver {
 
     private BackupService backupService;
 
-    private IParser parser;
     private final Category parentCategory;
 
     Saver(
@@ -42,7 +35,6 @@ public class Saver implements ISaver {
             ChildCategoryRepositoryInterface childCategoryRepository,
             ExpenseRepository expenseRepository,
             ActiveAccountsPreferencesInterface accountsPreferences,
-            IParser parser,
             BackupService backupService,
             Category parentCategory
     ) {
@@ -52,14 +44,13 @@ public class Saver implements ISaver {
 
         this.accountsPreferences = accountsPreferences;
 
-        this.parser = parser;
         this.parentCategory = parentCategory;
 
         this.backupService = backupService;
         this.backupService.createBackup();
     }
 
-    public static Saver create(Context context, IParser parser) {
+    public static Saver create(Context context) {
         CategoryRepositoryInterface categoryRepository = new CategoryRepository(context);
         Category parentCategory = categoryRepository.insert(new Category(
                 context.getString(R.string.imported_categories_parent_name),
@@ -73,25 +64,9 @@ public class Saver implements ISaver {
                 new CachedInsertChildCategoryRepositoryDecorator(new ChildCategoryRepository(context)),
                 new ExpenseRepository(context),
                 new AddAndSetDefaultDecorator(new ActiveAccountsPreferences(context), context),
-                parser,
                 new BackupService(),
                 parentCategory
         );
-    }
-
-    @Override
-    public boolean save(Line line) {
-        try {
-            Account account = parser.parseAccount(line);
-
-            ExpenseObject booking = parser.parseBooking(line);
-
-            saveBooking(booking, account);
-
-            return true;
-        } catch (NoMappingFoundException | InvalidInputException e) {
-            return false;
-        }
     }
 
     @Override
@@ -102,6 +77,14 @@ public class Saver implements ISaver {
     @Override
     public void finish() {
         backupService.removeBackups();
+    }
+
+    public void persist(ExpenseObject booking, Account account) {
+        saveAccountAndAttachToBooking(account, booking);
+
+        saveCategoryAndAttachToBooking(booking.getCategory(), booking);
+
+        bookingRepository.insert(booking);
     }
 
     private void saveAccountAndAttachToBooking(Account account, ExpenseObject booking) {
@@ -116,13 +99,5 @@ public class Saver implements ISaver {
         Category savedCategory = childCategoryRepository.insert(parentCategory, category);
 
         booking.setCategory(savedCategory);
-    }
-
-    private void saveBooking(ExpenseObject booking, Account account) {
-        saveAccountAndAttachToBooking(account, booking);
-
-        saveCategoryAndAttachToBooking(booking.getCategory(), booking);
-
-        bookingRepository.insert(booking);
     }
 }

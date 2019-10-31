@@ -1,29 +1,31 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter;
 
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.NoMappingFoundException;
-import com.example.lucas.haushaltsmanager.ExpenseImporter.Mappings.KeyMappingInterface;
+import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.IRequiredField;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 public class MappingList {
-    private List<KeyMappingInterface> mappings;
+    private HashMap<IRequiredField, Integer> mappings;
 
     public MappingList() {
-        mappings = new ArrayList<>();
+        mappings = new HashMap<>();
     }
 
-    public void addMapping(KeyMappingInterface mapping) {
-        mappings.add(mapping);
+    public void addMapping(IRequiredField key, int mappedValueIndex) {
+        mappings.put(key, mappedValueIndex);
     }
 
-    public String getMappingForKey(String key) throws NoMappingFoundException {
-        for (KeyMappingInterface keyMapping : mappings) {
-            if (keyMapping.getKey().equals(key)) {
-                return keyMapping.getMappedField();
-            }
+    /**
+     * @param key Key für den ein mapping erstellt werden soll.
+     * @return Index des gemappten Feldes
+     * @throws NoMappingFoundException Wenn der key nicht existiert, wird eine Exception ausgelöst
+     */
+    public int getMappingForKey(IRequiredField key) throws NoMappingFoundException {
+        if (mappings.containsKey(key)) {
+            return mappings.get(key);
         }
 
-        throw NoMappingFoundException.withKey(key);
+        throw NoMappingFoundException.withRequiredField(key);
     }
 }

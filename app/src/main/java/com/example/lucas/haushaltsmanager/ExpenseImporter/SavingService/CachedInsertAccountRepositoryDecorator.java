@@ -17,7 +17,7 @@ public class CachedInsertAccountRepositoryDecorator implements AccountRepository
     private AccountRepositoryInterface repository;
     private List<Account> cachedAccounts = new ArrayList<>();
 
-    public CachedInsertAccountRepositoryDecorator(AccountRepositoryInterface repository) {
+    CachedInsertAccountRepositoryDecorator(AccountRepositoryInterface repository) {
         this.repository = repository;
     }
 
