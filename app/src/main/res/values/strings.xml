@@ -54,6 +54,11 @@
     <string name="release_notes_130">This time there are only small updates in the list views of the app. Most of the changes are in the background and improve the speed of the app.</string>
     <string name="release_notes_130_list_improvements">Adapted lists in \"Bookings\", \"Categories\", \"Recurring Bookings\" and \"Import/Export\"</string>
     <string name="release_notes_130_tab_two_space">Added a little space at the end of the \"Monthly Overview\" list</string>
+    <string name="release_notes_131_cent_fix">Input of cents was not possible</string>
+    <string name="release_notes_132_fixed_strings">Minor wording issues fixed</string>
+    <string name="release_notes_133_infinite_scroll_fix">Fixed a crash when scrolling too far in the expenditure overview</string>
+    <string name="release_notes_14">Are you already using another app to track your expenses and want to switch now? Then you can now use the new file importer to import your data from a CSV file into the Expense Manager.</string>
+    <string name="release_notes_14_data_importer">Created CSV file importer</string>
 
 
     <string name="export_price">Price</string>
@@ -214,7 +219,4 @@
     <string name="import_file_sub_title_reading_content">Reading content of fileReader</string>
     <string name="click_on_button_similar_to_word">Please click on the button that most closely corresponds to the following term:</string>
     <string name="imported_categories_parent_name">Imported Categories</string>
-    <string name="release_notes_131_cent_fix">Input of cents was not possible</string>
-    <string name="release_notes_132_fixed_strings">Minor wording issues fixed</string>
-    <string name="release_notes_133_infinite_scroll_fix">Fixed a crash when scrolling too far in the expenditure overview</string>
 </resources>

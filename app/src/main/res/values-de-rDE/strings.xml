@@ -196,4 +196,6 @@
     <string name="mapping_booking_title">Titel</string>
     <string name="activity_show_recurring_bookings">Wiederkehrende Buchungen</string>
     <string name="mapping_price_type">Ausgabentyp</string>
+    <string name="release_notes_14">Benutzt du bereits eine andere App um deine Ausgaben zu verfolgen und möchtest nun wechseln? Dann kannst du jetzt den neuen Dateiimporter benutzen um deine Daten aus einer CSV Datei in den Ausgaben Manager zu importieren.</string>
+    <string name="release_notes_14_data_importer">CSV Dateiimporer erstellt</string>
 </resources>
