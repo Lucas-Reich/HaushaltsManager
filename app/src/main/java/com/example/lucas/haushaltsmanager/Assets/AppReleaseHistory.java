@@ -49,101 +49,62 @@ public class AppReleaseHistory implements ReleaseHistory {
         releases.add(getRelease132());
         releases.add(getRelease133());
         releases.add(getRelease14());
+        releases.add(getRelease15());
 
         return releases;
     }
 
     /**
-     * Methode, welche die Änderungen der Version 1.0.0 zurückgibt.
+     * Methode, welche die Änderungen der Version 1.5 zurückgibt
      *
-     * @return Version 1.0.0
+     * @return Version 1.5
      */
-    private Release getRelease100() {
-        return new Release(
-                1,
-                null,
-                null,
-                getDate(1, Calendar.JANUARY, 2019),
-                getString(R.string.release_notes_100),
-                new ArrayList<ChangelogItem>()
-        );
-    }
-
-    /**
-     * Methode, welche die Änderungen der Version 1.1.0 zurückgibt.
-     *
-     * @return Version 1.1.0
-     */
-    private Release getRelease110() {
+    private Release getRelease15() {
         List<ChangelogItem> changelog = new ArrayList<>();
-        changelog.add(new Feature(getString(R.string.release_notes_110_tab_one_feature_recycler_view)));
-        changelog.add(new Feature(getString(R.string.release_notes_110_tab_one_feature_animations)));
-        changelog.add(new Improvement(getString(R.string.release_notes_110_code_improvements)));
+        changelog.add(new Refactoring(getString(R.string.release_notes_15_code_improvements)));
 
         return new Release(
                 1,
-                1,
-                null,
-                getDate(1, Calendar.MARCH, 2019),
-                getString(R.string.release_notes_110),
-                changelog
-        );
-    }
-
-    /**
-     * Methode, welche die Änderungen der Version 1.2.0 zurückgibt.
-     *
-     * @return Version 1.2.0
-     */
-    private Release getRelease120() {
-        List<ChangelogItem> changelog = new ArrayList<>();
-        changelog.add(new Bug(getString(R.string.release_notes_120_correct_scheduling)));
-        changelog.add(new Improvement(getString(R.string.release_notes_120_improved_scheduling))); // RecurringBookings lassen sich nun einfacher planen
-
-
-        return new Release(
-                1,
-                2,
+                5,
                 0,
-                getDate(1, Calendar.APRIL, 2019),
-                getString(R.string.release_notes_120),
+                getDate(10, Calendar.NOVEMBER, 2019),
+                "",
                 changelog
         );
     }
 
     /**
-     * Methode, welche die Änderungen der Version 1.3.0 zurückgibt.
+     * Methode, welche die Änderungen der Version 1.4 zurückgibt.
      *
-     * @return Version 1.3.0
+     * @return Version 1.4
      */
-    private Release getRelease130() {
+    private Release getRelease14() {
         List<ChangelogItem> changelog = new ArrayList<>();
-        changelog.add(new Improvement(getString(R.string.release_notes_130_list_improvements)));
-        changelog.add(new Improvement(getString(R.string.release_notes_130_tab_two_space)));
+        changelog.add(new Feature(getString(R.string.release_notes_14_data_importer)));
+
+        return new Release(
+                1,
+                4,
+                0,
+                getDate(1, Calendar.NOVEMBER, 2019),
+                getString(R.string.release_notes_14),
+                changelog
+        );
+    }
+
+    /**
+     * Methode, welche die Änderungen der Version 1.3.3 zurückgibt.
+     *
+     * @return Version 1.3.3
+     */
+    private Release getRelease133() {
+        List<ChangelogItem> changelog = new ArrayList<>();
+        changelog.add(new Bug(getString(R.string.release_notes_133_infinite_scroll_fix)));
 
         return new Release(
                 1,
                 3,
-                0,
-                getDate(30, Calendar.JUNE, 2019),
-                getString(R.string.release_notes_130),
-                changelog
-        );
-    }
-
-    /**
-     * Methode, welche die Änderungen der Version 1.3.1 zurückgibt.
-     *
-     * @return Version 1.3.1
-     */
-    private Release getRelease131() {
-        List<ChangelogItem> changelog = new ArrayList<>();
-        changelog.add(new Bug(getString(R.string.release_notes_131_cent_fix)));
-
-        return new Release(
-                1,
                 3,
-                1,
                 getDate(25, Calendar.OCTOBER, 2019),
                 "",
                 changelog
@@ -170,18 +131,18 @@ public class AppReleaseHistory implements ReleaseHistory {
     }
 
     /**
-     * Methode, welche die Änderungen der Version 1.3.3 zurückgibt.
+     * Methode, welche die Änderungen der Version 1.3.1 zurückgibt.
      *
-     * @return Version 1.3.3
+     * @return Version 1.3.1
      */
-    private Release getRelease133() {
+    private Release getRelease131() {
         List<ChangelogItem> changelog = new ArrayList<>();
-        changelog.add(new Bug(getString(R.string.release_notes_133_infinite_scroll_fix)));
+        changelog.add(new Bug(getString(R.string.release_notes_131_cent_fix)));
 
         return new Release(
                 1,
                 3,
-                3,
+                1,
                 getDate(25, Calendar.OCTOBER, 2019),
                 "",
                 changelog
@@ -189,21 +150,80 @@ public class AppReleaseHistory implements ReleaseHistory {
     }
 
     /**
-     * Methode, welche die Änderungen der Version 1.4 zurückgibt.
+     * Methode, welche die Änderungen der Version 1.3.0 zurückgibt.
      *
-     * @return Version 2.4
+     * @return Version 1.3.0
      */
-    private Release getRelease14() {
+    private Release getRelease130() {
         List<ChangelogItem> changelog = new ArrayList<>();
-        changelog.add(new Feature(getString(R.string.release_notes_14_data_importer)));
+        changelog.add(new Improvement(getString(R.string.release_notes_130_list_improvements)));
+        changelog.add(new Improvement(getString(R.string.release_notes_130_tab_two_space)));
 
         return new Release(
                 1,
-                4,
+                3,
                 0,
-                getDate(1, Calendar.NOVEMBER, 2019),
-                getString(R.string.release_notes_14),
+                getDate(30, Calendar.JUNE, 2019),
+                getString(R.string.release_notes_130),
                 changelog
+        );
+    }
+
+    /**
+     * Methode, welche die Änderungen der Version 1.2.0 zurückgibt.
+     *
+     * @return Version 1.2.0
+     */
+    private Release getRelease120() {
+        List<ChangelogItem> changelog = new ArrayList<>();
+        changelog.add(new Bug(getString(R.string.release_notes_120_correct_scheduling)));
+        changelog.add(new Improvement(getString(R.string.release_notes_120_improved_scheduling))); // RecurringBookings lassen sich nun einfacher planen
+
+
+        return new Release(
+                1,
+                2,
+                0,
+                getDate(1, Calendar.APRIL, 2019),
+                getString(R.string.release_notes_120),
+                changelog
+        );
+    }
+
+    /**
+     * Methode, welche die Änderungen der Version 1.1.0 zurückgibt.
+     *
+     * @return Version 1.1.0
+     */
+    private Release getRelease110() {
+        List<ChangelogItem> changelog = new ArrayList<>();
+        changelog.add(new Feature(getString(R.string.release_notes_110_tab_one_feature_recycler_view)));
+        changelog.add(new Feature(getString(R.string.release_notes_110_tab_one_feature_animations)));
+        changelog.add(new Improvement(getString(R.string.release_notes_110_code_improvements)));
+
+        return new Release(
+                1,
+                1,
+                null,
+                getDate(1, Calendar.MARCH, 2019),
+                getString(R.string.release_notes_110),
+                changelog
+        );
+    }
+
+    /**
+     * Methode, welche die Änderungen der Version 1.0.0 zurückgibt.
+     *
+     * @return Version 1.0.0
+     */
+    private Release getRelease100() {
+        return new Release(
+                1,
+                null,
+                null,
+                getDate(1, Calendar.JANUARY, 2019),
+                getString(R.string.release_notes_100),
+                new ArrayList<ChangelogItem>()
         );
     }
 

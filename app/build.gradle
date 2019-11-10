@@ -7,8 +7,8 @@ android {
         applicationId "com.lucas.ausgabenmanager"
         minSdkVersion 19 // Android 4.4, KitKat
         targetSdkVersion 28
-        versionCode 9
-        versionName '1.4'
+        versionCode 10
+        versionName '1.5'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     testOptions {
