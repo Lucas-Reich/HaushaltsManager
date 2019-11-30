@@ -1,5 +1,7 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.Exception;
 
+import java.io.File;
+
 public class InvalidFileException extends RuntimeException {
     private InvalidFileException(String message, Throwable cause) {
         super(message, cause);
@@ -18,5 +20,16 @@ public class InvalidFileException extends RuntimeException {
                 "Given path '%s' does not reference a File.",
                 filePath
         ), null);
+    }
+
+    public static InvalidFileException generic(File file) {
+        return new InvalidFileException(String.format(
+                "Something went wrong while handling file: %s.",
+                file.getName()
+        ), null);
+    }
+
+    public static InvalidFileException nullGiven() {
+        return new InvalidFileException("Expected type File got null.", null);
     }
 }

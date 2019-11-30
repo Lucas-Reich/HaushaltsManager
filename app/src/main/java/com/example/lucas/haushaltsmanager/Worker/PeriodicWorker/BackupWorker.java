@@ -3,7 +3,9 @@ package com.example.lucas.haushaltsmanager.Worker.PeriodicWorker;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.example.lucas.haushaltsmanager.Backup.BackupHandler;
+import com.example.lucas.haushaltsmanager.Backup.BackupUtils;
+import com.example.lucas.haushaltsmanager.Backup.Handler.Decorator.DatabaseBackupHandler;
+import com.example.lucas.haushaltsmanager.Backup.Handler.FileBackupHandler;
 import com.example.lucas.haushaltsmanager.Entities.Backup;
 import com.example.lucas.haushaltsmanager.Entities.Directory;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.AppInternalPreferences;
@@ -41,8 +43,7 @@ public class BackupWorker extends AbstractRecurringWorker {
     public Result doWork() {
         boolean successful = createNewBackup();
 
-        BackupHandler backupHandler = new BackupHandler();
-        backupHandler.deleteBackupsAboveThreshold(getBackupDir(), getBackupThreshold());
+        BackupUtils.deleteBackupsAboveThreshold(getBackupDir(), getBackupThreshold());
 
         scheduleNextWorker(backup);
 
@@ -58,11 +59,7 @@ public class BackupWorker extends AbstractRecurringWorker {
     }
 
     private boolean createNewBackup() {
-        BackupHandler backupHandler = new BackupHandler();
-        return backupHandler.saveBackup(
-                backup,
-                null,
-                getApplicationContext()
-        );
+        DatabaseBackupHandler backupHandler = new DatabaseBackupHandler(getApplicationContext(), new FileBackupHandler());
+        return backupHandler.backup(null, backup.getTitle());
     }
 }

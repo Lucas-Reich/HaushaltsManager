@@ -1,12 +1,13 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.SavingService;
 
+import com.example.lucas.haushaltsmanager.Backup.Handler.Decorator.DataImporterBackupHandler;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepositoryInterface;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepositoryInterface;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
-import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences;
+import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences.ActiveAccountsPreferences;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -22,7 +23,7 @@ public class SaverTest {
     private ChildCategoryRepositoryInterface mockChildCategoryRepository;
     private ExpenseRepository mockExpenseRepository;
     private ActiveAccountsPreferences accountPreferences;
-    private BackupService backupService;
+    private DataImporterBackupHandler backupHandler;
 
     private ISaver saver;
 
@@ -32,14 +33,14 @@ public class SaverTest {
         mockChildCategoryRepository = mock(ChildCategoryRepositoryInterface.class);
         mockExpenseRepository = mock(ExpenseRepository.class);
         accountPreferences = mock(ActiveAccountsPreferences.class);
-        backupService = mock(BackupService.class);
+        backupHandler = mock(DataImporterBackupHandler.class);
 
         saver = new Saver(
                 mockAccountRepository,
                 mockChildCategoryRepository,
                 mockExpenseRepository,
                 accountPreferences,
-                backupService,
+                backupHandler,
                 mock(Category.class)
         );
     }
@@ -62,7 +63,7 @@ public class SaverTest {
 
 
         // Assert
-        verify(backupService, times(1)).createBackup();
+        verify(backupHandler, times(1)).backup();
 
 
         verify(mockAccountRepository, times(1)).create(account);
@@ -79,14 +80,14 @@ public class SaverTest {
     public void revertRestoresFiles() {
         saver.revert();
 
-        verify(backupService, times(1)).restoreBackup();
+        verify(backupHandler, times(1)).restore();
     }
 
     @Test
     public void finishRemovesUnusedResources() {
         saver.finish();
 
-        verify(backupService, times(1)).removeBackups();
+        verify(backupHandler, times(1)).remove();
     }
 
     private void childCategoryRepositoryShouldReturnCategory(Category category) {

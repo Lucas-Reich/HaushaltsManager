@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
+import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences.ActiveAccountsPreferences;
 
 import org.junit.After;
 import org.junit.Before;

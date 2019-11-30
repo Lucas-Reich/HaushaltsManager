@@ -16,10 +16,10 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.codekidlabs.storagechooser.StorageChooser;
-import com.example.lucas.haushaltsmanager.Backup.BackupHandler;
+import com.example.lucas.haushaltsmanager.Backup.Handler.Decorator.DatabaseBackupHandler;
+import com.example.lucas.haushaltsmanager.Backup.Handler.FileBackupHandler;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
-import com.example.lucas.haushaltsmanager.Entities.Backup;
 import com.example.lucas.haushaltsmanager.Entities.Directory;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Backup.BackupUtils;
@@ -101,10 +101,10 @@ public class BackupActivity extends AbstractAppCompatActivity {
                     @Override
                     public void onConfirmationResult(boolean restoreDatabase) {
                         if (restoreDatabase) {
-                            BackupHandler backupHandler = new BackupHandler();
-                            boolean restoredBackup = backupHandler.restoreBackup(file, BackupActivity.this);
+                            DatabaseBackupHandler backupHandler = new DatabaseBackupHandler(BackupActivity.this, new FileBackupHandler());
+                            boolean successful = backupHandler.restore(file);
 
-                            showToast(restoredBackup ? R.string.backup_restoring_successful : R.string.backup_restoring_failed);
+                            showToast(successful ? R.string.backup_restoring_successful : R.string.backup_restoring_failed);
                         }
                     }
                 });
@@ -127,8 +127,8 @@ public class BackupActivity extends AbstractAppCompatActivity {
                     @Override
                     public void onTextInput(String backupName) {
 
-                        BackupHandler backupHandler = new BackupHandler();
-                        boolean successful = backupHandler.saveBackup(new Backup(backupName), mBackupDirectory, BackupActivity.this);
+                        DatabaseBackupHandler backupHandler = new DatabaseBackupHandler(BackupActivity.this, new FileBackupHandler());
+                        boolean successful = backupHandler.backup(mBackupDirectory, backupName);
 
                         if (successful)
                             showToast(R.string.created_backup);
@@ -161,7 +161,6 @@ public class BackupActivity extends AbstractAppCompatActivity {
      * Methode um die ListView neu zu laden, wenn sich die Anzahl der Backups geändert hat.
      */
     private void updateListView() {
-
         List<String> mOldBackups = BackupUtils.getBackupsInDir(mBackupDirectory);
 
         ArrayAdapter<String> mListViewAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, mOldBackups);

@@ -34,35 +34,32 @@ public class FileUtils {
         return files;
     }
 
-    public static boolean copy(File file, Directory destDir, String newFileName) {
+    public static File copy(File file, Directory destDir, String newFileName) {
         try {
             InputStream in = new FileInputStream(file);
-            OutputStream out = new FileOutputStream(destDir.toString() + "/" + newFileName);
+            String path = String.format("%s/%s",
+                    destDir.toString(),
+                    newFileName
+            );
 
-            try {
-
+            try (OutputStream out = new FileOutputStream(path, false)) {
                 byte[] buf = new byte[1024];
                 int len;
                 while ((len = in.read(buf)) > 0) {
-
                     out.write(buf, 0, len);
                 }
-
-            } finally {
-
-                out.close();
             }
 
-            return true;
+            return new File(path);
         } catch (FileNotFoundException e) {
 
             Log.e(TAG, "Could not copy file. " + file.toString() + " does not exist.", e);
-            return false;
+            return null;
         } catch (IOException e) {
 
             //Wenn eine IOException ausgelöst wird, kann ich den Grund eh nicht genau ermitteln und somit auch einfach FALSE zurückgeben
             Log.e(TAG, "Something went wrong while copying", e);
-            return false;
+            return null;
         }
     }
 
@@ -94,5 +91,17 @@ public class FileUtils {
         }
 
         return oldestFile;
+    }
+
+    public static String getType(File file) {
+        String extension = "";
+        String fileName = file.getName();
+
+        int i = fileName.lastIndexOf('.');
+        if (i > 0) {
+            extension = fileName.substring(i + 1);
+        }
+
+        return extension;
     }
 }
