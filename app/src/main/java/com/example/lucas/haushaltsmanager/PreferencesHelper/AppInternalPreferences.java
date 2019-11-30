@@ -12,7 +12,7 @@ public class AppInternalPreferences {
     private static final String TAG = AppInternalPreferences.class.getSimpleName();
     private static final String APP_INTERNAL_SETTINGS = "AppInternalSettings";
 
-    private static final String BACKUP_DIRECTORY = "backupDirectory";
+    private static final String BACKUP_DIRECTORY_KEY = "backupDirectory";
 
     private SharedPreferences mPreferences;
     private Context mContext;
@@ -25,14 +25,14 @@ public class AppInternalPreferences {
 
     public Directory getBackupDirectory() {
 
-        return new Directory(mPreferences.getString(BACKUP_DIRECTORY, getDefaultBackupDir()));
+        return new Directory(mPreferences.getString(BACKUP_DIRECTORY_KEY, getDefaultBackupDir()));
     }
 
     public void setBackupDirectory(Directory dir) {
         if (!dir.exists())
             dir.mkdir();
 
-        mPreferences.edit().putString(BACKUP_DIRECTORY, dir.toString()).apply();
+        mPreferences.edit().putString(BACKUP_DIRECTORY_KEY, dir.toString()).apply();
     }
 
     private String getDefaultBackupDir() {

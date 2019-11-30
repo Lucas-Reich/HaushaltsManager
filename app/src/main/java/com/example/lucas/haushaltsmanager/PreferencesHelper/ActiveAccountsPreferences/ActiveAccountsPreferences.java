@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager.PreferencesHelper;
+package com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -10,17 +10,31 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class ActiveAccountsPreferences implements ActiveAccountsPreferencesInterface{
+public class ActiveAccountsPreferences implements ActiveAccountsPreferencesInterface {
     private static final String TAG = ActiveAccountsPreferences.class.getSimpleName();
 
-    public static final String PREFERENCES_NAME = "ActiveAccounts";
+    public static final String PREFERENCES_NAME = "ActiveAccounts.xml";
     private static boolean DEFAULT_ACCOUNT_VISIBILITY = true;
 
     private SharedPreferences mPreferences;
 
     public ActiveAccountsPreferences(Context context) {
+        mPreferences = context.getSharedPreferences(
+                PREFERENCES_NAME.split("\\.")[0],
+                Context.MODE_PRIVATE
+        );
+    }
 
-        mPreferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
+    public static void clear(Context context) {
+        new ActiveAccountsPreferences(context)
+                .mPreferences
+                .edit()
+                .clear()
+                .apply();
+    }
+
+    public void clear() {
+        mPreferences.edit().clear().apply();
     }
 
     public void addAccount(Account account) {

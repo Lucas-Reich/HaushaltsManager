@@ -27,7 +27,7 @@ import com.example.lucas.haushaltsmanager.Activities.Settings;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Dialogs.ChangeAccounts.ChooseAccountsDialogFragment;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
-import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences;
+import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences.ActiveAccountsPreferences;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseFilter;
 

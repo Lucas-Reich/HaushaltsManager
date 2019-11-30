@@ -132,7 +132,7 @@ public class ExpensesDbHelper extends SQLiteOpenHelper {
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         IMigration[] migrations = MigrationHelper.getMigrations();
 
-        for (int i=oldVersion; i > newVersion; i++) {
+        for (int i=oldVersion; i > newVersion; i--) {
             migrations[i-1].revert(db);
         }
     }

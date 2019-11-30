@@ -1,8 +1,9 @@
-package com.example.lucas.haushaltsmanager.PreferencesHelper;
+package com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences;
 
 import android.content.Context;
 
 import com.example.lucas.haushaltsmanager.Entities.Account;
+import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 
 import java.util.List;
 
@@ -40,5 +41,10 @@ public class AddAndSetDefaultDecorator implements ActiveAccountsPreferencesInter
     @Override
     public List<Long> getActiveAccounts() {
         return preferences.getActiveAccounts();
+    }
+
+    @Override
+    public void clear() {
+        preferences.clear();
     }
 }

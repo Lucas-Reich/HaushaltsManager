@@ -2,6 +2,8 @@ package com.example.lucas.haushaltsmanager.ExpenseImporter.SavingService;
 
 import android.content.Context;
 
+import com.example.lucas.haushaltsmanager.Backup.Handler.Decorator.DataImporterBackupHandler;
+import com.example.lucas.haushaltsmanager.Backup.Handler.FileBackupHandler;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepositoryInterface;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
@@ -13,9 +15,9 @@ import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
-import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences;
-import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferencesInterface;
-import com.example.lucas.haushaltsmanager.PreferencesHelper.AddAndSetDefaultDecorator;
+import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences.ActiveAccountsPreferences;
+import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences.ActiveAccountsPreferencesInterface;
+import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences.AddAndSetDefaultDecorator;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.util.ArrayList;
@@ -26,7 +28,7 @@ public class Saver implements ISaver {
     private ExpenseRepository bookingRepository;
     private ActiveAccountsPreferencesInterface accountsPreferences;
 
-    private BackupService backupService;
+    private DataImporterBackupHandler backupHandler;
 
     private final Category parentCategory;
 
@@ -35,7 +37,7 @@ public class Saver implements ISaver {
             ChildCategoryRepositoryInterface childCategoryRepository,
             ExpenseRepository expenseRepository,
             ActiveAccountsPreferencesInterface accountsPreferences,
-            BackupService backupService,
+            DataImporterBackupHandler backupHandler,
             Category parentCategory
     ) {
         this.accountRepository = accountRepository;
@@ -46,8 +48,8 @@ public class Saver implements ISaver {
 
         this.parentCategory = parentCategory;
 
-        this.backupService = backupService;
-        this.backupService.createBackup();
+        this.backupHandler = backupHandler;
+        this.backupHandler.backup();
     }
 
     public static Saver create(Context context) {
@@ -64,19 +66,19 @@ public class Saver implements ISaver {
                 new CachedInsertChildCategoryRepositoryDecorator(new ChildCategoryRepository(context)),
                 new ExpenseRepository(context),
                 new AddAndSetDefaultDecorator(new ActiveAccountsPreferences(context), context),
-                new BackupService(),
+                new DataImporterBackupHandler(context, new FileBackupHandler()),
                 parentCategory
         );
     }
 
     @Override
     public void revert() {
-        backupService.restoreBackup();
+        backupHandler.restore();
     }
 
     @Override
     public void finish() {
-        backupService.removeBackups();
+        backupHandler.remove();
     }
 
     public void persist(ExpenseObject booking, Account account) {
