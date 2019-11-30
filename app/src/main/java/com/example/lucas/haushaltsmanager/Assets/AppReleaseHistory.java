@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+// TODO: Changelog mit einer neuen Lib erstellen: https://android-arsenal.com/tag/16
 // Ich kann die History auch in einem XML file speichert
 // Quelle: https://android-arsenal.com/details/1/81
 //Then, you need a XML file with change log in res/raw folder. It automatically searches for res/raw/changelog.xml but you can customize filename.
@@ -50,8 +51,28 @@ public class AppReleaseHistory implements ReleaseHistory {
         releases.add(getRelease133());
         releases.add(getRelease14());
         releases.add(getRelease15());
+        releases.add(getRelease16());
 
         return releases;
+    }
+
+    /**
+     * Methode, welche die Änderungen der Version 1.6 zurückgibt.
+     *
+     * @return Version 1.6
+     */
+    private Release getRelease16() {
+        List<ChangelogItem> changelog = new ArrayList<>();
+        changelog.add(new Refactoring(getString(R.string.release_notes_15_code_improvements)));
+
+        return new Release(
+                1,
+                6,
+                0,
+                getDate(1, Calendar.DECEMBER, 2019),
+                "",
+                changelog
+        );
     }
 
     /**
