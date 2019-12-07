@@ -1,8 +1,8 @@
 package com.example.lucas.haushaltsmanager.Views;
 
 import android.content.Context;
-import android.support.annotation.ColorInt;
-import android.support.annotation.ColorRes;
+import androidx.annotation.ColorInt;
+import androidx.annotation.ColorRes;
 import android.util.AttributeSet;
 
 import com.example.lucas.haushaltsmanager.Entities.Price;
@@ -10,7 +10,7 @@ import com.example.lucas.haushaltsmanager.Utils.MoneyUtils;
 
 import java.util.Locale;
 
-public class MoneyTextView extends android.support.v7.widget.AppCompatTextView {
+public class MoneyTextView extends androidx.appcompat.widget.AppCompatTextView {
 
     public MoneyTextView(Context context) {
         super(context);

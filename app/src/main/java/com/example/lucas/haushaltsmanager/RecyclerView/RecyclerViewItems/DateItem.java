@@ -1,6 +1,6 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.example.lucas.haushaltsmanager.Utils.CalendarUtils;
 

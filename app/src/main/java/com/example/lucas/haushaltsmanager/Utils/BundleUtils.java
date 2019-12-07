@@ -2,7 +2,7 @@ package com.example.lucas.haushaltsmanager.Utils;
 
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.support.annotation.StringRes;
+import androidx.annotation.StringRes;
 
 public class BundleUtils {
     private Bundle mBundle;

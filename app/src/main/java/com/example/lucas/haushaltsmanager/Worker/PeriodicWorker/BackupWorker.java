@@ -1,7 +1,7 @@
 package com.example.lucas.haushaltsmanager.Worker.PeriodicWorker;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.example.lucas.haushaltsmanager.Backup.BackupUtils;
 import com.example.lucas.haushaltsmanager.Backup.Handler.Decorator.DatabaseBackupHandler;
@@ -29,8 +29,8 @@ public class BackupWorker extends AbstractRecurringWorker {
         );
     }
 
-    public static void cancelWorker() {
-        WorkManager.getInstance().cancelAllWorkByTag(WORKER_TAG);
+    public static void cancelWorker(Context context) {
+        WorkManager.getInstance(context).cancelAllWorkByTag(WORKER_TAG);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.example.lucas.haushaltsmanager.Entities;
 
-import android.support.annotation.DrawableRes;
+import androidx.annotation.DrawableRes;
 
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;

@@ -2,7 +2,6 @@ package com.example.lucas.haushaltsmanager.Views;
 
 import android.content.Context;
 import android.text.InputType;
-import android.text.TextWatcher;
 import android.util.AttributeSet;
 
 import com.example.lucas.haushaltsmanager.Entities.Price;
@@ -12,7 +11,7 @@ import java.util.Locale;
 
 import javax.annotation.Nullable;
 
-public class MoneyEditText extends android.support.v7.widget.AppCompatEditText {
+public class MoneyEditText extends androidx.appcompat.widget.AppCompatEditText {
     public MoneyEditText(Context context) {
         super(context);
 

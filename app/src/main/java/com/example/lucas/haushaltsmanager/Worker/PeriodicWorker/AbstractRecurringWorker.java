@@ -1,7 +1,7 @@
 package com.example.lucas.haushaltsmanager.Worker.PeriodicWorker;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Log;
 
 import com.example.lucas.haushaltsmanager.Worker.WorkRequestBuilder;
@@ -45,7 +45,7 @@ abstract class AbstractRecurringWorker extends Worker {
 
     final void scheduleNextWorker(Object object) {
         WorkRequest request = WorkRequestBuilder.from(object);
-        WorkManager.getInstance().enqueue(request);
+        WorkManager.getInstance(getApplicationContext()).enqueue(request);
 
         Log.i(TAG, String.format("Scheduled new '%s' Worker", getTag()));
     }

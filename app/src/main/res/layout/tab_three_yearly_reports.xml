@@ -5,7 +5,7 @@
             android:layout_height="match_parent"
             android:background="@color/primaryBackgroundColorBright">
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/tab_three_root"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -64,5 +64,5 @@
             app:layout_constraintStart_toEndOf="@+id/tab_three_income_card"
             app:layout_constraintTop_toBottomOf="@+id/tab_three_line_chart"/>
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

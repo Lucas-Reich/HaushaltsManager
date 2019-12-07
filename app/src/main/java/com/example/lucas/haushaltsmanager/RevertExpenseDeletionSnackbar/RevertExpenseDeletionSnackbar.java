@@ -1,7 +1,7 @@
 package com.example.lucas.haushaltsmanager.RevertExpenseDeletionSnackbar;
 
 import android.content.Context;
-import android.support.design.widget.Snackbar;
+import com.google.android.material.snackbar.Snackbar;
 import android.util.Log;
 import android.view.View;
 

@@ -1,6 +1,6 @@
 package com.example.lucas.haushaltsmanager.Assets;
 
-import android.support.annotation.StringRes;
+import androidx.annotation.StringRes;
 
 import com.example.lucas.changelogdialog.Bug;
 import com.example.lucas.changelogdialog.ChangelogItem;

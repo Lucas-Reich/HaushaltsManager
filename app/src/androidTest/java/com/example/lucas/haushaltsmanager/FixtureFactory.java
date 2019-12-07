@@ -1,6 +1,6 @@
 package com.example.lucas.haushaltsmanager;
 
-import android.support.test.InstrumentationRegistry;
+import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.example.lucas.haushaltsmanager.Fixtures.IFixtures;
 import com.example.lucas.haushaltsmanager.Fixtures.RecurringBookingsFixtures;

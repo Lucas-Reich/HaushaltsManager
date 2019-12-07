@@ -1,9 +1,9 @@
 package com.example.lucas.haushaltsmanager.FABToolbar;
 
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.view.animation.FastOutLinearInInterpolator;
-import android.support.v4.view.animation.LinearOutSlowInInterpolator;
-import android.support.v7.widget.TooltipCompat;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.interpolator.view.animation.FastOutLinearInInterpolator;
+import androidx.interpolator.view.animation.LinearOutSlowInInterpolator;
+import androidx.appcompat.widget.TooltipCompat;
 import android.transition.Fade;
 import android.transition.TransitionManager;
 import android.transition.TransitionSet;

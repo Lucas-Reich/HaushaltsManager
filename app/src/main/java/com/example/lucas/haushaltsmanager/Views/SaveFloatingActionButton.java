@@ -2,8 +2,8 @@ package com.example.lucas.haushaltsmanager.Views;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.DrawableRes;
-import android.support.design.widget.FloatingActionButton;
+import androidx.annotation.DrawableRes;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import android.util.AttributeSet;
 import android.view.View;
 

@@ -1,10 +1,10 @@
 package com.example.lucas.haushaltsmanager.CardPopulator;
 
 import android.content.res.Resources;
-import android.support.annotation.ColorRes;
-import android.support.annotation.StringRes;
-import android.support.v4.content.res.ResourcesCompat;
-import android.support.v7.widget.CardView;
+import androidx.annotation.ColorRes;
+import androidx.annotation.StringRes;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.cardview.widget.CardView;
 import android.view.View;
 import android.widget.TextView;
 

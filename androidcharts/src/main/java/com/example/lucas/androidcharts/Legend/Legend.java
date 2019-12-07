@@ -3,7 +3,7 @@ package com.example.lucas.androidcharts.Legend;
 import android.content.res.Resources;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.support.annotation.ColorInt;
+import androidx.annotation.ColorInt;
 
 
 import com.example.lucas.androidcharts.PieChart;

@@ -5,7 +5,7 @@ import android.util.AttributeSet;
 
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.IRequiredField;
 
-public class HeaderView extends android.support.v7.widget.AppCompatTextView {
+public class HeaderView extends androidx.appcompat.widget.AppCompatTextView {
     private IRequiredField boundField;
 
     public HeaderView(Context context) {

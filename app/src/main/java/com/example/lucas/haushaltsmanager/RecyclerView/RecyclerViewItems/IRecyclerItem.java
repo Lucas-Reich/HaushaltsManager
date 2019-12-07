@@ -1,6 +1,6 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 public interface IRecyclerItem {
     @NonNull

@@ -1,7 +1,7 @@
 package com.example.lucas.androidcharts;
 
-import android.support.annotation.ColorInt;
-import android.support.annotation.NonNull;
+import androidx.annotation.ColorInt;
+import androidx.annotation.NonNull;
 
 public class DataSet implements Comparable {
 

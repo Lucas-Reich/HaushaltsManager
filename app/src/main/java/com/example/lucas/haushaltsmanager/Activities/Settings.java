@@ -3,9 +3,9 @@ package com.example.lucas.haushaltsmanager.Activities;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -364,7 +364,7 @@ public class Settings extends AbstractAppCompatActivity {
         Backup backup = new Backup(null);
 
         WorkRequest backupWorkRequest = WorkRequestBuilder.from(backup);
-        WorkManager.getInstance().enqueueUniqueWork(
+        WorkManager.getInstance(this).enqueueUniqueWork(
                 BackupWorker.WORKER_TAG,
                 ExistingWorkPolicy.REPLACE,
                 (OneTimeWorkRequest) backupWorkRequest
@@ -372,7 +372,7 @@ public class Settings extends AbstractAppCompatActivity {
     }
 
     private void stopBackupWorker() {
-        BackupWorker.cancelWorker();
+        BackupWorker.cancelWorker(this);
     }
 
     /**
@@ -465,7 +465,7 @@ public class Settings extends AbstractAppCompatActivity {
         );
 
         WorkRequest notificationWorkRequest = WorkRequestBuilder.from(notification);
-        WorkManager.getInstance().enqueueUniqueWork(
+        WorkManager.getInstance(this).enqueueUniqueWork(
                 NotificationWorker.WORKER_TAG,
                 ExistingWorkPolicy.REPLACE,
                 (OneTimeWorkRequest) notificationWorkRequest
@@ -476,7 +476,7 @@ public class Settings extends AbstractAppCompatActivity {
      * Methode um den NotificationWorker zu stoppen
      **/
     private void stopNotificationWorker() {
-        NotificationWorker.stopWorker();
+        NotificationWorker.stopWorker(this);
     }
 
     /**

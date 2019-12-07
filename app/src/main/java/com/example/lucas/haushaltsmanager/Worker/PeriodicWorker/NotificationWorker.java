@@ -3,10 +3,13 @@ package com.example.lucas.haushaltsmanager.Worker.PeriodicWorker;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.work.WorkManager;
+import androidx.work.WorkerParameters;
 
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.App.app;
@@ -14,9 +17,6 @@ import com.example.lucas.haushaltsmanager.Entities.NotificationVO;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.util.Random;
-
-import androidx.work.WorkManager;
-import androidx.work.WorkerParameters;
 
 public class NotificationWorker extends AbstractRecurringWorker {
     public static final String WORKER_TAG = "notificationWorker";
@@ -40,18 +40,13 @@ public class NotificationWorker extends AbstractRecurringWorker {
         );
     }
 
-    public static void stopWorker() {
+    public static void stopWorker(Context context) {
         Log.i("NotificationWorker", "Stopping NotificationWorker");
-        WorkManager.getInstance().cancelAllWorkByTag(WORKER_TAG);
+        WorkManager.getInstance(context).cancelAllWorkByTag(WORKER_TAG);
     }
 
     public static boolean isRunning() {
         return isWorkerScheduled(WORKER_TAG);
-    }
-
-    @Override
-    String getTag() {
-        return "NotificationWorker";
     }
 
     @NonNull
@@ -75,6 +70,11 @@ public class NotificationWorker extends AbstractRecurringWorker {
         scheduleNextWorker(this.notification);
 
         return Result.success();
+    }
+
+    @Override
+    String getTag() {
+        return "NotificationWorker";
     }
 
     /**
