@@ -10,10 +10,10 @@ import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.InsertStrategy.MockInsertStrategy;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.SelectionRules.MockSelectionRules;
 import com.example.lucas.haushaltsmanager.RecyclerView.MockItemHandler;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ChildExpenseItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.DateItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ExpenseItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ParentExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.ChildExpenseItem.ChildExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.ExpenseItem.ExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.ParentExpenseItem.ParentExpenseItem;
 
 import org.junit.After;
 import org.junit.Before;

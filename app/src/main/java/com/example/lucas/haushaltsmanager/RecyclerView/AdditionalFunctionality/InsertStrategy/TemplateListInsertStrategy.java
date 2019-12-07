@@ -1,7 +1,7 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.InsertStrategy;
 
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.IRecyclerItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.TemplateItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.TemplateItem.TemplateItem;
 
 import java.util.List;
 

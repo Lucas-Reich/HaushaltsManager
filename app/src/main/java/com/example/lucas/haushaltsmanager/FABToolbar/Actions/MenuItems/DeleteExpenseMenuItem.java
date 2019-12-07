@@ -12,9 +12,9 @@ import com.example.lucas.haushaltsmanager.FABToolbar.Actions.ActionPayload;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.ActionKey;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.IActionKey;
 import com.example.lucas.haushaltsmanager.R;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ChildExpenseItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ExpenseItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.IRecyclerItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.ChildExpenseItem.ChildExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.ExpenseItem.ExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 
 public class DeleteExpenseMenuItem implements IMenuItem {
     public static final String ACTION_KEY = "deleteAction";

@@ -2,10 +2,10 @@ package com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.
 
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.AdItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ChildCategoryItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.IRecyclerItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ParentCategoryItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.AdItem.AdItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.ChildCategoryItem.ChildCategoryItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.ParentCategoryItem.ParentCategoryItem;
 
 import org.junit.Before;
 import org.junit.Test;

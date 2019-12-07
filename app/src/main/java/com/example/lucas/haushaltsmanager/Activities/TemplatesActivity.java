@@ -11,8 +11,8 @@ import com.example.lucas.haushaltsmanager.Entities.Template;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.RecyclerItemClickListener;
 import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.ItemCreator;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.IRecyclerItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.TemplateItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.TemplateItem.TemplateItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.TemplateListRecyclerViewAdapter;
 
 import java.util.List;

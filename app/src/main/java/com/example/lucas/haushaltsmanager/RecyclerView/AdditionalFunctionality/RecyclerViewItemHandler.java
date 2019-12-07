@@ -7,14 +7,14 @@ import android.view.ViewGroup;
 
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.InsertStrategy.InsertStrategy;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.IRecyclerItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.ViewHolder.AbstractViewHolder;
-import com.example.lucas.haushaltsmanager.RecyclerView.ViewHolder.GenericViewHolder;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.AbstractViewHolder;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.GenericViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class RecyclerViewItemHandler extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public abstract class RecyclerViewItemHandler extends RecyclerView.Adapter<AbstractViewHolder> {
     private ListHandler listHandler;
 
     public RecyclerViewItemHandler(List<IRecyclerItem> items, InsertStrategy insertStrategy) {
@@ -30,7 +30,7 @@ public abstract class RecyclerViewItemHandler extends RecyclerView.Adapter<Recyc
 
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+    public AbstractViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
 
         return new GenericViewHolder(inflater.inflate(
@@ -41,11 +41,9 @@ public abstract class RecyclerViewItemHandler extends RecyclerView.Adapter<Recyc
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull AbstractViewHolder holder, int position) {
         IRecyclerItem item = getItem(position);
-
-        AbstractViewHolder viewHolder = (AbstractViewHolder) holder;
-        viewHolder.bind(item);
+        holder.bind(item);
     }
 
     @Override

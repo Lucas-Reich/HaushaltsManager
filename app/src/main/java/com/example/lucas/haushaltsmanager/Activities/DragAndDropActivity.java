@@ -19,8 +19,8 @@ import android.widget.Toast;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.InsertStrategy.AppendInsertStrategy;
 import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.CardViewRecyclerViewAdapter;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.CardViewItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.IRecyclerItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.CardViewItem.CardViewItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -8,11 +8,10 @@ import android.view.ViewGroup;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.InsertStrategy.FileListInsertStrategy;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.RecyclerViewItemHandler;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.FileItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.IRecyclerItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.ViewHolder.AbstractViewHolder;
-import com.example.lucas.haushaltsmanager.RecyclerView.ViewHolder.FileViewHolder;
-import com.example.lucas.haushaltsmanager.RecyclerView.ViewHolder.GenericViewHolder;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.FileItem.FileItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.AbstractViewHolder;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.FileItem.FileViewHolder;
 
 import java.util.List;
 
@@ -23,7 +22,7 @@ public class FileListRecyclerViewAdapter extends RecyclerViewItemHandler {
 
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public AbstractViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 
         if (viewType == FileItem.VIEW_TYPE) {
@@ -34,23 +33,6 @@ public class FileListRecyclerViewAdapter extends RecyclerViewItemHandler {
             );
         }
 
-        return new GenericViewHolder(inflater.inflate(
-                R.layout.recycler_view_generic,
-                parent,
-                false)
-        );
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        IRecyclerItem item = getItem(position);
-
-        AbstractViewHolder viewHolder = (AbstractViewHolder) holder;
-        viewHolder.bind(item);
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        return getItem(position).getViewType();
+        return super.onCreateViewHolder(parent, viewType);
     }
 }

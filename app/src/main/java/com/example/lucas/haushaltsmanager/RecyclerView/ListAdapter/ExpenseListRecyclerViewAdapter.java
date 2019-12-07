@@ -10,21 +10,20 @@ import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.InsertStrategy.ExpenseListInsertStrategy;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.RecyclerViewSelectedItemHandler;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.SelectionRules.ExpenseListSelectionRules;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.AdItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ChildExpenseItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.DateItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ExpenseItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.IRecyclerItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ParentExpenseItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.RecurringBookingItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.ViewHolder.AbstractViewHolder;
-import com.example.lucas.haushaltsmanager.RecyclerView.ViewHolder.AdViewHolder;
-import com.example.lucas.haushaltsmanager.RecyclerView.ViewHolder.ChildExpenseViewHolder;
-import com.example.lucas.haushaltsmanager.RecyclerView.ViewHolder.DateViewHolder;
-import com.example.lucas.haushaltsmanager.RecyclerView.ViewHolder.ExpenseItemViewHolder;
-import com.example.lucas.haushaltsmanager.RecyclerView.ViewHolder.GenericViewHolder;
-import com.example.lucas.haushaltsmanager.RecyclerView.ViewHolder.ParentExpenseViewHolder;
-import com.example.lucas.haushaltsmanager.RecyclerView.ViewHolder.RecurringBookingViewHolder;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.AdItem.AdItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.ChildExpenseItem.ChildExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.ExpenseItem.ExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.ParentExpenseItem.ParentExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.RecurringBookingItem.RecurringBookingItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.AbstractViewHolder;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.AdItem.AdViewHolder;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.ChildExpenseItem.ChildExpenseViewHolder;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateViewHolder;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.ExpenseItem.ExpenseItemViewHolder;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.ParentExpenseItem.ParentExpenseViewHolder;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.RecurringBookingItem.RecurringBookingViewHolder;
 
 import java.util.List;
 
@@ -33,11 +32,9 @@ public class ExpenseListRecyclerViewAdapter extends RecyclerViewSelectedItemHand
         super(items, new ExpenseListInsertStrategy(), new ExpenseListSelectionRules());
     }
 
-    // TODO Der GenericViewHolder sollte hier in dem Adapter definiert werden
-
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public AbstractViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 
         switch (viewType) {
@@ -67,22 +64,15 @@ public class ExpenseListRecyclerViewAdapter extends RecyclerViewSelectedItemHand
                 return new RecurringBookingViewHolder(recurringBookingView);
             default:
 
-                View genericView = inflater.inflate(R.layout.recycler_view_generic, parent, false);
-                return new GenericViewHolder(genericView);
+                return super.onCreateViewHolder(parent, viewType);
         }
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull AbstractViewHolder holder, int position) {
         IRecyclerItem item = getItem(position);
 
-        AbstractViewHolder viewHolder = (AbstractViewHolder) holder;
-        viewHolder.itemView.setSelected(isItemSelected(item));
-        viewHolder.bind(item);
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        return getItem(position).getViewType();
+        holder.itemView.setSelected(isItemSelected(item));
+        holder.bind(item);
     }
 }

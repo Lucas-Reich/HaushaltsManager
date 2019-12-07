@@ -19,8 +19,8 @@ import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.RecyclerItemClickListener;
 import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.CategoryListRecyclerViewAdapter;
 import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.ItemCreator;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.IRecyclerItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ParentCategoryItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.ParentCategoryItem.ParentCategoryItem;
 import com.github.fafaldo.fabtoolbar.widget.FABToolbarLayout;
 
 import java.util.List;

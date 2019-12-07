@@ -1,8 +1,8 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.SelectionRules;
 
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.AdItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.IRecyclerItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ParentCategoryItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.AdItem.AdItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.ParentCategoryItem.ParentCategoryItem;
 
 import java.util.List;
 

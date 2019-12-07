@@ -1,8 +1,8 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.InsertStrategy;
 
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.IParentRecyclerItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.IRecyclerItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ParentCategoryItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.IParentRecyclerItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.ParentCategoryItem.ParentCategoryItem;
 
 import java.util.List;
 

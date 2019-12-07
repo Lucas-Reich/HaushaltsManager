@@ -1,6 +1,6 @@
 package com.example.lucas.haushaltsmanager.FABToolbar.Actions;
 
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.IRecyclerItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 
 import java.util.ArrayList;
 import java.util.List;

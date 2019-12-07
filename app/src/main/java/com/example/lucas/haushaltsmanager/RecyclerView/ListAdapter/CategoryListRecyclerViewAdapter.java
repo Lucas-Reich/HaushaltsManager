@@ -10,13 +10,12 @@ import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.InsertStrategy.CategoryListInsertStrategy;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.RecyclerViewSelectedItemHandler;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.SelectionRules.CategoryListSelectionRules;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ChildCategoryItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.IRecyclerItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.ParentCategoryItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.ViewHolder.AbstractViewHolder;
-import com.example.lucas.haushaltsmanager.RecyclerView.ViewHolder.ChildCategoryViewHolder;
-import com.example.lucas.haushaltsmanager.RecyclerView.ViewHolder.GenericViewHolder;
-import com.example.lucas.haushaltsmanager.RecyclerView.ViewHolder.ParentCategoryViewHolder;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.ChildCategoryItem.ChildCategoryItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.ParentCategoryItem.ParentCategoryItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.AbstractViewHolder;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.ChildCategoryItem.ChildCategoryViewHolder;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.ParentCategoryItem.ParentCategoryViewHolder;
 
 import java.util.List;
 
@@ -27,7 +26,7 @@ public class CategoryListRecyclerViewAdapter extends RecyclerViewSelectedItemHan
 
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public AbstractViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 
         switch (viewType) {
@@ -41,22 +40,15 @@ public class CategoryListRecyclerViewAdapter extends RecyclerViewSelectedItemHan
                 return new ParentCategoryViewHolder(parentCategoryView);
             default:
 
-                View genericView = inflater.inflate(R.layout.recycler_view_generic, parent, false);
-                return new GenericViewHolder(genericView);
+                return super.onCreateViewHolder(parent, viewType);
         }
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull AbstractViewHolder holder, int position) {
         IRecyclerItem item = getItem(position);
 
-        AbstractViewHolder viewHolder = (AbstractViewHolder) holder;
-        viewHolder.itemView.setSelected(isItemSelected(item));
-        viewHolder.bind(item);
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        return getItem(position).getViewType();
+        holder.itemView.setSelected(isItemSelected(item));
+        holder.bind(item);
     }
 }
