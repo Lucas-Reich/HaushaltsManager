@@ -18,9 +18,9 @@ import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.InsertStrategy.AppendInsertStrategy;
-import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.CardViewRecyclerViewAdapter;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.CardViewItem.CardViewItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.CardViewRecyclerViewAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +33,7 @@ public class DragAndDropActivity extends AbstractAppCompatActivity implements Vi
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.test_activity_drag_and_drop);
+        setContentView(R.layout.activity_drag_and_drop);
 
         rView = findViewById(R.id.recycler_view);
         rView.setOnDragListener(this);
@@ -131,8 +131,7 @@ public class DragAndDropActivity extends AbstractAppCompatActivity implements Vi
     }
 
     private void setUpRecyclerView() {
-        rView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-
+        rView.setLayoutManager(new LinearLayoutManager(this));
 
         List<IRecyclerItem> items = new ArrayList<>();
         items.add(new CardViewItem(R.drawable.ic_wallet_dark));

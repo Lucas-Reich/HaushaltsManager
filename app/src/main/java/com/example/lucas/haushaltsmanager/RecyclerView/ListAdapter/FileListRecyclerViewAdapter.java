@@ -8,10 +8,10 @@ import android.view.ViewGroup;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.InsertStrategy.FileListInsertStrategy;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.RecyclerViewItemHandler;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.FileItem.FileItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.AbstractViewHolder;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.FileItem.FileItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.FileItem.FileViewHolder;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 
 import java.util.List;
 
@@ -29,8 +29,8 @@ public class FileListRecyclerViewAdapter extends RecyclerViewItemHandler {
             return new FileViewHolder(inflater.inflate(
                     R.layout.recycler_view_file,
                     parent,
-                    false)
-            );
+                    false
+            ));
         }
 
         return super.onCreateViewHolder(parent, viewType);
