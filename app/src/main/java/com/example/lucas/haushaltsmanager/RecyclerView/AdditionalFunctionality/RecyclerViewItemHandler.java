@@ -1,9 +1,15 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
 
+import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.InsertStrategy.InsertStrategy;
 import com.example.lucas.haushaltsmanager.RecyclerView.RecyclerViewItems.IRecyclerItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.ViewHolder.AbstractViewHolder;
+import com.example.lucas.haushaltsmanager.RecyclerView.ViewHolder.GenericViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +26,31 @@ public abstract class RecyclerViewItemHandler extends RecyclerView.Adapter<Recyc
     @Override
     public int getItemCount() {
         return listHandler.count();
+    }
+
+    @NonNull
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+        LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
+
+        return new GenericViewHolder(inflater.inflate(
+                R.layout.recycler_view_generic,
+                viewGroup,
+                false
+        ));
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        IRecyclerItem item = getItem(position);
+
+        AbstractViewHolder viewHolder = (AbstractViewHolder) holder;
+        viewHolder.bind(item);
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return getItem(position).getViewType();
     }
 
     public void insertAll(List<IRecyclerItem> items) {
@@ -60,15 +91,15 @@ public abstract class RecyclerViewItemHandler extends RecyclerView.Adapter<Recyc
         }
     }
 
+    public IRecyclerItem getItem(int position) {
+        return listHandler.getItems().get(position);
+    }
+
     /**
      * Diese Funktion wird genutzt, wenn ein Parent zusammengeklappt wird.
      */
     void deleteItem(IRecyclerItem item) {
         listHandler.remove(item);
-    }
-
-    public IRecyclerItem getItem(int position) {
-        return listHandler.getItems().get(position);
     }
 
     void updateItem(IRecyclerItem item) {
