@@ -199,4 +199,5 @@
     <string name="release_notes_14">Are you already using another app to track your expenses and want to switch now? Then you can now use the new file importer to import your data from a CSV file into the Expense Manager.</string>
     <string name="release_notes_14_data_importer">Created CSV file importer</string>
     <string name="release_notes_15_code_improvements">Minor code changes</string>
+    <string name="release_notes_17_migrate_android_x">Migrate to AndroidX</string>
 </resources>

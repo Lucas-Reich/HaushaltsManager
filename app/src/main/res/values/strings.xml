@@ -221,4 +221,5 @@
     <string name="import_file_sub_title_reading_content">Reading content of fileReader</string>
     <string name="click_on_button_similar_to_word">Please click on the button that most closely corresponds to the following term:</string>
     <string name="imported_categories_parent_name">Imported Categories</string>
+    <string name="release_notes_17_migrate_android_x">Migrate to AndroidX</string>
 </resources>

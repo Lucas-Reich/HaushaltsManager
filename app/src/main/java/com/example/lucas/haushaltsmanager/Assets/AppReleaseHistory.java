@@ -52,8 +52,23 @@ public class AppReleaseHistory implements ReleaseHistory {
         releases.add(getRelease14());
         releases.add(getRelease15());
         releases.add(getRelease16());
+        releases.add(getRelease17());
 
         return releases;
+    }
+
+    private Release getRelease17() {
+        List<ChangelogItem> changelog = new ArrayList<>();
+        changelog.add(new Refactoring(getString(R.string.release_notes_17_migrate_android_x)));
+
+        return new Release(
+                1,
+                7,
+                0,
+                getDate(7, Calendar.DECEMBER, 2019),
+                "",
+                changelog
+        );
     }
 
     /**
