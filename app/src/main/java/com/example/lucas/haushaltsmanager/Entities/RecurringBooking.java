@@ -1,13 +1,13 @@
 package com.example.lucas.haushaltsmanager.Entities;
 
+import androidx.annotation.Nullable;
+
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Entities.Expense.Booking;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nullable;
 
 public class RecurringBooking {
     private final long mIndex;

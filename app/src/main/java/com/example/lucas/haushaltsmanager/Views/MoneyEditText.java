@@ -4,12 +4,12 @@ import android.content.Context;
 import android.text.InputType;
 import android.util.AttributeSet;
 
+import androidx.annotation.Nullable;
+
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.Utils.MoneyUtils;
 
 import java.util.Locale;
-
-import javax.annotation.Nullable;
 
 public class MoneyEditText extends androidx.appcompat.widget.AppCompatEditText {
     public MoneyEditText(Context context) {

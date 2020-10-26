@@ -1,11 +1,11 @@
 package com.example.lucas.haushaltsmanager.Utils;
 
+import androidx.annotation.Nullable;
+
 import com.example.lucas.haushaltsmanager.Entities.Price;
 
 import java.text.NumberFormat;
 import java.util.Locale;
-
-import javax.annotation.Nullable;
 
 public class MoneyUtils {
     private static final String DEFAULT_PRICE = "-,--";

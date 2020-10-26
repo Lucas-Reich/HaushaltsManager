@@ -21,6 +21,7 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -102,12 +103,12 @@ public class LineChartCardPopulator {
         return new LineData(lds);
     }
 
-    private IAxisValueFormatter getXAxisLabels() {
+    private ValueFormatter getXAxisLabels() {
         final String[] month = getMonthsShortened();
 
-        return new IAxisValueFormatter() {
+        return new ValueFormatter() {
             @Override
-            public String getFormattedValue(float value, AxisBase axis) {
+            public String getFormattedValue(float value) {
                 return month[(int) value - 1];
             }
         };

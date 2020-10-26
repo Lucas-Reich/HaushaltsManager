@@ -1,11 +1,11 @@
 package com.example.lucas.haushaltsmanager.Entities;
 
+import androidx.annotation.Nullable;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nullable;
 
 public class Backup {
     //.SaveDataFile
