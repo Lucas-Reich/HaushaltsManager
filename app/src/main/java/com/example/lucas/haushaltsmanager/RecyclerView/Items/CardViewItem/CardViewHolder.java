@@ -1,51 +1,50 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.Items.CardViewItem;
 
 import android.content.ClipData;
-import android.content.ClipDescription;
 import android.view.View;
 import android.widget.ImageView;
 
 import com.example.lucas.haushaltsmanager.R;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.AbstractViewHolder;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
+import com.example.lucas.haushaltsmanager.ReportBuilder.IChart;
 
 public class CardViewHolder extends AbstractViewHolder implements View.OnLongClickListener {
-    private ImageView iconHolder;
+    private IChart chart;
 
     public CardViewHolder(View itemView) {
         super(itemView);
 
-        iconHolder = itemView.findViewById(R.id.imageView);
         itemView.setOnLongClickListener(this);
-        itemView.setTag("SOME RANDOM TAG");
+        itemView.setTag("Do I really need this tag?");
     }
 
-    @Override
     public void bind(IRecyclerItem item) {
-        if (!(item instanceof CardViewItem)) {
-            throw new IllegalArgumentException("FAAAAAIL!");
-        }
+        CardViewItem cardView = castToCardViewItem(item);
+        chart = cardView.getContent();
 
-        iconHolder.setImageResource(((CardViewItem) item).getContent());
+        ImageView iconHolder = itemView.findViewById(R.id.imageView);
+        iconHolder.setImageResource(chart.getImage());
     }
 
-    @Override
-    public boolean onLongClick(View v) {
-        // Create a new ClipData.Item from the ImageView object's tag
-        ClipData.Item item = new ClipData.Item((CharSequence) v.getTag());
-        // Create a new ClipData using the tag as a label, the plain text MIME type, and
-        // the already-created item. This will create a new ClipDescription object within the
-        // ClipData, and set its MIME type entry to "text/plain"
-        String[] mimeTypes = {ClipDescription.MIMETYPE_TEXT_PLAIN};
-        ClipData data = new ClipData(v.getTag().toString(), mimeTypes, item);
-        // Instantiates the drag shadow builder.
-        View.DragShadowBuilder dragshadow = new View.DragShadowBuilder(v);
-        // Starts the drag
-        v.startDrag(data        // data to be dragged
-                , dragshadow   // drag shadow builder
-                , v           // local data about the drag and drop operation
+    public boolean onLongClick(View view) {
+        String viewTag = view.getTag().toString();
+
+        view.startDrag(
+                ClipData.newPlainText(viewTag, viewTag)        // data to be dragged
+                , new View.DragShadowBuilder(view)   // drag shadow builder
+                , chart      // local data about the drag and drop operation
                 , 0          // flags (not currently used, set to 0)
         );
+
         return true;
+    }
+
+    private CardViewItem castToCardViewItem(IRecyclerItem item) {
+        if (item instanceof CardViewItem) {
+            return (CardViewItem) item;
+        }
+
+        throw new IllegalArgumentException("FAAAAAIL!");
     }
 }

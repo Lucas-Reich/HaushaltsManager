@@ -6,9 +6,6 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/androidcharts/HaushaltsManager.androidcharts.iml" filepath="$PROJECT_DIR$/.idea/modules/androidcharts/HaushaltsManager.androidcharts.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/HaushaltsManager.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/HaushaltsManager.app.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/changelogdialog/HaushaltsManager.changelogdialog.iml" filepath="$PROJECT_DIR$/.idea/modules/changelogdialog/HaushaltsManager.changelogdialog.iml" />
-      <module fileurl="file://$PROJECT_DIR$/androidcharts/androidcharts.iml" filepath="$PROJECT_DIR$/androidcharts/androidcharts.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/changelogdialog/changelogdialog.iml" filepath="$PROJECT_DIR$/changelogdialog/changelogdialog.iml" />
     </modules>
   </component>
 </project>

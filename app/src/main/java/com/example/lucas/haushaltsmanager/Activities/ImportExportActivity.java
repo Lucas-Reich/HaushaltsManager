@@ -4,14 +4,13 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
+
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.codekidlabs.storagechooser.StorageChooser;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
@@ -23,15 +22,16 @@ import com.example.lucas.haushaltsmanager.ExpenseObjectExporter;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.RecyclerItemClickListener;
 import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.ItemCreator;
-import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.FileListRecyclerViewAdapter;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.FileItem.FileItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.FileListRecyclerViewAdapter;
 import com.example.lucas.haushaltsmanager.Utils.FileUtils;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;
 import java.util.List;
 
-public class ImportExportActivity extends AbstractAppCompatActivity implements RecyclerItemClickListener.OnItemClickListener {
+public class ImportExportActivity extends AbstractAppCompatActivity implements RecyclerItemClickListener.OnRecyclerItemClickListener {
     private static final String IMPORTABLE_FILE_CSV_REGEX = ".*.csv";
 
     private FloatingActionButton exportBookingsFab;
@@ -47,7 +47,7 @@ public class ImportExportActivity extends AbstractAppCompatActivity implements R
         setContentView(R.layout.activity_import_export);
 
         recyclerView = findViewById(R.id.activity_import_export_recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setLayoutManager(LayoutManagerFactory.vertical(this));
         recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, recyclerView, this));
 
         exportBookingsFab = findViewById(R.id.activity_import_export_add_export_btn);
@@ -134,7 +134,7 @@ public class ImportExportActivity extends AbstractAppCompatActivity implements R
     }
 
     @Override
-    public void onItemClick(IRecyclerItem item, int position) {
+    public void onClick(View v, IRecyclerItem item, int position) {
         Intent expenseImporterIntent = new Intent(ImportExportActivity.this, ExpenseImporterActivity.class);
         expenseImporterIntent.putExtras(createBundleWithSelectedFile(item));
 
@@ -142,7 +142,7 @@ public class ImportExportActivity extends AbstractAppCompatActivity implements R
     }
 
     @Override
-    public void onItemLongClick(IRecyclerItem item, int position) {
+    public void onLongClick(View v, IRecyclerItem item, int position) {
         // If item (importable file) is long clicked nothing should happen
     }
 

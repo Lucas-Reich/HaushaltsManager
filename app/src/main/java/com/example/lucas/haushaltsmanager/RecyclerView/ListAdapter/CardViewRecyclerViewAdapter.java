@@ -1,16 +1,17 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter;
 
-import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
 
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.InsertStrategy.InsertStrategy;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.RecyclerViewItemHandler;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.CardViewItem.CardViewItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.AbstractViewHolder;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.CardViewItem.CardViewHolder;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.CardViewItem.CardViewItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 
 import java.util.List;
 

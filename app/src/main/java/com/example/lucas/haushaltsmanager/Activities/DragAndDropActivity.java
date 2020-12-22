@@ -22,6 +22,7 @@ import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.I
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.CardViewItem.CardViewItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.CardViewRecyclerViewAdapter;
+import com.example.lucas.haushaltsmanager.ReportBuilder.PieChart;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -135,13 +136,13 @@ public class DragAndDropActivity extends AbstractAppCompatActivity implements Vi
         rView.setLayoutManager(new LinearLayoutManager(this));
 
         List<IRecyclerItem> items = new ArrayList<>();
-        items.add(new CardViewItem(R.drawable.ic_wallet_dark));
-        items.add(new CardViewItem(R.drawable.ic_wallet_dark));
-        items.add(new CardViewItem(R.drawable.ic_wallet_dark));
-        items.add(new CardViewItem(R.drawable.ic_wallet_dark));
-        items.add(new CardViewItem(R.drawable.ic_wallet_dark));
-        items.add(new CardViewItem(R.drawable.ic_wallet_dark));
-        items.add(new CardViewItem(R.drawable.ic_wallet_dark));
+        items.add(new CardViewItem(new PieChart(this)));
+        items.add(new CardViewItem(new PieChart(this)));
+        items.add(new CardViewItem(new PieChart(this)));
+        items.add(new CardViewItem(new PieChart(this)));
+        items.add(new CardViewItem(new PieChart(this)));
+        items.add(new CardViewItem(new PieChart(this)));
+        items.add(new CardViewItem(new PieChart(this)));
         CardViewRecyclerViewAdapter adapter = new CardViewRecyclerViewAdapter(items, new AppendInsertStrategy());
         rView.setAdapter(adapter);
     }

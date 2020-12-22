@@ -2,17 +2,19 @@ package com.example.lucas.haushaltsmanager.Activities.MainTab;
 
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.lucas.haushaltsmanager.Activities.DragAndDropActivity;
+import com.example.lucas.haushaltsmanager.Activities.DragAndDropActivity2;
 import com.example.lucas.haushaltsmanager.Activities.ExpenseScreen;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ParentExpenseObject;
@@ -33,20 +35,20 @@ import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.EndlessRecyclerViewScrollListener;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.RecyclerItemClickListener;
 import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.ItemCreator;
-import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.ExpenseListRecyclerViewAdapter;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.AdItem.AdItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.ChildExpenseItem.ChildExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.ExpenseItem.ExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.ParentExpenseItem.ParentExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.ExpenseListRecyclerViewAdapter;
 import com.example.lucas.haushaltsmanager.RevertExpenseDeletionSnackbar.RevertExpenseDeletionSnackbar;
 import com.github.fafaldo.fabtoolbar.widget.FABToolbarLayout;
 
 import java.util.List;
 
 public class TabOneBookings extends AbstractTab implements
-        RecyclerItemClickListener.OnItemClickListener,
+        RecyclerItemClickListener.OnRecyclerItemClickListener,
         OnFABToolbarItemClickListener,
         OnFABToolbarFABClickListener {
 
@@ -127,7 +129,7 @@ public class TabOneBookings extends AbstractTab implements
 //        createExpenseIntent.putExtra(ExpenseScreen.INTENT_MODE, ExpenseScreen.INTENT_MODE_CREATE_BOOKING);
 //        startActivity(createExpenseIntent);
 
-        Intent intent = new Intent(getContext(), DragAndDropActivity.class);
+        Intent intent = new Intent(getContext(), DragAndDropActivity2.class);
         startActivity(intent);
     }
 
@@ -170,7 +172,7 @@ public class TabOneBookings extends AbstractTab implements
     }
 
     @Override
-    public void onItemClick(IRecyclerItem item, int position) {
+    public void onClick(View v, IRecyclerItem item, int position) {
         if (item instanceof DateItem || item instanceof AdItem) {
             return;
         }
@@ -196,7 +198,7 @@ public class TabOneBookings extends AbstractTab implements
     }
 
     @Override
-    public void onItemLongClick(IRecyclerItem item, int position) {
+    public void onLongClick(View v, IRecyclerItem item, int position) {
         if (item instanceof DateItem || mAdapter.getSelectedItemCount() != 0)
             return;
 

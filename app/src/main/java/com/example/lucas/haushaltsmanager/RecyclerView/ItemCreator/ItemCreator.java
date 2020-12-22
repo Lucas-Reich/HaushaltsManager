@@ -20,9 +20,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- * Diese Klasse soll aus einer Liste von Objekten, eine Liste von RecyclerItems erstellen.
- */
 public class ItemCreator {
     private static final String SORT_DESC = "DESC";
     private static final String SORT_ASC = "ASC";
@@ -32,17 +29,15 @@ public class ItemCreator {
             return new ArrayList<>();
         }
 
-        String order = SORT_DESC;
-
         ItemCreator itemCreator = new ItemCreator();
 
-        itemCreator.sortBookingsByDate(bookings, order);
+        itemCreator.sortBookingsByDate(bookings, SORT_DESC);
 
         DateItem currentDate = new DateItem(bookings.get(0).getDate());
 
         List<IRecyclerItem> recyclerItems = new ArrayList<>();
         for (Booking booking : bookings) {
-            if (itemCreator.changeDate(booking, currentDate, order)) {
+            if (itemCreator.changeDate(booking, currentDate, SORT_DESC)) {
                 currentDate = new DateItem(booking.getDate());
 
                 recyclerItems.add(currentDate);

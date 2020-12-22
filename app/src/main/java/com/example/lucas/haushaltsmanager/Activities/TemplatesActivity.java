@@ -3,7 +3,8 @@ package com.example.lucas.haushaltsmanager.Activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import android.view.View;
+
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lucas.haushaltsmanager.Database.Repositories.Templates.TemplateRepository;
@@ -17,7 +18,7 @@ import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.TemplateListR
 
 import java.util.List;
 
-public class TemplatesActivity extends AbstractAppCompatActivity implements RecyclerItemClickListener.OnItemClickListener {
+public class TemplatesActivity extends AbstractAppCompatActivity implements RecyclerItemClickListener.OnRecyclerItemClickListener {
     private TemplateRepository mTemplateRepo;
     private RecyclerView recyclerView;
 
@@ -36,7 +37,7 @@ public class TemplatesActivity extends AbstractAppCompatActivity implements Recy
         setContentView(R.layout.activity_template_list);
 
         recyclerView = findViewById(R.id.template_list_recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setLayoutManager(LayoutManagerFactory.vertical(this));
         recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, recyclerView, this));
 
         initializeToolbar();
@@ -44,7 +45,7 @@ public class TemplatesActivity extends AbstractAppCompatActivity implements Recy
     }
 
     @Override
-    public void onItemClick(IRecyclerItem item, int position) {
+    public void onClick(View v, IRecyclerItem item, int position) {
         if (getCallingActivity() == null) {
             return;
         }
@@ -63,7 +64,7 @@ public class TemplatesActivity extends AbstractAppCompatActivity implements Recy
     }
 
     @Override
-    public void onItemLongClick(IRecyclerItem item, int position) {
+    public void onLongClick(View v, IRecyclerItem item, int position) {
         // Do nothing
     }
 

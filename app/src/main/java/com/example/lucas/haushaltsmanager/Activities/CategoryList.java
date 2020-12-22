@@ -3,8 +3,9 @@ package com.example.lucas.haushaltsmanager.Activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+
 import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepository;
@@ -31,7 +32,7 @@ import static com.example.lucas.haushaltsmanager.Activities.CreateCategory.INTEN
 import static com.example.lucas.haushaltsmanager.Activities.CreateCategory.INTENT_PARENT;
 
 public class CategoryList extends AbstractAppCompatActivity implements
-        RecyclerItemClickListener.OnItemClickListener,
+        RecyclerItemClickListener.OnRecyclerItemClickListener,
         OnFABToolbarItemClickListener,
         OnFABToolbarFABClickListener {
     private RecyclerView mRecyclerView;
@@ -44,7 +45,7 @@ public class CategoryList extends AbstractAppCompatActivity implements
         setContentView(R.layout.activity_category_list);
 
         mRecyclerView = findViewById(R.id.category_list_recycler_view);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.setLayoutManager(LayoutManagerFactory.vertical(this));
         mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, mRecyclerView, this));
 
         mFabToolbar = new FABToolbarWithActionHandler(
@@ -65,7 +66,7 @@ public class CategoryList extends AbstractAppCompatActivity implements
     }
 
     @Override
-    public void onItemClick(IRecyclerItem item, int position) {
+    public void onClick(View v, IRecyclerItem item, int position) {
         if (item instanceof ParentCategoryItem) {
             mRecyclerViewAdapter.toggleExpansion(position);
 
@@ -88,7 +89,7 @@ public class CategoryList extends AbstractAppCompatActivity implements
     }
 
     @Override
-    public void onItemLongClick(IRecyclerItem item, int position) {
+    public void onLongClick(View v, IRecyclerItem item, int position) {
         if (item instanceof ParentCategoryItem || mRecyclerViewAdapter.getSelectedItemsCount() > 0) {
 
             mRecyclerViewAdapter.toggleExpansion(position);

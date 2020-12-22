@@ -1,12 +1,13 @@
 package com.example.lucas.haushaltsmanager.CardPopulator;
 
 import android.content.res.Resources;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.ColorInt;
 import androidx.annotation.ColorRes;
 import androidx.annotation.StringRes;
 import androidx.cardview.widget.CardView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Entities.Category;
@@ -32,7 +33,7 @@ import java.util.Map;
 
 public class TimeFrameCardPopulator {
     private ViewHolder mViewHolder;
-    private Resources mResources;
+    private final Resources mResources;
 
     public TimeFrameCardPopulator(CardView rootView, Resources resources) {
         initializeViewHolder(rootView);
@@ -89,7 +90,7 @@ public class TimeFrameCardPopulator {
         mViewHolder.mPieChart.setNoDataText(getString(R.string.no_bookings_in_year));
         mViewHolder.mPieChart.setNoDataTextColor(getColor(R.color.text_color_alert));
         mViewHolder.mPieChart.setRotationEnabled(false);
-        mViewHolder.mPieChart.setHighlightPerTapEnabled(true); // Muss aktiviert seint, sonst kann ich den Listener nicht setzen
+        mViewHolder.mPieChart.setHighlightPerTapEnabled(true); // Muss aktiviert sein, sonst kann ich den Listener nicht setzen
         mViewHolder.mPieChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override
             public void onValueSelected(Entry e, Highlight h) {
@@ -181,7 +182,7 @@ public class TimeFrameCardPopulator {
         mViewHolder.mPieChart = rootView.findViewById(R.id.timeframe_report_card_pie_chart);
     }
 
-    private class ViewHolder {
+    private static class ViewHolder {
         TextView mTitle;
         MoneyTextView income;
         MoneyTextView expense;

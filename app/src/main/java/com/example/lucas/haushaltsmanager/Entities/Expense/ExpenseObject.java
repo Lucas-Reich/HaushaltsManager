@@ -2,6 +2,7 @@ package com.example.lucas.haushaltsmanager.Entities.Expense;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
 import androidx.annotation.NonNull;
 
 import com.example.lucas.haushaltsmanager.App.app;
@@ -236,8 +237,12 @@ public class ExpenseObject implements Parcelable, Booking {
     @NonNull
     @Override
     public String toString() {
-
-        return getIndex() + " " + getTitle() + " " + getUnsignedPrice();
+        return String.format(
+                "%s %s %s",
+                getIndex(),
+                getTitle(),
+                getUnsignedPrice()
+        );
     }
 
     /**

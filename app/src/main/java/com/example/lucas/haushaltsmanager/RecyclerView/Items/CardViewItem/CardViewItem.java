@@ -1,18 +1,16 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.Items.CardViewItem;
 
-import android.support.annotation.DrawableRes;
-
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IParentRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
+import com.example.lucas.haushaltsmanager.ReportBuilder.IChart;
 
 public class CardViewItem implements IRecyclerItem {
-    public static final int VIEW_TYPE = 9;
+    public static final int VIEW_TYPE = 10;
 
-    @DrawableRes
-    private final int imageRes;
+    private final IChart chart;
 
-    public CardViewItem(@DrawableRes int imageRes) {
-        this.imageRes = imageRes;
+    public CardViewItem(IChart chart) {
+        this.chart = chart;
     }
 
     @Override
@@ -21,9 +19,8 @@ public class CardViewItem implements IRecyclerItem {
     }
 
     @Override
-    @DrawableRes
-    public Integer getContent() {
-        return imageRes;
+    public IChart getContent() {
+        return chart;
     }
 
     @Override

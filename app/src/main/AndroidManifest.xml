@@ -73,6 +73,7 @@
         <activity
             android:name=".Activities.DragAndDropActivity"
             android:screenOrientation="landscape" />
+        <activity android:name=".Activities.DragAndDropActivity2" />
     </application>
 
 </manifest>
