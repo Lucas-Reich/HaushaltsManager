@@ -24,10 +24,10 @@ public class UserSettingsPreferences {
     private static final String REMINDER_TIME = "reminderTime";
     private static final String ACTIVE_ACCOUNT = "activeAccount";
 
-    private SharedPreferences mPreferences;
-    private Context mContext;
-    private AccountRepository mAccountRepo;
-    private CurrencyRepository mCurrencyRepo;
+    private final SharedPreferences mPreferences;
+    private final Context mContext;
+    private final AccountRepository mAccountRepo;
+    private final CurrencyRepository mCurrencyRepo;
 
     public UserSettingsPreferences(Context context) {
 

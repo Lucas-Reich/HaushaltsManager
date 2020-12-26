@@ -14,8 +14,8 @@ public class AppInternalPreferences {
 
     private static final String BACKUP_DIRECTORY_KEY = "backupDirectory";
 
-    private SharedPreferences mPreferences;
-    private Context mContext;
+    private final SharedPreferences mPreferences;
+    private final Context mContext;
 
     public AppInternalPreferences(Context context) {
 

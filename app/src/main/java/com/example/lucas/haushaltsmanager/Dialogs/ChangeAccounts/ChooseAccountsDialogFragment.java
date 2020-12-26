@@ -168,7 +168,7 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Acco
      * Methode um herauszufinden ob das angegebene Konto das aktuelle Hauptkonto ist.
      *
      * @param account Konto, welches überprüft werden soll
-     * @return TRUE wenn es das Hautpkonto ist, FALSE wenn nicht
+     * @return TRUE wenn es das Hauptkonto ist, FALSE wenn nicht
      */
     private boolean isCurrentMainAccount(Account account) {
         return account.equals(mUserPreferences.getActiveAccount());

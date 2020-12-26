@@ -1,7 +1,6 @@
 package com.example.lucas.haushaltsmanager.RevertExpenseDeletionSnackbar;
 
 import android.content.Context;
-import com.google.android.material.snackbar.Snackbar;
 import android.util.Log;
 import android.view.View;
 
@@ -15,6 +14,7 @@ import com.example.lucas.haushaltsmanager.RecyclerView.Items.ChildExpenseItem.Ch
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.ExpenseItem.ExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.ParentExpenseItem.ParentExpenseItem;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,9 +22,9 @@ import java.util.List;
 public class RevertExpenseDeletionSnackbar {
     private static final String TAG = RevertExpenseDeletionSnackbar.class.getSimpleName();
 
-    private List<IRecyclerItem> mItems;
-    private ChildExpenseRepository mChildExpenseRepo;
-    private ExpenseRepository mExpenseRepo;
+    private final List<IRecyclerItem> mItems;
+    private final ChildExpenseRepository mChildExpenseRepo;
+    private final ExpenseRepository mExpenseRepo;
     private String mSnackbarMessage;
     private OnExpenseRestoredListener mBetterListener;
 

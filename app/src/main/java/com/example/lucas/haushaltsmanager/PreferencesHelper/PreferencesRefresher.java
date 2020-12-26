@@ -3,7 +3,7 @@ package com.example.lucas.haushaltsmanager.PreferencesHelper;
 import android.content.Context;
 
 public class PreferencesRefresher {
-    private SharedPreferences preferences;
+    private final SharedPreferences preferences;
     private RebuildStrategyInterface rebuildStrategy;
 
     public PreferencesRefresher(SharedPreferences preferences) {

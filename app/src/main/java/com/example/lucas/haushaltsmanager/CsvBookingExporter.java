@@ -2,6 +2,7 @@ package com.example.lucas.haushaltsmanager;
 
 import android.content.Context;
 import android.os.Environment;
+
 import androidx.annotation.StringRes;
 
 import com.example.lucas.haushaltsmanager.App.app;
@@ -18,27 +19,14 @@ import java.util.List;
 /**
  * Klasse um eine Liste von ExpenseObjects in einem CSV Datei zu schreiben und dieses dann abzuspeichern.
  */
-public class ExpenseObjectExporter {
+public class CsvBookingExporter {
+    private final File targetDirectory;
+    private List<Account> accounts;
 
-    /**
-     * Verzeichnis in dem die Exportierte Datei gespeichert werden soll
-     */
-    private File mDirectory;
+    public CsvBookingExporter(File targetDirectory, Context context) {
 
-    /**
-     * Liste aller Konten
-     */
-    private List<Account> mAccounts;
-
-    /**
-     * Constructor
-     *
-     * @param directory Verzeichniss in dem gespeichert werden soll.
-     */
-    public ExpenseObjectExporter(File directory, Context context) {
-
-        assertDirectory(directory);
-        mDirectory = directory;
+        guardAgainstInvalidDirectory(targetDirectory);
+        this.targetDirectory = targetDirectory;
         initializeAccountList(context);
     }
 
@@ -48,8 +36,8 @@ public class ExpenseObjectExporter {
      * @param expenses Buchungen die in eine Datei geschrieben werden sollen.
      * @return Die erstellte Datei wird zurückgegeben. Falls die Datei nicht erstellt werden konnte wird NULL zurückgegeben.
      */
-    public File convertAndExportExpenses(List<ExpenseObject> expenses) {
-        File file = createFile(mDirectory);
+    public File writeToFile(List<ExpenseObject> expenses) {
+        File file = createFile(targetDirectory);
 
         if (file != null && writeExpensesToFile(expenses, file)) {
             return file;
@@ -59,12 +47,12 @@ public class ExpenseObjectExporter {
     }
 
     /**
-     * Methode um zu überprüfen ob das angegebene Verzeichniss auch wirklich ein Verzeichniss ist.
+     * Methode um zu überprüfen ob das angegebene Verzeichnis auch wirklich ein Verzeichnis ist.
      * Falls nicht wird eine Exception ausgelöst.
      *
-     * @param directory Verzeichniss das üerprüft werden soll.
+     * @param directory Verzeichnis das überprüft werden soll.
      */
-    private void assertDirectory(File directory) throws IllegalArgumentException {
+    private void guardAgainstInvalidDirectory(File directory) throws IllegalArgumentException {
         if (directory != null && !directory.isDirectory())
             throw new IllegalArgumentException("The given object is not a Directory!");
     }
@@ -138,7 +126,7 @@ public class ExpenseObjectExporter {
         expenseString.append(expense.getTitle()).append(",");
         expenseString.append(expense.getDateString()).append(",");
         expenseString.append(expense.getNotice()).append(",");
-        expenseString.append(expense.getCurrency().getName());
+        expenseString.append(expense.getCurrency().getName()).append(",");
         expenseString.append(expense.getCategory().getTitle()).append(",");
         Account account = getAccount(expense.getAccountId());
         expenseString.append(account != null ? account.getTitle() : "").append("\r\n");
@@ -152,9 +140,9 @@ public class ExpenseObjectExporter {
     }
 
     /**
-     * Methode um eine Neue Datei im angegebenen Verzeichniss anzulegen.
+     * Methode um eine Neue Datei im angegebenen Verzeichnis anzulegen.
      *
-     * @param directory Verzeichniss in dem die Datei angelegt werden soll.
+     * @param directory Verzeichnis in dem die Datei angelegt werden soll.
      * @return Angelegte Datei oder null, falls die Datei schon existieren sollte.
      */
     private File createFile(File directory) {
@@ -181,8 +169,8 @@ public class ExpenseObjectExporter {
      * @return True wenn dem so ist, False wenn nicht.
      */
     private boolean hasEnoughFreeSpace() {
-        long totalStorageSpace = mDirectory.getTotalSpace();
-        long freeStorageSpace = mDirectory.getFreeSpace();
+        long totalStorageSpace = targetDirectory.getTotalSpace();
+        long freeStorageSpace = targetDirectory.getFreeSpace();
 
         return freeStorageSpace / totalStorageSpace <= 0.9;
 
@@ -196,20 +184,20 @@ public class ExpenseObjectExporter {
     private boolean isMediumAvailable() {
         String externalStoragePath = Environment.getExternalStorageDirectory().getPath();
 
-        if (mDirectory.getPath().contains(externalStoragePath))
+        if (targetDirectory.getPath().contains(externalStoragePath))
             return Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState());
         else
             return true;
     }
 
     /**
-     * Methode um zu überprüfen ob der User Schreibberechtigung für das angegebene Verzeichniss hat.
+     * Methode um zu überprüfen ob der User Schreibberechtigung für das angegebene Verzeichnis hat.
      *
      * @return True bei einer Schreibberechtigung, False bei keiner
      */
     private boolean hasWritePermission() {
 
-        return mDirectory.canWrite();
+        return targetDirectory.canWrite();
     }
 
     /**
@@ -218,9 +206,6 @@ public class ExpenseObjectExporter {
      * @return Dateiname
      */
     private String createFileName() {
-        String prefix = "Export_";
-        String suffix = ".csv";
-
         Calendar date = Calendar.getInstance();
         String fileName = date.get(Calendar.DAY_OF_MONTH) + "_"
                 + date.get(Calendar.MONTH) + "_"
@@ -229,7 +214,7 @@ public class ExpenseObjectExporter {
                 + date.get(Calendar.MINUTE) + ":"
                 + date.get(Calendar.SECOND);
 
-        return prefix.concat(fileName).concat(suffix);
+        return String.format("Export_%s.csv", fileName);
     }
 
     /**
@@ -239,7 +224,7 @@ public class ExpenseObjectExporter {
      * @return Konto mit der angegebenen Id
      */
     private Account getAccount(long accountId) {
-        for (Account account : mAccounts) {
+        for (Account account : accounts) {
             if (account.getIndex() == accountId) {
                 return account;
             }
@@ -252,6 +237,6 @@ public class ExpenseObjectExporter {
      * Methode alle Konten in einer lokalen Liste zu speichern
      */
     private void initializeAccountList(Context context) {
-        mAccounts = new AccountRepository(context).getAll();
+        accounts = new AccountRepository(context).getAll();
     }
 }

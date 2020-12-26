@@ -305,12 +305,6 @@ public class TabOneBookings extends AbstractTab implements
         }
     }
 
-    private boolean noAccountExists() {
-        UserSettingsPreferences userSettings = new UserSettingsPreferences(mParent);
-
-        return null == userSettings.getActiveAccount();
-    }
-
     private void updateItem(IRecyclerItem item) {
         if (item instanceof ChildExpenseItem || item instanceof ExpenseItem) {
             String intentMode = item instanceof ChildExpenseItem ? ExpenseScreen.INTENT_MODE_UPDATE_CHILD : ExpenseScreen.INTENT_MODE_UPDATE_PARENT;

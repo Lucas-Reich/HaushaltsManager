@@ -25,7 +25,7 @@ public class NotificationWorker extends AbstractRecurringWorker {
     public static final String CONTENT = "content";
     public static final String ICON = "icon";
 
-    private NotificationVO notification;
+    private final NotificationVO notification;
 
     /**
      * Source: https://developer.android.com/training/notify-user/build-notification

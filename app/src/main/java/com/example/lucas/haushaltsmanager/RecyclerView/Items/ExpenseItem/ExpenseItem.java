@@ -9,8 +9,8 @@ import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 public class ExpenseItem implements IRecyclerItem {
     public static final int VIEW_TYPE = 1;
 
-    private ExpenseObject expense;
-    private DateItem parent;
+    private final ExpenseObject expense;
+    private final DateItem parent;
 
     public ExpenseItem(ExpenseObject expense, DateItem parent) {
         this.expense = expense;

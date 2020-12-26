@@ -292,17 +292,6 @@ public class TransferActivity extends AppCompatActivity {
     }
 
     /**
-     * Methode um das momentan aktive Konto aus den ScharedPreferences auszulesen und das dementsprechende Konto aus der Datenbank zu holen
-     *
-     * @return aktives Konto
-     */
-    private Account getActiveAccount() {
-
-        UserSettingsPreferences preferences = new UserSettingsPreferences(this);
-        return preferences.getActiveAccount();
-    }
-
-    /**
      * Methode um ein Calendar Object in einen String zu transformieren, der basierend auf der User Locale formatiert wird.
      *
      * @param calendar Datum das transformiert werden soll

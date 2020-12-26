@@ -10,18 +10,18 @@ import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.R;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.AbstractViewHolder;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.Views.MoneyTextView;
 import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
 
 public class ExpenseItemViewHolder extends AbstractViewHolder {
     private static final String TAG = ExpenseItemViewHolder.class.getSimpleName();
 
-    private RoundedTextView roundedTextView;
-    private TextView title;
-    private TextView person;
-    private MoneyTextView price;
+    private final RoundedTextView roundedTextView;
+    private final TextView title;
+    private final TextView person;
+    private final MoneyTextView price;
 
     public ExpenseItemViewHolder(View itemView) {
         super(itemView);

@@ -41,7 +41,7 @@ public class ExpenseSum {
     }
 
     public Double sum(List<ExpenseObject> expenses) {
-        Double sum = 0D;
+        double sum = 0D;
 
         for (ExpenseObject expense : expenses) {
             sum += expense.getSignedPrice();

@@ -1,30 +1,43 @@
-package com.example.lucas.haushaltsmanager.ListAdapter.AdapterCreator;
-
-import android.content.res.Resources;
+package com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.Strategies;
 
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Report.Report;
-import com.example.lucas.haushaltsmanager.Entities.Report.ReportInterface;
-import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseGrouper;
-import com.example.lucas.haushaltsmanager.ListAdapter.MonthlyReportAdapter;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.ReportItem.ReportItem;
+import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseGrouper;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class MonthlyReportAdapterCreator {
-    private ExpenseGrouper mExpenseGrouper;
-    private List<ExpenseObject> mExpenses;
-    private Resources mResources;
+public class CreateReportItemsStrategy implements RecyclerItemCreatorStrategyInterface<ExpenseObject> {
+    private final ExpenseGrouper expenseGrouper;
 
-    public MonthlyReportAdapterCreator(List<ExpenseObject> expenses, Resources resources) {
-        mExpenseGrouper = new ExpenseGrouper();
-        mExpenses = extractChildren(expenses);
-        mResources = resources;
+    public CreateReportItemsStrategy() {
+        expenseGrouper = new ExpenseGrouper();
+    }
+
+    public List<IRecyclerItem> create(List<ExpenseObject> expenses) {
+        if (expenses.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<IRecyclerItem> reportItems = new ArrayList<>();
+
+        expenses = extractChildren(expenses);
+        for (int i = getCurrentMonth(); i >= 1; i--) {
+            reportItems.add(new ReportItem(new Report(
+                    getStringifiedMonth(i - 1),
+                    groupExpensesByMonth(i - 1, expenses),
+                    getMainCurrency()
+            )));
+        }
+
+        return reportItems;
     }
 
     private List<ExpenseObject> extractChildren(List<ExpenseObject> expenses) {
@@ -40,32 +53,9 @@ public class MonthlyReportAdapterCreator {
         return expensesWithExtractedChildren;
     }
 
-    public MonthlyReportAdapter getAdapter() {
-        List<ReportInterface> reports = createMonthlyReports();
-
-        return new MonthlyReportAdapter(
-                reports,
-                mResources
-        );
-    }
-
-    private List<ReportInterface> createMonthlyReports() {
-        List<ReportInterface> reports = new ArrayList<>();
-
-        for (int i = getCurrentMonth(); i >= 1; i--) {
-            reports.add(new Report(
-                    getStringifiedMonth(i - 1),
-                    groupExpensesByMonth(i - 1),
-                    getMainCurrency()
-            ));
-        }
-
-        return reports;
-    }
-
-    private List<ExpenseObject> groupExpensesByMonth(int month) {
-        return mExpenseGrouper.byMonth(
-                mExpenses,
+    private List<ExpenseObject> groupExpensesByMonth(int month, List<ExpenseObject> expenses) {
+        return expenseGrouper.byMonth(
+                expenses,
                 month,
                 getCurrentYear()
         );
@@ -89,3 +79,4 @@ public class MonthlyReportAdapterCreator {
         return new UserSettingsPreferences(app.getContext()).getMainCurrency();
     }
 }
+
