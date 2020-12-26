@@ -3,14 +3,16 @@ package com.example.lucas.haushaltsmanager.RecyclerView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lucas.haushaltsmanager.Entities.Category;
+import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.Entities.Tag;
-import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.ExpenseListRecyclerViewAdapter;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.ExpenseItem.ExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.ExpenseListRecyclerViewAdapter;
 import com.example.lucas.haushaltsmanager.Utils.CalendarUtils;
 
 import org.junit.After;
@@ -247,7 +249,7 @@ public class RecyclerViewItemHolderTest {
                 "Ich bin eine Ausgabe",
                 new Price(105, true, currency),
                 expenseDate,
-                new Category("Kategorie", "#000000", true, new ArrayList<Category>()),
+                new Category("Kategorie", Color.black(), ExpenseType.expense(), new ArrayList<Category>()),
                 "",
                 -1,
                 ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE,

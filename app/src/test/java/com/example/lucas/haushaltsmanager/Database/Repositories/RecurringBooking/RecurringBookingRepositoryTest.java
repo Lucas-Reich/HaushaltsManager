@@ -4,9 +4,11 @@ import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.Exceptions.RecurringBookingNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.RecurringBookingRepository;
 import com.example.lucas.haushaltsmanager.Entities.Category;
+import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.Booking;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 import com.example.lucas.haushaltsmanager.Entities.Frequency;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.Entities.RecurringBooking;
@@ -92,7 +94,7 @@ public class RecurringBookingRepositoryTest {
         return new ExpenseObject(
                 "Ausgabe",
                 new Price(150, true, currency),
-                new Category("Kategorie", "#000000", true, new ArrayList<Category>()),
+                new Category("Kategorie", Color.black(), ExpenseType.expense(), new ArrayList<Category>()),
                 ExpensesDbHelper.INVALID_INDEX,
                 currency
         );

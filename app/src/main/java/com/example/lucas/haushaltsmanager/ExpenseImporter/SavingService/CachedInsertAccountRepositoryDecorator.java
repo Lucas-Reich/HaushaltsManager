@@ -22,11 +22,11 @@ public class CachedInsertAccountRepositoryDecorator implements AccountRepository
     }
 
     @Override
-    public Account create(Account account) {
+    public Account insert(Account account) {
         Account createdAccount = getAccountFromList(account);
 
         if (null == createdAccount) {
-            createdAccount = repository.create(account);
+            createdAccount = repository.insert(account);
             cachedAccounts.add(createdAccount);
         }
 

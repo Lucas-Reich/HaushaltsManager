@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lucas.haushaltsmanager.Activities.DragAndDropActivity;
-import com.example.lucas.haushaltsmanager.Activities.DragAndDropActivity2;
 import com.example.lucas.haushaltsmanager.Activities.ExpenseScreen;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ParentExpenseObject;
@@ -129,7 +128,7 @@ public class TabOneBookings extends AbstractTab implements
 //        createExpenseIntent.putExtra(ExpenseScreen.INTENT_MODE, ExpenseScreen.INTENT_MODE_CREATE_BOOKING);
 //        startActivity(createExpenseIntent);
 
-        Intent intent = new Intent(getContext(), DragAndDropActivity2.class);
+        Intent intent = new Intent(getContext(), DragAndDropActivity.class);
         startActivity(intent);
     }
 

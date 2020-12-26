@@ -16,8 +16,10 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Ex
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepository;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
+import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 
 import junit.framework.Assert;
@@ -65,14 +67,14 @@ public class ChildExpenseRepositoryTest {
         Category parentCategory = mock(Category.class);
         when(parentCategory.getIndex()).thenReturn(107L);
 
-        category = new Category("Kategorie", "#121212", true, new ArrayList<Category>());
+        category = new Category("Kategorie", new Color("#121212"), ExpenseType.expense(), new ArrayList<Category>());
         category = mChildCategoryRepo.insert(parentCategory, category);
 
         Currency currency = new Currency("Euro", "EUR", "€");
-        currency = mCurrencyRepo.create(currency);
+        currency = mCurrencyRepo.insert(currency);
 
-        account = new Account("Konto", 70, currency);
-        account = mAccountRepo.create(account);
+        account = new Account("Konto", new Price(70, currency));
+        account = mAccountRepo.insert(account);
     }
 
     @After
@@ -94,7 +96,7 @@ public class ChildExpenseRepositoryTest {
 
     private Currency getDefaultCurrency() {
         Currency currency = new Currency("Euro", "EUR", "€");
-        return mCurrencyRepo.create(currency);
+        return mCurrencyRepo.insert(currency);
     }
 
     private ExpenseObject getParentExpenseWithChildren() {
@@ -490,7 +492,7 @@ public class ChildExpenseRepositoryTest {
                 expectedChildExpense.getCategory().getIndex(),
                 expectedChildExpense.getCategory().getTitle(),
                 expectedChildExpense.getCategory().getColor().getColorString(),
-                expectedChildExpense.getCategory().getDefaultExpenseType() ? 1 : 0
+                expectedChildExpense.getCategory().getDefaultExpenseType().value() ? 1 : 0
         });
         cursor.moveToFirst();
 
@@ -542,7 +544,7 @@ public class ChildExpenseRepositoryTest {
                 expectedChildExpense.getCategory().getIndex(),
                 expectedChildExpense.getCategory().getTitle(),
                 expectedChildExpense.getCategory().getColor().getColorString(),
-                expectedChildExpense.getCategory().getDefaultExpenseType() ? 1 : 0
+                expectedChildExpense.getCategory().getDefaultExpenseType().value() ? 1 : 0
         });
         cursor.moveToFirst();
 

@@ -8,6 +8,8 @@ import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.Exceptions.CategoryNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepository;
 import com.example.lucas.haushaltsmanager.Entities.Category;
+import com.example.lucas.haushaltsmanager.Entities.Color;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 
 import junit.framework.Assert;
 
@@ -46,8 +48,8 @@ public class CategoryRepositoryTest {
     private Category getSimpleCategory() {
         return new Category(
                 "Kategorie",
-                "#000000",
-                false,
+                Color.black(),
+                ExpenseType.income(),
                 new ArrayList<Category>()
         );
     }
@@ -195,7 +197,7 @@ public class CategoryRepositoryTest {
         };
 
         MatrixCursor cursor = new MatrixCursor(columns);
-        cursor.addRow(new Object[]{expectedCategory.getIndex(), expectedCategory.getTitle(), expectedCategory.getColor().getColorString(), expectedCategory.getDefaultExpenseType() ? 1 : 0});
+        cursor.addRow(new Object[]{expectedCategory.getIndex(), expectedCategory.getTitle(), expectedCategory.getColor().getColorString(), expectedCategory.getDefaultExpenseType().value() ? 1 : 0});
         cursor.moveToFirst();
 
         try {
@@ -220,7 +222,7 @@ public class CategoryRepositoryTest {
         };
 
         MatrixCursor cursor = new MatrixCursor(columns);
-        cursor.addRow(new Object[]{expectedCategory.getIndex(), expectedCategory.getTitle(), expectedCategory.getDefaultExpenseType()});
+        cursor.addRow(new Object[]{expectedCategory.getIndex(), expectedCategory.getTitle(), expectedCategory.getDefaultExpenseType().value()});
         cursor.moveToFirst();
 
         try {

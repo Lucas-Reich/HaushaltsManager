@@ -421,7 +421,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
         mCategoryTxt.setText(mExpense.getCategory().getTitle());
 
         // Es kann sein, dass der DefaultExpenseType der Kategorie anders ist, als der der Buchung, von daher muss hier der Preis neu gesetzt werden
-        setPrice(new Price(mExpense.getPrice().getUnsignedValue(), mExpense.getCategory().getDefaultExpenseType(), getDefaultCurrency()));
+        setPrice(new Price(mExpense.getPrice().getUnsignedValue(), mExpense.getCategory().getDefaultExpenseType().value(), getDefaultCurrency()));
 
         enableFabIfBookingIsSaveable();
     }

@@ -7,7 +7,7 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Tags.QueryResult
 import com.example.lucas.haushaltsmanager.Database.Repositories.Tags.TagTransformer;
 
 public class DefaultDatabase {
-    private SQLiteDatabase db;
+    private final SQLiteDatabase db;
 
     public DefaultDatabase(SQLiteDatabase database) {
         db = database;

@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class QueryResult implements QueryResultInterface<Tag> {
-    private Cursor mCursor;
-    private TransformerInterface<Tag> mTransformer;
+    private final Cursor mCursor;
+    private final TransformerInterface<Tag> mTransformer;
 
     public QueryResult(Cursor c, TransformerInterface<Tag> transformer) {
         mCursor = c;

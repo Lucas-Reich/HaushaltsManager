@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface BaseRepository<T> {
 
-    T create(T entity);
+    T insert(T entity);
 
     T get(long entityId) throws EntityNotExistingException;
 

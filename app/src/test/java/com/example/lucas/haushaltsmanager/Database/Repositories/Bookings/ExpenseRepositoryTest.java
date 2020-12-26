@@ -16,8 +16,10 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Tags.TagReposito
 import com.example.lucas.haushaltsmanager.Database.Repositories.Templates.TemplateRepository;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
+import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.Entities.Tag;
 import com.example.lucas.haushaltsmanager.Entities.Template;
@@ -70,14 +72,14 @@ public class ExpenseRepositoryTest {
         Category parentCategoryMock = mock(Category.class);
         when(parentCategoryMock.getIndex()).thenReturn(100L);
 
-        category = new Category("Kategorie", "#000000", false, new ArrayList<Category>());
+        category = new Category("Kategorie", new Color("#000000"), ExpenseType.income(), new ArrayList<Category>());
         category = mChildCategoryRepo.insert(parentCategoryMock, category);
 
         currency = new Currency("Credits", "CRD", "C");
-        currency = mCurrencyRepo.create(currency);
+        currency = mCurrencyRepo.insert(currency);
 
-        account = new Account("Konto", 100, currency);
-        account = mAccountRepo.create(account);
+        account = new Account("Konto", new Price(100, currency));
+        account = mAccountRepo.insert(account);
     }
 
     private ExpenseObject getSimpleExpense() {
@@ -112,11 +114,11 @@ public class ExpenseRepositoryTest {
 
     private ExpenseObject getExpenseWithTags() {
         Tag tag1 = new Tag("Tag 1");
-        tag1 = mTagRepo.create(tag1);
+        tag1 = mTagRepo.insert(tag1);
         Tag tag2 = new Tag("Tag 2");
-        tag2 = mTagRepo.create(tag2);
+        tag2 = mTagRepo.insert(tag2);
         Tag tag3 = new Tag("Tag 3");
-        tag3 = mTagRepo.create(tag3);
+        tag3 = mTagRepo.insert(tag3);
 
 
         ExpenseObject expenseWithTags = getSimpleExpense();
@@ -502,7 +504,7 @@ public class ExpenseRepositoryTest {
                 expectedExpense.getCategory().getIndex(),
                 expectedExpense.getCategory().getTitle(),
                 expectedExpense.getCategory().getColor().getColorString(),
-                expectedExpense.getCategory().getDefaultExpenseType() ? 1 : 0
+                expectedExpense.getCategory().getDefaultExpenseType().value() ? 1 : 0
         });
         cursor.moveToFirst();
 
@@ -555,7 +557,7 @@ public class ExpenseRepositoryTest {
                 expectedExpense.getCategory().getIndex(),
                 expectedExpense.getCategory().getTitle(),
                 expectedExpense.getCategory().getColor().getColorString(),
-                expectedExpense.getCategory().getDefaultExpenseType() ? 1 : 0
+                expectedExpense.getCategory().getDefaultExpenseType().value() ? 1 : 0
         });
         cursor.moveToFirst();
 

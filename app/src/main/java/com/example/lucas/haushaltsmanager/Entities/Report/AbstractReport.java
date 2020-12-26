@@ -8,6 +8,7 @@ import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSum;
 import com.example.lucas.haushaltsmanager.R;
 
@@ -96,7 +97,7 @@ public abstract class AbstractReport implements ReportInterface {
         return new Category(
                 getResourceString(titleRes),
                 new Color(Color.WHITE),
-                false,
+                ExpenseType.income(),
                 new ArrayList<Category>()
         );
     }

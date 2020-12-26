@@ -4,6 +4,7 @@ package com.example.lucas.haushaltsmanager.Entities;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Entities.Expense.Booking;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 
 import org.junit.Test;
 
@@ -291,7 +292,7 @@ public class RecurringBookingTest {
                 "Ausgabe",
                 new Price(150, true, currency),
                 getDate(1, Calendar.JANUARY, 2019),
-                new Category("Kategorie", "#000000", true, new ArrayList<Category>()),
+                new Category("Kategorie", Color.black(), ExpenseType.expense(), new ArrayList<Category>()),
                 "",
                 ExpensesDbHelper.INVALID_INDEX,
                 ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE,

@@ -24,8 +24,6 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 
-import java.lang.reflect.Field;
-
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
@@ -65,14 +63,13 @@ public class AccountRepositoryTest {
 
         return new Account(
                 "Konto",
-                7653,
-                localCurrency
+                new Price(7653, localCurrency)
         );
     }
 
     @Test
     public void testExistsWithExistingAccountShouldSucceed() {
-        Account account = mAccountRepo.create(getSimpleAccount());
+        Account account = mAccountRepo.insert(getSimpleAccount());
 
         boolean exists = mAccountRepo.exists(account);
         assertTrue("Das Konto konnte nicht in der Datenbank gefunden werrden", exists);
@@ -88,7 +85,7 @@ public class AccountRepositoryTest {
 
     @Test
     public void testGetWithExistingAccountShouldSucceed() {
-        Account expectedAccount = mAccountRepo.create(getSimpleAccount());
+        Account expectedAccount = mAccountRepo.insert(getSimpleAccount());
 
         try {
             Account fetchedAccount = mAccountRepo.get(expectedAccount.getIndex());
@@ -116,7 +113,7 @@ public class AccountRepositoryTest {
 
     @Test
     public void testInsertWithValidAccountShouldSucceed() {
-        Account expectedAccount = mAccountRepo.create(getSimpleAccount());
+        Account expectedAccount = mAccountRepo.insert(getSimpleAccount());
 
         try {
             Account fetchedAccount = mAccountRepo.get(expectedAccount.getIndex());
@@ -130,7 +127,7 @@ public class AccountRepositoryTest {
 
     @Test
     public void testDeleteWithWithExistingAccountShouldSucceed() {
-        Account account = mAccountRepo.create(getSimpleAccount());
+        Account account = mAccountRepo.insert(getSimpleAccount());
 
         try {
             mAccountRepo.delete(account);
@@ -144,7 +141,7 @@ public class AccountRepositoryTest {
 
     @Test
     public void testDeleteWithExistingAccountAttachedToParentExpenseShouldFailWithCannotDeleteAccountException() {
-        Account account = mAccountRepo.create(getSimpleAccount());
+        Account account = mAccountRepo.insert(getSimpleAccount());
 
         ExpenseObject parentExpense = mBookingRepo.insert(getSimpleExpense());
 
@@ -161,7 +158,7 @@ public class AccountRepositoryTest {
 
     @Test
     public void testDeleteWithExistingAccountAttachedToChildExpenseShouldFailWithCannotDeleteAccountException() {
-        Account account = mAccountRepo.create(getSimpleAccount());
+        Account account = mAccountRepo.insert(getSimpleAccount());
 
         ExpenseObject mockParentExpense = mock(ExpenseObject.class);
 
@@ -196,7 +193,7 @@ public class AccountRepositoryTest {
 
     @Test
     public void testUpdateWithWithExistingAccountShouldSucceed() {
-        Account expectedAccount = mAccountRepo.create(getSimpleAccount());
+        Account expectedAccount = mAccountRepo.insert(getSimpleAccount());
 
         try {
             expectedAccount.setName("New Account Name");

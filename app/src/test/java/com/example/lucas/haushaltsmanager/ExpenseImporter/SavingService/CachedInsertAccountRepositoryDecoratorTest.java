@@ -3,6 +3,7 @@ package com.example.lucas.haushaltsmanager.ExpenseImporter.SavingService;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepositoryInterface;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
+import com.example.lucas.haushaltsmanager.Entities.Price;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -37,7 +38,7 @@ public class CachedInsertAccountRepositoryDecoratorTest {
 
 
         // Act
-        Account actualAccount = accountRepositoryDecorator.create(expectedAccount);
+        Account actualAccount = accountRepositoryDecorator.insert(expectedAccount);
 
 
         // Assert
@@ -53,19 +54,18 @@ public class CachedInsertAccountRepositoryDecoratorTest {
 
 
         // Act
-        Account actualAccount = accountRepositoryDecorator.create(mock(Account.class));
+        Account actualAccount = accountRepositoryDecorator.insert(mock(Account.class));
 
 
         //Assert
-        verify(mockAccountRepository, times(1)).create(any(Account.class));
+        verify(mockAccountRepository, times(1)).insert(any(Account.class));
         assertEquals(expectedAccount, actualAccount);
     }
 
     private Account mockAccount() {
         return new Account(
                 "any string",
-                1234,
-                mock(Currency.class)
+                new Price(1234, mock(Currency.class))
         );
     }
 
@@ -79,7 +79,7 @@ public class CachedInsertAccountRepositoryDecoratorTest {
     }
 
     private void accountRepositoryWillFindAccount(Account account) {
-        when(mockAccountRepository.create(any(Account.class)))
+        when(mockAccountRepository.insert(any(Account.class)))
                 .thenReturn(account);
     }
 }

@@ -10,8 +10,10 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.Exceptions.ChildCategoryNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
 import com.example.lucas.haushaltsmanager.Entities.Category;
+import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 
 import junit.framework.Assert;
@@ -46,22 +48,6 @@ public class ChildCategoryRepositoryTest {
         mChildCategoryRepo = new ChildCategoryRepository(RuntimeEnvironment.application);
         mCategoryRepo = new CategoryRepository(RuntimeEnvironment.application);
         mBookingRepo = new ExpenseRepository(RuntimeEnvironment.application);
-    }
-
-    private Category getSimpleCategory() {
-        return new Category(
-                "Kategorie",
-                "#000000",
-                true,
-                new ArrayList<Category>()
-        );
-    }
-
-    private Category getCategoryWithChild() {
-        Category parent = getSimpleCategory();
-        parent.addChild(getSimpleCategory());
-
-        return parent;
     }
 
     @Test
@@ -115,14 +101,14 @@ public class ChildCategoryRepositoryTest {
         Category parentCategory = mock(Category.class);
         when(parentCategory.getIndex()).thenReturn(106L);
 
-        Category visibleChildCategory1 = new Category("Sichtbare Kategorie 1", "#000000", false, new ArrayList<Category>());
+        Category visibleChildCategory1 = new Category("Sichtbare Kategorie 1", Color.black(), ExpenseType.income(), new ArrayList<Category>());
         visibleChildCategory1 = mChildCategoryRepo.insert(parentCategory, visibleChildCategory1);
 
-        Category visibleChildCategory2 = new Category("Sichtbare Kategorie 2", "#000000", true, new ArrayList<Category>());
+        Category visibleChildCategory2 = new Category("Sichtbare Kategorie 2", Color.black(), ExpenseType.expense(), new ArrayList<Category>());
         visibleChildCategory2 = mChildCategoryRepo.insert(parentCategory, visibleChildCategory2);
 
         try {
-            Category invisibleChildCategory1 = new Category("Unsichtbare Kategorie 1", "#000000", true, new ArrayList<Category>());
+            Category invisibleChildCategory1 = new Category("Unsichtbare Kategorie 1", Color.black(), ExpenseType.expense(), new ArrayList<Category>());
             invisibleChildCategory1 = mChildCategoryRepo.insert(parentCategory, invisibleChildCategory1);
             mChildCategoryRepo.hide(invisibleChildCategory1);
 
@@ -179,13 +165,13 @@ public class ChildCategoryRepositoryTest {
 
     @Test
     public void testDeleteWithExistingChildCategoryThatIsLastVisibleChildOfParentShouldSucceed() {
-        Category parentCategory = new Category("Parent Category", "#000000", false, new ArrayList<Category>());
+        Category parentCategory = new Category("Parent Category", Color.black(), ExpenseType.income(), new ArrayList<Category>());
         parentCategory = mCategoryRepo.insert(parentCategory);
 
-        Category visibleChildCategory = new Category("Visible Child Category", "#000000", false, new ArrayList<Category>());
+        Category visibleChildCategory = new Category("Visible Child Category", Color.black(), ExpenseType.income(), new ArrayList<Category>());
         visibleChildCategory = mChildCategoryRepo.insert(parentCategory, visibleChildCategory);
 
-        Category invisibleChildCategory = new Category("Invisible Child Category", "#000000", false, new ArrayList<Category>());
+        Category invisibleChildCategory = new Category("Invisible Child Category", Color.black(), ExpenseType.income(), new ArrayList<Category>());
         invisibleChildCategory = mChildCategoryRepo.insert(parentCategory, invisibleChildCategory);
 
         try {
@@ -322,7 +308,7 @@ public class ChildCategoryRepositoryTest {
         };
 
         MatrixCursor cursor = new MatrixCursor(columns);
-        cursor.addRow(new Object[]{expectedChildCategory.getIndex(), expectedChildCategory.getTitle(), expectedChildCategory.getColor().getColorString(), expectedChildCategory.getDefaultExpenseType() ? 1 : 0});
+        cursor.addRow(new Object[]{expectedChildCategory.getIndex(), expectedChildCategory.getTitle(), expectedChildCategory.getColor().getColorString(), expectedChildCategory.getDefaultExpenseType().value() ? 1 : 0});
         cursor.moveToFirst();
 
         try {
@@ -358,6 +344,22 @@ public class ChildCategoryRepositoryTest {
 
             //do nothing
         }
+    }
+
+    private Category getSimpleCategory() {
+        return new Category(
+                "Kategorie",
+                Color.black(),
+                ExpenseType.expense(),
+                new ArrayList<Category>()
+        );
+    }
+
+    private Category getCategoryWithChild() {
+        Category parent = getSimpleCategory();
+        parent.addChild(getSimpleCategory());
+
+        return parent;
     }
 
     private ExpenseObject getSimpleExpense(Category category) {

@@ -61,7 +61,7 @@ public class CurrencyRepositoryTest {
 
     @Test
     public void testExistsWithExistingCurrency() {
-        Currency currency = mCurrencyRepo.create(getSimpleCurrency());
+        Currency currency = mCurrencyRepo.insert(getSimpleCurrency());
 
         boolean exists = mCurrencyRepo.exists(currency);
         assertTrue("Could not find Currency in database", exists);
@@ -77,7 +77,7 @@ public class CurrencyRepositoryTest {
 
     @Test
     public void testGetWithExistingCurrencyShouldSucceed() {
-        Currency expectedCurrency = mCurrencyRepo.create(getSimpleCurrency());
+        Currency expectedCurrency = mCurrencyRepo.insert(getSimpleCurrency());
 
         try {
             Currency fetchedCurrency = mCurrencyRepo.get(expectedCurrency.getIndex());
@@ -105,7 +105,7 @@ public class CurrencyRepositoryTest {
 
     @Test
     public void testInsertWithValidCurrencyShouldSucceed() {
-        Currency expectedCurrency = mCurrencyRepo.create(getSimpleCurrency());
+        Currency expectedCurrency = mCurrencyRepo.insert(getSimpleCurrency());
 
         try {
             Currency fetchedCurrency = mCurrencyRepo.get(expectedCurrency.getIndex());
@@ -120,7 +120,7 @@ public class CurrencyRepositoryTest {
 
     @Test
     public void testDeleteWithExistingCurrencyShouldSucceed() {
-        Currency currency = mCurrencyRepo.create(getSimpleCurrency());
+        Currency currency = mCurrencyRepo.insert(getSimpleCurrency());
 
         try {
             mCurrencyRepo.delete(currency);
@@ -148,7 +148,7 @@ public class CurrencyRepositoryTest {
 
     @Test
     public void testDeleteWithExistingCurrencyAttachedToAccountShouldFailThrowCannotDeleteCurrencyException() {
-        Currency currency = mCurrencyRepo.create(getSimpleCurrency());
+        Currency currency = mCurrencyRepo.insert(getSimpleCurrency());
 
         AccountRepository mockAccountRepo = mock(AccountRepository.class);
         when(mockAccountRepo.isCurrencyAttachedToAccount(currency)).thenReturn(true);
@@ -168,7 +168,7 @@ public class CurrencyRepositoryTest {
 
     @Test
     public void testUpdateWithExistingCurrencyShouldSucceed() {
-        Currency expectedCurrency = mCurrencyRepo.create(getSimpleCurrency());
+        Currency expectedCurrency = mCurrencyRepo.insert(getSimpleCurrency());
 
         try {
             expectedCurrency.setName("New Name");

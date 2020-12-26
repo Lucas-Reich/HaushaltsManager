@@ -60,7 +60,7 @@ public class TagRepositoryTest {
 
     @Test
     public void testExistsWithExistingTagShouldSucceed() {
-        Tag tag = mTagRepo.create(getSimpleTag());
+        Tag tag = mTagRepo.insert(getSimpleTag());
 
         boolean exists = mTagRepo.exists(tag);
         assertTrue("Das Tag wurde nicht in der Datenbank gefunden", exists);
@@ -76,7 +76,7 @@ public class TagRepositoryTest {
 
     @Test
     public void testGetWithExistingTagShouldSucceed() {
-        Tag expectedTag = mTagRepo.create(getSimpleTag());
+        Tag expectedTag = mTagRepo.insert(getSimpleTag());
 
         try {
             Tag fetchedTag = mTagRepo.get(expectedTag.getIndex());
@@ -105,7 +105,7 @@ public class TagRepositoryTest {
 
     @Test
     public void testInsertWithValidTagShouldSucceed() {
-        Tag expectedTag = mTagRepo.create(getSimpleTag());
+        Tag expectedTag = mTagRepo.insert(getSimpleTag());
 
         try {
             Tag fetchedTag = mTagRepo.get(expectedTag.getIndex());
@@ -119,7 +119,7 @@ public class TagRepositoryTest {
 
     @Test
     public void testDeleteWithExistingTagShouldSucceed() {
-        Tag tag = mTagRepo.create(getSimpleTag());
+        Tag tag = mTagRepo.insert(getSimpleTag());
 
         try {
             mTagRepo.delete(tag);
@@ -148,7 +148,7 @@ public class TagRepositoryTest {
 
     @Test
     public void testDeleteWithExistingTagAttachedToBookingShouldThrowCannotDeleteTagException() {
-        Tag tag = mTagRepo.create(getSimpleTag());
+        Tag tag = mTagRepo.insert(getSimpleTag());
 
         //Mocking the BookingTagRepository and the isTagAssignedToBooking Method
         BookingTagRepository mockBookingTagRepo = mock(BookingTagRepository.class);
@@ -168,7 +168,7 @@ public class TagRepositoryTest {
 
     @Test
     public void testUpdateWithExistingTagShouldSucceed() {
-        Tag expectedTag = mTagRepo.create(getSimpleTag());
+        Tag expectedTag = mTagRepo.insert(getSimpleTag());
 
         try {
             expectedTag.setName("New Tag Name");

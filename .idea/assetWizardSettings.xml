@@ -14,8 +14,8 @@
                         <option name="values">
                           <map>
                             <entry key="assetSourceType" value="FILE" />
-                            <entry key="outputName" value="ic_import_file" />
-                            <entry key="sourceFile" value="$USER_HOME$/Dropbox/Privat/AusgabenManager/Zusätzliche icons/ic_import_file.svg" />
+                            <entry key="outputName" value="ic_line_chart_black" />
+                            <entry key="sourceFile" value="$USER_HOME$/Dropbox/Privat/AusgabenManager/Zusätzliche icons/ic_line_chart.svg" />
                           </map>
                         </option>
                       </PersistentState>

@@ -83,7 +83,7 @@ public class CurrencyRepository implements BaseRepository<Currency> {
         return currencies;
     }
 
-    public Currency create(Currency currency) {
+    public Currency insert(Currency currency) {
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.CURRENCIES_COL_NAME, currency.getName());
         values.put(ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME, currency.getShortName());

@@ -2,12 +2,11 @@ package com.example.lucas.haushaltsmanager.Entities;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
 import androidx.annotation.NonNull;
 
-import com.example.lucas.haushaltsmanager.App.app;
-import com.example.lucas.haushaltsmanager.R;
-
 public class Account implements Parcelable {
+    // TODO: Should I add all bookings for one account into a parameters within the Account class?
     /**
      * regenerating the parcelable object back into our Category object
      */
@@ -29,16 +28,14 @@ public class Account implements Parcelable {
     private String name;
     private Price balance;
 
-    public Account(long index, @NonNull String accountName, double balance, @NonNull Currency currency) {
-
+    public Account(long index, @NonNull String accountName, Price balance) {
         setIndex(index);
         setName(accountName);
-        setBalance(new Price(balance, currency));
+        setBalance(balance);
     }
 
-    public Account(@NonNull String accountName, double balance, @NonNull Currency currency) {
-
-        this(-1, accountName, balance, currency);
+    public Account(@NonNull String accountName, Price price) {
+        this(-1, accountName, price);
     }
 
     /**
@@ -55,16 +52,6 @@ public class Account implements Parcelable {
         setBalance((Price) source.readParcelable(Price.class.getClassLoader()));
     }
 
-    /**
-     * Methode um ein dummy Konto zu erstellen
-     *
-     * @return dummy Konto
-     */
-    public static Account createDummyAccount() {
-
-        return new Account(-1, app.getContext().getString(R.string.no_name), 0, Currency.createDummyCurrency());
-    }
-
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof Account)) {
@@ -78,6 +65,7 @@ public class Account implements Parcelable {
     }
 
     @Override
+    @NonNull
     public String toString() {
 
         return getTitle();
@@ -140,8 +128,7 @@ public class Account implements Parcelable {
      */
     public boolean isSet() {
 
-        return !getTitle().equals(app.getContext().getString(R.string.no_name))
-                && !getTitle().equals("")
+        return !getTitle().equals("")
                 && balance.getCurrency().isSet();
     }
 }

@@ -5,6 +5,7 @@ import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ParentExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.AdItem.AdItem;
@@ -132,7 +133,7 @@ public class ExpenseListSelectionRulesTest {
         return new ExpenseObject(
                 "Ausgabe",
                 new Price(100, currency),
-                new Category("Kategorie", new Color(Color.BLACK), true, new ArrayList<Category>()),
+                new Category("Kategorie", new Color(Color.BLACK), ExpenseType.expense(), new ArrayList<Category>()),
                 ExpensesDbHelper.INVALID_INDEX,
                 currency
         );

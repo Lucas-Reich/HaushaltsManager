@@ -91,7 +91,7 @@ public class CachedInsertChildCategoryRepositoryDecorator implements ChildCatego
 
     private boolean areEquals(Category one, Category other) {
         return one.getTitle().equals(other.getTitle())
-                && one.getDefaultExpenseType() == other.getDefaultExpenseType()
+                && one.getDefaultExpenseType().equals(other.getDefaultExpenseType())
                 && one.getChildren().equals(other.getChildren());
     }
 }

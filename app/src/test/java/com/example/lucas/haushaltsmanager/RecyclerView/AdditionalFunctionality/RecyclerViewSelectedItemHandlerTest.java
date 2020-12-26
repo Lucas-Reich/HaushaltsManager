@@ -5,6 +5,7 @@ import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ParentExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.InsertStrategy.MockInsertStrategy;
@@ -140,7 +141,7 @@ public class RecyclerViewSelectedItemHandlerTest {
         return new ExpenseObject(
                 "Ausgabe",
                 new Price(100, currency),
-                new Category("Kategorie", new Color(Color.WHITE), true, new ArrayList<Category>()),
+                new Category("Kategorie", new Color(Color.WHITE), ExpenseType.expense(), new ArrayList<Category>()),
                 ExpensesDbHelper.INVALID_INDEX,
                 currency
         );

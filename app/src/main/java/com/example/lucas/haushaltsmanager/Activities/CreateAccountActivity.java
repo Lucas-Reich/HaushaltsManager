@@ -126,7 +126,7 @@ public class CreateAccountActivity extends AbstractAppCompatActivity implements 
         switch (bundle.getString(INTENT_MODE, INTENT_MODE_CREATE)) {
             case INTENT_MODE_CREATE:
 
-                mAccount = mAccountRepo.create(mAccount);
+                mAccount = mAccountRepo.insert(mAccount);
 
                 new AddAndSetDefaultDecorator(new ActiveAccountsPreferences(this), this)
                         .addAccount(mAccount);
@@ -158,9 +158,7 @@ public class CreateAccountActivity extends AbstractAppCompatActivity implements 
                 break;
             case INTENT_MODE_CREATE:
 
-                mAccount = Account.createDummyAccount();
-                mAccount.setBalance(new Price(0, getDefaultCurrency()));
-                mAccount.setName("");
+                mAccount = new Account("", new Price(0, getDefaultCurrency()));
                 break;
             default:
                 throw new UnsupportedOperationException("Could not handle intent mode " + bundle.getString(INTENT_MODE, null));

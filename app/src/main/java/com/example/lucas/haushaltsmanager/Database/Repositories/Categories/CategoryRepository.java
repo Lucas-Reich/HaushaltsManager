@@ -12,6 +12,7 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.Excep
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepository;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +37,7 @@ public class CategoryRepository implements CategoryRepositoryInterface {
                 categoryIndex,
                 categoryName,
                 new Color(categoryColor),
-                defaultExpenseType,
+                ExpenseType.load(defaultExpenseType),
                 new ChildCategoryRepository(app.getContext()).getAll(categoryIndex)
         );
     }
@@ -50,7 +51,7 @@ public class CategoryRepository implements CategoryRepositoryInterface {
                 + " WHERE " + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_ID + " = " + category.getIndex()
                 + " AND " + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_NAME + " = '" + category.getTitle() + "'"
                 + " AND " + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_COLOR + " = '" + category.getColor().getColorString() + "'"
-                + " AND " + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE + " = " + (category.getDefaultExpenseType() ? 1 : 0)
+                + " AND " + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE + " = " + (category.getDefaultExpenseType().value() ? 1 : 0)
                 + " LIMIT 1;";
 
         Cursor c = mDatabase.rawQuery(selectQuery, null);
@@ -116,7 +117,7 @@ public class CategoryRepository implements CategoryRepositoryInterface {
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.CATEGORIES_COL_NAME, category.getTitle());
         values.put(ExpensesDbHelper.CATEGORIES_COL_COLOR, category.getColor().getColorString());
-        values.put(ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE, category.getDefaultExpenseType() ? 1 : 0);
+        values.put(ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE, category.getDefaultExpenseType().value() ? 1 : 0);
 
         long insertedCategoryId = mDatabase.insert(ExpensesDbHelper.TABLE_CATEGORIES, null, values);
 
@@ -124,7 +125,7 @@ public class CategoryRepository implements CategoryRepositoryInterface {
                 insertedCategoryId,
                 category.getTitle(),
                 category.getColor(),
-                category.getDefaultExpenseType(),
+                ExpenseType.load(category.getDefaultExpenseType().value()),
                 new ArrayList<Category>()
         );
 
@@ -139,7 +140,7 @@ public class CategoryRepository implements CategoryRepositoryInterface {
         ContentValues updatedCategory = new ContentValues();
         updatedCategory.put(ExpensesDbHelper.CATEGORIES_COL_NAME, category.getTitle());
         updatedCategory.put(ExpensesDbHelper.CATEGORIES_COL_COLOR, category.getColor().getColorString());
-        updatedCategory.put(ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE, (category.getDefaultExpenseType() ? 1 : 0));
+        updatedCategory.put(ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE, (category.getDefaultExpenseType().value() ? 1 : 0));
 
         int affectedRows = mDatabase.update(ExpensesDbHelper.TABLE_CATEGORIES, updatedCategory, ExpensesDbHelper.CATEGORIES_COL_ID + " = ?", new String[]{category.getIndex() + ""});
 

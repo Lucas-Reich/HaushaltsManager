@@ -7,12 +7,12 @@ import java.util.Calendar;
 import java.util.List;
 
 public class ParentExpenseObject implements Booking {
-    private List<ExpenseObject> mChildren;
-    private String mTitle;
-    private Currency mCurrency;
-    private long mIndex;
+    private final long mIndex;
+    private final Calendar mDate;
+    private final String mTitle;
+    private final List<ExpenseObject> mChildren;
+    private final Currency mCurrency;
 
-    private Calendar mDate;
 
     public ParentExpenseObject(long index, String title, Currency currency, Calendar date, List<ExpenseObject> children) {
         mIndex = index;
@@ -55,6 +55,14 @@ public class ParentExpenseObject implements Booking {
                 && other.getChildren().equals(getChildren());
     }
 
+    public Currency getCurrency() {
+        return mCurrency;
+    }
+
+    public Price getPrice() {
+        return new Price(calcChildrenPrice(), mCurrency);
+    }
+
     public long getIndex() {
         return mIndex;
     }
@@ -65,14 +73,6 @@ public class ParentExpenseObject implements Booking {
 
     public List<ExpenseObject> getChildren() {
         return mChildren;
-    }
-
-    public Currency getCurrency() {
-        return mCurrency;
-    }
-
-    public Price getPrice() {
-        return new Price(calcChildrenPrice(), mCurrency);
     }
 
     private static void assertIsParent(ExpenseObject expense) {

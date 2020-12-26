@@ -6,6 +6,8 @@ import android.content.Context;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepository;
 import com.example.lucas.haushaltsmanager.Entities.Category;
+import com.example.lucas.haushaltsmanager.Entities.Color;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +15,7 @@ import java.util.Locale;
 import java.util.Random;
 
 public class RandomCategoryGenerator {
-    private List<Category> mCategories;
+    private final List<Category> mCategories;
 
     public RandomCategoryGenerator(Context context) {
         generateParentCategories(3, context);
@@ -38,13 +40,11 @@ public class RandomCategoryGenerator {
         parentCategoryGenerator.createParentCategories(count, context);
     }
 
-    private Category makeCategory(String color) {
-        Random rnd = new Random();
-
+    private Category makeCategory(Color color) {
         return new Category(
                 String.format("Kategorie %s", 1),
                 color,
-                rnd.nextBoolean(),
+                withRandomExpenseType(),
                 new ArrayList<Category>()
         );
     }
@@ -55,14 +55,24 @@ public class RandomCategoryGenerator {
         return mCategories.get(index);
     }
 
-    private String withRandomColor() {
+    private ExpenseType withRandomExpenseType() {
         Random rnd = new Random();
 
-        return String.format(
+        if (rnd.nextBoolean()) {
+            return ExpenseType.expense();
+        }
+
+        return ExpenseType.income();
+    }
+
+    private Color withRandomColor() {
+        String colorString = String.format(
                 Locale.GERMANY,
                 "#%06d",
-                rnd.nextInt(999999)
+                new Random().nextInt(999999)
         );
+
+        return new Color(colorString);
     }
 
     private class RandomParentCategoryGenerator {
@@ -76,11 +86,11 @@ public class RandomCategoryGenerator {
             }
         }
 
-        private Category makeParentCategory(String color) {
+        private Category makeParentCategory(Color color) {
             return new Category(
                     "Kategorie",
                     color,
-                    true,
+                    ExpenseType.expense(),
                     new ArrayList<Category>()
             );
         }

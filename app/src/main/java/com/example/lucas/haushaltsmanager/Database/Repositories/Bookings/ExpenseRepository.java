@@ -33,7 +33,7 @@ import java.util.List;
 
 public class ExpenseRepository {
     private static final String TAG = ExpenseRepository.class.getSimpleName();
-    private SQLiteDatabase mDatabase;
+    private final SQLiteDatabase mDatabase;
 
     public ExpenseRepository(Context context) {
         DatabaseManager.initializeInstance(new ExpensesDbHelper(context));
@@ -41,44 +41,36 @@ public class ExpenseRepository {
         mDatabase = DatabaseManager.getInstance().openDatabase();
     }
 
-    public List<ExpenseObject> getList(int offset, int batchSize) {
+    public static ExpenseObject cursorToExpense(Cursor c) {
+        int expenseId = c.getInt(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_ID));
+        Calendar date = Calendar.getInstance();
+        String dateString = c.getString(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_DATE));
+        date.setTimeInMillis(Long.parseLong(dateString));
+        String title = c.getString(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_TITLE));
+        double rawPrice = c.getDouble(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_PRICE));
+        boolean expenditure = c.getInt(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_EXPENDITURE)) == 1;
+        String notice = c.getString(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_NOTICE));
+        long accountId = c.getLong(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID));
+        ExpenseObject.EXPENSE_TYPES expense_type = ExpenseObject.EXPENSE_TYPES.valueOf(c.getString(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_EXPENSE_TYPE)));
+        Category expenseCategory = ChildCategoryRepository.cursorToChildCategory(c);
+        Currency currency = CurrencyRepository.fromCursor(c);
 
-        String selectQuery = "SELECT "
-                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_ID + ", "
-                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_EXPENSE_TYPE + ", "
-                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_PRICE + ", "
-                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_EXPENDITURE + ", "
-                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_TITLE + ", "
-                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_DATE + ", "
-                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_NOTICE + ", "
-                + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID + ", "
-                + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_ID + ", "
-                + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_NAME + ", "
-                + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME + ", "
-                + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SYMBOL + ", "
-                + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CHILD_CATEGORIES_COL_ID + ", "
-                + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CHILD_CATEGORIES_COL_NAME + ", "
-                + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CHILD_CATEGORIES_COL_COLOR + ", "
-                + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CHILD_CATEGORIES_COL_DEFAULT_EXPENSE_TYPE
-                + " FROM " + ExpensesDbHelper.TABLE_BOOKINGS
-                + " LEFT JOIN " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + " ON " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID + " = " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CHILD_CATEGORIES_COL_ID
-                + " LEFT JOIN " + ExpensesDbHelper.TABLE_CURRENCIES + " ON " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_CURRENCY_ID + " = " + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_ID
-                + " ORDER BY " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_DATE + " DESC"
-                + " LIMIT " + batchSize + " OFFSET " + offset +  ";";
+        if (c.isLast())
+            c.close();
 
-        Cursor c = mDatabase.rawQuery(selectQuery, null);
-
-        c.moveToFirst();
-        ArrayList<ExpenseObject> bookings = new ArrayList<>();
-        while (!c.isAfterLast()) {
-
-            bookings.add(cursorToExpense(c));
-            c.moveToNext();
-        }
-
-        c.close();
-
-        return bookings;
+        return new ExpenseObject(
+                expenseId,
+                title,
+                new Price(rawPrice, expenditure, currency),
+                date,
+                expenseCategory,
+                notice,
+                accountId,
+                expense_type,
+                new BookingTagRepository(app.getContext()).get(expenseId),
+                expense_type.equals(ExpenseObject.EXPENSE_TYPES.PARENT_EXPENSE) ? new ChildExpenseRepository(app.getContext()).getAll(expenseId) : new ArrayList<ExpenseObject>(),
+                currency
+        );
     }
 
     public boolean exists(ExpenseObject expense) {
@@ -154,7 +146,7 @@ public class ExpenseRepository {
     /**
      * Method for receiving all bookings in a specified date range
      *
-     * @param startDateInMills startind date
+     * @param startDateInMills starting date
      * @param endDateInMills   ending date
      * @return list of Expenses which are between the starting and end date
      */
@@ -225,7 +217,7 @@ public class ExpenseRepository {
         } catch (AccountNotFoundException e) {
 
             Log.e(TAG, "", e);
-            //Sollte eingentlich nicht passieren können da der User nur aus existierenden Konten auswählen kann.
+            //Sollte eigentlich nicht passieren können da der User nur aus existierenden Konten auswählen kann.
         }
 
         long insertedExpenseId = mDatabase.insert(ExpensesDbHelper.TABLE_BOOKINGS, null, values);
@@ -334,7 +326,7 @@ public class ExpenseRepository {
                 throw ExpenseNotFoundException.expenseNotFoundException(expense.getIndex());
 
         } catch (AccountNotFoundException e) {
-
+            // Do nothing
         }
     }
 
@@ -382,6 +374,29 @@ public class ExpenseRepository {
         return isHidden;
     }
 
+    public boolean isTemplateBooking(ExpenseObject expense) {
+        return new TemplateRepository(app.getContext()).existsWithoutIndex(expense);// IMPROVEMENT: Das TemplateRepository sollte injected werden.
+    }
+
+    public boolean isRecurringBooking(ExpenseObject expense) {
+        return new RecurringBookingRepository(app.getContext()).exists(expense);// IMPROVEMENT: Das RecurringBookingRepository sollte injected werden.
+    }
+
+    @Deprecated
+    public void assertSavableExpense(ExpenseObject expense) {
+        // TODO Funktion nicht mehr benutzen
+        switch (expense.getExpenseType()) {
+            case PARENT_EXPENSE:
+            case NORMAL_EXPENSE:
+            case CHILD_EXPENSE:
+                break;
+            case DATE_PLACEHOLDER:
+            case TRANSFER_EXPENSE:
+            case DUMMY_EXPENSE:
+                throw new UnsupportedOperationException("Booking type cannot be saved.");
+        }
+    }
+
     /**
      * Methode um den Kontostand anzupassen.
      *
@@ -417,60 +432,5 @@ public class ExpenseRepository {
 
         c.close();
         return false;
-    }
-
-    public boolean isTemplateBooking(ExpenseObject expense) {
-        return new TemplateRepository(app.getContext()).existsWithoutIndex(expense);// IMPROVEMENT: Das TemplateRepository sollte injected werden.
-    }
-
-    public boolean isRecurringBooking(ExpenseObject expense) {
-        return new RecurringBookingRepository(app.getContext()).exists(expense);// IMPROVEMENT: Das RecurringBookingRepository sollte injected werden.
-    }
-
-    public static ExpenseObject cursorToExpense(Cursor c) {
-        int expenseId = c.getInt(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_ID));
-        Calendar date = Calendar.getInstance();
-        String dateString = c.getString(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_DATE));
-        date.setTimeInMillis(Long.parseLong(dateString));
-        String title = c.getString(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_TITLE));
-        double price = c.getDouble(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_PRICE));
-        boolean expenditure = c.getInt(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_EXPENDITURE)) == 1;
-        String notice = c.getString(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_NOTICE));
-        long accountId = c.getLong(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID));
-        ExpenseObject.EXPENSE_TYPES expense_type = ExpenseObject.EXPENSE_TYPES.valueOf(c.getString(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_EXPENSE_TYPE)));
-        Category expenseCategory = ChildCategoryRepository.cursorToChildCategory(c);
-        Currency currency = CurrencyRepository.fromCursor(c);
-
-        if (c.isLast())
-            c.close();
-
-        return new ExpenseObject(
-                expenseId,
-                title,
-                new Price(price, expenditure, currency),
-                date,
-                expenseCategory,
-                notice,
-                accountId,
-                expense_type,
-                new BookingTagRepository(app.getContext()).get(expenseId),
-                expense_type.equals(ExpenseObject.EXPENSE_TYPES.PARENT_EXPENSE) ? new ChildExpenseRepository(app.getContext()).getAll(expenseId) : new ArrayList<ExpenseObject>(),
-                currency
-        );
-    }
-
-    @Deprecated
-    public void assertSavableExpense(ExpenseObject expense) {
-        // TODO Funktion nicht mehr benutzen
-        switch (expense.getExpenseType()) {
-            case PARENT_EXPENSE:
-            case NORMAL_EXPENSE:
-            case CHILD_EXPENSE:
-                break;
-            case DATE_PLACEHOLDER:
-            case TRANSFER_EXPENSE:
-            case DUMMY_EXPENSE:
-                throw new UnsupportedOperationException("Booking type cannot be saved.");
-        }
     }
 }

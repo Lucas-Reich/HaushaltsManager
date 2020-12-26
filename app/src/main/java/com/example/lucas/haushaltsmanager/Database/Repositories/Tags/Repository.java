@@ -12,7 +12,7 @@ import com.example.lucas.haushaltsmanager.Entities.Tag;
 import java.util.List;
 
 public class Repository implements TagRepositoryInterface {
-    private DefaultDatabase mDatabase;
+    private final DefaultDatabase mDatabase;
 
     Repository(DefaultDatabase database) {
         mDatabase = database;

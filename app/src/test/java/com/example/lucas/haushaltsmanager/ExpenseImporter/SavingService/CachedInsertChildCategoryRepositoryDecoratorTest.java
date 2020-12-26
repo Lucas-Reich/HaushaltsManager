@@ -3,6 +3,7 @@ package com.example.lucas.haushaltsmanager.ExpenseImporter.SavingService;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepositoryInterface;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -89,7 +90,7 @@ public class CachedInsertChildCategoryRepositoryDecoratorTest {
         return new Category(
                 "any string",
                 mock(Color.class),
-                true,
+                ExpenseType.expense(),
                 new ArrayList<Category>()
         );
     }

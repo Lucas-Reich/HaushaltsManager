@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.util.ArrayList;
@@ -30,11 +31,11 @@ public class Category implements Parcelable {
 
     private long mIndex;
     private String mName;
-    private boolean mDefaultExpenseType;
+    private ExpenseType mDefaultExpenseType;
     private List<Category> mChildren;
     private Color color;
 
-    public Category(long index, @NonNull String name, Color color, boolean defaultExpenseType, List<Category> children) {
+    public Category(long index, @NonNull String name, Color color, ExpenseType defaultExpenseType, List<Category> children) {
         setIndex(index);
         setName(name);
         setColor(color);
@@ -42,14 +43,8 @@ public class Category implements Parcelable {
         addChildren(children);
     }
 
-    @Deprecated
-    public Category(@NonNull String categoryName, @NonNull String color, @NonNull Boolean defaultExpenseType, @NonNull List<Category> children) {
-
-        this(ExpensesDbHelper.INVALID_INDEX, categoryName, new Color(color), defaultExpenseType, children);
-    }
-
-    public Category(@NonNull String name, @NonNull Color color, @NonNull Boolean defaultExpenseType, @NonNull List<Category> children) {
-        this(ExpensesDbHelper.INVALID_INDEX, name, color, defaultExpenseType, children);
+    public Category(@NonNull String name, @NonNull Color color, ExpenseType expenseType, @NonNull List<Category> children) {
+        this(ExpensesDbHelper.INVALID_INDEX, name, color, expenseType, children);
     }
 
     /**
@@ -63,7 +58,7 @@ public class Category implements Parcelable {
         setIndex(source.readLong());
         setName(source.readString());
         setColor((Color) source.readParcelable(Color.class.getClassLoader()));
-        setDefaultExpenseType(source.readInt() == 1);
+        setDefaultExpenseType(ExpenseType.load(source.readInt() == 1));
         // TODO: Müssten hier nicht noch die Kinder initialisiert werden
     }
 
@@ -74,7 +69,7 @@ public class Category implements Parcelable {
      */
     public static Category createDummyCategory() {
 
-        return new Category(-1L, app.getContext().getString(R.string.no_name), new Color(Color.BLACK), false, new ArrayList<Category>());
+        return new Category(-1L, app.getContext().getString(R.string.no_name), new Color(Color.BLACK), ExpenseType.income(), new ArrayList<Category>());
     }
 
     @Override
@@ -87,12 +82,13 @@ public class Category implements Parcelable {
 
         return getTitle().equals(otherCategory.getTitle())
                 && otherCategory.getColor().equals(color)
-                && (getDefaultExpenseType() == otherCategory.getDefaultExpenseType())
+                && otherCategory.getDefaultExpenseType().equals(mDefaultExpenseType)
                 && mChildren.equals(otherCategory.getChildren());
     }
 
+    @Override
+    @NonNull
     public String toString() {
-
         return getTitle();
     }
 
@@ -129,7 +125,7 @@ public class Category implements Parcelable {
         dest.writeLong(mIndex);
         dest.writeString(mName);
         dest.writeParcelable(color, flags);
-        dest.writeInt(mDefaultExpenseType ? 1 : 0);
+        dest.writeInt(mDefaultExpenseType.value() ? 1 : 0);
     }
 
     public long getIndex() {
@@ -161,12 +157,12 @@ public class Category implements Parcelable {
         this.color = color;
     }
 
-    public boolean getDefaultExpenseType() {
+    public ExpenseType getDefaultExpenseType() {
 
         return mDefaultExpenseType;
     }
 
-    public void setDefaultExpenseType(boolean expenseType) {
+    public void setDefaultExpenseType(ExpenseType expenseType) {
 
         mDefaultExpenseType = expenseType;
     }

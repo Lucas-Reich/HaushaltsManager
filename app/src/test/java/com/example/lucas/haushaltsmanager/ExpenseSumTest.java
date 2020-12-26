@@ -4,6 +4,7 @@ import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.Entities.Tag;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSum;
@@ -299,8 +300,8 @@ public class ExpenseSumTest {
         return new Category(
                 index,
                 title,
-                new Color(Color.BLACK),
-                false,
+                Color.black(),
+                ExpenseType.income(),
                 new ArrayList<Category>()
         );
     }

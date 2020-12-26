@@ -3,8 +3,10 @@ package com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lucas.haushaltsmanager.Entities.Category;
+import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ParentExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.Entities.Tag;
@@ -238,7 +240,7 @@ public class RecyclerViewExpandableItemHandlerTest {
                 "Ich bin eine Ausgabe",
                 new Price(new Random().nextInt(), true, currency),
                 date,
-                new Category("Kategorie", "#000000", true, new ArrayList<Category>()),
+                new Category("Kategorie", Color.black(), ExpenseType.expense(), new ArrayList<Category>()),
                 "",
                 -1,
                 ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE,

@@ -11,7 +11,7 @@ public class RandomCurrencyGenerator {
         CurrencyRepository currencyRepository = new CurrencyRepository(context);
 
         for (; count >= 0; count--) {
-            currencyRepository.create(makeCurrency());
+            currencyRepository.insert(makeCurrency());
         }
     }
 

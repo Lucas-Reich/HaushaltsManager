@@ -2,7 +2,7 @@ package com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.P
 
 class DoubleParser {
     // TODO: Sollte ich auch es auch möglich machen Doubles zu parsen, die "," Werte lesen können
-    Double parse(String input) throws NumberFormatException {
+    public Double parse(String input) throws NumberFormatException {
         return Double.valueOf(input);
     }
 }

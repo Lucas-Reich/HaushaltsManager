@@ -6,6 +6,7 @@ import android.content.Context;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
+import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences.ActiveAccountsPreferences;
 
 public class RandomAccountGenerator {
@@ -25,7 +26,7 @@ public class RandomAccountGenerator {
         AccountRepository accountRepository = new AccountRepository(mContext);
 
         for (; count > 0; count--) {
-            accountRepository.create(makeAccount(
+            accountRepository.insert(makeAccount(
                     withRandomCurrency()
             ));
         }
@@ -42,8 +43,7 @@ public class RandomAccountGenerator {
     private Account makeAccount(Currency currency) {
         return new Account(
                 String.format("Konto %s", 1),
-                0,
-                currency
+                new Price(0, currency)
         );
     }
 

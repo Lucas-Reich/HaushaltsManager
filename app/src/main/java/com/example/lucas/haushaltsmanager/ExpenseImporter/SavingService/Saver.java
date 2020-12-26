@@ -15,6 +15,7 @@ import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences.ActiveAccountsPreferences;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences.ActiveAccountsPreferencesInterface;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences.AddAndSetDefaultDecorator;
@@ -57,7 +58,7 @@ public class Saver implements ISaver {
         Category parentCategory = categoryRepository.insert(new Category(
                 context.getString(R.string.imported_categories_parent_name),
                 Color.random(),
-                true,
+                ExpenseType.expense(),
                 new ArrayList<Category>()
         ));
 
@@ -90,7 +91,7 @@ public class Saver implements ISaver {
     }
 
     private void saveAccountAndAttachToBooking(Account account, ExpenseObject booking) {
-        Account savedAccount = accountRepository.create(account);
+        Account savedAccount = accountRepository.insert(account);
 
         booking.setAccount(savedAccount);
 

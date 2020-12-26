@@ -5,6 +5,7 @@ import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.Entities.Template;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.ExpenseItem.ExpenseItem;
@@ -66,7 +67,7 @@ public class TemplateListInsertStrategyTest {
         return new ExpenseObject(
                 "Ausgabe",
                 new Price(100, false, currency),
-                new Category("Kategorie", new Color(Color.WHITE), true, new ArrayList<Category>()),
+                new Category("Kategorie", new Color(Color.WHITE), ExpenseType.expense(), new ArrayList<Category>()),
                 ExpensesDbHelper.INVALID_INDEX,
                 currency
         );

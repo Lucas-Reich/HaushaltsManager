@@ -77,7 +77,7 @@ public class TagRepository implements BaseRepository<Tag> {
         return tags;
     }
 
-    public Tag create(Tag tag) {
+    public Tag insert(Tag tag) {
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.TAGS_COL_NAME, tag.getName());
 

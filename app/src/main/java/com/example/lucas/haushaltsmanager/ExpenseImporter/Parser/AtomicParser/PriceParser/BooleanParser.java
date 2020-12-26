@@ -7,7 +7,7 @@ class BooleanParser {
     private final List<String> VALID_BOOLEAN_TRUE = Arrays.asList("1", "true");
     private final List<String> VALID_BOOLEAN_FALSE = Arrays.asList("0", "false");
 
-    Boolean parse(String input) throws IllegalArgumentException {
+    public Boolean parse(String input) throws IllegalArgumentException {
         input = input.toLowerCase();
 
         if (VALID_BOOLEAN_TRUE.contains(input)) {
@@ -18,6 +18,6 @@ class BooleanParser {
             return false;
         }
 
-        throw new IllegalArgumentException(String.format("Could not parse '%s' to Boolean.", input));
+        throw new IllegalArgumentException(String.format("Could not parse '%s' as Boolean.", input));
     }
 }

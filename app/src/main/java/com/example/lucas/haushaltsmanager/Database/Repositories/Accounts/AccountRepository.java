@@ -12,18 +12,18 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Excepti
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepository;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
+import com.example.lucas.haushaltsmanager.Entities.Price;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class AccountRepository implements AccountRepositoryInterface {
-    private SQLiteDatabase mDatabase;
+    private final SQLiteDatabase mDatabase;
 
     public AccountRepository(Context context) {
         DatabaseManager.initializeInstance(new ExpensesDbHelper(context));
 
         mDatabase = DatabaseManager.getInstance().openDatabase();
-
     }
 
     public boolean exists(Account account) {
@@ -38,14 +38,7 @@ public class AccountRepository implements AccountRepositoryInterface {
 
         Cursor c = mDatabase.rawQuery(selectQuery, null);
 
-        if (c.moveToFirst()) {
-
-            c.close();
-            return true;
-        }
-
-        c.close();
-        return false;
+        return isEmpty(c);
     }
 
     public Account get(long accountId) throws AccountNotFoundException {
@@ -91,7 +84,7 @@ public class AccountRepository implements AccountRepositoryInterface {
         return accounts;
     }
 
-    public Account create(Account account) {
+    public Account insert(Account account) {
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.ACCOUNTS_COL_NAME, account.getTitle());
         values.put(ExpensesDbHelper.ACCOUNTS_COL_BALANCE, account.getBalance().getSignedValue());
@@ -102,13 +95,12 @@ public class AccountRepository implements AccountRepositoryInterface {
         return new Account(
                 insertedAccountId,
                 account.getTitle(),
-                account.getBalance().getSignedValue(),
-                account.getBalance().getCurrency()
+                account.getBalance()
         );
     }
 
     public void delete(Account account) throws CannotDeleteAccountException {
-        if (isAttachedToBooking(account))
+        if (hasBookingsAttached(account))
             throw new CannotDeleteAccountException(account);
 
         mDatabase.delete(ExpensesDbHelper.TABLE_ACCOUNTS, ExpensesDbHelper.ACCOUNTS_COL_ID + " = ?", new String[]{"" + account.getIndex()});
@@ -127,28 +119,21 @@ public class AccountRepository implements AccountRepositoryInterface {
     }
 
     /**
-     * Methode um zu überprüfen ob es ein Konto mit der angegebenen Währug gibt.
+     * Methode um zu überprüfen ob es ein Konto mit der angegebenen Währung gibt.
      *
-     * @param currency Zu überprüfende Wärhung
-     * @return TRUE wenn es ein Konto mit dieseer Währung gibt, FALSE wenn nicht
+     * @param currency Zu überprüfende Währung
+     * @return TRUE wenn es ein Konto mit dieser Währung gibt, FALSE wenn nicht
      */
     public boolean isCurrencyAttachedToAccount(Currency currency) {
-        String selectQuery = "SELECT"
-                + " *"
-                + " FROM " + ExpensesDbHelper.TABLE_ACCOUNTS
-                + " WHERE " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID + " = " + currency.getIndex()
-                + " LIMIT 1;";
+        Cursor c = mDatabase.rawQuery(String.format(
+                "SELECT * FROM %s WHERE %s.%s = %s LIMIT 1",
+                ExpensesDbHelper.TABLE_ACCOUNTS,
+                ExpensesDbHelper.TABLE_ACCOUNTS,
+                ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID,
+                currency.getIndex()
+        ), null);
 
-        Cursor c = mDatabase.rawQuery(selectQuery, null);
-
-        if (c.moveToFirst()) {
-
-            c.close();
-            return true;
-        }
-
-        c.close();
-        return false;
+        return !isEmpty(c);
     }
 
     public Account fromCursor(Cursor c) {
@@ -164,8 +149,7 @@ public class AccountRepository implements AccountRepositoryInterface {
         return new Account(
                 accountId,
                 accountName,
-                accountBalance,
-                accountCurrency
+                new Price(accountBalance, accountCurrency)
         );
     }
 
@@ -174,49 +158,22 @@ public class AccountRepository implements AccountRepositoryInterface {
         DatabaseManager.getInstance().closeDatabase();
     }
 
-    private boolean isAttachedToBooking(Account account) {
-        return isAttachedToParentBooking(account) || isAttachedToChildBooking(account);
+    private boolean hasBookingsAttached(Account account) {
+        Cursor c = mDatabase.rawQuery(String.format(
+                "SELECT * FROM %s WHERE %s.%s = %s LIMIT 1",
+                ExpensesDbHelper.TABLE_BOOKINGS,
+                ExpensesDbHelper.TABLE_BOOKINGS,
+                ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID,
+                account.getIndex()
+        ), null);
+
+        return !isEmpty(c);
     }
 
-    private boolean isAttachedToParentBooking(Account account) {
-
-        String selectQuery;
-        selectQuery = "SELECT"
-                + " *"
-                + " FROM " + ExpensesDbHelper.TABLE_BOOKINGS
-                + " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID + " = " + account.getIndex()
-                + " LIMIT 1;";
-
-        Cursor c = mDatabase.rawQuery(selectQuery, null);
-
-        if (c.moveToFirst()) {
-
-            c.close();
-            return true;
-        }
-
+    private boolean isEmpty(Cursor c) {
+        int resultCount = c.getCount();
         c.close();
-        return false;
-    }
 
-    private boolean isAttachedToChildBooking(Account account) {
-
-        String selectQuery;
-        selectQuery = "SELECT"
-                + " *"
-                + " FROM " + ExpensesDbHelper.TABLE_BOOKINGS
-                + " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID + " = " + account.getIndex()
-                + " LIMIT 1;";
-
-        Cursor c = mDatabase.rawQuery(selectQuery, null);
-
-        if (c.moveToFirst()) {
-
-            c.close();
-            return true;
-        }
-
-        c.close();
-        return false;
+        return resultCount == 0;
     }
 }

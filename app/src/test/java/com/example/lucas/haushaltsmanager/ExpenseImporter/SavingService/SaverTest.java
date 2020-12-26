@@ -66,7 +66,7 @@ public class SaverTest {
         verify(backupHandler, times(1)).backup();
 
 
-        verify(mockAccountRepository, times(1)).create(account);
+        verify(mockAccountRepository, times(1)).insert(account);
         verify(accountPreferences, times(1)).addAccount(account);
         verify(booking, times(1)).setAccount(account);
 
@@ -96,7 +96,7 @@ public class SaverTest {
     }
 
     private void accountRepositoryShouldReturnAccount(Account account) {
-        when(mockAccountRepository.create(any(Account.class)))
+        when(mockAccountRepository.insert(any(Account.class)))
                 .thenReturn(account);
     }
 }

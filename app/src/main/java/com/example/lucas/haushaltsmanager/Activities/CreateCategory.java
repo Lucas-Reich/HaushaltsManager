@@ -1,6 +1,8 @@
 package com.example.lucas.haushaltsmanager.Activities;
 
 import android.os.Bundle;
+
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import android.view.View;
 import android.widget.Button;
@@ -72,7 +74,7 @@ public class CreateCategory extends AbstractAppCompatActivity {
                 break;
             case INTENT_MODE_CREATE:
                 mCategory = Category.createDummyCategory();
-                mCategory.setDefaultExpenseType(true);
+                mCategory.setDefaultExpenseType(ExpenseType.expense());
                 break;
             default:
                 throw new UnsupportedOperationException("Could not handle intent mode " + bundle.getString(INTENT_MODE, null));
@@ -151,8 +153,8 @@ public class CreateCategory extends AbstractAppCompatActivity {
                             public void onTextInput(String categoryTitle) {
                                 setParent(mCategoryRepo.insert(new Category(
                                         categoryTitle,
-                                        "#000000",
-                                        false,
+                                        new Color("#000000"),
+                                        ExpenseType.income(),
                                         new ArrayList<Category>()))
                                 );
 
@@ -171,14 +173,14 @@ public class CreateCategory extends AbstractAppCompatActivity {
         mIncomeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setExpenditureType(false);
+                setExpenditureType(ExpenseType.income());
             }
         });
 
         mExpenseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setExpenditureType(true);
+                setExpenditureType(ExpenseType.expense());
             }
         });
 
@@ -273,11 +275,11 @@ public class CreateCategory extends AbstractAppCompatActivity {
         mColorView.setCircleColor(mCategory.getColor().getColorString());
     }
 
-    private void setExpenditureType(boolean expenditureType) {
+    private void setExpenditureType(ExpenseType expenditureType) {
         mCategory.setDefaultExpenseType(expenditureType);
 
         LinearLayout ll = findViewById(R.id.create_category_bottom_bar);
-        ll.setBackgroundColor(expenditureType
+        ll.setBackgroundColor(expenditureType.value()
                 ? getColorRes(R.color.booking_expense)
                 : getColorRes(R.color.booking_income)
         );

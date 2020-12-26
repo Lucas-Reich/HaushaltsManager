@@ -2,6 +2,7 @@ package com.example.lucas.haushaltsmanager.Entities;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
 import androidx.annotation.ColorInt;
 
 import java.util.Random;
@@ -23,7 +24,7 @@ public class Color extends android.graphics.Color implements Parcelable {
         }
     };
     static final String VALID_COLOR_PATTERN = "#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})";
-    private String color;
+    private final String color;
 
     public Color(String color) {
         if (!assertIsColorString(color)) {
@@ -39,6 +40,14 @@ public class Color extends android.graphics.Color implements Parcelable {
 
     private Color(Parcel source) {
         color = source.readString();
+    }
+
+    public static Color black() {
+        return new Color("#000000");
+    }
+
+    public static Color white() {
+        return new Color("#FFFFFF");
     }
 
     public static Color random() {

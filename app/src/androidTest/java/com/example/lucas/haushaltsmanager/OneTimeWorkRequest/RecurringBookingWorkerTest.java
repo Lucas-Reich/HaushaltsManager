@@ -17,6 +17,7 @@ import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.Booking;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 import com.example.lucas.haushaltsmanager.Entities.Frequency;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.Entities.RecurringBooking;
@@ -155,10 +156,9 @@ public class RecurringBookingWorkerTest extends DatabaseTest {
     }
 
     private Account createDefaultAccount(Context context) {
-        return new AccountRepository(context).create(new Account(
+        return new AccountRepository(context).insert(new Account(
                 "Konto",
-                1000,
-                new Currency("Euro", "EUR", "€")
+                new Price(1000, new Currency("Euro", "EUR", "€"))
         ));
     }
 
@@ -166,12 +166,12 @@ public class RecurringBookingWorkerTest extends DatabaseTest {
         Category category = new Category(
                 "Kategorie",
                 new Color(Color.BLACK),
-                true,
+                ExpenseType.expense(),
                 new ArrayList<Category>() {{
                     add(new Category(
                             "Kategorie",
                             new Color(Color.WHITE),
-                            true,
+                            ExpenseType.expense(),
                             new ArrayList<Category>()
                     ));
                 }}

@@ -8,6 +8,7 @@ import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSum;
 
@@ -93,8 +94,8 @@ public class Report implements ReportInterface {
     private Category getPlaceholderCategory(@StringRes int titleRes) {
         return new Category(
                 getResourceString(titleRes),
-                new Color(Color.WHITE),
-                false,
+                Color.white(),
+                ExpenseType.income(),
                 new ArrayList<Category>()
         );
     }

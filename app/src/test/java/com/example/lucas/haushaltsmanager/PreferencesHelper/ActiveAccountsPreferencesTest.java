@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
+import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences.ActiveAccountsPreferences;
 
 import org.junit.After;
@@ -163,8 +164,7 @@ public class ActiveAccountsPreferencesTest {
         return new Account(
                 id,
                 "Konto",
-                0d,
-                mock(Currency.class)
+                new Price(0d, mock(Currency.class))
         );
     }
 }

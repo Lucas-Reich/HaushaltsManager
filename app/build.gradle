@@ -54,6 +54,11 @@ dependencies {
     implementation project(path: ':changelogdialog')
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation 'androidx.gridlayout:gridlayout:1.0.0'
+
+
+    // Library um den Hintergrund weichzuzeichnen
+    implementation 'jp.wasabeef:blurry:3.0.0'
 
 
     // Dependencies welche benötigt werden, um die AndroidTests auszuführen

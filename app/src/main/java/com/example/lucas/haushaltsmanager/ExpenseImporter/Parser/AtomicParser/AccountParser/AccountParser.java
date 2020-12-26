@@ -2,6 +2,7 @@ package com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.A
 
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
+import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.InvalidInputException;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.NoMappingFoundException;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Line.Line;
@@ -16,7 +17,7 @@ import java.util.List;
 public class AccountParser implements IParser<Account> {
     public static final IRequiredField ACCOUNT_TITLE_KEY = new Title();
 
-    private Currency mainCurrency;
+    private final Currency mainCurrency;
 
     public AccountParser(Currency mainCurrency) {
         this.mainCurrency = mainCurrency;
@@ -34,8 +35,7 @@ public class AccountParser implements IParser<Account> {
 
         return new Account(
                 accountTitle,
-                0,
-                mainCurrency
+                new Price(0, mainCurrency)
         );
     }
 

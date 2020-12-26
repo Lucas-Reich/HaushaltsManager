@@ -16,8 +16,10 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Templates.Except
 import com.example.lucas.haushaltsmanager.Database.Repositories.Templates.Exceptions.TemplateNotFoundException;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
+import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.Entities.Template;
 
@@ -32,7 +34,6 @@ import org.robolectric.RuntimeEnvironment;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
@@ -69,15 +70,15 @@ public class TemplatesRepositoryTest {
         mBookingRepo = new ExpenseRepository(RuntimeEnvironment.application);
 
         currency = new Currency("Euro", "EUR", "€");
-        currency = mCurrencyRepo.create(currency);
+        currency = mCurrencyRepo.insert(currency);
 
-        account = new Account("Konto 1", 2453, currency);
-        account = mAccountRepo.create(account);
+        account = new Account("Konto 1", new Price(2453, currency));
+        account = mAccountRepo.insert(account);
 
         Category parentCategory = mock(Category.class);
         when(parentCategory.getIndex()).thenReturn(453L);
 
-        category = new Category("Kategorie", "#323211", false, new ArrayList<Category>());
+        category = new Category("Kategorie", new Color("#323211"), ExpenseType.income(), new ArrayList<Category>());
         category = mChildCategoryRepo.insert(parentCategory, category);
     }
 
