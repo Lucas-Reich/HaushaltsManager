@@ -5,7 +5,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 
 public class ButtonContainer {
-    private LinearLayout container;
+    private final LinearLayout container;
     private OnButtonContainerClick listener;
 
     public ButtonContainer(LinearLayout rootLayout) {
@@ -57,12 +57,12 @@ public class ButtonContainer {
         return new View.OnClickListener() {
             @Override
             public void onClick(View button) {
-//                disableView(button);
-
-                if (null != listener) {
-                    String buttonText = ((Button) button).getText().toString();
-                    listener.onClick(buttonText, (int) button.getTag());
+                if (null == listener) {
+                    return;
                 }
+
+                String buttonText = ((Button) button).getText().toString();
+                listener.onClick(buttonText, (int) button.getTag());
             }
         };
     }

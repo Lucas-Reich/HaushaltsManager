@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Locale;
 
 public class BackupUtils {
-    private static final String BACKUP_EXTENSION_REGEX = String.format(".*.%s", Backup.BACKUP_FILE_EXTENSION); // TODO: Wegen backwards compatibility muss ich das auch noch behalten
     private static final String BACKUP_EXTENSION_REGEX_NEW = String.format(".*.%s", FileBackupHandler.BACKUP_EXTENSION);
     private static final String AUTOMATIC_BACKUP_REGEX = String.format("([12]\\d{3}(0[1-9]|1[0-2])(0[1-9]|[12]\\d|3[01]))_Backup.%s", Backup.BACKUP_FILE_EXTENSION);
 

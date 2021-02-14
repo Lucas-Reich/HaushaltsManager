@@ -13,7 +13,7 @@ public class WeekdayUtils {
     public static final int SATURDAY = 5;
     public static final int SUNDAY = 6;
 
-    private String[] mWeekdays;
+    private final String[] mWeekdays;
 
     public WeekdayUtils(Context context) {
 

@@ -12,7 +12,7 @@ import com.example.lucas.haushaltsmanager.R;
 
 public class app extends Application {
     private static Context context;
-    private static String CHANNEL_ID = "reminder";
+    private static final String CHANNEL_ID = "reminder";
 
     public static Context getContext() {
         return context;

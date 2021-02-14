@@ -8,8 +8,8 @@ import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferen
 import java.util.List;
 
 public class AddAndSetDefaultDecorator implements ActiveAccountsPreferencesInterface {
-    private ActiveAccountsPreferencesInterface preferences;
-    private UserSettingsPreferences userPreferences;
+    private final ActiveAccountsPreferencesInterface preferences;
+    private final UserSettingsPreferences userPreferences;
 
     public AddAndSetDefaultDecorator(ActiveAccountsPreferencesInterface preferences, Context context) {
         this.preferences = preferences;

@@ -1,18 +1,19 @@
 package com.example.lucas.haushaltsmanager.CardPopulator;
 
 import android.content.res.Resources;
-import androidx.annotation.ColorRes;
-import androidx.annotation.StringRes;
-import androidx.core.content.res.ResourcesCompat;
-import androidx.cardview.widget.CardView;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.ColorRes;
+import androidx.annotation.StringRes;
+import androidx.cardview.widget.CardView;
+import androidx.core.content.res.ResourcesCompat;
+
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Report.ReportInterface;
+import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseGrouper;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSum;
-import com.example.lucas.haushaltsmanager.R;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
@@ -28,10 +29,10 @@ import java.util.List;
 public class LineChartCardPopulator {
     // IMPROVEMENT: Ich kann die Linie, basierend auf dem Kontostand einfärben. Wenn der Kontostand kleiner als 0 ist Rot größer oder gleich 0 grün
     // Trello: https://trello.com/c/uAhKQUnK/62-farbe-des-linecharts-im-tabthree-basierend-auf-dem-kontostand-einfärben
-    private CardView mRootView;
+    private final CardView mRootView;
     private ViewHolder mViewHolder;
     private Resources mResources;
-    private double mLastYearAccountBalance; // REFACTOR: Geht das auch anders?
+    private final double mLastYearAccountBalance; // REFACTOR: Geht das auch anders?
     private int mCurrentYear;
 
     public LineChartCardPopulator(CardView rootView, double lastYearAccountBalance) {
@@ -154,7 +155,7 @@ public class LineChartCardPopulator {
         mViewHolder.mLineChart = mRootView.findViewById(R.id.timeline_report_card_line_chart);
     }
 
-    private class ViewHolder {
+    private static class ViewHolder {
         TextView mTitle;
         LineChart mLineChart;
     }

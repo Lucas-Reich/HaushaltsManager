@@ -5,7 +5,7 @@ import com.example.lucas.changelogdialog.ChangelogItem;
 public class Refactoring implements ChangelogItem {
     private static final String REFACTORING = "Refactoring";
 
-    private String mDescription;
+    private final String mDescription;
 
     public Refactoring(String additionalInformation) {
         mDescription = additionalInformation != null ? additionalInformation : "";

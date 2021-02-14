@@ -15,10 +15,10 @@ public class DataImporterBackupHandler {
     private File databaseBkp;
     private File activeAccountPreferencesBkp;
 
-    private FileBackupHandler backupHandler;
+    private final FileBackupHandler backupHandler;
 
-    private Directory databaseDir;
-    private Directory preferencesDir;
+    private final Directory databaseDir;
+    private final Directory preferencesDir;
 
     public DataImporterBackupHandler(Context context, FileBackupHandler backupHandler) {
         this.backupHandler = backupHandler;

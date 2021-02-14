@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 public class PieChartCardPopulator {
-    private CardView mRootView;
+    private final CardView mRootView;
     private ViewHolder mViewHolder;
     private boolean mShowExpenditures;
 
@@ -114,7 +114,7 @@ public class PieChartCardPopulator {
         mViewHolder.mPieChart = mRootView.findViewById(R.id.pie_chart_card_pie);
     }
 
-    private class ViewHolder {
+    private static class ViewHolder {
         TextView mTitleTxt;
         PieChart mPieChart;
     }

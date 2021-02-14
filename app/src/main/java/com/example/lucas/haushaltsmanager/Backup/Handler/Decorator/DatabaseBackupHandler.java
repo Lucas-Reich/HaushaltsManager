@@ -17,13 +17,13 @@ import com.example.lucas.haushaltsmanager.PreferencesHelper.PreferencesRefresher
 import java.io.File;
 
 public class DatabaseBackupHandler {
-    private Directory defaultBackupDir;
-    private Directory databaseDir;
+    private final Directory defaultBackupDir;
+    private final Directory databaseDir;
 
-    private FileBackupHandler backupHandler;
-    private DatabaseFileValidator databaseFileValidator;
+    private final FileBackupHandler backupHandler;
+    private final DatabaseFileValidator databaseFileValidator;
 
-    private PreferencesRefresher preferencesRefresher;
+    private final PreferencesRefresher preferencesRefresher;
 
     public DatabaseBackupHandler(Context context, FileBackupHandler backupHandler) {
         databaseDir = new Directory(context.getDatabasePath(ExpensesDbHelper.DB_NAME).getParent());

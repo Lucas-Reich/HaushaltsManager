@@ -1,9 +1,6 @@
 package com.example.lucas.haushaltsmanager.Activities;
 
 import android.os.Bundle;
-
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -19,9 +16,11 @@ import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.SingleChoiceDialog;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
 import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 
@@ -62,23 +61,6 @@ public class CreateCategory extends AbstractAppCompatActivity {
         mSaveFAB = findViewById(R.id.create_category_save);
 
         resolveIntent();
-    }
-
-    private void resolveIntent() {
-        BundleUtils bundle = new BundleUtils(getIntent().getExtras());
-
-        switch (bundle.getString(INTENT_MODE, INTENT_MODE_CREATE)) {
-            case INTENT_MODE_UPDATE:
-                mParentCategory = (Category) bundle.getParcelable(INTENT_PARENT, null);
-                mCategory = (Category) bundle.getParcelable(INTENT_CATEGORY, null);
-                break;
-            case INTENT_MODE_CREATE:
-                mCategory = Category.createDummyCategory();
-                mCategory.setDefaultExpenseType(ExpenseType.expense());
-                break;
-            default:
-                throw new UnsupportedOperationException("Could not handle intent mode " + bundle.getString(INTENT_MODE, null));
-        }
     }
 
     @Override
@@ -185,6 +167,23 @@ public class CreateCategory extends AbstractAppCompatActivity {
         });
 
         mSaveFAB.setOnClickListener(getOnSaveClickListener());
+    }
+
+    private void resolveIntent() {
+        BundleUtils bundle = new BundleUtils(getIntent().getExtras());
+
+        switch (bundle.getString(INTENT_MODE, INTENT_MODE_CREATE)) {
+            case INTENT_MODE_UPDATE:
+                mParentCategory = (Category) bundle.getParcelable(INTENT_PARENT, null);
+                mCategory = (Category) bundle.getParcelable(INTENT_CATEGORY, null);
+                break;
+            case INTENT_MODE_CREATE:
+                mCategory = Category.createDummyCategory();
+                mCategory.setDefaultExpenseType(ExpenseType.expense());
+                break;
+            default:
+                throw new UnsupportedOperationException("Could not handle intent mode " + bundle.getString(INTENT_MODE, null));
+        }
     }
 
     private View.OnClickListener getOnSaveClickListener() {

@@ -5,7 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.StringRes;
 
 public class BundleUtils {
-    private Bundle mBundle;
+    private final Bundle mBundle;
 
     public BundleUtils(Bundle bundle) {
         mBundle = bundle == null ? new Bundle() : bundle;
