@@ -70,6 +70,7 @@ public class ExpenseRepository {
         );
     }
 
+    // TODO: This method is only used within tests
     public boolean exists(ExpenseObject expense) {
         String selectQuery = "SELECT"
                 + " *"
@@ -370,7 +371,6 @@ public class ExpenseRepository {
 
     @Deprecated
     public void assertSavableExpense(ExpenseObject expense) {
-        // TODO Funktion nicht mehr benutzen
         switch (expense.getExpenseType()) {
             case PARENT_EXPENSE:
             case NORMAL_EXPENSE:

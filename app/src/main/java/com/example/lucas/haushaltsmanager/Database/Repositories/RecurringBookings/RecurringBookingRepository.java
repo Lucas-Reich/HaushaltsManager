@@ -28,6 +28,7 @@ public class RecurringBookingRepository {
         transformer = new RecurringBookingTransformer();
     }
 
+    // TODO: This method is only used within tests
     public boolean exists(RecurringBooking recurringBooking) {
         String selectQuery = "SELECT"
                 + " *"

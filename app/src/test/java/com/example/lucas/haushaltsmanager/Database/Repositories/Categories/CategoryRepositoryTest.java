@@ -21,6 +21,7 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
@@ -45,113 +46,22 @@ public class CategoryRepositoryTest {
         DatabaseManager.getInstance().closeDatabase();
     }
 
-    private Category getSimpleCategory() {
-        return new Category(
-                "Kategorie",
-                Color.black(),
-                ExpenseType.income(),
-                new ArrayList<Category>()
-        );
-    }
-
-    private Category getCategoryWithChild() {
-        Category parentCategory = getSimpleCategory();
-        parentCategory.addChild(getSimpleCategory());
-
-        return parentCategory;
-    }
-
-    @Test
-    public void testExistsWithExistingCategoryShouldReturnTrue() {
-        Category category = mCategoryRepo.insert(getSimpleCategory());
-
-        boolean exists = mCategoryRepo.exists(category);
-        assertTrue("Kategorie wurde nicht gefunden", exists);
-    }
-
-    @Test
-    public void testExistsWithNotExistingCategoryShouldReturnFalse() {
-        Category category = getSimpleCategory();
-
-        boolean exists = mCategoryRepo.exists(category);
-        assertFalse("Nich existierende Kategorie wurde gefunden", exists);
-    }
-
-    @Test
-    public void testGetWithExistingCategoryShouldSucceed() {
-        Category expectedCategory = mCategoryRepo.insert(getSimpleCategory());
-
-        try {
-            Category fetchedCategory = mCategoryRepo.get(expectedCategory.getIndex());
-            assertEquals(expectedCategory, fetchedCategory);
-
-        } catch (CategoryNotFoundException e) {
-
-            Assert.fail("Kategorie wurde nicht gefunden");
-        }
-    }
-
-    @Test
-    public void testGetWithExistingCategoryThatHasChildrenShouldSucceed() {
-        Category expectedCategory = mCategoryRepo.insert(getCategoryWithChild());
-
-        try {
-            Category fetchedCategory = mCategoryRepo.get(expectedCategory.getIndex());
-            assertEquals(expectedCategory, fetchedCategory);
-
-        } catch (CategoryNotFoundException e) {
-
-            Assert.fail("Kategorie wurde nicht gefunden");
-        }
-    }
-
-    @Test
-    public void testGetWithNotExistingCategoryShouldThrowCategoryNotFoundException() {
-        long notExistingCategoryId = 1337;
-
-        try {
-            mCategoryRepo.get(notExistingCategoryId);
-            Assert.fail("Nicht existierende Kategorie wurde gefunden");
-
-        } catch (CategoryNotFoundException e) {
-
-            assertEquals(String.format("Could not find Category with index %s.", notExistingCategoryId), e.getMessage());
-        }
-    }
-
     @Test
     public void testInsertWithValidCategoryShouldSucceed() {
         Category expectedCategory = mCategoryRepo.insert(getSimpleCategory());
 
-        try {
-            Category fetchedCategory = mCategoryRepo.get(expectedCategory.getIndex());
-            assertEquals(expectedCategory, fetchedCategory);
-
-        } catch (CategoryNotFoundException e) {
-
-            Assert.fail("Gerade erstellte Kategorie wurde nicht gefunden");
-        }
+        Category fetchedCategory = getCategoryWithId(expectedCategory.getIndex());
+        assertEquals(expectedCategory, fetchedCategory);
     }
 
     @Test
     public void testInsertWithValidCategoryThatHasChildrenShouldSucceed() {
         Category expectedCategory = mCategoryRepo.insert(getCategoryWithChild());
 
-        try {
-            Category fetchedCategory = mCategoryRepo.get(expectedCategory.getIndex());
+        Category fetchedCategory = getCategoryWithId(expectedCategory.getIndex());
 
-            assertEquals(expectedCategory, fetchedCategory);
-            assertTrue("Kind der Kategorie wurde nicht gefunden", mChildCategoryRepo.exists(expectedCategory.getChildren().get(0)));
-
-        } catch (CategoryNotFoundException e) {
-
-            Assert.fail("Kategorie wurde nicht gefunden");
-        }
-    }
-
-    @Test
-    public void testInsertWithInvalidCategoryShouldFail() {
-        // TODO: Was sollte passieren wenn die Kategorie nicht richtig initialisiert wurde, zb kein name
+        assertEquals(expectedCategory, fetchedCategory);
+        assertTrue("Kind der Kategorie wurde nicht gefunden", mChildCategoryRepo.exists(expectedCategory.getChildren().get(0)));
     }
 
     @Test
@@ -161,7 +71,7 @@ public class CategoryRepositoryTest {
         try {
             expectedCategory.setName("New Category Name");
             mCategoryRepo.update(expectedCategory);
-            Category fetchedCategory = mCategoryRepo.get(expectedCategory.getIndex());
+            Category fetchedCategory = getCategoryWithId(expectedCategory.getIndex());
 
             assertEquals(expectedCategory, fetchedCategory);
 
@@ -233,5 +143,35 @@ public class CategoryRepositoryTest {
 
             //do nothing
         }
+    }
+
+    private Category getSimpleCategory() {
+        return new Category(
+                "Kategorie",
+                Color.black(),
+                ExpenseType.income(),
+                new ArrayList<Category>()
+        );
+    }
+
+    private Category getCategoryWithChild() {
+        Category parentCategory = getSimpleCategory();
+        parentCategory.addChild(getSimpleCategory());
+
+        return parentCategory;
+    }
+
+    private Category getCategoryWithId(long id) {
+        List<Category> categories = mCategoryRepo.getAll();
+
+        for (Category category : categories) {
+            if (category.getIndex() != id) {
+                continue;
+            }
+
+            return category;
+        }
+
+        return null;
     }
 }

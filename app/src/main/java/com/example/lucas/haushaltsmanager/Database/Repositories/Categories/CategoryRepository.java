@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CategoryRepository implements CategoryRepositoryInterface {
-    // REFACTOR: Versuchen das Repo so wie das TagRepo zu bauen
     private SQLiteDatabase mDatabase;
 
     public CategoryRepository(Context context) {
@@ -42,6 +41,7 @@ public class CategoryRepository implements CategoryRepositoryInterface {
         );
     }
 
+    // TODO: This method is only used within tests
     public boolean exists(Category category) {
         String selectQuery;
 
@@ -66,27 +66,8 @@ public class CategoryRepository implements CategoryRepositoryInterface {
         return false;
     }
 
-    public Category get(long categoryId) throws CategoryNotFoundException {
-
-        String selectQuery = "SELECT "
-                + ExpensesDbHelper.CATEGORIES_COL_ID + ", "
-                + ExpensesDbHelper.CATEGORIES_COL_NAME + ", "
-                + ExpensesDbHelper.CATEGORIES_COL_COLOR + ", "
-                + ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE
-                + " FROM " + ExpensesDbHelper.TABLE_CATEGORIES
-                + " WHERE " + ExpensesDbHelper.CATEGORIES_COL_ID + " = " + categoryId + ";";
-
-        Cursor c = mDatabase.rawQuery(selectQuery, null);
-
-        if (!c.moveToFirst()) {
-            throw new CategoryNotFoundException(categoryId);
-        }
-
-        Category category = cursorToCategory(c);
-        category.addChildren(new ChildCategoryRepository(app.getContext()).getAll(category.getIndex()));
-
-        c.close();
-        return category;
+    public Category get(long categoryId) {
+        throw new RuntimeException("Method get is not implemented");
     }
 
     public List<Category> getAll() {

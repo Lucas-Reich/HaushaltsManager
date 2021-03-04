@@ -43,19 +43,6 @@ public class RecyclerViewSelectedItemHandlerTest {
         itemHandler = null;
     }
 
-    public void selectedItemCanBeUnselected() {
-//        List<IRecyclerItem> items = new ArrayList<>();
-//        itemHandler.insertAll(items);
-//
-//
-//        itemHandler.selectItem(item);
-//        assertTrue(itemHandler.isItemSelected(item));
-//
-//
-//        itemHandler.unselectItem(item);
-//        assertFalse(itemHandler.isItemSelected(item));
-    }
-
     public void notSelectedItemCanBeSelected() {
     }
 

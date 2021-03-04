@@ -378,6 +378,7 @@ public class ChildExpenseRepository {
         }
     }
 
+    // TODO: This method is only used within tests
     public boolean isHidden(ExpenseObject childExpense) throws ChildExpenseNotFoundException {
         String selectQuery = "SELECT"
                 + " " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_HIDDEN
