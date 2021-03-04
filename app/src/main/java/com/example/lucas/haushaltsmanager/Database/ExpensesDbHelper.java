@@ -28,7 +28,7 @@ public class ExpensesDbHelper extends SQLiteOpenHelper {
     @Deprecated
     public static final String RECURRING_BOOKINGS_COL_FREQUENCY = "frequency"; // Deprecated in Migration2
     public static final String RECURRING_BOOKINGS_COL_END = "end";
-    public static final String RECURRING_BOOKINGS_COL_CALENDAR_FIELD= "calendar_field"; // Created in Migration2
+    public static final String RECURRING_BOOKINGS_COL_CALENDAR_FIELD = "calendar_field"; // Created in Migration2
     public static final String RECURRING_BOOKINGS_COL_AMOUNT = "amount"; // Created in Migration2
 
 
@@ -60,9 +60,12 @@ public class ExpensesDbHelper extends SQLiteOpenHelper {
 
 
     // define table Tags
+    @Deprecated
     public static final String TABLE_TAGS = "TAGS";
 
+    @Deprecated
     public static final String TAGS_COL_ID = "tag_id";
+    @Deprecated
     public static final String TAGS_COL_NAME = "tag_name";
 
     //define table parentCategories
@@ -85,10 +88,14 @@ public class ExpensesDbHelper extends SQLiteOpenHelper {
 
 
     // define table Booking_Tags
+    @Deprecated
     public static final String TABLE_BOOKINGS_TAGS = "BOOKING_TAGS";
 
+    @Deprecated
     public static final String BOOKINGS_TAGS_COL_ID = "booking_tag_id";
+    @Deprecated
     public static final String BOOKINGS_TAGS_COL_TAG_ID = "tag_id";
+    @Deprecated
     public static final String BOOKINGS_TAGS_COL_BOOKING_ID = "booking_id";
 
 
@@ -123,7 +130,7 @@ public class ExpensesDbHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         IMigration[] migrations = MigrationHelper.getMigrations();
 
-        for (int i=oldVersion; i < newVersion; i++) {
+        for (int i = oldVersion; i < newVersion; i++) {
             migrations[i].apply(db);
         }
     }
@@ -132,8 +139,8 @@ public class ExpensesDbHelper extends SQLiteOpenHelper {
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         IMigration[] migrations = MigrationHelper.getMigrations();
 
-        for (int i=oldVersion; i > newVersion; i--) {
-            migrations[i-1].revert(db);
+        for (int i = oldVersion; i > newVersion; i--) {
+            migrations[i - 1].revert(db);
         }
     }
 }

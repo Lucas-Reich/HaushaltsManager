@@ -10,7 +10,6 @@ import android.os.Build;
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.R;
-import com.pixplicity.easyprefs.library.Prefs;
 
 public class app extends Application {
     private static Context context;
@@ -53,14 +52,6 @@ public class app extends Application {
         context = this.getApplicationContext();
 
         initializeDatabase();
-
-        // Initialize the Prefs class
-        new Prefs.Builder()
-                .setContext(this)
-                .setMode(ContextWrapper.MODE_PRIVATE)
-                .setPrefsName(getPackageName())
-                .setUseDefaultSharedPreference(true)
-                .build();
 
     }
 
