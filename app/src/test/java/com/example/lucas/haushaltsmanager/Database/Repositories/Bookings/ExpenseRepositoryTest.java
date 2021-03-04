@@ -6,13 +6,10 @@ import android.database.MatrixCursor;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
-import com.example.lucas.haushaltsmanager.Database.Repositories.BookingTags.BookingTagRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.CannotDeleteExpenseException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.RecurringBookingRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Tags.TagRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Templates.TemplateRepository;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
@@ -21,7 +18,6 @@ import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 import com.example.lucas.haushaltsmanager.Entities.Price;
-import com.example.lucas.haushaltsmanager.Entities.Tag;
 import com.example.lucas.haushaltsmanager.Entities.Template;
 
 import junit.framework.Assert;
@@ -50,10 +46,7 @@ public class ExpenseRepositoryTest {
     private Currency currency;
     private AccountRepository mAccountRepo;
     private TemplateRepository mTemplateRepo;
-    private TagRepository mTagRepo;
-    private RecurringBookingRepository mRecurringBookingRepo;
     private ChildCategoryRepository mChildCategoryRepo;
-    private BookingTagRepository mBookingTagRepo;
     private ExpenseRepository mBookingRepo;
     private CurrencyRepository mCurrencyRepo;
 
@@ -62,11 +55,8 @@ public class ExpenseRepositoryTest {
 
         mAccountRepo = new AccountRepository(RuntimeEnvironment.application);
         mTemplateRepo = new TemplateRepository(RuntimeEnvironment.application);
-        mRecurringBookingRepo = new RecurringBookingRepository(RuntimeEnvironment.application);
         mChildCategoryRepo = new ChildCategoryRepository(RuntimeEnvironment.application);
-        mBookingTagRepo = new BookingTagRepository(RuntimeEnvironment.application);
         mBookingRepo = new ExpenseRepository(RuntimeEnvironment.application);
-        mTagRepo = new TagRepository(RuntimeEnvironment.application);
         mCurrencyRepo = new CurrencyRepository(RuntimeEnvironment.application);
 
         Category parentCategoryMock = mock(Category.class);
@@ -80,53 +70,6 @@ public class ExpenseRepositoryTest {
 
         account = new Account("Konto", new Price(100, currency));
         account = mAccountRepo.insert(account);
-    }
-
-    private ExpenseObject getSimpleExpense() {
-        return new ExpenseObject(
-                "Ausgabe",
-                new Price(new Random().nextInt(1000), true, getDefaultCurrency()),
-                category,
-                account.getIndex(),
-                currency
-        );
-    }
-
-    private ExpenseObject getExpenseWithChildren() {
-        ExpenseObject parentExpense = getSimpleExpense();
-        ExpenseObject childExpense = getSimpleExpense();
-
-        childExpense.setPrice(new Price(33, false, getDefaultCurrency()));
-        parentExpense.addChild(childExpense);
-
-        childExpense.setPrice(new Price(768, false, getDefaultCurrency()));
-        parentExpense.addChild(childExpense);
-
-        childExpense.setPrice(new Price(324, true, getDefaultCurrency()));
-        parentExpense.addChild(childExpense);
-
-        return parentExpense;
-    }
-
-    private Currency getDefaultCurrency() {
-        return null;
-    }
-
-    private ExpenseObject getExpenseWithTags() {
-        Tag tag1 = new Tag("Tag 1");
-        tag1 = mTagRepo.insert(tag1);
-        Tag tag2 = new Tag("Tag 2");
-        tag2 = mTagRepo.insert(tag2);
-        Tag tag3 = new Tag("Tag 3");
-        tag3 = mTagRepo.insert(tag3);
-
-
-        ExpenseObject expenseWithTags = getSimpleExpense();
-        expenseWithTags.addTag(tag1);
-        expenseWithTags.addTag(tag2);
-        expenseWithTags.addTag(tag3);
-
-        return expenseWithTags;
     }
 
     @Test
@@ -291,29 +234,6 @@ public class ExpenseRepositoryTest {
     }
 
     @Test
-    public void testInsertWithValidBookingThatHasTagsShouldSucceedAndTagsShouldExists() {
-        //fixme Test noch einmal ausführen, wenn das BookingTagRepository mit Tests versehen ist
-        ExpenseObject expectedExpenseWithTags = mBookingRepo.insert(getExpenseWithTags());
-
-        try {
-            ExpenseObject fetchedExpenseWithTags = mBookingRepo.get(expectedExpenseWithTags.getIndex());
-
-            assertEquals(expectedExpenseWithTags, fetchedExpenseWithTags);
-            assertTrue("Tag 1 wurde der Buchung nicht zugewiesen", mBookingTagRepo.exists(expectedExpenseWithTags, expectedExpenseWithTags.getTags().get(0)));
-            assertTrue("Tag 2 wurde der Buchung nicht zugewiesen", mBookingTagRepo.exists(expectedExpenseWithTags, expectedExpenseWithTags.getTags().get(1)));
-            assertTrue("Tag 3 wurde der Buchung nicht zugewiesen", mBookingTagRepo.exists(expectedExpenseWithTags, expectedExpenseWithTags.getTags().get(2)));
-            assertEqualAccountBalance(
-                    account.getBalance().getSignedValue() + expectedExpenseWithTags.getSignedPrice(),
-                    account
-            );
-
-        } catch (ExpenseNotFoundException e) {
-
-            Assert.fail("Ausgabe wurde nicht gefunden");
-        }
-    }
-
-    @Test
     public void testDeleteWithExistingBookingThatIsNotATemplateOrRecurringShouldSucceed() {
         ExpenseObject expense = mBookingRepo.insert(getSimpleExpense());
 
@@ -375,27 +295,6 @@ public class ExpenseRepositoryTest {
         } catch (CannotDeleteExpenseException e) {
 
             Assert.fail("Buchung konnte nicht gelöscht werden");
-        }
-    }
-
-    @Test
-    public void testDeleteWithExistingBookingThatHasTagsAssignedShouldDeleteBookingAndTagRelations() {
-        //fixme Test noch einmal ausführen, wenn das BookingTagRepository mit Tests versehen ist
-        ExpenseObject expenseWithTags = mBookingRepo.insert(getExpenseWithTags());
-
-        try {
-            mBookingRepo.delete(expenseWithTags);
-
-            assertTrue("Die Relation zu Tag 1 wurde nicht gelöscht", mBookingTagRepo.exists(expenseWithTags, expenseWithTags.getTags().get(0)));
-            assertTrue("Die Relation zu Tag 2 wurde nicht gelöscht", mBookingTagRepo.exists(expenseWithTags, expenseWithTags.getTags().get(1)));
-            assertTrue("Die Relation zu Tag 3 wurde nicht gelöscht", mBookingTagRepo.exists(expenseWithTags, expenseWithTags.getTags().get(2)));
-            assertEqualAccountBalance(
-                    account.getBalance().getSignedValue(),
-                    account
-            );
-        } catch (CannotDeleteExpenseException e) {
-
-            Assert.fail("Buchung kann nicht gelöscht werden");
         }
     }
 
@@ -688,6 +587,36 @@ public class ExpenseRepositoryTest {
 
             assertEquals(String.format("Could not find Booking with id %s.", expense.getIndex()), e.getMessage());
         }
+    }
+
+    private ExpenseObject getSimpleExpense() {
+        return new ExpenseObject(
+                "Ausgabe",
+                new Price(new Random().nextInt(1000), true, getDefaultCurrency()),
+                category,
+                account.getIndex(),
+                currency
+        );
+    }
+
+    private ExpenseObject getExpenseWithChildren() {
+        ExpenseObject parentExpense = getSimpleExpense();
+        ExpenseObject childExpense = getSimpleExpense();
+
+        childExpense.setPrice(new Price(33, false, getDefaultCurrency()));
+        parentExpense.addChild(childExpense);
+
+        childExpense.setPrice(new Price(768, false, getDefaultCurrency()));
+        parentExpense.addChild(childExpense);
+
+        childExpense.setPrice(new Price(324, true, getDefaultCurrency()));
+        parentExpense.addChild(childExpense);
+
+        return parentExpense;
+    }
+
+    private Currency getDefaultCurrency() {
+        return null;
     }
 
     private void assertEqualAccountBalance(double expectedAmount, Account account) {

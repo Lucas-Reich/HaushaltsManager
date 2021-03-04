@@ -8,7 +8,6 @@ import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 import com.example.lucas.haushaltsmanager.Entities.Price;
-import com.example.lucas.haushaltsmanager.Entities.Tag;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.ExpenseItem.ExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
@@ -253,7 +252,6 @@ public class RecyclerViewItemHolderTest {
                 "",
                 -1,
                 ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE,
-                new ArrayList<Tag>(),
                 new ArrayList<ExpenseObject>(),
                 currency);
     }

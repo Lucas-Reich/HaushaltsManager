@@ -9,13 +9,12 @@ import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ParentExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Price;
-import com.example.lucas.haushaltsmanager.Entities.Tag;
-import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.ExpenseListRecyclerViewAdapter;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.ChildExpenseItem.ChildExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.ExpenseItem.ExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.ParentExpenseItem.ParentExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.ExpenseListRecyclerViewAdapter;
 
 import org.junit.After;
 import org.junit.Before;
@@ -244,7 +243,6 @@ public class RecyclerViewExpandableItemHandlerTest {
                 "",
                 -1,
                 ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE,
-                new ArrayList<Tag>(),
                 new ArrayList<ExpenseObject>(),
                 currency
         );

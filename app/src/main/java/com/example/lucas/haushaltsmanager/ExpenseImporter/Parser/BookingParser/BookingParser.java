@@ -3,7 +3,6 @@ package com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.BookingParser;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
-import com.example.lucas.haushaltsmanager.Entities.Tag;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.InvalidInputException;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.NoMappingFoundException;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Line.Line;
@@ -57,7 +56,6 @@ public class BookingParser implements IParser<ExpenseObject> {
                 "",
                 ExpensesDbHelper.INVALID_INDEX,
                 ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE,
-                new ArrayList<Tag>(),
                 new ArrayList<ExpenseObject>(),
                 mainCurrency
         );

@@ -296,7 +296,6 @@ public class RecurringBookingTest {
                 "",
                 ExpensesDbHelper.INVALID_INDEX,
                 ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE,
-                new ArrayList<Tag>(),
                 new ArrayList<ExpenseObject>(),
                 currency
         );

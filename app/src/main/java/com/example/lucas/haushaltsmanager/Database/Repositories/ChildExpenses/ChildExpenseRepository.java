@@ -9,7 +9,6 @@ import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
-import com.example.lucas.haushaltsmanager.Database.Repositories.BookingTags.BookingTagRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.CannotDeleteExpenseException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
@@ -23,7 +22,6 @@ import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Price;
-import com.example.lucas.haushaltsmanager.Entities.Tag;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -31,7 +29,6 @@ import java.util.List;
 
 public class ChildExpenseRepository {
     private SQLiteDatabase mDatabase;
-    private BookingTagRepository mBookingTagRepo;
     private ExpenseRepository mBookingRepo;
     private AccountRepository mAccountRepo;
 
@@ -39,7 +36,6 @@ public class ChildExpenseRepository {
         DatabaseManager.initializeInstance(new ExpensesDbHelper(context));
 
         mDatabase = DatabaseManager.getInstance().openDatabase();
-        mBookingTagRepo = new BookingTagRepository(context);
         mBookingRepo = new ExpenseRepository(context);
         mAccountRepo = new AccountRepository(context);
     }
@@ -268,22 +264,7 @@ public class ChildExpenseRepository {
             //Kann nicht passieren, da der User bei der Buchungserstellung nur aus Konten auswählen kann die bereits existieren
         }
 
-        for (Tag tag : childExpense.getTags())
-            mBookingTagRepo.insert(insertedChildId, tag);
-
-        return new ExpenseObject(
-                insertedChildId,
-                childExpense.getTitle(),
-                childExpense.getPrice(),
-                childExpense.getDate(),
-                childExpense.getCategory(),
-                childExpense.getNotice(),
-                childExpense.getAccountId(),
-                childExpense.getExpenseType(),
-                childExpense.getTags(),
-                childExpense.getChildren(),
-                childExpense.getCurrency()
-        );
+        return ExpenseObject.copyWithNewIndex(childExpense, insertedChildId);
     }
 
     public void update(ExpenseObject childExpense) throws ChildExpenseNotFoundException {
@@ -297,11 +278,6 @@ public class ChildExpenseRepository {
         updatedChild.put(ExpensesDbHelper.BOOKINGS_COL_NOTICE, childExpense.getNotice());
         updatedChild.put(ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID, childExpense.getAccountId());
         updatedChild.put(ExpensesDbHelper.BOOKINGS_COL_CURRENCY_ID, childExpense.getCurrency().getIndex());
-
-        mBookingTagRepo.deleteAll(childExpense);
-        for (Tag tag : childExpense.getTags()) {
-            mBookingTagRepo.insert(childExpense.getIndex(), tag);
-        }
 
         try {
             ExpenseObject oldExpense = get(childExpense.getIndex());
@@ -488,7 +464,6 @@ public class ChildExpenseRepository {
                 notice,
                 accountId,
                 ExpenseObject.EXPENSE_TYPES.CHILD_EXPENSE,
-                mBookingTagRepo.get(expenseId),
                 new ArrayList<ExpenseObject>(),
                 expenseCurrency
         );

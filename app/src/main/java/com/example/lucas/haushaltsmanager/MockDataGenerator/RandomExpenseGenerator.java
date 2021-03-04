@@ -11,7 +11,6 @@ import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Price;
-import com.example.lucas.haushaltsmanager.Entities.Tag;
 import com.example.lucas.haushaltsmanager.Utils.CalendarUtils;
 
 import java.util.ArrayList;
@@ -71,7 +70,6 @@ public class RandomExpenseGenerator {
                 "",
                 account.getIndex(),
                 ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE,
-                new ArrayList<Tag>(),
                 new ArrayList<ExpenseObject>(),
                 currency
         );

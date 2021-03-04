@@ -11,7 +11,6 @@ import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Price;
-import com.example.lucas.haushaltsmanager.Entities.Tag;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
 
@@ -43,56 +42,28 @@ public class ExpenseObject implements Parcelable, Booking {
     };
 
     private EXPENSE_TYPES expenseType;
-
-    /**
-     * Database index of expense
-     */
     private long index;
-
-    /**
-     * Title of expense
-     */
     private String title;
-
     private Price price;
-
-    /**
-     * Date of expense
-     */
     private Calendar date;
-
-    /**
-     * Category of expense
-     */
     private Category category;
-
-    /**
-     * Tags assigned to expense
-     */
-    private List<Tag> tags = new ArrayList<>();
-
-    /**
-     * Notice from user
-     */
     private String notice;
-
-    /**
-     * Id des Zugehörigen Accounts
-     */
     private long mAccountId;
-
-    /**
-     * Children of expense
-     */
     private List<ExpenseObject> children = new ArrayList<>();
-
-    /**
-     * Die Währung der Buchung
-     */
     private Currency mCurrency;
 
-    public ExpenseObject(long index, @NonNull String expenseName, Price price, Calendar date, @NonNull Category category, String notice, long accountId, @NonNull EXPENSE_TYPES expenseType, @NonNull List<Tag> tags, @NonNull List<ExpenseObject> children, @NonNull Currency currency) {
-
+    public ExpenseObject(
+            long index,
+            @NonNull String expenseName,
+            Price price,
+            Calendar date,
+            @NonNull Category category,
+            String notice,
+            long accountId,
+            @NonNull EXPENSE_TYPES expenseType,
+            @NonNull List<ExpenseObject> children,
+            @NonNull Currency currency
+    ) {
         setIndex(index);
         setTitle(expenseName);
         setPrice(price);
@@ -101,7 +72,6 @@ public class ExpenseObject implements Parcelable, Booking {
         setNotice(notice != null ? notice : "");
         setAccountId(accountId);
         setExpenseType(expenseType);
-        setTags(tags);
         addChildren(children);
         setCurrency(currency);
     }
@@ -117,7 +87,6 @@ public class ExpenseObject implements Parcelable, Booking {
                 null,
                 accountId,
                 EXPENSE_TYPES.NORMAL_EXPENSE,
-                new ArrayList<Tag>(),
                 new ArrayList<ExpenseObject>(),
                 currency
         );
@@ -141,7 +110,6 @@ public class ExpenseObject implements Parcelable, Booking {
         setIndex(source.readLong());
         setPrice((Price) source.readParcelable(Price.class.getClassLoader()));
         setCategory((Category) source.readParcelable(Category.class.getClassLoader()));
-        source.readList(this.tags, Tag.class.getClassLoader());
         setNotice(source.readString());
         setAccountId(source.readLong());
         source.readList(this.children, ExpenseObject.class.getClassLoader());
@@ -166,15 +134,18 @@ public class ExpenseObject implements Parcelable, Booking {
                 null,
                 ExpensesDbHelper.INVALID_INDEX,
                 EXPENSE_TYPES.DUMMY_EXPENSE,
-                new ArrayList<Tag>(),
                 new ArrayList<ExpenseObject>(),
                 mainCurrency
         );
     }
 
     public static ExpenseObject copy(ExpenseObject other) {
+        return copyWithNewIndex(other, other.getIndex());
+    }
+
+    public static ExpenseObject copyWithNewIndex(ExpenseObject other, long newIndex) {
         return new ExpenseObject(
-                other.getIndex(),
+                newIndex,
                 other.getTitle(),
                 other.getPrice(),
                 other.getDate(),
@@ -182,7 +153,6 @@ public class ExpenseObject implements Parcelable, Booking {
                 other.getNotice(),
                 other.getAccountId(),
                 other.getExpenseType(),
-                other.getTags(),
                 other.getChildren(),
                 other.getCurrency()
         );
@@ -221,12 +191,6 @@ public class ExpenseObject implements Parcelable, Booking {
         result = result && getCategory().getIndex() == otherExpense.getCategory().getIndex();//ich kann die objekte nicht vergleichen da parent buchungen nur dummies bekommen
         result = result && getCurrency().getIndex() == otherExpense.getCurrency().getIndex();//ich kann die objekte nicht vergleichen da parent buchungen nur dummies bekommen
 
-        for (Tag tag : getTags()) {
-            for (Tag otherTag : otherExpense.getTags()) {
-                result = result && tag.equals(otherTag);
-            }
-        }
-
         for (ExpenseObject child : getChildren()) {
             result = result && otherExpense.getChildren().contains(child);
         }
@@ -245,23 +209,12 @@ public class ExpenseObject implements Parcelable, Booking {
         );
     }
 
-    /**
-     * can be ignored mostly
-     *
-     * @return int
-     */
     @Override
     public int describeContents() {
 
         return 0;
     }
 
-    /**
-     * converting the custom object into an parcelable object
-     *
-     * @param dest  destination Parcel
-     * @param flags flags
-     */
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(date.getTimeInMillis());
@@ -269,12 +222,28 @@ public class ExpenseObject implements Parcelable, Booking {
         dest.writeLong(index);
         dest.writeParcelable(price, flags);
         dest.writeParcelable(category, flags);
-        dest.writeList(tags);
         dest.writeString(notice);
         dest.writeLong(mAccountId);
         dest.writeList(children);
         dest.writeString(expenseType.name());
         dest.writeParcelable(mCurrency, flags);
+    }
+
+    public Price getPrice() {
+        return price;
+    }
+
+    public void setPrice(Price price) {
+        this.price = price;
+    }
+
+    public Currency getCurrency() {
+
+        return mCurrency;
+    }
+
+    public void setCurrency(Currency currency) {
+        mCurrency = currency;
     }
 
     public void setDateTime(@NonNull Calendar date) {
@@ -299,12 +268,6 @@ public class ExpenseObject implements Parcelable, Booking {
         return price.getUnsignedValue();
     }
 
-    /**
-     * Method um den tatsächlichen wert einer Buchung zu bekommen.
-     * Falls die Buchung ein Parent ist wird die Summer der Kinder zurückgegeben
-     *
-     * @return tatsächlicher Wert der Buchung
-     */
     public double getSignedPrice() {
         if (!isParent()) {
             return price.getSignedValue();
@@ -334,14 +297,6 @@ public class ExpenseObject implements Parcelable, Booking {
         return price.isNegative();
     }
 
-    public Price getPrice() {
-        return price;
-    }
-
-    public void setPrice(Price price) {
-        this.price = price;
-    }
-
     @NonNull
     public Category getCategory() {
 
@@ -351,27 +306,6 @@ public class ExpenseObject implements Parcelable, Booking {
     public void setCategory(@NonNull Category category) {
 
         this.category = category;
-    }
-
-    @NonNull
-    public List<Tag> getTags() {
-
-        return tags;
-    }
-
-    /**
-     * Methode um ein Liste von Tags zu einer Buchung hinzuzufügen
-     *
-     * @param tags Tags die der Buchung hinzugefügt werden sollen
-     */
-    public void setTags(@NonNull List<Tag> tags) {
-        for (Tag tag : tags)
-            addTag(tag);
-    }
-
-    public void addTag(@NonNull Tag tag) {
-
-        tags.add(tag);
     }
 
     @NonNull
@@ -397,15 +331,6 @@ public class ExpenseObject implements Parcelable, Booking {
         mAccountId = account.getIndex();
     }
 
-    public Currency getCurrency() {
-
-        return mCurrency;
-    }
-
-    public void setCurrency(Currency currency) {
-        mCurrency = currency;
-    }
-
     public void removeChild(ExpenseObject child) {
 
         this.children.remove(child);
@@ -426,11 +351,6 @@ public class ExpenseObject implements Parcelable, Booking {
         return this;
     }
 
-    /**
-     * Methode um einer Buchung mehrere Buchungen hinzuzufügen
-     *
-     * @param children Buchungen die als Kinder hinzugefügt werden sollen
-     */
     public void addChildren(@NonNull List<ExpenseObject> children) {
         for (ExpenseObject childExpense : children)
             addChild(childExpense);
@@ -447,14 +367,7 @@ public class ExpenseObject implements Parcelable, Booking {
         return expenseType == EXPENSE_TYPES.PARENT_EXPENSE;
     }
 
-    /**
-     * Methode die die Felder der Buchung checkt ob diese gesetzt sind oder nicht.
-     * Sind alle Felder gesetzt, dann kann die Buchung ohne Probleme in die Datenbank geschrieben werden.
-     *
-     * @return Ob die Buchung in die Datenbank geschrieben werden kann
-     */
     public boolean isSet() {
-
         return !this.title.equals(app.getContext().getString(R.string.no_name))
                 && price != null
                 && this.category.isSet()

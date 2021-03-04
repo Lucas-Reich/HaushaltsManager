@@ -11,7 +11,6 @@ import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
-import com.example.lucas.haushaltsmanager.Database.Repositories.BookingTags.BookingTagRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.CannotDeleteExpenseException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepository;
@@ -25,7 +24,6 @@ import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Price;
-import com.example.lucas.haushaltsmanager.Entities.Tag;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -67,7 +65,6 @@ public class ExpenseRepository {
                 notice,
                 accountId,
                 expense_type,
-                new BookingTagRepository(app.getContext()).get(expenseId),
                 expense_type.equals(ExpenseObject.EXPENSE_TYPES.PARENT_EXPENSE) ? new ChildExpenseRepository(app.getContext()).getAll(expenseId) : new ArrayList<ExpenseObject>(),
                 currency
         );
@@ -231,14 +228,9 @@ public class ExpenseRepository {
                 expense.getNotice(),
                 expense.getAccountId(),
                 expense.getExpenseType(),
-                expense.getTags(),
                 new ArrayList<ExpenseObject>(),
                 expense.getCurrency()
         );
-
-        for (Tag tag : expense.getTags()) {
-            new BookingTagRepository(app.getContext()).insert(insertedExpense.getIndex(), tag);// TODO: Kann ich die Tags hier zur Buchung zuordnen anstatt durch expense.getTags()
-        }
 
         for (ExpenseObject child : expense.getChildren()) {
             insertedExpense.addChild(new ChildExpenseRepository(app.getContext()).insert(insertedExpense, child));
@@ -276,7 +268,6 @@ public class ExpenseRepository {
                         -expense.getSignedPrice()
                 );
 
-                new BookingTagRepository(app.getContext()).deleteAll(expense);
                 for (ExpenseObject childExpense : expense.getChildren()) {
                     new ChildExpenseRepository(app.getContext()).delete(childExpense);
                 }
@@ -306,11 +297,6 @@ public class ExpenseRepository {
         updatedExpense.put(ExpensesDbHelper.BOOKINGS_COL_NOTICE, expense.getNotice());
         updatedExpense.put(ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID, expense.getAccountId());
         updatedExpense.put(ExpensesDbHelper.BOOKINGS_COL_CURRENCY_ID, expense.getCurrency().getIndex());
-
-        new BookingTagRepository(app.getContext()).deleteAll(expense);
-        for (Tag tag : expense.getTags()) {
-            new BookingTagRepository(app.getContext()).insert(expense.getIndex(), tag);
-        }
 
         try {
             ExpenseObject oldExpense = get(expense.getIndex());
