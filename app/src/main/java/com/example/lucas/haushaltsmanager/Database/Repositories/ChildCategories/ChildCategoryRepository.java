@@ -12,19 +12,20 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.Excep
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.Exceptions.CannotDeleteChildCategoryException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.Exceptions.ChildCategoryNotFoundException;
 import com.example.lucas.haushaltsmanager.Entities.Category;
-import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChildCategoryRepository implements ChildCategoryRepositoryInterface{
+public class ChildCategoryRepository implements ChildCategoryRepositoryInterface {
     private SQLiteDatabase mDatabase;
+    private final ChildCategoryTransformer transformer;
 
     public ChildCategoryRepository(Context context) {
         DatabaseManager.initializeInstance(new ExpensesDbHelper(context));
 
         mDatabase = DatabaseManager.getInstance().openDatabase();
+        transformer = new ChildCategoryTransformer();
     }
 
     public boolean exists(Category category) {
@@ -67,7 +68,7 @@ public class ChildCategoryRepository implements ChildCategoryRepositoryInterface
             throw new ChildCategoryNotFoundException(categoryId);
         }
 
-        Category category = cursorToChildCategory(c);
+        Category category = transformer.transform(c);
 
         c.close();
         return category;
@@ -90,7 +91,7 @@ public class ChildCategoryRepository implements ChildCategoryRepositoryInterface
         ArrayList<Category> categories = new ArrayList<>();
         while (!c.isAfterLast()) {
 
-            categories.add(cursorToChildCategory(c));
+            categories.add(transformer.transform(c));
             c.moveToNext();
         }
 
@@ -168,22 +169,6 @@ public class ChildCategoryRepository implements ChildCategoryRepositoryInterface
         if (affectedRows == 0)
             throw new ChildCategoryNotFoundException(category.getIndex());
     }
-
-    public static Category cursorToChildCategory(Cursor c) {
-        long categoryIndex = c.getLong(c.getColumnIndex(ExpensesDbHelper.CHILD_CATEGORIES_COL_ID));
-        String categoryName = c.getString(c.getColumnIndex(ExpensesDbHelper.CHILD_CATEGORIES_COL_NAME));
-        String categoryColor = c.getString(c.getColumnIndex(ExpensesDbHelper.CHILD_CATEGORIES_COL_COLOR));
-        boolean defaultExpenseType = c.getInt(c.getColumnIndex(ExpensesDbHelper.CHILD_CATEGORIES_COL_DEFAULT_EXPENSE_TYPE)) == 1;
-
-        return new Category(
-                categoryIndex,
-                categoryName,
-                new Color(categoryColor),
-                ExpenseType.load(defaultExpenseType),
-                new ArrayList<Category>()
-        );
-    }
-
 
     private Category getParent(Category childCategory) throws CategoryNotFoundException {
 

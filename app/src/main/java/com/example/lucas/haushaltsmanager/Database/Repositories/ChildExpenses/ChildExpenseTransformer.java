@@ -4,6 +4,7 @@ import android.database.Cursor;
 
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryTransformer;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyTransformer;
 import com.example.lucas.haushaltsmanager.Database.TransformerInterface;
 import com.example.lucas.haushaltsmanager.Entities.Category;
@@ -16,9 +17,14 @@ import java.util.Calendar;
 
 public class ChildExpenseTransformer implements TransformerInterface<ExpenseObject> {
     private final CurrencyTransformer currencyTransformer;
+    private final ChildCategoryTransformer childCategoryTransformer;
 
-    public ChildExpenseTransformer(CurrencyTransformer currencyTransformer) {
+    public ChildExpenseTransformer(
+        CurrencyTransformer currencyTransformer,
+        ChildCategoryTransformer childCategoryTransformer
+    ) {
         this.currencyTransformer = currencyTransformer;
+        this.childCategoryTransformer = childCategoryTransformer;
     }
 
     @Override
@@ -32,7 +38,7 @@ public class ChildExpenseTransformer implements TransformerInterface<ExpenseObje
         boolean expenditure = c.getInt(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_EXPENDITURE)) == 1;
         String notice = c.getString(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_NOTICE));
         long accountId = c.getLong(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID));
-        Category expenseCategory = ChildCategoryRepository.cursorToChildCategory(c);
+        Category expenseCategory = childCategoryTransformer.transform(c);
         Currency expenseCurrency = currencyTransformer.transform(c);
 
         if (c.isLast())

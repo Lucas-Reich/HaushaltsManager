@@ -12,6 +12,7 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Excepti
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.CannotDeleteExpenseException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryTransformer;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.AddChildToChildException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.CannotDeleteChildExpenseException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.ChildExpenseNotFoundException;
@@ -35,7 +36,10 @@ public class ChildExpenseRepository {
         mDatabase = DatabaseManager.getInstance().openDatabase();
         mBookingRepo = new ExpenseRepository(context);
         mAccountRepo = new AccountRepository(context);
-        transformer = new ChildExpenseTransformer(new CurrencyTransformer());
+        transformer = new ChildExpenseTransformer(
+                new CurrencyTransformer(),
+                new ChildCategoryTransformer()
+        );
     }
 
     public boolean exists(ExpenseObject expense) {

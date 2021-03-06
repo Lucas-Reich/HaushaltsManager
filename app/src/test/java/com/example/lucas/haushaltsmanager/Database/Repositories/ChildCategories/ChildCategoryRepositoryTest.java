@@ -296,56 +296,6 @@ public class ChildCategoryRepositoryTest {
 
     }
 
-    @Test
-    public void testCursorToChildCategoryWithValidCursorShouldSucceed() {
-        Category expectedChildCategory = getSimpleCategory();
-
-        String[] columns = new String[]{
-                ExpensesDbHelper.CHILD_CATEGORIES_COL_ID,
-                ExpensesDbHelper.CHILD_CATEGORIES_COL_NAME,
-                ExpensesDbHelper.CHILD_CATEGORIES_COL_COLOR,
-                ExpensesDbHelper.CHILD_CATEGORIES_COL_DEFAULT_EXPENSE_TYPE
-        };
-
-        MatrixCursor cursor = new MatrixCursor(columns);
-        cursor.addRow(new Object[]{expectedChildCategory.getIndex(), expectedChildCategory.getTitle(), expectedChildCategory.getColor().getColorString(), expectedChildCategory.getDefaultExpenseType().value() ? 1 : 0});
-        cursor.moveToFirst();
-
-        try {
-            Category actualChildCategory = ChildCategoryRepository.cursorToChildCategory(cursor);
-            assertEquals(expectedChildCategory, actualChildCategory);
-
-        } catch (CursorIndexOutOfBoundsException e) {
-
-            Assert.fail("KindKategorie konnte nicht aus einem Cursor wiederhergestellt werden, obwohl alles benötigte da ist");
-        }
-    }
-
-    @Test
-    public void testCursorToChildCategoryWithInvalidCursorShouldThrowCursorIndexOutOfBoundsException() {
-        Category expectedChildCategory = getSimpleCategory();
-
-        String[] columns = new String[]{
-                ExpensesDbHelper.CHILD_CATEGORIES_COL_ID,
-                ExpensesDbHelper.CHILD_CATEGORIES_COL_NAME,
-                //Die Farbe ist nicht im Cursor
-                ExpensesDbHelper.CHILD_CATEGORIES_COL_DEFAULT_EXPENSE_TYPE
-        };
-
-        MatrixCursor cursor = new MatrixCursor(columns);
-        cursor.addRow(new Object[]{expectedChildCategory.getIndex(), expectedChildCategory.getTitle(), expectedChildCategory.getDefaultExpenseType()});
-        cursor.moveToFirst();
-
-        try {
-            ChildCategoryRepository.cursorToChildCategory(cursor);
-            Assert.fail("Kategorie konnte aus einem Fehlerhaften Cursor wiederhergstellt werden");
-
-        } catch (CursorIndexOutOfBoundsException e) {
-
-            //do nothing
-        }
-    }
-
     private Category getSimpleCategory() {
         return new Category(
                 "Kategorie",

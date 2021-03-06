@@ -5,6 +5,7 @@ import android.database.CursorIndexOutOfBoundsException;
 import android.database.MatrixCursor;
 
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryTransformer;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyTransformer;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
@@ -25,7 +26,10 @@ public class ChildExpenseTransformerTest {
     private ChildExpenseTransformer transformer;
 
     public void setUp() {
-        transformer = new ChildExpenseTransformer(new CurrencyTransformer());
+        transformer = new ChildExpenseTransformer(
+                new CurrencyTransformer(),
+                new ChildCategoryTransformer()
+        );
     }
 
     @Test
@@ -104,11 +108,11 @@ public class ChildExpenseTransformerTest {
         Currency currency = new Currency("Euro", "EUR", "€");
 
         return new ExpenseObject(
-            "Ausgabe",
-            new Price(3135, false, currency),
-            category,
-            -1,
-            currency
+                "Ausgabe",
+                new Price(3135, false, currency),
+                category,
+                -1,
+                currency
         );
     }
 }
