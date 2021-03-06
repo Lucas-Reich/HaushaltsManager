@@ -19,12 +19,14 @@ import java.util.List;
 public class CurrencyRepository implements BaseRepository<Currency> {
     private SQLiteDatabase mDatabase;
     private AccountRepository mAccountRepo;
+    private final CurrencyTransformer transformer;
 
     public CurrencyRepository(Context context) {
         DatabaseManager.initializeInstance(new ExpensesDbHelper(context));
 
         mDatabase = DatabaseManager.getInstance().openDatabase();
         mAccountRepo = new AccountRepository(context);
+        this.transformer = new CurrencyTransformer();
     }
 
     public boolean exists(Currency currency) {
@@ -63,7 +65,7 @@ public class CurrencyRepository implements BaseRepository<Currency> {
         if (!c.moveToFirst())
             throw new CurrencyNotFoundException(currencyId);
 
-        return fromCursor(c);
+        return transformer.transform(c);
     }
 
     public List<Currency> getAll() {
@@ -78,7 +80,7 @@ public class CurrencyRepository implements BaseRepository<Currency> {
 
         ArrayList<Currency> currencies = new ArrayList<>();
         while (c.moveToNext())
-            currencies.add(fromCursor(c));
+            currencies.add(transformer.transform(c));
 
         return currencies;
     }
@@ -124,23 +126,6 @@ public class CurrencyRepository implements BaseRepository<Currency> {
 
         if (affectedRows == 0)
             throw new CurrencyNotFoundException(currency.getIndex());
-    }
-
-    public static Currency fromCursor(Cursor c) {
-        long currencyId = c.getLong(c.getColumnIndex(ExpensesDbHelper.CURRENCIES_COL_ID));
-        String currencyName = c.getString(c.getColumnIndex(ExpensesDbHelper.CURRENCIES_COL_NAME));
-        String currencyShortName = c.getString(c.getColumnIndex(ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME));
-        String currencySymbol = c.getString(c.getColumnIndex(ExpensesDbHelper.CURRENCIES_COL_SYMBOL));
-
-        if (c.isLast())
-            c.close();
-
-        return new Currency(
-                currencyId,
-                currencyName,
-                currencyShortName,
-                currencySymbol
-        );
     }
 
     public void closeDatabase() {

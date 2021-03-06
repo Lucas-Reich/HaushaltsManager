@@ -10,6 +10,7 @@ import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.CannotDeleteAccountException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyTransformer;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Price;
@@ -19,11 +20,13 @@ import java.util.List;
 
 public class AccountRepository implements AccountRepositoryInterface {
     private final SQLiteDatabase mDatabase;
+    private final CurrencyTransformer currencyTransformer;
 
     public AccountRepository(Context context) {
         DatabaseManager.initializeInstance(new ExpensesDbHelper(context));
 
         mDatabase = DatabaseManager.getInstance().openDatabase();
+        currencyTransformer = new CurrencyTransformer();
     }
 
     public boolean exists(Account account) {
@@ -141,7 +144,7 @@ public class AccountRepository implements AccountRepositoryInterface {
         long accountId = c.getLong(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_ID));
         String accountName = c.getString(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_NAME));
         double accountBalance = c.getDouble(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_BALANCE));
-        Currency accountCurrency = CurrencyRepository.fromCursor(c);
+        Currency accountCurrency = currencyTransformer.transform(c);
 
         if (c.isLast())
             c.close();

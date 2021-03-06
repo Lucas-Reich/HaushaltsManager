@@ -199,52 +199,6 @@ public class CurrencyRepositoryTest {
         }
     }
 
-    @Test
-    public void testCursorToCurrencyWithValidCursor() {
-        Currency expectedCurrency = getSimpleCurrency();
-
-        String[] columns = new String[]{
-                ExpensesDbHelper.CURRENCIES_COL_ID,
-                ExpensesDbHelper.CURRENCIES_COL_CREATED_AT,
-                ExpensesDbHelper.CURRENCIES_COL_NAME,
-                ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME,
-                ExpensesDbHelper.CURRENCIES_COL_SYMBOL
-        };
-
-        MatrixCursor cursor = new MatrixCursor(columns);
-        cursor.addRow(new Object[]{expectedCurrency.getIndex(), "1532772073359", expectedCurrency.getName(), expectedCurrency.getShortName(), expectedCurrency.getSymbol()});
-        cursor.moveToFirst();
-
-        Currency cursorCurrency = CurrencyRepository.fromCursor(cursor);
-        assertEquals(expectedCurrency, cursorCurrency);
-    }
-
-    @Test
-    public void testCursorToCurrencyWithInvalidCursorThrowCursorIndexOutOfBoundsException() {
-        Currency expectedCurrency = getSimpleCurrency();
-
-        String[] columns = new String[]{
-                ExpensesDbHelper.CURRENCIES_COL_ID,
-                ExpensesDbHelper.CURRENCIES_COL_CREATED_AT,
-                ExpensesDbHelper.CURRENCIES_COL_NAME,
-                //Die Abkürzung ist nicht mit im Cursor
-                ExpensesDbHelper.CURRENCIES_COL_SYMBOL
-        };
-
-        MatrixCursor cursor = new MatrixCursor(columns);
-        cursor.addRow(new Object[]{expectedCurrency.getIndex(), "1532772073359", expectedCurrency.getName(), expectedCurrency.getSymbol()});
-        cursor.moveToFirst();
-
-        try {
-            CurrencyRepository.fromCursor(cursor);
-            Assert.fail("Could createExpenseItems Currency from incomplete Cursor");
-
-        } catch (CursorIndexOutOfBoundsException e) {
-
-            //do nothing
-        }
-    }
-
     /**
      * Methode um ein Feld einer Klasse durch ein anderes, mit injection, auszutauschen.
      *
