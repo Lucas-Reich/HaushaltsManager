@@ -64,11 +64,6 @@ public class CachedInsertAccountRepositoryDecorator implements AccountRepository
     }
 
     @Override
-    public Account fromCursor(Cursor c) {
-        return repository.fromCursor(c);
-    }
-
-    @Override
     public boolean isCurrencyAttachedToAccount(Currency currency) {
         return repository.isCurrencyAttachedToAccount(currency);
     }

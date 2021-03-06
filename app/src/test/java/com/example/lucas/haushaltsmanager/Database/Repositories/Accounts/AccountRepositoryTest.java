@@ -58,15 +58,6 @@ public class AccountRepositoryTest {
         mDatabaseManagerInstance.closeDatabase();
     }
 
-    private Account getSimpleAccount() {
-        Currency localCurrency = mock(Currency.class);
-
-        return new Account(
-                "Konto",
-                new Price(7653, localCurrency)
-        );
-    }
-
     @Test
     public void testExistsWithExistingAccountShouldSucceed() {
         Account account = mAccountRepo.insert(getSimpleAccount());
@@ -222,57 +213,13 @@ public class AccountRepositoryTest {
         }
     }
 
-    @Test
-    public void testCursorToAccountWithValidCursorShouldSucceed() {
-        Account expectedAccount = getSimpleAccount();
+    private Account getSimpleAccount() {
+        Currency localCurrency = mock(Currency.class);
 
-        String[] columns = new String[]{
-                ExpensesDbHelper.ACCOUNTS_COL_ID,
-                ExpensesDbHelper.ACCOUNTS_COL_NAME,
-                ExpensesDbHelper.ACCOUNTS_COL_BALANCE,
-                ExpensesDbHelper.CURRENCIES_COL_ID,
-                ExpensesDbHelper.CURRENCIES_COL_NAME,
-                ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME,
-                ExpensesDbHelper.CURRENCIES_COL_SYMBOL
-        };
-
-        MatrixCursor cursor = new MatrixCursor(columns);
-        cursor.addRow(new Object[]{expectedAccount.getIndex(), expectedAccount.getTitle(), expectedAccount.getBalance(), expectedAccount.getBalance().getCurrency().getIndex(), expectedAccount.getBalance().getCurrency().getName(), expectedAccount.getBalance().getCurrency().getShortName(), expectedAccount.getBalance().getCurrency().getSymbol()});
-        cursor.moveToFirst();
-
-        try {
-            Account fetchedAccount = mAccountRepo.fromCursor(cursor);
-            assertEquals(expectedAccount, fetchedAccount);
-
-        } catch (CursorIndexOutOfBoundsException e) {
-
-            Assert.fail("Konto konnte nicht aus einem Cursor hergestellt werden");
-        }
-    }
-
-    @Test
-    public void testCursorToAccountWithInvalidCursorShouldThrowCursorIndexOutOfBoundsException() {
-        Account expectedAccount = getSimpleAccount();
-
-        String[] columns = new String[]{
-                ExpensesDbHelper.ACCOUNTS_COL_ID,
-                ExpensesDbHelper.ACCOUNTS_COL_NAME,
-                //Der Kontostand ist nicht mit im Cursor
-                ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID
-        };
-
-        MatrixCursor cursor = new MatrixCursor(columns);
-        cursor.addRow(new Object[]{expectedAccount.getIndex(), expectedAccount.getTitle(), expectedAccount.getBalance().getCurrency().getIndex()});
-        cursor.moveToFirst();
-
-        try {
-            mAccountRepo.fromCursor(cursor);
-            Assert.fail("Konto konnte aus einem Fehlerhaften Cursor wiederhergestellt werden");
-
-        } catch (CursorIndexOutOfBoundsException e) {
-
-            //do nothing
-        }
+        return new Account(
+                "Konto",
+                new Price(7653, localCurrency)
+        );
     }
 
     private ExpenseObject getSimpleExpense() {

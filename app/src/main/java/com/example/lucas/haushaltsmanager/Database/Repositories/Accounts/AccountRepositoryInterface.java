@@ -16,7 +16,5 @@ public interface AccountRepositoryInterface extends BaseRepository<Account> {
 
     void update(Account account) throws AccountNotFoundException;
 
-    Account fromCursor(Cursor c);
-
     boolean isCurrencyAttachedToAccount(Currency currency);
 }

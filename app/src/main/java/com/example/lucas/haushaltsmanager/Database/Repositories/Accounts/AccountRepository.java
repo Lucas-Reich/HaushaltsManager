@@ -9,24 +9,23 @@ import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.CannotDeleteAccountException;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyTransformer;
+import com.example.lucas.haushaltsmanager.Database.TransformerInterface;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
-import com.example.lucas.haushaltsmanager.Entities.Price;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class AccountRepository implements AccountRepositoryInterface {
     private final SQLiteDatabase mDatabase;
-    private final CurrencyTransformer currencyTransformer;
+    private final TransformerInterface<Account> transformer;
 
     public AccountRepository(Context context) {
         DatabaseManager.initializeInstance(new ExpensesDbHelper(context));
 
         mDatabase = DatabaseManager.getInstance().openDatabase();
-        currencyTransformer = new CurrencyTransformer();
+        transformer = new AccountTransformer(new CurrencyTransformer());
     }
 
     public boolean exists(Account account) {
@@ -62,7 +61,7 @@ public class AccountRepository implements AccountRepositoryInterface {
         if (!c.moveToFirst())
             throw new AccountNotFoundException(accountId);
 
-        return fromCursor(c);
+        return transformer.transform(c);
     }
 
     public List<Account> getAll() {
@@ -82,7 +81,7 @@ public class AccountRepository implements AccountRepositoryInterface {
 
         ArrayList<Account> accounts = new ArrayList<>();
         while (c.moveToNext())
-            accounts.add(fromCursor(c));
+            accounts.add(transformer.transform(c));
 
         return accounts;
     }
@@ -137,23 +136,6 @@ public class AccountRepository implements AccountRepositoryInterface {
         ), null);
 
         return !isEmpty(c);
-    }
-
-    public Account fromCursor(Cursor c) {
-        // TODO: Extract into transformer class
-        long accountId = c.getLong(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_ID));
-        String accountName = c.getString(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_NAME));
-        double accountBalance = c.getDouble(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_BALANCE));
-        Currency accountCurrency = currencyTransformer.transform(c);
-
-        if (c.isLast())
-            c.close();
-
-        return new Account(
-                accountId,
-                accountName,
-                new Price(accountBalance, accountCurrency)
-        );
     }
 
     public void closeDatabase() {
