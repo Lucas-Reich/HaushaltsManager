@@ -12,27 +12,22 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Excepti
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.CannotDeleteExpenseException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.AddChildToChildException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.CannotDeleteChildExpenseException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.ChildExpenseNotFoundException;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyTransformer;
 import com.example.lucas.haushaltsmanager.Entities.Account;
-import com.example.lucas.haushaltsmanager.Entities.Category;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 public class ChildExpenseRepository {
     private SQLiteDatabase mDatabase;
     private ExpenseRepository mBookingRepo;
     private AccountRepository mAccountRepo;
-    private final CurrencyTransformer currencyTransformer;
+    private final ChildExpenseTransformer transformer;
 
     public ChildExpenseRepository(Context context) {
         DatabaseManager.initializeInstance(new ExpensesDbHelper(context));
@@ -40,7 +35,7 @@ public class ChildExpenseRepository {
         mDatabase = DatabaseManager.getInstance().openDatabase();
         mBookingRepo = new ExpenseRepository(context);
         mAccountRepo = new AccountRepository(context);
-        currencyTransformer = new CurrencyTransformer();
+        transformer = new ChildExpenseTransformer(new CurrencyTransformer());
     }
 
     public boolean exists(ExpenseObject expense) {
@@ -204,7 +199,7 @@ public class ChildExpenseRepository {
             throw new ChildExpenseNotFoundException(expenseId);
         }
 
-        return fromCursor(c);
+        return transformer.transform(c);
     }
 
     public List<ExpenseObject> getAll(long parentId) {
@@ -237,7 +232,7 @@ public class ChildExpenseRepository {
 
         ArrayList<ExpenseObject> childBookings = new ArrayList<>();
         while (c.moveToNext())
-            childBookings.add(fromCursor(c));
+            childBookings.add(transformer.transform(c));
 
         return childBookings;
     }
@@ -441,36 +436,6 @@ public class ChildExpenseRepository {
             throw ExpenseNotFoundException.parentExpenseNotFoundException(childExpense);
 
         return ExpenseRepository.cursorToExpense(c);
-    }
-
-    public ExpenseObject fromCursor(Cursor c) {
-        long expenseId = c.getLong(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_ID));
-        Calendar date = Calendar.getInstance();
-        String dateString = c.getString(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_DATE));
-        date.setTimeInMillis(Long.parseLong(dateString));
-        String title = c.getString(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_TITLE));
-        double price = c.getDouble(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_PRICE));
-        boolean expenditure = c.getInt(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_EXPENDITURE)) == 1;
-        String notice = c.getString(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_NOTICE));
-        long accountId = c.getLong(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID));
-        Category expenseCategory = ChildCategoryRepository.cursorToChildCategory(c);
-        Currency expenseCurrency = currencyTransformer.transform(c);
-
-        if (c.isLast())
-            c.close();
-
-        return new ExpenseObject(
-                expenseId,
-                title,
-                new Price(price, expenditure, expenseCurrency),
-                date,
-                expenseCategory,
-                notice,
-                accountId,
-                ExpenseObject.EXPENSE_TYPES.CHILD_EXPENSE,
-                new ArrayList<ExpenseObject>(),
-                expenseCurrency
-        );
     }
 
     public void closeDatabase() {

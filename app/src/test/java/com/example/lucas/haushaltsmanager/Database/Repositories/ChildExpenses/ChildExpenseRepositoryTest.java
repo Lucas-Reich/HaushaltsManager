@@ -1,10 +1,6 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses;
 
-import android.database.CursorIndexOutOfBoundsException;
-import android.database.MatrixCursor;
-
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
-import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
@@ -82,31 +78,6 @@ public class ChildExpenseRepositoryTest {
 
         mChildExpenseRepo.closeDatabase();
         mDbManagerInstance.closeDatabase();
-    }
-
-    private ExpenseObject getSimpleExpense() {
-        return new ExpenseObject(
-                "Ausgabe",
-                new Price(new Random().nextInt(1000), false, getDefaultCurrency()),
-                category,
-                account.getIndex(),
-                getDefaultCurrency()
-        );
-    }
-
-    private Currency getDefaultCurrency() {
-        Currency currency = new Currency("Euro", "EUR", "€");
-        return mCurrencyRepo.insert(currency);
-    }
-
-    private ExpenseObject getParentExpenseWithChildren() {
-        ExpenseObject parentExpense = getSimpleExpense();
-        parentExpense.setPrice(new Price(0, getDefaultCurrency()));
-
-        parentExpense.addChild(getSimpleExpense());
-        parentExpense.addChild(getSimpleExpense());
-
-        return parentExpense;
     }
 
     @Test
@@ -454,111 +425,6 @@ public class ChildExpenseRepositoryTest {
     }
 
     @Test
-    public void testCursorToChildBookingWithValidCursorShouldSucceed() {
-        ExpenseObject expectedChildExpense = getSimpleExpense();
-        expectedChildExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.CHILD_EXPENSE);
-
-        String[] columns = new String[]{
-                ExpensesDbHelper.BOOKINGS_COL_ID,
-                ExpensesDbHelper.BOOKINGS_COL_DATE,
-                ExpensesDbHelper.BOOKINGS_COL_TITLE,
-                ExpensesDbHelper.BOOKINGS_COL_PRICE,
-                ExpensesDbHelper.BOOKINGS_COL_EXPENDITURE,
-                ExpensesDbHelper.BOOKINGS_COL_NOTICE,
-                ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID,
-                ExpensesDbHelper.BOOKINGS_COL_CURRENCY_ID,
-                ExpensesDbHelper.CURRENCIES_COL_NAME,
-                ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME,
-                ExpensesDbHelper.CURRENCIES_COL_SYMBOL,
-                ExpensesDbHelper.CATEGORIES_COL_ID,
-                ExpensesDbHelper.CATEGORIES_COL_NAME,
-                ExpensesDbHelper.CATEGORIES_COL_COLOR,
-                ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE
-        };
-
-        MatrixCursor cursor = new MatrixCursor(columns);
-        cursor.addRow(new Object[]{
-                expectedChildExpense.getIndex(),
-                expectedChildExpense.getDate().getTimeInMillis(),
-                expectedChildExpense.getTitle(),
-                expectedChildExpense.getUnsignedPrice(),
-                expectedChildExpense.isExpenditure() ? 1 : 0,
-                expectedChildExpense.getNotice(),
-                expectedChildExpense.getAccountId(),
-                expectedChildExpense.getCurrency().getIndex(),
-                expectedChildExpense.getCurrency().getName(),
-                expectedChildExpense.getCurrency().getShortName(),
-                expectedChildExpense.getCurrency().getSymbol(),
-                expectedChildExpense.getCategory().getIndex(),
-                expectedChildExpense.getCategory().getTitle(),
-                expectedChildExpense.getCategory().getColor().getColorString(),
-                expectedChildExpense.getCategory().getDefaultExpenseType().value() ? 1 : 0
-        });
-        cursor.moveToFirst();
-
-        try {
-            ExpenseObject actualChildExpense = mChildExpenseRepo.fromCursor(cursor);
-            assertEquals(expectedChildExpense, actualChildExpense);
-
-        } catch (CursorIndexOutOfBoundsException e) {
-
-            Assert.fail("Ausgabe konnte nicht aus einem vollständigen Cursor wiederhergestellt werden");
-        }
-    }
-
-    @Test
-    public void testCursorToChildBookingWithInvalidCursorShouldThrowCursorIndexOutOfBoundsException() {
-        ExpenseObject expectedChildExpense = getSimpleExpense();
-        expectedChildExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.CHILD_EXPENSE);
-
-        String[] columns = new String[]{
-                ExpensesDbHelper.BOOKINGS_COL_ID,
-                ExpensesDbHelper.BOOKINGS_COL_DATE,
-                ExpensesDbHelper.BOOKINGS_COL_TITLE,
-                //Der Preis der KindBuchung wurde nicht mit abgefragt
-                ExpensesDbHelper.BOOKINGS_COL_EXPENDITURE,
-                ExpensesDbHelper.BOOKINGS_COL_NOTICE,
-                ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID,
-                ExpensesDbHelper.BOOKINGS_COL_CURRENCY_ID,
-                ExpensesDbHelper.CURRENCIES_COL_NAME,
-                ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME,
-                ExpensesDbHelper.CURRENCIES_COL_SYMBOL,
-                ExpensesDbHelper.CATEGORIES_COL_ID,
-                ExpensesDbHelper.CATEGORIES_COL_NAME,
-                ExpensesDbHelper.CATEGORIES_COL_COLOR,
-                ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE
-        };
-
-        MatrixCursor cursor = new MatrixCursor(columns);
-        cursor.addRow(new Object[]{
-                expectedChildExpense.getIndex(),
-                expectedChildExpense.getDate().getTimeInMillis(),
-                expectedChildExpense.getTitle(),
-                expectedChildExpense.isExpenditure() ? 1 : 0,
-                expectedChildExpense.getNotice(),
-                expectedChildExpense.getAccountId(),
-                expectedChildExpense.getCurrency().getIndex(),
-                expectedChildExpense.getCurrency().getName(),
-                expectedChildExpense.getCurrency().getShortName(),
-                expectedChildExpense.getCurrency().getSymbol(),
-                expectedChildExpense.getCategory().getIndex(),
-                expectedChildExpense.getCategory().getTitle(),
-                expectedChildExpense.getCategory().getColor().getColorString(),
-                expectedChildExpense.getCategory().getDefaultExpenseType().value() ? 1 : 0
-        });
-        cursor.moveToFirst();
-
-        try {
-            mChildExpenseRepo.fromCursor(cursor);
-            Assert.fail("KindBuchung konnte trotz eines Fehlerhaften Cursor widerhergestellt werden");
-
-        } catch (CursorIndexOutOfBoundsException e) {
-
-            //do nothing
-        }
-    }
-
-    @Test
     public void testHideWithExistingChildExpenseShouldSucceed() {
         ExpenseObject parentExpense = mBookingRepo.insert(getParentExpenseWithChildren());
 
@@ -661,6 +527,31 @@ public class ChildExpenseRepositoryTest {
                     account.getIndex()
             );
         }
+    }
+
+    private ExpenseObject getSimpleExpense() {
+        return new ExpenseObject(
+                "Ausgabe",
+                new Price(new Random().nextInt(1000), false, getDefaultCurrency()),
+                category,
+                account.getIndex(),
+                getDefaultCurrency()
+        );
+    }
+
+    private Currency getDefaultCurrency() {
+        Currency currency = new Currency("Euro", "EUR", "€");
+        return mCurrencyRepo.insert(currency);
+    }
+
+    private ExpenseObject getParentExpenseWithChildren() {
+        ExpenseObject parentExpense = getSimpleExpense();
+        parentExpense.setPrice(new Price(0, getDefaultCurrency()));
+
+        parentExpense.addChild(getSimpleExpense());
+        parentExpense.addChild(getSimpleExpense());
+
+        return parentExpense;
     }
 
     private void assertEqualAccountBalance(double expectedAmount, long accountId) {
