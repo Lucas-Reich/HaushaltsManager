@@ -1,7 +1,5 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.Accounts;
 
-import android.database.Cursor;
-
 import com.example.lucas.haushaltsmanager.Database.BaseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.CannotDeleteAccountException;

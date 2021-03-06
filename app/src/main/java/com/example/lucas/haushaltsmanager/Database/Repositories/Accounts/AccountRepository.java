@@ -28,35 +28,15 @@ public class AccountRepository implements AccountRepositoryInterface {
         transformer = new AccountTransformer(new CurrencyTransformer());
     }
 
+    // TODO: This method is only used in testing
     public boolean exists(Account account) {
-        String selectQuery = "SELECT"
-                + " *"
-                + " FROM " + ExpensesDbHelper.TABLE_ACCOUNTS
-                + " WHERE " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_ID + " = " + account.getIndex()
-                + " AND " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_NAME + " = '" + account.getTitle() + "'"
-                + " AND " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_BALANCE + " = " + account.getBalance().getSignedValue()
-                + " AND " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID + " = " + account.getBalance().getCurrency().getIndex()
-                + " LIMIT 1;";
-
-        Cursor c = mDatabase.rawQuery(selectQuery, null);
+        Cursor c = executeRaw(new AccountExistsQuery(account));
 
         return isEmpty(c);
     }
 
     public Account get(long accountId) throws AccountNotFoundException {
-        String selectQuery = "SELECT "
-                + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_ID + ", "
-                + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_NAME + ", "
-                + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_BALANCE + ", "
-                + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_ID + ", "
-                + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_NAME + ", "
-                + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME + ", "
-                + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SYMBOL
-                + " FROM " + ExpensesDbHelper.TABLE_ACCOUNTS
-                + " JOIN " + ExpensesDbHelper.TABLE_CURRENCIES + " ON " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID + " = " + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_ID
-                + " WHERE " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_ID + " = " + accountId + ";";
-
-        Cursor c = mDatabase.rawQuery(selectQuery, null);
+        Cursor c = executeRaw(new GetQuery(accountId));
 
         if (!c.moveToFirst())
             throw new AccountNotFoundException(accountId);
@@ -65,23 +45,12 @@ public class AccountRepository implements AccountRepositoryInterface {
     }
 
     public List<Account> getAll() {
-        String selectQuery = "SELECT "
-                + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_ID + ", "
-                + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_NAME + ", "
-                + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_BALANCE + ", "
-                + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_ID + ", "
-                + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_NAME + ", "
-                + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME + ", "
-                + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SYMBOL
-                + " FROM " + ExpensesDbHelper.TABLE_ACCOUNTS
-                + " JOIN " + ExpensesDbHelper.TABLE_CURRENCIES + " ON " + ExpensesDbHelper.TABLE_ACCOUNTS + "." + ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID + " = " + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_ID
-                + ";";
-
-        Cursor c = mDatabase.rawQuery(selectQuery, null);
+        Cursor c = executeRaw(new GetAllAccountsQuery());
 
         ArrayList<Account> accounts = new ArrayList<>();
-        while (c.moveToNext())
+        while (c.moveToNext()) {
             accounts.add(transformer.transform(c));
+        }
 
         return accounts;
     }
@@ -116,24 +85,13 @@ public class AccountRepository implements AccountRepositoryInterface {
 
         int affectedRows = mDatabase.update(ExpensesDbHelper.TABLE_ACCOUNTS, updatedAccount, ExpensesDbHelper.ACCOUNTS_COL_ID + " = ?", new String[]{account.getIndex() + ""});
 
-        if (affectedRows == 0)
+        if (affectedRows == 0) {
             throw new AccountNotFoundException(account.getIndex());
+        }
     }
 
-    /**
-     * Methode um zu überprüfen ob es ein Konto mit der angegebenen Währung gibt.
-     *
-     * @param currency Zu überprüfende Währung
-     * @return TRUE wenn es ein Konto mit dieser Währung gibt, FALSE wenn nicht
-     */
     public boolean isCurrencyAttachedToAccount(Currency currency) {
-        Cursor c = mDatabase.rawQuery(String.format(
-                "SELECT * FROM %s WHERE %s.%s = %s LIMIT 1",
-                ExpensesDbHelper.TABLE_ACCOUNTS,
-                ExpensesDbHelper.TABLE_ACCOUNTS,
-                ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID,
-                currency.getIndex()
-        ), null);
+        Cursor c = executeRaw(new IsCurrencyAttachedToAccountQuery(currency));
 
         return !isEmpty(c);
     }
@@ -144,15 +102,16 @@ public class AccountRepository implements AccountRepositoryInterface {
     }
 
     private boolean hasBookingsAttached(Account account) {
-        Cursor c = mDatabase.rawQuery(String.format(
-                "SELECT * FROM %s WHERE %s.%s = %s LIMIT 1",
-                ExpensesDbHelper.TABLE_BOOKINGS,
-                ExpensesDbHelper.TABLE_BOOKINGS,
-                ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID,
-                account.getIndex()
-        ), null);
+        Cursor c = executeRaw(new HasAccountBookingsAttachedQuery(account));
 
         return !isEmpty(c);
+    }
+
+    private Cursor executeRaw(QueryInterface query) {
+        return mDatabase.rawQuery(String.format(
+                query.sql(),
+                query.values()
+        ), null);
     }
 
     private boolean isEmpty(Cursor c) {
@@ -161,4 +120,5 @@ public class AccountRepository implements AccountRepositoryInterface {
 
         return resultCount == 0;
     }
+
 }
