@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.Exceptions.RecurringBookingNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.TransformerInterface;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
@@ -18,14 +19,15 @@ import java.util.List;
 
 public class RecurringBookingRepository {
     private SQLiteDatabase mDatabase;
-    private TransformerInterface<RecurringBooking> transformer;
+    private final TransformerInterface<RecurringBooking> transformer;
 
     public RecurringBookingRepository(Context context) {
-        // TODO: Kann ich hier eine Default database injecten, sodass es mit dem testen einfacher wird
         DatabaseManager.initializeInstance(new ExpensesDbHelper(context));
 
         mDatabase = DatabaseManager.getInstance().openDatabase();
-        transformer = new RecurringBookingTransformer();
+        transformer = new RecurringBookingTransformer(
+                new ExpenseRepository(context)
+        );
     }
 
     // TODO: This method is only used within tests

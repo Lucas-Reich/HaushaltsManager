@@ -8,8 +8,6 @@ import java.util.List;
 public interface CategoryRepositoryInterface {
     boolean exists(Category category);
 
-    Category get(long categoryId)throws CategoryNotFoundException;
-
     List<Category> getAll();
 
     Category insert(Category category);

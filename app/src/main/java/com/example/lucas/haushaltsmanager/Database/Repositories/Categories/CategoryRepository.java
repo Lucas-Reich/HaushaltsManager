@@ -12,7 +12,6 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.Excep
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepository;
 import com.example.lucas.haushaltsmanager.Database.TransformerInterface;
 import com.example.lucas.haushaltsmanager.Entities.Category;
-import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 
 import java.util.ArrayList;
@@ -52,10 +51,6 @@ public class CategoryRepository implements CategoryRepositoryInterface {
 
         c.close();
         return false;
-    }
-
-    public Category get(long categoryId) {
-        throw new RuntimeException("Method get is not implemented");
     }
 
     public List<Category> getAll() {

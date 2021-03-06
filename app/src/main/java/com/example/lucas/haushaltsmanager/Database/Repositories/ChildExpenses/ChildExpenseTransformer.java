@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 public class ChildExpenseTransformer implements TransformerInterface<ExpenseObject> {
-    private final CurrencyTransformer currencyTransformer;
+    private final TransformerInterface<Currency> currencyTransformer;
     private final ChildCategoryTransformer childCategoryTransformer;
 
     public ChildExpenseTransformer(

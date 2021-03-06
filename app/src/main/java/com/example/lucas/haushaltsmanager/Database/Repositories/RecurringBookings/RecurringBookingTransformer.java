@@ -16,6 +16,11 @@ import java.util.Calendar;
 
 public class RecurringBookingTransformer implements TransformerInterface<RecurringBooking> {
     private static final String TAG = RecurringBookingTransformer.class.getSimpleName();
+    private final ExpenseRepository expenseRepository;
+
+    public RecurringBookingTransformer(ExpenseRepository expenseRepository) {
+        this.expenseRepository = expenseRepository;
+    }
 
     @Override
     public RecurringBooking transform(Cursor c) {
@@ -43,11 +48,9 @@ public class RecurringBookingTransformer implements TransformerInterface<Recurri
     private Booking getBooking(Cursor c) {
         long id = c.getLong(c.getColumnIndex(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID));
 
-        ExpenseRepository bookingRepo = new ExpenseRepository(app.getContext());
-
         try {
 
-            return bookingRepo.get(id);
+            return expenseRepository.get(id);
         } catch (ExpenseNotFoundException e) {
 
             Log.e(TAG, "Failed to fetch Booking " + id, e);

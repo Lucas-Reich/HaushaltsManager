@@ -11,6 +11,7 @@ import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.Exceptions.CannotDeleteCurrencyException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.Exceptions.CurrencyNotFoundException;
+import com.example.lucas.haushaltsmanager.Database.TransformerInterface;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ import java.util.List;
 public class CurrencyRepository implements BaseRepository<Currency> {
     private SQLiteDatabase mDatabase;
     private AccountRepository mAccountRepo;
-    private final CurrencyTransformer transformer;
+    private final TransformerInterface<Currency> transformer;
 
     public CurrencyRepository(Context context) {
         DatabaseManager.initializeInstance(new ExpensesDbHelper(context));
