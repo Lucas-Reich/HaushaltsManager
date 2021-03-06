@@ -10,6 +10,7 @@ import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.Exceptions.CategoryNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepository;
+import com.example.lucas.haushaltsmanager.Database.TransformerInterface;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
@@ -19,26 +20,13 @@ import java.util.List;
 
 public class CategoryRepository implements CategoryRepositoryInterface {
     private SQLiteDatabase mDatabase;
+    private final TransformerInterface<Category> transformer;
 
     public CategoryRepository(Context context) {
         DatabaseManager.initializeInstance(new ExpensesDbHelper(context));
 
         mDatabase = DatabaseManager.getInstance().openDatabase();
-    }
-
-    public static Category cursorToCategory(Cursor c) {
-        long categoryIndex = c.getLong(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_ID));
-        String categoryName = c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_NAME));
-        String categoryColor = c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_COLOR));
-        boolean defaultExpenseType = c.getInt(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE)) == 1;
-
-        return new Category(
-                categoryIndex,
-                categoryName,
-                new Color(categoryColor),
-                ExpenseType.load(defaultExpenseType),
-                new ChildCategoryRepository(app.getContext()).getAll(categoryIndex)
-        );
+        transformer = new CategoryTransformer(new ChildCategoryRepository(context));
     }
 
     // TODO: This method is only used within tests
@@ -85,7 +73,7 @@ public class CategoryRepository implements CategoryRepositoryInterface {
         ArrayList<Category> categories = new ArrayList<>();
         while (!c.isAfterLast()) {
 
-            categories.add(cursorToCategory(c));
+            categories.add(transformer.transform(c));
             c.moveToNext();
         }
 

@@ -95,56 +95,6 @@ public class CategoryRepositoryTest {
         }
     }
 
-    @Test
-    public void testCursorToCategoryWithValidCursorShouldSucceed() {
-        Category expectedCategory = getSimpleCategory();
-
-        String[] columns = new String[]{
-                ExpensesDbHelper.CATEGORIES_COL_ID,
-                ExpensesDbHelper.CATEGORIES_COL_NAME,
-                ExpensesDbHelper.CATEGORIES_COL_COLOR,
-                ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE
-        };
-
-        MatrixCursor cursor = new MatrixCursor(columns);
-        cursor.addRow(new Object[]{expectedCategory.getIndex(), expectedCategory.getTitle(), expectedCategory.getColor().getColorString(), expectedCategory.getDefaultExpenseType().value() ? 1 : 0});
-        cursor.moveToFirst();
-
-        try {
-            Category fetchedCategory = CategoryRepository.cursorToCategory(cursor);
-            assertEquals(expectedCategory, fetchedCategory);
-
-        } catch (CursorIndexOutOfBoundsException e) {
-
-            Assert.fail("Kategorie konnte nicht aus einem vollständingen Cursor hergestellt werden");
-        }
-    }
-
-    @Test
-    public void testCursorToCategoryWithInvalidCursorShouldThrowCursorIndexOutOfBoundsException() {
-        Category expectedCategory = getSimpleCategory();
-
-        String[] columns = new String[]{
-                ExpensesDbHelper.CATEGORIES_COL_ID,
-                ExpensesDbHelper.CATEGORIES_COL_NAME,
-                //Die Farbe ist nicht mit im Cursor
-                ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE
-        };
-
-        MatrixCursor cursor = new MatrixCursor(columns);
-        cursor.addRow(new Object[]{expectedCategory.getIndex(), expectedCategory.getTitle(), expectedCategory.getDefaultExpenseType().value()});
-        cursor.moveToFirst();
-
-        try {
-            CategoryRepository.cursorToCategory(cursor);
-            Assert.fail("Kategorie konnte aus einem unvollständigen Cursor wiederhergestellt werden");
-
-        } catch (CursorIndexOutOfBoundsException e) {
-
-            //do nothing
-        }
-    }
-
     private Category getSimpleCategory() {
         return new Category(
                 "Kategorie",

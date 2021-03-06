@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryTransformer;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.Exceptions.CategoryNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.Exceptions.CannotDeleteChildCategoryException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.Exceptions.ChildCategoryNotFoundException;
@@ -20,12 +21,14 @@ import java.util.List;
 public class ChildCategoryRepository implements ChildCategoryRepositoryInterface {
     private SQLiteDatabase mDatabase;
     private final ChildCategoryTransformer transformer;
+    private final CategoryTransformer categoryTransformer;
 
     public ChildCategoryRepository(Context context) {
         DatabaseManager.initializeInstance(new ExpensesDbHelper(context));
 
         mDatabase = DatabaseManager.getInstance().openDatabase();
         transformer = new ChildCategoryTransformer();
+        categoryTransformer = new CategoryTransformer(this);
     }
 
     public boolean exists(Category category) {
@@ -195,7 +198,7 @@ public class ChildCategoryRepository implements ChildCategoryRepositoryInterface
             throw new CategoryNotFoundException(childCategory.getIndex());
         }
 
-        Category category = CategoryRepository.cursorToCategory(c);
+        Category category = categoryTransformer.transform(c);
 
         c.close();
         return category;
