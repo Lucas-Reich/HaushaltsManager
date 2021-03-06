@@ -511,24 +511,6 @@ public class ChildExpenseRepositoryTest {
         }
     }
 
-    @Test
-    public void testIsHiddenWithNotExistingChildExpenseShouldThrowExpenseNotFoundException() {
-        ExpenseObject childExpense = getSimpleExpense();
-
-        try {
-            mChildExpenseRepo.isHidden(childExpense);
-            Assert.fail("ChildExpense wurde gefunden");
-
-        } catch (ChildExpenseNotFoundException e) {
-
-            assertEquals(String.format("Could not find Child Booking with id %s.", childExpense.getIndex()), e.getMessage());
-            assertEqualAccountBalance(
-                    account.getBalance().getSignedValue(),
-                    account.getIndex()
-            );
-        }
-    }
-
     private ExpenseObject getSimpleExpense() {
         return new ExpenseObject(
                 "Ausgabe",

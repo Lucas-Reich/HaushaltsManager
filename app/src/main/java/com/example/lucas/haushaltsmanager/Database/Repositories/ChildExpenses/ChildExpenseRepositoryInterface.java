@@ -1,25 +1,32 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses;
 
-import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.AddChildToChildException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.CannotDeleteChildExpenseException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.ChildExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 
 import java.util.List;
 
 public interface ChildExpenseRepositoryInterface {
-    ExpenseObject create(ExpenseObject child, ExpenseObject parent) throws ExpenseNotFoundException;
+    boolean exists(ExpenseObject childExpense);
 
-    void update(ExpenseObject child) throws ChildExpenseNotFoundException;
+    ExpenseObject addChildToBooking(ExpenseObject childExpense, ExpenseObject parentBooking) throws AddChildToChildException;
 
-    void delete(ExpenseObject child);
+    ExpenseObject combineExpenses(List<ExpenseObject> expenses);
 
-    ExpenseObject get(long id) throws ChildExpenseNotFoundException;
+    ExpenseObject extractChildFromBooking(ExpenseObject childExpense) throws ChildExpenseNotFoundException;
 
-    boolean exists(ExpenseObject child);
+    ExpenseObject get(long childExpenseId) throws ChildExpenseNotFoundException;
 
-    void hide(ExpenseObject child) throws ChildExpenseNotFoundException;
+    List<ExpenseObject> getAll(long parentExpenseId);
 
-    boolean isHidden(ExpenseObject child) throws ChildExpenseNotFoundException;
+    ExpenseObject insert(ExpenseObject parentExpense, ExpenseObject childExpense);
 
-    List<ExpenseObject> getAll(long parentId);
+    void update(ExpenseObject childExpense) throws ChildExpenseNotFoundException;
+
+    void delete(ExpenseObject childExpense) throws CannotDeleteChildExpenseException;
+
+    void hide(ExpenseObject childExpense) throws ChildExpenseNotFoundException;
+
+    void closeDatabase();
 }

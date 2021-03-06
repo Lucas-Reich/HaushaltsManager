@@ -9,6 +9,7 @@ import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.BookingTransformer;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.CannotDeleteExpenseException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
@@ -17,6 +18,7 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Ex
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.CannotDeleteChildExpenseException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.ChildExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyTransformer;
+import com.example.lucas.haushaltsmanager.Database.TransformerInterface;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Price;
@@ -24,11 +26,12 @@ import com.example.lucas.haushaltsmanager.Entities.Price;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChildExpenseRepository {
+public class ChildExpenseRepository implements ChildExpenseRepositoryInterface{
     private SQLiteDatabase mDatabase;
     private ExpenseRepository mBookingRepo;
     private AccountRepository mAccountRepo;
     private final ChildExpenseTransformer transformer;
+    private final TransformerInterface<ExpenseObject> bookingTransformer;
 
     public ChildExpenseRepository(Context context) {
         DatabaseManager.initializeInstance(new ExpensesDbHelper(context));
@@ -37,8 +40,13 @@ public class ChildExpenseRepository {
         mBookingRepo = new ExpenseRepository(context);
         mAccountRepo = new AccountRepository(context);
         transformer = new ChildExpenseTransformer(
-                new CurrencyTransformer(),
-                new ChildCategoryTransformer()
+            new CurrencyTransformer(),
+            new ChildCategoryTransformer()
+        );
+        bookingTransformer = new BookingTransformer(
+            new CurrencyTransformer(),
+            new ChildCategoryTransformer(),
+            this
         );
     }
 
@@ -380,26 +388,6 @@ public class ChildExpenseRepository {
         }
     }
 
-    // TODO: This method is only used within tests
-    public boolean isHidden(ExpenseObject childExpense) throws ChildExpenseNotFoundException {
-        String selectQuery = "SELECT"
-                + " " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_HIDDEN
-                + " FROM " + ExpensesDbHelper.TABLE_BOOKINGS
-                + " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_ID + " = " + childExpense.getIndex()
-                + ";";
-
-        Cursor c = mDatabase.rawQuery(selectQuery, null);
-
-        if (!c.moveToFirst())
-            throw new ChildExpenseNotFoundException(childExpense.getIndex());
-
-
-        boolean isHidden = c.getInt(c.getColumnIndex(ExpensesDbHelper.BOOKINGS_COL_HIDDEN)) == 1;
-        c.close();
-
-        return isHidden;
-    }
-
     public ExpenseObject getParent(ExpenseObject childExpense) throws ChildExpenseNotFoundException, ExpenseNotFoundException {
 
         if (!exists(childExpense))
@@ -439,7 +427,7 @@ public class ChildExpenseRepository {
         if (!c.moveToFirst())
             throw ExpenseNotFoundException.parentExpenseNotFoundException(childExpense);
 
-        return ExpenseRepository.cursorToExpense(c);
+        return bookingTransformer.transform(c);
     }
 
     public void closeDatabase() {
