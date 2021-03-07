@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
+import com.example.lucas.haushaltsmanager.Database.QueryInterface;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.Exceptions.CategoryNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepository;
 import com.example.lucas.haushaltsmanager.Database.TransformerInterface;
@@ -30,18 +31,7 @@ public class CategoryRepository implements CategoryRepositoryInterface {
 
     // TODO: This method is only used within tests
     public boolean exists(Category category) {
-        String selectQuery;
-
-        selectQuery = "SELECT"
-                + " *"
-                + " FROM " + ExpensesDbHelper.TABLE_CATEGORIES
-                + " WHERE " + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_ID + " = " + category.getIndex()
-                + " AND " + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_NAME + " = '" + category.getTitle() + "'"
-                + " AND " + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_COLOR + " = '" + category.getColor().getColorString() + "'"
-                + " AND " + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE + " = " + (category.getDefaultExpenseType().value() ? 1 : 0)
-                + " LIMIT 1;";
-
-        Cursor c = mDatabase.rawQuery(selectQuery, null);
+        Cursor c = executeRaw(new CategoryExistsQuery(category));
 
         if (c.moveToFirst()) {
 
@@ -54,15 +44,7 @@ public class CategoryRepository implements CategoryRepositoryInterface {
     }
 
     public List<Category> getAll() {
-
-        String selectQuery = "SELECT "
-                + ExpensesDbHelper.CATEGORIES_COL_ID + ", "
-                + ExpensesDbHelper.CATEGORIES_COL_NAME + ", "
-                + ExpensesDbHelper.CATEGORIES_COL_COLOR + ", "
-                + ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE + " "
-                + "FROM " + ExpensesDbHelper.TABLE_CATEGORIES + ";";
-
-        Cursor c = mDatabase.rawQuery(selectQuery, null);
+        Cursor c = executeRaw(new GetAllCategoriesQuery());
 
         c.moveToFirst();
         ArrayList<Category> categories = new ArrayList<>();
@@ -110,5 +92,12 @@ public class CategoryRepository implements CategoryRepositoryInterface {
 
         if (affectedRows == 0)
             throw new CategoryNotFoundException(category.getIndex());
+    }
+
+    private Cursor executeRaw(QueryInterface query) {
+        return mDatabase.rawQuery(String.format(
+                query.sql(),
+                query.values()
+        ), null);
     }
 }
