@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
+import com.example.lucas.haushaltsmanager.Database.QueryInterface;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.Exceptions.RecurringBookingNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.TransformerInterface;
@@ -32,18 +33,7 @@ public class RecurringBookingRepository {
 
     // TODO: This method is only used within tests
     public boolean exists(RecurringBooking recurringBooking) {
-        String selectQuery = "SELECT"
-                + " *"
-                + " FROM " + ExpensesDbHelper.TABLE_RECURRING_BOOKINGS
-                + " WHERE " + ExpensesDbHelper.TABLE_RECURRING_BOOKINGS + "." + ExpensesDbHelper.RECURRING_BOOKINGS_COL_ID + " = " + recurringBooking.getIndex()
-                + " AND " + ExpensesDbHelper.TABLE_RECURRING_BOOKINGS + "." + ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID + " = " + recurringBooking.getBooking().getIndex()
-                + " AND " + ExpensesDbHelper.TABLE_RECURRING_BOOKINGS + "." + ExpensesDbHelper.RECURRING_BOOKINGS_COL_OCCURRENCE + " = " + recurringBooking.getExecutionDate().getTimeInMillis()
-                + " AND " + ExpensesDbHelper.TABLE_RECURRING_BOOKINGS + "." + ExpensesDbHelper.RECURRING_BOOKINGS_COL_END + " = " + recurringBooking.getEnd().getTimeInMillis()
-                + " AND " + ExpensesDbHelper.TABLE_RECURRING_BOOKINGS + "." + ExpensesDbHelper.RECURRING_BOOKINGS_COL_CALENDAR_FIELD + " = " + recurringBooking.getFrequency().getCalendarField()
-                + " AND " + ExpensesDbHelper.TABLE_RECURRING_BOOKINGS + "." + ExpensesDbHelper.RECURRING_BOOKINGS_COL_AMOUNT + " = " + recurringBooking.getFrequency().getAmount()
-                + " LIMIT 1;";
-
-        Cursor c = mDatabase.rawQuery(selectQuery, null);
+        Cursor c = executeRaw(new RecurringBookingExistsQuery(recurringBooking));
 
         if (c.moveToFirst()) {
 
@@ -56,13 +46,7 @@ public class RecurringBookingRepository {
     }
 
     public boolean exists(ExpenseObject expense) {
-        String selectQuery = "SELECT"
-                + " *"
-                + " FROM " + ExpensesDbHelper.TABLE_RECURRING_BOOKINGS
-                + " WHERE " + ExpensesDbHelper.TABLE_RECURRING_BOOKINGS + "." + ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID + " = " + expense.getIndex()
-                + " LIMIT 1;";
-
-        Cursor c = mDatabase.rawQuery(selectQuery, null);
+        Cursor c = executeRaw(new BookingExistsQuery(expense));
 
         if (c.moveToFirst()) {
 
@@ -94,17 +78,7 @@ public class RecurringBookingRepository {
     }
 
     public RecurringBooking get(long index) throws RecurringBookingNotFoundException {
-        String selectQuery = "SELECT "
-                + ExpensesDbHelper.RECURRING_BOOKINGS_COL_ID + ", "
-                + ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID + ", "
-                + ExpensesDbHelper.RECURRING_BOOKINGS_COL_CALENDAR_FIELD + ", "
-                + ExpensesDbHelper.RECURRING_BOOKINGS_COL_AMOUNT + ", "
-                + ExpensesDbHelper.RECURRING_BOOKINGS_COL_OCCURRENCE + ", "
-                + ExpensesDbHelper.RECURRING_BOOKINGS_COL_END
-                + " FROM " + ExpensesDbHelper.TABLE_RECURRING_BOOKINGS
-                + " WHERE " + ExpensesDbHelper.RECURRING_BOOKINGS_COL_ID + " = " + index;
-
-        Cursor c = mDatabase.rawQuery(selectQuery, null);
+        Cursor c = executeRaw(new GetRecurringBookingQuery(index));
 
         if (!c.moveToFirst())
             throw new RecurringBookingNotFoundException(index);
@@ -113,18 +87,7 @@ public class RecurringBookingRepository {
     }
 
     public List<RecurringBooking> getAll(Calendar start, Calendar end) {
-        String selectQuery = "SELECT "
-                + ExpensesDbHelper.RECURRING_BOOKINGS_COL_ID + ", "
-                + ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID + ", "
-                + ExpensesDbHelper.RECURRING_BOOKINGS_COL_CALENDAR_FIELD + ", "
-                + ExpensesDbHelper.RECURRING_BOOKINGS_COL_AMOUNT + ", "
-                + ExpensesDbHelper.RECURRING_BOOKINGS_COL_OCCURRENCE + ", "
-                + ExpensesDbHelper.RECURRING_BOOKINGS_COL_END
-                + " FROM " + ExpensesDbHelper.TABLE_RECURRING_BOOKINGS
-                + " WHERE " + ExpensesDbHelper.RECURRING_BOOKINGS_COL_OCCURRENCE
-                + " BETWEEN " + start.getTimeInMillis() + " AND " + end.getTimeInMillis() + ";";
-
-        Cursor c = mDatabase.rawQuery(selectQuery, null);
+        Cursor c = executeRaw(new GetAllRecurringBookingsQuery(start, end));
 
         List<RecurringBooking> recurringBookings = new ArrayList<>();
         while (c.moveToNext()) {
@@ -157,5 +120,12 @@ public class RecurringBookingRepository {
                 ExpensesDbHelper.RECURRING_BOOKINGS_COL_ID + " = ?",
                 new String[]{"" + recurringBooking.getIndex()}
         );
+    }
+
+    private Cursor executeRaw(QueryInterface query) {
+        return mDatabase.rawQuery(String.format(
+                query.sql(),
+                query.values()
+        ), null);
     }
 }
