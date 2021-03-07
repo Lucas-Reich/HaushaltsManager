@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepository;
+import com.example.lucas.haushaltsmanager.Database.QueryInterface;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryTransformer;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.Exceptions.CategoryNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.Exceptions.CannotDeleteChildCategoryException;
@@ -32,18 +32,7 @@ public class ChildCategoryRepository implements ChildCategoryRepositoryInterface
     }
 
     public boolean exists(Category category) {
-
-        String selectQuery;
-        selectQuery = "SELECT"
-                + " *"
-                + " FROM " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES
-                + " WHERE " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CHILD_CATEGORIES_COL_ID + " = " + category.getIndex()
-                + " AND " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CHILD_CATEGORIES_COL_NAME + " = '" + category.getTitle() + "'"
-                + " AND " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CHILD_CATEGORIES_COL_COLOR + " = '" + category.getColor().getColorString() + "'"
-                + " AND " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CHILD_CATEGORIES_COL_DEFAULT_EXPENSE_TYPE + " = " + (category.getDefaultExpenseType().value() ? 1 : 0)
-                + " LIMIT 1;";
-
-        Cursor c = mDatabase.rawQuery(selectQuery, null);
+        Cursor c = executeRaw(new ChildCategoryExistsQuery(category));
 
         if (c.moveToFirst()) {
 
@@ -56,16 +45,7 @@ public class ChildCategoryRepository implements ChildCategoryRepositoryInterface
     }
 
     public Category get(long categoryId) throws ChildCategoryNotFoundException {
-
-        String selectQuery = "SELECT "
-                + ExpensesDbHelper.CHILD_CATEGORIES_COL_ID + ", "
-                + ExpensesDbHelper.CHILD_CATEGORIES_COL_NAME + ", "
-                + ExpensesDbHelper.CHILD_CATEGORIES_COL_COLOR + ", "
-                + ExpensesDbHelper.CHILD_CATEGORIES_COL_DEFAULT_EXPENSE_TYPE
-                + " FROM " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES
-                + " WHERE " + ExpensesDbHelper.CHILD_CATEGORIES_COL_ID + " = " + categoryId + ";";
-
-        Cursor c = mDatabase.rawQuery(selectQuery, null);
+        Cursor c = executeRaw(new GetChildCategoryQuery(categoryId));
 
         if (!c.moveToFirst()) {
             throw new ChildCategoryNotFoundException(categoryId);
@@ -78,17 +58,7 @@ public class ChildCategoryRepository implements ChildCategoryRepositoryInterface
     }
 
     public List<Category> getAll(long parentId) {
-
-        String selectQuery = "SELECT "
-                + ExpensesDbHelper.CHILD_CATEGORIES_COL_ID + ", "
-                + ExpensesDbHelper.CHILD_CATEGORIES_COL_NAME + ", "
-                + ExpensesDbHelper.CHILD_CATEGORIES_COL_COLOR + ", "
-                + ExpensesDbHelper.CHILD_CATEGORIES_COL_DEFAULT_EXPENSE_TYPE + " "
-                + "FROM " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + " "
-                + "WHERE " + ExpensesDbHelper.CHILD_CATEGORIES_COL_PARENT_ID + " = '" + parentId + "' "
-                + "AND " + ExpensesDbHelper.CHILD_CATEGORIES_COL_HIDDEN + " = '" + 0 + "';";
-
-        Cursor c = mDatabase.rawQuery(selectQuery, null);
+        Cursor c = executeRaw(new GetAllChildCategoriesQuery(parentId));
 
         c.moveToFirst();
         ArrayList<Category> categories = new ArrayList<>();
@@ -173,26 +143,15 @@ public class ChildCategoryRepository implements ChildCategoryRepositoryInterface
             throw new ChildCategoryNotFoundException(category.getIndex());
     }
 
+    private Cursor executeRaw(QueryInterface query) {
+        return mDatabase.rawQuery(String.format(
+                query.sql(),
+                query.values()
+        ), null);
+    }
+
     private Category getParent(Category childCategory) throws CategoryNotFoundException {
-
-        String subQuery;
-        subQuery = "(SELECT "
-                + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CHILD_CATEGORIES_COL_PARENT_ID
-                + " FROM " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES
-                + " WHERE " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CHILD_CATEGORIES_COL_ID + " = '" + childCategory.getIndex() + "'"
-                + ")";
-
-
-        String selectQuery;
-        selectQuery = "SELECT "
-                + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_ID + ", "
-                + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_NAME + ", "
-                + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_COLOR + ", "
-                + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE
-                + " FROM " + ExpensesDbHelper.TABLE_CATEGORIES
-                + " WHERE " + ExpensesDbHelper.TABLE_CATEGORIES + "." + ExpensesDbHelper.CATEGORIES_COL_ID + " = " + subQuery + ";";
-
-        Cursor c = mDatabase.rawQuery(selectQuery, null);
+        Cursor c = executeRaw(new GetParentCategoryQuery(childCategory));
 
         if (!c.moveToFirst()) {
             throw new CategoryNotFoundException(childCategory.getIndex());
@@ -205,15 +164,7 @@ public class ChildCategoryRepository implements ChildCategoryRepositoryInterface
     }
 
     private boolean isAttachedToParentBooking(Category category) {
-        String selectQuery;
-
-        selectQuery = "SELECT"
-                + " *"
-                + " FROM " + ExpensesDbHelper.TABLE_BOOKINGS
-                + " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID + " = " + category.getIndex()
-                + " LIMIT 1;";
-
-        Cursor c = mDatabase.rawQuery(selectQuery, null);
+        Cursor c = executeRaw(new IsAttachedToParentBookingQuery(category));
 
         if (c.moveToFirst()) {
 
@@ -226,15 +177,7 @@ public class ChildCategoryRepository implements ChildCategoryRepositoryInterface
     }
 
     private boolean isAttachedToChildBooking(Category category) {
-        String selectQuery;
-
-        selectQuery = "SELECT"
-                + " *"
-                + " FROM " + ExpensesDbHelper.TABLE_BOOKINGS
-                + " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID + " = " + category.getIndex()
-                + " LIMIT 1;";
-
-        Cursor c = mDatabase.rawQuery(selectQuery, null);
+        Cursor c = executeRaw(new IsAttachedToChildBookingQuery(category));
 
         if (c.moveToFirst()) {
 
@@ -247,12 +190,7 @@ public class ChildCategoryRepository implements ChildCategoryRepositoryInterface
     }
 
     private boolean hasParentChildren(Category parentCategory) {
-        String selectQuery = "SELECT *"
-                + " FROM " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES
-                + " WHERE " + ExpensesDbHelper.TABLE_CHILD_CATEGORIES + "." + ExpensesDbHelper.CHILD_CATEGORIES_COL_PARENT_ID + " = " + parentCategory.getIndex()
-                + ";";
-
-        Cursor c = mDatabase.rawQuery(selectQuery, null);
+        Cursor c = executeRaw(new HasCategoryChildrenQuery(parentCategory));
 
         if (c.getCount() >= 1) {
 
