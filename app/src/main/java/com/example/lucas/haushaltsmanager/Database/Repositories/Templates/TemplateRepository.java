@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
+import com.example.lucas.haushaltsmanager.Database.QueryInterface;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
@@ -27,15 +28,7 @@ public class TemplateRepository {
     }
 
     public boolean existsWithoutIndex(ExpenseObject expense) {
-        // IMPROVEMENT: Kann man irgendwie anders überprüfen ob eine ausgabe ein Template ist?
-
-        String selectQuery = "SELECT"
-                + " *"
-                + " FROM " + ExpensesDbHelper.TABLE_TEMPLATE_BOOKINGS
-                + " WHERE " + ExpensesDbHelper.TABLE_TEMPLATE_BOOKINGS + "." + ExpensesDbHelper.TEMPLATE_COL_BOOKING_ID + " = " + expense.getIndex()
-                + " LIMIT 1;";
-
-        Cursor c = mDatabase.rawQuery(selectQuery, null);
+        Cursor c = executeRaw(new TemplateBookingExistsQuery(expense));
 
         if (c.moveToFirst()) {
 
@@ -48,14 +41,7 @@ public class TemplateRepository {
     }
 
     public List<Template> getAll() {
-
-        String selectQuery;
-        selectQuery = "SELECT "
-                + ExpensesDbHelper.TABLE_TEMPLATE_BOOKINGS + "." + ExpensesDbHelper.TEMPLATE_COL_ID + ","
-                + " " + ExpensesDbHelper.TABLE_TEMPLATE_BOOKINGS + "." + ExpensesDbHelper.TEMPLATE_COL_BOOKING_ID
-                + " FROM " + ExpensesDbHelper.TABLE_TEMPLATE_BOOKINGS + ";";
-
-        Cursor c = mDatabase.rawQuery(selectQuery, null);
+        Cursor c = executeRaw(new GetAllTemplateBookingsQuery());
 
         c.moveToFirst();
         ArrayList<Template> templateBookings = new ArrayList<>();
@@ -94,5 +80,12 @@ public class TemplateRepository {
                 insertedTemplateId,
                 template.getTemplate()
         );
+    }
+
+    private Cursor executeRaw(QueryInterface query) {
+        return mDatabase.rawQuery(String.format(
+                query.sql(),
+                query.values()
+        ), null);
     }
 }
