@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import com.example.lucas.haushaltsmanager.Database.BaseRepository;
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
+import com.example.lucas.haushaltsmanager.Database.QueryInterface;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.Exceptions.CannotDeleteCurrencyException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.Exceptions.CurrencyNotFoundException;
@@ -31,16 +32,7 @@ public class CurrencyRepository implements BaseRepository<Currency> {
     }
 
     public boolean exists(Currency currency) {
-        String selectQuery = "SELECT"
-                + " *"
-                + " FROM " + ExpensesDbHelper.TABLE_CURRENCIES
-                + " WHERE " + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_ID + " = " + currency.getIndex()
-                + " AND " + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_NAME + " = '" + currency.getName() + "'"
-                + " AND " + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME + " = '" + currency.getShortName() + "'"
-                + " AND " + ExpensesDbHelper.TABLE_CURRENCIES + "." + ExpensesDbHelper.CURRENCIES_COL_SYMBOL + " = '" + currency.getSymbol() + "'"
-                + " LIMIT 1;";
-
-        Cursor c = mDatabase.rawQuery(selectQuery, null);
+        Cursor c = executeRaw(new CurrencyExistsQuery(currency));
 
         if (c.moveToFirst()) {
 
@@ -53,15 +45,7 @@ public class CurrencyRepository implements BaseRepository<Currency> {
     }
 
     public Currency get(long currencyId) throws CurrencyNotFoundException {
-        String selectQuery = "SELECT "
-                + ExpensesDbHelper.CURRENCIES_COL_ID + ", "
-                + ExpensesDbHelper.CURRENCIES_COL_NAME + ", "
-                + ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME + ", "
-                + ExpensesDbHelper.CURRENCIES_COL_SYMBOL
-                + " FROM " + ExpensesDbHelper.TABLE_CURRENCIES
-                + " WHERE " + ExpensesDbHelper.CURRENCIES_COL_ID + " = " + currencyId + ";";
-
-        Cursor c = mDatabase.rawQuery(selectQuery, null);
+        Cursor c = executeRaw(new GetCurrencyQuery(currencyId));
 
         if (!c.moveToFirst())
             throw new CurrencyNotFoundException(currencyId);
@@ -70,14 +54,7 @@ public class CurrencyRepository implements BaseRepository<Currency> {
     }
 
     public List<Currency> getAll() {
-        String selectQuery = "SELECT "
-                + ExpensesDbHelper.CURRENCIES_COL_ID + ", "
-                + ExpensesDbHelper.CURRENCIES_COL_NAME + ", "
-                + ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME + ", "
-                + ExpensesDbHelper.CURRENCIES_COL_SYMBOL
-                + " FROM " + ExpensesDbHelper.TABLE_CURRENCIES + ";";
-
-        Cursor c = mDatabase.rawQuery(selectQuery, null);
+        Cursor c = executeRaw(new GetAllCurrenciesQuery());
 
         ArrayList<Currency> currencies = new ArrayList<>();
         while (c.moveToNext())
@@ -131,5 +108,12 @@ public class CurrencyRepository implements BaseRepository<Currency> {
 
     public void closeDatabase() {
         DatabaseManager.getInstance().closeDatabase();
+    }
+
+    private Cursor executeRaw(QueryInterface query) {
+        return mDatabase.rawQuery(String.format(
+                query.sql(),
+                query.values()
+        ), null);
     }
 }
