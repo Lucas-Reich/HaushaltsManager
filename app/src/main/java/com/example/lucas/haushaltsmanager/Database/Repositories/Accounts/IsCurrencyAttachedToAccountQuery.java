@@ -1,9 +1,10 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.Accounts;
 
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
+import com.example.lucas.haushaltsmanager.Database.QueryInterface;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 
-class IsCurrencyAttachedToAccountQuery implements QueryInterface{
+class IsCurrencyAttachedToAccountQuery implements QueryInterface {
     private final Currency currency;
 
     public IsCurrencyAttachedToAccountQuery(Currency currency) {

@@ -1,6 +1,7 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.Accounts;
 
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
+import com.example.lucas.haushaltsmanager.Database.QueryInterface;
 
 class GetAllAccountsQuery implements QueryInterface {
     @Override

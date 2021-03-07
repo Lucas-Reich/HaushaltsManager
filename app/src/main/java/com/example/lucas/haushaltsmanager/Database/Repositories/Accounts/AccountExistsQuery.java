@@ -1,6 +1,7 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.Accounts;
 
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
+import com.example.lucas.haushaltsmanager.Database.QueryInterface;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 
 class AccountExistsQuery implements QueryInterface {
