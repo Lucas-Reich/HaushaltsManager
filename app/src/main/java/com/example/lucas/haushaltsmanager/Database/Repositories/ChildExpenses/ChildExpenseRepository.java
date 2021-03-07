@@ -46,8 +46,7 @@ public class ChildExpenseRepository implements ChildExpenseRepositoryInterface {
         );
         bookingTransformer = new BookingTransformer(
                 new CurrencyTransformer(),
-                new ChildCategoryTransformer(),
-                this
+                new ChildCategoryTransformer()
         );
     }
 

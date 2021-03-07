@@ -117,19 +117,22 @@ public class TabOneBookings extends AbstractTab implements
 
     @Override
     public void onFabClick() {
-//        if (noAccountExists()) {
-//            Toast.makeText(getContext(), getString(R.string.no_account), Toast.LENGTH_SHORT).show();
-//            // TODO: Open dialog which prompts the user to createExpenseItems an account
-//
-//            return;
-//        }
-//
-//        Intent createExpenseIntent = new Intent(getContext(), ExpenseScreen.class);
-//        createExpenseIntent.putExtra(ExpenseScreen.INTENT_MODE, ExpenseScreen.INTENT_MODE_CREATE_BOOKING);
-//        startActivity(createExpenseIntent);
+        if (noAccountExists()) {
+            Toast.makeText(getContext(), getString(R.string.no_account), Toast.LENGTH_SHORT).show();
+            // TODO: Open dialog which prompts the user to add an account
 
-        Intent intent = new Intent(getContext(), DragAndDropActivity.class);
-        startActivity(intent);
+            return;
+        }
+
+        Intent createExpenseIntent = new Intent(getContext(), ExpenseScreen.class);
+        createExpenseIntent.putExtra(ExpenseScreen.INTENT_MODE, ExpenseScreen.INTENT_MODE_CREATE_BOOKING);
+        startActivity(createExpenseIntent);
+    }
+
+    private boolean noAccountExists() {
+        UserSettingsPreferences userSettings = new UserSettingsPreferences(mParent);
+
+        return null == userSettings.getActiveAccount();
     }
 
     @Override

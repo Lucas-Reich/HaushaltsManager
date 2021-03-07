@@ -40,8 +40,7 @@ public class ExpenseRepository {
         mDatabase = DatabaseManager.getInstance().openDatabase();
         transformer = new BookingTransformer(
                 new CurrencyTransformer(),
-                new ChildCategoryTransformer(),
-                new ChildExpenseRepository(context)
+                new ChildCategoryTransformer()
         );
     }
 

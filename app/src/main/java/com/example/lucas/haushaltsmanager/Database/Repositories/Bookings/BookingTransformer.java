@@ -2,7 +2,9 @@ package com.example.lucas.haushaltsmanager.Database.Repositories.Bookings;
 
 import android.database.Cursor;
 
+import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepositoryInterface;
 import com.example.lucas.haushaltsmanager.Database.TransformerInterface;
 import com.example.lucas.haushaltsmanager.Entities.Category;
@@ -17,16 +19,13 @@ import java.util.List;
 public class BookingTransformer implements TransformerInterface<ExpenseObject> {
     private final TransformerInterface<Currency> currencyTransformer;
     private final TransformerInterface<Category> childCategoryTransformer;
-    private final ChildExpenseRepositoryInterface childExpenseRepository;
 
     public BookingTransformer(
             TransformerInterface<Currency> currencyTransformer,
-            TransformerInterface<Category> childCategoryTransformer,
-            ChildExpenseRepositoryInterface childExpenseRepository
+            TransformerInterface<Category> childCategoryTransformer
     ) {
         this.currencyTransformer = currencyTransformer;
         this.childCategoryTransformer = childCategoryTransformer;
-        this.childExpenseRepository = childExpenseRepository;
     }
 
     @Override
@@ -49,7 +48,7 @@ public class BookingTransformer implements TransformerInterface<ExpenseObject> {
 
         List<ExpenseObject> children = new ArrayList<>();
         if (expenseType.equals(ExpenseObject.EXPENSE_TYPES.PARENT_EXPENSE)) {
-            children = childExpenseRepository.getAll(expenseId);
+            children = new ChildExpenseRepository(app.getContext()).getAll(expenseId);
         }
 
         return new ExpenseObject(

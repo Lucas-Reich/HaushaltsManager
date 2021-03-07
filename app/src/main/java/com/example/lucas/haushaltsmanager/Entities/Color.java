@@ -23,13 +23,11 @@ public class Color extends android.graphics.Color implements Parcelable {
             return new Color[size];
         }
     };
-    static final String VALID_COLOR_PATTERN = "#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})";
+    static final String VALID_COLOR_PATTERN = "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$";
     private final String color;
 
     public Color(String color) {
-        if (!assertIsColorString(color)) {
-            throw new IllegalArgumentException(String.format("Could not create Color from: '%s'", color));
-        }
+        guardAgainstInvalidColorString(color);
 
         this.color = color;
     }
@@ -86,6 +84,14 @@ public class Color extends android.graphics.Color implements Parcelable {
     @ColorInt
     public int getColorInt() {
         return parseColor(color);
+    }
+
+    private void guardAgainstInvalidColorString(String colorString) {
+        if (assertIsColorString(colorString)) {
+            return;
+        }
+
+        throw new IllegalArgumentException(String.format("Could not create Color from: '%s'", colorString));
     }
 
     // TODO: Könnte getBrightness Funktion enthalten
