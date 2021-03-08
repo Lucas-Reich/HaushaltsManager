@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.codekidlabs.storagechooser.StorageChooser;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepositoryInterface;
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.SingleChoiceDialog;
 import com.example.lucas.haushaltsmanager.Entities.Backup;
@@ -56,7 +57,7 @@ public class Settings extends AbstractAppCompatActivity {
     private UserSettingsPreferences mUserSettings;
     private WeekdayUtils mWeekdayUtils;
     private AppInternalPreferences mInternalPreferences;
-    private CurrencyRepository mCurrencyRepo;
+    private CurrencyRepositoryInterface mCurrencyRepo;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

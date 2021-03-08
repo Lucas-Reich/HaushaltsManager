@@ -7,6 +7,7 @@ import com.example.lucas.haushaltsmanager.Activities.Settings;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepositoryInterface;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.Exceptions.CurrencyNotFoundException;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
@@ -27,7 +28,7 @@ public class UserSettingsPreferences {
     private final SharedPreferences mPreferences;
     private final Context mContext;
     private final AccountRepository mAccountRepo;
-    private final CurrencyRepository mCurrencyRepo;
+    private final CurrencyRepositoryInterface mCurrencyRepo;
 
     public UserSettingsPreferences(Context context) {
 

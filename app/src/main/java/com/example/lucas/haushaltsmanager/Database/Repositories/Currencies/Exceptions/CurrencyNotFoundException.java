@@ -6,8 +6,4 @@ public class CurrencyNotFoundException extends EntityNotExistingException {
     public CurrencyNotFoundException(long currencyId) {
         super("Could not find Currency with id " + currencyId + ".");
     }
-
-    public CurrencyNotFoundException(String currencyName) {
-        super("Could not find Currency with short name " + currencyName + ".");
-    }
 }

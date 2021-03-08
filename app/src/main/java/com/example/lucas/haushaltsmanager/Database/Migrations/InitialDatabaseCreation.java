@@ -81,6 +81,7 @@ final class InitialDatabaseCreation implements IMigration {
             + CURRENCIES_COL_SHORT_NAME + " TEXT NOT NULL"
             + ");";
 
+    @Deprecated
     private static final String CREATE_BOOKINGS_TAGS = "CREATE TABLE " + TABLE_BOOKINGS_TAGS
             + "("
             + BOOKINGS_TAGS_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -106,6 +107,7 @@ final class InitialDatabaseCreation implements IMigration {
             + CATEGORIES_COL_DEFAULT_EXPENSE_TYPE + " INTEGER NOT NULL"
             + ");";
 
+    @Deprecated
     private static final String CREATE_TAGS = "CREATE TABLE " + TABLE_TAGS
             + "("
             + TAGS_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -205,6 +207,7 @@ final class InitialDatabaseCreation implements IMigration {
      * @param db reference to editable mDatabase
      */
     private static void insertCurrencies(SQLiteDatabase db) {
+        Log.d(TAG, "Inserting default currencies");
         UserSettingsPreferences preferences = new UserSettingsPreferences(app.getContext());
 
         //details from: https://developers.google.com/public-data/docs/canonical/currencies_csv
@@ -265,6 +268,8 @@ final class InitialDatabaseCreation implements IMigration {
                 ));
             }
         }
+
+        Log.d(TAG, "Finished inserting categories");
     }
 
     /**
@@ -273,13 +278,14 @@ final class InitialDatabaseCreation implements IMigration {
      * @param db Datenbank
      */
     private static void insertHiddenCategories(SQLiteDatabase db) {
+        Log.d(TAG, "Started inserting hidden categories");
         // IMPROVEMENT: SystemKategorien sollten in einer XML Datei gespeichert sein, dann lassen sie sich auch einfacher übersetzen.
-        String defaultColor = String.format("#%s", Integer.toHexString(app.getContext().getResources().getColor(R.color.transfer_booking_color)));
+        Color color = new Color(app.getContext().getResources().getColor(R.color.transfer_booking_color));
 
         ArrayList<Category> categories = new ArrayList<>();
         categories.add(new Category(
                 app.getContext().getString(R.string.category_transfer),
-                new Color(defaultColor),
+                color,
                 ExpenseType.expense(),
                 new ArrayList<Category>()
         ));
@@ -296,5 +302,7 @@ final class InitialDatabaseCreation implements IMigration {
 
             db.insert(TABLE_CHILD_CATEGORIES, null, values);
         }
+
+        Log.d(TAG, "Finished inserting hidden categories");
     }
 }

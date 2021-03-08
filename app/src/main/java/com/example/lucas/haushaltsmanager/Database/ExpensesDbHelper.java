@@ -10,7 +10,7 @@ import com.example.lucas.haushaltsmanager.Database.Migrations.MigrationHelper;
 
 public class ExpensesDbHelper extends SQLiteOpenHelper {
     public static final String DB_NAME = "expenses.db";
-    public static final int DB_VERSION = 2;
+    public static final int DB_VERSION = 3;
     public static final int INVALID_INDEX = -1;
 
     //define table Template_Bookings
@@ -115,6 +115,11 @@ public class ExpensesDbHelper extends SQLiteOpenHelper {
 
     public ExpensesDbHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
+    }
+
+    @Override
+    public void onConfigure(SQLiteDatabase db) {
+        db.setForeignKeyConstraintsEnabled(true);
     }
 
     @Override
