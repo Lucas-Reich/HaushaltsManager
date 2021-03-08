@@ -63,11 +63,6 @@ public class CachedInsertAccountRepositoryDecorator implements AccountRepository
         repository.update(account);
     }
 
-    @Override
-    public boolean isCurrencyAttachedToAccount(Currency currency) {
-        return repository.isCurrencyAttachedToAccount(currency);
-    }
-
     @Nullable
     private Account getAccountFromList(Account account) {
         for (Account existingAccount : cachedAccounts) {

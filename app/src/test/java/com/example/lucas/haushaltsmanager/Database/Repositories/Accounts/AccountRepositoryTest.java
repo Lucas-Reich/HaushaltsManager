@@ -1,13 +1,8 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.Accounts;
 
-import android.database.CursorIndexOutOfBoundsException;
-import android.database.MatrixCursor;
-
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
-import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.CannotDeleteAccountException;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
@@ -34,7 +29,6 @@ public class AccountRepositoryTest {
     private AccountRepositoryInterface mAccountRepo;
 
     private ChildExpenseRepository mChildExpenseRepo;
-    private ExpenseRepository mBookingRepo;
 
     /**
      * Manager welcher die Datenbank verbindungen hält
@@ -46,9 +40,7 @@ public class AccountRepositoryTest {
         mAccountRepo = new AccountRepository(RuntimeEnvironment.application);
         mDatabaseManagerInstance = DatabaseManager.getInstance();
 
-
         mChildExpenseRepo = new ChildExpenseRepository(RuntimeEnvironment.application);
-        mBookingRepo = new ExpenseRepository(RuntimeEnvironment.application);
     }
 
     @After
@@ -133,8 +125,6 @@ public class AccountRepositoryTest {
     @Test
     public void testDeleteWithExistingAccountAttachedToParentExpenseShouldFailWithCannotDeleteAccountException() {
         Account account = mAccountRepo.insert(getSimpleAccount());
-
-        ExpenseObject parentExpense = mBookingRepo.insert(getSimpleExpense());
 
         try {
             mAccountRepo.delete(account);

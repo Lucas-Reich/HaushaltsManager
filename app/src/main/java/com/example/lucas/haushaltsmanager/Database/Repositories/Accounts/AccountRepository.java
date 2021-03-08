@@ -7,13 +7,12 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
+import com.example.lucas.haushaltsmanager.Database.QueryInterface;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.CannotDeleteAccountException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyTransformer;
-import com.example.lucas.haushaltsmanager.Database.QueryInterface;
 import com.example.lucas.haushaltsmanager.Database.TransformerInterface;
 import com.example.lucas.haushaltsmanager.Entities.Account;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -89,12 +88,6 @@ public class AccountRepository implements AccountRepositoryInterface {
         if (affectedRows == 0) {
             throw new AccountNotFoundException(account.getIndex());
         }
-    }
-
-    public boolean isCurrencyAttachedToAccount(Currency currency) {
-        Cursor c = executeRaw(new IsCurrencyAttachedToAccountQuery(currency));
-
-        return !isEmpty(c);
     }
 
     public void closeDatabase() {
