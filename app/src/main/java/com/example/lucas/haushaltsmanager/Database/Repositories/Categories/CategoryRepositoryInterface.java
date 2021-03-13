@@ -6,8 +6,6 @@ import com.example.lucas.haushaltsmanager.Entities.Category;
 import java.util.List;
 
 public interface CategoryRepositoryInterface {
-    boolean exists(Category category);
-
     List<Category> getAll();
 
     Category insert(Category category);

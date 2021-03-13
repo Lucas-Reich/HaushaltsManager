@@ -156,7 +156,7 @@ public class ChildCategoryRepositoryTest {
             boolean exists = categoryExistsInDb(visibleChildCategory, parentCategory.getIndex());
             assertFalse("Kind Kategorie wurde nicht gelöscht", exists);
 
-            exists = mCategoryRepo.exists(parentCategory);
+            exists = parentCategoryExistsInDb(parentCategory);
             assertTrue("Parent Category wurde auch gelöscht, obwohl es noch eine versteckte Kategorie mit ihr gibt", exists);
         } catch (ChildCategoryNotFoundException e) {
 
@@ -176,7 +176,7 @@ public class ChildCategoryRepositoryTest {
             mChildCategoryRepo.delete(childCategory);
 
             assertFalse("KindKategorie wurde nicht gelöscht", categoryExistsInDb(childCategory, parentCategory.getIndex()));
-            assertFalse("ParentCategory wurde nicht gelöscht", mCategoryRepo.exists(parentCategory));
+            assertFalse("ParentCategory wurde nicht gelöscht", parentCategoryExistsInDb(parentCategory));
 
         } catch (CannotDeleteChildCategoryException e) {
 
@@ -269,6 +269,18 @@ public class ChildCategoryRepositoryTest {
             assertEquals(String.format("Could not find Child Category with index %s.", childCategory.getIndex()), e.getMessage());
         }
 
+    }
+
+    private boolean parentCategoryExistsInDb(Category category) {
+        List<Category> parentCategories = mCategoryRepo.getAll();
+
+        for (Category parentCategory : parentCategories) {
+            if (parentCategory.getIndex() == category.getIndex()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private boolean categoryExistsInDb(Category category, long parentId) {

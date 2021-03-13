@@ -29,20 +29,6 @@ public class CategoryRepository implements CategoryRepositoryInterface {
         transformer = new CategoryTransformer(new ChildCategoryRepository(context));
     }
 
-    // TODO: This method is only used within tests
-    public boolean exists(Category category) {
-        Cursor c = executeRaw(new CategoryExistsQuery(category));
-
-        if (c.moveToFirst()) {
-
-            c.close();
-            return true;
-        }
-
-        c.close();
-        return false;
-    }
-
     public List<Category> getAll() {
         Cursor c = executeRaw(new GetAllCategoriesQuery());
 
@@ -76,6 +62,7 @@ public class CategoryRepository implements CategoryRepositoryInterface {
         );
 
         for (Category childCategory : category.getChildren()) {
+            // TODO: Do in TransactionRepository
             parentCategory.addChild(new ChildCategoryRepository(app.getContext()).insert(parentCategory, childCategory));
         }
 
@@ -90,8 +77,9 @@ public class CategoryRepository implements CategoryRepositoryInterface {
 
         int affectedRows = mDatabase.update(ExpensesDbHelper.TABLE_CATEGORIES, updatedCategory, ExpensesDbHelper.CATEGORIES_COL_ID + " = ?", new String[]{category.getIndex() + ""});
 
-        if (affectedRows == 0)
+        if (affectedRows == 0) {
             throw new CategoryNotFoundException(category.getIndex());
+        }
     }
 
     private Cursor executeRaw(QueryInterface query) {

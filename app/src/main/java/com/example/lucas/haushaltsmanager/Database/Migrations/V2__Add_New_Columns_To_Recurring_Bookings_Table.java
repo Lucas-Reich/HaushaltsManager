@@ -22,8 +22,8 @@ import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.TABLE
  * Columns CALENDAR_FIELD and AMOUNT will be added
  * Column FREQUENCY will be removed
  */
-final class Migration1 implements IMigration {
-    private static final String TAG = Migration1.class.getSimpleName();
+final class V2__Add_New_Columns_To_Recurring_Bookings_Table implements IMigration {
+    private static final String TAG = V2__Add_New_Columns_To_Recurring_Bookings_Table.class.getSimpleName();
 
     private static final String CREATE_RECURRING_BOOKINGS = "CREATE TABLE " + TABLE_RECURRING_BOOKINGS
             + "("

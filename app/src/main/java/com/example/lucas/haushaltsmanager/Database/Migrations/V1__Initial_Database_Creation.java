@@ -69,8 +69,8 @@ import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.TAGS_
 import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.TEMPLATE_COL_BOOKING_ID;
 import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.TEMPLATE_COL_ID;
 
-final class InitialDatabaseCreation implements IMigration {
-    private static final String TAG = InitialDatabaseCreation.class.getSimpleName();
+final class V1__Initial_Database_Creation implements IMigration {
+    private static final String TAG = V1__Initial_Database_Creation.class.getSimpleName();
 
     private static final String CREATE_CURRENCIES = "CREATE TABLE " + TABLE_CURRENCIES
             + "("
@@ -198,14 +198,8 @@ final class InitialDatabaseCreation implements IMigration {
     }
 
     public void revert(SQLiteDatabase db) {
-        // TODO: Was soll ich machen
     }
 
-    /**
-     * initialization of currency table
-     *
-     * @param db reference to editable mDatabase
-     */
     private static void insertCurrencies(SQLiteDatabase db) {
         Log.d(TAG, "Inserting default currencies");
         UserSettingsPreferences preferences = new UserSettingsPreferences(app.getContext());
@@ -272,14 +266,8 @@ final class InitialDatabaseCreation implements IMigration {
         Log.d(TAG, "Finished inserting categories");
     }
 
-    /**
-     * Initialisiere System Kategorien.
-     *
-     * @param db Datenbank
-     */
     private static void insertHiddenCategories(SQLiteDatabase db) {
         Log.d(TAG, "Started inserting hidden categories");
-        // IMPROVEMENT: SystemKategorien sollten in einer XML Datei gespeichert sein, dann lassen sie sich auch einfacher übersetzen.
         Color color = new Color(app.getContext().getResources().getColor(R.color.transfer_booking_color));
 
         ArrayList<Category> categories = new ArrayList<>();

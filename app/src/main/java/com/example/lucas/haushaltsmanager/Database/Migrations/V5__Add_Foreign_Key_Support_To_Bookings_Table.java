@@ -24,8 +24,8 @@ import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.TABLE
 import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.TABLE_CHILD_CATEGORIES;
 import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.TABLE_CURRENCIES;
 
-final class Migration3 implements IMigration {
-    private static final String TAG = Migration3.class.getSimpleName();
+final class V5__Add_Foreign_Key_Support_To_Bookings_Table implements IMigration {
+    private static final String TAG = V5__Add_Foreign_Key_Support_To_Bookings_Table.class.getSimpleName();
     private static final String TABLE_BOOKINGS_NEW = "BOOKINGS_new";
 
     private static final String CREATE_BOOKINGS_TABLE_FOREIGN_KEY = "CREATE TABLE " + TABLE_BOOKINGS_NEW

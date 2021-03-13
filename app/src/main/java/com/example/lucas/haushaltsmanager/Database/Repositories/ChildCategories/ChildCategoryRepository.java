@@ -87,11 +87,8 @@ public class ChildCategoryRepository implements ChildCategoryRepositoryInterface
 
             mDatabase.delete(ExpensesDbHelper.TABLE_CHILD_CATEGORIES, ExpensesDbHelper.CHILD_CATEGORIES_COL_ID + " = ?", new String[]{"" + category.getIndex()});
 
-            // TODO: Wenn der Parent nicht gelöscht werden konnte und eine Exception ausgelöst wurde,
-            //  ist an dieser Stelle die KindKategorie bereits gelöscht.
-            //  Man müsste beides also in einer Transaktion laufen lassen.
-
             if (!hasParentChildren(parentCategory)) {
+                // TODO: This should be moved into a TransactionRepository
                 deleteParentCategory(parentCategory);
             }
 
