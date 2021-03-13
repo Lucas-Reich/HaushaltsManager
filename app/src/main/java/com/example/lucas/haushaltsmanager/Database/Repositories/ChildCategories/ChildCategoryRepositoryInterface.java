@@ -7,8 +7,6 @@ import com.example.lucas.haushaltsmanager.Entities.Category;
 import java.util.List;
 
 public interface ChildCategoryRepositoryInterface {
-    boolean exists(Category childCategory);
-
     Category get(long childCategoryId) throws ChildCategoryNotFoundException;
 
     List<Category> getAll(long parentCategoryId);

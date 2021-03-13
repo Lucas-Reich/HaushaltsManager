@@ -20,11 +20,6 @@ public class CachedInsertChildCategoryRepositoryDecorator implements ChildCatego
     }
 
     @Override
-    public boolean exists(Category childCategory) {
-        return repository.exists(childCategory);
-    }
-
-    @Override
     public Category get(long childCategoryId) throws ChildCategoryNotFoundException {
         return repository.get(childCategoryId);
     }

@@ -5,7 +5,8 @@ public class MigrationHelper {
         return new IMigration[]{
                 new InitialDatabaseCreation(),
                 new Migration1(),
-                new Migration2()
+                new Migration2(),
+                new Migration3()
         };
     }
 }

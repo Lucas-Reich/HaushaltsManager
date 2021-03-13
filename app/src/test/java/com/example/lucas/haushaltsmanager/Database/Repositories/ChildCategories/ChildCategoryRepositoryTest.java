@@ -1,8 +1,5 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories;
 
-import android.database.CursorIndexOutOfBoundsException;
-import android.database.MatrixCursor;
-
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepository;
@@ -48,23 +45,6 @@ public class ChildCategoryRepositoryTest {
         mChildCategoryRepo = new ChildCategoryRepository(RuntimeEnvironment.application);
         mCategoryRepo = new CategoryRepository(RuntimeEnvironment.application);
         mBookingRepo = new ExpenseRepository(RuntimeEnvironment.application);
-    }
-
-    @Test
-    public void testExistsWithExistingChildCategoryShouldSucceed() {
-        Category parent = getCategoryWithChild();
-        Category childCategory = mChildCategoryRepo.insert(parent, parent.getChildren().get(0));
-
-        boolean exists = mChildCategoryRepo.exists(childCategory);
-        assertTrue("Die KindKategorie wurde nicht in der Datenbank gefunden", exists);
-    }
-
-    @Test
-    public void testExistsWithNotExistingChildCategoryShouldFail() {
-        Category notExistingChildCategory = getSimpleCategory();
-
-        boolean exists = mChildCategoryRepo.exists(notExistingChildCategory);
-        assertFalse("Die KindKategorie wurde in der Datenbank gefunden", exists);
     }
 
     @Test
@@ -139,11 +119,6 @@ public class ChildCategoryRepositoryTest {
     }
 
     @Test
-    public void testInsertWithInvalidInputShouldFail() {
-        // IMPROVEMENT: Was sollte passieren wenn eine KindKategorie nicht richtig initialisiert wurde, zb kein name
-    }
-
-    @Test
     public void testDeleteWithExistingChildCategoryShouldSucceed() {
         Category parentCategory = getCategoryWithChild();
         parentCategory.addChild(getSimpleCategory());
@@ -154,8 +129,8 @@ public class ChildCategoryRepositoryTest {
         try {
             mChildCategoryRepo.delete(childCategory1);
 
-            assertFalse("Kategorie 1 wurde nicht gelöscht", mChildCategoryRepo.exists(childCategory1));
-            assertTrue("Kategorie 2 wurde gelöscht", mChildCategoryRepo.exists(childCategory2));
+            assertFalse("Kategorie 1 wurde nicht gelöscht", categoryExistsInDb(childCategory1, parentCategory.getIndex()));
+            assertTrue("Kategorie 2 wurde gelöscht", categoryExistsInDb(childCategory2, parentCategory.getIndex()));
 
         } catch (CannotDeleteChildCategoryException e) {
 
@@ -178,7 +153,7 @@ public class ChildCategoryRepositoryTest {
             mChildCategoryRepo.hide(invisibleChildCategory);
             mChildCategoryRepo.delete(visibleChildCategory);
 
-            boolean exists = mChildCategoryRepo.exists(visibleChildCategory);
+            boolean exists = categoryExistsInDb(visibleChildCategory, parentCategory.getIndex());
             assertFalse("Kind Kategorie wurde nicht gelöscht", exists);
 
             exists = mCategoryRepo.exists(parentCategory);
@@ -200,7 +175,7 @@ public class ChildCategoryRepositoryTest {
         try {
             mChildCategoryRepo.delete(childCategory);
 
-            assertFalse("KindKategorie wurde nicht gelöscht", mChildCategoryRepo.exists(childCategory));
+            assertFalse("KindKategorie wurde nicht gelöscht", categoryExistsInDb(childCategory, parentCategory.getIndex()));
             assertFalse("ParentCategory wurde nicht gelöscht", mCategoryRepo.exists(parentCategory));
 
         } catch (CannotDeleteChildCategoryException e) {
@@ -223,7 +198,7 @@ public class ChildCategoryRepositoryTest {
 
         } catch (CannotDeleteChildCategoryException e) {
 
-            assertTrue("Kategorie konnte gelöscht werden", mChildCategoryRepo.exists(childCategory));
+            assertTrue("Kategorie konnte gelöscht werden", categoryExistsInDb(childCategory, parentCategory.getIndex()));
             assertEquals(String.format("Child category %s is attached to a ParentExpense and cannot be deleted.", childCategory.getTitle()), e.getMessage());
         }
     }
@@ -245,7 +220,7 @@ public class ChildCategoryRepositoryTest {
 
         } catch (CannotDeleteChildCategoryException e) {
 
-            assertTrue("Kategorie konnte gelöscht werden", mChildCategoryRepo.exists(childCategory));
+            assertTrue("Kategorie konnte gelöscht werden", categoryExistsInDb(childCategory, parentCategory.getIndex()));
             assertEquals(String.format("Child category %s is attached to a ChildExpense and cannot be deleted.", childCategory.getTitle()), e.getMessage());
         }
     }
@@ -294,6 +269,18 @@ public class ChildCategoryRepositoryTest {
             assertEquals(String.format("Could not find Child Category with index %s.", childCategory.getIndex()), e.getMessage());
         }
 
+    }
+
+    private boolean categoryExistsInDb(Category category, long parentId) {
+        List<Category> childCategories = mChildCategoryRepo.getAll(parentId);
+
+        for (Category foundCategory : childCategories) {
+            if (foundCategory.getIndex() == category.getIndex()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private Category getSimpleCategory() {

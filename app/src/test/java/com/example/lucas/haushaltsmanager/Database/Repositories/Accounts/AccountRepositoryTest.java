@@ -19,6 +19,8 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 
+import java.util.List;
+
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
@@ -48,22 +50,6 @@ public class AccountRepositoryTest {
 
         mAccountRepo.closeDatabase();
         mDatabaseManagerInstance.closeDatabase();
-    }
-
-    @Test
-    public void testExistsWithExistingAccountShouldSucceed() {
-        Account account = mAccountRepo.insert(getSimpleAccount());
-
-        boolean exists = mAccountRepo.exists(account);
-        assertTrue("Das Konto konnte nicht in der Datenbank gefunden werrden", exists);
-    }
-
-    @Test
-    public void testExistsWithNotExistingAccountShouldSucceed() {
-        Account account = getSimpleAccount();
-
-        boolean exists = mAccountRepo.exists(account);
-        assertFalse("Nicht existierendes Konto konnte in der Datenbank gefunden werden", exists);
     }
 
     @Test
@@ -114,7 +100,7 @@ public class AccountRepositoryTest {
 
         try {
             mAccountRepo.delete(account);
-            assertFalse("Konto wurde nicht gelöscht", mAccountRepo.exists(account));
+            assertFalse(accountExistsInDb(account));
 
         } catch (CannotDeleteAccountException e) {
 
@@ -132,7 +118,7 @@ public class AccountRepositoryTest {
 
         } catch (CannotDeleteAccountException e) {
 
-            assertTrue("Konto wurde gelöscht", mAccountRepo.exists(account));
+            assertTrue("Konto wurde gelöscht", accountExistsInDb(account));
             assertEquals(String.format("Account %s cannot be deleted.", account.getTitle()), e.getMessage());
         }
     }
@@ -152,7 +138,7 @@ public class AccountRepositoryTest {
 
         } catch (CannotDeleteAccountException e) {
 
-            assertTrue("Konto wurde gelöscht", mAccountRepo.exists(account));
+            assertTrue("Konto wurde gelöscht", accountExistsInDb(account));
             assertEquals(String.format("Account %s cannot be deleted.", account.getTitle()), e.getMessage());
         }
     }
@@ -163,7 +149,7 @@ public class AccountRepositoryTest {
 
         try {
             mAccountRepo.delete(account);
-            assertFalse("Konto wurde in der Datenbank gefunden", mAccountRepo.exists(account));
+            assertFalse(accountExistsInDb(account));
 
         } catch (CannotDeleteAccountException e) {
 
@@ -201,6 +187,18 @@ public class AccountRepositoryTest {
 
             assertEquals(String.format("Could not find Account with id %s.", account.getIndex()), e.getMessage());
         }
+    }
+
+    private boolean accountExistsInDb(Account account) {
+        List<Account> accounts = mAccountRepo.getAll();
+
+        for (Account account1 : accounts) {
+            if (account1.getIndex() == account.getIndex()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private Account getSimpleAccount() {

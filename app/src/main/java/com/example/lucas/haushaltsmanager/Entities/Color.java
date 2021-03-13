@@ -23,7 +23,7 @@ public class Color extends android.graphics.Color implements Parcelable {
             return new Color[size];
         }
     };
-    static final String VALID_COLOR_PATTERN = "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$";
+    static final String VALID_COLOR_PATTERN = "^#[0-9a-fA-F]{8}$|#[0-9a-fA-F]{6}$|#[0-9a-fA-F]{4}$|#[0-9a-fA-F]{3}$";
     private final String color;
 
     public Color(String color) {

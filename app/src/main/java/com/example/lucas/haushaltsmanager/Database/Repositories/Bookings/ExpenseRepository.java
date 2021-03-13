@@ -94,6 +94,7 @@ public class ExpenseRepository {
     }
 
     public ExpenseObject insert(ExpenseObject expense) {
+        // TODO: Method could fail with SQLException when referenced Account/Currency/Category is not existing
 
         ContentValues values = new ContentValues();
         values.put(ExpensesDbHelper.BOOKINGS_COL_EXPENSE_TYPE, expense.getExpenseType().name());
@@ -108,6 +109,7 @@ public class ExpenseRepository {
         values.put(ExpensesDbHelper.BOOKINGS_COL_HIDDEN, 0);
 
         try {
+            // TODO: Use Transaction to insert booking and update account balance
             if (expense.getExpenseType() != ExpenseObject.EXPENSE_TYPES.DUMMY_EXPENSE && expense.getExpenseType() != ExpenseObject.EXPENSE_TYPES.DATE_PLACEHOLDER && expense.getExpenseType() != ExpenseObject.EXPENSE_TYPES.PARENT_EXPENSE) {
                 updateAccountBalance(
                         expense.getAccountId(),
@@ -189,6 +191,7 @@ public class ExpenseRepository {
     }
 
     public void update(ExpenseObject expense) throws ExpenseNotFoundException {
+        // TODO: Method could fail with SQLException when referenced Account/Currency/Category is not existing
 
         ContentValues updatedExpense = new ContentValues();
         updatedExpense.put(ExpensesDbHelper.BOOKINGS_COL_EXPENSE_TYPE, expense.getExpenseType().name());
@@ -226,18 +229,19 @@ public class ExpenseRepository {
 
         int affectedRows = mDatabase.update(ExpensesDbHelper.TABLE_BOOKINGS, values, ExpensesDbHelper.BOOKINGS_COL_ID + " = ?", new String[]{"" + expense.getIndex()});
 
-        if (affectedRows == 0)
+        if (affectedRows == 0) {
             throw ExpenseNotFoundException.expenseNotFoundException(expense.getIndex());
+        }
 
         if (!expense.isParent()) {
+            // TODO: Use Transaction to update booking and update account balance
             try {
                 updateAccountBalance(
                         expense.getAccountId(),
                         -expense.getSignedPrice()
                 );
             } catch (AccountNotFoundException e) {
-
-                // TODO: Die gesamte Transaktion muss zurückgenommen werden und eine CannotDeleteExpenseException muss ausgelösct werden
+                // Do nothing
             }
         }
     }

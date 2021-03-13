@@ -1,10 +1,6 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.Categories;
 
-import android.database.CursorIndexOutOfBoundsException;
-import android.database.MatrixCursor;
-
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
-import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.Exceptions.CategoryNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepository;
 import com.example.lucas.haushaltsmanager.Entities.Category;
@@ -24,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 
 @RunWith(RobolectricTestRunner.class)
@@ -61,7 +56,7 @@ public class CategoryRepositoryTest {
         Category fetchedCategory = getCategoryWithId(expectedCategory.getIndex());
 
         assertEquals(expectedCategory, fetchedCategory);
-        assertTrue("Kind der Kategorie wurde nicht gefunden", mChildCategoryRepo.exists(expectedCategory.getChildren().get(0)));
+        assertTrue("Kind der Kategorie wurde nicht gefunden", childCategoryExistsInDb(expectedCategory.getChildren().get(0), expectedCategory.getIndex()));
     }
 
     @Test
@@ -93,6 +88,18 @@ public class CategoryRepositoryTest {
 
             assertEquals(String.format("Could not find Category with index %s.", category.getIndex()), e.getMessage());
         }
+    }
+
+    private boolean childCategoryExistsInDb(Category childCategory, long parentId) {
+        List<Category> childCategories = mChildCategoryRepo.getAll(parentId);
+
+        for (Category foundCategory : childCategories) {
+            if (foundCategory.getIndex() == childCategory.getIndex()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private Category getSimpleCategory() {

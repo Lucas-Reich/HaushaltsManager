@@ -5,6 +5,6 @@ import com.example.lucas.haushaltsmanager.Entities.Category;
 
 public class CannotDeleteCategoryException extends CouldNotDeleteEntityException {
     public CannotDeleteCategoryException(Category category) {
-        super("Category " + category.getTitle() + " cannot be deleted.");
+        super("Category " + category.getTitle() + " cannot be deleted.", null);
     }
 }

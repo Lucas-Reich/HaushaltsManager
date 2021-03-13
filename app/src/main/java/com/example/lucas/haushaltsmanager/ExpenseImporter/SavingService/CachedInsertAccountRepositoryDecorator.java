@@ -49,11 +49,6 @@ public class CachedInsertAccountRepositoryDecorator implements AccountRepository
     }
 
     @Override
-    public boolean exists(Account account) {
-        return repository.exists(account);
-    }
-
-    @Override
     public void closeDatabase() {
         repository.closeDatabase();
     }

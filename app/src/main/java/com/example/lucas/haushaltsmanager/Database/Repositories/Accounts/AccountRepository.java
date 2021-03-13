@@ -3,6 +3,7 @@ package com.example.lucas.haushaltsmanager.Database.Repositories.Accounts;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
@@ -26,13 +27,6 @@ public class AccountRepository implements AccountRepositoryInterface {
 
         mDatabase = DatabaseManager.getInstance().openDatabase();
         transformer = new AccountTransformer(new CurrencyTransformer());
-    }
-
-    // TODO: This method is only used in testing
-    public boolean exists(Account account) {
-        Cursor c = executeRaw(new AccountExistsQuery(account));
-
-        return isEmpty(c);
     }
 
     public Account get(long accountId) throws AccountNotFoundException {
@@ -71,10 +65,15 @@ public class AccountRepository implements AccountRepositoryInterface {
     }
 
     public void delete(Account account) throws CannotDeleteAccountException {
-        if (hasBookingsAttached(account))
-            throw new CannotDeleteAccountException(account);
-
-        mDatabase.delete(ExpensesDbHelper.TABLE_ACCOUNTS, ExpensesDbHelper.ACCOUNTS_COL_ID + " = ?", new String[]{"" + account.getIndex()});
+        try {
+            mDatabase.delete(
+                    ExpensesDbHelper.TABLE_ACCOUNTS,
+                    ExpensesDbHelper.ACCOUNTS_COL_ID + " = ?",
+                    new String[]{"" + account.getIndex()}
+            );
+        } catch (SQLException e) {
+            throw new CannotDeleteAccountException(account, e);
+        }
     }
 
     public void update(Account account) throws AccountNotFoundException {
@@ -95,24 +94,10 @@ public class AccountRepository implements AccountRepositoryInterface {
         DatabaseManager.getInstance().closeDatabase();
     }
 
-    private boolean hasBookingsAttached(Account account) {
-        Cursor c = executeRaw(new HasAccountBookingsAttachedQuery(account));
-
-        return !isEmpty(c);
-    }
-
     private Cursor executeRaw(QueryInterface query) {
         return mDatabase.rawQuery(String.format(
                 query.sql(),
                 query.values()
         ), null);
     }
-
-    private boolean isEmpty(Cursor c) {
-        int resultCount = c.getCount();
-        c.close();
-
-        return resultCount == 0;
-    }
-
 }

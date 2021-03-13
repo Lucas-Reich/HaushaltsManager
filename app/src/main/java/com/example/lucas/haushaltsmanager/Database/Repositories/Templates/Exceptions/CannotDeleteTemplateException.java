@@ -5,6 +5,6 @@ import com.example.lucas.haushaltsmanager.Entities.Template;
 
 public class CannotDeleteTemplateException extends CouldNotDeleteEntityException {
     public CannotDeleteTemplateException(Template template) {
-        super("Template " + template.getTemplate().getTitle() + " cannot be deleted.");
+        super("Template " + template.getTemplate().getTitle() + " cannot be deleted.", null);
     }
 }

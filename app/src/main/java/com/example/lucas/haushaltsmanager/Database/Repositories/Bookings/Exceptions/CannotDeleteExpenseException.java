@@ -5,7 +5,7 @@ import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 
 public class CannotDeleteExpenseException extends CouldNotDeleteEntityException {
     private CannotDeleteExpenseException(String message) {
-        super(message);
+        super(message, null);
     }
 
     public static CannotDeleteExpenseException BookingAttachedToChildException(ExpenseObject expense) {

@@ -13,7 +13,6 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.lucas.haushaltsmanager.Activities.DragAndDropActivity;
 import com.example.lucas.haushaltsmanager.Activities.ExpenseScreen;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ParentExpenseObject;
@@ -129,12 +128,6 @@ public class TabOneBookings extends AbstractTab implements
         startActivity(createExpenseIntent);
     }
 
-    private boolean noAccountExists() {
-        UserSettingsPreferences userSettings = new UserSettingsPreferences(mParent);
-
-        return null == userSettings.getActiveAccount();
-    }
-
     @Override
     public void onFABMenuItemClick(IMenuItem actionHandler) {
         ActionPayload actionPayload = new ActionPayload();
@@ -213,6 +206,12 @@ public class TabOneBookings extends AbstractTab implements
         mAdapter.selectItem(item, position);
 
         updateFABToolbar();
+    }
+
+    private boolean noAccountExists() {
+        UserSettingsPreferences userSettings = new UserSettingsPreferences(mParent);
+
+        return null == userSettings.getActiveAccount();
     }
 
     private List<IRecyclerItem> loadData(int offset) {

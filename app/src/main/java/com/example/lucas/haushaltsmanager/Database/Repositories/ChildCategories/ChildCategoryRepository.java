@@ -3,6 +3,7 @@ package com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
@@ -29,19 +30,6 @@ public class ChildCategoryRepository implements ChildCategoryRepositoryInterface
         mDatabase = DatabaseManager.getInstance().openDatabase();
         transformer = new ChildCategoryTransformer();
         categoryTransformer = new CategoryTransformer(this);
-    }
-
-    public boolean exists(Category category) {
-        Cursor c = executeRaw(new ChildCategoryExistsQuery(category));
-
-        if (c.moveToFirst()) {
-
-            c.close();
-            return true;
-        }
-
-        c.close();
-        return false;
     }
 
     public Category get(long categoryId) throws ChildCategoryNotFoundException {
@@ -94,13 +82,6 @@ public class ChildCategoryRepository implements ChildCategoryRepositoryInterface
     }
 
     public void delete(Category category) throws CannotDeleteChildCategoryException {
-
-        if (isAttachedToParentBooking(category))
-            throw CannotDeleteChildCategoryException.childCategoryAttachedToParentExpenseException(category);
-
-        if (isAttachedToChildBooking(category))
-            throw CannotDeleteChildCategoryException.childCategoryAttachedToChildExpenseException(category);
-
         try {
             Category parentCategory = getParent(category);
 
@@ -116,6 +97,8 @@ public class ChildCategoryRepository implements ChildCategoryRepositoryInterface
 
         } catch (CategoryNotFoundException e) {
             throw CannotDeleteChildCategoryException.childCategoryParentNotFoundException(category);
+        } catch (SQLException e) {
+            throw new CannotDeleteChildCategoryException("Failed to delete ChildCategory", e);
         }
     }
 
@@ -128,8 +111,9 @@ public class ChildCategoryRepository implements ChildCategoryRepositoryInterface
 
         int affectedRows = mDatabase.update(ExpensesDbHelper.TABLE_CHILD_CATEGORIES, updatedCategory, ExpensesDbHelper.CHILD_CATEGORIES_COL_ID + " = ?", new String[]{"" + category.getIndex()});
 
-        if (affectedRows == 0)
+        if (affectedRows == 0) {
             throw new ChildCategoryNotFoundException(category.getIndex());
+        }
     }
 
     public void hide(Category category) throws ChildCategoryNotFoundException {
@@ -161,32 +145,6 @@ public class ChildCategoryRepository implements ChildCategoryRepositoryInterface
 
         c.close();
         return category;
-    }
-
-    private boolean isAttachedToParentBooking(Category category) {
-        Cursor c = executeRaw(new IsAttachedToParentBookingQuery(category));
-
-        if (c.moveToFirst()) {
-
-            c.close();
-            return true;
-        }
-
-        c.close();
-        return false;
-    }
-
-    private boolean isAttachedToChildBooking(Category category) {
-        Cursor c = executeRaw(new IsAttachedToChildBookingQuery(category));
-
-        if (c.moveToFirst()) {
-
-            c.close();
-            return true;
-        }
-
-        c.close();
-        return false;
     }
 
     private boolean hasParentChildren(Category parentCategory) {

@@ -15,7 +15,7 @@ import static com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper.TABLE
  * This migration will create a new Accounts table.
  * The new Accounts table will have a new foreign key constraint to the Currencies table.
  */
-class Migration2 implements IMigration {
+final class Migration2 implements IMigration {
     private static final String TAG = Migration2.class.getSimpleName();
 
     private static final String TABLE_ACCOUNTS_NEW = "ACCOUNTS_new";

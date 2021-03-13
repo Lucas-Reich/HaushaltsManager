@@ -5,19 +5,16 @@ import com.example.lucas.haushaltsmanager.Entities.Category;
 
 public class CannotDeleteChildCategoryException extends CouldNotDeleteEntityException {
 
-    private CannotDeleteChildCategoryException(String message) {
-        super(message);
-    }
-
-    public static CannotDeleteChildCategoryException childCategoryAttachedToParentExpenseException(Category category) {
-        return new CannotDeleteChildCategoryException("Child category " + category.getTitle() + " is attached to a ParentExpense and cannot be deleted.");
-    }
-
-    public static CannotDeleteChildCategoryException childCategoryAttachedToChildExpenseException(Category category) {
-        return new CannotDeleteChildCategoryException("Child category " + category.getTitle() + " is attached to a ChildExpense and cannot be deleted.");
+    public CannotDeleteChildCategoryException(String message, Throwable previous) {
+        super(message, previous);
     }
 
     public static CannotDeleteChildCategoryException childCategoryParentNotFoundException(Category category) {
-        return new CannotDeleteChildCategoryException("Parent of the Child category " + category.getTitle() + " was not found.");
+        String message = String.format(
+                "Parent of the Child category %s was not found.",
+                category.getTitle()
+        );
+
+        return new CannotDeleteChildCategoryException(message, null);
     }
 }
