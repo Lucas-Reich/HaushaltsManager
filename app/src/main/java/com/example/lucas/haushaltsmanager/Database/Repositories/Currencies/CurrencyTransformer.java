@@ -14,9 +14,6 @@ public class CurrencyTransformer implements TransformerInterface<Currency> {
         String currencyShortName = c.getString(c.getColumnIndex(ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME));
         String currencySymbol = c.getString(c.getColumnIndex(ExpensesDbHelper.CURRENCIES_COL_SYMBOL));
 
-        if (c.isLast())
-            c.close();
-
         return new Currency(
                 currencyId,
                 currencyName,

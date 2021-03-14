@@ -364,56 +364,6 @@ public class ExpenseRepositoryTest {
     }
 
     @Test
-    public void testAssertSavableExpenseWithSavableExpenseShouldSucceed() {
-        ExpenseObject savableExpense = getSimpleExpense();
-
-        savableExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.PARENT_EXPENSE);
-        mBookingRepo.assertSavableExpense(savableExpense);
-
-        savableExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE);
-        mBookingRepo.assertSavableExpense(savableExpense);
-
-        savableExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.CHILD_EXPENSE);
-        mBookingRepo.assertSavableExpense(savableExpense);
-
-    }
-
-    @Test
-    public void testAssertSavableExpenseWithNotSavableExpenseShouldThrowUnsupportedOperationException() {
-        ExpenseObject savableExpense = getSimpleExpense();
-
-        savableExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.DATE_PLACEHOLDER);
-        try {
-            mBookingRepo.assertSavableExpense(savableExpense);
-            Assert.fail("Konnte nicht speicherbare Buchung speichern");
-
-        } catch (UnsupportedOperationException e) {
-
-            assertEquals("Booking type cannot be saved.", e.getMessage());
-        }
-
-        savableExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.TRANSFER_EXPENSE);
-        try {
-            mBookingRepo.assertSavableExpense(savableExpense);
-            Assert.fail("Konnte nicht speicherbare Buchung speichern");
-
-        } catch (UnsupportedOperationException e) {
-
-            assertEquals("Booking type cannot be saved.", e.getMessage());
-        }
-
-        savableExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.DUMMY_EXPENSE);
-        try {
-            mBookingRepo.assertSavableExpense(savableExpense);
-            Assert.fail("Konnte nicht speicherbare Buchung speichern");
-
-        } catch (UnsupportedOperationException e) {
-
-            assertEquals("Booking type cannot be saved.", e.getMessage());
-        }
-    }
-
-    @Test
     public void testHideWithValidExpenseShouldSucceed() {
         ExpenseObject expense = mBookingRepo.insert(getSimpleExpense());
 

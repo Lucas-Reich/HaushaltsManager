@@ -72,11 +72,6 @@ final class V2__Add_New_Columns_To_Recurring_Bookings_Table implements IMigratio
         deleteTempRecurringBookingTable(db);
     }
 
-    @Override
-    public void revert(SQLiteDatabase db) {
-        // Revert changes from this migration
-    }
-
     private void renameRecurringBookingsTable(SQLiteDatabase db) {
         Log.d(TAG, "Rename RecurringBookings table");
         db.execSQL(RENAME_RECURRING_BOOKINGS_TABLE_TO_TEMP);

@@ -33,16 +33,20 @@ public class CurrencyRepository implements CurrencyRepositoryInterface {
             throw new CurrencyNotFoundException(currencyId);
         }
 
-        return transformer.transform(c);
+        Currency currency = transformer.transform(c);
+        c.close();
+        return currency;
     }
 
     public List<Currency> getAll() {
         Cursor c = executeRaw(new GetAllCurrenciesQuery());
 
         ArrayList<Currency> currencies = new ArrayList<>();
-        while (c.moveToNext())
+        while (c.moveToNext()) {
             currencies.add(transformer.transform(c));
+        }
 
+        c.close();
         return currencies;
     }
 

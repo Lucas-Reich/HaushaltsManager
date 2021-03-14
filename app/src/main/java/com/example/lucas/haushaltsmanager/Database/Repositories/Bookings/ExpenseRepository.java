@@ -19,7 +19,6 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Ch
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.CannotDeleteChildExpenseException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyTransformer;
 import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.RecurringBookingRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Templates.TemplateRepository;
 import com.example.lucas.haushaltsmanager.Database.TransformerInterface;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
@@ -146,7 +145,7 @@ public class ExpenseRepository {
 
     public void delete(ExpenseObject expense) throws CannotDeleteExpenseException {
 
-        if (isRecurringBooking(expense) || isTemplateBooking(expense)) {
+        if (isRecurringBooking(expense)) {
 
             try {
 
@@ -259,26 +258,8 @@ public class ExpenseRepository {
         return isHidden;
     }
 
-    public boolean isTemplateBooking(ExpenseObject expense) {
-        return new TemplateRepository(app.getContext()).existsWithoutIndex(expense);// IMPROVEMENT: Das TemplateRepository sollte injected werden.
-    }
-
     public boolean isRecurringBooking(ExpenseObject expense) {
         return new RecurringBookingRepository(app.getContext()).exists(expense);// IMPROVEMENT: Das RecurringBookingRepository sollte injected werden.
-    }
-
-    @Deprecated
-    public void assertSavableExpense(ExpenseObject expense) {
-        switch (expense.getExpenseType()) {
-            case PARENT_EXPENSE:
-            case NORMAL_EXPENSE:
-            case CHILD_EXPENSE:
-                break;
-            case DATE_PLACEHOLDER:
-            case TRANSFER_EXPENSE:
-            case DUMMY_EXPENSE:
-                throw new UnsupportedOperationException("Booking type cannot be saved.");
-        }
     }
 
     private Cursor executeRaw(QueryInterface query) {

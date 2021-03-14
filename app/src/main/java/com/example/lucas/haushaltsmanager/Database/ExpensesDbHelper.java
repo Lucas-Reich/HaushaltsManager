@@ -4,13 +4,12 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.Migrations.IMigration;
 import com.example.lucas.haushaltsmanager.Database.Migrations.MigrationHelper;
 
 public class ExpensesDbHelper extends SQLiteOpenHelper {
     public static final String DB_NAME = "expenses.db";
-    public static final int DB_VERSION = 5;
+    public static final int DB_VERSION = 6;
     public static final int INVALID_INDEX = -1;
 
     //define table Template_Bookings
@@ -108,11 +107,6 @@ public class ExpensesDbHelper extends SQLiteOpenHelper {
     public static final String CURRENCIES_COL_NAME = "cur_name";
     public static final String CURRENCIES_COL_SHORT_NAME = "short_name";
 
-
-    public ExpensesDbHelper() {
-        super(app.getContext(), DB_NAME, null, DB_VERSION);
-    }
-
     public ExpensesDbHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
     }
@@ -137,15 +131,6 @@ public class ExpensesDbHelper extends SQLiteOpenHelper {
 
         for (int i = oldVersion; i < newVersion; i++) {
             migrations[i].apply(db);
-        }
-    }
-
-    @Override
-    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        IMigration[] migrations = MigrationHelper.getMigrations();
-
-        for (int i = oldVersion; i > newVersion; i--) {
-            migrations[i - 1].revert(db);
         }
     }
 }

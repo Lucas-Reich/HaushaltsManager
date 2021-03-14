@@ -246,7 +246,7 @@ public class ChildExpenseRepository implements ChildExpenseRepositoryInterface {
 
     public void delete(ExpenseObject childExpense) throws CannotDeleteChildExpenseException {
 
-        if (!isParentRecurringOrTemplate(childExpense)) {
+        if (!isParentRecurring(childExpense)) {
             try {
                 hide(childExpense);
             } catch (ChildExpenseNotFoundException e) {
@@ -351,12 +351,11 @@ public class ChildExpenseRepository implements ChildExpenseRepositoryInterface {
         ), null);
     }
 
-    private boolean isParentRecurringOrTemplate(ExpenseObject expense) {
+    private boolean isParentRecurring(ExpenseObject expense) {
         try {
             ExpenseObject parentExpense = getParent(expense);
 
-            return !mBookingRepo.isRecurringBooking(parentExpense)
-                    || !mBookingRepo.isTemplateBooking(parentExpense);
+            return !mBookingRepo.isRecurringBooking(parentExpense);
         } catch (Exception e) {
             return false;
         }

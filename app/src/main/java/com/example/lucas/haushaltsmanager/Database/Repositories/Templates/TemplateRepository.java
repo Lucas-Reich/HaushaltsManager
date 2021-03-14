@@ -7,9 +7,11 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
+import com.example.lucas.haushaltsmanager.Database.Migrations.TemplateBookingsTable;
 import com.example.lucas.haushaltsmanager.Database.QueryInterface;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryTransformer;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyTransformer;
+import com.example.lucas.haushaltsmanager.Database.TransformerInterface;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Template;
 
@@ -18,46 +20,25 @@ import java.util.List;
 
 public class TemplateRepository {
     private SQLiteDatabase mDatabase;
-    private ExpenseRepository mBookingRepo;
+    private final TransformerInterface<Template> transformer;
 
     public TemplateRepository(Context context) {
         DatabaseManager.initializeInstance(new ExpensesDbHelper(context));
 
         mDatabase = DatabaseManager.getInstance().openDatabase();
-        mBookingRepo = new ExpenseRepository(context);
-    }
-
-    public boolean existsWithoutIndex(ExpenseObject expense) {
-        Cursor c = executeRaw(new TemplateBookingExistsQuery(expense));
-
-        if (c.moveToFirst()) {
-
-            c.close();
-            return true;
-        }
-
-        c.close();
-        return false;
+        transformer = new TemplateTransformer(
+                new CurrencyTransformer(),
+                new ChildCategoryTransformer()
+        );
     }
 
     public List<Template> getAll() {
         Cursor c = executeRaw(new GetAllTemplateBookingsQuery());
-
         c.moveToFirst();
+
         ArrayList<Template> templateBookings = new ArrayList<>();
         while (!c.isAfterLast()) {
-            long templateId = c.getLong(c.getColumnIndex(ExpensesDbHelper.TEMPLATE_COL_ID));
-            long expenseId = c.getLong(c.getColumnIndex(ExpensesDbHelper.TEMPLATE_COL_BOOKING_ID));
-
-            try {
-
-                templateBookings.add(new Template(expenseId, mBookingRepo.get(expenseId)));
-            } catch (ExpenseNotFoundException e) {
-
-                //Kann die Buchung zu einem Template nicht mehr gefunden werden wird das Template aus der Datenbank gelöscht.
-                mDatabase.delete(ExpensesDbHelper.TABLE_TEMPLATE_BOOKINGS, ExpensesDbHelper.TEMPLATE_COL_ID + " = ?", new String[]{"" + templateId});
-            }
-
+            templateBookings.add(transformer.transform(c));
             c.moveToNext();
         }
 
@@ -66,19 +47,27 @@ public class TemplateRepository {
     }
 
     public Template insert(Template template) {
-
-        // TODO: Ich sollte überprüfen ob es die Buchung template.getTemplate() auch wirklich in der Buchungs Tabelle gibt
-
-        mBookingRepo.assertSavableExpense(template.getTemplate());
+        ExpenseObject expense = template.getTemplate();
 
         ContentValues values = new ContentValues();
-        values.put(ExpensesDbHelper.TEMPLATE_COL_BOOKING_ID, template.getTemplate().getIndex());
+        values.put(TemplateBookingsTable.TB_EXPENSE_TYPE, expense.getExpenseType().name());
+        values.put(TemplateBookingsTable.TB_PRICE, expense.getUnsignedPrice());
+        values.put(TemplateBookingsTable.TB_CATEGORY_ID, expense.getCategory().getIndex());
+        values.put(TemplateBookingsTable.TB_EXPENDITURE, expense.isExpenditure());
+        values.put(TemplateBookingsTable.TB_TITLE, expense.getTitle());
+        values.put(TemplateBookingsTable.TB_DATE, expense.getDate().getTimeInMillis());
+        values.put(TemplateBookingsTable.TB_ACCOUNT_ID, expense.getAccountId());
+        values.put(TemplateBookingsTable.TB_CURRENCY_ID, expense.getCurrency().getIndex());
 
-        long insertedTemplateId = mDatabase.insert(ExpensesDbHelper.TABLE_TEMPLATE_BOOKINGS, null, values);
+        long insertedTemplateId = mDatabase.insert(
+                TemplateBookingsTable.TB_TABLE,
+                null,
+                values
+        );
 
         return new Template(
                 insertedTemplateId,
-                template.getTemplate()
+                expense
         );
     }
 

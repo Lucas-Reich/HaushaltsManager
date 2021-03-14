@@ -197,9 +197,6 @@ final class V1__Initial_Database_Creation implements IMigration {
         }
     }
 
-    public void revert(SQLiteDatabase db) {
-    }
-
     private static void insertCurrencies(SQLiteDatabase db) {
         Log.d(TAG, "Inserting default currencies");
         UserSettingsPreferences preferences = new UserSettingsPreferences(app.getContext());

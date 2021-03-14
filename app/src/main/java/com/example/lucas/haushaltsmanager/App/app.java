@@ -4,7 +4,6 @@ import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.os.Build;
 
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
@@ -12,8 +11,8 @@ import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.R;
 
 public class app extends Application {
-    private static Context context;
     private static final String CHANNEL_ID = "reminder";
+    private static Context context;
 
     public static Context getContext() {
         return context;
@@ -56,6 +55,6 @@ public class app extends Application {
     }
 
     private void initializeDatabase() {
-        DatabaseManager.initializeInstance(new ExpensesDbHelper());
+        DatabaseManager.initializeInstance(new ExpensesDbHelper(context));
     }
 }

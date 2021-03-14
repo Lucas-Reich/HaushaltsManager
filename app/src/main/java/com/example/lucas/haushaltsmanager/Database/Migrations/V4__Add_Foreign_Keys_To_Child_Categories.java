@@ -39,11 +39,6 @@ final class V4__Add_Foreign_Keys_To_Child_Categories implements IMigration {
         renameNewChildCategoriesTable(db);
     }
 
-    @Override
-    public void revert(SQLiteDatabase db) {
-        // Do nothing
-    }
-
     private void createChildCategoryTableWithForeignKeys(SQLiteDatabase db) {
         Log.d(TAG, "Creating new ChildCategories table with foreign key support");
         db.execSQL(CREATE_CHILD_CATEGORIES_TABLE_FOREIGN_KEY);

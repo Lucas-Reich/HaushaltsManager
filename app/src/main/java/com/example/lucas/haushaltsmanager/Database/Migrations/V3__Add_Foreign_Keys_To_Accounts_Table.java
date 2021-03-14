@@ -41,11 +41,6 @@ final class V3__Add_Foreign_Keys_To_Accounts_Table implements IMigration {
         renameNewAccountsTable(db);
     }
 
-    @Override
-    public void revert(SQLiteDatabase db) {
-        // Revert changes from this migration
-    }
-
     private void createAccountsTableWithForeignKey(SQLiteDatabase db) {
         Log.d(TAG, "Creating new Accounts table with foreign key support");
         db.execSQL(CREATE_ACCOUNTS_TABLE_FOREIGN_KEY);

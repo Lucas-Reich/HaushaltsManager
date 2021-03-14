@@ -59,11 +59,6 @@ final class V5__Add_Foreign_Key_Support_To_Bookings_Table implements IMigration 
         renameNewBookingsTable(db);
     }
 
-    @Override
-    public void revert(SQLiteDatabase db) {
-        // Revert changes from this migration
-    }
-
     private void createBookingsTableWithForeignKeys(SQLiteDatabase db) {
         Log.d(TAG, "Creating new Bookings table with foreign key support");
         db.execSQL(CREATE_BOOKINGS_TABLE_FOREIGN_KEY);
