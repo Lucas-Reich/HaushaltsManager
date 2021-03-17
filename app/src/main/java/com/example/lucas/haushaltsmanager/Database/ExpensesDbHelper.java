@@ -9,7 +9,7 @@ import com.example.lucas.haushaltsmanager.Database.Migrations.MigrationHelper;
 
 public class ExpensesDbHelper extends SQLiteOpenHelper {
     public static final String DB_NAME = "expenses.db";
-    public static final int DB_VERSION = 6;
+    public static final int DB_VERSION = 7;
     public static final int INVALID_INDEX = -1;
 
     //define table Template_Bookings

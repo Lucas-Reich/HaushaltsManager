@@ -245,17 +245,6 @@ public class ChildExpenseRepository implements ChildExpenseRepositoryInterface {
     }
 
     public void delete(ExpenseObject childExpense) throws CannotDeleteChildExpenseException {
-
-        if (!isParentRecurring(childExpense)) {
-            try {
-                hide(childExpense);
-            } catch (ChildExpenseNotFoundException e) {
-
-                // TODO Was soll passieren, wenn das Kind nicht gefunden wurde?
-            }
-            return;
-        }
-
         if (isLastChildOfParent(childExpense)) {
             try {
                 ExpenseObject parentExpense = getParent(childExpense);
@@ -349,16 +338,6 @@ public class ChildExpenseRepository implements ChildExpenseRepositoryInterface {
                 query.sql(),
                 query.values()
         ), null);
-    }
-
-    private boolean isParentRecurring(ExpenseObject expense) {
-        try {
-            ExpenseObject parentExpense = getParent(expense);
-
-            return !mBookingRepo.isRecurringBooking(parentExpense);
-        } catch (Exception e) {
-            return false;
-        }
     }
 
     private boolean isLastChildOfParent(ExpenseObject childExpense) {

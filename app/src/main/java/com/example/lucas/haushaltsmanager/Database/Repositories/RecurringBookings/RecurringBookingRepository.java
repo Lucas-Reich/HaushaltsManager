@@ -8,7 +8,8 @@ import android.database.sqlite.SQLiteDatabase;
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.QueryInterface;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryTransformer;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyTransformer;
 import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.Exceptions.RecurringBookingNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.TransformerInterface;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
@@ -27,46 +28,30 @@ public class RecurringBookingRepository {
 
         mDatabase = DatabaseManager.getInstance().openDatabase();
         transformer = new RecurringBookingTransformer(
-                new ExpenseRepository(context)
+                new CurrencyTransformer(),
+                new ChildCategoryTransformer()
         );
     }
 
-    // TODO: This method is only used within tests
-    public boolean exists(RecurringBooking recurringBooking) {
-        Cursor c = executeRaw(new RecurringBookingExistsQuery(recurringBooking));
-
-        if (c.moveToFirst()) {
-
-            c.close();
-            return true;
-        }
-
-        c.close();
-        return false;
-    }
-
-    public boolean exists(ExpenseObject expense) {
-        Cursor c = executeRaw(new BookingExistsQuery(expense));
-
-        if (c.moveToFirst()) {
-
-            c.close();
-            return true;
-        }
-
-        c.close();
-        return false;
-    }
-
     public RecurringBooking create(RecurringBooking recurringBooking) {
-        ContentValues values = new ContentValues();
-        values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID, recurringBooking.getBooking().getIndex());
-        values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_OCCURRENCE, recurringBooking.getExecutionDate().getTimeInMillis());
-        values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_CALENDAR_FIELD, recurringBooking.getFrequency().getCalendarField());
-        values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_AMOUNT, recurringBooking.getFrequency().getAmount());
-        values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_END, recurringBooking.getEnd().getTimeInMillis());
+        ExpenseObject booking = recurringBooking.getBooking();
 
-        long insertedIndex = mDatabase.insert(ExpensesDbHelper.TABLE_RECURRING_BOOKINGS, null, values);
+        ContentValues values = new ContentValues();
+        values.put("expense_type", booking.getExpenseType().name());
+        values.put("price", booking.getUnsignedPrice());
+        values.put("category_id", booking.getCategory().getIndex());
+        values.put("expenditure", booking.getPrice().isNegative() ? 1 : 0);
+        values.put("title", booking.getTitle());
+        values.put("date", booking.getDate().getTimeInMillis());
+        values.put("account_id", booking.getAccountId());
+        values.put("currency_id", booking.getCurrency().getIndex());
+
+        values.put("calendar_field", recurringBooking.getFrequency().getCalendarField());
+        values.put("amount", recurringBooking.getFrequency().getAmount());
+        values.put("start", recurringBooking.getExecutionDate().getTimeInMillis());
+        values.put("end", recurringBooking.getEnd().getTimeInMillis());
+
+        long insertedIndex = mDatabase.insert("RECURRING_BOOKINGS", null, values);
 
         return RecurringBooking.load(
                 insertedIndex,
@@ -80,8 +65,9 @@ public class RecurringBookingRepository {
     public RecurringBooking get(long index) throws RecurringBookingNotFoundException {
         Cursor c = executeRaw(new GetRecurringBookingQuery(index));
 
-        if (!c.moveToFirst())
+        if (!c.moveToFirst()) {
             throw new RecurringBookingNotFoundException(index);
+        }
 
         return transformer.transform(c);
     }
@@ -99,17 +85,27 @@ public class RecurringBookingRepository {
     }
 
     public boolean update(RecurringBooking recurringBooking) {
+        ExpenseObject booking = recurringBooking.getBooking();
+
         ContentValues values = new ContentValues();
-        values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID, recurringBooking.getBooking().getIndex());
-        values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_OCCURRENCE, recurringBooking.getExecutionDate().getTimeInMillis());
-        values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_CALENDAR_FIELD, recurringBooking.getFrequency().getCalendarField());
-        values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_AMOUNT, recurringBooking.getFrequency().getAmount());
-        values.put(ExpensesDbHelper.RECURRING_BOOKINGS_COL_END, recurringBooking.getEnd().getTimeInMillis());
+        values.put("expense_type", booking.getExpenseType().name());
+        values.put("price", booking.getUnsignedPrice());
+        values.put("category_id", booking.getCategory().getIndex());
+        values.put("expenditure", booking.getPrice().isNegative() ? 1 : 0);
+        values.put("title", booking.getTitle());
+        values.put("date", booking.getDate().getTimeInMillis());
+        values.put("account_id", booking.getAccountId());
+        values.put("currency_id", booking.getCurrency().getIndex());
+
+        values.put("calendar_field", recurringBooking.getFrequency().getCalendarField());
+        values.put("amount", recurringBooking.getFrequency().getAmount());
+        values.put("start", recurringBooking.getExecutionDate().getTimeInMillis());
+        values.put("end", recurringBooking.getEnd().getTimeInMillis());
 
         return 1 == mDatabase.update(
-                ExpensesDbHelper.TABLE_RECURRING_BOOKINGS,
+                "RECURRING_BOOKINGS",
                 values,
-                ExpensesDbHelper.RECURRING_BOOKINGS_COL_ID + " = ?",
+                "id = ?",
                 new String[]{"" + recurringBooking.getIndex()}
         );
     }
@@ -117,7 +113,7 @@ public class RecurringBookingRepository {
     public void delete(RecurringBooking recurringBooking) {
         mDatabase.delete(
                 ExpensesDbHelper.TABLE_RECURRING_BOOKINGS,
-                ExpensesDbHelper.RECURRING_BOOKINGS_COL_ID + " = ?",
+                "id = ?",
                 new String[]{"" + recurringBooking.getIndex()}
         );
     }

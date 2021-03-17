@@ -24,8 +24,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 @RunWith(RobolectricTestRunner.class)
 public class RecurringBookingRepositoryTest {
@@ -34,35 +32,6 @@ public class RecurringBookingRepositoryTest {
     @Before
     public void setup() {
         mRepo = new RecurringBookingRepository(RuntimeEnvironment.application);
-    }
-
-    @Test
-    public void testExistWithExistingRecurringBooking() {
-        RecurringBooking recurringBooking = mRepo.create(createSimpleRecurringBooking());
-
-        assertTrue(mRepo.exists(recurringBooking));
-    }
-
-    @Test
-    public void testExistsWithNotExistingRecurringBooking() {
-        RecurringBooking recurringBooking = createSimpleRecurringBooking();
-
-        assertFalse(mRepo.exists(recurringBooking));
-    }
-
-    @Test
-    public void testExistWithExistingBooking() {
-        RecurringBooking recurringBooking = mRepo.create(createSimpleRecurringBooking());
-
-        ExpenseObject booking = recurringBooking.getBooking();
-        assertTrue(mRepo.exists(booking));
-    }
-
-    @Test
-    public void testExistsWithNotExistingBooking() {
-        ExpenseObject booking = (ExpenseObject) createBooking();
-
-        assertFalse(mRepo.exists(booking));
     }
 
     @Test

@@ -18,7 +18,6 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.CannotDeleteChildExpenseException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyTransformer;
-import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.RecurringBookingRepository;
 import com.example.lucas.haushaltsmanager.Database.TransformerInterface;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
@@ -145,48 +144,29 @@ public class ExpenseRepository {
 
     public void delete(ExpenseObject expense) throws CannotDeleteExpenseException {
 
-        if (isRecurringBooking(expense)) {
-
-            try {
-
-                if (hasChildren(expense)) {
-                    throw CannotDeleteExpenseException.BookingAttachedToChildException(expense);
-                }
-
-                hide(expense);
-            } catch (ExpenseNotFoundException e) {
-
-                // TODO: Was soll passieren, wenn eine Buchung nicht gefunden werden kann, die als TemplateBuchung hinterlegt ist?
-                // --> eintrag aus der template tabelle löschen
-                // -->
-                Log.e(TAG, "Could not find Booking " + expense);
-            }
-        } else {
-
-            if (hasChildren(expense))
-                throw CannotDeleteExpenseException.BookingAttachedToChildException(expense);
-
-            try {
-                updateAccountBalance(
-                        expense.getAccountId(),
-                        -expense.getSignedPrice()
-                );
-
-                for (ExpenseObject childExpense : expense.getChildren()) {
-                    new ChildExpenseRepository(app.getContext()).delete(childExpense);
-                }
-            } catch (AccountNotFoundException e) {
-
-                //sollte das Konto aus irgendeinem Grund nicht mehr existieren, muss der Kontostand auch nicht mehr angepasst werden
-                Log.e(TAG, "Could not delete Booking " + expense.getTitle() + " attached Account " + expense.getAccountId() + " does not exist");
-            } catch (CannotDeleteChildExpenseException e) {
-
-                Log.e(TAG, e.getMessage());
-                throw CannotDeleteExpenseException.CannotDeleteChild(expense);
-            }
-
-            mDatabase.delete(ExpensesDbHelper.TABLE_BOOKINGS, ExpensesDbHelper.BOOKINGS_COL_ID + " = ?", new String[]{"" + expense.getIndex()});
+        if (hasChildren(expense)) {
+            throw CannotDeleteExpenseException.BookingAttachedToChildException(expense);
         }
+
+        try {
+            updateAccountBalance(
+                    expense.getAccountId(),
+                    -expense.getSignedPrice()
+            );
+
+            for (ExpenseObject childExpense : expense.getChildren()) {
+                new ChildExpenseRepository(app.getContext()).delete(childExpense);
+            }
+        } catch (AccountNotFoundException e) {
+
+            Log.e(TAG, "Could not delete Booking " + expense.getTitle() + " attached Account " + expense.getAccountId() + " does not exist");
+        } catch (CannotDeleteChildExpenseException e) {
+
+            Log.e(TAG, e.getMessage());
+            throw CannotDeleteExpenseException.CannotDeleteChild(expense);
+        }
+
+        mDatabase.delete(ExpensesDbHelper.TABLE_BOOKINGS, ExpensesDbHelper.BOOKINGS_COL_ID + " = ?", new String[]{"" + expense.getIndex()});
     }
 
     public void update(ExpenseObject expense) throws ExpenseNotFoundException {
@@ -256,10 +236,6 @@ public class ExpenseRepository {
         c.close();
 
         return isHidden;
-    }
-
-    public boolean isRecurringBooking(ExpenseObject expense) {
-        return new RecurringBookingRepository(app.getContext()).exists(expense);// IMPROVEMENT: Das RecurringBookingRepository sollte injected werden.
     }
 
     private Cursor executeRaw(QueryInterface query) {

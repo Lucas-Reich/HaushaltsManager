@@ -9,7 +9,7 @@ import com.example.lucas.haushaltsmanager.Entities.RecurringBooking;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.RecurringBookingItem.RecurringBookingItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.ExpenseListRecyclerViewAdapter;
+import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.RecurringBookingsViewAdapter;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -40,7 +40,7 @@ public class RecurringBookingList extends AbstractAppCompatActivity {
     }
 
     private void updateListView() {
-        ExpenseListRecyclerViewAdapter mAdapter = new ExpenseListRecyclerViewAdapter(loadData());
+        RecurringBookingsViewAdapter mAdapter = new RecurringBookingsViewAdapter(loadData());
 
         mRecyclerView.setAdapter(mAdapter);
     }
@@ -77,7 +77,7 @@ public class RecurringBookingList extends AbstractAppCompatActivity {
     private Calendar getLastOfMonth() {
         Calendar date = Calendar.getInstance();
         date.set(
-                date.get(Calendar.YEAR),
+                2025,
                 date.get(Calendar.MONTH),
                 date.getActualMaximum(Calendar.DAY_OF_MONTH)
         );
