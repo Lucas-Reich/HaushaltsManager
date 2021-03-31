@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountCouldNotBeCreatedException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
@@ -17,7 +18,6 @@ import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences.ActiveAccountsPreferences;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences.AddAndSetDefaultDecorator;
-import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
 import com.example.lucas.haushaltsmanager.Utils.MoneyUtils;
@@ -34,6 +34,7 @@ public class CreateAccountActivity extends AbstractAppCompatActivity implements 
     private Button mAccountNameBtn, mAccountBalanceBtn, mAccountCurrencyBtn;
     private Account mAccount;
     private AccountRepository mAccountRepo;
+    private AddAndSetDefaultDecorator addAndSetDefaultDecorator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +46,8 @@ public class CreateAccountActivity extends AbstractAppCompatActivity implements 
         mAccountNameBtn = findViewById(R.id.new_account_name);
         mAccountBalanceBtn = findViewById(R.id.new_account_balance);
         mAccountCurrencyBtn = findViewById(R.id.new_account_currency);
+
+        addAndSetDefaultDecorator = new AddAndSetDefaultDecorator(new ActiveAccountsPreferences(this), this);
 
         resolveMode(getIntent().getExtras());
 
@@ -109,7 +112,7 @@ public class CreateAccountActivity extends AbstractAppCompatActivity implements 
             }
         });
 
-        mAccountCurrencyBtn.setText(mAccount.getBalance().getCurrency().getShortName().toUpperCase());
+        mAccountCurrencyBtn.setText(new Currency().getShortName().toUpperCase());
 
         SaveFloatingActionButton saveFloatingActionButton = findViewById(R.id.new_account_save);
         saveFloatingActionButton.setOnClickListener(this);
@@ -126,10 +129,13 @@ public class CreateAccountActivity extends AbstractAppCompatActivity implements 
         switch (bundle.getString(INTENT_MODE, INTENT_MODE_CREATE)) {
             case INTENT_MODE_CREATE:
 
-                mAccount = mAccountRepo.insert(mAccount);
+                try {
+                    mAccountRepo.insert(mAccount);
 
-                new AddAndSetDefaultDecorator(new ActiveAccountsPreferences(this), this)
-                        .addAccount(mAccount);
+                    addAndSetDefaultDecorator.addAccount(mAccount);
+                } catch (AccountCouldNotBeCreatedException e) {
+                    Toast.makeText(CreateAccountActivity.this, getString(R.string.cannot_create_account), Toast.LENGTH_LONG).show();
+                }
                 break;
             case INTENT_MODE_UPDATE:
 
@@ -158,20 +164,11 @@ public class CreateAccountActivity extends AbstractAppCompatActivity implements 
                 break;
             case INTENT_MODE_CREATE:
 
-                mAccount = new Account("", new Price(0, getDefaultCurrency()));
+                mAccount = new Account("", new Price(0));
                 break;
             default:
                 throw new UnsupportedOperationException("Could not handle intent mode " + bundle.getString(INTENT_MODE, null));
         }
-    }
-
-    /**
-     * Methode um die Standartwährung aus den Preferences auszulesen.
-     *
-     * @return Standartwährung
-     */
-    private Currency getDefaultCurrency() {
-        return new UserSettingsPreferences(this).getMainCurrency();
     }
 
     private void showCloseScreenDialog() {

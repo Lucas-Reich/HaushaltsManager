@@ -2,8 +2,8 @@ package com.example.lucas.haushaltsmanager.Entities;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
 import androidx.annotation.ColorRes;
-import androidx.annotation.NonNull;
 
 import com.example.lucas.haushaltsmanager.R;
 
@@ -29,36 +29,24 @@ public class Price implements Parcelable {
 
     private double value;
     private boolean isNegative;
-    private Currency currency;
 
-    public Price(double value, boolean isNegative, @NonNull Currency currency) {
+    public Price(double value, boolean isNegative) {
         setPrice(value, isNegative);
-        setCurrency(currency);
     }
 
-    public Price(String value, boolean isNegative, @NonNull Currency currency, Locale locale) {
-        double parsedPrice = localeAwareDoubleParser(value, locale);
-
-        setPrice(parsedPrice, isNegative);
-        setCurrency(currency);
-    }
-
-    public Price(String value, @NonNull Currency currency, Locale locale) {
+    public Price(String value, Locale locale) {
         double parsedPrice = localeAwareDoubleParser(value, locale);
 
         setPrice(parsedPrice);
-        setCurrency(currency);
     }
 
-    public Price(double price, @NonNull Currency currency) {
+    public Price(double price) {
         setPrice(price);
-        setCurrency(currency);
     }
 
     private Price(Parcel source) {
         value = source.readDouble();
         isNegative = source.readByte() != 0;
-        currency = source.readParcelable(Currency.class.getClassLoader());
     }
 
     @Override
@@ -69,8 +57,7 @@ public class Price implements Parcelable {
 
         Price other = (Price) obj;
 
-        return other.getSignedValue() == getSignedValue()
-                && other.getCurrency().equals(getCurrency());
+        return other.getSignedValue() == getSignedValue();
     }
 
     @Override
@@ -82,7 +69,6 @@ public class Price implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeDouble(value);
         dest.writeByte((byte) (isNegative ? 1 : 0));
-        dest.writeParcelable(currency, flags);
     }
 
     public double getUnsignedValue() {
@@ -99,14 +85,6 @@ public class Price implements Parcelable {
 
     public boolean isNegative() {
         return isNegative;
-    }
-
-    public Currency getCurrency() {
-        return currency;
-    }
-
-    private void setCurrency(Currency currency) {
-        this.currency = currency;
     }
 
     @ColorRes
@@ -142,7 +120,7 @@ public class Price implements Parcelable {
             return NumberFormat.getInstance(locale)
                     .parse(doubleString)
                     .doubleValue();
-        } catch (ParseException e) {
+        } catch (ParseException | NullPointerException e) {
             return 0D;
         }
     }

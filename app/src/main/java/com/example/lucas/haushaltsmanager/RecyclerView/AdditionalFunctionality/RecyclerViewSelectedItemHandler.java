@@ -72,6 +72,10 @@ public abstract class RecyclerViewSelectedItemHandler extends RecyclerViewExpand
         return itemCount;
     }
 
+    public boolean isInSelectionMode() {
+        return selectedItems.size() > 0;
+    }
+
     public int getSelectedChildCount() {
         int childCount = 0;
 

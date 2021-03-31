@@ -1,6 +1,6 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.BookingParser;
 
-import com.example.lucas.haushaltsmanager.Entities.Currency;
+import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Delimiter.Comma;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Delimiter.IDelimiter;
@@ -14,7 +14,6 @@ import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.Da
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.PriceParser.PriceParser;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.PriceParser.RequiredFields.Type;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.PriceParser.RequiredFields.Value;
-import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.BookingParser.BookingParser;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.BookingParser.RequiredFields.Title;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.IRequiredField;
 
@@ -25,20 +24,16 @@ import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
-import static org.mockito.Mockito.mock;
 
 public class BookingParserTest {
     private BookingParser parser;
 
     @Before
     public void setUp() {
-        Currency mockCurrency = mock(Currency.class);
-
         parser = new BookingParser(
-                new PriceParser(mockCurrency),
+                new PriceParser(),
                 new CategoryParser(),
-                new DateParser(),
-                mockCurrency
+                new DateParser()
         );
     }
 

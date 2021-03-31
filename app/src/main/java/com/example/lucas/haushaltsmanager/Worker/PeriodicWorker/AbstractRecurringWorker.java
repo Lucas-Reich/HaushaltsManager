@@ -1,19 +1,19 @@
 package com.example.lucas.haushaltsmanager.Worker.PeriodicWorker;
 
 import android.content.Context;
-import androidx.annotation.NonNull;
 import android.util.Log;
 
-import com.example.lucas.haushaltsmanager.Worker.WorkRequestBuilder;
-import com.google.common.util.concurrent.ListenableFuture;
-
-import java.util.List;
-
+import androidx.annotation.NonNull;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 import androidx.work.WorkRequest;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
+
+import com.example.lucas.haushaltsmanager.Worker.WorkRequestBuilder;
+import com.google.common.util.concurrent.ListenableFuture;
+
+import java.util.List;
 
 abstract class AbstractRecurringWorker extends Worker {
     private static final String TAG = AbstractRecurringWorker.class.getSimpleName();

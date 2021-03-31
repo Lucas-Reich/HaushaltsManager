@@ -68,7 +68,9 @@
     <string name="error_name_missing">Bitte gib einen Namen ein</string>
     <string name="could_not_create_backup">Backup konnte nicht erstellt werden</string>
     <string name="cannot_update_account">Konto konnte nicht geupdated werden! Konto wurde nicht gefunden.</string>
-    <string name="category_not_found">Kategorie konnte nicht geupdated werden! Kategorie wurde nicht gefunden.</string>
+    <string name="cannot_create_account">Konto konnte nicht erstellt werden!</string>
+    <string name="cannot_update_category">Kategorie konnte nicht geupdated werden! Kategorie wurde nicht gefunden.</string>
+    <string name="cannot_create_category">Kategorie konnte nicht erstellt werden!</string>
     <string name="btn_choose">Auswählen</string>
     <string name="select_currency">Wähle eine Währung aus</string>
     <string name="choose_weekday">Wähle einen Wochentag aus</string>

@@ -2,33 +2,41 @@ package com.example.lucas.haushaltsmanager.Database.Repositories.Categories;
 
 import android.database.Cursor;
 
-import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
-import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepositoryInterface;
 import com.example.lucas.haushaltsmanager.Database.TransformerInterface;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 
+import java.util.UUID;
+
 public class CategoryTransformer implements TransformerInterface<Category> {
-    private final ChildCategoryRepositoryInterface childCategoryRepository;
-
-    public CategoryTransformer(ChildCategoryRepositoryInterface childCategoryRepository) {
-        this.childCategoryRepository = childCategoryRepository;
-    }
-
     @Override
     public Category transform(Cursor c) {
-        long categoryIndex = c.getLong(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_ID));
-        String categoryName = c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_NAME));
-        String categoryColor = c.getString(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_COLOR));
-        boolean defaultExpenseType = c.getInt(c.getColumnIndex(ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE)) == 1;
+        String categoryName = c.getString(c.getColumnIndex("name"));
+        String categoryColor = c.getString(c.getColumnIndex("color"));
 
         return new Category(
-            categoryIndex,
-            categoryName,
-            new Color(categoryColor),
-            ExpenseType.load(defaultExpenseType),
-            childCategoryRepository.getAll(categoryIndex)
+                getId(c),
+                categoryName,
+                new Color(categoryColor),
+                getExpenseType(c)
         );
+    }
+
+    private UUID getId(Cursor c) {
+        int columnIndex = c.getColumnIndex("category_id");
+        if (-1 == columnIndex) {
+            columnIndex = c.getColumnIndex("id");
+        }
+
+        String rawId = c.getString(columnIndex);
+
+        return UUID.fromString(rawId);
+    }
+
+    private ExpenseType getExpenseType(Cursor c) {
+        boolean rawExpenseType = c.getInt(c.getColumnIndex("default_expense_type")) == 1;
+
+        return ExpenseType.load(rawExpenseType);
     }
 }

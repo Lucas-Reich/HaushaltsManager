@@ -4,7 +4,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 import com.example.lucas.haushaltsmanager.Entities.Price;
@@ -24,6 +23,7 @@ import org.robolectric.RuntimeEnvironment;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
@@ -241,19 +241,17 @@ public class RecyclerViewItemHolderTest {
     }
 
     private ExpenseObject createSimpleExpense(Calendar expenseDate) {
-        Currency currency = new Currency("Euro", "EUR", "€");
-
         return new ExpenseObject(
-                -1,
+                UUID.randomUUID(),
                 "Ich bin eine Ausgabe",
-                new Price(105, true, currency),
+                new Price(105, true),
                 expenseDate,
-                new Category("Kategorie", Color.black(), ExpenseType.expense(), new ArrayList<Category>()),
+                new Category("Kategorie", Color.black(), ExpenseType.expense()),
                 "",
-                -1,
+                UUID.randomUUID(),
                 ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE,
-                new ArrayList<ExpenseObject>(),
-                currency);
+                new ArrayList<ExpenseObject>()
+        );
     }
 
     private void assertSameDate(DateItem cal1, DateItem cal2) {

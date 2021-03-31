@@ -11,7 +11,6 @@ import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.Ca
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.IParser;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.IRequiredField;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -31,8 +30,7 @@ public class CategoryParser implements IParser<Category> {
         return new Category(
                 categoryTitle,
                 Color.random(),
-                ExpenseType.expense(),
-                new ArrayList<Category>()
+                ExpenseType.expense()
         );
     }
 

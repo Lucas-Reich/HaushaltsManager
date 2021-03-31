@@ -2,8 +2,10 @@ package com.example.lucas.haushaltsmanager.Database.Repositories.Categories.Exce
 
 import com.example.lucas.haushaltsmanager.Database.Exceptions.EntityNotExistingException;
 
+import java.util.UUID;
+
 public class CategoryNotFoundException extends EntityNotExistingException {
-    public CategoryNotFoundException(long categoryId) {
-        super("Could not find Category with index " + categoryId + ".");
+    public CategoryNotFoundException(UUID categoryId) {
+        super("Could not find Category with index " + categoryId.toString() + ".");
     }
 }

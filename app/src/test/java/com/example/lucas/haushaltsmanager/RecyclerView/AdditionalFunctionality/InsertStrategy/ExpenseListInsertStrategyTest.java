@@ -3,7 +3,6 @@ package com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ParentExpenseObject;
@@ -20,6 +19,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -146,21 +146,17 @@ public class ExpenseListInsertStrategyTest {
         return new ParentExpenseObject(
                 ExpensesDbHelper.INVALID_INDEX,
                 "ParentAusgabe",
-                new Currency("Euro", "EUR", "€"),
                 createDate(1, Calendar.JANUARY, 2019),
                 new ArrayList<ExpenseObject>()
         );
     }
 
     private ExpenseObject createDummyExpense() {
-        Currency currency = new Currency("Euro", "EUR", "€");
-
         return new ExpenseObject(
                 "Ausgabe",
-                new Price(100, false, currency),
-                new Category("Kategorie", new Color(Color.WHITE), ExpenseType.expense(), new ArrayList<Category>()),
-                ExpensesDbHelper.INVALID_INDEX,
-                currency
+                new Price(100, false),
+                new Category("Kategorie", new Color(Color.WHITE), ExpenseType.expense()),
+                UUID.randomUUID()
         );
     }
 

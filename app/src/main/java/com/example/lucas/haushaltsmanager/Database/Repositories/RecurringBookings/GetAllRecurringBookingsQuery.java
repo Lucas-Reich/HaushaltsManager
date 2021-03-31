@@ -1,6 +1,5 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings;
 
-import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.QueryInterface;
 
 import java.util.Calendar;
@@ -16,16 +15,9 @@ class GetAllRecurringBookingsQuery implements QueryInterface {
 
     @Override
     public String sql() {
-        return "SELECT "
-                + ExpensesDbHelper.RECURRING_BOOKINGS_COL_ID + ", "
-                + ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID + ", "
-                + ExpensesDbHelper.RECURRING_BOOKINGS_COL_CALENDAR_FIELD + ", "
-                + ExpensesDbHelper.RECURRING_BOOKINGS_COL_AMOUNT + ", "
-                + ExpensesDbHelper.RECURRING_BOOKINGS_COL_OCCURRENCE + ", "
-                + ExpensesDbHelper.RECURRING_BOOKINGS_COL_END
-                + " FROM " + ExpensesDbHelper.TABLE_RECURRING_BOOKINGS
-                + " WHERE " + ExpensesDbHelper.RECURRING_BOOKINGS_COL_OCCURRENCE
-                + " BETWEEN %s AND %s;";
+        return "SELECT id, calendar_field, amount, start, end "
+                + "FROM RECURRING_BOOKINGS "
+                + "WHERE start BETWEEN %s AND %s;";
     }
 
     @Override

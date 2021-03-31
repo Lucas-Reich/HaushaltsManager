@@ -1,6 +1,5 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.PriceParser;
 
-import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Delimiter.Comma;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Delimiter.IDelimiter;
@@ -8,7 +7,6 @@ import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.InvalidInput
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.NoMappingFoundException;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Line.Line;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.MappingList;
-import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.PriceParser.PriceParser;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.PriceParser.RequiredFields.Type;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.PriceParser.RequiredFields.Value;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.IRequiredField;
@@ -23,7 +21,6 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
 
 public class PriceParserTest {
     private PriceParser parser;
@@ -32,7 +29,7 @@ public class PriceParserTest {
 
     @Before
     public void setUp() {
-        this.parser = new PriceParser(mock(Currency.class));
+        this.parser = new PriceParser();
     }
 
     @Test

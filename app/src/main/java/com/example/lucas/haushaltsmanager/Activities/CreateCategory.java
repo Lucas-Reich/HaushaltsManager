@@ -7,13 +7,12 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepositoryInterface;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.Exceptions.CategoryCouldNotBeCreatedException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.Exceptions.CategoryNotFoundException;
-import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.Exceptions.ChildCategoryNotFoundException;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ColorPickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
-import com.example.lucas.haushaltsmanager.Dialogs.SingleChoiceDialog;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
@@ -22,38 +21,31 @@ import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
 import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.util.ArrayList;
-
 public class CreateCategory extends AbstractAppCompatActivity {
     public static final String INTENT_MODE = "mode";
     public static final String INTENT_MODE_UPDATE = "update_category";
     public static final String INTENT_MODE_CREATE = "create_category";
 
-    public static final String INTENT_PARENT = "parent";
     public static final String INTENT_CATEGORY = "category";
 
-    private Category mCategory, mParentCategory;
-    private Button mTitleBtn, mParentBtn, mExpenseBtn, mIncomeBtn;
+    private Category mCategory;
+    private Button mTitleBtn, mExpenseBtn, mIncomeBtn;
     private RoundedTextView mColorView;
     private FloatingActionButton mSaveFAB;
-    private boolean parentCategoryCreated = false;
 
-    private CategoryRepository mCategoryRepo;
-    private ChildCategoryRepository mChildCategoryRepo;
+    private CategoryRepositoryInterface categoryRepository;
 
     @Override
     protected void onCreate(Bundle savedInstances) {
         super.onCreate(savedInstances);
         setContentView(R.layout.activity_new_category);
 
-        mCategoryRepo = new CategoryRepository(this);
-        mChildCategoryRepo = new ChildCategoryRepository(this);
+        categoryRepository = new CategoryRepository(this);
 
         initializeToolbar();
 
         mTitleBtn = findViewById(R.id.create_category_title);
         mColorView = findViewById(R.id.create_category_color);
-        mParentBtn = findViewById(R.id.create_category_parent);
 
         mIncomeBtn = findViewById(R.id.create_category_income);
         mExpenseBtn = findViewById(R.id.create_category_expense);
@@ -104,52 +96,6 @@ public class CreateCategory extends AbstractAppCompatActivity {
             }
         });
 
-        mParentBtn.setHint(getString(R.string.choose_parent_category_hint));
-        if (mParentCategory != null)
-            setParent(mParentCategory);
-        mParentBtn.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-
-                SingleChoiceDialog<Category> categoryPicker = new SingleChoiceDialog<>();
-                categoryPicker.createBuilder(CreateCategory.this);
-                categoryPicker.setTitle(getString(R.string.choose_parent_category));
-                categoryPicker.setContent(mCategoryRepo.getAll(), -1);
-                categoryPicker.setNeutralButton(getString(R.string.create_new));
-                categoryPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
-                    @Override
-                    public void onPositiveClick(Object category) {
-                        setParent((Category) category);
-                    }
-
-                    @Override
-                    public void onNeutralClick() {
-                        Bundle bundle = new Bundle();
-                        bundle.putString(BasicTextInputDialog.TITLE, getString(R.string.new_parent_category_name));
-
-                        BasicTextInputDialog textInputDialog = new BasicTextInputDialog();
-                        textInputDialog.setArguments(bundle);
-                        textInputDialog.setOnTextInputListener(new BasicTextInputDialog.OnTextInput() {
-                            @Override
-                            public void onTextInput(String categoryTitle) {
-                                setParent(mCategoryRepo.insert(new Category(
-                                        categoryTitle,
-                                        new Color("#000000"),
-                                        ExpenseType.income(),
-                                        new ArrayList<Category>()))
-                                );
-
-                                parentCategoryCreated = true;
-                            }
-                        });
-                        textInputDialog.show(getFragmentManager(), "create_category_parent_name");
-                    }
-                });
-                categoryPicker.show(getFragmentManager(), "create_category_parent");
-            }
-        });
-
         setExpenditureType(mCategory.getDefaultExpenseType());
 
         mIncomeBtn.setOnClickListener(new View.OnClickListener() {
@@ -174,12 +120,14 @@ public class CreateCategory extends AbstractAppCompatActivity {
 
         switch (bundle.getString(INTENT_MODE, INTENT_MODE_CREATE)) {
             case INTENT_MODE_UPDATE:
-                mParentCategory = (Category) bundle.getParcelable(INTENT_PARENT, null);
                 mCategory = (Category) bundle.getParcelable(INTENT_CATEGORY, null);
                 break;
             case INTENT_MODE_CREATE:
-                mCategory = Category.createDummyCategory();
-                mCategory.setDefaultExpenseType(ExpenseType.expense());
+                mCategory = new Category(
+                        getString(R.string.no_name),
+                        Color.black(),
+                        ExpenseType.expense()
+                );
                 break;
             default:
                 throw new UnsupportedOperationException("Could not handle intent mode " + bundle.getString(INTENT_MODE, null));
@@ -199,18 +147,19 @@ public class CreateCategory extends AbstractAppCompatActivity {
 
                 switch (bundle.getString(INTENT_MODE, INTENT_MODE_CREATE)) {
                     case INTENT_MODE_CREATE:
-                        if (parentCategoryCreated)
-                            setParentCategoryColor();
-
-                        mChildCategoryRepo.insert(mParentCategory, mCategory);
+                        try {
+                            categoryRepository.insert(mCategory);
+                        } catch (CategoryCouldNotBeCreatedException e) {
+                            Toast.makeText(CreateCategory.this, getString(R.string.cannot_create_category), Toast.LENGTH_SHORT).show();
+                        }
                         break;
                     case INTENT_MODE_UPDATE:
 
                         try {
-                            mChildCategoryRepo.update(mCategory);
-                        } catch (ChildCategoryNotFoundException e) {
+                            categoryRepository.update(mCategory);
+                        } catch (CategoryNotFoundException e) {
 
-                            Toast.makeText(CreateCategory.this, getString(R.string.category_not_found), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(CreateCategory.this, getString(R.string.cannot_update_category), Toast.LENGTH_SHORT).show();
                             // TODO: Fehlerbehandlung wenn versucht wird eine nicht existierende Kategorie zu updaten
                         }
                         break;
@@ -219,17 +168,6 @@ public class CreateCategory extends AbstractAppCompatActivity {
                 finish();
             }
         };
-    }
-
-    private void setParentCategoryColor() {
-        try {
-
-            mParentCategory.setColor(mCategory.getColor());
-            mCategoryRepo.update(mParentCategory);
-        } catch (CategoryNotFoundException e) {
-
-            // TODO: Was sollte passieren, wenn die ParentKategorie nicht gefunden werden konnte?
-        }
     }
 
     private void showCloseScreenDialog() {
@@ -253,20 +191,11 @@ public class CreateCategory extends AbstractAppCompatActivity {
         mCategory.setName(title);
         mTitleBtn.setText(mCategory.getTitle());
 
-        if (isCategorySavable())
+        if (isCategorySavable()) {
             runCrossToCheckAnimation();
-        else
+        } else {
             runCheckToCrossAnimation();
-    }
-
-    private void setParent(Category parent) {
-        mParentCategory = parent;
-        mParentBtn.setText(mParentCategory.getTitle());
-
-        if (isCategorySavable())
-            runCrossToCheckAnimation();
-        else
-            runCheckToCrossAnimation();
+        }
     }
 
     private void setColor(Color color) {
@@ -295,6 +224,6 @@ public class CreateCategory extends AbstractAppCompatActivity {
     }
 
     private boolean isCategorySavable() {
-        return mCategory.isSet() && mParentCategory != null;
+        return mCategory.isSet();
     }
 }

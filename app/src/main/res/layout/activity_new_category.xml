@@ -86,21 +86,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/create_category_title"/>
 
-    <Button
-        android:id="@+id/create_category_parent"
-        style="@style/Widget.AppCompat.Button.Borderless"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:drawableStart="@drawable/ic_superordinate_dark"
-        android:textAllCaps="false"
-        android:textColor="@color/primary_text_color"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/title_divider"/>
-
     <View
         android:id="@+id/parent_divider"
         android:layout_width="match_parent"

@@ -4,12 +4,9 @@ import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
 import android.database.MatrixCursor;
 
-import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
-import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryTransformer;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyTransformer;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryTransformer;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 import com.example.lucas.haushaltsmanager.Entities.Price;
@@ -18,9 +15,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class BookingTransformerTest {
     private BookingTransformer transformer;
@@ -28,9 +25,7 @@ public class BookingTransformerTest {
     @Before
     public void setUp() {
         transformer = new BookingTransformer(
-                new CurrencyTransformer(),
-                new ChildCategoryTransformer(),
-                new MockChildExpenseRepository()
+                new CategoryTransformer()
         );
     }
 
@@ -40,22 +35,18 @@ public class BookingTransformerTest {
         final ExpenseObject expectedExpense = getSimpleExpense();
 
         Cursor cursor = createCursor(new HashMap<String, Object>() {{
-            put(ExpensesDbHelper.BOOKINGS_COL_ID, expectedExpense.getIndex());
-            put(ExpensesDbHelper.BOOKINGS_COL_DATE, expectedExpense.getDate().getTimeInMillis());
-            put(ExpensesDbHelper.BOOKINGS_COL_TITLE, expectedExpense.getTitle());
-            put(ExpensesDbHelper.BOOKINGS_COL_PRICE, expectedExpense.getUnsignedPrice());
-            put(ExpensesDbHelper.BOOKINGS_COL_EXPENDITURE, expectedExpense.isExpenditure() ? 1 : 0);
-            put(ExpensesDbHelper.BOOKINGS_COL_NOTICE, expectedExpense.getNotice());
-            put(ExpensesDbHelper.BOOKINGS_COL_EXPENSE_TYPE, expectedExpense.getExpenseType().name());
-            put(ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID, expectedExpense.getAccountId());
-            put(ExpensesDbHelper.CURRENCIES_COL_ID, expectedExpense.getCurrency().getIndex());
-            put(ExpensesDbHelper.CURRENCIES_COL_NAME, expectedExpense.getCurrency().getName());
-            put(ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME, expectedExpense.getCurrency().getShortName());
-            put(ExpensesDbHelper.CURRENCIES_COL_SYMBOL, expectedExpense.getCurrency().getSymbol());
-            put(ExpensesDbHelper.CHILD_CATEGORIES_COL_ID, expectedExpense.getCategory().getIndex());
-            put(ExpensesDbHelper.CHILD_CATEGORIES_COL_NAME, expectedExpense.getCategory().getTitle());
-            put(ExpensesDbHelper.CHILD_CATEGORIES_COL_COLOR, expectedExpense.getCategory().getColor().getColorString());
-            put(ExpensesDbHelper.CHILD_CATEGORIES_COL_DEFAULT_EXPENSE_TYPE, expectedExpense.getCategory().getDefaultExpenseType().value() ? 1 : 0);
+            put("BOOKINGS.id", expectedExpense.getId().toString());
+            put("BOOKINGS.date", expectedExpense.getDate().getTimeInMillis());
+            put("BOOKINGS.title", expectedExpense.getTitle());
+            put("BOOKINGS.price", expectedExpense.getUnsignedPrice());
+            put("BOOKINGS.expenditure", expectedExpense.isExpenditure() ? 1 : 0);
+            put("BOOKINGS.notice", expectedExpense.getNotice());
+            put("BOOKINGS.expense_type", expectedExpense.getExpenseType().name());
+            put("BOOKINGS.account_id", expectedExpense.getAccountId());
+            put("CATEGORIES.id", expectedExpense.getCategory().getId().toString());
+            put("CATEGORIES.name", expectedExpense.getCategory().getTitle());
+            put("CATEGORIES.color", expectedExpense.getCategory().getColor().getColorString());
+            put("CATEGORIES.default_expense_type", expectedExpense.getCategory().getDefaultExpenseType().value() ? 1 : 0);
         }});
 
         // Act
@@ -71,22 +62,18 @@ public class BookingTransformerTest {
         final ExpenseObject expectedExpense = getSimpleExpense();
 
         Cursor cursor = createCursor(new HashMap<String, Object>() {{
-            put(ExpensesDbHelper.BOOKINGS_COL_ID, expectedExpense.getIndex());
-            put(ExpensesDbHelper.BOOKINGS_COL_DATE, expectedExpense.getDate().getTimeInMillis());
-            // Booking title information is not present in Cursors
-            put(ExpensesDbHelper.BOOKINGS_COL_PRICE, expectedExpense.getUnsignedPrice());
-            put(ExpensesDbHelper.BOOKINGS_COL_EXPENDITURE, expectedExpense.isExpenditure() ? 1 : 0);
-            put(ExpensesDbHelper.BOOKINGS_COL_NOTICE, expectedExpense.getNotice());
-            put(ExpensesDbHelper.BOOKINGS_COL_EXPENSE_TYPE, expectedExpense.getExpenseType().name());
-            put(ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID, expectedExpense.getAccountId());
-            put(ExpensesDbHelper.CURRENCIES_COL_ID, expectedExpense.getCurrency().getIndex());
-            put(ExpensesDbHelper.CURRENCIES_COL_NAME, expectedExpense.getCurrency().getName());
-            put(ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME, expectedExpense.getCurrency().getShortName());
-            put(ExpensesDbHelper.CURRENCIES_COL_SYMBOL, expectedExpense.getCurrency().getSymbol());
-            put(ExpensesDbHelper.CHILD_CATEGORIES_COL_ID, expectedExpense.getCategory().getIndex());
-            put(ExpensesDbHelper.CHILD_CATEGORIES_COL_NAME, expectedExpense.getCategory().getTitle());
-            put(ExpensesDbHelper.CHILD_CATEGORIES_COL_COLOR, expectedExpense.getCategory().getColor().getColorString());
-            put(ExpensesDbHelper.CHILD_CATEGORIES_COL_DEFAULT_EXPENSE_TYPE, expectedExpense.getCategory().getDefaultExpenseType().value() ? 1 : 0);
+            put("BOOKINGS.id", expectedExpense.getId().toString());
+            put("BOOKINGS.date", expectedExpense.getDate().getTimeInMillis());
+            // Booking title is not present
+            put("BOOKINGS.price", expectedExpense.getUnsignedPrice());
+            put("BOOKINGS.expenditure", expectedExpense.isExpenditure() ? 1 : 0);
+            put("BOOKINGS.notice", expectedExpense.getNotice());
+            put("BOOKINGS.expense_type", expectedExpense.getExpenseType().name());
+            put("BOOKINGS.account_id", expectedExpense.getAccountId());
+            put("CATEGORIES.id", expectedExpense.getCategory().getId().toString());
+            put("CATEGORIES.name", expectedExpense.getCategory().getTitle());
+            put("CATEGORIES.color", expectedExpense.getCategory().getColor().getColorString());
+            put("CATEGORIES.default_expense_type", expectedExpense.getCategory().getDefaultExpenseType().value() ? 1 : 0);
         }});
 
         // Act
@@ -107,32 +94,19 @@ public class BookingTransformerTest {
     }
 
     private ExpenseObject getSimpleExpense() {
-        Currency currency = getSimpleCurrency();
-
         return new ExpenseObject(
                 "Ausgabe",
-                new Price(500, true, currency),
+                new Price(500, true),
                 getSimpleCategory(),
-                -1,
-                currency
+                UUID.randomUUID()
         );
     }
 
     private Category getSimpleCategory() {
         return new Category(
-                -1,
                 "Category name",
                 Color.black(),
-                ExpenseType.expense(),
-                new ArrayList<Category>()
-        );
-    }
-
-    private Currency getSimpleCurrency() {
-        return new Currency(
-                "Euro",
-                "EUR",
-                "€"
+                ExpenseType.expense()
         );
     }
 }

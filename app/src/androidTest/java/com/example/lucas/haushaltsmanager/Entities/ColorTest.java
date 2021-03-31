@@ -1,6 +1,7 @@
 package com.example.lucas.haushaltsmanager.Entities;
 
 import android.os.Parcel;
+
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import org.junit.Test;
@@ -14,11 +15,14 @@ public class ColorTest {
 
     @Test
     public void colorCanBeCreatedFromParcel() {
+        // Arrange
         Color color = new Color(WHITE);
 
+        // Act
         Parcel parcel = writeToParcel(color);
         Color createdFromParcel = Color.CREATOR.createFromParcel(parcel);
 
+        // Assert
         assertEquals(color, createdFromParcel);
     }
 

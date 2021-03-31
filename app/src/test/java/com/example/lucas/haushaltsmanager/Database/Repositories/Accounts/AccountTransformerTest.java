@@ -4,10 +4,7 @@ import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
 import android.database.MatrixCursor;
 
-import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyTransformer;
 import com.example.lucas.haushaltsmanager.Entities.Account;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 
 import org.junit.Before;
@@ -23,7 +20,7 @@ public class AccountTransformerTest {
 
     @Before
     public void setUp() {
-        transformer = new AccountTransformer(new CurrencyTransformer());
+        transformer = new AccountTransformer();
     }
 
     @Test
@@ -32,13 +29,9 @@ public class AccountTransformerTest {
         final Account expectedAccount = getSimpleAccount();
 
         Cursor cursor = createCursor(new HashMap<String, Object>() {{
-            put(ExpensesDbHelper.ACCOUNTS_COL_ID, expectedAccount.getIndex());
-            put(ExpensesDbHelper.ACCOUNTS_COL_NAME, expectedAccount.getTitle());
-            put(ExpensesDbHelper.ACCOUNTS_COL_BALANCE, expectedAccount.getBalance().getUnsignedValue());
-            put(ExpensesDbHelper.CURRENCIES_COL_ID, expectedAccount.getBalance().getCurrency().getIndex());
-            put(ExpensesDbHelper.CURRENCIES_COL_NAME, expectedAccount.getBalance().getCurrency().getName());
-            put(ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME, expectedAccount.getBalance().getCurrency().getShortName());
-            put(ExpensesDbHelper.CURRENCIES_COL_SYMBOL, expectedAccount.getBalance().getCurrency().getSymbol());
+            put("id", expectedAccount.getId().toString());
+            put("name", expectedAccount.getTitle());
+            put("balance", expectedAccount.getBalance().getUnsignedValue());
         }});
 
         // Act
@@ -54,13 +47,9 @@ public class AccountTransformerTest {
         final Account expectedAccount = getSimpleAccount();
 
         Cursor cursor = createCursor(new HashMap<String, Object>() {{
-            put(ExpensesDbHelper.ACCOUNTS_COL_ID, expectedAccount.getIndex());
+            put("id", expectedAccount.getId().toString());
             // Account name is not in Cursor
-            put(ExpensesDbHelper.ACCOUNTS_COL_BALANCE, expectedAccount.getBalance().getUnsignedValue());
-            put(ExpensesDbHelper.CURRENCIES_COL_ID, expectedAccount.getBalance().getCurrency().getIndex());
-            put(ExpensesDbHelper.CURRENCIES_COL_NAME, expectedAccount.getBalance().getCurrency().getName());
-            put(ExpensesDbHelper.CURRENCIES_COL_SHORT_NAME, expectedAccount.getBalance().getCurrency().getShortName());
-            put(ExpensesDbHelper.CURRENCIES_COL_SYMBOL, expectedAccount.getBalance().getCurrency().getSymbol());
+            put("balance", expectedAccount.getBalance().getUnsignedValue());
         }});
 
         // Act
@@ -82,17 +71,8 @@ public class AccountTransformerTest {
 
     private Account getSimpleAccount() {
         return new Account(
-            "Bank account",
-            new Price(7653, getSimpleCurrency())
-        );
-    }
-
-    private Currency getSimpleCurrency() {
-        return new Currency(
-            -1,
-            "Euro",
-            "EUR",
-            "€"
+                "Bank account",
+                new Price(7653)
         );
     }
 }

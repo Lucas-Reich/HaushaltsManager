@@ -1,32 +1,27 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings;
 
-import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.QueryInterface;
 
-class GetRecurringBookingQuery implements QueryInterface {
-    private final long recurringBookingId;
+import java.util.UUID;
 
-    public GetRecurringBookingQuery(long recurringBookingId) {
-        this.recurringBookingId = recurringBookingId;
+class GetRecurringBookingQuery implements QueryInterface {
+    private final UUID recurringBookingId;
+
+    public GetRecurringBookingQuery(UUID id) {
+        this.recurringBookingId = id;
     }
 
     @Override
     public String sql() {
-        return "SELECT "
-                + ExpensesDbHelper.RECURRING_BOOKINGS_COL_ID + ", "
-                + ExpensesDbHelper.RECURRING_BOOKINGS_COL_BOOKING_ID + ", "
-                + ExpensesDbHelper.RECURRING_BOOKINGS_COL_CALENDAR_FIELD + ", "
-                + ExpensesDbHelper.RECURRING_BOOKINGS_COL_AMOUNT + ", "
-                + ExpensesDbHelper.RECURRING_BOOKINGS_COL_OCCURRENCE + ", "
-                + ExpensesDbHelper.RECURRING_BOOKINGS_COL_END
-                + " FROM " + ExpensesDbHelper.TABLE_RECURRING_BOOKINGS
-                + " WHERE " + ExpensesDbHelper.RECURRING_BOOKINGS_COL_ID + " = %s";
+        return "SELECT id, calendar_field, amount, start, end "
+                + " FROM RECURRING_BOOKINGS "
+                + " WHERE id = '%s'";
     }
 
     @Override
     public Object[] values() {
         return new Object[]{
-                recurringBookingId
+                recurringBookingId.toString()
         };
     }
 }

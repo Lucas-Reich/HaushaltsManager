@@ -5,11 +5,10 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
+import java.util.UUID;
+
+// TODO: Should I add all bookings for one account into a parameters within the Account class?
 public class Account implements Parcelable {
-    // TODO: Should I add all bookings for one account into a parameters within the Account class?
-    /**
-     * regenerating the parcelable object back into our Category object
-     */
     public static final Parcelable.Creator<Account> CREATOR = new Parcelable.Creator<Account>() {
 
         @Override
@@ -24,18 +23,22 @@ public class Account implements Parcelable {
             return new Account[size];
         }
     };
-    private long index;
+    private final UUID id;
     private String name;
     private Price balance;
 
-    public Account(long index, @NonNull String accountName, Price balance) {
-        setIndex(index);
-        setName(accountName);
-        setBalance(balance);
+    public Account(
+            @NonNull UUID id,
+            @NonNull String name,
+            @NonNull Price balance
+    ) {
+        this.id = id;
+        this.name = name;
+        this.balance = balance;
     }
 
     public Account(@NonNull String accountName, Price price) {
-        this(-1, accountName, price);
+        this(UUID.randomUUID(), accountName, price);
     }
 
     /**
@@ -47,7 +50,7 @@ public class Account implements Parcelable {
      * @param source .
      */
     public Account(Parcel source) {
-        setIndex(source.readLong());
+        this.id = UUID.fromString(source.readString());
         setName(source.readString());
         setBalance((Price) source.readParcelable(Price.class.getClassLoader()));
     }
@@ -61,7 +64,7 @@ public class Account implements Parcelable {
         Account otherAccount = (Account) obj;
 
         return name.equals(otherAccount.getTitle())
-                && index == otherAccount.getIndex();
+                && id.equals(otherAccount.getId());
     }
 
     @Override
@@ -86,19 +89,13 @@ public class Account implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
 
-        dest.writeLong(index);
+        dest.writeString(id.toString());
         dest.writeString(name);
         dest.writeParcelable(balance, flags);
     }
 
-    public long getIndex() {
-
-        return index;
-    }
-
-    private void setIndex(long index) {
-
-        this.index = index;
+    public UUID getId() {
+        return id;
     }
 
     @NonNull
@@ -128,7 +125,6 @@ public class Account implements Parcelable {
      */
     public boolean isSet() {
 
-        return !getTitle().equals("")
-                && balance.getCurrency().isSet();
+        return !getTitle().equals("");
     }
 }

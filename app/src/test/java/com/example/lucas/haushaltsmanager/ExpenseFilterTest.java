@@ -1,7 +1,6 @@
 package com.example.lucas.haushaltsmanager;
 
 import com.example.lucas.haushaltsmanager.Entities.Category;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseFilter;
@@ -13,6 +12,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -123,16 +123,16 @@ public class ExpenseFilterTest {
 
     @Test
     public void testFilterByAccounts() {
-        List<Long> activeAccounts = new ArrayList<>();
-        activeAccounts.add(1L);
-        activeAccounts.add(3L);
+        List<UUID> activeAccounts = new ArrayList<>();
+        activeAccounts.add(UUID.randomUUID());
+        activeAccounts.add(UUID.randomUUID());
 
         List<ExpenseObject> expenses = new ArrayList<>();
-        expenses.add(getExpenseWithAccount(1));
-        expenses.add(getExpenseWithAccount(3));
-        expenses.add(getExpenseWithAccount(2));
-        expenses.add(getExpenseWithAccount(2));
-        expenses.add(getExpenseWithAccount(3));
+        expenses.add(getExpenseWithAccount(activeAccounts.get(0)));
+        expenses.add(getExpenseWithAccount(UUID.randomUUID()));
+        expenses.add(getExpenseWithAccount(activeAccounts.get(1)));
+        expenses.add(getExpenseWithAccount(activeAccounts.get(1)));
+        expenses.add(getExpenseWithAccount(UUID.randomUUID()));
 
         List<ExpenseObject> filteredExpenses = mExpenseFilter.byAccount(expenses, activeAccounts);
 
@@ -141,18 +141,18 @@ public class ExpenseFilterTest {
 
     @Test
     public void testFilterByAccountsShouldNotConsiderParents() {
-        List<Long> activeAccounts = new ArrayList<>();
-        activeAccounts.add(1L);
-        activeAccounts.add(3L);
+        List<UUID> activeAccounts = new ArrayList<>();
+        activeAccounts.add(UUID.randomUUID());
+        activeAccounts.add(UUID.randomUUID());
 
         List<ExpenseObject> expenses = new ArrayList<>();
 
-        ExpenseObject parent = getExpenseWithAccount(1L);
-        parent.addChild(getExpenseWithAccount(1L));
+        ExpenseObject parent = getExpenseWithAccount(activeAccounts.get(0));
+        parent.addChild(getExpenseWithAccount(activeAccounts.get(0)));
         expenses.add(parent);
 
-        expenses.add(getExpenseWithAccount(2L));
-        expenses.add(getExpenseWithAccount(3L));
+        expenses.add(getExpenseWithAccount(activeAccounts.get(1)));
+        expenses.add(getExpenseWithAccount(UUID.randomUUID()));
 
         List<ExpenseObject> filteredExpenses = mExpenseFilter.byAccount(expenses, activeAccounts);
 
@@ -161,48 +161,47 @@ public class ExpenseFilterTest {
 
     @Test
     public void testFilterByAccountsWithChildrenShouldConsiderChildren() {
-        List<Long> activeAccounts = new ArrayList<>();
-        activeAccounts.add(1L);
-        activeAccounts.add(3L);
+        List<UUID> activeAccounts = new ArrayList<>();
+        activeAccounts.add(UUID.randomUUID());
+        activeAccounts.add(UUID.randomUUID());
 
         List<ExpenseObject> expenses = new ArrayList<>();
 
-        ExpenseObject parent = getExpenseWithAccount(1L);
-        parent.addChild(getExpenseWithAccount(1L));
+        ExpenseObject parent = getExpenseWithAccount(activeAccounts.get(0));
+        parent.addChild(getExpenseWithAccount(activeAccounts.get(0)));
         expenses.add(parent);
 
-        expenses.add(getExpenseWithAccount(2L));
-        expenses.add(getExpenseWithAccount(3L));
+        expenses.add(getExpenseWithAccount(UUID.randomUUID()));
+        expenses.add(getExpenseWithAccount(activeAccounts.get(1)));
 
         List<ExpenseObject> filteredExpenses = mExpenseFilter.byAccountWithChildren(expenses, activeAccounts);
 
         assertEquals(2, filteredExpenses.size());
     }
 
-    private ExpenseObject getExpenseWithAccount(long accountId) {
+    private ExpenseObject getExpenseWithAccount(UUID accountId) {
         return getExpense(true, getSimpleCalendar(Calendar.JANUARY, 2018), accountId);
     }
 
     private ExpenseObject getExpenseWithDate(Calendar date) {
-        return getExpense(true, date, -1);
+        return getExpense(true, date, UUID.randomUUID());
     }
 
     private ExpenseObject getExpenseWithType(boolean isExpenditure) {
-        return getExpense(isExpenditure, getSimpleCalendar(Calendar.JANUARY, 2018), -1);
+        return getExpense(isExpenditure, getSimpleCalendar(Calendar.JANUARY, 2018), UUID.randomUUID());
     }
 
-    private ExpenseObject getExpense(boolean isExpenditure, Calendar date, long accountId) {
+    private ExpenseObject getExpense(boolean isExpenditure, Calendar date, UUID accountId) {
         return new ExpenseObject(
-                32,
+                UUID.randomUUID(),
                 "Ausgabe",
-                new Price(12, isExpenditure, mock(Currency.class)),
+                new Price(12, isExpenditure),
                 date,
                 mock(Category.class),
                 "",
                 accountId,
                 ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE,
-                new ArrayList<ExpenseObject>(),
-                mock(Currency.class)
+                new ArrayList<ExpenseObject>()
         );
     }
 

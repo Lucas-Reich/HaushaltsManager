@@ -48,4 +48,9 @@ public class ChildExpenseItem implements IRecyclerItem {
     public IParentRecyclerItem getParent() {
         return parent;
     }
+
+    @Override
+    public boolean isSelectable() {
+        return true;
+    }
 }

@@ -30,6 +30,11 @@ public class ReportItem implements IRecyclerItem {
         return null;
     }
 
+    @Override
+    public boolean isSelectable() {
+        return false;
+    }
+
     public boolean equals(Object obj) {
         if (!(obj instanceof ReportItem)) {
             return false;

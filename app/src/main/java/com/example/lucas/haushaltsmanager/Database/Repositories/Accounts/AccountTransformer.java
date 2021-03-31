@@ -2,33 +2,38 @@ package com.example.lucas.haushaltsmanager.Database.Repositories.Accounts;
 
 import android.database.Cursor;
 
-import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyTransformer;
 import com.example.lucas.haushaltsmanager.Database.TransformerInterface;
 import com.example.lucas.haushaltsmanager.Entities.Account;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 
-public class AccountTransformer implements TransformerInterface<Account> {
-    private final CurrencyTransformer currencyTransformer;
+import java.util.UUID;
 
-    public AccountTransformer(CurrencyTransformer currencyTransformer) {
-        this.currencyTransformer = currencyTransformer;
-    }
+public class AccountTransformer implements TransformerInterface<Account> {
     @Override
     public Account transform(Cursor c) {
-        long accountId = c.getLong(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_ID));
-        String accountName = c.getString(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_NAME));
-        double accountBalance = c.getDouble(c.getColumnIndex(ExpensesDbHelper.ACCOUNTS_COL_BALANCE));
-        Currency accountCurrency = currencyTransformer.transform(c);
+        UUID accountId = getId(c);
+        String accountName = c.getString(c.getColumnIndex("name"));
+        double accountBalance = c.getDouble(c.getColumnIndex("balance"));
 
-        if (c.isLast())
+        if (c.isLast()) {
             c.close();
+        }
 
         return new Account(
-            accountId,
-            accountName,
-            new Price(accountBalance, accountCurrency)
+                accountId,
+                accountName,
+                new Price(accountBalance)
         );
+    }
+
+    private UUID getId(Cursor c) {
+        int columnIndex = c.getColumnIndex("account_id");
+        if (-1 == columnIndex) {
+            columnIndex = c.getColumnIndex("id");
+        }
+
+        String rawId = c.getString(columnIndex);
+
+        return UUID.fromString(rawId);
     }
 }

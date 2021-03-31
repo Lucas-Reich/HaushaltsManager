@@ -1,13 +1,11 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.InsertStrategy;
 
-import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 import com.example.lucas.haushaltsmanager.Entities.Price;
-import com.example.lucas.haushaltsmanager.Entities.Template;
+import com.example.lucas.haushaltsmanager.Entities.TemplateBooking;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.ExpenseItem.ExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.TemplateItem.TemplateItem;
@@ -17,10 +15,11 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 
-public class TemplateListInsertStrategyTest {
+public class TemplateBookingListInsertStrategyTest {
     private TemplateListInsertStrategy insertStrategy = new TemplateListInsertStrategy();
 
 
@@ -57,19 +56,16 @@ public class TemplateListInsertStrategyTest {
         return items;
     }
 
-    private Template getDummyTemplate() {
-        return new Template(getDummyExpense());
+    private TemplateBooking getDummyTemplate() {
+        return new TemplateBooking(getDummyExpense());
     }
 
     private ExpenseObject getDummyExpense() {
-        Currency currency = new Currency("Euro", "EUR", "€");
-
         return new ExpenseObject(
                 "Ausgabe",
-                new Price(100, false, currency),
-                new Category("Kategorie", new Color(Color.WHITE), ExpenseType.expense(), new ArrayList<Category>()),
-                ExpensesDbHelper.INVALID_INDEX,
-                currency
+                new Price(100, false),
+                new Category("Kategorie", new Color(Color.WHITE), ExpenseType.expense()),
+                UUID.randomUUID()
         );
     }
 }

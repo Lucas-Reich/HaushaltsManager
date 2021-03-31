@@ -11,11 +11,10 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 public class RecurringBookingTest {
     /**
@@ -23,7 +22,7 @@ public class RecurringBookingTest {
      */
     @Test
     public void testGetNextOccurrenceWithDay1() {
-        RecurringBooking recurringBooking = RecurringBooking.create(
+        RecurringBooking recurringBooking = new RecurringBooking(
                 getDate(1, Calendar.JANUARY, 2018),
                 getDate(1, Calendar.JANUARY, 2019),
                 new Frequency(Calendar.DATE, 1),
@@ -42,7 +41,7 @@ public class RecurringBookingTest {
      */
     @Test
     public void testGetNextOccurrenceWithDay2() {
-        RecurringBooking recurringBooking = RecurringBooking.create(
+        RecurringBooking recurringBooking = new RecurringBooking(
                 getDate(31, Calendar.JANUARY, 2018),
                 getDate(1, Calendar.JANUARY, 2019),
                 new Frequency(Calendar.DATE, 1),
@@ -61,7 +60,7 @@ public class RecurringBookingTest {
      */
     @Test
     public void testGetNextOccurrenceWithWeek1() {
-        RecurringBooking recurringBooking = RecurringBooking.create(
+        RecurringBooking recurringBooking = new RecurringBooking(
                 getDate(1, Calendar.JANUARY, 2018),
                 getDate(1, Calendar.JANUARY, 2019),
                 new Frequency(Calendar.WEEK_OF_YEAR, 1),
@@ -80,7 +79,7 @@ public class RecurringBookingTest {
      */
     @Test
     public void testGetNextOccurrenceWithWeek2() {
-        RecurringBooking recurringBooking = RecurringBooking.create(
+        RecurringBooking recurringBooking = new RecurringBooking(
                 getDate(28, Calendar.JANUARY, 2018),
                 getDate(1, Calendar.JANUARY, 2019),
                 new Frequency(Calendar.WEEK_OF_YEAR, 1),
@@ -99,7 +98,7 @@ public class RecurringBookingTest {
      */
     @Test
     public void testGetNextOccurrenceWithMonth1() {
-        RecurringBooking recurringBooking = RecurringBooking.create(
+        RecurringBooking recurringBooking = new RecurringBooking(
                 getDate(1, Calendar.JANUARY, 2018),
                 getDate(1, Calendar.JANUARY, 2019),
                 new Frequency(Calendar.MONTH, 1),
@@ -118,7 +117,7 @@ public class RecurringBookingTest {
      */
     @Test
     public void testGetNextOccurrenceWithMonth2() {
-        RecurringBooking recurringBooking = RecurringBooking.create(
+        RecurringBooking recurringBooking = new RecurringBooking(
                 getDate(31, Calendar.JANUARY, 2018),
                 getDate(1, Calendar.JANUARY, 2019),
                 new Frequency(Calendar.MONTH, 1),
@@ -137,7 +136,7 @@ public class RecurringBookingTest {
      */
     @Test
     public void testGetNextOccurrenceWithYear1() {
-        RecurringBooking recurringBooking = RecurringBooking.create(
+        RecurringBooking recurringBooking = new RecurringBooking(
                 getDate(31, Calendar.JANUARY, 2018),
                 getDate(1, Calendar.JANUARY, 2020),
                 new Frequency(Calendar.YEAR, 1),
@@ -156,7 +155,7 @@ public class RecurringBookingTest {
      */
     @Test
     public void testGetNextOccurrenceWithYear2() {
-        RecurringBooking recurringBooking = RecurringBooking.create(
+        RecurringBooking recurringBooking = new RecurringBooking(
                 getDate(29, Calendar.FEBRUARY, 2016),
                 getDate(1, Calendar.JANUARY, 2020),
                 new Frequency(Calendar.YEAR, 1),
@@ -175,7 +174,7 @@ public class RecurringBookingTest {
      */
     @Test
     public void testGetCorrectRecurringBookingCount1() {
-        RecurringBooking recurringBooking = RecurringBooking.create(
+        RecurringBooking recurringBooking = new RecurringBooking(
                 getDate(1, Calendar.JANUARY, 2018),
                 getDate(2, Calendar.JANUARY, 2019),
                 new Frequency(Calendar.MONTH, 1),
@@ -198,7 +197,7 @@ public class RecurringBookingTest {
      */
     @Test
     public void testGetCorrectRecurringBookingCount2() {
-        RecurringBooking recurringBooking = RecurringBooking.create(
+        RecurringBooking recurringBooking = new RecurringBooking(
                 getDate(1, Calendar.JANUARY, 2018),
                 getDate(1, Calendar.JANUARY, 2019),
                 new Frequency(Calendar.MONTH, 1),
@@ -221,7 +220,7 @@ public class RecurringBookingTest {
      */
     @Test
     public void testGetCorrectRecurringBookingCount3() {
-        RecurringBooking recurringBooking = RecurringBooking.create(
+        RecurringBooking recurringBooking = new RecurringBooking(
                 getDate(1, Calendar.JANUARY, 2018),
                 getDate(31, Calendar.DECEMBER, 2018),
                 new Frequency(Calendar.MONTH, 1),
@@ -246,7 +245,7 @@ public class RecurringBookingTest {
         Calendar date = Calendar.getInstance();
         date.add(Calendar.DATE, 5);
 
-        RecurringBooking recurringBooking = RecurringBooking.create(
+        RecurringBooking recurringBooking = new RecurringBooking(
                 date,
                 getDate(1, Calendar.JANUARY, 3000),
                 new Frequency(Calendar.MONTH, 1),
@@ -264,7 +263,7 @@ public class RecurringBookingTest {
         Calendar yesterday = Calendar.getInstance();
         yesterday.add(Calendar.DATE, -1);
 
-        RecurringBooking recurringBooking = RecurringBooking.create(
+        RecurringBooking recurringBooking = new RecurringBooking(
                 yesterday,
                 getDate(1, Calendar.JANUARY, 3000),
                 new Frequency(Calendar.MONTH, 1),
@@ -285,19 +284,16 @@ public class RecurringBookingTest {
     }
 
     private Booking getBooking() {
-        Currency currency = new Currency("Euro", "EUR", "€");
-
         return new ExpenseObject(
-                ExpensesDbHelper.INVALID_INDEX,
+                UUID.randomUUID(),
                 "Ausgabe",
-                new Price(150, true, currency),
+                new Price(150, true),
                 getDate(1, Calendar.JANUARY, 2019),
-                new Category("Kategorie", Color.black(), ExpenseType.expense(), new ArrayList<Category>()),
+                new Category("Kategorie", Color.black(), ExpenseType.expense()),
                 "",
-                ExpensesDbHelper.INVALID_INDEX,
+                UUID.randomUUID(),
                 ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE,
-                new ArrayList<ExpenseObject>(),
-                currency
+                new ArrayList<ExpenseObject>()
         );
     }
 

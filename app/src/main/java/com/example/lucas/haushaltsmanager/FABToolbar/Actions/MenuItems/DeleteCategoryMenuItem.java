@@ -5,27 +5,31 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.example.lucas.haushaltsmanager.App.app;
-import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.Exceptions.CannotDeleteChildCategoryException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepositoryInterface;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.ActionPayload;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.ActionKey;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.IActionKey;
 import com.example.lucas.haushaltsmanager.R;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.ChildCategoryItem.ChildCategoryItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.CategoryItem.CategoryItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
+
+import java.sql.SQLException;
 
 public class DeleteCategoryMenuItem implements IMenuItem {
     public static final String ACTION_KEY = "deleteCategoryAction";
     private static final String TAG = DeleteCategoryMenuItem.class.getSimpleName();
 
-    private IActionKey mActionKey;
-    private OnSuccessCallback mCallback;
-    private ChildCategoryRepository mChildRepo;
+    private final OnSuccessCallback mCallback;
+    private final IActionKey mActionKey = new ActionKey(ACTION_KEY);
+    private final CategoryRepositoryInterface categoryRepository;
 
-    public DeleteCategoryMenuItem(OnSuccessCallback callback) {
+    public DeleteCategoryMenuItem(
+            OnSuccessCallback callback,
+            CategoryRepositoryInterface categoryRepository
+    ) {
         mCallback = callback;
-        mActionKey = new ActionKey(ACTION_KEY);
+        this.categoryRepository = categoryRepository;
     }
 
     @Override
@@ -50,34 +54,28 @@ public class DeleteCategoryMenuItem implements IMenuItem {
 
     @Override
     public void handleClick(ActionPayload actionPayload, Context context) {
-        initRepo(context);
-
         for (IRecyclerItem selectedItem : actionPayload.getItems()) {
-            if (!(selectedItem instanceof ChildCategoryItem)) {
+            if (!(selectedItem instanceof CategoryItem)) {
                 continue;
             }
 
-            deleteChildCategory((ChildCategoryItem) selectedItem);
+            deleteCategory((CategoryItem) selectedItem);
         }
     }
 
-    private void initRepo(Context context) {
-        mChildRepo = new ChildCategoryRepository(context);
-    }
-
-    private void deleteChildCategory(ChildCategoryItem childCategory) {
-        Category category = childCategory.getContent();
+    private void deleteCategory(CategoryItem categoryItem) {
+        Category category = categoryItem.getContent();
 
         try {
-            mChildRepo.delete(category);
+            categoryRepository.delete(category);
 
             if (null != mCallback) {
-                mCallback.onSuccess(childCategory);
+                mCallback.onSuccess(categoryItem);
             }
-        } catch (CannotDeleteChildCategoryException e) {
+        } catch (SQLException e) {
 
             Toast.makeText(app.getContext(), R.string.could_not_delete_child_category, Toast.LENGTH_SHORT).show();
-            Log.e(TAG, "Could not delete ChildCategory " + category.getTitle(), e);
+            Log.e(TAG, "Could not delete Category " + category.getTitle(), e);
         }
     }
 

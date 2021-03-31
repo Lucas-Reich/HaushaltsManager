@@ -1,6 +1,5 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.SelectionRules;
 
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.AdItem.AdItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.ChildExpenseItem.ChildExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.ExpenseItem.ExpenseItem;
@@ -65,10 +64,6 @@ public class ExpenseListSelectionRules implements SelectionRules {
         }
 
         if (item instanceof DateItem) {
-            return true;
-        }
-
-        if (item instanceof AdItem) {
             return true;
         }
 

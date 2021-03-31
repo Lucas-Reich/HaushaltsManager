@@ -7,7 +7,9 @@ import androidx.annotation.StringRes;
 
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepositoryInterface;
 import com.example.lucas.haushaltsmanager.Entities.Account;
+import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 
 import java.io.File;
@@ -15,19 +17,22 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Klasse um eine Liste von ExpenseObjects in einem CSV Datei zu schreiben und dieses dann abzuspeichern.
  */
 public class CsvBookingExporter {
     private final File targetDirectory;
-    private List<Account> accounts;
+    private final List<Account> accounts;
 
     public CsvBookingExporter(File targetDirectory, Context context) {
 
         guardAgainstInvalidDirectory(targetDirectory);
         this.targetDirectory = targetDirectory;
-        initializeAccountList(context);
+
+        AccountRepositoryInterface accountRepository = new AccountRepository(context);
+        accounts = accountRepository.getAll();
     }
 
     /**
@@ -126,7 +131,7 @@ public class CsvBookingExporter {
         expenseString.append(expense.getTitle()).append(",");
         expenseString.append(expense.getDateString()).append(",");
         expenseString.append(expense.getNotice()).append(",");
-        expenseString.append(expense.getCurrency().getName()).append(",");
+        expenseString.append(new Currency().getName()).append(",");
         expenseString.append(expense.getCategory().getTitle()).append(",");
         Account account = getAccount(expense.getAccountId());
         expenseString.append(account != null ? account.getTitle() : "").append("\r\n");
@@ -217,26 +222,13 @@ public class CsvBookingExporter {
         return String.format("Export_%s.csv", fileName);
     }
 
-    /**
-     * Methode um das Konto zu einer Konto id zu bekommen.
-     *
-     * @param accountId Id des Kontos
-     * @return Konto mit der angegebenen Id
-     */
-    private Account getAccount(long accountId) {
+    private Account getAccount(UUID id) {
         for (Account account : accounts) {
-            if (account.getIndex() == accountId) {
+            if (account.getId() == id) {
                 return account;
             }
         }
 
         return null;
-    }
-
-    /**
-     * Methode alle Konten in einer lokalen Liste zu speichern
-     */
-    private void initializeAccountList(Context context) {
-        accounts = new AccountRepository(context).getAll();
     }
 }

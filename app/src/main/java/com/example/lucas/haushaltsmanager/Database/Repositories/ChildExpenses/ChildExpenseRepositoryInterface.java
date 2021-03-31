@@ -6,6 +6,7 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Ex
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface ChildExpenseRepositoryInterface {
     boolean exists(ExpenseObject childExpense);
@@ -16,11 +17,11 @@ public interface ChildExpenseRepositoryInterface {
 
     ExpenseObject extractChildFromBooking(ExpenseObject childExpense) throws ChildExpenseNotFoundException;
 
-    ExpenseObject get(long childExpenseId) throws ChildExpenseNotFoundException;
+    ExpenseObject get(UUID childExpenseId) throws ChildExpenseNotFoundException;
 
-    List<ExpenseObject> getAll(long parentExpenseId);
+    List<ExpenseObject> getAll(UUID parentExpenseId);
 
-    ExpenseObject insert(ExpenseObject parentExpense, ExpenseObject childExpense);
+    void insert(ExpenseObject parentExpense, ExpenseObject childExpense);
 
     void update(ExpenseObject childExpense) throws ChildExpenseNotFoundException;
 

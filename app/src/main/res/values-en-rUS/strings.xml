@@ -68,7 +68,9 @@
     <string name="error_name_missing">Please enter a name</string>
     <string name="could_not_create_backup">Backup could not be created</string>
     <string name="cannot_update_account">Cannot update Account, Account not found!</string>
-    <string name="category_not_found">Cannot update category. Category not found</string>
+    <string name="cannot_create_account">Account could  not be created!</string>
+    <string name="cannot_update_category">Cannot update category. Category not found</string>
+    <string name="cannot_create_category">Category could not be created!</string>
     <string name="btn_choose">Choose</string>
     <string name="select_currency">Choose a currency</string>
     <string name="choose_weekday">Select a Weekday</string>
@@ -104,7 +106,7 @@
     <string name="activity_import_export_name">Import/ Export</string>
     <string name="activity_settings_name">Settings</string>
     <string name="activity_about_name">About</string>
-    <string name="template_empty_list">No templates created</string>
+    <string name="template_empty_list">No templateBookings created</string>
     <string name="course_empty_list">No bookings created</string>
     <string name="licenses_title">Licenses</string>
     <string name="backup_restoring_successful">Restored Backup</string>
@@ -115,7 +117,7 @@
     <string name="recurring_bookings_empty_list">No recurring bookings this month</string>
     <string name="default_backup_location">Choose default backup location</string>
     <string name="could_not_update_booking">Failed to update Expense</string>
-    <string name="saved_as_template">Saved expense as template</string>
+    <string name="saved_as_template">Saved expense as templateBooking</string>
     <string name="activity_create_recurring_booking">Create recurring booking</string>
     <string name="could_not_save_recurring_booking">Cannot save RecurringBooking</string>
     <string name="abort_action_confirmation_text">Unsaved data will be lost! Still close?</string>
@@ -162,7 +164,7 @@
     <string name="fab_menu_item_combine_hint">Combine selected Bookings</string>
     <string name="fab_menu_item_extract_hint">Extract selected children</string>
     <string name="fab_menu_item_recurring_hint">Save as recurring Booking</string>
-    <string name="fab_menu_item_template_hint">Save as template</string>
+    <string name="fab_menu_item_template_hint">Save as templateBooking</string>
     <string name="expenses_empty_list">No Expenses created</string>
     <string name="release_notes_110_tab_one_feature_recycler_view">"Infinite booking overview "</string>
     <string name="release_notes_110_tab_one_feature_animations">Animations in the booking overview</string>

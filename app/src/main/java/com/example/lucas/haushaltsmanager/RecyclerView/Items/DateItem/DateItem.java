@@ -53,6 +53,11 @@ public class DateItem implements IParentRecyclerItem {
     }
 
     @Override
+    public boolean isSelectable() {
+        return false;
+    }
+
+    @Override
     public List<IRecyclerItem> getChildren() {
         return new ArrayList<>();
     }

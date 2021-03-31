@@ -3,72 +3,72 @@ package com.example.lucas.haushaltsmanager.Database.Repositories.Templates;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
-import com.example.lucas.haushaltsmanager.Database.Migrations.TemplateBookingsTable;
 import com.example.lucas.haushaltsmanager.Database.QueryInterface;
-import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryTransformer;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyTransformer;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryTransformer;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Templates.Exceptions.TemplateCouldNotBeCreatedException;
 import com.example.lucas.haushaltsmanager.Database.TransformerInterface;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
-import com.example.lucas.haushaltsmanager.Entities.Template;
+import com.example.lucas.haushaltsmanager.Entities.TemplateBooking;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class TemplateRepository {
+    private static final String TABLE = "TEMPLATE_BOOKINGS";
+
     private SQLiteDatabase mDatabase;
-    private final TransformerInterface<Template> transformer;
+    private final TransformerInterface<TemplateBooking> transformer;
 
     public TemplateRepository(Context context) {
         DatabaseManager.initializeInstance(new ExpensesDbHelper(context));
 
         mDatabase = DatabaseManager.getInstance().openDatabase();
         transformer = new TemplateTransformer(
-                new CurrencyTransformer(),
-                new ChildCategoryTransformer()
+                new CategoryTransformer()
         );
     }
 
-    public List<Template> getAll() {
+    public List<TemplateBooking> getAll() {
         Cursor c = executeRaw(new GetAllTemplateBookingsQuery());
         c.moveToFirst();
 
-        ArrayList<Template> templateBookings = new ArrayList<>();
+        ArrayList<TemplateBooking> templateBookingBookings = new ArrayList<>();
         while (!c.isAfterLast()) {
-            templateBookings.add(transformer.transform(c));
+            templateBookingBookings.add(transformer.transform(c));
             c.moveToNext();
         }
 
         c.close();
-        return templateBookings;
+        return templateBookingBookings;
     }
 
-    public Template insert(Template template) {
-        ExpenseObject expense = template.getTemplate();
+    public void insert(TemplateBooking templateBooking) throws TemplateCouldNotBeCreatedException {
+        ExpenseObject expense = templateBooking.getTemplate();
 
         ContentValues values = new ContentValues();
-        values.put(TemplateBookingsTable.TB_EXPENSE_TYPE, expense.getExpenseType().name());
-        values.put(TemplateBookingsTable.TB_PRICE, expense.getUnsignedPrice());
-        values.put(TemplateBookingsTable.TB_CATEGORY_ID, expense.getCategory().getIndex());
-        values.put(TemplateBookingsTable.TB_EXPENDITURE, expense.isExpenditure());
-        values.put(TemplateBookingsTable.TB_TITLE, expense.getTitle());
-        values.put(TemplateBookingsTable.TB_DATE, expense.getDate().getTimeInMillis());
-        values.put(TemplateBookingsTable.TB_ACCOUNT_ID, expense.getAccountId());
-        values.put(TemplateBookingsTable.TB_CURRENCY_ID, expense.getCurrency().getIndex());
+        values.put("id", templateBooking.getId().toString());
+        values.put("expense_type", expense.getExpenseType().name());
+        values.put("price", expense.getUnsignedPrice());
+        values.put("category_id", expense.getCategory().getId().toString());
+        values.put("expenditure", expense.isExpenditure());
+        values.put("title", expense.getTitle());
+        values.put("date", expense.getDate().getTimeInMillis());
+        values.put("account_id", expense.getAccountId().toString());
 
-        long insertedTemplateId = mDatabase.insert(
-                TemplateBookingsTable.TB_TABLE,
-                null,
-                values
-        );
-
-        return new Template(
-                insertedTemplateId,
-                expense
-        );
+        try {
+            mDatabase.insertOrThrow(
+                    TABLE,
+                    null,
+                    values
+            );
+        } catch (SQLException e) {
+            throw new TemplateCouldNotBeCreatedException(templateBooking, e);
+        }
     }
 
     private Cursor executeRaw(QueryInterface query) {

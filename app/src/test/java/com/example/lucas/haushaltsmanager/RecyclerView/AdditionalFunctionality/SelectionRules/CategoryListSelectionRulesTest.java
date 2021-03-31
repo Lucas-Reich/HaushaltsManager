@@ -3,10 +3,8 @@ package com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.AdItem.AdItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.ChildCategoryItem.ChildCategoryItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.CategoryItem.CategoryItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.ParentCategoryItem.ParentCategoryItem;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -27,18 +25,9 @@ public class CategoryListSelectionRulesTest {
 
     @Test
     public void parentCategoryItemCannotBeSelected() {
-        ParentCategoryItem parentCategoryItem = new ParentCategoryItem(getDummyCategory());
+        CategoryItem categoryItem = new CategoryItem(getDummyCategory());
 
-        boolean parentCanBeSelected = selectionRules.canBeSelected(parentCategoryItem, new ArrayList<IRecyclerItem>());
-
-        assertFalse(parentCanBeSelected);
-    }
-
-    @Test
-    public void adItemCannotBeSelected() {
-        AdItem adItem = new AdItem();
-
-        boolean parentCanBeSelected = selectionRules.canBeSelected(adItem, new ArrayList<IRecyclerItem>());
+        boolean parentCanBeSelected = selectionRules.canBeSelected(categoryItem, new ArrayList<IRecyclerItem>());
 
         assertFalse(parentCanBeSelected);
     }
@@ -47,7 +36,7 @@ public class CategoryListSelectionRulesTest {
     public void alreadySelectedItemCannotBeSelected() {
         List<IRecyclerItem> selectedItems = new ArrayList<>();
 
-        ChildCategoryItem selectedItem = new ChildCategoryItem(getDummyCategory(), getDummyParentCategoryItem());
+        CategoryItem selectedItem = new CategoryItem(getDummyCategory());
         selectedItems.add(selectedItem);
 
         boolean canBeSelected = selectionRules.canBeSelected(selectedItem, selectedItems);
@@ -57,34 +46,18 @@ public class CategoryListSelectionRulesTest {
 
     @Test
     public void childCategoryItemCanBeSelected() {
-        ChildCategoryItem childCategoryItem = new ChildCategoryItem(getDummyCategory(), null);
+        CategoryItem childCategoryItem = new CategoryItem(getDummyCategory());
 
         boolean childCanBeSelected = selectionRules.canBeSelected(childCategoryItem, new ArrayList<IRecyclerItem>());
 
         assertTrue(childCanBeSelected);
     }
 
-    @Test
-    public void childCategoryItemWithADifferentParentCannotBeSelected() {
-        List<IRecyclerItem> selectedItems = new ArrayList<>();
-        selectedItems.add(new ChildCategoryItem(getDummyCategory(), getDummyParentCategoryItem()));
-
-        ChildCategoryItem child = new ChildCategoryItem(getDummyCategory(), getDummyParentCategoryItem());
-        boolean canBeSelected = selectionRules.canBeSelected(child, selectedItems);
-
-        assertFalse(canBeSelected);
-    }
-
-    private ParentCategoryItem getDummyParentCategoryItem() {
-        return new ParentCategoryItem(getDummyCategory());
-    }
-
     private Category getDummyCategory() {
         return new Category(
                 "Kategorie",
                 new Color(Color.BLACK),
-                ExpenseType.expense(),
-                new ArrayList<Category>()
+                ExpenseType.expense()
         );
     }
 }

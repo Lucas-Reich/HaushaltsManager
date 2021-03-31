@@ -8,7 +8,7 @@ import android.view.View;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lucas.haushaltsmanager.Database.Repositories.Templates.TemplateRepository;
-import com.example.lucas.haushaltsmanager.Entities.Template;
+import com.example.lucas.haushaltsmanager.Entities.TemplateBooking;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.RecyclerItemClickListener;
 import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.ItemCreator;
@@ -58,7 +58,7 @@ public class TemplatesActivity extends AbstractAppCompatActivity implements Recy
         //  Außerdem sollte man Templates auch löschen können.
 
         Intent returnTemplateIntent = new Intent();
-        returnTemplateIntent.putExtra("templateObj", ((Template) item.getContent()).getTemplate());
+        returnTemplateIntent.putExtra("templateObj", ((TemplateBooking) item.getContent()).getTemplate());
         setResult(Activity.RESULT_OK, returnTemplateIntent);
         finish();
     }
@@ -77,8 +77,8 @@ public class TemplatesActivity extends AbstractAppCompatActivity implements Recy
     }
 
     private List<IRecyclerItem> loadData() {
-        List<Template> templates = mTemplateRepo.getAll();
+        List<TemplateBooking> templateBookings = mTemplateRepo.getAll();
 
-        return ItemCreator.createTemplateItems(templates);
+        return ItemCreator.createTemplateItems(templateBookings);
     }
 }

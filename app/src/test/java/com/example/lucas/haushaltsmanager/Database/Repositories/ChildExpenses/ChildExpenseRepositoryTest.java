@@ -2,18 +2,16 @@ package com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses;
 
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountCouldNotBeCreatedException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.AddChildToChildException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.CannotDeleteChildExpenseException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.ChildExpenseNotFoundException;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepository;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 import com.example.lucas.haushaltsmanager.Entities.Price;
@@ -30,47 +28,32 @@ import org.robolectric.RuntimeEnvironment;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @RunWith(RobolectricTestRunner.class)
 public class ChildExpenseRepositoryTest {
     private Account account;
-    private Category category;
     private AccountRepository mAccountRepo;
-    private CurrencyRepository mCurrencyRepo;
-    private ChildCategoryRepository mChildCategoryRepo;
     private ChildExpenseRepository mChildExpenseRepo;
     private ExpenseRepository mBookingRepo;
 
     private DatabaseManager mDbManagerInstance;
 
     @Before
-    public void setup() {
+    public void setup() throws AccountCouldNotBeCreatedException {
 
         mChildExpenseRepo = new ChildExpenseRepository(RuntimeEnvironment.application);
         mDbManagerInstance = DatabaseManager.getInstance();
 
         mAccountRepo = new AccountRepository(RuntimeEnvironment.application);
-        mCurrencyRepo = new CurrencyRepository(RuntimeEnvironment.application);
-        mChildCategoryRepo = new ChildCategoryRepository(RuntimeEnvironment.application);
         mBookingRepo = new ExpenseRepository(RuntimeEnvironment.application);
 
-        Category parentCategory = mock(Category.class);
-        when(parentCategory.getIndex()).thenReturn(107L);
-
-        category = new Category("Kategorie", new Color("#121212"), ExpenseType.expense(), new ArrayList<Category>());
-        category = mChildCategoryRepo.insert(parentCategory, category);
-
-        Currency currency = new Currency("Euro", "EUR", "€");
-        currency = mCurrencyRepo.insert(currency);
-
-        account = new Account("Konto", new Price(70, currency));
-        account = mAccountRepo.insert(account);
+        account = new Account("Konto", new Price(70));
+        mAccountRepo.insert(account);
     }
 
     @After
@@ -83,7 +66,8 @@ public class ChildExpenseRepositoryTest {
     @Test
     public void testExistsWithValidChildExpenseShouldSucceed() {
         ExpenseObject parentExpense = getParentExpenseWithChildren();
-        ExpenseObject childExpense = mChildExpenseRepo.insert(parentExpense, parentExpense.getChildren().get(0));
+        ExpenseObject childExpense = parentExpense.getChildren().get(0);
+        mChildExpenseRepo.insert(parentExpense, childExpense);
 
         boolean exists = mChildExpenseRepo.exists(childExpense);
         assertTrue("Kindbuchung wurde nicht gefunden", exists);
@@ -103,7 +87,7 @@ public class ChildExpenseRepositoryTest {
         ExpenseObject parentExpense = getParentExpenseWithChildren();
 
         ExpenseObject childExpense = getSimpleExpense();
-        childExpense.setPrice(new Price(133, false, getDefaultCurrency()));
+        childExpense.setPrice(new Price(133, false));
 
         try {
             ExpenseObject actualExpense = mChildExpenseRepo.addChildToBooking(childExpense, parentExpense);
@@ -113,7 +97,7 @@ public class ChildExpenseRepositoryTest {
             assertEquals(parentExpense.getChildren().get(2), actualExpense.getChildren().get(2));
             assertEqualAccountBalance(
                     account.getBalance().getSignedValue() + childExpense.getSignedPrice(),
-                    account.getIndex()
+                    account.getId()
             );
         } catch (AddChildToChildException e) {
 
@@ -124,11 +108,11 @@ public class ChildExpenseRepositoryTest {
     @Test
     public void testAddChildToBookingWithExistingParentThatHasNoChildrenShouldSucceed() {
         ExpenseObject parentExpense = getSimpleExpense();
-        parentExpense.setPrice(new Price(144, true, getDefaultCurrency()));
-        parentExpense = mBookingRepo.insert(parentExpense);
+        parentExpense.setPrice(new Price(144, true));
+        mBookingRepo.insert(parentExpense);
 
         ExpenseObject childExpense = getSimpleExpense();
-        childExpense.setPrice(new Price(177, true, getDefaultCurrency()));
+        childExpense.setPrice(new Price(177, true));
 
         try {
             ExpenseObject actualParentExpense = mChildExpenseRepo.addChildToBooking(childExpense, parentExpense);
@@ -148,7 +132,8 @@ public class ChildExpenseRepositoryTest {
 
     @Test
     public void testAddChildToBookingWithParentBookingIsChildShouldThrowAddChildToExpenseException() {
-        ExpenseObject parentExpense = mBookingRepo.insert(getParentExpenseWithChildren());
+        ExpenseObject parentExpense = getParentExpenseWithChildren();
+        mBookingRepo.insert(parentExpense);
         ExpenseObject childExpense = getSimpleExpense();
 
         try {
@@ -164,32 +149,38 @@ public class ChildExpenseRepositoryTest {
     @Test
     public void testCombineExpensesWithParentExpensesShouldSucceed() {
         ArrayList<ExpenseObject> expenses = new ArrayList<>();
-        expenses.add(mBookingRepo.insert(getSimpleExpense()));
-        expenses.add(mBookingRepo.insert(getSimpleExpense()));
+        ExpenseObject expense1 = getSimpleExpense();
+        mBookingRepo.insert(expense1);
+        ExpenseObject expense2 = getSimpleExpense();
+        mBookingRepo.insert(expense2);
+
+        expenses.add(expense1);
+        expenses.add(expense2);
 
         ExpenseObject parentExpense = mChildExpenseRepo.combineExpenses(expenses);
 
-        assertTrue("ParentExpense wurde nicht erstellt", mBookingRepo.exists(parentExpense));
+        assertBookingExists(parentExpense);
         assertTrue("ChildExpense 1 wurde nicht erstellt", mChildExpenseRepo.exists(parentExpense.getChildren().get(0)));
         assertTrue("ChildExpense 2 wurde nicht erstellt", mChildExpenseRepo.exists(parentExpense.getChildren().get(1)));
         assertEqualAccountBalance(
                 account.getBalance().getSignedValue() + expenses.get(0).getSignedPrice() + expenses.get(1).getSignedPrice(),
-                account.getIndex()
+                account.getId()
         );
     }
 
     @Test
     public void testExtractChildFromBookingShouldSucceed() {
-        ExpenseObject parentExpense = mBookingRepo.insert(getParentExpenseWithChildren());
+        ExpenseObject parentExpense = getParentExpenseWithChildren();
+        mBookingRepo.insert(parentExpense);
 
         try {
             ExpenseObject extractedChildExpense = mChildExpenseRepo.extractChildFromBooking(parentExpense.getChildren().get(0));
 
-            assertTrue("Die KindBuchung wurde nicht zu einer ParentBuchung konvertiert", mBookingRepo.exists(extractedChildExpense));
+            assertBookingExists(extractedChildExpense);
             assertFalse("Die extrahierte KindBuchung wurde nicht gelöscht", mChildExpenseRepo.exists(extractedChildExpense));
             assertEqualAccountBalance(
                     account.getBalance().getSignedValue() + parentExpense.getChildren().get(0).getSignedPrice() + parentExpense.getChildren().get(1).getSignedPrice(),
-                    account.getIndex()
+                    account.getId()
             );
 
         } catch (ChildExpenseNotFoundException e) {
@@ -202,16 +193,16 @@ public class ChildExpenseRepositoryTest {
     public void testExtractLastChildFromBookingShouldSucceedAndParentBookingShouldBeRemoved() {
         ExpenseObject parentExpense = getParentExpenseWithChildren();
         parentExpense.removeChild(parentExpense.getChildren().get(1));
-        parentExpense = mBookingRepo.insert(parentExpense);
+        mBookingRepo.insert(parentExpense);
 
         try {
             ExpenseObject extractedChildExpense = mChildExpenseRepo.extractChildFromBooking(parentExpense.getChildren().get(0));
 
-            assertTrue("KindBuchung wurde nicht in eine ParentBuchung konvertiert", mBookingRepo.exists(extractedChildExpense));
-            assertFalse("ParentBuchung ohne Kinder wurde nicht gelöscht", mBookingRepo.exists(parentExpense));
+            assertBookingExists(extractedChildExpense);
+            assertBookingNotExisting(parentExpense);
             assertEqualAccountBalance(
                     account.getBalance().getSignedValue() + parentExpense.getChildren().get(0).getSignedPrice(),
-                    account.getIndex()
+                    account.getId()
             );
 
         } catch (ChildExpenseNotFoundException e) {
@@ -230,10 +221,10 @@ public class ChildExpenseRepositoryTest {
 
         } catch (ChildExpenseNotFoundException e) {
 
-            assertEquals(String.format("Could not find Child Booking with id %s.", childExpense.getIndex()), e.getMessage());
+            assertEquals(String.format("Could not find Child Booking with id %s.", childExpense.getId().toString()), e.getMessage());
             assertEqualAccountBalance(
                     account.getBalance().getSignedValue(),
-                    account.getIndex()
+                    account.getId()
             );
         }
     }
@@ -241,10 +232,11 @@ public class ChildExpenseRepositoryTest {
     @Test
     public void testGetWithExistingChildExpenseShouldSucceed() {
         ExpenseObject parentExpense = getParentExpenseWithChildren();
-        ExpenseObject expectedChildExpense = mChildExpenseRepo.insert(parentExpense, parentExpense.getChildren().get(0));
+        ExpenseObject expectedChildExpense = parentExpense.getChildren().get(0);
+        mChildExpenseRepo.insert(parentExpense, expectedChildExpense);
 
         try {
-            ExpenseObject actualChildExpense = mChildExpenseRepo.get(expectedChildExpense.getIndex());
+            ExpenseObject actualChildExpense = mChildExpenseRepo.get(expectedChildExpense.getId());
             assertEquals(expectedChildExpense, actualChildExpense);
 
         } catch (ChildExpenseNotFoundException e) {
@@ -255,7 +247,7 @@ public class ChildExpenseRepositoryTest {
 
     @Test
     public void testGetWithNotExistingChildExpenseShouldThrowChildExpenseNotFoundException() {
-        long notExistingChildExpenseId = 524L;
+        UUID notExistingChildExpenseId = UUID.randomUUID();
 
         try {
             mChildExpenseRepo.get(notExistingChildExpenseId);
@@ -270,11 +262,11 @@ public class ChildExpenseRepositoryTest {
     @Test
     public void testGetAllShouldOnlyReturnChildrenThatAreNotHidden() {
         ExpenseObject parentExpense = getParentExpenseWithChildren();
-        parentExpense = mBookingRepo.insert(parentExpense);
+        mBookingRepo.insert(parentExpense);
 
         try {
             mChildExpenseRepo.hide(parentExpense.getChildren().get(0));
-            List<ExpenseObject> fetchedChildren = mChildExpenseRepo.getAll(parentExpense.getIndex());
+            List<ExpenseObject> fetchedChildren = mChildExpenseRepo.getAll(parentExpense.getId());
 
             assertEquals("Es wurden zu viele Kinder aus der Datenbank geholt", 1, fetchedChildren.size());
             assertFalse("Ein verstecktes Kind wurde aus der Datenbank geholt", fetchedChildren.contains(parentExpense.getChildren().get(0)));
@@ -288,18 +280,19 @@ public class ChildExpenseRepositoryTest {
     @Test
     public void testUpdateWithExistingChildExpenseShouldSucceed() {
         ExpenseObject parentExpense = getParentExpenseWithChildren();
-        ExpenseObject expectedChildExpense = mChildExpenseRepo.insert(parentExpense, parentExpense.getChildren().get(0));
+        ExpenseObject expectedChildExpense = parentExpense.getChildren().get(0);
+        mChildExpenseRepo.insert(parentExpense, expectedChildExpense);
 
         try {
-            expectedChildExpense.setPrice(new Price(13, true, getDefaultCurrency()));
+            expectedChildExpense.setPrice(new Price(13, true));
 
             mChildExpenseRepo.update(expectedChildExpense);
-            ExpenseObject actualChildExpense = mChildExpenseRepo.get(expectedChildExpense.getIndex());
+            ExpenseObject actualChildExpense = mChildExpenseRepo.get(expectedChildExpense.getId());
 
             assertEquals(expectedChildExpense, actualChildExpense);
             assertEqualAccountBalance(
                     account.getBalance().getSignedValue() + expectedChildExpense.getSignedPrice(),
-                    account.getIndex()
+                    account.getId()
             );
 
         } catch (ChildExpenseNotFoundException e) {
@@ -318,13 +311,14 @@ public class ChildExpenseRepositoryTest {
 
         } catch (ChildExpenseNotFoundException e) {
 
-            assertEquals(String.format("Could not find Child Booking with id %s.", childExpense.getIndex()), e.getMessage());
+            assertEquals(String.format("Could not find Child Booking with id %s.", childExpense.getId().toString()), e.getMessage());
         }
     }
 
     @Test
     public void testDeleteWithExistingChildExpenseShouldSucceed() {
-        ExpenseObject parentExpense = mBookingRepo.insert(getParentExpenseWithChildren());
+        ExpenseObject parentExpense = getParentExpenseWithChildren();
+        mBookingRepo.insert(parentExpense);
         ExpenseObject childExpense = parentExpense.getChildren().get(0);
 
         try {
@@ -360,14 +354,14 @@ public class ChildExpenseRepositoryTest {
     public void testDeleteWithChildExpenseIsLastOfParentShouldDeleteParentAsWell() {
         ExpenseObject parentExpense = getParentExpenseWithChildren();
         parentExpense.getChildren().remove(parentExpense.getChildren().get(1));
-        parentExpense = mBookingRepo.insert(parentExpense);
-        assertTrue("ParentExpense wurde nicht erstellt", mBookingRepo.exists(parentExpense));
+        mBookingRepo.insert(parentExpense);
+        assertBookingExists(parentExpense);
 
         try {
             mChildExpenseRepo.delete(parentExpense.getChildren().get(0));
 
             assertFalse("KindBuchung wurde nicht gelöscht", mChildExpenseRepo.exists(parentExpense.getChildren().get(0)));
-            assertFalse("ParentBuchung wurde nicht gelöscht", mBookingRepo.exists(parentExpense));
+            assertBookingNotExisting(parentExpense);
 
         } catch (Exception e) {
 
@@ -377,7 +371,8 @@ public class ChildExpenseRepositoryTest {
 
     @Test
     public void testGetParentWithExistingChildExpenseShouldSucceed() {
-        ExpenseObject expectedParentExpense = mBookingRepo.insert(getParentExpenseWithChildren());
+        ExpenseObject expectedParentExpense = getParentExpenseWithChildren();
+        mBookingRepo.insert(expectedParentExpense);
 
         try {
             ExpenseObject actualParentExpense = mChildExpenseRepo.getParent(expectedParentExpense.getChildren().get(0));
@@ -402,14 +397,15 @@ public class ChildExpenseRepositoryTest {
             Assert.fail("Existierende ParentBuchung konnte nicht gefunden werden");
         } catch (ChildExpenseNotFoundException e) {
 
-            assertEquals(String.format("Could not find Child Booking with id %s.", childExpense.getIndex()), e.getMessage());
+            assertEquals(String.format("Could not find Child Booking with id %s.", childExpense.getId().toString()), e.getMessage());
         }
     }
 
     @Test
     public void testGetParentWithNotExistingParentExpenseShouldThrowExpenseNotFoundException() {
         ExpenseObject parentExpense = getParentExpenseWithChildren();
-        ExpenseObject childExpense = mChildExpenseRepo.insert(parentExpense, parentExpense.getChildren().get(0));
+        ExpenseObject childExpense = parentExpense.getChildren().get(0);
+        mChildExpenseRepo.insert(parentExpense, childExpense);
 
         try {
             mChildExpenseRepo.getParent(childExpense);
@@ -426,17 +422,18 @@ public class ChildExpenseRepositoryTest {
 
     @Test
     public void testHideWithExistingChildExpenseShouldSucceed() {
-        ExpenseObject parentExpense = mBookingRepo.insert(getParentExpenseWithChildren());
+        ExpenseObject parentExpense = getParentExpenseWithChildren();
+        mBookingRepo.insert(parentExpense);
 
         try {
             ExpenseObject hiddenChild = parentExpense.getChildren().get(0);
             mChildExpenseRepo.hide(hiddenChild);
 
             assertTrue("KindBuchung wurde gelöscht", mChildExpenseRepo.exists(hiddenChild));
-            assertFalse("Versteckte Buchung wurde aus der Datenbank geholt", mChildExpenseRepo.getAll(parentExpense.getIndex()).contains(hiddenChild));
+            assertFalse("Versteckte Buchung wurde aus der Datenbank geholt", mChildExpenseRepo.getAll(parentExpense.getId()).contains(hiddenChild));
             assertEqualAccountBalance(
                     account.getBalance().getSignedValue() + parentExpense.getChildren().get(1).getSignedPrice(),
-                    account.getIndex()
+                    account.getId()
             );
 
         } catch (ChildExpenseNotFoundException e) {
@@ -449,17 +446,17 @@ public class ChildExpenseRepositoryTest {
     public void testHideLastChildOfParentShouldHideParentAsWell() {
         ExpenseObject parentExpense = getParentExpenseWithChildren();
         parentExpense.getChildren().remove(1);
-        parentExpense = mBookingRepo.insert(parentExpense);
+        mBookingRepo.insert(parentExpense);
 
         try {
             ExpenseObject hiddenChildExpense = parentExpense.getChildren().get(0);
             mChildExpenseRepo.hide(hiddenChildExpense);
 
             assertTrue("ParentBuchung wurde nicht versteckt", mBookingRepo.isHidden(parentExpense));
-            assertFalse("KindBuchung wurde nicht versteckt", mChildExpenseRepo.getAll(parentExpense.getIndex()).contains(hiddenChildExpense));
+            assertFalse("KindBuchung wurde nicht versteckt", mChildExpenseRepo.getAll(parentExpense.getId()).contains(hiddenChildExpense));
             assertEqualAccountBalance(
                     account.getBalance().getSignedValue(),
-                    account.getIndex()
+                    account.getId()
             );
         } catch (ChildExpenseNotFoundException e) {
 
@@ -480,17 +477,18 @@ public class ChildExpenseRepositoryTest {
 
         } catch (ChildExpenseNotFoundException e) {
 
-            assertEquals(String.format("Could not find Child Booking with id %s.", childExpense.getIndex()), e.getMessage());
+            assertEquals(String.format("Could not find Child Booking with id %s.", childExpense.getId().toString()), e.getMessage());
             assertEqualAccountBalance(
                     account.getBalance().getSignedValue(),
-                    account.getIndex()
+                    account.getId()
             );
         }
     }
 
     @Test
     public void testIsHiddenWithExistingChildExpenseShouldSucceed() {
-        ExpenseObject parentExpense = mBookingRepo.insert(getParentExpenseWithChildren());
+        ExpenseObject parentExpense = getParentExpenseWithChildren();
+        mBookingRepo.insert(parentExpense);
 
         try {
             ExpenseObject hiddenChildExpense = parentExpense.getChildren().get(0);
@@ -511,24 +509,56 @@ public class ChildExpenseRepositoryTest {
         }
     }
 
-    private ExpenseObject getSimpleExpense() {
-        return new ExpenseObject(
-                "Ausgabe",
-                new Price(new Random().nextInt(1000), false, getDefaultCurrency()),
-                category,
-                account.getIndex(),
-                getDefaultCurrency()
-        );
+    private void assertBookingExists(ExpenseObject booking) {
+        List<ExpenseObject> bookings = mBookingRepo.getAll();
+
+        boolean bookingFound = false;
+        for (ExpenseObject existingBooking : bookings) {
+            if (!existingBooking.equals(booking)) {
+                continue;
+            }
+
+            bookingFound = true;
+            break;
+        }
+
+        assertTrue(bookingFound);
     }
 
-    private Currency getDefaultCurrency() {
-        Currency currency = new Currency("Euro", "EUR", "€");
-        return mCurrencyRepo.insert(currency);
+    private void assertBookingNotExisting(ExpenseObject booking) {
+        List<ExpenseObject> bookings = mBookingRepo.getAll();
+
+        boolean bookingFound = false;
+        for (ExpenseObject existingBooking : bookings) {
+            if (!existingBooking.equals(booking)) {
+                continue;
+            }
+
+            bookingFound = true;
+            break;
+        }
+
+        assertFalse(bookingFound);
+    }
+
+    private ExpenseObject getSimpleExpense() {
+        Category category = new Category(
+                "Kategorie",
+                Color.black(),
+                ExpenseType.expense()
+        );
+
+        return new ExpenseObject(
+                "Ausgabe",
+                new Price(new Random().nextInt(1000), false),
+                category,
+                account.getId()
+        );
     }
 
     private ExpenseObject getParentExpenseWithChildren() {
         ExpenseObject parentExpense = getSimpleExpense();
-        parentExpense.setPrice(new Price(0, getDefaultCurrency()));
+        parentExpense.setPrice(new Price(0));
 
         parentExpense.addChild(getSimpleExpense());
         parentExpense.addChild(getSimpleExpense());
@@ -536,7 +566,7 @@ public class ChildExpenseRepositoryTest {
         return parentExpense;
     }
 
-    private void assertEqualAccountBalance(double expectedAmount, long accountId) {
+    private void assertEqualAccountBalance(double expectedAmount, UUID accountId) {
 
         try {
             double actualBalance = mAccountRepo.get(accountId).getBalance().getSignedValue();

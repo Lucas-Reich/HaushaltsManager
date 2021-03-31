@@ -5,6 +5,7 @@ import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.UUID;
 
 public class ExpenseFilter {
 
@@ -30,7 +31,7 @@ public class ExpenseFilter {
         return filteredExpenses;
     }
 
-    public List<ExpenseObject> byAccountWithParents(List<ExpenseObject> expenses, List<Long> accounts) {
+    public List<ExpenseObject> byAccountWithParents(List<ExpenseObject> expenses, List<UUID> accounts) {
         List<ExpenseObject> filteredExpenses = new ArrayList<>();
 
         for (ExpenseObject expense : expenses) {
@@ -44,11 +45,11 @@ public class ExpenseFilter {
     }
 
     @Deprecated
-    public List<ExpenseObject> byAccountWithChildren(List<ExpenseObject> expenses, List<Long> accounts) {
+    public List<ExpenseObject> byAccountWithChildren(List<ExpenseObject> expenses, List<UUID> accounts) {
         return byAccount(pullChildrenUp(expenses), accounts);
     }
 
-    public List<ExpenseObject> byAccount(List<ExpenseObject> expenses, List<Long> accounts) {
+    public List<ExpenseObject> byAccount(List<ExpenseObject> expenses, List<UUID> accounts) {
         List<ExpenseObject> filteredExpenses = new ArrayList<>();
 
         for (ExpenseObject expense : expenses) {
@@ -72,11 +73,11 @@ public class ExpenseFilter {
         return extractedExpenses;
     }
 
-    private boolean hasAccount(ExpenseObject expense, List<Long> accounts) {
+    private boolean hasAccount(ExpenseObject expense, List<UUID> accounts) {
         return accounts.contains(expense.getAccountId());
     }
 
-    private ExpenseObject getVisibleExpense(ExpenseObject expense, List<Long> accounts) {
+    private ExpenseObject getVisibleExpense(ExpenseObject expense, List<UUID> accounts) {
         if (expense.isParent()) {
             ExpenseObject expenseWithVisibleChildren = removeInvisibleChildren(expense, accounts);
 
@@ -91,7 +92,7 @@ public class ExpenseFilter {
         return null;
     }
 
-    private ExpenseObject removeInvisibleChildren(ExpenseObject expense, List<Long> accounts) {
+    private ExpenseObject removeInvisibleChildren(ExpenseObject expense, List<UUID> accounts) {
         List<ExpenseObject> visibleChildren = new ArrayList<>();
         for (ExpenseObject child : expense.getChildren()) {
             if (hasAccount(child, accounts)) {
@@ -99,11 +100,10 @@ public class ExpenseFilter {
             }
         }
 
-        ExpenseObject expenseWithVisibleChildren = ExpenseObject.copy(expense);
-        expenseWithVisibleChildren.removeChildren();
-        expenseWithVisibleChildren.addChildren(visibleChildren);
+        expense.removeChildren();
+        expense.addChildren(visibleChildren);
 
-        return expenseWithVisibleChildren;
+        return expense;
     }
 
     private boolean isInMonth(ExpenseObject expense, int month) {

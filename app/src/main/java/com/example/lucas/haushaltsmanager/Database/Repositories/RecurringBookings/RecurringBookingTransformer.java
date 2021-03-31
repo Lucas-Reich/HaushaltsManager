@@ -2,10 +2,8 @@ package com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookin
 
 import android.database.Cursor;
 
-import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.TransformerInterface;
 import com.example.lucas.haushaltsmanager.Entities.Category;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Frequency;
 import com.example.lucas.haushaltsmanager.Entities.Price;
@@ -13,24 +11,15 @@ import com.example.lucas.haushaltsmanager.Entities.RecurringBooking;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-
-import static com.example.lucas.haushaltsmanager.Database.Migrations.TemplateBookingsTable.TB_ACCOUNT_ID;
-import static com.example.lucas.haushaltsmanager.Database.Migrations.TemplateBookingsTable.TB_DATE;
-import static com.example.lucas.haushaltsmanager.Database.Migrations.TemplateBookingsTable.TB_EXPENDITURE;
-import static com.example.lucas.haushaltsmanager.Database.Migrations.TemplateBookingsTable.TB_EXPENSE_TYPE;
-import static com.example.lucas.haushaltsmanager.Database.Migrations.TemplateBookingsTable.TB_PRICE;
-import static com.example.lucas.haushaltsmanager.Database.Migrations.TemplateBookingsTable.TB_TITLE;
+import java.util.UUID;
 
 public class RecurringBookingTransformer implements TransformerInterface<RecurringBooking> {
-    private final TransformerInterface<Currency> currencyTransformer;
-    private final TransformerInterface<Category> childCategoryTransformer;
+    private final TransformerInterface<Category> categoryTransformer;
 
     public RecurringBookingTransformer(
-            TransformerInterface<Currency> currencyTransformer,
-            TransformerInterface<Category> childCategoryTransformer
+            TransformerInterface<Category> categoryTransformer
     ) {
-        this.currencyTransformer = currencyTransformer;
-        this.childCategoryTransformer = childCategoryTransformer;
+        this.categoryTransformer = categoryTransformer;
     }
 
     @Override
@@ -39,68 +28,81 @@ public class RecurringBookingTransformer implements TransformerInterface<Recurri
             return null;
         }
 
-        return fromCursor(c);
-    }
-
-    private RecurringBooking fromCursor(Cursor c) {
-        long index = c.getLong(c.getColumnIndex(ExpensesDbHelper.RECURRING_BOOKINGS_COL_ID));
-        long startInMillis = c.getLong(c.getColumnIndex(ExpensesDbHelper.RECURRING_BOOKINGS_COL_OCCURRENCE));
-        long endInMillis = c.getLong(c.getColumnIndex(ExpensesDbHelper.RECURRING_BOOKINGS_COL_END));
-
-        return RecurringBooking.load(
-                index,
-                createFromMillis(startInMillis),
-                createFromMillis(endInMillis),
+        return new RecurringBooking(
+                getId(c),
+                getStart(c),
+                getEnd(c),
                 extractFrequency(c),
                 extractExpense(c)
         );
     }
 
+    private UUID getId(Cursor c) {
+        String rawId = c.getString(c.getColumnIndex("id"));
+
+        return UUID.fromString(rawId);
+    }
+
+    private Calendar getStart(Cursor c) {
+        long rawStart = c.getLong(c.getColumnIndex("start"));
+
+        return createFromMillis(rawStart);
+    }
+
+    private Calendar getEnd(Cursor c) {
+        long rawEnd = c.getLong(c.getColumnIndex("end"));
+
+        return createFromMillis(rawEnd);
+    }
+
     private ExpenseObject extractExpense(Cursor c) {
-        String title = c.getString(c.getColumnIndex(TB_TITLE));
-        long accountId = c.getLong(c.getColumnIndex(TB_ACCOUNT_ID));
-        Category category = childCategoryTransformer.transform(c);
-        Currency currency = currencyTransformer.transform(c);
+        String title = c.getString(c.getColumnIndex("title"));
+        Category category = categoryTransformer.transform(c);
 
         return new ExpenseObject(
-                -1,
+                new UUID(0, 0),
                 title,
-                extractPrice(c, currency),
+                extractPrice(c),
                 extractDate(c),
                 category,
                 "",
-                accountId,
+                getAccountId(c),
                 extractExpenseType(c),
-                new ArrayList<ExpenseObject>(),
-                currency
+                new ArrayList<ExpenseObject>()
         );
     }
 
+    private UUID getAccountId(Cursor c) {
+        String rawAccountId = c.getString(c.getColumnIndex("account_id"));
+
+        return UUID.fromString(rawAccountId);
+    }
+
     private ExpenseObject.EXPENSE_TYPES extractExpenseType(Cursor c) {
-        String rawExpenseType = c.getString(c.getColumnIndex(TB_EXPENSE_TYPE));
+        String rawExpenseType = c.getString(c.getColumnIndex("expense_type"));
 
         return ExpenseObject.EXPENSE_TYPES.valueOf(rawExpenseType);
     }
 
     private Calendar extractDate(Cursor c) {
         Calendar date = Calendar.getInstance();
-        String dateString = c.getString(c.getColumnIndex(TB_DATE));
+        String dateString = c.getString(c.getColumnIndex("date"));
         date.setTimeInMillis(Long.parseLong(dateString));
 
         return date;
     }
 
-    private Price extractPrice(Cursor c, Currency currency) {
-        double rawPrice = c.getDouble(c.getColumnIndex(TB_PRICE));
-        boolean expenditure = c.getInt(c.getColumnIndex(TB_EXPENDITURE)) == 1;
+    private Price extractPrice(Cursor c) {
+        double rawPrice = c.getDouble(c.getColumnIndex("price"));
+        boolean expenditure = c.getInt(c.getColumnIndex("expenditure")) == 1;
 
-        return new Price(rawPrice, expenditure, currency);
+        return new Price(rawPrice, expenditure);
 
     }
 
     private Frequency extractFrequency(Cursor c) {
-        int calendarField = c.getInt(c.getColumnIndex(ExpensesDbHelper.RECURRING_BOOKINGS_COL_CALENDAR_FIELD));
-        int amount = c.getInt(c.getColumnIndex(ExpensesDbHelper.RECURRING_BOOKINGS_COL_AMOUNT));
+        int calendarField = c.getInt(c.getColumnIndex("calendar_field"));
+        int amount = c.getInt(c.getColumnIndex("amount"));
 
         return new Frequency(
                 calendarField,

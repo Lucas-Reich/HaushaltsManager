@@ -84,7 +84,7 @@
     <string name="fab_menu_item_delete_hint">Delete selected bookings</string>
     <string name="fab_menu_item_extract_hint">Extract selected children</string>
     <string name="fab_menu_item_recurring_hint">Save as recurring Booking</string>
-    <string name="fab_menu_item_template_hint">Save as template</string>
+    <string name="fab_menu_item_template_hint">Save as templateBooking</string>
 
 
     <string name="mapping_account_title">Account</string>
@@ -154,7 +154,9 @@
     <string name="error_name_missing">Please enter a name</string>
     <string name="could_not_create_backup">Backup could not be created</string>
     <string name="cannot_update_account">Cannot update Account, Account not found!</string>
-    <string name="category_not_found">Cannot update category. Category not found</string>
+    <string name="cannot_create_account">Account could  not be created!</string>
+    <string name="cannot_update_category">Cannot update category. Category not found</string>
+    <string name="cannot_create_category">Category could not be created!</string>
     <string name="select_currency">Choose a currency</string>
     <string name="choose_weekday">Select a Weekday</string>
     <string name="choose_backup_amount">Choose the amount of concurrent Backups</string>
@@ -177,7 +179,7 @@
     <string name="app_version">App Version</string>
     <string name="licenses">Licenses</string>
     <string name="activity_about_name">About</string>
-    <string name="template_empty_list">No templates created</string>
+    <string name="template_empty_list">No templateBookings created</string>
     <string name="course_empty_list">No bookings created</string>
     <string name="backups_empty_list">No Backups in this directory</string>
     <string name="licenses_title">Licenses</string>
@@ -188,7 +190,7 @@
     <string name="recurring_bookings_empty_list">No recurring bookings this month</string>
     <string name="default_backup_location">Choose default backup location</string>
     <string name="could_not_update_booking">Failed to update Expense</string>
-    <string name="saved_as_template">Saved expense as template</string>
+    <string name="saved_as_template">Saved expense as templateBooking</string>
     <string name="activity_create_recurring_booking">Create recurring booking</string>
     <string name="could_not_save_recurring_booking">Cannot save RecurringBooking</string>
     <!-- IMPROVEMENT: "input_frequency_label" kann eventuell durch frequency_in_days ersetzen werden-->

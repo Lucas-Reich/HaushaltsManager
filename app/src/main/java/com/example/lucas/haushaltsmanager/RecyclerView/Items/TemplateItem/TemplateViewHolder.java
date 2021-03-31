@@ -5,10 +5,10 @@ import android.widget.TextView;
 
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Price;
-import com.example.lucas.haushaltsmanager.Entities.Template;
+import com.example.lucas.haushaltsmanager.Entities.TemplateBooking;
 import com.example.lucas.haushaltsmanager.R;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.AbstractViewHolder;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.Views.MoneyTextView;
 import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
 
@@ -36,11 +36,11 @@ public class TemplateViewHolder extends AbstractViewHolder {
             throw new IllegalArgumentException(String.format("Could not attach %s to %s", item.getClass().getSimpleName(), TAG));
         }
 
-        Template template = (Template) item.getContent();
+        TemplateBooking templateBooking = (TemplateBooking) item.getContent();
 
-        setRoundedTextView(template.getCategory());
-        setTitle(template.getTitle());
-        setPrice(template.getPrice());
+        setRoundedTextView(templateBooking.getCategory());
+        setTitle(templateBooking.getTitle());
+        setPrice(templateBooking.getPrice());
         setUser("");
     }
 

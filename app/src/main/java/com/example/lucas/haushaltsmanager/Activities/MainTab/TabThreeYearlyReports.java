@@ -1,11 +1,12 @@
 package com.example.lucas.haushaltsmanager.Activities.MainTab;
 
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.cardview.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 
 import com.example.lucas.haushaltsmanager.CardPopulator.LineChartCardPopulator;
 import com.example.lucas.haushaltsmanager.CardPopulator.PieChartCardPopulator;
@@ -13,11 +14,11 @@ import com.example.lucas.haushaltsmanager.CardPopulator.TimeFrameCardPopulator;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Report.Report;
 import com.example.lucas.haushaltsmanager.Entities.Report.ReportInterface;
-import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseGrouper;
-import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSum;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.CalendarUtils;
+import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseGrouper;
+import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSum;
 
 import java.util.HashMap;
 import java.util.List;
@@ -114,8 +115,7 @@ public class TabThreeYearlyReports extends AbstractTab {
     private ReportInterface createReport(String title, List<ExpenseObject> expenses) {
         return new Report(
                 title,
-                filterByYear(expenses, CalendarUtils.getCurrentYear()),
-                mUserPreferences.getMainCurrency()
+                filterByYear(expenses, CalendarUtils.getCurrentYear())
         );
     }
 

@@ -2,6 +2,7 @@ package com.example.lucas.haushaltsmanager.FABToolbar.MenuItems;
 
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.ActionKey;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.DeleteCategoryMenuItem;
+import com.example.lucas.haushaltsmanager.MockCategoryRepository;
 import com.example.lucas.haushaltsmanager.R;
 
 import org.junit.Before;
@@ -14,7 +15,7 @@ public class DeleteCategoryMenuItemTest {
 
     @Before
     public void setUp() {
-        deleteItem = new DeleteCategoryMenuItem(null);
+        deleteItem = new DeleteCategoryMenuItem(null, new MockCategoryRepository());
     }
 
     @Test

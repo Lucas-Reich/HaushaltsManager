@@ -1,10 +1,13 @@
 package com.example.lucas.haushaltsmanager.Views;
 
 import android.content.Context;
-import androidx.annotation.ColorInt;
-import androidx.annotation.ColorRes;
 import android.util.AttributeSet;
 
+import androidx.annotation.ColorInt;
+import androidx.annotation.ColorRes;
+
+import com.example.lucas.haushaltsmanager.App.app;
+import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.Utils.MoneyUtils;
 
@@ -32,11 +35,11 @@ public class MoneyTextView extends androidx.appcompat.widget.AppCompatTextView {
     }
 
     private String formatString(Price price) {
-        return String.format("%s %s", getHumanReadablePrice(price), getCurrencySymbol(price));
-    }
-
-    private String getCurrencySymbol(Price price) {
-        return price.getCurrency().getSymbol();
+        return String.format(
+                "%s %s",
+                getHumanReadablePrice(price),
+                new Currency().getSymbol()
+        );
     }
 
     private String getHumanReadablePrice(Price price) {

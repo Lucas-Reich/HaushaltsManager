@@ -46,6 +46,11 @@ public class ParentExpenseItem implements IParentRecyclerItem {
     }
 
     @Override
+    public boolean isSelectable() {
+        return false;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof ParentExpenseItem)) {
             return false;

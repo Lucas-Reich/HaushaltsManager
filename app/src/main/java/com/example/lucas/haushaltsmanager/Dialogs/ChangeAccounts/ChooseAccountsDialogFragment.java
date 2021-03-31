@@ -5,12 +5,13 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.appcompat.app.AlertDialog;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
 
 import com.example.lucas.haushaltsmanager.Activities.CreateAccountActivity;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
@@ -22,6 +23,7 @@ import com.example.lucas.haushaltsmanager.R;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class ChooseAccountsDialogFragment extends DialogFragment implements AccountAdapter.OnDeleteAccountSelected {
     private OnSelectedAccount mCallback;
@@ -87,6 +89,53 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Acco
         return builder.create();
     }
 
+    /**
+     * Methode die den Callback des AccountAdapters implementiert, wenn ein Konto gelöscht werden soll
+     *
+     * @param account Zu löschendes Konto
+     */
+    @Override
+    public void onDeleteAccountSelected(Account account) {
+
+        try {
+            if (isCurrentMainAccount(account)) {
+
+                deleteAccount(account);
+
+                Account newMainAccount = getNewMainAccountSafe();
+                if (newMainAccount != null)
+                    makeAccountMain(newMainAccount);
+            } else {
+
+                deleteAccount(account);
+            }
+
+            Toast.makeText(getActivity(), getString(R.string.deleted_account), Toast.LENGTH_SHORT).show();
+        } catch (CannotDeleteAccountException e) {
+
+            Toast.makeText(getActivity(), getString(R.string.failed_to_delete_account), Toast.LENGTH_SHORT).show();
+        }
+
+        dismiss();
+    }
+
+    /**
+     * Methode die den Callback des AccountsAdapters implementiert, wenn ein Konto als Hauptkonto ausgewählt wurde
+     *
+     * @param account Konto das nun das Hautpkonto sein soll
+     */
+    @Override
+    public void onAccountSetMain(Account account) {
+        makeAccountMain(account);
+        Toast.makeText(getActivity(), account.getTitle() + getString(R.string.changed_main_account), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onCancel(DialogInterface dialog) {
+        super.onCancel(dialog);
+        revertUserInteractions();
+    }
+
     public void setOnAccountSelectedListener(OnSelectedAccount listener) {
         mCallback = listener;
     }
@@ -127,36 +176,6 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Acco
         return (Account) mListView.getItemAtPosition(position);
     }
 
-    /**
-     * Methode die den Callback des AccountAdapters implementiert, wenn ein Konto gelöscht werden soll
-     *
-     * @param account Zu löschendes Konto
-     */
-    @Override
-    public void onDeleteAccountSelected(Account account) {
-
-        try {
-            if (isCurrentMainAccount(account)) {
-
-                deleteAccount(account);
-
-                Account newMainAccount = getNewMainAccountSafe();
-                if (newMainAccount != null)
-                    makeAccountMain(newMainAccount);
-            } else {
-
-                deleteAccount(account);
-            }
-
-            Toast.makeText(getActivity(), getString(R.string.deleted_account), Toast.LENGTH_SHORT).show();
-        } catch (CannotDeleteAccountException e) {
-
-            Toast.makeText(getActivity(), getString(R.string.failed_to_delete_account), Toast.LENGTH_SHORT).show();
-        }
-
-        dismiss();
-    }
-
     private Account getNewMainAccountSafe() {
         if (mInitialAccountState.size() == 0)
             return null;
@@ -188,17 +207,6 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Acco
     }
 
     /**
-     * Methode die den Callback des AccountsAdapters implementiert, wenn ein Konto als Hauptkonto ausgewählt wurde
-     *
-     * @param account Konto das nun das Hautpkonto sein soll
-     */
-    @Override
-    public void onAccountSetMain(Account account) {
-        makeAccountMain(account);
-        Toast.makeText(getActivity(), account.getTitle() + getString(R.string.changed_main_account), Toast.LENGTH_SHORT).show();
-    }
-
-    /**
      * Methode um das gewählte Konto zum Hauptkonto zu machen.
      *
      * @param account Neues Hauptkonto
@@ -226,16 +234,10 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Acco
         mAccountPreferences.changeVisibility(account, isVisible);
 
         if (null != mCallback)
-            mCallback.onAccountSelected(account.getIndex(), isVisible);
-    }
-
-    @Override
-    public void onCancel(DialogInterface dialog) {
-        super.onCancel(dialog);
-        revertUserInteractions();
+            mCallback.onAccountSelected(account.getId(), isVisible);
     }
 
     public interface OnSelectedAccount {
-        void onAccountSelected(long accountId, boolean isChecked);
+        void onAccountSelected(UUID accountId, boolean isChecked);
     }
 }

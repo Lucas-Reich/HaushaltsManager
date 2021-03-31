@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.lucas.haushaltsmanager.Activities.ExpenseScreen;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ParentExpenseObject;
-import com.example.lucas.haushaltsmanager.Entities.Template;
+import com.example.lucas.haushaltsmanager.Entities.TemplateBooking;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.ActionPayload;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.AddChildMenuItem;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.CombineMenuItem;
@@ -33,7 +33,6 @@ import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.EndlessRecyclerViewScrollListener;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.RecyclerItemClickListener;
 import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.ItemCreator;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.AdItem.AdItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.ChildExpenseItem.ChildExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.ExpenseItem.ExpenseItem;
@@ -168,7 +167,7 @@ public class TabOneBookings extends AbstractTab implements
 
     @Override
     public void onClick(View v, IRecyclerItem item, int position) {
-        if (item instanceof DateItem || item instanceof AdItem) {
+        if (item instanceof DateItem) {
             return;
         }
 
@@ -177,7 +176,7 @@ public class TabOneBookings extends AbstractTab implements
             return;
         }
 
-        if (mAdapter.getSelectedItemCount() == 0) {
+        if (!mAdapter.isInSelectionMode()) {
             if (item instanceof ExpenseItem || item instanceof ChildExpenseItem) {
                 updateItem(item);
             }
@@ -256,7 +255,7 @@ public class TabOneBookings extends AbstractTab implements
 
         mFABToolbar.addMenuItem(new TemplateMenuItem(new TemplateMenuItem.OnSuccessCallback() {
             @Override
-            public void onSuccess(Template template) {
+            public void onSuccess(TemplateBooking templateBooking) {
 
                 Toast.makeText(getContext(), R.string.saved_as_template, Toast.LENGTH_SHORT).show();
             }

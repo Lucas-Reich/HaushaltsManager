@@ -1,112 +1,87 @@
 package com.example.lucas.haushaltsmanager.Entities;
 
-import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
+import androidx.annotation.NonNull;
+
 import com.example.lucas.haushaltsmanager.Entities.Expense.Booking;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 
 import java.util.Calendar;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
 public class RecurringBooking {
-    private final long mIndex;
+    private final UUID id;
+    private Calendar start, endDate;
+    private final Frequency frequency;
+    private final Booking templateBooking;
 
-    private Calendar executionDate, endDate;
-    private Frequency frequency;
-    private Booking templateBooking;
-
-    private RecurringBooking(long index, Calendar executionDate, Calendar end, Frequency frequency, Booking booking) {
-        mIndex = index;
-
-        setBooking(booking);
-        setExecutionDate(executionDate);
-        setEnd(end);
-        setFrequency(frequency);
+    public RecurringBooking(
+            @NonNull UUID id,
+            @NonNull Calendar start,
+            @NonNull Calendar end,
+            @NonNull Frequency frequency,
+            @NonNull Booking booking
+    ) {
+        this.id = id;
+        this.templateBooking = booking;
+        setExecutionDate(start);
+        this.endDate = end;
+        this.frequency = frequency;
     }
 
-    public static RecurringBooking load(long id, Calendar executionDate, Calendar end, Frequency frequency, Booking booking) {
-        return new RecurringBooking(
-                id,
-                executionDate,
-                end,
-                frequency,
-                booking
-        );
+    public RecurringBooking(
+            @NonNull Calendar start,
+            @NonNull Calendar end,
+            @NonNull Frequency frequency,
+            @NonNull Booking booking
+    ) {
+        this(UUID.randomUUID(), start, end, frequency, booking);
     }
 
-    public static RecurringBooking create(Calendar executionDate, Calendar end, Frequency frequency, Booking booking) {
-        return new RecurringBooking(
-                ExpensesDbHelper.INVALID_INDEX,
-                executionDate,
-                end,
-                frequency,
-                booking
-        );
-    }
-
-    /**
-     * Method which creates the next RecurringBooking based on the Frequency information within it.
-     *
-     * @param recurringBooking Base RecurringBooking
-     * @return RecurringBooking with next schedule date. NULL if time frame ended.
-     */
     @Nullable
     public static RecurringBooking createNextRecurringBooking(RecurringBooking recurringBooking) {
-        Calendar nextOccurrence = recurringBooking.getNextOccurrence();
-        if (nextOccurrence.after(recurringBooking.getEnd())) {
+        Calendar start = recurringBooking.getNextOccurrence();
+        if (start.after(recurringBooking.getEnd())) {
             return null;
         }
 
         return new RecurringBooking(
-                recurringBooking.getIndex(),
-                nextOccurrence,
+                start,
                 recurringBooking.getEnd(),
                 recurringBooking.getFrequency(),
-                ExpenseObject.copy(recurringBooking.getBooking())
+                recurringBooking.getBooking()
         );
     }
 
-    public long getIndex() {
-        return mIndex;
+    public UUID getId() {
+        return id;
     }
 
     public ExpenseObject getBooking() {
         return (ExpenseObject) templateBooking;
     }
 
-    private void setBooking(Booking booking) {
-        templateBooking = booking;
-    }
-
     public Frequency getFrequency() {
         return frequency;
     }
 
-    public void setFrequency(Frequency frequency) {
-        this.frequency = frequency;
-    }
-
     public Calendar getExecutionDate() {
-        return executionDate;
+        return start;
     }
 
     public void setExecutionDate(Calendar executionDate) {
-        this.executionDate = executionDate;
-        ((ExpenseObject) templateBooking).setDateTime(executionDate);
+        this.start = executionDate;
+        templateBooking.setDate(executionDate);
     }
 
     public Calendar getEnd() {
         return endDate;
     }
 
-    public void setEnd(Calendar end) {
-        // TODO: Solle ich hier noch einen check einführen, welcher garantiert, dass das EndDatum auch nach dem start ist?
-        endDate = end;
-    }
-
     public Delay getDelayUntilNextExecution() {
-        long timeBetween = getTimeBetweenNowAnd(executionDate);
+        long timeBetween = getTimeBetweenNowAnd(start);
         if (timeBetween < 0) {
             timeBetween = getTimeBetweenNowAnd(getNextOccurrence());
         }
@@ -118,7 +93,7 @@ public class RecurringBooking {
     }
 
     private Calendar getNextOccurrence() {
-        Calendar nextOccurrence = (Calendar) executionDate.clone();
+        Calendar nextOccurrence = (Calendar) start.clone();
 
         increaseByFrequency(nextOccurrence, frequency);
 

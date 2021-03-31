@@ -110,7 +110,7 @@
           <listeners />
           <method />
         </configuration>
-        <configuration name="&lt;template&gt;" type="Applet" default="true" selected="false">
+        <configuration name="&lt;templateBooking&gt;" type="Applet" default="true" selected="false">
           <option name="MAIN_CLASS_NAME" />
           <option name="HTML_FILE_NAME" />
           <option name="HTML_USED" value="false" />
@@ -119,7 +119,7 @@
           <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
           <option name="VM_PARAMETERS" />
         </configuration>
-        <configuration name="&lt;template&gt;" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType" default="true" selected="false">
+        <configuration name="&lt;templateBooking&gt;" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType" default="true" selected="false">
           <option name="VM_PARAMETERS" value="-Xmx512m -Xms256m -XX:MaxPermSize=250m -ea" />
         </configuration>
       </component>

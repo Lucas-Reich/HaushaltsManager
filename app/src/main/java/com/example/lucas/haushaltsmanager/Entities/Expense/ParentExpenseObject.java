@@ -1,41 +1,61 @@
 package com.example.lucas.haushaltsmanager.Entities.Expense;
 
-import com.example.lucas.haushaltsmanager.Entities.Currency;
+import androidx.annotation.NonNull;
+
 import com.example.lucas.haushaltsmanager.Entities.Price;
 
 import java.util.Calendar;
 import java.util.List;
+import java.util.UUID;
 
 public class ParentExpenseObject implements Booking {
-    private final long mIndex;
-    private final Calendar mDate;
+    private final UUID id;
+    private Calendar mDate;
     private final String mTitle;
     private final List<ExpenseObject> mChildren;
-    private final Currency mCurrency;
 
 
-    public ParentExpenseObject(long index, String title, Currency currency, Calendar date, List<ExpenseObject> children) {
-        mIndex = index;
+    public ParentExpenseObject(
+            @NonNull UUID id,
+            @NonNull String title,
+            @NonNull Calendar date,
+            @NonNull List<ExpenseObject> children
+    ) {
+        this.id = id;
         mTitle = title;
-        mCurrency = currency;
         mDate = date;
         mChildren = children;
+    }
+
+    public ParentExpenseObject(
+            @NonNull String title,
+            @NonNull Calendar date,
+            @NonNull List<ExpenseObject> children
+    ) {
+        this(UUID.randomUUID(), title, date, children);
     }
 
     public static ParentExpenseObject fromParentExpense(ExpenseObject parentExpense) {
         assertIsParent(parentExpense);
 
         return new ParentExpenseObject(
-                parentExpense.getIndex(),
+                parentExpense.getId(),
                 parentExpense.getTitle(),
-                parentExpense.getCurrency(),
                 parentExpense.getDate(),
                 parentExpense.getChildren()
         );
     }
 
+    public UUID getId() {
+        return id;
+    }
+
     public Calendar getDate() {
         return mDate;
+    }
+
+    public void setDate(Calendar date) {
+        this.mDate = date;
     }
 
     public String getTitle() {
@@ -51,24 +71,11 @@ public class ParentExpenseObject implements Booking {
         ParentExpenseObject other = (ParentExpenseObject) obj;
 
         return other.getTitle().equals(getTitle())
-                && other.getCurrency().equals(getCurrency())
                 && other.getChildren().equals(getChildren());
     }
 
-    public Currency getCurrency() {
-        return mCurrency;
-    }
-
     public Price getPrice() {
-        return new Price(calcChildrenPrice(), mCurrency);
-    }
-
-    public long getIndex() {
-        return mIndex;
-    }
-
-    public void addChild(ExpenseObject child) {
-        mChildren.add(child);
+        return new Price(calcChildrenPrice());
     }
 
     public List<ExpenseObject> getChildren() {

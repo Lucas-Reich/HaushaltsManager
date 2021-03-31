@@ -1,9 +1,5 @@
 package com.example.lucas.haushaltsmanager.FABToolbar;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import androidx.interpolator.view.animation.FastOutLinearInInterpolator;
-import androidx.interpolator.view.animation.LinearOutSlowInInterpolator;
-import androidx.appcompat.widget.TooltipCompat;
 import android.transition.Fade;
 import android.transition.TransitionManager;
 import android.transition.TransitionSet;
@@ -12,12 +8,16 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import androidx.annotation.StringRes;
+import androidx.appcompat.widget.TooltipCompat;
+import androidx.interpolator.view.animation.FastOutLinearInInterpolator;
+import androidx.interpolator.view.animation.LinearOutSlowInInterpolator;
+
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.IMenuItem;
 import com.example.lucas.haushaltsmanager.R;
 import com.github.fafaldo.fabtoolbar.widget.FABToolbarLayout;
-
-import androidx.annotation.StringRes;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class FABToolbarWithActionHandler {
     private FABToolbarLayout mRootLayout;

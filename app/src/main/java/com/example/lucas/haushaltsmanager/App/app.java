@@ -10,7 +10,11 @@ import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.R;
 
+import java.util.UUID;
+
 public class app extends Application {
+    public static final UUID transferCategoryId = UUID.fromString("eed05d4b-866d-4f20-b580-c50901066d73");
+
     private static final String CHANNEL_ID = "reminder";
     private static Context context;
 
@@ -43,6 +47,10 @@ public class app extends Application {
         }
 
         return CHANNEL_ID;
+    }
+
+    public static UUID getNilUuid() {
+        return new UUID(0, 0);
     }
 
     @Override

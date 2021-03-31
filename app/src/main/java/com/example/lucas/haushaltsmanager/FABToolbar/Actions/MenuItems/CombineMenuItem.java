@@ -110,7 +110,7 @@ public class CombineMenuItem implements IMenuItem {
                 }
 
                 parent.setCategory(parent.getChildren().get(0).getCategory());
-                parent = mExpenseRepo.insert(parent);
+                mExpenseRepo.insert(parent);
 
                 if (null != mCallback) {
                     mCallback.onSuccess(
@@ -123,7 +123,6 @@ public class CombineMenuItem implements IMenuItem {
             private ExpenseObject createParentExpenseWithTitle(String title) {
                 ExpenseObject parent = ExpenseObject.createDummyExpense();
                 parent.setTitle(title);
-                parent.setCurrency(new UserSettingsPreferences(app.getContext()).getMainCurrency());
 
                 return parent;
             }

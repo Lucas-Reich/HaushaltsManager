@@ -9,16 +9,19 @@ import android.database.sqlite.SQLiteDatabase;
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.QueryInterface;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountCouldNotBeCreatedException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.CannotDeleteAccountException;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyTransformer;
 import com.example.lucas.haushaltsmanager.Database.TransformerInterface;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class AccountRepository implements AccountRepositoryInterface {
+    private final String TABLE = "ACCOUNTS";
+
     private final SQLiteDatabase mDatabase;
     private final TransformerInterface<Account> transformer;
 
@@ -26,14 +29,15 @@ public class AccountRepository implements AccountRepositoryInterface {
         DatabaseManager.initializeInstance(new ExpensesDbHelper(context));
 
         mDatabase = DatabaseManager.getInstance().openDatabase();
-        transformer = new AccountTransformer(new CurrencyTransformer());
+        transformer = new AccountTransformer();
     }
 
-    public Account get(long accountId) throws AccountNotFoundException {
+    public Account get(UUID accountId) throws AccountNotFoundException {
         Cursor c = executeRaw(new GetQuery(accountId));
 
-        if (!c.moveToFirst())
+        if (!c.moveToFirst()) {
             throw new AccountNotFoundException(accountId);
+        }
 
         return transformer.transform(c);
     }
@@ -49,27 +53,29 @@ public class AccountRepository implements AccountRepositoryInterface {
         return accounts;
     }
 
-    public Account insert(Account account) {
+    public void insert(Account account) throws AccountCouldNotBeCreatedException {
         ContentValues values = new ContentValues();
-        values.put(ExpensesDbHelper.ACCOUNTS_COL_NAME, account.getTitle());
-        values.put(ExpensesDbHelper.ACCOUNTS_COL_BALANCE, account.getBalance().getSignedValue());
-        values.put(ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID, account.getBalance().getCurrency().getIndex());
+        values.put("id", account.getId().toString());
+        values.put("name", account.getTitle());
+        values.put("balance", account.getBalance().getSignedValue());
 
-        long insertedAccountId = mDatabase.insert(ExpensesDbHelper.TABLE_ACCOUNTS, null, values);
-
-        return new Account(
-                insertedAccountId,
-                account.getTitle(),
-                account.getBalance()
-        );
+        try {
+            mDatabase.insertOrThrow(
+                    TABLE,
+                    null,
+                    values
+            );
+        } catch (SQLException e) {
+            throw new AccountCouldNotBeCreatedException(account, e);
+        }
     }
 
     public void delete(Account account) throws CannotDeleteAccountException {
         try {
             mDatabase.delete(
-                    ExpensesDbHelper.TABLE_ACCOUNTS,
-                    ExpensesDbHelper.ACCOUNTS_COL_ID + " = ?",
-                    new String[]{"" + account.getIndex()}
+                    TABLE,
+                    "id = ?",
+                    new String[]{account.getId().toString()}
             );
         } catch (SQLException e) {
             throw new CannotDeleteAccountException(account, e);
@@ -78,20 +84,19 @@ public class AccountRepository implements AccountRepositoryInterface {
 
     public void update(Account account) throws AccountNotFoundException {
         ContentValues updatedAccount = new ContentValues();
-        updatedAccount.put(ExpensesDbHelper.ACCOUNTS_COL_NAME, account.getTitle());
-        updatedAccount.put(ExpensesDbHelper.ACCOUNTS_COL_BALANCE, account.getBalance().getSignedValue());
-        updatedAccount.put(ExpensesDbHelper.ACCOUNTS_COL_CURRENCY_ID, account.getBalance().getCurrency().getIndex());
+        updatedAccount.put("name", account.getTitle());
+        updatedAccount.put("balance", account.getBalance().getSignedValue());
 
-        int affectedRows = mDatabase.update(ExpensesDbHelper.TABLE_ACCOUNTS, updatedAccount, ExpensesDbHelper.ACCOUNTS_COL_ID + " = ?", new String[]{account.getIndex() + ""});
+        int affectedRows = mDatabase.update(
+                TABLE,
+                updatedAccount,
+                "id = ?",
+                new String[]{account.getId().toString()}
+        );
 
         if (affectedRows == 0) {
-            throw new AccountNotFoundException(account.getIndex());
+            throw new AccountNotFoundException(account.getId());
         }
-    }
-
-    public void closeDatabase() {
-
-        DatabaseManager.getInstance().closeDatabase();
     }
 
     private Cursor executeRaw(QueryInterface query) {

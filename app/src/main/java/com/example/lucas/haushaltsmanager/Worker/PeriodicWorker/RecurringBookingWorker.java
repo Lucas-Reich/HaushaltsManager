@@ -1,33 +1,29 @@
 package com.example.lucas.haushaltsmanager.Worker.PeriodicWorker;
 
 import android.content.Context;
-import androidx.annotation.NonNull;
 import android.util.Log;
 
-import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
+import androidx.annotation.NonNull;
+import androidx.work.WorkerParameters;
+
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.Exceptions.RecurringBookingNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.RecurringBookingRepository;
 import com.example.lucas.haushaltsmanager.Entities.RecurringBooking;
 
-import androidx.work.WorkerParameters;
+import java.util.UUID;
 
 public class RecurringBookingWorker extends AbstractRecurringWorker {
     public static final String RECURRING_BOOKING = "recurringBookingId";
     private static final String TAG = RecurringBookingWorker.class.getSimpleName();
 
-    private RecurringBooking mRecurringBooking;
+    private final RecurringBooking mRecurringBooking;
 
     public RecurringBookingWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
 
-        long recurringBookingId = extractIdFromParameters(workerParams);
+        UUID recurringBookingId = extractIdFromParameters(workerParams);
         mRecurringBooking = getRecurringBookingById(recurringBookingId);
-    }
-
-    @Override
-    String getTag() {
-        return "RecurringBookingWorker";
     }
 
     @NonNull
@@ -53,6 +49,11 @@ public class RecurringBookingWorker extends AbstractRecurringWorker {
         return Result.success();
     }
 
+    @Override
+    String getTag() {
+        return "RecurringBookingWorker";
+    }
+
     private boolean hasNextRecurringBooking(RecurringBooking recurringBooking) {
         return null != RecurringBooking.createNextRecurringBooking(recurringBooking);
     }
@@ -69,11 +70,13 @@ public class RecurringBookingWorker extends AbstractRecurringWorker {
         new ExpenseRepository(getApplicationContext()).insert(recurringBooking.getBooking());
     }
 
-    private long extractIdFromParameters(WorkerParameters workerParams) {
-        return workerParams.getInputData().getLong(RECURRING_BOOKING, ExpensesDbHelper.INVALID_INDEX);
+    private UUID extractIdFromParameters(WorkerParameters workerParams) {
+        String rawId = workerParams.getInputData().getString(RECURRING_BOOKING);
+
+        return UUID.fromString(rawId);
     }
 
-    private RecurringBooking getRecurringBookingById(long recurringBookingId) {
+    private RecurringBooking getRecurringBookingById(UUID recurringBookingId) {
         try {
             return new RecurringBookingRepository(getApplicationContext()).get(recurringBookingId);
         } catch (RecurringBookingNotFoundException e) {

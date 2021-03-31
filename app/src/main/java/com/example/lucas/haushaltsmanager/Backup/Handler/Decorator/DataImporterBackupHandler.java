@@ -44,7 +44,7 @@ public class DataImporterBackupHandler {
             backupHandler.restore(activeAccountPreferencesBkp, preferencesDir, ActiveAccountsPreferences.PREFERENCES_NAME);
         } else {
             // Preferences did not exist previously, so I have to clear all fields which might have been written to this file
-            ActiveAccountsPreferences.clear(app.getContext());
+            new ActiveAccountsPreferences(app.getContext()).clear();
         }
     }
 

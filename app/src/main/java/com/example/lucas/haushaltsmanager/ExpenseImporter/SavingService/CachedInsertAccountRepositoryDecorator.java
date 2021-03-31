@@ -1,15 +1,14 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.SavingService;
 
-import android.database.Cursor;
-
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepositoryInterface;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountCouldNotBeCreatedException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.CannotDeleteAccountException;
 import com.example.lucas.haushaltsmanager.Entities.Account;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Nullable;
 
@@ -22,20 +21,15 @@ public class CachedInsertAccountRepositoryDecorator implements AccountRepository
     }
 
     @Override
-    public Account insert(Account account) {
+    public void insert(Account account) throws AccountCouldNotBeCreatedException {
         Account createdAccount = getAccountFromList(account);
 
-        if (null == createdAccount) {
-            createdAccount = repository.insert(account);
-            cachedAccounts.add(createdAccount);
+        if (null != createdAccount) {
+            return;
         }
 
-        return createdAccount;
-    }
-
-    @Override
-    public Account get(long index) throws AccountNotFoundException {
-        return repository.get(index);
+        repository.insert(account);
+        cachedAccounts.add(account);
     }
 
     @Override
@@ -49,13 +43,13 @@ public class CachedInsertAccountRepositoryDecorator implements AccountRepository
     }
 
     @Override
-    public void closeDatabase() {
-        repository.closeDatabase();
+    public void update(Account account) throws AccountNotFoundException {
+        repository.update(account);
     }
 
     @Override
-    public void update(Account account) throws AccountNotFoundException {
-        repository.update(account);
+    public Account get(UUID index) throws AccountNotFoundException {
+        return repository.get(index);
     }
 
     @Nullable
@@ -70,7 +64,8 @@ public class CachedInsertAccountRepositoryDecorator implements AccountRepository
     }
 
     private boolean areEquals(Account one, Account other) {
-        return one.getTitle().equals(other.getTitle())
+        return one.getId().equals(other.getId())
+                && one.getTitle().equals(other.getTitle())
                 && one.getBalance().equals(other.getBalance());
     }
 }

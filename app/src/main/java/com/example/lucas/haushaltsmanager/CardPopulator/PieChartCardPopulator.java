@@ -1,18 +1,19 @@
 package com.example.lucas.haushaltsmanager.CardPopulator;
 
-import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
 import android.view.View;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 
 import com.example.lucas.androidcharts.DataSet;
 import com.example.lucas.androidcharts.PieChart;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Report.ReportInterface;
+import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseFilter;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSum;
-import com.example.lucas.haushaltsmanager.R;
 
 import java.util.ArrayList;
 import java.util.HashMap;

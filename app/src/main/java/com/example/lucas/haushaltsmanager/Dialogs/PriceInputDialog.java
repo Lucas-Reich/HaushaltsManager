@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import androidx.appcompat.app.AlertDialog;
 import android.view.KeyEvent;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
@@ -12,7 +11,8 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.lucas.haushaltsmanager.Entities.Currency;
+import androidx.appcompat.app.AlertDialog;
+
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
@@ -129,13 +129,8 @@ public class PriceInputDialog extends DialogFragment {
     private Price createPrice(String value) {
         return new Price(
                 value,
-                getDefaultCurrency(),
                 Locale.US // TODO: Locale auf Locale.getDefault() wechseln, wenn ich den PriceFormatTextWatcher gefixt habe.
         );
-    }
-
-    private Currency getDefaultCurrency() {
-        return Currency.getDefault(getActivity());
     }
 
     public interface OnPriceSelected {

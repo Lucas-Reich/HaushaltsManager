@@ -1,14 +1,12 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.AccountParser;
 
 import com.example.lucas.haushaltsmanager.Entities.Account;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Delimiter.Comma;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Delimiter.IDelimiter;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.InvalidInputException;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.NoMappingFoundException;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Line.Line;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.MappingList;
-import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.AccountParser.AccountParser;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.AccountParser.RequiredFields.Title;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.IRequiredField;
 
@@ -19,14 +17,13 @@ import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
-import static org.mockito.Mockito.mock;
 
 public class AccountParserTest {
     private AccountParser parser;
 
     @Before
     public void setUp() {
-        this.parser = new AccountParser(mock(Currency.class));
+        this.parser = new AccountParser();
     }
 
     @Test

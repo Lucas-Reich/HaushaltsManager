@@ -1,8 +1,8 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.SavingService;
 
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepositoryInterface;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountCouldNotBeCreatedException;
 import com.example.lucas.haushaltsmanager.Entities.Account;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 
 import org.junit.Before;
@@ -11,13 +11,10 @@ import org.junit.Test;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
 
 public class CachedInsertAccountRepositoryDecoratorTest {
     private AccountRepositoryInterface mockAccountRepository;
@@ -33,39 +30,32 @@ public class CachedInsertAccountRepositoryDecoratorTest {
     @Test
     public void whenAccountIsCachedNoCallToDatabaseIsMade() throws Exception {
         // SetUp
-        Account expectedAccount = mockAccount();
-        injectAccountToCache(expectedAccount);
-
+        Account account = mockAccount();
+        injectAccountToCache(account);
 
         // Act
-        Account actualAccount = accountRepositoryDecorator.insert(expectedAccount);
-
+        accountRepositoryDecorator.insert(account);
 
         // Assert
         verifyZeroInteractions(mockAccountRepository);
-        assertEquals(expectedAccount, actualAccount);
     }
 
     @Test
-    public void whenAccountIsNotCachedCreateWillBeCalled() {
+    public void whenAccountIsNotCachedCreateWillBeCalled() throws AccountCouldNotBeCreatedException {
         // SetUp
-        Account expectedAccount = mock(Account.class);
-        accountRepositoryWillFindAccount(expectedAccount);
-
+        Account account = mock(Account.class);
 
         // Act
-        Account actualAccount = accountRepositoryDecorator.insert(mock(Account.class));
-
+        accountRepositoryDecorator.insert(account);
 
         //Assert
-        verify(mockAccountRepository, times(1)).insert(any(Account.class));
-        assertEquals(expectedAccount, actualAccount);
+        verify(mockAccountRepository, times(1)).insert(account);
     }
 
     private Account mockAccount() {
         return new Account(
                 "any string",
-                new Price(1234, mock(Currency.class))
+                new Price(1234)
         );
     }
 
@@ -76,10 +66,5 @@ public class CachedInsertAccountRepositoryDecoratorTest {
         accounts.set(accountRepositoryDecorator, new ArrayList() {{
             add(account);
         }});
-    }
-
-    private void accountRepositoryWillFindAccount(Account account) {
-        when(mockAccountRepository.insert(any(Account.class)))
-                .thenReturn(account);
     }
 }

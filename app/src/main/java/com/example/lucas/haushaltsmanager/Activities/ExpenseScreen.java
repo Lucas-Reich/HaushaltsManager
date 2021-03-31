@@ -3,7 +3,6 @@ package com.example.lucas.haushaltsmanager.Activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,6 +10,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+
+import androidx.annotation.Nullable;
 
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
@@ -27,8 +28,10 @@ import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.SingleChoiceDialog;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
+import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
@@ -39,17 +42,16 @@ import com.example.lucas.haushaltsmanager.Views.SaveFloatingActionButton;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 public class ExpenseScreen extends AbstractAppCompatActivity {
-    private static final String TAG = ExpenseScreen.class.getSimpleName();
-
     public static final String INTENT_MODE = "mode";
     public static final String INTENT_BOOKING = "booking";
     public static final String INTENT_MODE_UPDATE_CHILD = "updateChild";
     public static final String INTENT_MODE_UPDATE_PARENT = "updateParent";
     public static final String INTENT_MODE_ADD_CHILD = "addChild";
     public static final String INTENT_MODE_CREATE_BOOKING = "createBooking";
-
+    private static final String TAG = ExpenseScreen.class.getSimpleName();
     private Button mPriceBtn, mTitleTxt, mNoticeTxt, mAccountTxt, mCategoryTxt, mDateTxt, mIncomeBtn, mExpenseBtn, mCurrencyBtn;
     private ExpenseObject mExpense, mParentBooking;
 
@@ -84,41 +86,6 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
         mExpenseBtn = findViewById(R.id.expense_screen_expense);
 
         resolveIntent();
-    }
-
-    private void resolveIntent() {
-        BundleUtils bundle = new BundleUtils(getIntent().getExtras());
-
-        switch (bundle.getString(INTENT_MODE, INTENT_MODE_CREATE_BOOKING)) {
-            case INTENT_MODE_UPDATE_PARENT:
-            case INTENT_MODE_UPDATE_CHILD:
-                mExpense = (ExpenseObject) bundle.getParcelable(INTENT_BOOKING, null);
-                break;
-            case INTENT_MODE_ADD_CHILD:
-                mParentBooking = (ExpenseObject) bundle.getParcelable(INTENT_BOOKING, null);
-            case INTENT_MODE_CREATE_BOOKING:
-                mExpense = new ExpenseObject(
-                        getString(R.string.no_name),
-                        new Price(0D, true, mUserPreferences.getMainCurrency()),
-                        Category.createDummyCategory(),
-                        mUserPreferences.getActiveAccount().getIndex(),
-                        mUserPreferences.getMainCurrency()
-                );
-
-                break;
-            default:
-                throw new UnsupportedOperationException("Could not handle intent mode " + bundle.getString(INTENT_MODE, null));
-        }
-    }
-
-    private Account getExpenseAccount(long accountId) {
-        try {
-
-            return mAccountRepo.get(accountId);
-        } catch (AccountNotFoundException e) {
-
-            return mUserPreferences.getActiveAccount();
-        }
     }
 
     @Override
@@ -245,18 +212,104 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
         mIncomeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setPrice(new Price(mExpense.getUnsignedPrice(), false, getDefaultCurrency()));
+                setPrice(new Price(mExpense.getUnsignedPrice(), false));
             }
         });
 
         mExpenseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setPrice(new Price(mExpense.getUnsignedPrice(), true, getDefaultCurrency()));
+                setPrice(new Price(mExpense.getUnsignedPrice(), true));
             }
         });
 
         enableFabIfBookingIsSaveable();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode != Activity.RESULT_OK) {
+            return;
+        }
+
+        switch (requestCode) {
+            case 1:
+                Category category = data.getParcelableExtra("categoryObj");
+                setCategory(category);
+
+                break;
+            case 2:
+                ExpenseObject template = data.getParcelableExtra("templateObj");
+                showExpenseOnScreen(template);
+
+                break;
+            default:
+                throw new UnsupportedOperationException("Could not resolve action with result code: " + requestCode);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.expense_screen_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+//            case R.id.template: // TODO: How to fix this?
+//                Intent chooseTemplateIntent = new Intent(this, TemplatesActivity.class);
+//                startActivityForResult(chooseTemplateIntent, 2);
+//
+//                break;
+            case android.R.id.home:
+                onBackPressed();
+
+                break;
+            default:
+                throw new UnsupportedOperationException("Du hast auf einen Menüpunkt geklickt, welcher nicht unterstützt wird");
+        }
+
+        return true;
+    }
+
+    private void resolveIntent() {
+        BundleUtils bundle = new BundleUtils(getIntent().getExtras());
+
+        switch (bundle.getString(INTENT_MODE, INTENT_MODE_CREATE_BOOKING)) {
+            case INTENT_MODE_UPDATE_PARENT:
+            case INTENT_MODE_UPDATE_CHILD:
+                mExpense = (ExpenseObject) bundle.getParcelable(INTENT_BOOKING, null);
+                break;
+            case INTENT_MODE_ADD_CHILD:
+                mParentBooking = (ExpenseObject) bundle.getParcelable(INTENT_BOOKING, null);
+            case INTENT_MODE_CREATE_BOOKING:
+                Category category = new Category(
+                        getString(R.string.no_name),
+                        Color.black(),
+                        ExpenseType.expense()
+                );
+
+                mExpense = new ExpenseObject(
+                        getString(R.string.no_name),
+                        new Price(0D, true),
+                        category,
+                        mUserPreferences.getActiveAccount().getId()
+                );
+                break;
+            default:
+                throw new UnsupportedOperationException("Could not handle intent mode " + bundle.getString(INTENT_MODE, null));
+        }
+    }
+
+    private Account getExpenseAccount(UUID accountId) {
+        try {
+
+            return mAccountRepo.get(accountId);
+        } catch (AccountNotFoundException e) {
+
+            return mUserPreferences.getActiveAccount();
+        }
     }
 
     private void showCloseScreenDialog() {
@@ -291,6 +344,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
                     case INTENT_MODE_UPDATE_PARENT:
 
                         try {
+                            Log.d(TAG, "1 Updating expense with id " + mExpense.getId());
                             mExpenseRepo.update(mExpense);
                         } catch (ExpenseNotFoundException e) {
 
@@ -321,7 +375,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
                         break;
                     case INTENT_MODE_CREATE_BOOKING:
 
-                        mExpense = mExpenseRepo.insert(mExpense);
+                        mExpenseRepo.insert(mExpense);
                         break;
                     default:
                         throw new UnsupportedOperationException("Could not handle intent mode " + bundle.getString(INTENT_MODE, null));
@@ -331,52 +385,6 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
                 startActivity(intent);
             }
         };
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.expense_screen_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.template:
-                Intent chooseTemplateIntent = new Intent(this, TemplatesActivity.class);
-                startActivityForResult(chooseTemplateIntent, 2);
-
-                break;
-            case android.R.id.home:
-                onBackPressed();
-
-                break;
-            default:
-                throw new UnsupportedOperationException("Du hast auf einen Menüpunkt geklickt, welcher nicht unterstützt wird");
-        }
-
-        return true;
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode != Activity.RESULT_OK)
-            return;
-
-        switch (requestCode) {
-            case 1:
-                Category category = data.getParcelableExtra("categoryObj");
-                setCategory(category);
-
-                break;
-            case 2:
-                ExpenseObject template = data.getParcelableExtra("templateObj");
-                showExpenseOnScreen(template);
-
-                break;
-            default:
-                throw new UnsupportedOperationException("Could not resolve action with result code: " + requestCode);
-        }
     }
 
     private void showExpenseOnScreen(ExpenseObject expense) {
@@ -403,8 +411,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
     }
 
     private void setExpenseCurrency() {
-        mExpense.setCurrency(mUserPreferences.getMainCurrency());
-        mCurrencyBtn.setText(mExpense.getCurrency().getShortName());
+        mCurrencyBtn.setText(new Currency().getShortName());
     }
 
     private void showExpenditureType() {
@@ -421,7 +428,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
         mCategoryTxt.setText(mExpense.getCategory().getTitle());
 
         // Es kann sein, dass der DefaultExpenseType der Kategorie anders ist, als der der Buchung, von daher muss hier der Preis neu gesetzt werden
-        setPrice(new Price(mExpense.getPrice().getUnsignedValue(), mExpense.getCategory().getDefaultExpenseType().value(), getDefaultCurrency()));
+        setPrice(new Price(mExpense.getPrice().getUnsignedValue(), mExpense.getCategory().getDefaultExpenseType().value()));
 
         enableFabIfBookingIsSaveable();
     }
@@ -434,7 +441,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
     }
 
     private void setDate(Calendar date) {
-        mExpense.setDateTime(date);
+        mExpense.setDate(date);
         mDateTxt.setText(mExpense.getDisplayableDateTime());
     }
 
@@ -446,10 +453,6 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
     private void setAccount(Account account) {
         mExpense.setAccount(account);
         mAccountTxt.setText(account.getTitle());
-    }
-
-    private Currency getDefaultCurrency() {
-        return new UserSettingsPreferences(this).getMainCurrency();
     }
 
     private void enableFabIfBookingIsSaveable() {

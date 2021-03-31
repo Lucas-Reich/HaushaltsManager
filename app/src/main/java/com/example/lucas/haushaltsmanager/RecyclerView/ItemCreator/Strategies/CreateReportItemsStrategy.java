@@ -1,10 +1,8 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.Strategies;
 
 import com.example.lucas.haushaltsmanager.App.app;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Report.Report;
-import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.ReportItem.ReportItem;
@@ -32,8 +30,7 @@ public class CreateReportItemsStrategy implements RecyclerItemCreatorStrategyInt
         for (int i = getCurrentMonth(); i >= 1; i--) {
             reportItems.add(new ReportItem(new Report(
                     getStringifiedMonth(i - 1),
-                    groupExpensesByMonth(i - 1, expenses),
-                    getMainCurrency()
+                    groupExpensesByMonth(i - 1, expenses)
             )));
         }
 
@@ -73,10 +70,6 @@ public class CreateReportItemsStrategy implements RecyclerItemCreatorStrategyInt
 
     private int getCurrentMonth() {
         return Calendar.getInstance().get(Calendar.MONTH) + 1;
-    }
-
-    private Currency getMainCurrency() {
-        return new UserSettingsPreferences(app.getContext()).getMainCurrency();
     }
 }
 

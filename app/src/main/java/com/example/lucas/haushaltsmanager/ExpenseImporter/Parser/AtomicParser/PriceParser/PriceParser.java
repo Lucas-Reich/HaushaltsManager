@@ -1,6 +1,5 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.PriceParser;
 
-import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.InvalidInputException;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.NoMappingFoundException;
@@ -20,11 +19,8 @@ public class PriceParser implements IParser<Price> {
 
     private final BooleanParser booleanParser;
     private final DoubleParser doubleParser;
-    private final Currency mainCurrency;
 
-    public PriceParser(Currency currency) {
-        this.mainCurrency = currency;
-
+    public PriceParser() {
         booleanParser = new BooleanParser();
         doubleParser = new DoubleParser();
     }
@@ -32,8 +28,8 @@ public class PriceParser implements IParser<Price> {
     @Override
     public List<IRequiredField> getRequiredFields() {
         return Arrays.asList(
-            PRICE_VALUE_KEY,
-            PRICE_TYPE_KEY
+                PRICE_VALUE_KEY,
+                PRICE_TYPE_KEY
         );
     }
 
@@ -45,9 +41,8 @@ public class PriceParser implements IParser<Price> {
         assertNotEmpty(typeString);
 
         return new Price(
-            parseValue(valueString),
-            parseType(typeString),
-            mainCurrency
+                parseValue(valueString),
+                parseType(typeString)
         );
     }
 

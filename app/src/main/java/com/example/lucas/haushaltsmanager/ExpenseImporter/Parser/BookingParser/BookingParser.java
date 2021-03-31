@@ -1,7 +1,6 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.BookingParser;
 
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.InvalidInputException;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.NoMappingFoundException;
@@ -16,6 +15,7 @@ import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.IRequiredField;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class BookingParser implements IParser<ExpenseObject> {
     public static final IRequiredField BOOKING_TITLE_KEY = new Title();
@@ -23,14 +23,11 @@ public class BookingParser implements IParser<ExpenseObject> {
     private PriceParser priceParser;
     private CategoryParser categoryParser;
     private DateParser dateParser;
-    private Currency mainCurrency;
 
-    public BookingParser(PriceParser priceParser, CategoryParser categoryParser, DateParser dateParser, Currency mainCurrency) {
+    public BookingParser(PriceParser priceParser, CategoryParser categoryParser, DateParser dateParser) {
         this.priceParser = priceParser;
         this.categoryParser = categoryParser;
         this.dateParser = dateParser;
-
-        this.mainCurrency = mainCurrency;
     }
 
     @Override
@@ -48,16 +45,15 @@ public class BookingParser implements IParser<ExpenseObject> {
         assertNotEmpty(bookingTitle);
 
         return new ExpenseObject(
-                ExpensesDbHelper.INVALID_INDEX,
+                UUID.randomUUID(),
                 bookingTitle,
                 priceParser.parse(line, mapping),
                 dateParser.parse(line, mapping),
                 categoryParser.parse(line, mapping),
                 "",
-                ExpensesDbHelper.INVALID_INDEX,
+                UUID.randomUUID(),
                 ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE,
-                new ArrayList<ExpenseObject>(),
-                mainCurrency
+                new ArrayList<ExpenseObject>()
         );
     }
 

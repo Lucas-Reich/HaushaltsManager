@@ -1,12 +1,12 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.Accounts;
 
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountCouldNotBeCreatedException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.CannotDeleteAccountException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 
@@ -20,6 +20,7 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 
 import java.util.List;
+import java.util.UUID;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
@@ -48,16 +49,16 @@ public class AccountRepositoryTest {
     @After
     public void teardown() {
 
-        mAccountRepo.closeDatabase();
         mDatabaseManagerInstance.closeDatabase();
     }
 
     @Test
-    public void testGetWithExistingAccountShouldSucceed() {
-        Account expectedAccount = mAccountRepo.insert(getSimpleAccount());
+    public void testGetWithExistingAccountShouldSucceed() throws AccountCouldNotBeCreatedException {
+        Account expectedAccount = getSimpleAccount();
+        mAccountRepo.insert(expectedAccount);
 
         try {
-            Account fetchedAccount = mAccountRepo.get(expectedAccount.getIndex());
+            Account fetchedAccount = mAccountRepo.get(expectedAccount.getId());
             assertEquals(expectedAccount, fetchedAccount);
 
         } catch (AccountNotFoundException e) {
@@ -68,7 +69,7 @@ public class AccountRepositoryTest {
 
     @Test
     public void testGetWithNotExistingAccountShouldThrowAccountNotFoundException() {
-        long notExistingAccountId = 1337;
+        UUID notExistingAccountId = UUID.randomUUID();
 
         try {
             mAccountRepo.get(notExistingAccountId);
@@ -81,11 +82,12 @@ public class AccountRepositoryTest {
     }
 
     @Test
-    public void testInsertWithValidAccountShouldSucceed() {
-        Account expectedAccount = mAccountRepo.insert(getSimpleAccount());
+    public void testInsertWithValidAccountShouldSucceed() throws AccountCouldNotBeCreatedException {
+        Account expectedAccount = getSimpleAccount();
+        mAccountRepo.insert(expectedAccount);
 
         try {
-            Account fetchedAccount = mAccountRepo.get(expectedAccount.getIndex());
+            Account fetchedAccount = mAccountRepo.get(expectedAccount.getId());
             assertEquals(expectedAccount, fetchedAccount);
 
         } catch (AccountNotFoundException e) {
@@ -95,8 +97,9 @@ public class AccountRepositoryTest {
     }
 
     @Test
-    public void testDeleteWithWithExistingAccountShouldSucceed() {
-        Account account = mAccountRepo.insert(getSimpleAccount());
+    public void testDeleteWithWithExistingAccountShouldSucceed() throws AccountCouldNotBeCreatedException {
+        Account account = getSimpleAccount();
+        mAccountRepo.insert(account);
 
         try {
             mAccountRepo.delete(account);
@@ -109,8 +112,9 @@ public class AccountRepositoryTest {
     }
 
     @Test
-    public void testDeleteWithExistingAccountAttachedToParentExpenseShouldFailWithCannotDeleteAccountException() {
-        Account account = mAccountRepo.insert(getSimpleAccount());
+    public void testDeleteWithExistingAccountAttachedToParentExpenseShouldFailWithCannotDeleteAccountException() throws AccountCouldNotBeCreatedException {
+        Account account = getSimpleAccount();
+        mAccountRepo.insert(account);
 
         try {
             mAccountRepo.delete(account);
@@ -124,8 +128,9 @@ public class AccountRepositoryTest {
     }
 
     @Test
-    public void testDeleteWithExistingAccountAttachedToChildExpenseShouldFailWithCannotDeleteAccountException() {
-        Account account = mAccountRepo.insert(getSimpleAccount());
+    public void testDeleteWithExistingAccountAttachedToChildExpenseShouldFailWithCannotDeleteAccountException() throws AccountCouldNotBeCreatedException {
+        Account account = getSimpleAccount();
+        mAccountRepo.insert(account);
 
         ExpenseObject mockParentExpense = mock(ExpenseObject.class);
 
@@ -159,13 +164,14 @@ public class AccountRepositoryTest {
     }
 
     @Test
-    public void testUpdateWithWithExistingAccountShouldSucceed() {
-        Account expectedAccount = mAccountRepo.insert(getSimpleAccount());
+    public void testUpdateWithWithExistingAccountShouldSucceed() throws AccountCouldNotBeCreatedException {
+        Account expectedAccount = getSimpleAccount();
+        mAccountRepo.insert(expectedAccount);
 
         try {
             expectedAccount.setName("New Account Name");
             mAccountRepo.update(expectedAccount);
-            Account fetchedAccount = mAccountRepo.get(expectedAccount.getIndex());
+            Account fetchedAccount = mAccountRepo.get(expectedAccount.getId());
 
             assertEquals(expectedAccount, fetchedAccount);
 
@@ -176,8 +182,9 @@ public class AccountRepositoryTest {
     }
 
     @Test
-    public void testUpdateWithNotExistingAccountShouldThrowAccountNotFoundException() {
+    public void testUpdateWithNotExistingAccountShouldThrowAccountNotFoundException() throws AccountCouldNotBeCreatedException {
         Account account = getSimpleAccount();
+        mAccountRepo.insert(account);
 
         try {
             mAccountRepo.update(account);
@@ -185,7 +192,7 @@ public class AccountRepositoryTest {
 
         } catch (AccountNotFoundException e) {
 
-            assertEquals(String.format("Could not find Account with id %s.", account.getIndex()), e.getMessage());
+            assertEquals(String.format("Could not find Account with id %s.", account.getId()), e.getMessage());
         }
     }
 
@@ -193,7 +200,7 @@ public class AccountRepositoryTest {
         List<Account> accounts = mAccountRepo.getAll();
 
         for (Account account1 : accounts) {
-            if (account1.getIndex() == account.getIndex()) {
+            if (account1.getId().equals(account.getId())) {
                 return true;
             }
         }
@@ -202,21 +209,18 @@ public class AccountRepositoryTest {
     }
 
     private Account getSimpleAccount() {
-        Currency localCurrency = mock(Currency.class);
-
         return new Account(
                 "Konto",
-                new Price(7653, localCurrency)
+                new Price(7653)
         );
     }
 
     private ExpenseObject getSimpleExpense() {
         return new ExpenseObject(
                 "Ich bin eine Ausgabe",
-                new Price(0, mock(Currency.class)),
+                new Price(0),
                 mock(Category.class),
-                getSimpleAccount().getIndex(),
-                mock(Currency.class)
+                getSimpleAccount().getId()
         );
     }
 }

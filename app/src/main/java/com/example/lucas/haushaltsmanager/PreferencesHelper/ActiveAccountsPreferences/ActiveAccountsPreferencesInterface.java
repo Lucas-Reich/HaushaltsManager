@@ -4,6 +4,7 @@ import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.SharedPreferences;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface ActiveAccountsPreferencesInterface extends SharedPreferences {
     void addAccount(Account account);
@@ -14,5 +15,5 @@ public interface ActiveAccountsPreferencesInterface extends SharedPreferences {
 
     boolean isActive(Account account);
 
-    List<Long> getActiveAccounts();
+    List<UUID> getActiveAccounts();
 }

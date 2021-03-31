@@ -3,12 +3,10 @@ package com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ParentExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Price;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.AdItem.AdItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.ChildExpenseItem.ChildExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.ExpenseItem.ExpenseItem;
@@ -21,6 +19,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.UUID;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertFalse;
@@ -49,15 +48,6 @@ public class ExpenseListSelectionRulesTest {
         boolean dateItemCanBeSelected = selectionRules.canBeSelected(dateItem, new ArrayList<IRecyclerItem>());
 
         assertFalse(dateItemCanBeSelected);
-    }
-
-    @Test
-    public void adItemCannotBeSelected() {
-        AdItem adItem = new AdItem();
-
-        boolean parentCanBeSelected = selectionRules.canBeSelected(adItem, new ArrayList<IRecyclerItem>());
-
-        assertFalse(parentCanBeSelected);
     }
 
     @Test
@@ -128,14 +118,11 @@ public class ExpenseListSelectionRulesTest {
     }
 
     private ExpenseObject getDummyExpense() {
-        Currency currency = new Currency("Euro", "EUR", "€");
-
         return new ExpenseObject(
                 "Ausgabe",
-                new Price(100, currency),
-                new Category("Kategorie", new Color(Color.BLACK), ExpenseType.expense(), new ArrayList<Category>()),
-                ExpensesDbHelper.INVALID_INDEX,
-                currency
+                new Price(100),
+                new Category("Kategorie", new Color(Color.BLACK), ExpenseType.expense()),
+                UUID.randomUUID()
         );
     }
 
@@ -143,7 +130,6 @@ public class ExpenseListSelectionRulesTest {
         return new ParentExpenseObject(
                 ExpensesDbHelper.INVALID_INDEX,
                 "Parent Ausgabe",
-                new Currency("Euro", "EUR", "€"),
                 Calendar.getInstance(),
                 new ArrayList<ExpenseObject>()
         );

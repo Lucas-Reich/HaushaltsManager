@@ -1,9 +1,8 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.Items;
 
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
+import androidx.recyclerview.widget.RecyclerView;
 
 public abstract class AbstractViewHolder extends RecyclerView.ViewHolder {
     public AbstractViewHolder(View itemView) {

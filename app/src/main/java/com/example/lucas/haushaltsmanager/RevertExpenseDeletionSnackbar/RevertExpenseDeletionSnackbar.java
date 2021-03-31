@@ -74,23 +74,26 @@ public class RevertExpenseDeletionSnackbar {
         ExpenseObject expense = item.getContent();
 
         Log.i(TAG, "Restoring ParentExpense " + expense.getTitle());
-        ExpenseObject restoredExpense = mExpenseRepo.insert(expense);
+        mExpenseRepo.insert(expense);
 
-        if (mBetterListener != null)
-            mBetterListener.onExpenseRestored(new ExpenseItem(restoredExpense, item.getParent()));
+        if (mBetterListener != null) {
+            mBetterListener.onExpenseRestored(new ExpenseItem(expense, item.getParent()));
+        }
     }
 
     private void restoreChildExpenses(ChildExpenseItem child) {
         ExpenseObject childExpense = child.getContent();
+        ParentExpenseItem parentExpense = (ParentExpenseItem) child.getParent();
 
         try {
-            ExpenseObject parent = mExpenseRepo.get(((ParentExpenseItem) child.getParent()).getContent().getIndex());
+            ExpenseObject parent = mExpenseRepo.get(parentExpense.getContent().getId());
 
             Log.i(TAG, "Restoring ChildExpense " + childExpense.getTitle() + " and attaching it to ParentExpense " + parent.getTitle());
             ExpenseObject restoredChild = mChildExpenseRepo.addChildToBooking(childExpense, parent);
 
-            if (mBetterListener != null)
+            if (mBetterListener != null) {
                 mBetterListener.onExpenseRestored(new ChildExpenseItem(restoredChild, child.getParent()));
+            }
 
         } catch (AddChildToChildException e) {
             Log.e(TAG, "Could not restore ChildExpense " + childExpense.getTitle(), e);

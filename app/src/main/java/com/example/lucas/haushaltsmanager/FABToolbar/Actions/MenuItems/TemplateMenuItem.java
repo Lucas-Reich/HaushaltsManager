@@ -2,9 +2,11 @@ package com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems;
 
 import android.content.Context;
 
+import com.example.lucas.haushaltsmanager.App.app;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Templates.Exceptions.TemplateCouldNotBeCreatedException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Templates.TemplateRepository;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
-import com.example.lucas.haushaltsmanager.Entities.Template;
+import com.example.lucas.haushaltsmanager.Entities.TemplateBooking;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.ActionPayload;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.ActionKey;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.IActionKey;
@@ -13,13 +15,13 @@ import com.example.lucas.haushaltsmanager.R;
 public class TemplateMenuItem implements IMenuItem {
     public static final String ACTION_KEY = "templateAction";
 
-    private IActionKey mActionKey;
-
-    private OnSuccessCallback mCallback;
+    private final OnSuccessCallback mCallback;
+    private final IActionKey mActionKey = new ActionKey(ACTION_KEY);
+    private final TemplateRepository templateRepository;
 
     public TemplateMenuItem(OnSuccessCallback callback) {
         mCallback = callback;
-        mActionKey = new ActionKey(ACTION_KEY);
+        templateRepository = new TemplateRepository(app.getContext());
     }
 
     @Override
@@ -46,23 +48,26 @@ public class TemplateMenuItem implements IMenuItem {
     public void handleClick(ActionPayload actionPayload, Context context) {
         ExpenseObject templateExpense = extractExpenseFromPayload(actionPayload);
 
-        saveAsTemplate(templateExpense, context);
+        saveAsTemplate(new TemplateBooking(templateExpense));
     }
 
     private ExpenseObject extractExpenseFromPayload(ActionPayload actionPayload) {
         return (ExpenseObject) actionPayload.getFirstItem().getContent();
     }
 
-    private void saveAsTemplate(ExpenseObject templateExpense, Context context) {
-        TemplateRepository templateRepo = new TemplateRepository(context);
-        Template template = templateRepo.insert(new Template(templateExpense));
+    private void saveAsTemplate(TemplateBooking templateBooking) {
+        try {
+            templateRepository.insert(templateBooking);
 
-        if (null != mCallback) {
-            mCallback.onSuccess(template);
+            if (null != mCallback) {
+                mCallback.onSuccess(templateBooking);
+            }
+        } catch (TemplateCouldNotBeCreatedException e) {
+            // TODO:  Do nothing?
         }
     }
 
     public interface OnSuccessCallback {
-        void onSuccess(Template template);
+        void onSuccess(TemplateBooking templateBooking);
     }
 }

@@ -4,7 +4,6 @@ import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
 import android.database.MatrixCursor;
 
-import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
@@ -12,7 +11,6 @@ import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,7 +21,7 @@ public class CategoryTransformerTest {
 
     @Before
     public void setUp() {
-        transformer = new CategoryTransformer(new MockChildCategoryRepository());
+        transformer = new CategoryTransformer();
     }
 
     @Test
@@ -32,10 +30,10 @@ public class CategoryTransformerTest {
         final Category expectedCategory = getSimpleCategory();
 
         Cursor cursor = createCursor(new HashMap<String, Object>() {{
-            put(ExpensesDbHelper.CATEGORIES_COL_ID, expectedCategory.getIndex());
-            put(ExpensesDbHelper.CATEGORIES_COL_NAME, expectedCategory.getTitle());
-            put(ExpensesDbHelper.CATEGORIES_COL_COLOR, expectedCategory.getColor().getColorString());
-            put(ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE, expectedCategory.getDefaultExpenseType().value() ? 1 : 0);
+            put("id", expectedCategory.getId().toString());
+            put("name", expectedCategory.getTitle());
+            put("color", expectedCategory.getColor().getColorString());
+            put("default_expense_type", expectedCategory.getDefaultExpenseType().value() ? 1 : 0);
         }});
 
         // Act
@@ -51,10 +49,10 @@ public class CategoryTransformerTest {
         final Category expectedCategory = getSimpleCategory();
 
         Cursor cursor = createCursor(new HashMap<String, Object>() {{
-            put(ExpensesDbHelper.CATEGORIES_COL_ID, expectedCategory.getIndex());
-            put(ExpensesDbHelper.CATEGORIES_COL_NAME, expectedCategory.getTitle());
+            put("id", expectedCategory.getId().toString());
+            put("name", expectedCategory.getTitle());
             // No color information in Cursor
-            put(ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE, expectedCategory.getDefaultExpenseType().value() ? 1 : 0);
+            put("default_expense_type", expectedCategory.getDefaultExpenseType().value() ? 1 : 0);
         }});
 
         // Act
@@ -76,10 +74,9 @@ public class CategoryTransformerTest {
 
     private Category getSimpleCategory() {
         return new Category(
-            "Category Name",
-            Color.black(),
-            ExpenseType.income(),
-            new ArrayList<Category>()
+                "Category Name",
+                Color.black(),
+                ExpenseType.income()
         );
     }
 }

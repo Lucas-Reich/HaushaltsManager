@@ -2,7 +2,6 @@ package com.example.lucas.haushaltsmanager;
 
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 import com.example.lucas.haushaltsmanager.Entities.Price;
@@ -16,10 +15,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
+import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
 
 public class ExpenseGrouperTest {
     private ExpenseGrouper mExpenseGrouper;
@@ -63,9 +61,9 @@ public class ExpenseGrouperTest {
 
     @Test
     public void testGroupByCategory() {
-        Category category1 = getSimpleCategory(1, "Kategorie 1");
-        Category category2 = getSimpleCategory(2, "Kategorie 2");
-        Category category3 = getSimpleCategory(3, "Kategorie 3");
+        Category category1 = getSimpleCategory("Kategorie 1");
+        Category category2 = getSimpleCategory("Kategorie 2");
+        Category category3 = getSimpleCategory("Kategorie 3");
 
         List<ExpenseObject> expenses = new ArrayList<>();
         expenses.add(getExpenseWithCategory(category1));
@@ -108,7 +106,7 @@ public class ExpenseGrouperTest {
     }
 
     private ExpenseObject getExpenseWithDate(Calendar date) {
-        return getExpense(date, getSimpleCategory(1, "Kategorie"));
+        return getExpense(date, getSimpleCategory("Kategorie"));
     }
 
     private ExpenseObject getExpenseWithCategory(Category category) {
@@ -117,16 +115,15 @@ public class ExpenseGrouperTest {
 
     private ExpenseObject getExpense(Calendar date, Category category) {
         return new ExpenseObject(
-                new Random().nextLong(),
+                UUID.randomUUID(),
                 "Ausgabe",
-                new Price(778.4, false, mock(Currency.class)),
+                new Price(778.4, false),
                 date,
                 category,
                 "",
-                1,
+                UUID.randomUUID(),
                 ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE,
-                new ArrayList<ExpenseObject>(),
-                mock(Currency.class)
+                new ArrayList<ExpenseObject>()
         );
     }
 
@@ -139,13 +136,11 @@ public class ExpenseGrouperTest {
         return date;
     }
 
-    private Category getSimpleCategory(int index, String name) {
+    private Category getSimpleCategory(String name) {
         return new Category(
-                index,
                 name,
                 Color.black(),
-                ExpenseType.income(),
-                new ArrayList<Category>()
+                ExpenseType.income()
         );
     }
 }

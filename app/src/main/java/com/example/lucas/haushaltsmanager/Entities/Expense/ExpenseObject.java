@@ -6,12 +6,10 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 
 import com.example.lucas.haushaltsmanager.App.app;
-import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
+import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.Entities.Price;
-import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.text.DateFormat;
@@ -21,11 +19,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 public class ExpenseObject implements Parcelable, Booking {
-    /**
-     * regenerating the parcelable object back into our Category object
-     */
     public static final Parcelable.Creator<ExpenseObject> CREATOR = new Parcelable.Creator<ExpenseObject>() {
 
         @Override
@@ -42,119 +38,88 @@ public class ExpenseObject implements Parcelable, Booking {
     };
 
     private EXPENSE_TYPES expenseType;
-    private long index;
+    private final UUID id;
     private String title;
     private Price price;
     private Calendar date;
     private Category category;
     private String notice;
-    private long mAccountId;
+    private UUID accountId;
     private List<ExpenseObject> children = new ArrayList<>();
-    private Currency mCurrency;
 
     public ExpenseObject(
-            long index,
+            @NonNull UUID id,
             @NonNull String expenseName,
-            Price price,
+            @NonNull Price price,
             Calendar date,
             @NonNull Category category,
             String notice,
-            long accountId,
+            @NonNull UUID accountId,
             @NonNull EXPENSE_TYPES expenseType,
-            @NonNull List<ExpenseObject> children,
-            @NonNull Currency currency
+            @NonNull List<ExpenseObject> children
     ) {
-        setIndex(index);
+        this.id = id;
         setTitle(expenseName);
         setPrice(price);
-        setDateTime(date != null ? date : Calendar.getInstance());
+        setDate(date != null ? date : Calendar.getInstance());
         setCategory(category);
         setNotice(notice != null ? notice : "");
-        setAccountId(accountId);
+        this.accountId = accountId;
         setExpenseType(expenseType);
         addChildren(children);
-        setCurrency(currency);
     }
 
-    public ExpenseObject(@NonNull String title, Price price, @NonNull Category category, long accountId, Currency currency) {
-
+    public ExpenseObject(
+            @NonNull String title,
+            @NonNull Price price,
+            @NonNull Category category,
+            @NonNull UUID accountId
+    ) {
         this(
-                ExpensesDbHelper.INVALID_INDEX,
+                UUID.randomUUID(),
                 title,
                 price,
                 Calendar.getInstance(),
                 category,
-                null,
+                "",
                 accountId,
                 EXPENSE_TYPES.NORMAL_EXPENSE,
-                new ArrayList<ExpenseObject>(),
-                currency
+                new ArrayList<ExpenseObject>()
         );
     }
 
-    /**
-     * This will be only used by ParcelableCategories
-     * see: http://prasanta-paul.blogspot.de/2010/06/android-parcelable-example.html (Parcelable ArrayList)
-     * and: https://stackoverflow.com/questions/2139134/how-to-send-an-object-from-one-android-activity-to-another-using-intents for further explanations (Parcelable Object)
-     * <p>
-     * this constructor converts our parcelable object back into an Category object
-     *
-     * @param source .
-     */
     private ExpenseObject(Parcel source) {
 
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(source.readLong());
-        setDateTime(cal);
+        setDate(cal);
         setTitle(source.readString());
-        setIndex(source.readLong());
+        this.id = UUID.fromString(source.readString());
         setPrice((Price) source.readParcelable(Price.class.getClassLoader()));
         setCategory((Category) source.readParcelable(Category.class.getClassLoader()));
         setNotice(source.readString());
-        setAccountId(source.readLong());
+        accountId = UUID.fromString(source.readString());
         source.readList(this.children, ExpenseObject.class.getClassLoader());
         setExpenseType(EXPENSE_TYPES.valueOf(source.readString()));
-        setCurrency((Currency) source.readParcelable(Currency.class.getClassLoader()));
     }
 
-    /**
-     * Methode um eine dummy Booking zu erstellen
-     *
-     * @return dummy Booking
-     */
     public static ExpenseObject createDummyExpense() {
-        Currency mainCurrency = new UserSettingsPreferences(app.getContext()).getMainCurrency();
-
-        return new ExpenseObject(
-                ExpensesDbHelper.INVALID_INDEX,
+        Category category = new Category(
                 app.getContext().getString(R.string.no_name),
-                new Price(0, false, mainCurrency),
-                Calendar.getInstance(),
-                Category.createDummyCategory(),
-                null,
-                ExpensesDbHelper.INVALID_INDEX,
-                EXPENSE_TYPES.DUMMY_EXPENSE,
-                new ArrayList<ExpenseObject>(),
-                mainCurrency
+                Color.black(),
+                ExpenseType.expense()
         );
-    }
 
-    public static ExpenseObject copy(ExpenseObject other) {
-        return copyWithNewIndex(other, other.getIndex());
-    }
-
-    public static ExpenseObject copyWithNewIndex(ExpenseObject other, long newIndex) {
         return new ExpenseObject(
-                newIndex,
-                other.getTitle(),
-                other.getPrice(),
-                other.getDate(),
-                other.getCategory(),
-                other.getNotice(),
-                other.getAccountId(),
-                other.getExpenseType(),
-                other.getChildren(),
-                other.getCurrency()
+                UUID.randomUUID(),
+                app.getContext().getString(R.string.no_name),
+                new Price(0, false),
+                Calendar.getInstance(),
+                category,
+                null,
+                UUID.randomUUID(),
+                EXPENSE_TYPES.DUMMY_EXPENSE,
+                new ArrayList<ExpenseObject>()
         );
     }
 
@@ -162,6 +127,12 @@ public class ExpenseObject implements Parcelable, Booking {
     public Calendar getDate() {
 
         return this.date;
+    }
+
+    @Override
+    public void setDate(@NonNull Calendar date) {
+
+        this.date = date;
     }
 
     @NonNull
@@ -177,8 +148,9 @@ public class ExpenseObject implements Parcelable, Booking {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof ExpenseObject))
+        if (!(obj instanceof ExpenseObject)) {
             return false;
+        }
 
         ExpenseObject otherExpense = (ExpenseObject) obj;
 
@@ -188,8 +160,7 @@ public class ExpenseObject implements Parcelable, Booking {
         result = result && getExpenseType().equals(otherExpense.getExpenseType());
         result = result && getDate().getTimeInMillis() == otherExpense.getDate().getTimeInMillis();
         result = result && getNotice().equals(otherExpense.getNotice());
-        result = result && getCategory().getIndex() == otherExpense.getCategory().getIndex();//ich kann die objekte nicht vergleichen da parent buchungen nur dummies bekommen
-        result = result && getCurrency().getIndex() == otherExpense.getCurrency().getIndex();//ich kann die objekte nicht vergleichen da parent buchungen nur dummies bekommen
+        result = result && getCategory().getId() == otherExpense.getCategory().getId();//ich kann die objekte nicht vergleichen da parent buchungen nur dummies bekommen
 
         for (ExpenseObject child : getChildren()) {
             result = result && otherExpense.getChildren().contains(child);
@@ -203,7 +174,7 @@ public class ExpenseObject implements Parcelable, Booking {
     public String toString() {
         return String.format(
                 "%s %s %s",
-                getIndex(),
+                getId().toString(),
                 getTitle(),
                 getUnsignedPrice()
         );
@@ -219,14 +190,13 @@ public class ExpenseObject implements Parcelable, Booking {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(date.getTimeInMillis());
         dest.writeString(title);
-        dest.writeLong(index);
+        dest.writeString(id.toString());
         dest.writeParcelable(price, flags);
         dest.writeParcelable(category, flags);
         dest.writeString(notice);
-        dest.writeLong(mAccountId);
+        dest.writeString(accountId.toString());
         dest.writeList(children);
         dest.writeString(expenseType.name());
-        dest.writeParcelable(mCurrency, flags);
     }
 
     public Price getPrice() {
@@ -237,18 +207,8 @@ public class ExpenseObject implements Parcelable, Booking {
         this.price = price;
     }
 
-    public Currency getCurrency() {
-
-        return mCurrency;
-    }
-
-    public void setCurrency(Currency currency) {
-        mCurrency = currency;
-    }
-
-    public void setDateTime(@NonNull Calendar date) {
-
-        this.date = date;
+    public UUID getId() {
+        return id;
     }
 
     @NonNull
@@ -282,16 +242,6 @@ public class ExpenseObject implements Parcelable, Booking {
         return calcPrice;
     }
 
-    public long getIndex() {
-
-        return index;
-    }
-
-    private void setIndex(long index) {
-
-        this.index = index;
-    }
-
     public boolean isExpenditure() {
 
         return price.isNegative();
@@ -319,16 +269,12 @@ public class ExpenseObject implements Parcelable, Booking {
         this.notice = notice;
     }
 
-    public long getAccountId() {
-        return mAccountId;
-    }
-
-    public void setAccountId(long accountId) {
-        mAccountId = accountId;
+    public UUID getAccountId() {
+        return accountId;
     }
 
     public void setAccount(Account account) {
-        mAccountId = account.getIndex();
+        accountId = account.getId();
     }
 
     public void removeChild(ExpenseObject child) {
@@ -367,11 +313,11 @@ public class ExpenseObject implements Parcelable, Booking {
         return expenseType == EXPENSE_TYPES.PARENT_EXPENSE;
     }
 
+    @Deprecated
     public boolean isSet() {
         return !this.title.equals(app.getContext().getString(R.string.no_name))
                 && price != null
-                && this.category.isSet()
-                && this.mAccountId != -1;
+                && this.category.isSet();
     }
 
     @NonNull

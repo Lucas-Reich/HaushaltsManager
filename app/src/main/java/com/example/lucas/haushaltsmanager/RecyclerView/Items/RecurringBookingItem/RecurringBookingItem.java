@@ -54,6 +54,11 @@ public class RecurringBookingItem implements IParentRecyclerItem {
     }
 
     @Override
+    public boolean isSelectable() {
+        return true;
+    }
+
+    @Override
     public void addChild(IRecyclerItem item) {
         // Do nothing
     }

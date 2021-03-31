@@ -3,22 +3,24 @@ package com.example.lucas.haushaltsmanager.Database.Repositories.Categories;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.QueryInterface;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.Exceptions.CategoryCouldNotBeCreatedException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.Exceptions.CategoryNotFoundException;
-import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepository;
 import com.example.lucas.haushaltsmanager.Database.TransformerInterface;
 import com.example.lucas.haushaltsmanager.Entities.Category;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class CategoryRepository implements CategoryRepositoryInterface {
+    private final String TABLE = "CATEGORIES";
+
     private SQLiteDatabase mDatabase;
     private final TransformerInterface<Category> transformer;
 
@@ -26,7 +28,7 @@ public class CategoryRepository implements CategoryRepositoryInterface {
         DatabaseManager.initializeInstance(new ExpensesDbHelper(context));
 
         mDatabase = DatabaseManager.getInstance().openDatabase();
-        transformer = new CategoryTransformer(new ChildCategoryRepository(context));
+        transformer = new CategoryTransformer();
     }
 
     public List<Category> getAll() {
@@ -45,41 +47,62 @@ public class CategoryRepository implements CategoryRepositoryInterface {
         return categories;
     }
 
-    public Category insert(Category category) {
+    public void insert(Category category) throws CategoryCouldNotBeCreatedException {
         ContentValues values = new ContentValues();
-        values.put(ExpensesDbHelper.CATEGORIES_COL_NAME, category.getTitle());
-        values.put(ExpensesDbHelper.CATEGORIES_COL_COLOR, category.getColor().getColorString());
-        values.put(ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE, category.getDefaultExpenseType().value() ? 1 : 0);
+        values.put("id", category.getId().toString());
+        values.put("name", category.getTitle());
+        values.put("color", category.getColor().getColorString());
+        values.put("default_expense_type", category.getDefaultExpenseType().value() ? 1 : 0);
+        values.put("hidden", 0);
 
-        long insertedCategoryId = mDatabase.insert(ExpensesDbHelper.TABLE_CATEGORIES, null, values);
-
-        Category parentCategory = new Category(
-                insertedCategoryId,
-                category.getTitle(),
-                category.getColor(),
-                ExpenseType.load(category.getDefaultExpenseType().value()),
-                new ArrayList<Category>()
-        );
-
-        for (Category childCategory : category.getChildren()) {
-            // TODO: Do in TransactionRepository
-            parentCategory.addChild(new ChildCategoryRepository(app.getContext()).insert(parentCategory, childCategory));
+        try {
+            mDatabase.insertOrThrow(
+                    TABLE,
+                    null,
+                    values
+            );
+        } catch (SQLException e) {
+            throw new CategoryCouldNotBeCreatedException(category, e);
         }
-
-        return parentCategory;
     }
 
     public void update(Category category) throws CategoryNotFoundException {
         ContentValues updatedCategory = new ContentValues();
-        updatedCategory.put(ExpensesDbHelper.CATEGORIES_COL_NAME, category.getTitle());
-        updatedCategory.put(ExpensesDbHelper.CATEGORIES_COL_COLOR, category.getColor().getColorString());
-        updatedCategory.put(ExpensesDbHelper.CATEGORIES_COL_DEFAULT_EXPENSE_TYPE, (category.getDefaultExpenseType().value() ? 1 : 0));
+        updatedCategory.put("name", category.getTitle());
+        updatedCategory.put("color", category.getColor().getColorString());
+        updatedCategory.put("default_expense_type", (category.getDefaultExpenseType().value() ? 1 : 0));
 
-        int affectedRows = mDatabase.update(ExpensesDbHelper.TABLE_CATEGORIES, updatedCategory, ExpensesDbHelper.CATEGORIES_COL_ID + " = ?", new String[]{category.getIndex() + ""});
+        int affectedRows = mDatabase.update(
+                TABLE,
+                updatedCategory,
+                "id = ?",
+                new String[]{category.getId().toString()}
+        );
 
         if (affectedRows == 0) {
-            throw new CategoryNotFoundException(category.getIndex());
+            throw new CategoryNotFoundException(category.getId());
         }
+    }
+
+    public void delete(Category category) throws SQLException {
+        mDatabase.delete(
+                TABLE,
+                "id = ?",
+                new String[]{category.getId().toString()}
+        );
+    }
+
+    public Category get(UUID id) throws CategoryNotFoundException {
+        Cursor c = executeRaw(new GetCategoryQuery(id));
+
+        if (!c.moveToFirst()) {
+            throw new CategoryNotFoundException(id);
+        }
+
+        Category category = transformer.transform(c);
+
+        c.close();
+        return category;
     }
 
     private Cursor executeRaw(QueryInterface query) {

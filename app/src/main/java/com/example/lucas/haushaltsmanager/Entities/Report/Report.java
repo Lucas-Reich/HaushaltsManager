@@ -6,13 +6,11 @@ import androidx.annotation.StringRes;
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSum;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,16 +18,13 @@ import java.util.Map;
 public class Report implements ReportInterface {
     private String mCardTitle;
     private List<ExpenseObject> mExpenses;
-    private Currency mCurrency;
 
     public Report(
             @NonNull String cardTitle,
-            @NonNull List<ExpenseObject> expenses,
-            @NonNull Currency currency
+            @NonNull List<ExpenseObject> expenses
     ) {
         setCardTitle(cardTitle);
         mExpenses = expenses;
-        mCurrency = currency;
     }
 
     @NonNull
@@ -82,11 +77,6 @@ public class Report implements ReportInterface {
         mCardTitle = title;
     }
 
-    @Override
-    public Currency getCurrency() {
-        return mCurrency;
-    }
-
     private String getResourceString(@StringRes int stringRes) {
         return app.getContext().getString(stringRes);
     }
@@ -95,8 +85,7 @@ public class Report implements ReportInterface {
         return new Category(
                 getResourceString(titleRes),
                 Color.white(),
-                ExpenseType.income(),
-                new ArrayList<Category>()
+                ExpenseType.income()
         );
     }
 

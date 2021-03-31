@@ -1,6 +1,5 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses;
 
-import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.QueryInterface;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 
@@ -13,35 +12,33 @@ class ChildBookingExistsQuery implements QueryInterface {
 
     @Override
     public String sql() {
-        return "SELECT *"
-                + " FROM " + ExpensesDbHelper.TABLE_BOOKINGS
-                + " WHERE " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_ID + " = %s"
-                + " AND " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_TITLE + " = '%s'"
-                + " AND " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_PRICE + " = %s"
-                + " AND " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_EXPENSE_TYPE + " = '%s'"
-                + " AND " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_CATEGORY_ID + " = %s"
-                + " AND " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_ACCOUNT_ID + " = %s"
-                + " AND " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_EXPENDITURE + " = %s"
-                + " AND " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_DATE + " = '%s'"
-                + " AND " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_NOTICE + " = '%s'"
-                + " AND " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_CURRENCY_ID + " = %s"
-                + " AND " + ExpensesDbHelper.TABLE_BOOKINGS + "." + ExpensesDbHelper.BOOKINGS_COL_PARENT_ID + " IS NOT NULL"
-                + " LIMIT 1;";
+        return "SELECT * "
+                + "FROM BOOKINGS "
+                + "WHERE id = %s "
+                + "AND title = '%s' "
+                + "AND price = %s "
+                + "AND expense_type = '%s' "
+                + "AND category_id = %s "
+                + "AND account_id = %s "
+                + "AND expenditure = %s "
+                + "AND date = '%s' "
+                + "AND notice = '%s' "
+                + "AND parent_id IS NOT NULL "
+                + "LIMIT 1;";
     }
 
     @Override
     public Object[] values() {
         return new Object[]{
-                childBooking.getIndex(),
+                childBooking.getId().toString(),
                 childBooking.getTitle(),
                 childBooking.getUnsignedPrice(),
                 childBooking.getExpenseType().name(),
-                childBooking.getCategory().getIndex(),
-                childBooking.getAccountId(),
+                childBooking.getCategory().getId().toString(),
+                childBooking.getAccountId().toString(),
                 (childBooking.isExpenditure() ? 1 : 0),
                 childBooking.getDate().getTimeInMillis(),
-                childBooking.getNotice(),
-                childBooking.getCurrency().getIndex()
+                childBooking.getNotice()
         };
     }
 }

@@ -71,9 +71,9 @@ public class ReportItemViewHolder extends AbstractViewHolder {
         ReportInterface report = castToReportItem(item).getContent();
 
         setCardTitle(report.getCardTitle());
-        setIncome(new Price(report.getIncoming(), report.getCurrency()));
-        setOutgoing(new Price(report.getOutgoing(), report.getCurrency()));
-        setTotal(new Price(report.getTotal(), report.getCurrency()));
+        setIncome(new Price(report.getIncoming()));
+        setOutgoing(new Price(report.getOutgoing()));
+        setTotal(new Price(report.getTotal()));
         setTotalBookingsCount(report.getBookingCount());
         setCategory(report.getMostStressedCategory());
         setPieChart(report);

@@ -48,4 +48,9 @@ public class ExpenseItem implements IRecyclerItem {
     public DateItem getParent() {
         return parent;
     }
+
+    @Override
+    public boolean isSelectable() {
+        return true;
+    }
 }

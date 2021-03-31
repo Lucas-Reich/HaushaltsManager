@@ -1,6 +1,7 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.SavingService;
 
-import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepositoryInterface;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepositoryInterface;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.Exceptions.CategoryCouldNotBeCreatedException;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
@@ -10,99 +11,62 @@ import org.junit.Test;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
 
 public class CachedInsertChildCategoryRepositoryDecoratorTest {
-    private ChildCategoryRepositoryInterface repository;
-    private CachedInsertChildCategoryRepositoryDecorator decorator;
+    private CategoryRepositoryInterface repository;
+    private CachedInsertCategoryRepositoryDecorator decorator;
 
     @Before
     public void setUp() {
-        repository = mock(ChildCategoryRepositoryInterface.class);
-        decorator = new CachedInsertChildCategoryRepositoryDecorator(repository);
+        repository = mock(CategoryRepositoryInterface.class);
+        decorator = new CachedInsertCategoryRepositoryDecorator(repository);
     }
 
     @Test
     public void whenChildCategoryIsCachedNoDatabaseCallIsMade() throws Exception {
         // SetUp
         Category expectedCategory = createCategory();
-        Category parent = createCategory();
-        injectToCache(parent, expectedCategory);
+        injectToCache(expectedCategory);
 
         // Act
-        Category actualCategory = decorator.insert(parent, expectedCategory);
-
+        decorator.insert(expectedCategory);
 
         // Assert
         verifyZeroInteractions(repository);
-        assertEquals(expectedCategory, actualCategory);
     }
 
     @Test
-    public void whenChildCategoryIsNotCachedADatabaseCallIsMade() {
+    public void whenChildCategoryIsNotCachedADatabaseCallIsMade() throws CategoryCouldNotBeCreatedException {
         // SetUp
-        Category expectedCategory = mock(Category.class);
-        childCategoryRepositoryWillFindCategory(expectedCategory);
-
+        Category category = mock(Category.class);
 
         // Act
-        Category actualCategory = decorator.insert(mock(Category.class), mock(Category.class));
-
-
-        // Assert
-        verify(repository, times(1)).insert(any(Category.class), any(Category.class));
-        assertEquals(expectedCategory, actualCategory);
-    }
-
-    @Test
-    public void whenChildCategoryIsNotCachedADatabaseCallIsMade2() throws Exception {
-        // SetUp
-        Category expectedCategory = mock(Category.class);
-        childCategoryRepositoryWillFindCategory(expectedCategory);
-
-        injectToCache(mock(Category.class), mock(Category.class));
-
-
-        // Act
-        Category actualCategory = decorator.insert(mock(Category.class), mock(Category.class));
-
+        decorator.insert(category);
 
         // Assert
-        verify(repository, times(1)).insert(any(Category.class), any(Category.class));
-        assertEquals(expectedCategory, actualCategory);
-    }
-
-    private void childCategoryRepositoryWillFindCategory(Category category) {
-        when(repository.insert(any(Category.class), any(Category.class)))
-                .thenReturn(category);
+        verify(repository, times(1)).insert(any(Category.class));
     }
 
     private Category createCategory() {
         return new Category(
                 "any string",
                 mock(Color.class),
-                ExpenseType.expense(),
-                new ArrayList<Category>()
+                ExpenseType.expense()
         );
     }
 
-    private void injectToCache(final Category parent, final Category child) throws Exception {
-        Field accounts = CachedInsertChildCategoryRepositoryDecorator.class.getDeclaredField("cachedCategories");
+    private void injectToCache(final Category category) throws Exception {
+        Field accounts = CachedInsertCategoryRepositoryDecorator.class.getDeclaredField("cachedCategories");
 
         accounts.setAccessible(true);
-        accounts.set(decorator, new HashMap<Category, List<Category>>() {{
-            put(parent, new ArrayList<Category>() {{
-                add(child);
-            }});
+        accounts.set(decorator, new ArrayList<Category>() {{
+            add(category);
         }});
     }
 }

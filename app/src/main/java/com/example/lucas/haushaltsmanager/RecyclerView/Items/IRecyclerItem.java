@@ -13,4 +13,6 @@ public interface IRecyclerItem {
     Object getContent();
 
     IParentRecyclerItem getParent();
+
+    boolean isSelectable();
 }

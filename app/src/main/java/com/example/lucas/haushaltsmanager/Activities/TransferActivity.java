@@ -3,21 +3,24 @@ package com.example.lucas.haushaltsmanager.Activities;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
+import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.ChildCategoryRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.ChildCategories.Exceptions.ChildCategoryNotFoundException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepositoryInterface;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.Exceptions.CategoryNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
 import com.example.lucas.haushaltsmanager.Dialogs.DatePickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ErrorAlertDialog;
@@ -28,7 +31,6 @@ import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Price;
-import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.text.DateFormat;
@@ -49,52 +51,8 @@ public class TransferActivity extends AppCompatActivity {
     private ExpenseObject mToExpense;
     private AccountRepository mAccountRepo;
     private ChildExpenseRepository mChildExpenseRepo;
-    private ChildCategoryRepository mChildCategoryRepo;
+    private CategoryRepositoryInterface categoryRepository;
     private ExpenseRepository mBookingRepo;
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_transfers);
-
-        mAccountRepo = new AccountRepository(this);
-        mChildExpenseRepo = new ChildExpenseRepository(this);
-        mChildCategoryRepo = new ChildCategoryRepository(this);
-        mBookingRepo = new ExpenseRepository(this);
-
-        mCalendar = Calendar.getInstance();
-
-        try {
-            mFromExpense = ExpenseObject.createDummyExpense();
-            mFromExpense.setPrice(new Price(0, true, getDefaultCurrency()));
-            mFromExpense.setCategory(getTransferCategory());
-            mFromExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.TRANSFER_EXPENSE);
-
-            mToExpense = ExpenseObject.createDummyExpense();
-            mToExpense.setPrice(new Price(0, false, getDefaultCurrency()));
-            mToExpense.setCategory(getTransferCategory());
-            mToExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.TRANSFER_EXPENSE);
-        } catch (ChildCategoryNotFoundException e) {
-
-            finish();
-        }
-
-        mDateBtn = findViewById(R.id.transfer_date_btn);
-        mFromAccountBtn = findViewById(R.id.transfer_from_account_btn);
-        mToAccountBtn = findViewById(R.id.transfer_to_account_btn);
-        mCreateTransferBtn = findViewById(R.id.transfer_create_btn);
-        mAmountBtn = findViewById(R.id.transfer_amount_btn);
-
-        initializeToolbar();
-
-        Bundle bundle = getIntent().getExtras();
-        if (bundle != null && bundle.containsKey("from_account"))
-            setFromAccount((Account) bundle.getParcelable("from_account"));
-    }
-
-    private Currency getDefaultCurrency() {
-        return new UserSettingsPreferences(this).getMainCurrency();
-    }
 
     @Override
     protected void onStart() {
@@ -114,13 +72,11 @@ public class TransferActivity extends AppCompatActivity {
                 expenseInput.setOnPriceSelectedListener(new PriceInputDialog.OnPriceSelected() {
                     @Override
                     public void onPriceSelected(Price price) {
-                        UserSettingsPreferences preferences = new UserSettingsPreferences(TransferActivity.this);
-
                         mFromExpense.setPrice(price);
                         mAmountBtn.setText(String.format(
                                 getResources().getConfiguration().locale, "%.2f %s",
                                 mFromExpense.getUnsignedPrice(),
-                                preferences.getMainCurrency().getSymbol())
+                                new Currency().getSymbol())
                         );
 
                         setToExpense(price.getUnsignedValue());
@@ -208,8 +164,8 @@ public class TransferActivity extends AppCompatActivity {
                     public void onDateSelected(Calendar date) {
 
                         mCalendar = date;
-                        mFromExpense.setDateTime(date);
-                        mToExpense.setDateTime(date);
+                        mFromExpense.setDate(date);
+                        mToExpense.setDate(date);
                         mDateBtn.setText(transformCalendarToReadableDate(date));
                     }
                 });
@@ -257,6 +213,46 @@ public class TransferActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_transfers);
+
+        mAccountRepo = new AccountRepository(this);
+        mChildExpenseRepo = new ChildExpenseRepository(this);
+        categoryRepository = new CategoryRepository(this);
+        mBookingRepo = new ExpenseRepository(this);
+
+        mCalendar = Calendar.getInstance();
+
+        try {
+            mFromExpense = ExpenseObject.createDummyExpense();
+            mFromExpense.setPrice(new Price(0, true));
+            mFromExpense.setCategory(getTransferCategory());
+            mFromExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.TRANSFER_EXPENSE);
+
+            mToExpense = ExpenseObject.createDummyExpense();
+            mToExpense.setPrice(new Price(0, false));
+            mToExpense.setCategory(getTransferCategory());
+            mToExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.TRANSFER_EXPENSE);
+        } catch (CategoryNotFoundException e) {
+
+            finish();
+        }
+
+        mDateBtn = findViewById(R.id.transfer_date_btn);
+        mFromAccountBtn = findViewById(R.id.transfer_from_account_btn);
+        mToAccountBtn = findViewById(R.id.transfer_to_account_btn);
+        mCreateTransferBtn = findViewById(R.id.transfer_create_btn);
+        mAmountBtn = findViewById(R.id.transfer_amount_btn);
+
+        initializeToolbar();
+
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null && bundle.containsKey("from_account"))
+            setFromAccount((Account) bundle.getParcelable("from_account"));
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
@@ -282,13 +278,8 @@ public class TransferActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
-    /**
-     * Methode um die Default TransferKategorie aus der Datenbank zu holen.
-     *
-     * @return Default TransferKategorie
-     */
-    private Category getTransferCategory() throws ChildCategoryNotFoundException {
-        return mChildCategoryRepo.get(1);
+    private Category getTransferCategory() throws CategoryNotFoundException {
+        return categoryRepository.get(app.transferCategoryId);
     }
 
     /**
@@ -311,7 +302,7 @@ public class TransferActivity extends AppCompatActivity {
 
         mFromAccount = newAccount;
         mToExpense.setTitle(String.format("%s %s", getString(R.string.transfer_from), mFromAccount.getTitle()));
-        mFromExpense.setAccountId(mFromAccount.getIndex());
+        mFromExpense.setAccount(mFromAccount);
         mFromAccountBtn.setText(mFromAccount.getTitle());
 
         Log.d(TAG, "selected " + mFromAccount.getTitle() + " as from account");
@@ -326,7 +317,7 @@ public class TransferActivity extends AppCompatActivity {
 
         mToAccount = newAccount;
         mFromExpense.setTitle(String.format("%s %s", getString(R.string.transfer_to), mToAccount.getTitle()));
-        mToExpense.setAccountId(mToAccount.getIndex());
+        mToExpense.setAccount(mToAccount);
         mToAccountBtn.setText(mToAccount.getTitle());
 
         Log.d(TAG, "selected " + mToAccount.getTitle() + " as to account");
@@ -340,8 +331,7 @@ public class TransferActivity extends AppCompatActivity {
     private void setToExpense(double newPrice) {
         mToExpense.setPrice(new Price(
                 newPrice,
-                false,
-                getDefaultCurrency())
-        );
+                false
+        ));
     }
 }

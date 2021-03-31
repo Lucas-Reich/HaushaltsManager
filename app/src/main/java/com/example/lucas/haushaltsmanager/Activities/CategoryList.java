@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepositoryInterface;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.ActionPayload;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.DeleteCategoryMenuItem;
@@ -18,10 +19,10 @@ import com.example.lucas.haushaltsmanager.FABToolbar.OnFABToolbarFABClickListene
 import com.example.lucas.haushaltsmanager.FABToolbar.OnFABToolbarItemClickListener;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.RecyclerItemClickListener;
-import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.CategoryListRecyclerViewAdapter;
 import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.ItemCreator;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.CategoryItem.CategoryItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.ParentCategoryItem.ParentCategoryItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.CategoryListRecyclerViewAdapter;
 import com.github.fafaldo.fabtoolbar.widget.FABToolbarLayout;
 
 import java.util.List;
@@ -29,7 +30,6 @@ import java.util.List;
 import static com.example.lucas.haushaltsmanager.Activities.CreateCategory.INTENT_CATEGORY;
 import static com.example.lucas.haushaltsmanager.Activities.CreateCategory.INTENT_MODE;
 import static com.example.lucas.haushaltsmanager.Activities.CreateCategory.INTENT_MODE_UPDATE;
-import static com.example.lucas.haushaltsmanager.Activities.CreateCategory.INTENT_PARENT;
 
 public class CategoryList extends AbstractAppCompatActivity implements
         RecyclerItemClickListener.OnRecyclerItemClickListener,
@@ -38,6 +38,7 @@ public class CategoryList extends AbstractAppCompatActivity implements
     private RecyclerView mRecyclerView;
     private FABToolbarWithActionHandler mFabToolbar;
     private CategoryListRecyclerViewAdapter mRecyclerViewAdapter;
+    private CategoryRepositoryInterface categoryRepository;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -47,6 +48,8 @@ public class CategoryList extends AbstractAppCompatActivity implements
         mRecyclerView = findViewById(R.id.category_list_recycler_view);
         mRecyclerView.setLayoutManager(LayoutManagerFactory.vertical(this));
         mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, mRecyclerView, this));
+
+        categoryRepository = new CategoryRepository(this);
 
         mFabToolbar = new FABToolbarWithActionHandler(
                 (FABToolbarLayout) findViewById(R.id.category_list_fab_toolbar)
@@ -67,14 +70,10 @@ public class CategoryList extends AbstractAppCompatActivity implements
 
     @Override
     public void onClick(View v, IRecyclerItem item, int position) {
-        if (item instanceof ParentCategoryItem) {
-            mRecyclerViewAdapter.toggleExpansion(position);
+        if (!mRecyclerViewAdapter.isInSelectionMode()) {
+            CategoryItem categoryItem = (CategoryItem) item;
 
-            return;
-        }
-
-        if (mRecyclerViewAdapter.getSelectedItemsCount() == 0) {
-            handleOpenChildClick((Category) item.getContent(), (Category) item.getParent().getContent());
+            handleOpenChildClick(categoryItem.getContent());
 
             return;
         }
@@ -90,12 +89,6 @@ public class CategoryList extends AbstractAppCompatActivity implements
 
     @Override
     public void onLongClick(View v, IRecyclerItem item, int position) {
-        if (item instanceof ParentCategoryItem || mRecyclerViewAdapter.getSelectedItemsCount() > 0) {
-
-            mRecyclerViewAdapter.toggleExpansion(position);
-            return;
-        }
-
         mRecyclerViewAdapter.selectItem(item, position);
 
         updateFABToolbar();
@@ -131,7 +124,7 @@ public class CategoryList extends AbstractAppCompatActivity implements
         mFabToolbar.toggleToolbarVisibility(itemsSelected);
     }
 
-    private void handleOpenChildClick(Category clickedCategory, Category parent) {
+    private void handleOpenChildClick(Category clickedCategory) {
 
         if (getCallingActivity() != null) {
 
@@ -144,7 +137,6 @@ public class CategoryList extends AbstractAppCompatActivity implements
             Intent updateCategoryIntent = new Intent(CategoryList.this, CreateCategory.class);
             updateCategoryIntent.putExtra(INTENT_MODE, INTENT_MODE_UPDATE);
             updateCategoryIntent.putExtra(INTENT_CATEGORY, clickedCategory);
-            updateCategoryIntent.putExtra(INTENT_PARENT, parent);
             startActivity(updateCategoryIntent);
         }
     }
@@ -158,15 +150,9 @@ public class CategoryList extends AbstractAppCompatActivity implements
     }
 
     private List<IRecyclerItem> loadData() {
-        List<Category> categories = getAllCategories();
+        List<Category> categories = categoryRepository.getAll();
 
         return ItemCreator.createCategoryItems(categories);
-    }
-
-    private List<Category> getAllCategories() {
-        CategoryRepository categoryRepo = new CategoryRepository(this);
-
-        return categoryRepo.getAll();
     }
 
     private void setActionHandler() {
@@ -176,6 +162,6 @@ public class CategoryList extends AbstractAppCompatActivity implements
 
                 mRecyclerViewAdapter.removeItem(deletedItem);
             }
-        }), this);
+        }, new CategoryRepository(this)), this);
     }
 }

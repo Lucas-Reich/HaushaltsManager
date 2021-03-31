@@ -1,7 +1,6 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.DataImporter.ImporterStrategy;
 
 import com.example.lucas.haushaltsmanager.Entities.Account;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.DataImporter.ImportStrategies.ImportBookingStrategy;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Delimiter.Comma;
@@ -41,12 +40,11 @@ public class ImportBookingStrategyTest {
 
     @Before
     public void setUp() {
-        Currency mockCurrency = mock(Currency.class);
         mockSaver = mock(ISaver.class);
 
         strategy = new ImportBookingStrategy(
-                new BookingParser(new PriceParser(mockCurrency), new CategoryParser(), new DateParser(), mockCurrency),
-                new AccountParser(mockCurrency),
+                new BookingParser(new PriceParser(), new CategoryParser(), new DateParser()),
+                new AccountParser(),
                 mockSaver
         );
     }

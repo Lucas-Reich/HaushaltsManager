@@ -12,90 +12,79 @@ public class PriceTest {
 
     @Test
     public void testCreatePrice() {
+        // Arrange
         double expectedValue = 100;
         boolean expectedIsNegative = false;
-        Currency expectedCurrency = createCurrency();
 
-        Price price = new Price(expectedValue, expectedIsNegative, expectedCurrency);
+        // Act
+        Price price = new Price(expectedValue, expectedIsNegative);
 
+        // Assert
         assertEquals(expectedValue, price.getSignedValue(), 0);
         assertEquals(expectedIsNegative, price.isNegative());
-        assertEquals(expectedCurrency, price.getCurrency());
     }
 
     @Test
     public void testInferredPositiveValue() {
+        // Arrange
         double expectedValue = 100;
-        Currency expectedCurrency = createCurrency();
 
-        Price price = new Price(expectedValue, expectedCurrency);
+        // Act
+        Price price = new Price(expectedValue);
 
+        // Assert
         assertEquals(expectedValue, price.getSignedValue(), 0);
         assertFalse(price.isNegative());
-        assertEquals(expectedCurrency, price.getCurrency());
     }
 
     @Test
     public void testInferredNegativeValue() {
+        // Arrange
         double expectedValue = -100;
-        Currency expectedCurrency = createCurrency();
 
-        Price price = new Price(expectedValue, expectedCurrency);
+        // Act
+        Price price = new Price(expectedValue);
 
+        // Assert
         assertEquals(expectedValue, price.getSignedValue(), 0);
         assertTrue(price.isNegative());
-        assertEquals(expectedCurrency, price.getCurrency());
-    }
-
-    @Test
-    public void testCreatePriceFromPositiveFourDigitStringWithCents() {
-        String expectedValue = "1.000,33";
-        Currency expectedCurrency = createCurrency();
-
-        Price price = new Price(expectedValue, false, expectedCurrency, Locale.GERMANY);
-
-        assertEquals(1000.33, price.getSignedValue(), 0);
-        assertFalse(price.isNegative());
-        assertEquals(expectedCurrency, price.getCurrency());
     }
 
     @Test
     public void testCreatePriceFromEmptyString() {
-        Price price = new Price("", createCurrency(), Locale.GERMANY);
+        // Act
+        Price price = new Price("", Locale.GERMANY);
 
+        // Assert
         assertEquals(0, price.getUnsignedValue(), 0);
     }
 
     @Test
     public void testInferredPositiveValueFromString() {
-        Currency expectedCurrency = createCurrency();
+        // Act
+        Price price = new Price("10.000", Locale.GERMANY);
 
-        Price price = new Price("10.000", expectedCurrency, Locale.GERMANY);
-
+        // Assert
         assertEquals(10000, price.getUnsignedValue(), 0);
         assertFalse(price.isNegative());
-        assertEquals(expectedCurrency, price.getCurrency());
     }
 
     @Test
     public void testInferredNegativeValueFromString() {
-        Currency expectedCurrency = createCurrency();
+        // Act
+        Price price = new Price("-10.000", Locale.GERMANY);
 
-        Price price = new Price("-10.000", expectedCurrency, Locale.GERMANY);
-
+        // Assert
         assertEquals(10000, price.getUnsignedValue(), 0);
         assertTrue(price.isNegative());
-        assertEquals(expectedCurrency, price.getCurrency());
     }
 
     @Test
     public void testInvalidValueStringDefaultsToZero() {
-        Price price = new Price("I am a not valid Price", createCurrency(), Locale.GERMANY);
+        // Act
+        Price price = new Price("I am a not valid Price", Locale.GERMANY);
 
+        // Assert
         assertEquals(0, price.getUnsignedValue(), 0);
-    }
-
-    private Currency createCurrency() {
-        return new Currency("Euro", "EUR", "€");
     }
 }

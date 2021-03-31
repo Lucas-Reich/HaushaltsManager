@@ -2,7 +2,6 @@ package com.example.lucas.haushaltsmanager;
 
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 import com.example.lucas.haushaltsmanager.Entities.Price;
@@ -16,9 +15,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
 
 public class ExpenseSumTest {
     private ExpenseSum mExpenseSum;
@@ -35,9 +34,9 @@ public class ExpenseSumTest {
 
     @Test
     public void testSumByCategoriesWithDifferentCategories() {
-        Category category1 = getSimpleCategory(1, "Kategorie 1");
-        Category category2 = getSimpleCategory(2, "Kategorie 2");
-        Category category3 = getSimpleCategory(3, "Kategorie 3");
+        Category category1 = getSimpleCategory("Kategorie 1");
+        Category category2 = getSimpleCategory("Kategorie 2");
+        Category category3 = getSimpleCategory("Kategorie 3");
 
         List<ExpenseObject> expenses = new ArrayList<>();
         expenses.add(getExpenseWithCategory(category3, 113));
@@ -57,7 +56,7 @@ public class ExpenseSumTest {
 
     @Test
     public void testSumByCategoriesWithPositiveValues() {
-        Category category = getSimpleCategory(1, "Kategorie");
+        Category category = getSimpleCategory("Kategorie");
 
         List<ExpenseObject> expenses = new ArrayList<>();
         expenses.add(getExpenseWithCategory(category, 170));
@@ -72,7 +71,7 @@ public class ExpenseSumTest {
 
     @Test
     public void testSumByCategoryWithNegativeValues() {
-        Category category = getSimpleCategory(1, "Kategorie");
+        Category category = getSimpleCategory("Kategorie");
 
         List<ExpenseObject> expenses = new ArrayList<>();
         expenses.add(getExpenseWithCategory(category, -100));
@@ -86,7 +85,7 @@ public class ExpenseSumTest {
 
     @Test
     public void testSumByCategoriesWithChildren() {
-        Category category = getSimpleCategory(1, "Kategorie");
+        Category category = getSimpleCategory("Kategorie");
 
         ExpenseObject expenseWithChildren = getExpenseWithCategory(category, 0);
         expenseWithChildren.addChild(getExpenseWithCategory(category, 1000));
@@ -272,35 +271,32 @@ public class ExpenseSumTest {
     }
 
     private ExpenseObject getExpenseWithDate(Calendar date, double price) {
-        return getExpense(price, getSimpleCategory(1, "Kategorie"), date);
+        return getExpense(price, getSimpleCategory("Kategorie"), date);
     }
 
     private ExpenseObject getSimpleExpense(double price) {
-        return getExpense(price, getSimpleCategory(1, "Kategorie"), getSimpleDate(Calendar.JANUARY, 2018));
+        return getExpense(price, getSimpleCategory("Kategorie"), getSimpleDate(Calendar.JANUARY, 2018));
     }
 
     private ExpenseObject getExpense(double price, Category category, Calendar date) {
         return new ExpenseObject(
-                2,
+                UUID.randomUUID(),
                 "Buchung",
-                new Price(price, mock(Currency.class)),
+                new Price(price),
                 date,
                 category,
                 "",
-                6,
+                UUID.randomUUID(),
                 ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE,
-                new ArrayList<ExpenseObject>(),
-                mock(Currency.class)
+                new ArrayList<ExpenseObject>()
         );
     }
 
-    private Category getSimpleCategory(long index, String title) {
+    private Category getSimpleCategory(String title) {
         return new Category(
-                index,
                 title,
                 Color.black(),
-                ExpenseType.income(),
-                new ArrayList<Category>()
+                ExpenseType.income()
         );
     }
 

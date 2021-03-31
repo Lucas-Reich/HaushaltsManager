@@ -1,7 +1,10 @@
 package com.example.lucas.haushaltsmanager.Worker.PeriodicWorker;
 
 import android.content.Context;
+
 import androidx.annotation.NonNull;
+import androidx.work.WorkManager;
+import androidx.work.WorkerParameters;
 
 import com.example.lucas.haushaltsmanager.Backup.BackupUtils;
 import com.example.lucas.haushaltsmanager.Backup.Handler.Decorator.DatabaseBackupHandler;
@@ -10,9 +13,6 @@ import com.example.lucas.haushaltsmanager.Entities.Backup;
 import com.example.lucas.haushaltsmanager.Entities.Directory;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.AppInternalPreferences;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
-
-import androidx.work.WorkManager;
-import androidx.work.WorkerParameters;
 
 public class BackupWorker extends AbstractRecurringWorker {
     public static final String WORKER_TAG = "backupWorker";

@@ -6,6 +6,7 @@ import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 
 import java.util.List;
+import java.util.UUID;
 
 public class AddAndSetDefaultDecorator implements ActiveAccountsPreferencesInterface {
     private final ActiveAccountsPreferencesInterface preferences;
@@ -39,7 +40,7 @@ public class AddAndSetDefaultDecorator implements ActiveAccountsPreferencesInter
     }
 
     @Override
-    public List<Long> getActiveAccounts() {
+    public List<UUID> getActiveAccounts() {
         return preferences.getActiveAccounts();
     }
 

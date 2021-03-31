@@ -1,6 +1,5 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.DataImporter;
 
-import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.DataImporter.ImportStrategies.IImportStrategy;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.DataImporter.ImportStrategies.ImportBookingStrategy;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.NoMappingFoundException;
@@ -135,8 +134,8 @@ public class ImporterTest {
     public void returnsExpectedRequiredFields() {
         // Set Up
         IImporter importer = new Importer(mock(IFileReader.class), new ImportBookingStrategy(
-                new BookingParser(new PriceParser(mock(Currency.class)), new CategoryParser(), new DateParser(), mock(Currency.class)),
-                new AccountParser(mock(Currency.class)),
+                new BookingParser(new PriceParser(), new CategoryParser(), new DateParser()),
+                new AccountParser(),
                 mock(ISaver.class)
         ));
 

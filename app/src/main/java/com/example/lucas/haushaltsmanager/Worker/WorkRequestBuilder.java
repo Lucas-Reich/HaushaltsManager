@@ -71,17 +71,13 @@ public class WorkRequestBuilder {
         return new OneTimeWorkRequest.Builder(RecurringBookingWorker.class)
                 .setInitialDelay(delay.getDuration(), delay.getTimeUnit())
                 .setInputData(buildInputData(recurringBooking))
-                .addTag(createTag(recurringBooking.getIndex()))
+                .addTag(recurringBooking.getId().toString())
                 .build();
     }
 
     private Data buildInputData(RecurringBooking recurringBooking) {
         return new Data.Builder()
-                .putLong(RecurringBookingWorker.RECURRING_BOOKING, recurringBooking.getIndex())
+                .putString(RecurringBookingWorker.RECURRING_BOOKING, recurringBooking.getId().toString())
                 .build();
-    }
-
-    private String createTag(long value) {
-        return String.format("%s", value);
     }
 }

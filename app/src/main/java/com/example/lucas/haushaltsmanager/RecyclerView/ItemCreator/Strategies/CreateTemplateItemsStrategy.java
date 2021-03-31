@@ -1,22 +1,22 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.Strategies;
 
-import com.example.lucas.haushaltsmanager.Entities.Template;
+import com.example.lucas.haushaltsmanager.Entities.TemplateBooking;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.TemplateItem.TemplateItem;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CreateTemplateItemsStrategy implements RecyclerItemCreatorStrategyInterface<Template> {
+public class CreateTemplateItemsStrategy implements RecyclerItemCreatorStrategyInterface<TemplateBooking> {
     @Override
-    public List<IRecyclerItem> create(List<Template> templates) {
-        if (templates.isEmpty()) {
+    public List<IRecyclerItem> create(List<TemplateBooking> templateBookings) {
+        if (templateBookings.isEmpty()) {
             return new ArrayList<>();
         }
 
         List<IRecyclerItem> templateItems = new ArrayList<>();
-        for (Template template : templates) {
-            templateItems.add(new TemplateItem(template));
+        for (TemplateBooking templateBooking : templateBookings) {
+            templateItems.add(new TemplateItem(templateBooking));
         }
 
         return templateItems;

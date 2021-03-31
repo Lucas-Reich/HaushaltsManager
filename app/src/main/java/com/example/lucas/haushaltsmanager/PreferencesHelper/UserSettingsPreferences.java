@@ -6,18 +6,15 @@ import android.content.SharedPreferences;
 import com.example.lucas.haushaltsmanager.Activities.Settings;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepositoryInterface;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.Exceptions.CurrencyNotFoundException;
 import com.example.lucas.haushaltsmanager.Entities.Account;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Time;
 import com.example.lucas.haushaltsmanager.Utils.WeekdayUtils;
+
+import java.util.UUID;
 
 public class UserSettingsPreferences {
     private static final String USER_SETTINGS = "UserSettings";
 
-    private static final String MAIN_CURRENCY_ID = "mainCurrencyIndex";
     private static final String MAX_BACKUP_COUNT = "maxBackupCount";
     private static final String SEND_REMINDER_NOTIFICATIONS = "sendReminderNotification";
     private static final String FIRST_DAY_OF_WEEK = "firstDayOfWeek";
@@ -28,25 +25,12 @@ public class UserSettingsPreferences {
     private final SharedPreferences mPreferences;
     private final Context mContext;
     private final AccountRepository mAccountRepo;
-    private final CurrencyRepositoryInterface mCurrencyRepo;
 
     public UserSettingsPreferences(Context context) {
 
         mPreferences = context.getSharedPreferences(USER_SETTINGS, Context.MODE_PRIVATE);
         mContext = context;
         mAccountRepo = new AccountRepository(context);
-        mCurrencyRepo = new CurrencyRepository(context);
-    }
-
-    public Currency getMainCurrency() {
-        long mainCurrencyId = mPreferences.getLong(MAIN_CURRENCY_ID, 1);
-
-        return fetchCurrency(mainCurrencyId);
-    }
-
-    public void setMainCurrency(Currency mainCurrency) {
-
-        mPreferences.edit().putLong(MAIN_CURRENCY_ID, mainCurrency.getIndex()).apply();
     }
 
     public int getMaxBackupCount() {
@@ -105,32 +89,20 @@ public class UserSettingsPreferences {
     }
 
     public Account getActiveAccount() {
+        String rawAccountId = mPreferences.getString(ACTIVE_ACCOUNT, "00000000-0000-0000-0000-000000000000");
 
-        long accountId = mPreferences.getLong(ACTIVE_ACCOUNT, -1);
-
-        return fetchAccount(accountId);
+        return fetchAccount(UUID.fromString(rawAccountId));
     }
 
     public void setActiveAccount(Account account) {
 
-        mPreferences.edit().putLong(ACTIVE_ACCOUNT, account.getIndex()).apply();
+        mPreferences.edit().putString(ACTIVE_ACCOUNT, account.getId().toString()).apply();
     }
 
-    private Currency fetchCurrency(long index) {
+    private Account fetchAccount(UUID accountId) {
         try {
 
-            return mCurrencyRepo.get(index);
-        } catch (CurrencyNotFoundException e) {
-
-            // TODO: Kann dieser Fall eintreten?
-            return null;
-        }
-    }
-
-    private Account fetchAccount(long index) {
-        try {
-
-            return mAccountRepo.get(index);
+            return mAccountRepo.get(accountId);
         } catch (AccountNotFoundException e) {
 
             // TODO: Wenn der Benutzer noch kein Konto erstellt hat, dann wird NULL zurückgegeben.

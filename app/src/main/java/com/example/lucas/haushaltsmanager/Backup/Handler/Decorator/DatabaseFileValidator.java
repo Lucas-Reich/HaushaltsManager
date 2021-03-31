@@ -85,14 +85,14 @@ public class DatabaseFileValidator {
     }
 
     private boolean validateSchema(List<String> input) {
-        return input.contains(ExpensesDbHelper.TABLE_ACCOUNTS)
-                && input.contains(ExpensesDbHelper.TABLE_BOOKINGS)
-                && input.contains(ExpensesDbHelper.TABLE_BOOKINGS_TAGS)
-                && input.contains(ExpensesDbHelper.TABLE_CATEGORIES)
-                && input.contains(ExpensesDbHelper.TABLE_CHILD_CATEGORIES)
-                && input.contains(ExpensesDbHelper.TABLE_CURRENCIES)
-                && input.contains(ExpensesDbHelper.TABLE_RECURRING_BOOKINGS)
-                && input.contains(ExpensesDbHelper.TABLE_TAGS)
-                && input.contains(ExpensesDbHelper.TABLE_TEMPLATE_BOOKINGS);
+        return input.contains("ACCOUNTS")
+                && input.contains("BOOKINGS")
+                && input.contains("BOOKING_TAGS")
+                && input.contains("CATEGORIES")
+                && input.contains("CHILD_CATEGORIES")
+                && input.contains("CURRENCIES")
+                && input.contains("RECURRING_BOOKINGS")
+                && input.contains("TAGS")
+                && input.contains("TEMPLATE_BOOKINGS");
     }
 }

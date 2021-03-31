@@ -1,11 +1,10 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBooking;
 
-import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
+import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.Exceptions.RecurringBookingCouldNotBeCreatedException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.Exceptions.RecurringBookingNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.RecurringBookingRepository;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.Booking;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
@@ -20,8 +19,8 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 
-import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 
@@ -35,12 +34,13 @@ public class RecurringBookingRepositoryTest {
     }
 
     @Test
-    public void testCreateWithValidRecurringBookingShouldSucceed() {
-        RecurringBooking recurringBooking = mRepo.create(createSimpleRecurringBooking());
+    public void testCreateWithValidRecurringBookingShouldSucceed() throws RecurringBookingCouldNotBeCreatedException {
+        RecurringBooking recurringBooking = createSimpleRecurringBooking();
+        mRepo.insert(recurringBooking);
 
         try {
 
-            RecurringBooking actualRecurringBooking = mRepo.get(recurringBooking.getIndex());
+            RecurringBooking actualRecurringBooking = mRepo.get(recurringBooking.getId());
             assertEquals(recurringBooking, actualRecurringBooking);
         } catch (RecurringBookingNotFoundException e) {
 
@@ -49,7 +49,7 @@ public class RecurringBookingRepositoryTest {
     }
 
     private RecurringBooking createSimpleRecurringBooking() {
-        return RecurringBooking.create(
+        return new RecurringBooking(
                 createDate(1, Calendar.JANUARY, 2019),
                 createDate(1, Calendar.JANUARY, 2020),
                 new Frequency(Calendar.MONTH, 1),
@@ -58,14 +58,11 @@ public class RecurringBookingRepositoryTest {
     }
 
     private Booking createBooking() {
-        Currency currency = new Currency("Euro", "EUR", "€");
-
         return new ExpenseObject(
                 "Ausgabe",
-                new Price(150, true, currency),
-                new Category("Kategorie", Color.black(), ExpenseType.expense(), new ArrayList<Category>()),
-                ExpensesDbHelper.INVALID_INDEX,
-                currency
+                new Price(150, true),
+                new Category("Kategorie", Color.black(), ExpenseType.expense()),
+                UUID.randomUUID()
         );
     }
 

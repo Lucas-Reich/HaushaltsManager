@@ -34,12 +34,13 @@ import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class ParentActivity extends AppCompatActivity implements ChooseAccountsDialogFragment.OnSelectedAccount {
     private TabLayout mTabLayout;
     private ViewPager mViewPager;
     private List<ExpenseObject> mExpenses = new ArrayList<>();
-    private List<Long> mActiveAccounts = new ArrayList<>();
+    private List<UUID> mActiveAccounts = new ArrayList<>();
     private ExpenseRepository mBookingRepo;
 
     @Override
@@ -155,7 +156,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
     }
 
     @Override
-    public void onAccountSelected(long accountId, boolean isChecked) {
+    public void onAccountSelected(UUID accountId, boolean isChecked) {
         if (mActiveAccounts.contains(accountId) == isChecked)
             return;
 

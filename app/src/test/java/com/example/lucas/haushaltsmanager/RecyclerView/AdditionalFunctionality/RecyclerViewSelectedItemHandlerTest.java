@@ -3,18 +3,17 @@ package com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ParentExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.InsertStrategy.MockInsertStrategy;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.SelectionRules.MockSelectionRules;
-import com.example.lucas.haushaltsmanager.RecyclerView.MockItemHandler;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.ChildExpenseItem.ChildExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.ExpenseItem.ExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.ParentExpenseItem.ParentExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.MockItemHandler;
 
 import org.junit.After;
 import org.junit.Before;
@@ -24,6 +23,7 @@ import org.robolectric.RobolectricTestRunner;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -108,7 +108,6 @@ public class RecyclerViewSelectedItemHandlerTest {
                         (
                                 ExpensesDbHelper.INVALID_INDEX,
                                 "Ausgabe",
-                                new Currency("Euro", "EUR", "€"),
                                 Calendar.getInstance(),
                                 new ArrayList<ExpenseObject>()
                         ),
@@ -123,14 +122,11 @@ public class RecyclerViewSelectedItemHandlerTest {
     }
 
     private ExpenseObject getDummyExpense() {
-        Currency currency = new Currency("Euro", "EUR", "€");
-
         return new ExpenseObject(
                 "Ausgabe",
-                new Price(100, currency),
-                new Category("Kategorie", new Color(Color.WHITE), ExpenseType.expense(), new ArrayList<Category>()),
-                ExpensesDbHelper.INVALID_INDEX,
-                currency
+                new Price(100),
+                new Category("Kategorie", new Color(Color.WHITE), ExpenseType.expense()),
+                UUID.randomUUID()
         );
     }
 }

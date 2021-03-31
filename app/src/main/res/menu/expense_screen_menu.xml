@@ -3,7 +3,7 @@
       xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/template"
+        android:id="@+id/templateBooking"
         android:icon="@drawable/ic_template_white"
         android:title="@string/show_templates"
         app:showAsAction="always"/>

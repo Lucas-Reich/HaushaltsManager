@@ -3,17 +3,17 @@ package com.example.lucas.haushaltsmanager.RecyclerView.Items.TemplateItem;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.example.lucas.haushaltsmanager.Entities.Template;
+import com.example.lucas.haushaltsmanager.Entities.TemplateBooking;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IParentRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 
 public class TemplateItem implements IRecyclerItem {
     public static final int VIEW_TYPE = 8;
 
-    private Template template;
+    private TemplateBooking templateBooking;
 
-    public TemplateItem(Template template) {
-        this.template = template;
+    public TemplateItem(TemplateBooking templateBooking) {
+        this.templateBooking = templateBooking;
     }
 
     @Override
@@ -23,7 +23,7 @@ public class TemplateItem implements IRecyclerItem {
 
     @Override
     public Object getContent() {
-        return template;
+        return templateBooking;
     }
 
     @Override
@@ -31,10 +31,15 @@ public class TemplateItem implements IRecyclerItem {
         return null;
     }
 
+    @Override
+    public boolean isSelectable() {
+        return true;
+    }
+
     @NonNull
     @Override
     public String toString() {
-        return template.toString();
+        return templateBooking.toString();
     }
 
     @Override

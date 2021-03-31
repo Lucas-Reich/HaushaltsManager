@@ -1,6 +1,5 @@
 package com.example.lucas.haushaltsmanager.Utils;
 
-import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 
 import org.junit.Test;
@@ -19,7 +18,7 @@ public class MoneyUtilsTest {
 
     @Test
     public void testWithEmptyPrice() {
-        String actualValue = MoneyUtils.formatHumanReadable(createPrice(0, true), Locale.GERMANY);
+        String actualValue = MoneyUtils.formatHumanReadable(new Price(0, true), Locale.GERMANY);
 
         assertEquals("-,--", actualValue);
     }
@@ -27,7 +26,7 @@ public class MoneyUtilsTest {
     @Test
     public void testWithPositiveOneDigitPrice() {
         String actualValue = MoneyUtils.formatHumanReadable(
-                createPrice(1, false),
+                new Price(1, false),
                 Locale.GERMANY
         );
 
@@ -37,7 +36,7 @@ public class MoneyUtilsTest {
     @Test
     public void testWithPositiveFourDigitPrice() {
         String actualValue = MoneyUtils.formatHumanReadable(
-                createPrice(1000, false),
+                new Price(1000, false),
                 Locale.GERMANY
         );
 
@@ -47,7 +46,7 @@ public class MoneyUtilsTest {
     @Test
     public void testWithPositiveFourDigitAndCentPrice() {
         String actualValue = MoneyUtils.formatHumanReadable(
-                createPrice(1000.77, false),
+                new Price(1000.77, false),
                 Locale.GERMANY
         );
 
@@ -57,7 +56,7 @@ public class MoneyUtilsTest {
     @Test
     public void testWithNegativeOneDigitPrice() {
         String actualValue = MoneyUtils.formatHumanReadable(
-                createPrice(1, true),
+                new Price(1, true),
                 Locale.GERMANY
         );
 
@@ -67,7 +66,7 @@ public class MoneyUtilsTest {
     @Test
     public void testWithNegativeFourDigitPrice() {
         String actualValue = MoneyUtils.formatHumanReadable(
-                createPrice(1000, true),
+                new Price(1000, true),
                 Locale.GERMANY
         );
 
@@ -77,7 +76,7 @@ public class MoneyUtilsTest {
     @Test
     public void testWithNegativeFourDigitAndCentPrice() {
         String actualValue = MoneyUtils.formatHumanReadable(
-                createPrice(1000.98, true),
+                new Price(1000.98, true),
                 Locale.GERMANY
         );
 
@@ -87,7 +86,7 @@ public class MoneyUtilsTest {
     @Test
     public void testOmitCents() {
         String actualValue = MoneyUtils.formatHumanReadableOmitCents(
-                createPrice(100.50, false),
+                new Price(100.50, false),
                 Locale.GERMANY
         );
 
@@ -97,18 +96,10 @@ public class MoneyUtilsTest {
     @Test
     public void testWithUSLocale() {
         String actualValue = MoneyUtils.formatHumanReadable(
-                createPrice(1000.33, false),
+                new Price(1000.33, false),
                 Locale.US
         );
 
         assertEquals("1,000.33", actualValue);
-    }
-
-    private Price createPrice(double withValue, boolean isNegative) {
-        return new Price(withValue, isNegative, createCurrency());
-    }
-
-    private Currency createCurrency() {
-        return new Currency("Euro", "EUR", "€");
     }
 }

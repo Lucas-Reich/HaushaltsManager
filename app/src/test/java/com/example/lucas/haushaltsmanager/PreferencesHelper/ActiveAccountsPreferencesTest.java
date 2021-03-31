@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.example.lucas.haushaltsmanager.Entities.Account;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences.ActiveAccountsPreferences;
 
@@ -17,6 +16,7 @@ import org.robolectric.RobolectricTestRunner;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -46,7 +46,7 @@ public class ActiveAccountsPreferencesTest {
 
     @Test
     public void testAddAccount() {
-        Account account = getSimpleAccount(1);
+        Account account = getSimpleAccount();
 
         SharedPreferences.Editor editor = mock(SharedPreferences.Editor.class);
 
@@ -58,13 +58,13 @@ public class ActiveAccountsPreferencesTest {
         mPreferences = new ActiveAccountsPreferences(mContext);
         mPreferences.addAccount(account);
 
-        verify(editor, times(1)).putBoolean("1", true);
+        verify(editor, times(1)).putBoolean(account.getId().toString(), true);
         verify(editor, times(1)).apply();
     }
 
     @Test
     public void testRemoveAccount() {
-        Account account = getSimpleAccount(1);
+        Account account = getSimpleAccount();
 
         SharedPreferences.Editor editor = mock(SharedPreferences.Editor.class);
 
@@ -76,18 +76,18 @@ public class ActiveAccountsPreferencesTest {
         mPreferences = new ActiveAccountsPreferences(mContext);
         mPreferences.removeAccount(account);
 
-        verify(editor, times(1)).remove("1");
+        verify(editor, times(1)).remove(account.getId().toString());
         verify(editor, times(1)).apply();
     }
 
     @Test
     public void testChangeVisibility() {
-        Account account = getSimpleAccount(5);
+        Account account = getSimpleAccount();
 
         SharedPreferences.Editor editor = mock(SharedPreferences.Editor.class);
 
         SharedPreferences preferences = mock(SharedPreferences.class);
-        when(preferences.contains(account.getIndex() + "")).thenReturn(true);
+        when(preferences.contains(account.getId().toString())).thenReturn(true);
         when(preferences.edit()).thenReturn(editor);
 
         when(mContext.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)).thenReturn(preferences);
@@ -95,18 +95,18 @@ public class ActiveAccountsPreferencesTest {
         mPreferences = new ActiveAccountsPreferences(mContext);
         mPreferences.changeVisibility(account, false);
 
-        verify(editor, times(1)).putBoolean("5", false);
+        verify(editor, times(1)).putBoolean(account.getId().toString(), false);
         verify(editor, times(1)).apply();
     }
 
     @Test
     public void testChangeVisibilityWithNotExistingAccount() {
-        Account account = getSimpleAccount(27);
+        Account account = getSimpleAccount();
 
         SharedPreferences.Editor editor = mock(SharedPreferences.Editor.class);
 
         SharedPreferences preferences = mock(SharedPreferences.class);
-        when(preferences.contains(account.getIndex() + "")).thenReturn(false);
+        when(preferences.contains(account.getId().toString())).thenReturn(false);
         when(preferences.edit()).thenReturn(editor);
 
         when(mContext.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)).thenReturn(preferences);
@@ -114,18 +114,18 @@ public class ActiveAccountsPreferencesTest {
         mPreferences = new ActiveAccountsPreferences(mContext);
         mPreferences.changeVisibility(account, false);
 
-        verify(editor, times(0)).putBoolean("27", false);
+        verify(editor, times(0)).putBoolean(account.getId().toString(), false);
         verify(editor, times(0)).apply();
     }
 
     @Test
     public void testGetActiveAccounts() {
-        Account expectedAccount1 = getSimpleAccount(1);
-        Account expectedAccount2 = getSimpleAccount(2);
+        Account expectedAccount1 = getSimpleAccount();
+        Account expectedAccount2 = getSimpleAccount();
 
         HashMap<String, Boolean> map = new HashMap<>();
-        map.put("1", true);
-        map.put("2", true);
+        map.put(expectedAccount1.getId().toString(), true);
+        map.put(expectedAccount2.getId().toString(), true);
 
         SharedPreferences preferences = mock(SharedPreferences.class);
         doReturn(map).when(preferences).getAll();
@@ -133,16 +133,16 @@ public class ActiveAccountsPreferencesTest {
         when(mContext.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)).thenReturn(preferences);
 
         mPreferences = new ActiveAccountsPreferences(mContext);
-        List<Long> actualAccounts = mPreferences.getActiveAccounts();
+        List<UUID> actualAccounts = mPreferences.getActiveAccounts();
 
-        assertEquals(expectedAccount1.getIndex(), (long) actualAccounts.get(0));
-        assertEquals(expectedAccount2.getIndex(), (long) actualAccounts.get(1));
+        assertEquals(expectedAccount1.getId(), actualAccounts.get(0));
+        assertEquals(expectedAccount2.getId(), actualAccounts.get(1));
     }
 
     @Test
     public void testGetActiveAccountsShouldRemoveEntriesWithInvalidKeyInPreferences() {
         HashMap<String, Boolean> invalidMap = new HashMap<>();
-        invalidMap.put("NoLongValue", true);
+        invalidMap.put("NotExistingAccountId", true);
 
         SharedPreferences.Editor editor = mock(SharedPreferences.Editor.class);
 
@@ -153,18 +153,17 @@ public class ActiveAccountsPreferencesTest {
         when(mContext.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)).thenReturn(preferences);
 
         mPreferences = new ActiveAccountsPreferences(mContext);
-        List<Long> actualAccounts = mPreferences.getActiveAccounts();
+        List<UUID> actualAccounts = mPreferences.getActiveAccounts();
 
         assertTrue(actualAccounts.isEmpty());
-        verify(editor, times(1)).remove("NoLongValue");
+        verify(editor, times(1)).remove("NotExistingAccountId");
         verify(editor, times(1)).apply();
     }
 
-    private Account getSimpleAccount(long id) {
+    private Account getSimpleAccount() {
         return new Account(
-                id,
                 "Konto",
-                new Price(0d, mock(Currency.class))
+                new Price(0d)
         );
     }
 }

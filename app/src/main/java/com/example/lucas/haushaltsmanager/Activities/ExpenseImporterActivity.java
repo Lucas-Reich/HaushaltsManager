@@ -1,14 +1,13 @@
 package com.example.lucas.haushaltsmanager.Activities;
 
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+
 import com.example.lucas.haushaltsmanager.Dialogs.ProgressBarDialog;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.DataImporter.ImportStrategies.ImportBookingStrategy;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.DataImporter.Importer;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.InvalidFileException;
@@ -22,12 +21,12 @@ import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.Da
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.PriceParser.PriceParser;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.BookingParser.BookingParser;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.SavingService.Saver;
-import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
 import com.example.lucas.haushaltsmanager.Views.ButtonContainer;
 import com.example.lucas.haushaltsmanager.Views.HeaderView;
 import com.example.lucas.haushaltsmanager.Views.RequiredFieldsView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.FileNotFoundException;
 
@@ -78,11 +77,9 @@ public class ExpenseImporterActivity extends AbstractAppCompatActivity implement
     }
 
     private Importer buildNewImporter(IFileReader fileReader) {
-        Currency mainCurrency = getMainCurrency();
-
         return new Importer(fileReader, new ImportBookingStrategy(
-                new BookingParser(new PriceParser(mainCurrency), new CategoryParser(), new DateParser(), mainCurrency),
-                new AccountParser(mainCurrency),
+                new BookingParser(new PriceParser(), new CategoryParser(), new DateParser()),
+                new AccountParser(),
                 Saver.create(this)
         ));
     }
@@ -113,10 +110,6 @@ public class ExpenseImporterActivity extends AbstractAppCompatActivity implement
         } catch (FileNotFoundException | InvalidFileException e) {
             return null;
         }
-    }
-
-    private Currency getMainCurrency() {
-        return new UserSettingsPreferences(this).getMainCurrency();
     }
 
     private void showImportFAB() {

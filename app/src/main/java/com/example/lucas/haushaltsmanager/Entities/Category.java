@@ -2,16 +2,15 @@ package com.example.lucas.haushaltsmanager.Entities;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
 import androidx.annotation.NonNull;
 
 import com.example.lucas.haushaltsmanager.App.app;
-import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 import com.example.lucas.haushaltsmanager.R;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 public class Category implements Parcelable {
     public static final Creator<Category> CREATOR = new Creator<Category>() {
@@ -29,47 +28,39 @@ public class Category implements Parcelable {
         }
     };
 
-    private long mIndex;
-    private String mName;
-    private ExpenseType mDefaultExpenseType;
-    private List<Category> mChildren;
+    private final UUID id;
+    private String name;
     private Color color;
+    private ExpenseType defaultExpenseType;
 
-    public Category(long index, @NonNull String name, Color color, ExpenseType defaultExpenseType, List<Category> children) {
-        setIndex(index);
-        setName(name);
-        setColor(color);
-        setDefaultExpenseType(defaultExpenseType);
-        addChildren(children);
+    public Category(
+            @NonNull UUID id,
+            @NonNull String name,
+            @NonNull Color color,
+            @NonNull ExpenseType defaultExpenseType
+    ) {
+        this.id = id;
+        this.name = name;
+        this.color = color;
+        this.defaultExpenseType = defaultExpenseType;
     }
 
-    public Category(@NonNull String name, @NonNull Color color, ExpenseType expenseType, @NonNull List<Category> children) {
-        this(ExpensesDbHelper.INVALID_INDEX, name, color, expenseType, children);
+    public Category(
+            @NonNull String name,
+            @NonNull Color color,
+            @NonNull ExpenseType expenseType
+    ) {
+        this.id = UUID.randomUUID();
+        this.name = name;
+        this.color = color;
+        this.defaultExpenseType = expenseType;
     }
 
-    /**
-     * constructor converts our parcelable object back into an Category object
-     * see: http://prasanta-paul.blogspot.de/2010/06/android-parcelable-example.html (Parcelable ArrayList)
-     * and: https://stackoverflow.com/questions/2139134/how-to-send-an-object-from-one-android-activity-to-another-using-intents for further explanations (Parcelable Object)
-     *
-     * @param source .
-     */
     private Category(Parcel source) {
-        setIndex(source.readLong());
-        setName(source.readString());
-        setColor((Color) source.readParcelable(Color.class.getClassLoader()));
-        setDefaultExpenseType(ExpenseType.load(source.readInt() == 1));
-        // TODO: Müssten hier nicht noch die Kinder initialisiert werden
-    }
-
-    /**
-     * Methode um eine Dummy Category zu erstellen
-     *
-     * @return Category dummy object
-     */
-    public static Category createDummyCategory() {
-
-        return new Category(-1L, app.getContext().getString(R.string.no_name), new Color(Color.BLACK), ExpenseType.income(), new ArrayList<Category>());
+        this.id = UUID.fromString(source.readString());
+        this.name = source.readString();
+        this.color = (Color) source.readParcelable(Color.class.getClassLoader());
+        this.defaultExpenseType = ExpenseType.load(source.readInt() == 1);
     }
 
     @Override
@@ -80,10 +71,10 @@ public class Category implements Parcelable {
 
         Category otherCategory = (Category) obj;
 
-        return getTitle().equals(otherCategory.getTitle())
-                && otherCategory.getColor().equals(color)
-                && otherCategory.getDefaultExpenseType().equals(mDefaultExpenseType)
-                && mChildren.equals(otherCategory.getChildren());
+        return id.equals(otherCategory.getId())
+                && name.equals(otherCategory.getTitle())
+                && color.equals(otherCategory.getColor())
+                && defaultExpenseType.equals(otherCategory.getDefaultExpenseType());
     }
 
     @Override
@@ -95,76 +86,53 @@ public class Category implements Parcelable {
     @Override
     public int hashCode() {
         return Objects.hash(
-                getIndex(),
+                getId(),
                 getTitle(),
                 getColor(),
-                getDefaultExpenseType(),
-                getChildren()
+                getDefaultExpenseType()
         );
     }
 
-    /**
-     * can be ignored mostly
-     *
-     * @return int
-     */
     @Override
     public int describeContents() {
 
         return 0;
     }
 
-    /**
-     * converting the custom object into an parcelable object
-     *
-     * @param dest  destination Parcel
-     * @param flags flags
-     */
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(mIndex);
-        dest.writeString(mName);
+        dest.writeString(id.toString());
+        dest.writeString(name);
         dest.writeParcelable(color, flags);
-        dest.writeInt(mDefaultExpenseType.value() ? 1 : 0);
+        dest.writeInt(defaultExpenseType.value() ? 1 : 0);
     }
 
-    public long getIndex() {
-
-        return mIndex;
+    public UUID getId() {
+        return id;
     }
 
-    private void setIndex(long index) {
-
-        mIndex = index;
-    }
-
-    @NonNull
     public String getTitle() {
-
-        return mName;
+        return name;
     }
 
     public void setName(@NonNull String name) {
-
-        mName = name;
+        this.name = name;
     }
 
     public Color getColor() {
         return color;
     }
 
-    public void setColor(Color color) {
+    public void setColor(@NonNull Color color) {
         this.color = color;
     }
 
     public ExpenseType getDefaultExpenseType() {
-
-        return mDefaultExpenseType;
+        return defaultExpenseType;
     }
 
-    public void setDefaultExpenseType(ExpenseType expenseType) {
-
-        mDefaultExpenseType = expenseType;
+    public void setDefaultExpenseType(@NonNull ExpenseType expenseType) {
+        this.defaultExpenseType = expenseType;
     }
 
     /**
@@ -174,22 +142,6 @@ public class Category implements Parcelable {
      * @return Ob die Kategorie in die Datenbank geschrieben werden kann
      */
     public boolean isSet() {
-        return !mName.equals(app.getContext().getString(R.string.no_name));
-    }
-
-    public void addChild(Category child) {
-        mChildren.add(child);
-    }
-
-    public void addChildren(List<Category> children) {
-        if (mChildren == null) {
-            mChildren = new ArrayList<>();
-        }
-
-        mChildren.addAll(children);
-    }
-
-    public List<Category> getChildren() {
-        return mChildren;
+        return !name.equals(app.getContext().getString(R.string.no_name));
     }
 }

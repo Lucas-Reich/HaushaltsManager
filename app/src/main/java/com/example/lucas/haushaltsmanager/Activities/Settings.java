@@ -3,22 +3,24 @@ package com.example.lucas.haushaltsmanager.Activities;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.work.ExistingWorkPolicy;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
+import androidx.work.WorkRequest;
+
 import com.codekidlabs.storagechooser.StorageChooser;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Currencies.CurrencyRepositoryInterface;
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.SingleChoiceDialog;
 import com.example.lucas.haushaltsmanager.Entities.Backup;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Directory;
 import com.example.lucas.haushaltsmanager.Entities.NotificationVO;
 import com.example.lucas.haushaltsmanager.Entities.Time;
@@ -31,12 +33,6 @@ import com.example.lucas.haushaltsmanager.Worker.PeriodicWorker.NotificationWork
 import com.example.lucas.haushaltsmanager.Worker.WorkRequestBuilder;
 
 import java.util.Arrays;
-import java.util.List;
-
-import androidx.work.ExistingWorkPolicy;
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkManager;
-import androidx.work.WorkRequest;
 
 public class Settings extends AbstractAppCompatActivity {
 
@@ -50,31 +46,25 @@ public class Settings extends AbstractAppCompatActivity {
     public static final boolean DEFAULT_REMINDER_STATUS = false;
     public static final Time DEFAULT_REMINDER_TIME = new Time(10, 0);
 
-    private LinearLayout firstDayLayout, createBkpLayout, concurrentBackupsLayout, currencyLayout, notificationsAllowLayout, notificationTimeLayout, backupLocationLayout;
+    private LinearLayout firstDayLayout, createBkpLayout, concurrentBackupsLayout, notificationTimeLayout, backupLocationLayout;
     private Button resetSettingsBtn;
     private CheckBox createBackupsChk, allowReminderChk;
-    private TextView currencyNameTxt, firstDayOfWeekTxt, maxBackupCountTxt, backupCountTextTxt, notificationTimeTxt, notificationTimeTextTxt, backupLocationTxt, backupLocationHeadingTxt;
+    private TextView firstDayOfWeekTxt, maxBackupCountTxt, backupCountTextTxt, notificationTimeTxt, notificationTimeTextTxt, backupLocationTxt, backupLocationHeadingTxt;
     private UserSettingsPreferences mUserSettings;
     private WeekdayUtils mWeekdayUtils;
     private AppInternalPreferences mInternalPreferences;
-    private CurrencyRepositoryInterface mCurrencyRepo;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        mCurrencyRepo = new CurrencyRepository(this);
-
         firstDayLayout = findViewById(R.id.settings_first_day_wrapper);
         createBkpLayout = findViewById(R.id.settings_backups_enable_wrapper);
         concurrentBackupsLayout = findViewById(R.id.settings_backups_concurrent_wrapper);
-        currencyLayout = findViewById(R.id.settings_currency_wrapper);
-        notificationsAllowLayout = findViewById(R.id.settings_notifications_allow_wrapper);
         notificationTimeLayout = findViewById(R.id.settings_notifications_time_wrapper);
         backupLocationLayout = findViewById(R.id.settings_backups_location_wrapper);
 
-        currencyNameTxt = findViewById(R.id.settings_currency_name);
         firstDayOfWeekTxt = findViewById(R.id.settings_general_first_of_week);
         backupCountTextTxt = findViewById(R.id.settings_backups_concurrent_text);
         maxBackupCountTxt = findViewById(R.id.settings_backups_concurrent_count);
@@ -186,35 +176,6 @@ public class Settings extends AbstractAppCompatActivity {
                     }
                 });
                 concurrentBackupCount.show(getFragmentManager(), "settings_concurrent_backups");
-            }
-        });
-
-        setMainCurrency(mUserSettings.getMainCurrency());
-        currencyLayout.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                List<Currency> currencies = mCurrencyRepo.getAll();
-                int mainCurrencyIndex = currencies.indexOf(mUserSettings.getMainCurrency());
-
-                SingleChoiceDialog<Currency> currencyPicker = new SingleChoiceDialog<>();
-                currencyPicker.createBuilder(Settings.this);
-                currencyPicker.setTitle(getString(R.string.select_currency));
-                currencyPicker.setContent(currencies, mainCurrencyIndex);
-                currencyPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
-                    @Override
-                    public void onPositiveClick(Object entry) {
-
-                        setMainCurrency((Currency) entry);
-                    }
-
-                    @Override
-                    public void onNeutralClick() {
-
-                        //do nothing
-                    }
-                });
-                currencyPicker.show(getFragmentManager(), "settings_main_currency");
             }
         });
 
@@ -424,17 +385,6 @@ public class Settings extends AbstractAppCompatActivity {
 
         mUserSettings.setMaxBackupCount(maxBackupCount);
         maxBackupCountTxt.setText(String.format("%s", maxBackupCount));
-    }
-
-    /**
-     * Methode um die Hauptwährung des Users anzupassen.
-     *
-     * @param mainCurrency Neue Hauptwährung
-     */
-    private void setMainCurrency(Currency mainCurrency) {
-
-        mUserSettings.setMainCurrency(mainCurrency);
-        currencyNameTxt.setText(mainCurrency.getName());
     }
 
     /**
