@@ -8,8 +8,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nullable;
 
 public class Backup {
-    //.SaveDataFile
-    public static final String BACKUP_FILE_EXTENSION = "sdf";
+    public static final String BACKUP_FILE_EXTENSION = "sdf"; //.SaveDataFile
 
     // Backups sollten immer um 23:59 erstellt werden
     private static final Time executionTime = new Time(23, 59);

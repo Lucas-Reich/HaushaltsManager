@@ -4,6 +4,7 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Ex
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.CannotDeleteChildExpenseException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.ChildExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ParentBooking;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,6 +21,8 @@ public interface ChildExpenseRepositoryInterface {
     ExpenseObject get(UUID childExpenseId) throws ChildExpenseNotFoundException;
 
     List<ExpenseObject> getAll(UUID parentExpenseId);
+
+    void insert(ParentBooking parent, ExpenseObject child);
 
     void insert(ExpenseObject parentExpense, ExpenseObject childExpense);
 

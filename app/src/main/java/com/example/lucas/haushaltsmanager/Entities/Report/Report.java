@@ -85,7 +85,7 @@ public class Report implements ReportInterface {
         return new Category(
                 getResourceString(titleRes),
                 Color.white(),
-                ExpenseType.income()
+                ExpenseType.deposit()
         );
     }
 

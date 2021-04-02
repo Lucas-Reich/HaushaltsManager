@@ -1,17 +1,16 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.InsertStrategy;
 
-import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ParentExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ParentBooking;
 import com.example.lucas.haushaltsmanager.Entities.Price;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.ChildExpenseItem.ChildExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBookingItem.ChildExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.ExpenseItem.ExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.BookingItem.ExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.ParentExpenseItem.ParentExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ParentBookingItem.ParentBookingItem;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -80,7 +79,7 @@ public class ExpenseListInsertStrategyTest {
         DateItem dateItem = new DateItem(createDate(1, Calendar.JANUARY, 2019));
         items.add(dateItem);
 
-        ParentExpenseItem parentItem = new ParentExpenseItem(createDummyParentExpense(), dateItem);
+        ParentBookingItem parentItem = new ParentBookingItem(createDummyParentExpense(), dateItem);
         parentItem.setExpanded(false); // ParentItem is not expanded
         items.add(parentItem);
 
@@ -91,7 +90,7 @@ public class ExpenseListInsertStrategyTest {
 
         assertEquals(2, items.size());
         assertEquals(insertIndex, InsertStrategy.INVALID_INDEX);
-        assertTrue(((ParentExpenseItem) items.get(1)).getChildren().contains(childItem));
+        assertTrue(((ParentBookingItem) items.get(1)).getChildren().contains(childItem));
     }
 
     @Test
@@ -101,7 +100,7 @@ public class ExpenseListInsertStrategyTest {
         DateItem dateItem = new DateItem(createDate(1, Calendar.JANUARY, 2019));
         items.add(dateItem);
 
-        ParentExpenseItem parentItem = new ParentExpenseItem(createDummyParentExpense(), dateItem);
+        ParentBookingItem parentItem = new ParentBookingItem(createDummyParentExpense(), dateItem);
         parentItem.setExpanded(true); // ParentItem is expanded
         items.add(parentItem);
 
@@ -114,7 +113,7 @@ public class ExpenseListInsertStrategyTest {
         assertEquals(insertIndex, items.indexOf(childItem));
         assertEquals(childItem, items.get(2));
 
-        assertTrue(((ParentExpenseItem) items.get(1)).getChildren().contains(childItem));
+        assertTrue(((ParentBookingItem) items.get(1)).getChildren().contains(childItem));
     }
 
     @Test
@@ -130,7 +129,7 @@ public class ExpenseListInsertStrategyTest {
 
     @Test
     public void itemWithNotExistingParentCannotBeAddedToListAndReturnsInvalidIndex2() {
-        ParentExpenseItem notInListParent = new ParentExpenseItem(createDummyParentExpense(), null);
+        ParentBookingItem notInListParent = new ParentBookingItem(createDummyParentExpense(), null);
         notInListParent.setExpanded(true);
 
         ChildExpenseItem child = new ChildExpenseItem(createDummyExpense(), notInListParent);
@@ -142,9 +141,8 @@ public class ExpenseListInsertStrategyTest {
         assertEquals(InsertStrategy.INVALID_INDEX, insertIndex);
     }
 
-    private ParentExpenseObject createDummyParentExpense() {
-        return new ParentExpenseObject(
-                ExpensesDbHelper.INVALID_INDEX,
+    private ParentBooking createDummyParentExpense() {
+        return new ParentBooking(
                 "ParentAusgabe",
                 createDate(1, Calendar.JANUARY, 2019),
                 new ArrayList<ExpenseObject>()

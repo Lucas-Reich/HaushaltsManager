@@ -11,15 +11,15 @@ import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.I
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.RecyclerViewSelectedItemHandler;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.SelectionRules.ExpenseListSelectionRules;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.AbstractViewHolder;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.ChildExpenseItem.ChildExpenseItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.ChildExpenseItem.ChildExpenseViewHolder;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBookingItem.ChildExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBookingItem.ChildExpenseViewHolder;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateViewHolder;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.ExpenseItem.ExpenseItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.ExpenseItem.ExpenseItemViewHolder;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.BookingItem.ExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.BookingItem.ExpenseItemViewHolder;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.ParentExpenseItem.ParentExpenseItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.ParentExpenseItem.ParentExpenseViewHolder;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ParentBookingItem.ParentBookingItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ParentBookingItem.ParentExpenseViewHolder;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.RecurringBookingItem.RecurringBookingItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.RecurringBookingItem.RecurringBookingViewHolder;
 
@@ -44,7 +44,7 @@ public class ExpenseListRecyclerViewAdapter extends RecyclerViewSelectedItemHand
 
                 View expenseView = inflater.inflate(R.layout.recycler_view_child_expense, parent, false);
                 return new ExpenseItemViewHolder(expenseView);
-            case ParentExpenseItem.VIEW_TYPE:
+            case ParentBookingItem.VIEW_TYPE:
 
                 View parentExpenseView = inflater.inflate(R.layout.recycler_view_parent_expense, parent, false);
                 return new ParentExpenseViewHolder(parentExpenseView);

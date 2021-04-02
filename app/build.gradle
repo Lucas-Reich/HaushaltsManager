@@ -50,7 +50,6 @@ dependencies {
     implementation 'de.psdev.licensesdialog:licensesdialog:1.8.3'
     //AlertDialog um den User ein Verzeichniss auswählen zu lassen
     implementation 'com.github.codekidX:storage-chooser:2.0.3'
-    implementation project(path: ':androidcharts')
     implementation project(path: ':changelogdialog')
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'

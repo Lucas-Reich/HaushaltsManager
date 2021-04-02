@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lucas.haushaltsmanager.Activities.ExpenseScreen;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ParentExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ParentBooking;
 import com.example.lucas.haushaltsmanager.Entities.TemplateBooking;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.ActionPayload;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.AddChildMenuItem;
@@ -33,11 +33,11 @@ import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.EndlessRecyclerViewScrollListener;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.RecyclerItemClickListener;
 import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.ItemCreator;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.ChildExpenseItem.ChildExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBookingItem.ChildExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.ExpenseItem.ExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.BookingItem.ExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.ParentExpenseItem.ParentExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ParentBookingItem.ParentBookingItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.ExpenseListRecyclerViewAdapter;
 import com.example.lucas.haushaltsmanager.RevertExpenseDeletionSnackbar.RevertExpenseDeletionSnackbar;
 import com.github.fafaldo.fabtoolbar.widget.FABToolbarLayout;
@@ -171,7 +171,7 @@ public class TabOneBookings extends AbstractTab implements
             return;
         }
 
-        if (item instanceof ParentExpenseItem) {
+        if (item instanceof ParentBookingItem) {
             mAdapter.toggleExpansion(position);
             return;
         }
@@ -196,7 +196,7 @@ public class TabOneBookings extends AbstractTab implements
         if (item instanceof DateItem || mAdapter.getSelectedItemCount() != 0)
             return;
 
-        if (item instanceof ParentExpenseItem) {
+        if (item instanceof ParentBookingItem) {
             mAdapter.toggleExpansion(position);
 
             return;
@@ -231,12 +231,12 @@ public class TabOneBookings extends AbstractTab implements
 
         mFABToolbar.addMenuItem(new CombineMenuItem(new CombineMenuItem.OnSuccessCallback() {
             @Override
-            public void onSuccess(ParentExpenseObject combinedExpense, List<IRecyclerItem> removedItems) {
+            public void onSuccess(ParentBooking combinedExpense, List<IRecyclerItem> removedItems) {
                 for (IRecyclerItem removedItem : removedItems) {
                     mAdapter.removeItem(removedItem);
                 }
 
-                mAdapter.insertItem(new ParentExpenseItem(combinedExpense, (DateItem) removedItems.get(0).getParent()));
+                mAdapter.insertItem(new ParentBookingItem(combinedExpense, (DateItem) removedItems.get(0).getParent()));
 
                 mParent.updateExpenses();
             }

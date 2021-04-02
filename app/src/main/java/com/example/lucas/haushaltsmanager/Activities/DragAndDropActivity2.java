@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -26,8 +25,6 @@ import java.util.List;
 public class DragAndDropActivity2 extends AbstractAppCompatActivity implements View.OnDragListener {
     private RecyclerView recyclerView;
     private CardView targetView;
-    private Button buttonLeft;
-    private Button buttonRight;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -42,10 +39,6 @@ public class DragAndDropActivity2 extends AbstractAppCompatActivity implements V
         // Middle
         targetView = findViewById(R.id.drop_target);
         targetView.setOnDragListener(this);
-
-        // Bottom
-        buttonLeft = findViewById(R.id.button_left);
-        buttonRight = findViewById(R.id.button_right);
     }
 
     @Override

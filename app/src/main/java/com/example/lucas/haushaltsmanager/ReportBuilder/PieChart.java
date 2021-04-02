@@ -4,7 +4,7 @@ import android.content.Context;
 import android.view.View;
 
 import com.example.lucas.haushaltsmanager.R;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.ExpenseItem.ExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.BookingItem.ExpenseItem;
 import com.github.mikephil.charting.data.PieData;
 
 import java.util.List;

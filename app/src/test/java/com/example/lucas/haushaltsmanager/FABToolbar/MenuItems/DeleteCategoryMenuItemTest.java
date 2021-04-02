@@ -49,6 +49,4 @@ public class DeleteCategoryMenuItemTest {
                 deleteItem.getTitle()
         );
     }
-
-    // TODO: Can I somehow check the "handle()" method
 }

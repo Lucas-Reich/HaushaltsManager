@@ -6,6 +6,7 @@ import com.example.lucas.haushaltsmanager.Entities.Category;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 
 public class MockCategoryRepository implements CategoryRepositoryInterface {
     @Override
@@ -14,8 +15,8 @@ public class MockCategoryRepository implements CategoryRepositoryInterface {
     }
 
     @Override
-    public Category insert(Category category) {
-        return null;
+    public void insert(Category category) {
+
     }
 
     @Override
@@ -29,7 +30,7 @@ public class MockCategoryRepository implements CategoryRepositoryInterface {
     }
 
     @Override
-    public Category get(long categoryId) throws CategoryNotFoundException {
+    public Category get(UUID id) throws CategoryNotFoundException {
         return null;
     }
 }

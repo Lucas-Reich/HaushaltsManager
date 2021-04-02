@@ -3,10 +3,10 @@ package com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality;
 import android.util.Log;
 
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.InsertStrategy.InsertStrategy;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.ChildExpenseItem.ChildExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBookingItem.ChildExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IParentRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.ParentExpenseItem.ParentExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ParentBookingItem.ParentBookingItem;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,7 +23,7 @@ public abstract class RecyclerViewExpandableItemHandler extends RecyclerViewItem
     public void removeItem(IRecyclerItem item) {
         if (item instanceof ChildExpenseItem) {
 
-            ParentExpenseItem parent = (ParentExpenseItem) item.getParent();
+            ParentBookingItem parent = (ParentBookingItem) item.getParent();
             parent.removeChild(item);
 
             updateItem(parent);

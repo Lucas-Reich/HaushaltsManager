@@ -1,17 +1,16 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.SelectionRules;
 
-import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ParentExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ParentBooking;
 import com.example.lucas.haushaltsmanager.Entities.Price;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.ChildExpenseItem.ChildExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBookingItem.ChildExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.ExpenseItem.ExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.BookingItem.ExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.ParentExpenseItem.ParentExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ParentBookingItem.ParentBookingItem;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -34,7 +33,7 @@ public class ExpenseListSelectionRulesTest {
 
     @Test
     public void parentCategoryItemCannotBeSelected() {
-        ParentExpenseItem parentCategoryItem = new ParentExpenseItem(getDummyParentExpense(), getDummyDateItem());
+        ParentBookingItem parentCategoryItem = new ParentBookingItem(getDummyParentExpense(), getDummyDateItem());
 
         boolean parentCanBeSelected = selectionRules.canBeSelected(parentCategoryItem, new ArrayList<IRecyclerItem>());
 
@@ -113,8 +112,8 @@ public class ExpenseListSelectionRulesTest {
         assertFalse(canBeSelected);
     }
 
-    private ParentExpenseItem getDummyParentItem() {
-        return new ParentExpenseItem(getDummyParentExpense(), getDummyDateItem());
+    private ParentBookingItem getDummyParentItem() {
+        return new ParentBookingItem(getDummyParentExpense(), getDummyDateItem());
     }
 
     private ExpenseObject getDummyExpense() {
@@ -126,9 +125,8 @@ public class ExpenseListSelectionRulesTest {
         );
     }
 
-    private ParentExpenseObject getDummyParentExpense() {
-        return new ParentExpenseObject(
-                ExpensesDbHelper.INVALID_INDEX,
+    private ParentBooking getDummyParentExpense() {
+        return new ParentBooking(
                 "Parent Ausgabe",
                 Calendar.getInstance(),
                 new ArrayList<ExpenseObject>()

@@ -1,18 +1,17 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality;
 
-import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ParentExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ParentBooking;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.InsertStrategy.MockInsertStrategy;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.SelectionRules.MockSelectionRules;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.ChildExpenseItem.ChildExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBookingItem.ChildExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.ExpenseItem.ExpenseItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.ParentExpenseItem.ParentExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.BookingItem.ExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ParentBookingItem.ParentBookingItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.MockItemHandler;
 
 import org.junit.After;
@@ -82,7 +81,7 @@ public class RecyclerViewSelectedItemHandlerTest {
 
     @Test
     public void childItemStaysSelectedWhenParentIsClosedAndOpened() {
-        ParentExpenseItem parent = getDummyParentItem();
+        ParentBookingItem parent = getDummyParentItem();
 
         ChildExpenseItem child = new ChildExpenseItem(getDummyExpense(), parent);
         parent.addChild(child);
@@ -102,17 +101,13 @@ public class RecyclerViewSelectedItemHandlerTest {
         assertTrue(itemHandler.isItemSelected(child));
     }
 
-    private ParentExpenseItem getDummyParentItem() {
-        return new ParentExpenseItem(
-                new ParentExpenseObject
-                        (
-                                ExpensesDbHelper.INVALID_INDEX,
-                                "Ausgabe",
-                                Calendar.getInstance(),
-                                new ArrayList<ExpenseObject>()
-                        ),
-                getDummyDate()
-        );
+    private ParentBookingItem getDummyParentItem() {
+        return new ParentBookingItem(
+                new ParentBooking(
+                        "Ausgabe",
+                        Calendar.getInstance(),
+                        new ArrayList<ExpenseObject>()
+                ), getDummyDate());
     }
 
     private DateItem getDummyDate() {

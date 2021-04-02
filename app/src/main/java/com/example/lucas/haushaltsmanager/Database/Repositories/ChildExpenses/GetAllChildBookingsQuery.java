@@ -25,10 +25,10 @@ class GetAllChildBookingsQuery implements QueryInterface {
                 + "BOOKINGS.category_id, "
                 + "CATEGORIES.name, "
                 + "CATEGORIES.color, "
-                + "CATEGORIES.default_expense_type, "
+                + "CATEGORIES.default_expense_type "
                 + "FROM BOOKINGS "
                 + "LEFT JOIN CATEGORIES ON BOOKINGS.category_id = CATEGORIES.id "
-                + "WHERE BOOKINGS.parent_id = %s "
+                + "WHERE BOOKINGS.parent_id = '%s' "
                 + "AND BOOKINGS.hidden != 1 "
                 + "ORDER BY BOOKINGS.date DESC;";
     }

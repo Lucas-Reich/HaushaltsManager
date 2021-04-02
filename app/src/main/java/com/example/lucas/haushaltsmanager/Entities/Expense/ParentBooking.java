@@ -4,18 +4,19 @@ import androidx.annotation.NonNull;
 
 import com.example.lucas.haushaltsmanager.Entities.Price;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
 
-public class ParentExpenseObject implements Booking {
+public class ParentBooking implements Booking {
     private final UUID id;
     private Calendar mDate;
     private final String mTitle;
-    private final List<ExpenseObject> mChildren;
+    private final List<ExpenseObject> children;
 
 
-    public ParentExpenseObject(
+    public ParentBooking(
             @NonNull UUID id,
             @NonNull String title,
             @NonNull Calendar date,
@@ -24,10 +25,16 @@ public class ParentExpenseObject implements Booking {
         this.id = id;
         mTitle = title;
         mDate = date;
-        mChildren = children;
+        this.children = children;
     }
 
-    public ParentExpenseObject(
+    public ParentBooking(
+            @NonNull String title
+    ) {
+        this(UUID.randomUUID(), title, Calendar.getInstance(), new ArrayList<ExpenseObject>());
+    }
+
+    public ParentBooking(
             @NonNull String title,
             @NonNull Calendar date,
             @NonNull List<ExpenseObject> children
@@ -35,10 +42,10 @@ public class ParentExpenseObject implements Booking {
         this(UUID.randomUUID(), title, date, children);
     }
 
-    public static ParentExpenseObject fromParentExpense(ExpenseObject parentExpense) {
+    public static ParentBooking fromParentExpense(ExpenseObject parentExpense) {
         assertIsParent(parentExpense);
 
-        return new ParentExpenseObject(
+        return new ParentBooking(
                 parentExpense.getId(),
                 parentExpense.getTitle(),
                 parentExpense.getDate(),
@@ -64,11 +71,11 @@ public class ParentExpenseObject implements Booking {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof ParentExpenseObject)) {
+        if (!(obj instanceof ParentBooking)) {
             return false;
         }
 
-        ParentExpenseObject other = (ParentExpenseObject) obj;
+        ParentBooking other = (ParentBooking) obj;
 
         return other.getTitle().equals(getTitle())
                 && other.getChildren().equals(getChildren());
@@ -78,8 +85,12 @@ public class ParentExpenseObject implements Booking {
         return new Price(calcChildrenPrice());
     }
 
+    public void addChild(ExpenseObject booking) {
+        children.add(booking);
+    }
+
     public List<ExpenseObject> getChildren() {
-        return mChildren;
+        return children;
     }
 
     private static void assertIsParent(ExpenseObject expense) {
@@ -90,7 +101,7 @@ public class ParentExpenseObject implements Booking {
 
     private double calcChildrenPrice() {
         double calcPrice = 0;
-        for (ExpenseObject child : mChildren) {
+        for (ExpenseObject child : children) {
 
             calcPrice += child.getSignedPrice();
         }

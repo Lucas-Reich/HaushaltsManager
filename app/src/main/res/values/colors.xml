@@ -13,6 +13,7 @@
     <color name="list_item_background">@color/white</color>
 
     <color name="transfer_booking_color">#0033cc</color>
+    <color name="unassigned_category_color">#00BCD4</color>
 
     <color name="text_color_disabled">#808080</color>
     <color name="text_color_alert">#eb3323</color>

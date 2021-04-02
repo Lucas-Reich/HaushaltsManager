@@ -1,9 +1,6 @@
 package com.example.lucas.haushaltsmanager.Utils;
 
-import android.content.res.Resources;
 import android.os.Bundle;
-
-import androidx.annotation.StringRes;
 
 public class BundleUtils {
     private final Bundle mBundle;
@@ -12,41 +9,19 @@ public class BundleUtils {
         mBundle = bundle == null ? new Bundle() : bundle;
     }
 
-    /**
-     * Methode um einen bestimmten Key aus dem Bundle zu erhalten.
-     * Existiert dieser key nicht wird der Defaultwert zurückgegeben.
-     *
-     * @param key Key zu einem Value
-     * @param def Wert der zurückgeben soll wenn der Key nicht existiert
-     * @return Key value oder Default
-     */
-    public String getString(String key, String def) {
+    public String getString(String key, String defaultValue) {
 
-        return mBundle.containsKey(key) ? mBundle.getString(key) : def;
+        return mBundle.containsKey(key) ? mBundle.getString(key) : defaultValue;
     }
 
-    /**
-     * Methode um einen bestimmten Key aus dem Bundle zu erhalten.
-     * Existiert dieser key nicht wird der Defaultwert zurückgegeben, welcher als String resource gespeichert ist.
-     *
-     * @param key Key zu einem Value
-     * @param def String Resource welche zurückgegeben werden soll wenn der Key nicht existiert
-     * @return Key value oder Default
-     */
-    public String getString(String key, @StringRes int def) {
+    public long getLong(String key, long defaultValue) {
 
-        String defaultString = Resources.getSystem().getString(def);
-        return getString(key, defaultString);
+        return mBundle.containsKey(key) ? mBundle.getLong(key) : defaultValue;
     }
 
-    public long getLong(String key, long def) {
+    public Object getParcelable(String key, Object defaultValue) {
 
-        return mBundle.containsKey(key) ? mBundle.getLong(key) : def;
-    }
-
-    public Object getParcelable(String key, Object def) {
-
-        return mBundle.containsKey(key) ? mBundle.getParcelable(key) : def;
+        return mBundle.containsKey(key) ? mBundle.getParcelable(key) : defaultValue;
     }
 
     public boolean hasMapping(String key) {

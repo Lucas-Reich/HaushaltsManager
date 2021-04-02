@@ -15,14 +15,14 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Ch
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.CannotDeleteChildExpenseException;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ParentExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ParentBooking;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.ActionPayload;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.ActionKey;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.IActionKey;
-import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.ChildExpenseItem.ChildExpenseItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.ExpenseItem.ExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.BookingItem.ExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBookingItem.ChildExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.IBookingItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 
 import java.util.ArrayList;
@@ -34,8 +34,8 @@ public class CombineMenuItem implements IMenuItem {
 
     private IActionKey mActionKey;
 
-    private ExpenseRepository mExpenseRepo;
-    private ChildExpenseRepository mChildExpenseRepo;
+    private ExpenseRepository bookingRepository;
+    private ChildExpenseRepository childBookingRepository;
     private OnSuccessCallback mCallback;
 
     public CombineMenuItem(OnSuccessCallback callback) {
@@ -77,8 +77,8 @@ public class CombineMenuItem implements IMenuItem {
     }
 
     private void initRepos(Context context) {
-        mExpenseRepo = new ExpenseRepository(context);
-        mChildExpenseRepo = new ChildExpenseRepository(context);
+        bookingRepository = new ExpenseRepository(context);
+        childBookingRepository = new ChildExpenseRepository(context);
     }
 
     private FragmentManager getFragmentManager(Context context) {
@@ -98,7 +98,7 @@ public class CombineMenuItem implements IMenuItem {
             public void onTextInput(String combinedExpenseTitle) {
                 List<IRecyclerItem> removedItems = new ArrayList<>();
 
-                ExpenseObject parent = createParentExpenseWithTitle(combinedExpenseTitle);
+                ParentBooking parent = new ParentBooking(combinedExpenseTitle);
 
                 for (IRecyclerItem deletedChildItem : selectedItems) {
                     IRecyclerItem deletedChild = deleteItem(deletedChildItem);
@@ -109,38 +109,27 @@ public class CombineMenuItem implements IMenuItem {
                     }
                 }
 
-                parent.setCategory(parent.getChildren().get(0).getCategory());
-                mExpenseRepo.insert(parent);
+                bookingRepository.insert(parent);
 
                 if (null != mCallback) {
-                    mCallback.onSuccess(
-                            ParentExpenseObject.fromParentExpense(parent),
-                            removedItems
-                    );
+                    mCallback.onSuccess(parent, removedItems);
                 }
-            }
-
-            private ExpenseObject createParentExpenseWithTitle(String title) {
-                ExpenseObject parent = ExpenseObject.createDummyExpense();
-                parent.setTitle(title);
-
-                return parent;
             }
         };
     }
 
-    private IRecyclerItem deleteItem(IRecyclerItem item) {
+    private IBookingItem deleteItem(IRecyclerItem item) {
         try {
             if (item instanceof ExpenseItem) {
-                mExpenseRepo.delete(((ExpenseItem) item).getContent());
+                bookingRepository.delete(((ExpenseItem) item).getContent());
 
-                return item;
+                return (IBookingItem) item;
             }
 
             if (item instanceof ChildExpenseItem) {
-                mChildExpenseRepo.delete(((ChildExpenseItem) item).getContent());
+                childBookingRepository.delete(((ChildExpenseItem) item).getContent());
 
-                return item;
+                return (IBookingItem) item;
             }
         } catch (CannotDeleteChildExpenseException e) {
 
@@ -156,6 +145,6 @@ public class CombineMenuItem implements IMenuItem {
     }
 
     public interface OnSuccessCallback {
-        void onSuccess(ParentExpenseObject combinedExpense, List<IRecyclerItem> removedItems);
+        void onSuccess(ParentBooking combinedExpense, List<IRecyclerItem> removedItems);
     }
 }

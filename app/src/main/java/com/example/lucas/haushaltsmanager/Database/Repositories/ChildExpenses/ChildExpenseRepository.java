@@ -21,6 +21,7 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Ex
 import com.example.lucas.haushaltsmanager.Database.TransformerInterface;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ParentBooking;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 
 import java.util.ArrayList;
@@ -169,33 +170,11 @@ public class ChildExpenseRepository implements ChildExpenseRepositoryInterface {
     }
 
     public void insert(ExpenseObject parentExpense, ExpenseObject childExpense) {
-        ContentValues values = new ContentValues();
-        values.put("id", childExpense.getId().toString());
-        values.put("expense_type", childExpense.getExpenseType().name());
-        values.put("price", childExpense.getUnsignedPrice());
-        values.put("parent_id", parentExpense.getId().toString());
-        values.put("category_id", childExpense.getCategory().getId().toString());
-        values.put("expenditure", childExpense.isExpenditure());
-        values.put("title", childExpense.getTitle());
-        values.put("date", childExpense.getDate().getTimeInMillis());
-        values.put("notice", childExpense.getNotice());
-        values.put("account_id", childExpense.getAccountId().toString());
-        values.put("hidden", 0);
+        insert(parentExpense.getId(), childExpense);
+    }
 
-        mDatabase.insertOrThrow(
-                TABLE,
-                null,
-                values
-        );
-
-        try {
-            updateAccountBalance(
-                    childExpense.getAccountId(),
-                    childExpense.getSignedPrice()
-            );
-        } catch (AccountNotFoundException e) {
-            //Kann nicht passieren, da der User bei der Buchungserstellung nur aus Konten auswählen kann die bereits existieren
-        }
+    public void insert(ParentBooking parent, ExpenseObject child) {
+        insert(parent.getId(), child);
     }
 
     public void update(ExpenseObject childExpense) throws ChildExpenseNotFoundException {
@@ -358,6 +337,37 @@ public class ChildExpenseRepository implements ChildExpenseRepositoryInterface {
         }
 
         return bookingTransformer.transform(c);
+    }
+
+    private void insert(UUID parentId, ExpenseObject child) {
+        ContentValues values = new ContentValues();
+        values.put("parent_id", parentId.toString());
+
+        values.put("id", child.getId().toString());
+        values.put("expense_type", ExpenseObject.EXPENSE_TYPES.CHILD_EXPENSE.name());
+        values.put("price", child.getUnsignedPrice());
+        values.put("expenditure", child.isExpenditure());
+        values.put("title", child.getTitle());
+        values.put("date", child.getDate().getTimeInMillis());
+        values.put("notice", child.getNotice());
+        values.put("category_id", child.getCategory().getId().toString());
+        values.put("account_id", child.getAccountId().toString());
+        values.put("hidden", 0);
+
+        mDatabase.insertOrThrow(
+                TABLE,
+                null,
+                values
+        );
+
+        try {
+            updateAccountBalance(
+                    child.getAccountId(),
+                    child.getSignedPrice()
+            );
+        } catch (AccountNotFoundException e) {
+            //Kann nicht passieren, da der User bei der Buchungserstellung nur aus Konten auswählen kann die bereits existieren
+        }
     }
 
     private Cursor executeRaw(QueryInterface query) {

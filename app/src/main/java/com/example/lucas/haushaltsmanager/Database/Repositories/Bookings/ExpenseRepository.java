@@ -17,10 +17,12 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Excepti
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryTransformer;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepositoryInterface;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.CannotDeleteChildExpenseException;
 import com.example.lucas.haushaltsmanager.Database.TransformerInterface;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ParentBooking;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 
 import java.util.ArrayList;
@@ -78,6 +80,32 @@ public class ExpenseRepository {
         c.close();
 
         return bookings;
+    }
+
+    public void insert(ParentBooking parentBooking) {
+        ContentValues values = new ContentValues();
+        values.put("id", parentBooking.getId().toString());
+        values.put("expense_type", ExpenseObject.EXPENSE_TYPES.PARENT_EXPENSE.name());
+
+        values.put("price", parentBooking.getPrice().getUnsignedValue());
+        values.put("expenditure", parentBooking.getPrice().isNegative() ? 1 : 0);
+        values.put("category_id", app.unassignedCategoryId.toString());
+        values.put("account_id", new UUID(0, 0).toString());
+
+        values.put("title", parentBooking.getTitle());
+        values.put("date", parentBooking.getDate().getTimeInMillis());
+        values.put("hidden", 0);
+
+        mDatabase.insertOrThrow(
+                TABLE,
+                null,
+                values
+        );
+
+        ChildExpenseRepositoryInterface childRepo = new ChildExpenseRepository(app.getContext());
+        for (ExpenseObject child : parentBooking.getChildren()) {
+            childRepo.insert(parentBooking, child);
+        }
     }
 
     public void insert(ExpenseObject expense) {

@@ -1,18 +1,18 @@
-package com.example.lucas.haushaltsmanager.RecyclerView.Items.ExpenseItem;
+package com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBookingItem;
 
 import androidx.annotation.NonNull;
 
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.IBookingItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.IParentRecyclerItem;
 
-public class ExpenseItem implements IRecyclerItem {
-    public static final int VIEW_TYPE = 1;
+public class ChildExpenseItem implements IBookingItem {
+    public static final int VIEW_TYPE = 4;
 
-    private final ExpenseObject expense;
-    private final DateItem parent;
+    private IParentRecyclerItem parent;
+    private ExpenseObject expense;
 
-    public ExpenseItem(ExpenseObject expense, DateItem parent) {
+    public ChildExpenseItem(ExpenseObject expense, IParentRecyclerItem parent) {
         this.expense = expense;
         this.parent = parent;
     }
@@ -29,11 +29,11 @@ public class ExpenseItem implements IRecyclerItem {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof ExpenseItem)) {
+        if (!(obj instanceof ChildExpenseItem)) {
             return false;
         }
 
-        ExpenseItem other = (ExpenseItem) obj;
+        ChildExpenseItem other = (ChildExpenseItem) obj;
 
         return other.getContent().equals(getContent());
     }
@@ -45,7 +45,7 @@ public class ExpenseItem implements IRecyclerItem {
     }
 
     @Override
-    public DateItem getParent() {
+    public IParentRecyclerItem getParent() {
         return parent;
     }
 

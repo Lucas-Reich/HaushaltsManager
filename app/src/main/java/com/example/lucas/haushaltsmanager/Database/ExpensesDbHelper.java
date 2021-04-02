@@ -10,7 +10,6 @@ import com.example.lucas.haushaltsmanager.Database.Migrations.MigrationHelper;
 public class ExpensesDbHelper extends SQLiteOpenHelper {
     public static final String DB_NAME = "expenses.db";
     public static final int DB_VERSION = 1;
-    public static final int INVALID_INDEX = -1;
 
     public ExpensesDbHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);

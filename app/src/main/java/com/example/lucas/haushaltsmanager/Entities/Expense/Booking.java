@@ -8,7 +8,6 @@ import java.util.UUID;
 public interface Booking {
     UUID getId();
 
-    // TODO: Was macht eine Buchung aus?
     Calendar getDate();
 
     void setDate(Calendar date);

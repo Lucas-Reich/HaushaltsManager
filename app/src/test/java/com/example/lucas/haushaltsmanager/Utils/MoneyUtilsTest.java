@@ -84,16 +84,6 @@ public class MoneyUtilsTest {
     }
 
     @Test
-    public void testOmitCents() {
-        String actualValue = MoneyUtils.formatHumanReadableOmitCents(
-                new Price(100.50, false),
-                Locale.GERMANY
-        );
-
-        assertEquals("100", actualValue);
-    }
-
-    @Test
     public void testWithUSLocale() {
         String actualValue = MoneyUtils.formatHumanReadable(
                 new Price(1000.33, false),

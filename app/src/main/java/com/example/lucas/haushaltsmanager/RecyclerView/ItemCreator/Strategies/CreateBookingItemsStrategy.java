@@ -2,11 +2,11 @@ package com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.Strategies;
 
 import com.example.lucas.haushaltsmanager.Entities.Expense.Booking;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ParentExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ParentBooking;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.ExpenseItem.ExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.BookingItem.ExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.ParentExpenseItem.ParentExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ParentBookingItem.ParentBookingItem;
 import com.example.lucas.haushaltsmanager.Utils.CalendarUtils;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSorter;
 
@@ -53,12 +53,12 @@ public class CreateBookingItemsStrategy implements RecyclerItemCreatorStrategyIn
     }
 
     private IRecyclerItem createExpenseItem(Booking booking, DateItem currentDate) {
-        if (booking instanceof ParentExpenseObject) {
-            return new ParentExpenseItem((ParentExpenseObject) booking, currentDate);
+        if (booking instanceof ParentBooking) {
+            return new ParentBookingItem((ParentBooking) booking, currentDate);
         }
 
         if (booking instanceof ExpenseObject && ((ExpenseObject) booking).isParent()) {
-            return new ParentExpenseItem(ParentExpenseObject.fromParentExpense((ExpenseObject) booking), currentDate);
+            return new ParentBookingItem(ParentBooking.fromParentExpense((ExpenseObject) booking), currentDate);
         }
 
         return new ExpenseItem((ExpenseObject) booking, currentDate);

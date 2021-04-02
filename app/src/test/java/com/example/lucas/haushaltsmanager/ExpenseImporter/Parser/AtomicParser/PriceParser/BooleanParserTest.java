@@ -3,7 +3,6 @@ package com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.P
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -29,12 +28,8 @@ public class BooleanParserTest {
         assertFalse(parser.parse("0"));
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void throwsExceptionForInvalidInput() {
-        try {
-            parser.parse("invalid_input");
-        } catch (IllegalArgumentException e) {
-            assertEquals("Could not parse 'invalid_input' to Boolean.", e.getMessage());
-        }
+        parser.parse("invalid_input");
     }
 }

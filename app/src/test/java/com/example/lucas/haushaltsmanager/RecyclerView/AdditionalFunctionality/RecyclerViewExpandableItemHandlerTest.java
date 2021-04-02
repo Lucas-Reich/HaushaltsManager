@@ -6,13 +6,13 @@ import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ParentExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ParentBooking;
 import com.example.lucas.haushaltsmanager.Entities.Price;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.ChildExpenseItem.ChildExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBookingItem.ChildExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.ExpenseItem.ExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.BookingItem.ExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.ParentExpenseItem.ParentExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ParentBookingItem.ParentBookingItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.ExpenseListRecyclerViewAdapter;
 
 import org.junit.After;
@@ -54,74 +54,74 @@ public class RecyclerViewExpandableItemHandlerTest {
     public void testInsertChildToExistingAndCollapsedParent() {
         DateItem parent = new DateItem(createSimpleDate(10, Calendar.JUNE, 2019));
 
-        ParentExpenseItem parentExpenseItem = new ParentExpenseItem(getParentExpenseObject(2), parent);
-        ChildExpenseItem expectedChildItem = new ChildExpenseItem(parentExpenseItem.getContent().getChildren().get(1), parentExpenseItem);
-        parentExpenseItem.getChildren().remove(1);
+        ParentBookingItem parentBookingItem = new ParentBookingItem(getParentExpenseObject(2), parent);
+        ChildExpenseItem expectedChildItem = new ChildExpenseItem(parentBookingItem.getContent().getChildren().get(1), parentBookingItem);
+        parentBookingItem.getChildren().remove(1);
 
-        mItemHandler.insertItem(parentExpenseItem);
+        mItemHandler.insertItem(parentBookingItem);
         assertEquals(2, mItemHandler.getItemCount());
 
         mItemHandler.insertItem(expectedChildItem);
         assertEquals(2, mItemHandler.getItemCount());
-        assertEquals(2, ((ParentExpenseItem) mItemHandler.getItem(1)).getChildren().size());
-        assertTrue(((ParentExpenseItem) mItemHandler.getItem(1)).getChildren().contains(expectedChildItem));
+        assertEquals(2, ((ParentBookingItem) mItemHandler.getItem(1)).getChildren().size());
+        assertTrue(((ParentBookingItem) mItemHandler.getItem(1)).getChildren().contains(expectedChildItem));
     }
 
     @Test
     public void testInsertChildToExistingAndExpandedParent() {
         DateItem parent = new DateItem(createSimpleDate(10, Calendar.JUNE, 2019));
 
-        ParentExpenseItem parentExpenseItem = new ParentExpenseItem(getParentExpenseObject(2), parent);
-        ChildExpenseItem expectedChildItem = new ChildExpenseItem(parentExpenseItem.getContent().getChildren().get(1), parentExpenseItem);
-        parentExpenseItem.getChildren().remove(1);
+        ParentBookingItem parentBookingItem = new ParentBookingItem(getParentExpenseObject(2), parent);
+        ChildExpenseItem expectedChildItem = new ChildExpenseItem(parentBookingItem.getContent().getChildren().get(1), parentBookingItem);
+        parentBookingItem.getChildren().remove(1);
 
-        mItemHandler.insertItem(parentExpenseItem);
+        mItemHandler.insertItem(parentBookingItem);
         mItemHandler.toggleExpansion(1);
         assertEquals(3, mItemHandler.getItemCount());
 
         mItemHandler.insertItem(expectedChildItem);
         assertEquals(4, mItemHandler.getItemCount());
-        assertEquals(2, ((ParentExpenseItem) mItemHandler.getItem(1)).getChildren().size());
-        assertTrue(((ParentExpenseItem) mItemHandler.getItem(1)).getChildren().contains(expectedChildItem));
+        assertEquals(2, ((ParentBookingItem) mItemHandler.getItem(1)).getChildren().size());
+        assertTrue(((ParentBookingItem) mItemHandler.getItem(1)).getChildren().contains(expectedChildItem));
     }
 
     @Test
     public void testInsertChildToNotExistingParentShouldInsertChildAsExpenseItem() {
         DateItem date = new DateItem(createSimpleDate(10, Calendar.JUNE, 2019));
-        ParentExpenseObject parentExpense = getParentExpenseObject(1);
-        ChildExpenseItem childItem = new ChildExpenseItem(parentExpense.getChildren().get(0), new ParentExpenseItem(parentExpense, date));
+        ParentBooking parentExpense = getParentExpenseObject(1);
+        ChildExpenseItem childItem = new ChildExpenseItem(parentExpense.getChildren().get(0), new ParentBookingItem(parentExpense, date));
 
         mItemHandler.insertItem(childItem);
 
         assertEquals(2, mItemHandler.getItemCount());
-        assertTrue(mItemHandler.getItem(1) instanceof ParentExpenseItem);
+        assertTrue(mItemHandler.getItem(1) instanceof ParentBookingItem);
     }
 
     @Test
     public void testRemoveChildItemShouldSucceed() {
         DateItem parent = new DateItem(createSimpleDate(10, Calendar.JUNE, 2019));
 
-        ParentExpenseItem expectedParentExpenseItem = new ParentExpenseItem(getParentExpenseObject(3), parent);
+        ParentBookingItem expectedParentBookingItem = new ParentBookingItem(getParentExpenseObject(3), parent);
 
-        mItemHandler.insertItem(expectedParentExpenseItem);
+        mItemHandler.insertItem(expectedParentBookingItem);
         mItemHandler.toggleExpansion(1);
         assertSame(5, mItemHandler.getItemCount());
 
         mItemHandler.removeItem(mItemHandler.getItem(2));
 
         assertSame(4, mItemHandler.getItemCount());
-        assertSame(2, ((ParentExpenseItem) mItemHandler.getItem(1)).getChildren().size());
+        assertSame(2, ((ParentBookingItem) mItemHandler.getItem(1)).getChildren().size());
 
-        assertEquals(expectedParentExpenseItem, mItemHandler.getItem(1));
-        assertEquals(expectedParentExpenseItem.getChildren().get(0).getContent(), mItemHandler.getItem(2).getContent());
-        assertEquals(expectedParentExpenseItem.getChildren().get(1).getContent(), mItemHandler.getItem(3).getContent());
+        assertEquals(expectedParentBookingItem, mItemHandler.getItem(1));
+        assertEquals(expectedParentBookingItem.getChildren().get(0).getContent(), mItemHandler.getItem(2).getContent());
+        assertEquals(expectedParentBookingItem.getChildren().get(1).getContent(), mItemHandler.getItem(3).getContent());
     }
 
     @Test
     public void testRemoveLastChildOfParentShouldRemoveParent() {
         DateItem date = new DateItem(createSimpleDate(10, Calendar.MAY, 2019));
 
-        mItemHandler.insertItem(new ParentExpenseItem(getParentExpenseObject(1), date));
+        mItemHandler.insertItem(new ParentBookingItem(getParentExpenseObject(1), date));
         mItemHandler.insertItem(new ExpenseItem(createSimpleExpense(date.getContent()), date));
         mItemHandler.toggleExpansion(2);
         assertSame(4, mItemHandler.getItemCount());
@@ -133,11 +133,11 @@ public class RecyclerViewExpandableItemHandlerTest {
 
     @Test
     public void testRemoveLastChildOfParentAsLastItemOfDateShouldRemoveAll() {
-        ParentExpenseObject parentExpenseObject = getParentExpenseObject(1);
+        ParentBooking parentBooking = getParentExpenseObject(1);
 
         DateItem parent = new DateItem(createSimpleDate(10, Calendar.JUNE, 2019));
 
-        mItemHandler.insertItem(new ParentExpenseItem(parentExpenseObject, parent));
+        mItemHandler.insertItem(new ParentBookingItem(parentBooking, parent));
         mItemHandler.toggleExpansion(1);
         assertSame(3, mItemHandler.getItemCount());
 
@@ -150,34 +150,34 @@ public class RecyclerViewExpandableItemHandlerTest {
     public void testToggleExpansionShouldOpenParentAndAddChildren() {
         DateItem parent = new DateItem(createSimpleDate(10, Calendar.JUNE, 2019));
 
-        ParentExpenseItem expectedParentExpenseItem = new ParentExpenseItem(getParentExpenseObject(2), parent);
+        ParentBookingItem expectedParentBookingItem = new ParentBookingItem(getParentExpenseObject(2), parent);
 
-        mItemHandler.insertItem(expectedParentExpenseItem);
+        mItemHandler.insertItem(expectedParentBookingItem);
         assertSame(2, mItemHandler.getItemCount());
 
         mItemHandler.toggleExpansion(1);
         assertSame(4, mItemHandler.getItemCount());
 
-        assertTrue(((ParentExpenseItem) mItemHandler.getItem(1)).isExpanded());
-        assertEquals(expectedParentExpenseItem, mItemHandler.getItem(1));
-        assertEquals(expectedParentExpenseItem.getChildren().get(0), mItemHandler.getItem(2));
-        assertEquals(expectedParentExpenseItem.getChildren().get(1), mItemHandler.getItem(3));
+        assertTrue(((ParentBookingItem) mItemHandler.getItem(1)).isExpanded());
+        assertEquals(expectedParentBookingItem, mItemHandler.getItem(1));
+        assertEquals(expectedParentBookingItem.getChildren().get(0), mItemHandler.getItem(2));
+        assertEquals(expectedParentBookingItem.getChildren().get(1), mItemHandler.getItem(3));
     }
 
     @Test
     public void testToggleExpansionShouldCloseParentAndRemoveChildren() {
         DateItem parent = new DateItem(createSimpleDate(10, Calendar.JUNE, 2019));
 
-        ParentExpenseItem expectedParentExpenseItem = new ParentExpenseItem(getParentExpenseObject(2), parent);
+        ParentBookingItem expectedParentBookingItem = new ParentBookingItem(getParentExpenseObject(2), parent);
 
-        mItemHandler.insertItem(expectedParentExpenseItem);
+        mItemHandler.insertItem(expectedParentBookingItem);
         mItemHandler.toggleExpansion(1);
         assertSame(4, mItemHandler.getItemCount());
 
         mItemHandler.toggleExpansion(1);
 
-        assertFalse(((ParentExpenseItem) mItemHandler.getItem(1)).isExpanded());
-        assertEquals(expectedParentExpenseItem, mItemHandler.getItem(1));
+        assertFalse(((ParentBookingItem) mItemHandler.getItem(1)).isExpanded());
+        assertEquals(expectedParentBookingItem, mItemHandler.getItem(1));
     }
 
     @Test
@@ -206,10 +206,10 @@ public class RecyclerViewExpandableItemHandlerTest {
         assertSame(2, mItemHandler.getItemCount());
     }
 
-    private ParentExpenseObject getParentExpenseObject(int childCount) {
+    private ParentBooking getParentExpenseObject(int childCount) {
         ExpenseObject parentExpense = getParentExpenseWithChildren(childCount);
 
-        return ParentExpenseObject.fromParentExpense(parentExpense);
+        return ParentBooking.fromParentExpense(parentExpense);
     }
 
     private ExpenseObject getParentExpenseWithChildren(int childrenCount) {

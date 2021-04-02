@@ -7,13 +7,10 @@
     android:clickable="true"
     android:focusable="true">
 
-    <com.example.lucas.androidcharts.PieChart
+    <com.github.mikephil.charting.charts.PieChart
         android:id="@+id/recycler_view_parent_chart"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_width="53dp"
+        android:layout_height="53dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

@@ -296,7 +296,7 @@ public class ExpenseSumTest {
         return new Category(
                 title,
                 Color.black(),
-                ExpenseType.income()
+                ExpenseType.deposit()
         );
     }
 

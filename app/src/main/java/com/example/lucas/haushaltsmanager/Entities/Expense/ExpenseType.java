@@ -9,7 +9,7 @@ public class ExpenseType {
         this.type = type;
     }
 
-    public static ExpenseType income() {
+    public static ExpenseType deposit() {
         return new ExpenseType(false);
     }
 

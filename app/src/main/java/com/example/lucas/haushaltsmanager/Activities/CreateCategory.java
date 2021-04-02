@@ -101,7 +101,7 @@ public class CreateCategory extends AbstractAppCompatActivity {
         mIncomeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setExpenditureType(ExpenseType.income());
+                setExpenditureType(ExpenseType.deposit());
             }
         });
 

@@ -6,14 +6,17 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 
-import com.example.lucas.androidcharts.DataSet;
-import com.example.lucas.androidcharts.PieChart;
+import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Report.ReportInterface;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseFilter;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSum;
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,27 +55,40 @@ public class PieChartCardPopulator {
     }
 
     private void setCardTitle(@NonNull String title) {
-        mViewHolder.mTitleTxt.setText(title);
+        mViewHolder.titleTxt.setText(title);
     }
 
     private void setPieChart(ReportInterface report) {
-        mViewHolder.mPieChart.setNoDataText(R.string.no_bookings_in_year);
-        mViewHolder.mPieChart.setPieData(createDataSets(report.getExpenses()));
+        mViewHolder.pieChart.setNoDataText(app.getContext().getString(R.string.no_bookings_in_year));
+        mViewHolder.pieChart.setData(createDataSet(report.getExpenses()));
     }
 
-    private List<DataSet> createDataSets(List<ExpenseObject> expenses) {
-        List<ExpenseObject> expensesWithoutParents = extractChildren(expenses);
+
+    private PieData createDataSet(List<ExpenseObject> bookings) {
+        List<ExpenseObject> expensesWithoutParents = extractChildren(bookings);
 
         expensesWithoutParents = filterExpenses(expensesWithoutParents, mShowExpenditures);
 
         HashMap<Category, Double> aggregatedExpenses = sumByCategory(expensesWithoutParents);
+        return createData(aggregatedExpenses);
+    }
 
-        List<DataSet> dataSets = new ArrayList<>();
+    private PieData createData(HashMap<Category, Double> aggregatedExpenses) {
+        List<PieEntry> entries = new ArrayList<>();
+        List<Integer> colors = new ArrayList<>();
+
         for (Map.Entry<Category, Double> entry : aggregatedExpenses.entrySet()) {
-            dataSets.add(toDataSet(entry));
+            colors.add(entry.getKey().getColor().getColorInt());
+            entries.add(new PieEntry(
+                    Math.abs(entry.getValue().floatValue()),
+                    entry.getKey().getTitle()
+            ));
         }
+        PieDataSet dataSet = new PieDataSet(entries, "");
+        dataSet.setColors(colors);
+        dataSet.setDrawValues(false);
 
-        return dataSets;
+        return new PieData(dataSet);
     }
 
     private List<ExpenseObject> extractChildren(List<ExpenseObject> expenses) {
@@ -86,14 +102,6 @@ public class PieChartCardPopulator {
         }
 
         return flatExpenseList;
-    }
-
-    private DataSet toDataSet(Map.Entry<Category, Double> entry) {
-        return new DataSet(
-                entry.getValue().floatValue(),
-                entry.getKey().getColor().getColorInt(),
-                entry.getKey().getTitle()
-        );
     }
 
     private List<ExpenseObject> filterExpenses(List<ExpenseObject> expenses, boolean filter) {
@@ -111,12 +119,18 @@ public class PieChartCardPopulator {
     private void initializeViewHolder() {
         mViewHolder = new ViewHolder();
 
-        mViewHolder.mTitleTxt = mRootView.findViewById(R.id.pie_chart_card_title);
-        mViewHolder.mPieChart = mRootView.findViewById(R.id.pie_chart_card_pie);
+        mViewHolder.titleTxt = mRootView.findViewById(R.id.pie_chart_card_title);
+
+        mViewHolder.pieChart = mRootView.findViewById(R.id.pie_chart_card_pie);
+        mViewHolder.pieChart.getLegend().setEnabled(false);
+        mViewHolder.pieChart.getDescription().setEnabled(false);
+        mViewHolder.pieChart.setDrawEntryLabels(false);
+        mViewHolder.pieChart.setTouchEnabled(false);
+        mViewHolder.pieChart.setDrawHoleEnabled(false);
     }
 
     private static class ViewHolder {
-        TextView mTitleTxt;
-        PieChart mPieChart;
+        TextView titleTxt;
+        PieChart pieChart;
     }
 }

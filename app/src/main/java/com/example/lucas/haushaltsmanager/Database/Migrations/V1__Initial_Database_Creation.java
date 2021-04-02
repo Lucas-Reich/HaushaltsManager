@@ -32,11 +32,11 @@ final class V1__Initial_Database_Creation implements IMigration {
             + "expenditure INTEGER NOT NULL, "
             + "title TEXT NOT NULL, "
             + "date TEXT NOT NULL, "
-            + "notice TEXT, "
+            + "notice TEXT DEFAULT '', "
             + "hidden INTEGER NOT NULL, "
             + "parent_id INTEGER, "
-            + "category_id TEXT NOT NULL, "
-            + "account_id TEXT, "
+            + "category_id TEXT DEFAULT NULL, "
+            + "account_id TEXT DEFAULT NULL, "
             + "FOREIGN KEY (category_id) REFERENCES CATEGORIES(id) ON UPDATE CASCADE ON DELETE RESTRICT, "
             + "FOREIGN KEY (account_id) REFERENCES ACCOUNTS(id) ON UPDATE CASCADE ON DELETE RESTRICT)";
 
@@ -87,8 +87,9 @@ final class V1__Initial_Database_Creation implements IMigration {
             Log.d(TAG, "Creating RECURRING_BOOKINGS table:" + CREATE_RECURRING_BOOKINGS);
             db.execSQL(CREATE_RECURRING_BOOKINGS);
 
-            Log.d(TAG, "Creating transfer Category");
+            Log.d(TAG, "Creating system categories");
             insertTransferCategory(db);
+            insertNotAssignedCategory(db);
         } catch (Exception e) {
             Log.e(TAG, "Fehler beim Anlegen der Tabelle: " + e.getMessage());
         }
@@ -104,9 +105,26 @@ final class V1__Initial_Database_Creation implements IMigration {
         values.put("color", color.getColorString());
         values.put("default_expense_type", ExpenseType.expense().value());
         values.put("hidden", 1);
-
         db.insert("CATEGORIES", null, values);
 
-        Log.d(TAG, "Finished inserting hidden categories");
+        Log.d(TAG, "Finished inserting 'Transfer' Category");
+    }
+
+    private static void insertNotAssignedCategory(SQLiteDatabase db) {
+        Log.d(TAG, "Inserting 'not assigned' Category");
+        Color color = new Color(
+                app.getContext().getResources().getColor(R.color.unassigned_category_color)
+        );
+
+        ContentValues values = new ContentValues();
+        values.put("id", app.unassignedCategoryId.toString());
+        values.put("name", "Not Assigned");
+        values.put("color", color.getColorString());
+        values.put("default_expense_type", ExpenseType.expense().value());
+        values.put("hidden", 1);
+        db.insert("CATEGORIES", null, values);
+
+        Log.d(TAG, "Finished inserting 'Not Assigned' Category");
+
     }
 }

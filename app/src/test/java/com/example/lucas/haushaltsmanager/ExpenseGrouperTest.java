@@ -140,7 +140,7 @@ public class ExpenseGrouperTest {
         return new Category(
                 name,
                 Color.black(),
-                ExpenseType.income()
+                ExpenseType.deposit()
         );
     }
 }

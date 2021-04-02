@@ -76,7 +76,7 @@ public class CategoryTransformerTest {
         return new Category(
                 "Category Name",
                 Color.black(),
-                ExpenseType.income()
+                ExpenseType.deposit()
         );
     }
 }

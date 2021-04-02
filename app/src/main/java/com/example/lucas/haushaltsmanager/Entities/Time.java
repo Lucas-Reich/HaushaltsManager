@@ -25,14 +25,6 @@ public class Time {
         return String.format(Locale.US, "%02d:%02d", hour, minute);
     }
 
-    public int getHour() {
-        return hour;
-    }
-
-    public int getMinute() {
-        return minute;
-    }
-
     public long toMillis() {
         Calendar time = Calendar.getInstance();
         time.set(Calendar.HOUR_OF_DAY, hour);

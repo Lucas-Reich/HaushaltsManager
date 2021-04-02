@@ -1,7 +1,6 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.Bookings;
 
 import android.database.Cursor;
-import android.util.Log;
 
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
