@@ -15,9 +15,9 @@ import java.util.UUID;
 public class ActiveAccountsPreferences implements ActiveAccountsPreferencesInterface {
     public static final String PREFERENCES_NAME = "ActiveAccounts.xml";
     private static final String TAG = ActiveAccountsPreferences.class.getSimpleName();
-    private static boolean DEFAULT_ACCOUNT_VISIBILITY = true;
+    private static final boolean DEFAULT_ACCOUNT_VISIBILITY = true;
 
-    private SharedPreferences mPreferences;
+    private final SharedPreferences mPreferences;
 
     public ActiveAccountsPreferences(Context context) {
         mPreferences = context.getSharedPreferences(
@@ -57,6 +57,19 @@ public class ActiveAccountsPreferences implements ActiveAccountsPreferencesInter
     }
 
     public List<UUID> getActiveAccounts() {
+        Map<String, ?> map = mPreferences.getAll();
+
+        List<UUID> activeAccounts = new ArrayList<>();
+        for (Map.Entry<String, ?> entry : map.entrySet()) {
+            if ((Boolean) entry.getValue()) {
+                activeAccounts.add(UUID.fromString(entry.getKey()));
+            }
+        }
+
+        return activeAccounts;
+    }
+
+    public List<UUID> getAll() {
         Map<String, ?> map = mPreferences.getAll();
 
         return toUUIDList(map);

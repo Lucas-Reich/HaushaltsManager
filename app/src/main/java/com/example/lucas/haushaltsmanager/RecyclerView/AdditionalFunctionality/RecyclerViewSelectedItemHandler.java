@@ -10,8 +10,8 @@ import java.util.List;
 
 // REFACTORING: Ich kann die Selection Implementierung hiermit https://proandroiddev.com/a-guide-to-recyclerview-selection-3ed9f2381504 austauschen
 public abstract class RecyclerViewSelectedItemHandler extends RecyclerViewExpandableItemHandler {
-    private SelectionRules selectionRules;
-    private List<IRecyclerItem> selectedItems;
+    private final SelectionRules selectionRules;
+    private final List<IRecyclerItem> selectedItems;
 
     public RecyclerViewSelectedItemHandler(List<IRecyclerItem> items, InsertStrategy insertStrategy, SelectionRules selectionRules) {
         super(items, insertStrategy);

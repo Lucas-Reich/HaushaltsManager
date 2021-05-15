@@ -1,6 +1,9 @@
 package com.example.lucas.haushaltsmanager.Utils.ExpenseUtils;
 
+import androidx.annotation.NonNull;
+
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.IBooking;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -13,8 +16,15 @@ public class ExpenseFilter {
         List<ExpenseObject> filteredExpenses = new ArrayList<>();
 
         for (ExpenseObject expense : expenses) {
-            if (matchesFilter(expense, filter) && !expense.isParent())
-                filteredExpenses.add(expense);
+            if (expense.isParent()) {
+                continue;
+            }
+
+            if (expense.getPrice().isNegative() != filter) {
+                continue;
+            }
+
+            filteredExpenses.add(expense);
         }
 
         return filteredExpenses;
@@ -24,8 +34,15 @@ public class ExpenseFilter {
         List<ExpenseObject> filteredExpenses = new ArrayList<>();
 
         for (ExpenseObject expense : expenses) {
-            if (isInMonth(expense, month) && isInYear(expense, year) && !expense.isParent())
-                filteredExpenses.add(expense);
+            if (expense.isParent()) {
+                continue;
+            }
+
+            if (!isInMonth(expense, month) || !isInYear(expense, year)) {
+                continue;
+            }
+
+            filteredExpenses.add(expense);
         }
 
         return filteredExpenses;
@@ -45,7 +62,10 @@ public class ExpenseFilter {
     }
 
     @Deprecated
-    public List<ExpenseObject> byAccountWithChildren(List<ExpenseObject> expenses, List<UUID> accounts) {
+    public List<ExpenseObject> byAccountWithChildren(
+            @NonNull List<ExpenseObject> expenses,
+            @NonNull List<UUID> accounts
+    ) {
         return byAccount(pullChildrenUp(expenses), accounts);
     }
 
@@ -53,8 +73,15 @@ public class ExpenseFilter {
         List<ExpenseObject> filteredExpenses = new ArrayList<>();
 
         for (ExpenseObject expense : expenses) {
-            if (hasAccount(expense, accounts) && !expense.isParent())
-                filteredExpenses.add(expense);
+            if (expense.isParent()) {
+                continue;
+            }
+
+            if (!hasAccount(expense, accounts)) {
+                continue;
+            }
+
+            filteredExpenses.add(expense);
         }
 
         return filteredExpenses;
@@ -85,8 +112,9 @@ public class ExpenseFilter {
                 return expenseWithVisibleChildren;
             }
         } else {
-            if (hasAccount(expense, accounts))
+            if (hasAccount(expense, accounts)) {
                 return expense;
+            }
         }
 
         return null;
@@ -106,15 +134,11 @@ public class ExpenseFilter {
         return expense;
     }
 
-    private boolean isInMonth(ExpenseObject expense, int month) {
+    private boolean isInMonth(IBooking expense, int month) {
         return expense.getDate().get(Calendar.MONTH) == month;
     }
 
-    private boolean isInYear(ExpenseObject expense, int year) {
+    private boolean isInYear(IBooking expense, int year) {
         return expense.getDate().get(Calendar.YEAR) == year;
-    }
-
-    private boolean matchesFilter(ExpenseObject expense, boolean filter) {
-        return expense.isExpenditure() == filter;
     }
 }

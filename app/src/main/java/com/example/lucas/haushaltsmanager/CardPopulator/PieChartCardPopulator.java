@@ -95,10 +95,11 @@ public class PieChartCardPopulator {
         List<ExpenseObject> flatExpenseList = new ArrayList<>();
 
         for (ExpenseObject expense : expenses) {
-            if (expense.isParent())
+            if (expense.isParent()) {
                 flatExpenseList.addAll(expense.getChildren());
-            else
+            } else {
                 flatExpenseList.add(expense);
+            }
         }
 
         return flatExpenseList;

@@ -104,6 +104,7 @@ public class RecyclerViewSelectedItemHandlerTest {
     private ParentBookingItem getDummyParentItem() {
         return new ParentBookingItem(
                 new ParentBooking(
+                        UUID.randomUUID(),
                         "Ausgabe",
                         Calendar.getInstance(),
                         new ArrayList<ExpenseObject>()

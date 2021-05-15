@@ -5,7 +5,7 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBooking
 import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.RecurringBookingRepository;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
-import com.example.lucas.haushaltsmanager.Entities.Expense.Booking;
+import com.example.lucas.haushaltsmanager.Entities.Expense.IBooking;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 import com.example.lucas.haushaltsmanager.Entities.Frequency;
@@ -57,7 +57,7 @@ public class RecurringBookingRepositoryTest {
         );
     }
 
-    private Booking createBooking() {
+    private IBooking createBooking() {
         return new ExpenseObject(
                 "Ausgabe",
                 new Price(150, true),

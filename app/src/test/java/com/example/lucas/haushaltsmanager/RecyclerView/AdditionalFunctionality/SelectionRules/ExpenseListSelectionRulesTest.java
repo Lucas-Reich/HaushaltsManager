@@ -127,6 +127,7 @@ public class ExpenseListSelectionRulesTest {
 
     private ParentBooking getDummyParentExpense() {
         return new ParentBooking(
+                UUID.randomUUID(),
                 "Parent Ausgabe",
                 Calendar.getInstance(),
                 new ArrayList<ExpenseObject>()

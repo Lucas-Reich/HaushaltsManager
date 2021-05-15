@@ -45,6 +45,11 @@ public class AddAndSetDefaultDecorator implements ActiveAccountsPreferencesInter
     }
 
     @Override
+    public List<UUID> getAll() {
+        return preferences.getAll();
+    }
+
+    @Override
     public void clear() {
         preferences.clear();
     }

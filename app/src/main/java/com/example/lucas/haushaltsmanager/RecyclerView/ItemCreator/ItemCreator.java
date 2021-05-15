@@ -2,6 +2,7 @@ package com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator;
 
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.IBooking;
 import com.example.lucas.haushaltsmanager.Entities.TemplateBooking;
 import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.Strategies.CreateBookingItemsStrategy;
 import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.Strategies.CreateCategoryItemsStrategy;

@@ -18,10 +18,10 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Excepti
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryTransformer;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepositoryInterface;
-import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.CannotDeleteChildExpenseException;
 import com.example.lucas.haushaltsmanager.Database.TransformerInterface;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.IBooking;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ParentBooking;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 
@@ -62,12 +62,10 @@ public class ExpenseRepository {
     }
 
     public List<ExpenseObject> getAll() {
-
-        return getAll(0, Calendar.getInstance().getTimeInMillis());
-    }
-
-    public List<ExpenseObject> getAll(long startDateInMills, long endDateInMills) {
-        Cursor c = executeRaw(new GetAllBookingsQuery(startDateInMills, endDateInMills));
+        Cursor c = executeRaw(new GetAllBookingsQuery(
+                0,
+                Calendar.getInstance().getTimeInMillis()
+        ));
 
         c.moveToFirst();
         ArrayList<ExpenseObject> bookings = new ArrayList<>();
@@ -154,28 +152,26 @@ public class ExpenseRepository {
         }
 
         try {
+            mDatabase.beginTransaction();
+
+            mDatabase.delete(
+                    TABLE,
+                    "id = ?",
+                    new String[]{expense.getId().toString()}
+            );
+
             updateAccountBalance(
                     expense.getAccountId(),
                     -expense.getSignedPrice()
             );
 
-            for (ExpenseObject childExpense : expense.getChildren()) {
-                new ChildExpenseRepository(app.getContext()).delete(childExpense);
-            }
+            mDatabase.setTransactionSuccessful();
         } catch (AccountNotFoundException e) {
 
             Log.e(TAG, "Could not delete Booking " + expense.getTitle() + " attached Account " + expense.getAccountId() + " does not exist");
-        } catch (CannotDeleteChildExpenseException e) {
-
-            Log.e(TAG, e.getMessage());
-            throw CannotDeleteExpenseException.CannotDeleteChild(expense);
+        } finally {
+            mDatabase.endTransaction();
         }
-
-        mDatabase.delete(
-                TABLE,
-                "id = ?",
-                new String[]{expense.getId().toString()}
-        );
     }
 
     public void update(ExpenseObject expense) throws ExpenseNotFoundException {

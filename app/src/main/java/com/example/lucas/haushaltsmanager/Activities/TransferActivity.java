@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,12 +15,10 @@ import androidx.appcompat.widget.Toolbar;
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepositoryInterface;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.Exceptions.CategoryNotFoundException;
-import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
 import com.example.lucas.haushaltsmanager.Dialogs.DatePickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ErrorAlertDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
@@ -30,11 +27,11 @@ import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.ParentBooking;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -50,7 +47,6 @@ public class TransferActivity extends AppCompatActivity {
     //Einnahme
     private ExpenseObject mToExpense;
     private AccountRepository mAccountRepo;
-    private ChildExpenseRepository mChildExpenseRepo;
     private CategoryRepositoryInterface categoryRepository;
     private ExpenseRepository mBookingRepo;
 
@@ -180,21 +176,10 @@ public class TransferActivity extends AppCompatActivity {
 
                 //checke ob alles gesetzt ist
                 if (mFromExpense.isSet() && mToExpense.isSet()) {
-
-                    ArrayList<ExpenseObject> bookings = new ArrayList<>();
-                    bookings.add(mFromExpense);
-                    bookings.add(mToExpense);
-
-
-                    ExpenseObject parent = mChildExpenseRepo.combineExpenses(bookings);
-                    parent.setTitle(String.format("%s\n%s -> %s", getString(R.string.transfer), mFromAccount.getTitle(), mToAccount.getTitle()));
-                    try {
-                        mBookingRepo.update(parent);
-                    } catch (ExpenseNotFoundException e) {
-
-                        Toast.makeText(TransferActivity.this, R.string.could_not_update_title, Toast.LENGTH_SHORT).show();
-                        // TODO: Was soll passieren, wenn der Titeln nich geupdated werden konnte?
-                    }
+                    ParentBooking parent = new ParentBooking(String.format("%s\n%s -> %s", getString(R.string.transfer), mFromAccount.getTitle(), mToAccount.getTitle()));
+                    parent.addChild(mFromExpense);
+                    parent.addChild(mToExpense);
+                    mBookingRepo.insert(parent);
 
                     Intent intent = new Intent(TransferActivity.this, ParentActivity.class);
                     TransferActivity.this.startActivity(intent);
@@ -218,7 +203,6 @@ public class TransferActivity extends AppCompatActivity {
         setContentView(R.layout.activity_transfers);
 
         mAccountRepo = new AccountRepository(this);
-        mChildExpenseRepo = new ChildExpenseRepository(this);
         categoryRepository = new CategoryRepository(this);
         mBookingRepo = new ExpenseRepository(this);
 
@@ -254,12 +238,12 @@ public class TransferActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         switch (item.getItemId()) {
             case android.R.id.home:
 
                 onBackPressed();
         }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -323,11 +307,6 @@ public class TransferActivity extends AppCompatActivity {
         Log.d(TAG, "selected " + mToAccount.getTitle() + " as to account");
     }
 
-    /**
-     * Methode um den Betrag der ToExpense zu setzen, da dieser eventuell umgerechnet werden muss.
-     *
-     * @param newPrice Den Preis, welcher umgerechnet werden muss
-     */
     private void setToExpense(double newPrice) {
         mToExpense.setPrice(new Price(
                 newPrice,

@@ -14,8 +14,6 @@ public interface ChildExpenseRepositoryInterface {
 
     ExpenseObject addChildToBooking(ExpenseObject childExpense, ExpenseObject parentBooking) throws AddChildToChildException;
 
-    ExpenseObject combineExpenses(List<ExpenseObject> expenses);
-
     ExpenseObject extractChildFromBooking(ExpenseObject childExpense) throws ChildExpenseNotFoundException;
 
     ExpenseObject get(UUID childExpenseId) throws ChildExpenseNotFoundException;

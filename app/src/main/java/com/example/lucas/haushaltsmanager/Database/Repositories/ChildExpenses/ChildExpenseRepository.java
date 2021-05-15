@@ -104,43 +104,6 @@ public class ChildExpenseRepository implements ChildExpenseRepositoryInterface {
         }
     }
 
-    /**
-     * Methode um mehrere Buchungen zusammenzufügen
-     *
-     * @param expenses Liste der Buchungen die zusammengefügt werden sollen
-     * @return Parent der zusammengefügten Buchungen, mit den hinzugefügten KinmDatabaseuchungen
-     */
-    public ExpenseObject combineExpenses(List<ExpenseObject> expenses) {
-        ExpenseObject dummyParentExpense = ExpenseObject.createDummyExpense();
-
-        for (ExpenseObject expense : expenses) {
-            if (expense.isParent()) {
-
-                dummyParentExpense.addChildren(expense.getChildren());
-                try {
-                    for (ExpenseObject child : expense.getChildren())
-                        delete(child);
-                } catch (CannotDeleteChildExpenseException e) {
-
-                    // TODO: Was soll passieren wenn ein Kind nicht gelöscht werden kann?
-                }
-            } else {
-
-                try {
-                    dummyParentExpense.addChild(expense);
-                    mBookingRepo.delete(expense);
-                } catch (CannotDeleteExpenseException e) {
-
-                    // TODO: Kann eine ParentExpense nicht gefunden werden muss der gesamte vorgang abgebrochen werden
-                    //Beispiel: https://stackoverflow.com/questions/6909221/android-sqlite-rollback
-                }
-            }
-        }
-
-        mBookingRepo.insert(dummyParentExpense);
-        return dummyParentExpense;
-    }
-
     public ExpenseObject extractChildFromBooking(ExpenseObject childExpense) throws ChildExpenseNotFoundException {
         if (!exists(childExpense)) {
             throw new ChildExpenseNotFoundException(childExpense.getId());
@@ -346,7 +309,7 @@ public class ChildExpenseRepository implements ChildExpenseRepositoryInterface {
         values.put("id", child.getId().toString());
         values.put("expense_type", ExpenseObject.EXPENSE_TYPES.CHILD_EXPENSE.name());
         values.put("price", child.getUnsignedPrice());
-        values.put("expenditure", child.isExpenditure());
+        values.put("expenditure", child.isExpenditure() ? 1 : 0);
         values.put("title", child.getTitle());
         values.put("date", child.getDate().getTimeInMillis());
         values.put("notice", child.getNotice());

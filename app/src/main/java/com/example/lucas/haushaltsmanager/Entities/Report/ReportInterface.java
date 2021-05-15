@@ -2,6 +2,7 @@ package com.example.lucas.haushaltsmanager.Entities.Report;
 
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.IBooking;
 
 import java.util.List;
 

@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
-public class ExpenseObject implements Parcelable, Booking {
+public class ExpenseObject implements Parcelable, IBooking {
     public static final Parcelable.Creator<ExpenseObject> CREATOR = new Parcelable.Creator<ExpenseObject>() {
 
         @Override
@@ -280,8 +280,9 @@ public class ExpenseObject implements Parcelable, Booking {
     public void removeChild(ExpenseObject child) {
 
         this.children.remove(child);
-        if (children.size() == 0)
+        if (children.size() == 0) {
             setExpenseType(EXPENSE_TYPES.NORMAL_EXPENSE);
+        }
     }
 
     public void removeChildren() {
@@ -336,7 +337,7 @@ public class ExpenseObject implements Parcelable, Booking {
         DATE_PLACEHOLDER,
         PARENT_EXPENSE,
         NORMAL_EXPENSE,
-        TRANSFER_EXPENSE,
+        TRANSFER_EXPENSE, // TODO: Only used in TransferActivity
         CHILD_EXPENSE
     }
 }

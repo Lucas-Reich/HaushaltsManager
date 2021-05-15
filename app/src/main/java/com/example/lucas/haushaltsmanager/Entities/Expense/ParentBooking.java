@@ -9,24 +9,11 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
 
-public class ParentBooking implements Booking {
+public class ParentBooking implements IBooking {
     private final UUID id;
-    private Calendar mDate;
-    private final String mTitle;
+    private Calendar date;
+    private final String title;
     private final List<ExpenseObject> children;
-
-
-    public ParentBooking(
-            @NonNull UUID id,
-            @NonNull String title,
-            @NonNull Calendar date,
-            @NonNull List<ExpenseObject> children
-    ) {
-        this.id = id;
-        mTitle = title;
-        mDate = date;
-        this.children = children;
-    }
 
     public ParentBooking(
             @NonNull String title
@@ -35,22 +22,15 @@ public class ParentBooking implements Booking {
     }
 
     public ParentBooking(
+            @NonNull UUID id,
             @NonNull String title,
             @NonNull Calendar date,
             @NonNull List<ExpenseObject> children
     ) {
-        this(UUID.randomUUID(), title, date, children);
-    }
-
-    public static ParentBooking fromParentExpense(ExpenseObject parentExpense) {
-        assertIsParent(parentExpense);
-
-        return new ParentBooking(
-                parentExpense.getId(),
-                parentExpense.getTitle(),
-                parentExpense.getDate(),
-                parentExpense.getChildren()
-        );
+        this.id = id;
+        this.title = title;
+        this.date = date;
+        this.children = children;
     }
 
     public UUID getId() {
@@ -58,15 +38,15 @@ public class ParentBooking implements Booking {
     }
 
     public Calendar getDate() {
-        return mDate;
+        return date;
     }
 
     public void setDate(Calendar date) {
-        this.mDate = date;
+        this.date = date;
     }
 
     public String getTitle() {
-        return mTitle;
+        return title;
     }
 
     @Override
@@ -86,17 +66,15 @@ public class ParentBooking implements Booking {
     }
 
     public void addChild(ExpenseObject booking) {
+        if (children.contains(booking)) {
+            return;
+        }
+
         children.add(booking);
     }
 
     public List<ExpenseObject> getChildren() {
         return children;
-    }
-
-    private static void assertIsParent(ExpenseObject expense) {
-        if (!expense.isParent()) {
-            throw new IllegalArgumentException(String.format("Given Booking %s is not a ParentExpense", expense.getTitle()));
-        }
     }
 
     private double calcChildrenPrice() {

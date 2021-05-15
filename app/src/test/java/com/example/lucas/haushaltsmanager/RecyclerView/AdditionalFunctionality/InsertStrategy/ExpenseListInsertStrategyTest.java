@@ -143,6 +143,7 @@ public class ExpenseListInsertStrategyTest {
 
     private ParentBooking createDummyParentExpense() {
         return new ParentBooking(
+                UUID.randomUUID(),
                 "ParentAusgabe",
                 createDate(1, Calendar.JANUARY, 2019),
                 new ArrayList<ExpenseObject>()

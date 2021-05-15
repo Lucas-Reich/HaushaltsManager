@@ -123,8 +123,9 @@ public class AboutUsActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
 
         //schatten der toolbar
-        if (Build.VERSION.SDK_INT >= 21)
+        if (Build.VERSION.SDK_INT >= 21) {
             toolbar.setElevation(10.f);
+        }
 
         setSupportActionBar(toolbar);
 

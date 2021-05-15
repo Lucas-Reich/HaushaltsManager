@@ -23,7 +23,6 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 
-import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -111,40 +110,6 @@ public class ExpenseRepositoryTest {
         assertEquals("Es wurden zu viele Ausgaben aus der Datenbank geholt", 2, expenses.size());
         assertTrue("Die ParentExpense wurde nicht aus der Datenbank geholt", expenses.contains(parentExpense));
         assertTrue("Die Ausgabe wurde nicht aus der Datenbank geholt", expenses.contains(expense));
-    }
-
-    @Test
-    public void testGetAllInSpecifiedTimeFrameShouldReturnBookingsInThisTimeFrame() {
-        //fixme
-        //todo den Test noch einmal ausführen, wenn es einen Test für ExpenseObject.setDateTime() und ExpenseObject.getDate() gibt
-        //das Verhalten vom Calendar ist unerwartet
-        Calendar date = Calendar.getInstance();
-        ExpenseObject expenseBeforeTimeFrame = getSimpleExpense();
-        date.setTimeInMillis(1527803999000L);//31.05.2018 23:59:59
-        expenseBeforeTimeFrame.setDate(date);
-        mBookingRepo.insert(expenseBeforeTimeFrame);
-
-        ExpenseObject expenseWithinTimeFrame1 = getSimpleExpense();
-        date.setTimeInMillis(1527804000000L);//01.06.2018 00:00:00
-        expenseWithinTimeFrame1.setDate(date);
-        mBookingRepo.insert(expenseWithinTimeFrame1);
-
-        ExpenseObject expenseWithinTimeFrame2 = getSimpleExpense();
-        date.setTimeInMillis(1527867176000L);//01.06.2018 17:32:56
-        expenseWithinTimeFrame2.setDate(date);
-        mBookingRepo.insert(expenseWithinTimeFrame2);
-
-        ExpenseObject expenseAfterTimeFrame = getSimpleExpense();
-        date.setTimeInMillis(1527890400000L);//02.06.2018 00:00:00
-        expenseAfterTimeFrame.setDate(date);
-        mBookingRepo.insert(expenseAfterTimeFrame);
-
-        List<ExpenseObject> expenses = mBookingRepo.getAll(1527804000000L, 1527890399000L);//01.06.2018 00:00:00 - 01.06.2018 23:59:59
-
-        assertFalse("Buchung die vor dem angegebenen Zeitraum ist wurde aus der Datenbank geholt", expenses.contains(expenseBeforeTimeFrame));
-        assertTrue("Buchung 1 die innerhalb des Zeitraums ist wurde nicht aus der Datenbank geholt", expenses.contains(expenseWithinTimeFrame1));
-        assertTrue("Buchung 2 die innerhalb des Zeitraums ist wurde nicht aus der Datenbank geholt", expenses.contains(expenseWithinTimeFrame2));
-        assertFalse("Buchung die nach dem angegebenen Zeitraum ist wurde aus der Datenbank geholt", expenses.contains(expenseAfterTimeFrame));
     }
 
     @Test

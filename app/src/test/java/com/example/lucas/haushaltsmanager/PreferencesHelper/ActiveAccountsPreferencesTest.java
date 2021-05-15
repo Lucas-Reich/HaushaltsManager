@@ -133,7 +133,7 @@ public class ActiveAccountsPreferencesTest {
         when(mContext.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)).thenReturn(preferences);
 
         mPreferences = new ActiveAccountsPreferences(mContext);
-        List<UUID> actualAccounts = mPreferences.getActiveAccounts();
+        List<UUID> actualAccounts = mPreferences.getAll();
 
         assertEquals(expectedAccount1.getId(), actualAccounts.get(0));
         assertEquals(expectedAccount2.getId(), actualAccounts.get(1));
@@ -153,7 +153,7 @@ public class ActiveAccountsPreferencesTest {
         when(mContext.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)).thenReturn(preferences);
 
         mPreferences = new ActiveAccountsPreferences(mContext);
-        List<UUID> actualAccounts = mPreferences.getActiveAccounts();
+        List<UUID> actualAccounts = mPreferences.getAll();
 
         assertTrue(actualAccounts.isEmpty());
         verify(editor, times(1)).remove("NotExistingAccountId");

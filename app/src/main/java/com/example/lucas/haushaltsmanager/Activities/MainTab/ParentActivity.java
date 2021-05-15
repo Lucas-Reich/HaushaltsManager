@@ -23,36 +23,21 @@ import com.example.lucas.haushaltsmanager.Activities.CategoryList;
 import com.example.lucas.haushaltsmanager.Activities.ImportExportActivity;
 import com.example.lucas.haushaltsmanager.Activities.RecurringBookingList;
 import com.example.lucas.haushaltsmanager.Activities.Settings;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Dialogs.ChangeAccounts.ChooseAccountsDialogFragment;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
-import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences.ActiveAccountsPreferences;
 import com.example.lucas.haushaltsmanager.R;
-import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseFilter;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 public class ParentActivity extends AppCompatActivity implements ChooseAccountsDialogFragment.OnSelectedAccount {
     private TabLayout mTabLayout;
     private ViewPager mViewPager;
-    private List<ExpenseObject> mExpenses = new ArrayList<>();
-    private List<UUID> mActiveAccounts = new ArrayList<>();
-    private ExpenseRepository mBookingRepo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tab_main_mit_nav_drawer);
-
-        mBookingRepo = new ExpenseRepository(this);
-
-        initializeActiveAccounts();
-
-        updateExpenses();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -157,43 +142,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
 
     @Override
     public void onAccountSelected(UUID accountId, boolean isChecked) {
-        if (mActiveAccounts.contains(accountId) == isChecked)
-            return;
-
-        if (mActiveAccounts.contains(accountId) && !isChecked)
-            mActiveAccounts.remove(accountId);
-        else
-            mActiveAccounts.add(accountId);
-
         updateVisibleTab();
-    }
-
-    public void updateExpenses() {
-        mExpenses = mBookingRepo.getAll();
-    }
-
-    public List<ExpenseObject> getVisibleExpenses() {
-        return new ExpenseFilter().byAccountWithChildren(mExpenses, mActiveAccounts);
-    }
-
-    public List<ExpenseObject> getVisibleExpensesByOffsetWithParents(int offset, int batchSize) {
-        List<ExpenseObject> visibleExpenses = new ExpenseFilter().byAccountWithParents(mExpenses, mActiveAccounts);
-
-        if (visibleExpenses.size() <= offset) {
-            return new ArrayList<>();
-        }
-
-        if (visibleExpenses.size() < (offset + batchSize)) {
-            return visibleExpenses.subList(offset, visibleExpenses.size());
-        }
-
-        return visibleExpenses.subList(offset, offset + batchSize);
-    }
-
-    private void initializeActiveAccounts() {
-        ActiveAccountsPreferences preferences = new ActiveAccountsPreferences(this);
-
-        mActiveAccounts = preferences.getActiveAccounts();
     }
 
     /**
@@ -228,6 +177,7 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
             super(fm);
         }
 
+        @NonNull
         @Override
         public Fragment getItem(int position) {
             switch (position) {

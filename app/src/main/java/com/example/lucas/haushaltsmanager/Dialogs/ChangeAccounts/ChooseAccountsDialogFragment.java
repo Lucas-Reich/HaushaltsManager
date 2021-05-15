@@ -224,17 +224,12 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Acco
         }
     }
 
-    /**
-     * Methode um die Sichtbarkeit eines Kontos (im TabOne) zu verändern.
-     *
-     * @param account   Konto von dem die Sichtbarkeit angepasst werden soll
-     * @param isVisible Sichtabkeit. TRUE für sichtbar, FALSE für nicht sichtbar
-     */
     private void setAccountVisibility(Account account, boolean isVisible) {
         mAccountPreferences.changeVisibility(account, isVisible);
 
-        if (null != mCallback)
+        if (null != mCallback) {
             mCallback.onAccountSelected(account.getId(), isVisible);
+        }
     }
 
     public interface OnSelectedAccount {

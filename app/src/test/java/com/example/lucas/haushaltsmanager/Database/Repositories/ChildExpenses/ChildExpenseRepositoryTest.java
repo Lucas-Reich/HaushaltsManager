@@ -147,28 +147,6 @@ public class ChildExpenseRepositoryTest {
     }
 
     @Test
-    public void testCombineExpensesWithParentExpensesShouldSucceed() {
-        ArrayList<ExpenseObject> expenses = new ArrayList<>();
-        ExpenseObject expense1 = getSimpleExpense();
-        mBookingRepo.insert(expense1);
-        ExpenseObject expense2 = getSimpleExpense();
-        mBookingRepo.insert(expense2);
-
-        expenses.add(expense1);
-        expenses.add(expense2);
-
-        ExpenseObject parentExpense = mChildExpenseRepo.combineExpenses(expenses);
-
-        assertBookingExists(parentExpense);
-        assertTrue("ChildExpense 1 wurde nicht erstellt", mChildExpenseRepo.exists(parentExpense.getChildren().get(0)));
-        assertTrue("ChildExpense 2 wurde nicht erstellt", mChildExpenseRepo.exists(parentExpense.getChildren().get(1)));
-        assertEqualAccountBalance(
-                account.getBalance().getSignedValue() + expenses.get(0).getSignedPrice() + expenses.get(1).getSignedPrice(),
-                account.getId()
-        );
-    }
-
-    @Test
     public void testExtractChildFromBookingShouldSucceed() {
         ExpenseObject parentExpense = getParentExpenseWithChildren();
         mBookingRepo.insert(parentExpense);

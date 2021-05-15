@@ -100,7 +100,7 @@ public class ExpenseImporterActivity extends AbstractAppCompatActivity implement
         } catch (FileNotFoundException e) {
             errorCloseActivity();
 
-            return null; // TODO: Kann ich das irgendwie anders lösen?
+            return null;
         }
     }
 

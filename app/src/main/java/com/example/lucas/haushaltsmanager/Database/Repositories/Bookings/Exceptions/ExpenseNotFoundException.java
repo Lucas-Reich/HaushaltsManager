@@ -1,7 +1,7 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions;
 
 import com.example.lucas.haushaltsmanager.Database.Exceptions.EntityNotExistingException;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.IBooking;
 
 import java.util.UUID;
 
@@ -21,7 +21,7 @@ public class ExpenseNotFoundException extends EntityNotExistingException {
         ));
     }
 
-    public static ExpenseNotFoundException parentExpenseNotFoundException(ExpenseObject childExpense) {
+    public static ExpenseNotFoundException parentExpenseNotFoundException(IBooking childExpense) {
         return new ExpenseNotFoundException("Could not find ParentExpense for ChildExpense " + childExpense.getTitle() + ".");
     }
 }

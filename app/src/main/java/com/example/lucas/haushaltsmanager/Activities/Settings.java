@@ -38,7 +38,6 @@ public class Settings extends AbstractAppCompatActivity {
 
     /**
      * Maximale Anzahl von gleichzeitig existierenden Backups.
-     * Die Höhe dieser Zahl hat keinen Grund und könnte genauso gut 1 oder 100 sein.
      */
     public static final int DEFAULT_BACKUP_CAP = 20;
     public static final int DEFAULT_WEEKDAY = WeekdayUtils.MONDAY;

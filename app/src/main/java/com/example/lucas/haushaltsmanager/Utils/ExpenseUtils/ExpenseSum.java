@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 public class ExpenseSum {
-
     public HashMap<Category, Double> byCategory(List<ExpenseObject> expenses) {
         HashMap<Category, List<ExpenseObject>> expensesGroupedByCategory = groupByCategory(pullChildrenUp(expenses));
 
@@ -44,7 +43,7 @@ public class ExpenseSum {
         double sum = 0D;
 
         for (ExpenseObject expense : expenses) {
-            sum += expense.getSignedPrice();
+            sum += expense.getPrice().getSignedValue();
         }
 
         return sum;

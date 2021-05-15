@@ -2,7 +2,7 @@ package com.example.lucas.haushaltsmanager.Entities;
 
 import androidx.annotation.NonNull;
 
-import com.example.lucas.haushaltsmanager.Entities.Expense.Booking;
+import com.example.lucas.haushaltsmanager.Entities.Expense.IBooking;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 
 import java.util.Calendar;
@@ -15,14 +15,14 @@ public class RecurringBooking {
     private final UUID id;
     private Calendar start, endDate;
     private final Frequency frequency;
-    private final Booking templateBooking;
+    private final IBooking templateBooking;
 
     public RecurringBooking(
             @NonNull UUID id,
             @NonNull Calendar start,
             @NonNull Calendar end,
             @NonNull Frequency frequency,
-            @NonNull Booking booking
+            @NonNull IBooking booking
     ) {
         this.id = id;
         this.templateBooking = booking;
@@ -35,7 +35,7 @@ public class RecurringBooking {
             @NonNull Calendar start,
             @NonNull Calendar end,
             @NonNull Frequency frequency,
-            @NonNull Booking booking
+            @NonNull IBooking booking
     ) {
         this(UUID.randomUUID(), start, end, frequency, booking);
     }

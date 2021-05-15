@@ -1,12 +1,12 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.Strategies;
 
-import com.example.lucas.haushaltsmanager.Entities.Expense.Booking;
+import com.example.lucas.haushaltsmanager.Entities.Expense.IBooking;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ParentBooking;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.BookingItem.ExpenseItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ParentBookingItem.ParentBookingItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.Utils.CalendarUtils;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSorter;
 
@@ -31,7 +31,7 @@ public class CreateBookingItemsStrategy implements RecyclerItemCreatorStrategyIn
         DateItem currentDate = new DateItem(bookings.get(0).getDate());
 
         List<IRecyclerItem> recyclerItems = new ArrayList<>();
-        for (Booking booking : bookings) {
+        for (IBooking booking : bookings) {
             if (changeDate(booking, currentDate, SORT_DESC)) {
                 currentDate = new DateItem(booking.getDate());
 
@@ -44,7 +44,7 @@ public class CreateBookingItemsStrategy implements RecyclerItemCreatorStrategyIn
         return recyclerItems;
     }
 
-    private boolean changeDate(Booking booking, DateItem currentDate, String order) {
+    private boolean changeDate(IBooking booking, DateItem currentDate, String order) {
         if (order.equals(SORT_ASC)) {
             return CalendarUtils.beforeByDate(booking.getDate(), currentDate.getContent());
         }
@@ -52,13 +52,18 @@ public class CreateBookingItemsStrategy implements RecyclerItemCreatorStrategyIn
         return CalendarUtils.afterByDate(booking.getDate(), currentDate.getContent());
     }
 
-    private IRecyclerItem createExpenseItem(Booking booking, DateItem currentDate) {
+    private IRecyclerItem createExpenseItem(IBooking booking, DateItem currentDate) {
         if (booking instanceof ParentBooking) {
             return new ParentBookingItem((ParentBooking) booking, currentDate);
         }
 
         if (booking instanceof ExpenseObject && ((ExpenseObject) booking).isParent()) {
-            return new ParentBookingItem(ParentBooking.fromParentExpense((ExpenseObject) booking), currentDate);
+            return new ParentBookingItem(new ParentBooking(
+                    booking.getId(),
+                    booking.getTitle(),
+                    booking.getDate(),
+                    ((ExpenseObject) booking).getChildren()
+            ), currentDate);
         }
 
         return new ExpenseItem((ExpenseObject) booking, currentDate);

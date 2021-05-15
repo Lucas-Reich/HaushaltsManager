@@ -16,4 +16,6 @@ public interface ActiveAccountsPreferencesInterface extends SharedPreferences {
     boolean isActive(Account account);
 
     List<UUID> getActiveAccounts();
+
+    List<UUID> getAll();
 }

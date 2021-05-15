@@ -58,8 +58,9 @@ public class CreateAccountActivity extends AbstractAppCompatActivity implements 
     protected void onStart() {
         super.onStart();
 
-        if (!mAccount.getTitle().equals(""))
+        if (!mAccount.getTitle().equals("")) {
             mAccountNameBtn.setHint(mAccount.getTitle());
+        }
         mAccountNameBtn.setOnClickListener(new View.OnClickListener() {
 
             @Override

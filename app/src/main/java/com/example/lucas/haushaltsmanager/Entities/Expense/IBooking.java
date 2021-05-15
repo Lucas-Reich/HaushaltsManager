@@ -5,7 +5,7 @@ import com.example.lucas.haushaltsmanager.Entities.Price;
 import java.util.Calendar;
 import java.util.UUID;
 
-public interface Booking {
+public interface IBooking {
     UUID getId();
 
     Calendar getDate();

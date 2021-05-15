@@ -209,7 +209,12 @@ public class RecyclerViewExpandableItemHandlerTest {
     private ParentBooking getParentExpenseObject(int childCount) {
         ExpenseObject parentExpense = getParentExpenseWithChildren(childCount);
 
-        return ParentBooking.fromParentExpense(parentExpense);
+        return new ParentBooking(
+                parentExpense.getId(),
+                parentExpense.getTitle(),
+                parentExpense.getDate(),
+                parentExpense.getChildren()
+        );
     }
 
     private ExpenseObject getParentExpenseWithChildren(int childrenCount) {

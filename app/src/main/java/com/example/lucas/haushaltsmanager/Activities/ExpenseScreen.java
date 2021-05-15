@@ -257,11 +257,11 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-//            case R.id.template: // TODO: How to fix this?
-//                Intent chooseTemplateIntent = new Intent(this, TemplatesActivity.class);
-//                startActivityForResult(chooseTemplateIntent, 2);
-//
-//                break;
+            case 5:  // TODO: How to fix this?
+                Intent chooseTemplateIntent = new Intent(this, TemplatesActivity.class);
+                startActivityForResult(chooseTemplateIntent, 2);
+
+                break;
             case android.R.id.home:
                 onBackPressed();
 
@@ -458,14 +458,10 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
     private void enableFabIfBookingIsSaveable() {
         SaveFloatingActionButton saveFab = findViewById(R.id.expense_screen_save);
 
-        if (isBookingSaveable()) {
+        if (mExpense.isSet()) {
             saveFab.enable();
         } else {
             saveFab.disable();
         }
-    }
-
-    private boolean isBookingSaveable() {
-        return mExpense.isSet();
     }
 }

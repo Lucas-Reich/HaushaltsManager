@@ -2,6 +2,7 @@ package com.example.lucas.haushaltsmanager.Utils.ExpenseUtils;
 
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.IBooking;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -18,8 +19,9 @@ public class ExpenseGrouper {
         List<ExpenseObject> groupedExpenses = new ArrayList<>();
 
         for (ExpenseObject expense : expenses) {
-            if (isInYear(expense, year))
+            if (isInYear(expense, year)) {
                 groupedExpenses.add(expense);
+            }
         }
 
         return groupedExpenses;
@@ -76,8 +78,9 @@ public class ExpenseGrouper {
         }
 
         for (ExpenseObject expense : expenses) {
-            if (!isInYear(expense, year))
+            if (!isInYear(expense, year)) {
                 continue;
+            }
 
             groupedExpenses.get(extractMonth(expense)).add(expense);
         }
@@ -85,15 +88,15 @@ public class ExpenseGrouper {
         return groupedExpenses;
     }
 
-    private int extractMonth(ExpenseObject expense) {
+    private int extractMonth(IBooking expense) {
         return expense.getDate().get(Calendar.MONTH);
     }
 
-    private boolean isInMonth(ExpenseObject expense, int month) {
+    private boolean isInMonth(IBooking expense, int month) {
         return expense.getDate().get(Calendar.MONTH) == month;
     }
 
-    private boolean isInYear(ExpenseObject expense, int year) {
+    private boolean isInYear(IBooking expense, int year) {
         return expense.getDate().get(Calendar.YEAR) == year;
     }
 }

@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/HaushaltsManager.iml" filepath="$PROJECT_DIR$/HaushaltsManager.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/androidcharts/HaushaltsManager.androidcharts.iml" filepath="$PROJECT_DIR$/.idea/modules/androidcharts/HaushaltsManager.androidcharts.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/HaushaltsManager.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/HaushaltsManager.app.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/changelogdialog/HaushaltsManager.changelogdialog.iml" filepath="$PROJECT_DIR$/.idea/modules/changelogdialog/HaushaltsManager.changelogdialog.iml" />
     </modules>

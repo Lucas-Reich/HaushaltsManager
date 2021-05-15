@@ -14,8 +14,8 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBooking
 import com.example.lucas.haushaltsmanager.Dialogs.DatePickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.FrequencyInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
-import com.example.lucas.haushaltsmanager.Entities.Expense.Booking;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Expense.IBooking;
 import com.example.lucas.haushaltsmanager.Entities.Frequency;
 import com.example.lucas.haushaltsmanager.Entities.RecurringBooking;
 import com.example.lucas.haushaltsmanager.R;
@@ -128,7 +128,7 @@ public class EditRecurringBooking extends AbstractAppCompatActivity {
             throw new IllegalArgumentException("Could not start EditRecurringBookingScreen without associated Booking");
         }
 
-        Booking booking = (ExpenseObject) bundle.getParcelable(INTENT_BOOKING, null);
+        IBooking booking = (IBooking) bundle.getParcelable(INTENT_BOOKING, null);
         recurringBookingBuilder.setBooking(booking);
     }
 
@@ -167,7 +167,7 @@ public class EditRecurringBooking extends AbstractAppCompatActivity {
 
     private void scheduleWorkRequestFor(RecurringBooking recurringBooking) {
         WorkRequest recurringBookingWorkRequest = WorkRequestBuilder.from(recurringBooking);
-        WorkManager.getInstance().enqueue(recurringBookingWorkRequest);
+        WorkManager.getInstance(this).enqueue(recurringBookingWorkRequest);
     }
 
     private void enableFabIfBookingIsSaveable() {

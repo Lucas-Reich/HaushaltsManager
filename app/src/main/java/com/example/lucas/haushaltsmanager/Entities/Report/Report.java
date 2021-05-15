@@ -8,6 +8,7 @@ import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
+import com.example.lucas.haushaltsmanager.Entities.Expense.IBooking;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSum;
 
@@ -61,8 +62,9 @@ public class Report implements ReportInterface {
     public Category getMostStressedCategory() {
         HashMap<Category, Double> categories = sumExpensesByCategory();
 
-        if (categories.isEmpty())
+        if (categories.isEmpty()) {
             return getPlaceholderCategory(R.string.no_expenses);
+        }
 
         return getMaxEntry(categories).getKey();
     }
@@ -75,6 +77,10 @@ public class Report implements ReportInterface {
     @Override
     public void setCardTitle(String title) {
         mCardTitle = title;
+    }
+
+    public List<IBooking> getBookings() {
+        return (List<IBooking>) (List<?>) mExpenses;
     }
 
     private String getResourceString(@StringRes int stringRes) {

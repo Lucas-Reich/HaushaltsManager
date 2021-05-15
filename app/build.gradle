@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion '28.0.3'
+    compileSdkVersion 30
+    buildToolsVersion '29.0.2'
     defaultConfig {
         applicationId "com.lucas.ausgabenmanager"
-        minSdkVersion 19 // Android 4.4, KitKat
-        targetSdkVersion 29
+        minSdkVersion 21
+        targetSdkVersion 30
         versionCode 12
         versionName '1.7'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -58,6 +58,7 @@ dependencies {
 
     // Library um den Hintergrund weichzuzeichnen
     implementation 'jp.wasabeef:blurry:3.0.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
 
     // Dependencies welche benötigt werden, um die AndroidTests auszuführen

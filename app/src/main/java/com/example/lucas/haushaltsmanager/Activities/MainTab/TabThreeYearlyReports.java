@@ -11,10 +11,11 @@ import androidx.cardview.widget.CardView;
 import com.example.lucas.haushaltsmanager.CardPopulator.LineChartCardPopulator;
 import com.example.lucas.haushaltsmanager.CardPopulator.PieChartCardPopulator;
 import com.example.lucas.haushaltsmanager.CardPopulator.TimeFrameCardPopulator;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Report.Report;
 import com.example.lucas.haushaltsmanager.Entities.Report.ReportInterface;
-import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
+import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences.ActiveAccountsPreferences;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.CalendarUtils;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseGrouper;
@@ -24,8 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class TabThreeYearlyReports extends AbstractTab {
-    private ParentActivity mParent;
-    private UserSettingsPreferences mUserPreferences;
+    private ActiveAccountsPreferences activeAccounts;
     private LineChartCardPopulator mLineChartPopulator;
     private PieChartCardPopulator mIncomeCardPopulator, mExpenseCardPopulator;
     private TimeFrameCardPopulator mTimeFrameCardPopulator;
@@ -34,15 +34,14 @@ public class TabThreeYearlyReports extends AbstractTab {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mParent = (ParentActivity) getActivity();
-        mUserPreferences = new UserSettingsPreferences(getContext());
+        activeAccounts = new ActiveAccountsPreferences(getActivity());
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstances) {
         View rootView = inflater.inflate(R.layout.tab_three_yearly_reports, container, false);
 
-        List<ExpenseObject> expenses = mParent.getVisibleExpenses();
+        List<ExpenseObject> expenses = getVisibleExpenses();
 
         mTimeFrameCardPopulator = new TimeFrameCardPopulator(
                 (CardView) rootView.findViewById(R.id.tab_three_timeframe_report_card),
@@ -75,7 +74,7 @@ public class TabThreeYearlyReports extends AbstractTab {
                 (CardView) rootView.findViewById(R.id.tab_three_line_chart),
                 getLastYearAccountBalance(CalendarUtils.getCurrentYear(), expenses)
         );
-        mLineChartPopulator.setResources(mParent.getResources(), CalendarUtils.getCurrentYear()); // TODO: Kann ich das mit dem Jahr anders machen. Es wird nur für die GroupFunkion benutzt
+        mLineChartPopulator.setResources(getResources(), CalendarUtils.getCurrentYear());
         mLineChartPopulator.setData(createReport(
                 getString(R.string.account_balance),
                 expenses
@@ -85,7 +84,7 @@ public class TabThreeYearlyReports extends AbstractTab {
     }
 
     public void updateView(View rootView) {
-        ReportInterface report = createReport("", mParent.getVisibleExpenses());
+        ReportInterface report = createReport("", getVisibleExpenses());
 
         report.setCardTitle(getStringifiedYear());
         mTimeFrameCardPopulator.setData(report);
@@ -100,14 +99,20 @@ public class TabThreeYearlyReports extends AbstractTab {
         mExpenseCardPopulator.setData(report);
     }
 
+    private List<ExpenseObject> getVisibleExpenses() {
+        ExpenseRepository repository = new ExpenseRepository(getContext());
+
+        return repository.getAll();
+    }
+
     private double getLastYearAccountBalance(int currentYear, List<ExpenseObject> expenses) {
-        // TODO: Würde ich gerne anders machen
         HashMap<Integer, Double> mAccountBalanceYear = new ExpenseSum().byYear(expenses);
 
         int lastYear = currentYear - 1;
 
-        if (mAccountBalanceYear.containsKey(lastYear))
+        if (mAccountBalanceYear.containsKey(lastYear)) {
             return mAccountBalanceYear.get(lastYear);
+        }
 
         return 0d;
     }

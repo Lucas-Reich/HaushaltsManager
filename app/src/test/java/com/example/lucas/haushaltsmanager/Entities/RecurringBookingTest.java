@@ -1,8 +1,7 @@
 package com.example.lucas.haushaltsmanager.Entities;
 
 
-import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
-import com.example.lucas.haushaltsmanager.Entities.Expense.Booking;
+import com.example.lucas.haushaltsmanager.Entities.Expense.IBooking;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 
@@ -283,7 +282,7 @@ public class RecurringBookingTest {
         return RecurringBooking.createNextRecurringBooking(recurringBooking).getExecutionDate().getTimeInMillis() - now.getTimeInMillis();
     }
 
-    private Booking getBooking() {
+    private IBooking getBooking() {
         return new ExpenseObject(
                 UUID.randomUUID(),
                 "Ausgabe",
