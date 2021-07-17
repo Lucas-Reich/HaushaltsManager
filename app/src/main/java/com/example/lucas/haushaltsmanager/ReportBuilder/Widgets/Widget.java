@@ -7,7 +7,11 @@ import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import java.util.List;
 
 public interface Widget {
-    View getWidgetView();
+    boolean equals(Object other);
+
+    View getView();
 
     void setData(List<ExpenseObject> expenses);
+
+    int getIcon();
 }

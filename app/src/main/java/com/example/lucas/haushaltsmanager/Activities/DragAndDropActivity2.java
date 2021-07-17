@@ -24,7 +24,6 @@ import java.util.List;
 
 public class DragAndDropActivity2 extends AbstractAppCompatActivity implements View.OnDragListener {
     private RecyclerView recyclerView;
-    private CardView targetView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -37,7 +36,7 @@ public class DragAndDropActivity2 extends AbstractAppCompatActivity implements V
         initializeRecyclerView();
 
         // Middle
-        targetView = findViewById(R.id.drop_target);
+        CardView targetView = findViewById(R.id.drop_target);
         targetView.setOnDragListener(this);
     }
 

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.View;
 
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.R;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
@@ -20,7 +21,7 @@ public class PieChartWidget implements Widget {
     }
 
     @Override
-    public View getWidgetView() {
+    public View getView() {
         return chart;
     }
 
@@ -28,6 +29,28 @@ public class PieChartWidget implements Widget {
     public void setData(List<ExpenseObject> expenses) {
         // TODO: Create data set from expenses and add to PieChart
         chart.invalidate();
+    }
+
+    @Override
+    public int getIcon() {
+        return R.drawable.ic_pie_chart;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof PieChartWidget)) {
+            return false;
+        }
+
+        PieChartWidget other = (PieChartWidget) o;
+
+        return getIcon() == other.getIcon()
+                && getView() == other.getView();
+    }
+
+    @Override
+    public int hashCode() {
+        return chart != null ? chart.hashCode() : 0;
     }
 
     private void initChartWithDefaultValues(Context context) {

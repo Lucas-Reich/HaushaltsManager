@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.lucas.haushaltsmanager.Activities.DragAndDropActivity;
 import com.example.lucas.haushaltsmanager.Activities.ExpenseScreen;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
@@ -119,16 +120,19 @@ public class TabOneBookings extends AbstractTab implements
 
     @Override
     public void onFabClick() {
-        if (noAccountExists()) {
-            Toast.makeText(getContext(), getString(R.string.no_account), Toast.LENGTH_SHORT).show();
-            // TODO: Open dialog which prompts the user to add an account
+//        if (noAccountExists()) {
+//            Toast.makeText(getContext(), getString(R.string.no_account), Toast.LENGTH_SHORT).show();
+//            // TODO: Open dialog which prompts the user to add an account
+//
+//            return;
+//        }
+//
+//        Intent createExpenseIntent = new Intent(getContext(), ExpenseScreen.class);
+//        createExpenseIntent.putExtra(ExpenseScreen.INTENT_MODE, ExpenseScreen.INTENT_MODE_CREATE_BOOKING);
+//        startActivity(createExpenseIntent);
 
-            return;
-        }
-
-        Intent createExpenseIntent = new Intent(getContext(), ExpenseScreen.class);
-        createExpenseIntent.putExtra(ExpenseScreen.INTENT_MODE, ExpenseScreen.INTENT_MODE_CREATE_BOOKING);
-        startActivity(createExpenseIntent);
+        Intent openDnD = new Intent(getContext(), DragAndDropActivity.class);
+        startActivity(openDnD);
     }
 
     @Override

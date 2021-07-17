@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.View;
 
 import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.R;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
@@ -20,13 +21,36 @@ public class LineChartWidget implements Widget {
     }
 
     @Override
-    public View getWidgetView() {
+    public View getView() {
         return this.chart;
     }
 
     @Override
     public void setData(List<ExpenseObject> expenses) {
+        // TODO: Update data
         chart.invalidate();
+    }
+
+    @Override
+    public int getIcon() {
+        return R.drawable.ic_line_chart_black;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof LineChartWidget)) {
+            return false;
+        }
+
+        LineChartWidget otherWidget = (LineChartWidget) other;
+
+        return getIcon() == otherWidget.getIcon()
+                && getView() == otherWidget.getView();
+    }
+
+    @Override
+    public int hashCode() {
+        return chart != null ? chart.hashCode() : 0;
     }
 
     private void initChartWithDefaultValues(Context context) {

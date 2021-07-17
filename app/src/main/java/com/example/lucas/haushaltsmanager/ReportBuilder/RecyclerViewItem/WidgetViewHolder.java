@@ -7,11 +7,11 @@ import android.widget.ImageView;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.AbstractViewHolder;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
-import com.example.lucas.haushaltsmanager.ReportBuilder.RecyclerViewItem.WidgetViewItems.CardViewContent;
 import com.example.lucas.haushaltsmanager.ReportBuilder.RecyclerViewItem.WidgetViewItems.CardViewItem;
+import com.example.lucas.haushaltsmanager.ReportBuilder.Widgets.Widget;
 
 public class WidgetViewHolder extends AbstractViewHolder implements View.OnLongClickListener {
-    private CardViewContent cardViewContent;
+    private Widget widget;
 
     public WidgetViewHolder(View itemView) {
         super(itemView);
@@ -22,9 +22,9 @@ public class WidgetViewHolder extends AbstractViewHolder implements View.OnLongC
     @Override
     public void bind(IRecyclerItem item) {
         CardViewItem cardViewItem = castToCardViewItem(item);
-        cardViewContent = cardViewItem.getContent();
+        widget = cardViewItem.getContent();
 
-        setWidgetIcon(cardViewContent.getIcon());
+        setWidgetIcon(widget.getIcon());
     }
 
     @Override
@@ -32,7 +32,7 @@ public class WidgetViewHolder extends AbstractViewHolder implements View.OnLongC
         v.startDrag(
                 ClipData.newPlainText("widget_tag", "widget_tag"),
                 new View.DragShadowBuilder(v),
-                cardViewContent.getWidget(),
+                widget,
                 0
         );
 

@@ -9,54 +9,54 @@ import androidx.cardview.widget.CardView;
 import com.example.lucas.haushaltsmanager.ReportBuilder.Widgets.Widget;
 
 public class DropZoneCard {
-    private int zoneCount;
+    private int dropZoneCount;
     private final CardView cardView;
 
     public DropZoneCard(@NonNull CardView cardView) {
         this.cardView = cardView;
-        this.zoneCount = 3;
+        this.dropZoneCount = 3;
     }
 
     public void addDroppedView(Widget widget, float x, float y) {
         // TODO: Disable on click behaviour of widgets in Builder
-        int droppedZone = determineDropZone(new Point(x, y));
+        int dropZoneId = translateCoordsToDropzone(new Point(x, y));
 
-        removeExistingViewFromZone(droppedZone);
+        removeExistingViewFromZone(dropZoneId);
 
-        View widgetView = widget.getWidgetView();
+        View widgetView = widget.getView();
 
-        addLayoutConstraintsToChild(widgetView, droppedZone);
+        addLayoutConstraintsToChild(widgetView, dropZoneId);
 
-        addView(widgetView, droppedZone);
+        addView(widgetView, dropZoneId);
     }
 
     public void setDropZoneCount(int dropZoneCount) {
-        zoneCount = dropZoneCount;
+        this.dropZoneCount = dropZoneCount;
 
         cardView.removeAllViews();
         cardView.invalidate();
     }
 
-    private void addView(View view, int droppedZone) {
-        view.setId(droppedZone);
+    private void addView(View view, int zoneId) {
+        view.setId(zoneId);
         cardView.addView(view);
 
         cardView.invalidate();
     }
 
-    private void addLayoutConstraintsToChild(View widgetView, int droppedZone) {
+    private void addLayoutConstraintsToChild(View widgetView, int dropZoneId) {
         widgetView.setLayoutParams(new LinearLayout.LayoutParams(
-                cardView.getWidth() / zoneCount,
+                cardView.getWidth() / dropZoneCount,
                 cardView.getHeight()
         ));
 
-        int x = cardView.getWidth() / zoneCount;
+        int widgetWidth = cardView.getWidth() / dropZoneCount;
 
-        widgetView.setX(droppedZone * x);
+        widgetView.setX(dropZoneId * widgetWidth);
     }
 
-    private void removeExistingViewFromZone(int droppedZone) {
-        View oldView = cardView.findViewById(droppedZone);
+    private void removeExistingViewFromZone(int dropZoneId) {
+        View oldView = cardView.findViewById(dropZoneId);
 
         if (null == oldView) {
             return;
@@ -65,15 +65,15 @@ public class DropZoneCard {
         cardView.removeView(oldView);
     }
 
-    private int determineDropZone(Point dropPoint) {
-        int zoneWidth = this.cardView.getWidth() / zoneCount;
+    private int translateCoordsToDropzone(Point dropPoint) {
+        int zoneWidth = this.cardView.getWidth() / dropZoneCount;
 
-        for (int i = 0; i < zoneCount; i++) {
-            int zoneStart = i * zoneWidth;
+        for (int zone = 0; zone < dropZoneCount; zone++) {
+            int zoneStart = zone * zoneWidth;
             int zoneEnd = zoneStart + zoneWidth;
 
             if (isPointInRange(dropPoint, zoneStart, zoneEnd)) {
-                return i;
+                return zone;
             }
         }
 

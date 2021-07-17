@@ -6,14 +6,15 @@ import androidx.annotation.Nullable;
 
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IParentRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
+import com.example.lucas.haushaltsmanager.ReportBuilder.Widgets.Widget;
 
 public abstract class CardViewItem implements IRecyclerItem {
     public static final int VIEW_TYPE = 9;
 
-    private final CardViewContent content;
+    private final Widget widget;
 
-    public CardViewItem(CardViewContent content) {
-        this.content = content;
+    public CardViewItem(Widget widget) {
+        this.widget = widget;
     }
 
     @Override
@@ -22,8 +23,8 @@ public abstract class CardViewItem implements IRecyclerItem {
     }
 
     @Override
-    public CardViewContent getContent() {
-        return content;
+    public Widget getContent() {
+        return widget;
     }
 
     @Override
@@ -45,7 +46,7 @@ public abstract class CardViewItem implements IRecyclerItem {
 
         CardViewItem other = (CardViewItem) obj;
 
-        return other.getContent().equals(content);
+        return other.getContent().equals(widget);
     }
 
     @Override

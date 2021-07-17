@@ -35,18 +35,18 @@ public class DragAndDropActivity extends AbstractAppCompatActivity implements Vi
         setUpRecyclerView();
 
 
-        findViewById(R.id.drop_zone_root)
-                .setOnDragListener(this);
+        findViewById(R.id.drop_zone_root).setOnDragListener(this);
 
         View dropZoneView = findViewById(R.id.drop_zone);
         dropZoneView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // get tapped view
+
                 // blur background
 
                 // move view to upper third of the screen
-                v.animate().x(0).y(0)
-                        .setDuration(2000);
+                v.animate().x(0).y(0).setDuration(2000);
 
                 // increase size of selected view
 
