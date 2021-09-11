@@ -2,7 +2,7 @@ package com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.C
 
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
+import com.example.lucas.haushaltsmanager.Entities.Booking.ExpenseType;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.InvalidInputException;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.NoMappingFoundException;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Line.Line;

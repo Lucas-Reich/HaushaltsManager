@@ -4,8 +4,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.ExpenseType;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.BookingItem.ExpenseItem;
@@ -240,8 +240,8 @@ public class RecyclerViewItemHolderTest {
         return secureDate;
     }
 
-    private ExpenseObject createSimpleExpense(Calendar expenseDate) {
-        return new ExpenseObject(
+    private Booking createSimpleExpense(Calendar expenseDate) {
+        return new Booking(
                 UUID.randomUUID(),
                 "Ich bin eine Ausgabe",
                 new Price(105, true),
@@ -249,8 +249,7 @@ public class RecyclerViewItemHolderTest {
                 new Category("Kategorie", Color.black(), ExpenseType.expense()),
                 "",
                 UUID.randomUUID(),
-                ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE,
-                new ArrayList<ExpenseObject>()
+                Booking.EXPENSE_TYPES.NORMAL_EXPENSE
         );
     }
 

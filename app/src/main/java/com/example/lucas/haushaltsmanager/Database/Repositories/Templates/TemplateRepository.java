@@ -12,7 +12,7 @@ import com.example.lucas.haushaltsmanager.Database.QueryInterface;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryTransformer;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Templates.Exceptions.TemplateCouldNotBeCreatedException;
 import com.example.lucas.haushaltsmanager.Database.TransformerInterface;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
 import com.example.lucas.haushaltsmanager.Entities.TemplateBooking;
 
 import java.util.ArrayList;
@@ -48,7 +48,7 @@ public class TemplateRepository {
     }
 
     public void insert(TemplateBooking templateBooking) throws TemplateCouldNotBeCreatedException {
-        ExpenseObject expense = templateBooking.getTemplate();
+        Booking expense = templateBooking.getTemplate();
 
         ContentValues values = new ContentValues();
         values.put("id", templateBooking.getId().toString());

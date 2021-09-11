@@ -4,15 +4,21 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
 
 import com.example.lucas.haushaltsmanager.App.app;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
+import com.example.lucas.haushaltsmanager.Entities.Booking.ExpenseType;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.util.Objects;
 import java.util.UUID;
 
+@Entity(tableName = "categories")
 public class Category implements Parcelable {
+    @Ignore
     public static final Creator<Category> CREATOR = new Creator<Category>() {
 
         @Override
@@ -28,9 +34,12 @@ public class Category implements Parcelable {
         }
     };
 
-    private final UUID id;
+    @PrimaryKey
+    @NonNull
+    private UUID id;
     private String name;
     private Color color;
+    @ColumnInfo(name = "default_expense_type")
     private ExpenseType defaultExpenseType;
 
     public Category(
@@ -45,6 +54,7 @@ public class Category implements Parcelable {
         this.defaultExpenseType = defaultExpenseType;
     }
 
+    @Ignore
     public Category(
             @NonNull String name,
             @NonNull Color color,
@@ -56,6 +66,7 @@ public class Category implements Parcelable {
         this.defaultExpenseType = expenseType;
     }
 
+    @Ignore
     private Category(Parcel source) {
         this.id = UUID.fromString(source.readString());
         this.name = source.readString();
@@ -72,7 +83,7 @@ public class Category implements Parcelable {
         Category otherCategory = (Category) obj;
 
         return id.equals(otherCategory.getId())
-                && name.equals(otherCategory.getTitle())
+                && name.equals(otherCategory.getName())
                 && color.equals(otherCategory.getColor())
                 && defaultExpenseType.equals(otherCategory.getDefaultExpenseType());
     }
@@ -80,14 +91,14 @@ public class Category implements Parcelable {
     @Override
     @NonNull
     public String toString() {
-        return getTitle();
+        return getName();
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(
                 getId(),
-                getTitle(),
+                getName(),
                 getColor(),
                 getDefaultExpenseType()
         );
@@ -107,11 +118,17 @@ public class Category implements Parcelable {
         dest.writeInt(defaultExpenseType.value() ? 1 : 0);
     }
 
+    @NonNull
     public UUID getId() {
         return id;
     }
 
-    public String getTitle() {
+    public void setId(@NonNull UUID id) {
+        this.id = id;
+    }
+
+    @NonNull
+    public String getName() {
         return name;
     }
 
@@ -119,6 +136,7 @@ public class Category implements Parcelable {
         this.name = name;
     }
 
+    @NonNull
     public Color getColor() {
         return color;
     }
@@ -127,6 +145,7 @@ public class Category implements Parcelable {
         this.color = color;
     }
 
+    @NonNull
     public ExpenseType getDefaultExpenseType() {
         return defaultExpenseType;
     }

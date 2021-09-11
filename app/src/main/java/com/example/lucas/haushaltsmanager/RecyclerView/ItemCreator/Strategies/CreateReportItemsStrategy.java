@@ -1,7 +1,7 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.Strategies;
 
 import com.example.lucas.haushaltsmanager.App.app;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Booking.IBooking;
 import com.example.lucas.haushaltsmanager.Entities.Report.Report;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
@@ -12,47 +12,33 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class CreateReportItemsStrategy implements RecyclerItemCreatorStrategyInterface<ExpenseObject> {
+public class CreateReportItemsStrategy implements RecyclerItemCreatorStrategyInterface<IBooking> {
     private final ExpenseGrouper expenseGrouper;
 
     public CreateReportItemsStrategy() {
         expenseGrouper = new ExpenseGrouper();
     }
 
-    public List<IRecyclerItem> create(List<ExpenseObject> expenses) {
-        if (expenses.isEmpty()) {
+    public List<IRecyclerItem> create(List<IBooking> bookings) {
+        if (bookings.isEmpty()) {
             return new ArrayList<>();
         }
 
         List<IRecyclerItem> reportItems = new ArrayList<>();
 
-        expenses = extractChildren(expenses);
         for (int i = getCurrentMonth(); i >= 1; i--) {
             reportItems.add(new ReportItem(new Report(
                     getStringifiedMonth(i - 1),
-                    groupExpensesByMonth(i - 1, expenses)
+                    groupExpensesByMonth(i - 1, bookings)
             )));
         }
 
         return reportItems;
     }
 
-    private List<ExpenseObject> extractChildren(List<ExpenseObject> expenses) {
-        List<ExpenseObject> expensesWithExtractedChildren = new ArrayList<>();
-
-        for (ExpenseObject expense : expenses) {
-            if (expense.isParent())
-                expensesWithExtractedChildren.addAll(expense.getChildren());
-            else
-                expensesWithExtractedChildren.add(expense);
-        }
-
-        return expensesWithExtractedChildren;
-    }
-
-    private List<ExpenseObject> groupExpensesByMonth(int month, List<ExpenseObject> expenses) {
+    private List<IBooking> groupExpensesByMonth(int month, List<IBooking> bookings) {
         return expenseGrouper.byMonth(
-                expenses,
+                bookings,
                 month,
                 getCurrentYear()
         );

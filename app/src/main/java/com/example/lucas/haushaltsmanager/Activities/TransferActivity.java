@@ -5,29 +5,28 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Button;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.room.Room;
 
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.App.app;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
+import com.example.lucas.haushaltsmanager.Database.AppDatabase;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountDAO;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepositoryInterface;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.Exceptions.CategoryNotFoundException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryDAO;
 import com.example.lucas.haushaltsmanager.Dialogs.DatePickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ErrorAlertDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.SingleChoiceDialog;
 import com.example.lucas.haushaltsmanager.Entities.Account;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.ParentBooking;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ParentBooking;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.R;
 
@@ -35,6 +34,7 @@ import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 public class TransferActivity extends AppCompatActivity {
     private static final String TAG = TransferActivity.class.getSimpleName();
@@ -43,11 +43,11 @@ public class TransferActivity extends AppCompatActivity {
     private Account mFromAccount, mToAccount;
     private Calendar mCalendar;
     //Ausgabe
-    private ExpenseObject mFromExpense;
+    private Booking mFromExpense;
     //Einnahme
-    private ExpenseObject mToExpense;
-    private AccountRepository mAccountRepo;
-    private CategoryRepositoryInterface categoryRepository;
+    private Booking mToExpense;
+    private AccountDAO accountRepo;
+    private CategoryDAO categoryRepo;
     private ExpenseRepository mBookingRepo;
 
     @Override
@@ -55,144 +55,112 @@ public class TransferActivity extends AppCompatActivity {
         super.onStart();
 
         mAmountBtn.setHint(R.string.placeholder_amount);
-        mAmountBtn.setOnClickListener(new View.OnClickListener() {
+        mAmountBtn.setOnClickListener(v -> {
+            Bundle bundle = new Bundle();
+            bundle.putString(PriceInputDialog.TITLE, getResources().getString(R.string.input_price));
 
-            @Override
-            public void onClick(View v) {
+            PriceInputDialog expenseInput = new PriceInputDialog();
+            expenseInput.setArguments(bundle);
+            expenseInput.setOnPriceSelectedListener(price -> {
+                mFromExpense.setPrice(price);
+                mAmountBtn.setText(String.format(
+                        getResources().getConfiguration().locale, "%.2f %s",
+                        mFromExpense.getUnsignedPrice(),
+                        new Currency().getSymbol())
+                );
 
-                Bundle bundle = new Bundle();
-                bundle.putString(PriceInputDialog.TITLE, getResources().getString(R.string.input_price));
-
-                PriceInputDialog expenseInput = new PriceInputDialog();
-                expenseInput.setArguments(bundle);
-                expenseInput.setOnPriceSelectedListener(new PriceInputDialog.OnPriceSelected() {
-                    @Override
-                    public void onPriceSelected(Price price) {
-                        mFromExpense.setPrice(price);
-                        mAmountBtn.setText(String.format(
-                                getResources().getConfiguration().locale, "%.2f %s",
-                                mFromExpense.getUnsignedPrice(),
-                                new Currency().getSymbol())
-                        );
-
-                        setToExpense(price.getUnsignedValue());
-                    }
-                });
-                expenseInput.show(getFragmentManager(), "transfers_amount_input");
-            }
+                setToExpense(price.getUnsignedValue());
+            });
+            expenseInput.show(getFragmentManager(), "transfers_amount_input");
         });
 
         mFromAccountBtn.setHint(R.string.input_account);
-        mFromAccountBtn.setOnClickListener(new View.OnClickListener() {
+        mFromAccountBtn.setOnClickListener(v -> {
+            SingleChoiceDialog<Account> accountPicker = new SingleChoiceDialog<>();
+            accountPicker.createBuilder(TransferActivity.this);
+            accountPicker.setTitle(getString(R.string.input_account));
 
-            @Override
-            public void onClick(View v) {
+            List<Account> accounts = accountRepo.getAll();
+            accounts.remove(mToAccount);
+            accountPicker.setContent(accounts, -1);
+            accountPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
+                @Override
+                public void onPositiveClick(Object fromAccount) {
 
-                SingleChoiceDialog<Account> accountPicker = new SingleChoiceDialog<>();
-                accountPicker.createBuilder(TransferActivity.this);
-                accountPicker.setTitle(getString(R.string.input_account));
+                    setFromAccount((Account) fromAccount);
+                    setToExpense(mFromExpense.getUnsignedPrice());
+                }
 
-                List<Account> accounts = mAccountRepo.getAll();
-                accounts.remove(mToAccount);
-                accountPicker.setContent(accounts, -1);
-                accountPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
-                    @Override
-                    public void onPositiveClick(Object fromAccount) {
+                @Override
+                public void onNeutralClick() {
 
-                        setFromAccount((Account) fromAccount);
-                        setToExpense(mFromExpense.getUnsignedPrice());
-                    }
-
-                    @Override
-                    public void onNeutralClick() {
-
-                        //do nothing
-                    }
-                });
-                accountPicker.show(getFragmentManager(), "transfers_from_account");
-            }
+                    //do nothing
+                }
+            });
+            accountPicker.show(getFragmentManager(), "transfers_from_account");
         });
 
         mToAccountBtn.setHint(R.string.input_account);
-        mToAccountBtn.setOnClickListener(new View.OnClickListener() {
+        mToAccountBtn.setOnClickListener(v -> {
+            SingleChoiceDialog<Account> accountPicker = new SingleChoiceDialog<>();
+            accountPicker.createBuilder(TransferActivity.this);
+            accountPicker.setTitle(getString(R.string.choose_account));
 
-            @Override
-            public void onClick(View v) {
+            List<Account> accounts = accountRepo.getAll();
+            accounts.remove(mFromAccount);
+            accountPicker.setContent(accounts, -1);
+            accountPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
+                @Override
+                public void onPositiveClick(Object toAccount) {
 
-                SingleChoiceDialog<Account> accountPicker = new SingleChoiceDialog<>();
-                accountPicker.createBuilder(TransferActivity.this);
-                accountPicker.setTitle(getString(R.string.choose_account));
+                    setToAccount((Account) toAccount);
+                    setToExpense(mFromExpense.getUnsignedPrice());
+                }
 
-                List<Account> accounts = mAccountRepo.getAll();
-                accounts.remove(mFromAccount);
-                accountPicker.setContent(accounts, -1);
-                accountPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
-                    @Override
-                    public void onPositiveClick(Object toAccount) {
+                @Override
+                public void onNeutralClick() {
 
-                        setToAccount((Account) toAccount);
-                        setToExpense(mFromExpense.getUnsignedPrice());
-                    }
-
-                    @Override
-                    public void onNeutralClick() {
-
-                        //do nothing
-                    }
-                });
-                accountPicker.show(getFragmentManager(), "transfers_to_account");
-            }
+                    //do nothing
+                }
+            });
+            accountPicker.show(getFragmentManager(), "transfers_to_account");
         });
 
         mDateBtn.setText(transformCalendarToReadableDate(mCalendar));
-        mDateBtn.setOnClickListener(new View.OnClickListener() {
+        mDateBtn.setOnClickListener(v -> {
+            Bundle bundle = new Bundle();
+            bundle.putLong(DatePickerDialog.CURRENT_DAY_IN_MILLIS, mCalendar.getTimeInMillis());
 
-            @Override
-            public void onClick(View v) {
-
-                Bundle bundle = new Bundle();
-                bundle.putLong(DatePickerDialog.CURRENT_DAY_IN_MILLIS, mCalendar.getTimeInMillis());
-
-                DatePickerDialog datePicker = new DatePickerDialog();
-                datePicker.setArguments(bundle);
-                datePicker.setOnDateSelectedListener(new DatePickerDialog.OnDateSelected() {
-                    @Override
-                    public void onDateSelected(Calendar date) {
-
-                        mCalendar = date;
-                        mFromExpense.setDate(date);
-                        mToExpense.setDate(date);
-                        mDateBtn.setText(transformCalendarToReadableDate(date));
-                    }
-                });
-                datePicker.show(getFragmentManager(), "transfers_date");
-            }
+            DatePickerDialog datePicker = new DatePickerDialog();
+            datePicker.setArguments(bundle);
+            datePicker.setOnDateSelectedListener(date -> {
+                mCalendar = date;
+                mFromExpense.setDate(date);
+                mToExpense.setDate(date);
+                mDateBtn.setText(transformCalendarToReadableDate(date));
+            });
+            datePicker.show(getFragmentManager(), "transfers_date");
         });
 
-        mCreateTransferBtn.setOnClickListener(new View.OnClickListener() {
+        mCreateTransferBtn.setOnClickListener(v -> {
+            //checke ob alles gesetzt ist
+            if (mFromExpense.isSet() && mToExpense.isSet()) {
+                ParentBooking parent = new ParentBooking(String.format("%s\n%s -> %s", getString(R.string.transfer), mFromAccount.getName(), mToAccount.getName()));
+                parent.addChild(mFromExpense);
+                parent.addChild(mToExpense);
+                mBookingRepo.insert(parent);
 
-            @Override
-            public void onClick(View v) {
+                Intent intent = new Intent(TransferActivity.this, ParentActivity.class);
+                TransferActivity.this.startActivity(intent);
+            } else {
 
-                //checke ob alles gesetzt ist
-                if (mFromExpense.isSet() && mToExpense.isSet()) {
-                    ParentBooking parent = new ParentBooking(String.format("%s\n%s -> %s", getString(R.string.transfer), mFromAccount.getTitle(), mToAccount.getTitle()));
-                    parent.addChild(mFromExpense);
-                    parent.addChild(mToExpense);
-                    mBookingRepo.insert(parent);
+                Bundle bundle = new Bundle();
+                bundle.putString(ErrorAlertDialog.TITLE, getString(R.string.error));
+                bundle.putString(ErrorAlertDialog.CONTENT, getString(R.string.error_missing_content));
 
-                    Intent intent = new Intent(TransferActivity.this, ParentActivity.class);
-                    TransferActivity.this.startActivity(intent);
-                } else {
-
-                    Bundle bundle = new Bundle();
-                    bundle.putString(ErrorAlertDialog.TITLE, getString(R.string.error));
-                    bundle.putString(ErrorAlertDialog.CONTENT, getString(R.string.error_missing_content));
-
-                    ErrorAlertDialog errorAlert = new ErrorAlertDialog();
-                    errorAlert.setArguments(bundle);
-                    errorAlert.show(getFragmentManager(), "transfer_activity_error");
-                }
+                ErrorAlertDialog errorAlert = new ErrorAlertDialog();
+                errorAlert.setArguments(bundle);
+                errorAlert.show(getFragmentManager(), "transfer_activity_error");
             }
         });
     }
@@ -202,26 +170,31 @@ public class TransferActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_transfers);
 
-        mAccountRepo = new AccountRepository(this);
-        categoryRepository = new CategoryRepository(this);
+        accountRepo = Room.databaseBuilder(this, AppDatabase.class, "expenses")
+                .allowMainThreadQueries() // TODO: Remove
+                .build().accountDAO();
+        categoryRepo = Room.databaseBuilder(this, AppDatabase.class, "expenses")
+                .allowMainThreadQueries() // TODO: Remove
+                .build().categoryDAO();
         mBookingRepo = new ExpenseRepository(this);
 
         mCalendar = Calendar.getInstance();
 
-        try {
-            mFromExpense = ExpenseObject.createDummyExpense();
-            mFromExpense.setPrice(new Price(0, true));
-            mFromExpense.setCategory(getTransferCategory());
-            mFromExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.TRANSFER_EXPENSE);
+        mFromExpense = new Booking(
+                "",
+                new Price(0, true),
+                getTransferCategory(),
+                UUID.randomUUID()
+        );
+        mFromExpense.setExpenseType(Booking.EXPENSE_TYPES.TRANSFER_EXPENSE);
 
-            mToExpense = ExpenseObject.createDummyExpense();
-            mToExpense.setPrice(new Price(0, false));
-            mToExpense.setCategory(getTransferCategory());
-            mToExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.TRANSFER_EXPENSE);
-        } catch (CategoryNotFoundException e) {
-
-            finish();
-        }
+        mToExpense = new Booking(
+                "",
+                new Price(0, true),
+                getTransferCategory(),
+                UUID.randomUUID()
+        );
+        mToExpense.setExpenseType(Booking.EXPENSE_TYPES.TRANSFER_EXPENSE);
 
         mDateBtn = findViewById(R.id.transfer_date_btn);
         mFromAccountBtn = findViewById(R.id.transfer_from_account_btn);
@@ -262,8 +235,8 @@ public class TransferActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
-    private Category getTransferCategory() throws CategoryNotFoundException {
-        return categoryRepository.get(app.transferCategoryId);
+    private Category getTransferCategory() {
+        return categoryRepo.get(app.transferCategoryId);
     }
 
     /**
@@ -285,11 +258,11 @@ public class TransferActivity extends AppCompatActivity {
     private void setFromAccount(Account newAccount) {
 
         mFromAccount = newAccount;
-        mToExpense.setTitle(String.format("%s %s", getString(R.string.transfer_from), mFromAccount.getTitle()));
+        mToExpense.setTitle(String.format("%s %s", getString(R.string.transfer_from), mFromAccount.getName()));
         mFromExpense.setAccount(mFromAccount);
-        mFromAccountBtn.setText(mFromAccount.getTitle());
+        mFromAccountBtn.setText(mFromAccount.getName());
 
-        Log.d(TAG, "selected " + mFromAccount.getTitle() + " as from account");
+        Log.d(TAG, "selected " + mFromAccount.getName() + " as from account");
     }
 
     /**
@@ -300,11 +273,11 @@ public class TransferActivity extends AppCompatActivity {
     private void setToAccount(Account newAccount) {
 
         mToAccount = newAccount;
-        mFromExpense.setTitle(String.format("%s %s", getString(R.string.transfer_to), mToAccount.getTitle()));
+        mFromExpense.setTitle(String.format("%s %s", getString(R.string.transfer_to), mToAccount.getName()));
         mToExpense.setAccount(mToAccount);
-        mToAccountBtn.setText(mToAccount.getTitle());
+        mToAccountBtn.setText(mToAccount.getName());
 
-        Log.d(TAG, "selected " + mToAccount.getTitle() + " as to account");
+        Log.d(TAG, "selected " + mToAccount.getName() + " as to account");
     }
 
     private void setToExpense(double newPrice) {

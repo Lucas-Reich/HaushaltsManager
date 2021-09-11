@@ -4,18 +4,17 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
-import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepositoryInterface;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.Exceptions.CategoryCouldNotBeCreatedException;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.Exceptions.CategoryNotFoundException;
+import androidx.room.Room;
+
+import com.example.lucas.haushaltsmanager.Database.AppDatabase;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryDAO;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ColorPickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
+import com.example.lucas.haushaltsmanager.Entities.Booking.ExpenseType;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
 import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
@@ -33,14 +32,16 @@ public class CreateCategory extends AbstractAppCompatActivity {
     private RoundedTextView mColorView;
     private FloatingActionButton mSaveFAB;
 
-    private CategoryRepositoryInterface categoryRepository;
+    private CategoryDAO categoryRepo;
 
     @Override
     protected void onCreate(Bundle savedInstances) {
         super.onCreate(savedInstances);
         setContentView(R.layout.activity_new_category);
 
-        categoryRepository = new CategoryRepository(this);
+        categoryRepo = Room.databaseBuilder(this, AppDatabase.class, "expenses")
+                .allowMainThreadQueries() // TODO: Remove
+                .build().categoryDAO();
 
         initializeToolbar();
 
@@ -59,58 +60,30 @@ public class CreateCategory extends AbstractAppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        mTitleBtn.setHint(mCategory.getTitle());
-        mTitleBtn.setOnClickListener(new View.OnClickListener() {
+        mTitleBtn.setHint(mCategory.getName());
+        mTitleBtn.setOnClickListener(v -> {
+            Bundle bundle = new Bundle();
+            bundle.putString(BasicTextInputDialog.TITLE, getString(R.string.category_name));
+            bundle.putString(BasicTextInputDialog.HINT, mCategory.getName());
 
-            @Override
-            public void onClick(View v) {
-                Bundle bundle = new Bundle();
-                bundle.putString(BasicTextInputDialog.TITLE, getString(R.string.category_name));
-                bundle.putString(BasicTextInputDialog.HINT, mCategory.getTitle());
-
-                BasicTextInputDialog nameDialog = new BasicTextInputDialog();
-                nameDialog.setArguments(bundle);
-                nameDialog.setOnTextInputListener(new BasicTextInputDialog.OnTextInput() {
-                    @Override
-                    public void onTextInput(String textInput) {
-                        setCategoryTitle(textInput);
-                    }
-                });
-                nameDialog.show(getFragmentManager(), "create_category_name");
-            }
+            BasicTextInputDialog nameDialog = new BasicTextInputDialog();
+            nameDialog.setArguments(bundle);
+            nameDialog.setOnTextInputListener(this::setCategoryTitle);
+            nameDialog.show(getFragmentManager(), "create_category_name");
         });
 
         setColor(mCategory.getColor());
-        mColorView.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                ColorPickerDialog colorPickerDialog = new ColorPickerDialog(CreateCategory.this, Color.WHITE);
-                colorPickerDialog.setOnColorSelectedListener(new ColorPickerDialog.OnColorSelectedListener() {
-                    @Override
-                    public void onColorSelected(Color color) {
-                        setColor(color);
-                    }
-                });
-                colorPickerDialog.show();
-            }
+        mColorView.setOnClickListener(v -> {
+            ColorPickerDialog colorPickerDialog = new ColorPickerDialog(CreateCategory.this, Color.WHITE);
+            colorPickerDialog.setOnColorSelectedListener(this::setColor);
+            colorPickerDialog.show();
         });
 
         setExpenditureType(mCategory.getDefaultExpenseType());
 
-        mIncomeBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setExpenditureType(ExpenseType.deposit());
-            }
-        });
+        mIncomeBtn.setOnClickListener(v -> setExpenditureType(ExpenseType.deposit()));
 
-        mExpenseBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setExpenditureType(ExpenseType.expense());
-            }
-        });
+        mExpenseBtn.setOnClickListener(v -> setExpenditureType(ExpenseType.expense()));
 
         mSaveFAB.setOnClickListener(getOnSaveClickListener());
     }
@@ -135,38 +108,24 @@ public class CreateCategory extends AbstractAppCompatActivity {
     }
 
     private View.OnClickListener getOnSaveClickListener() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!isCategorySavable()) {
-                    showCloseScreenDialog();
-                    return;
-                }
-
-                BundleUtils bundle = new BundleUtils(getIntent().getExtras());
-
-                switch (bundle.getString(INTENT_MODE, INTENT_MODE_CREATE)) {
-                    case INTENT_MODE_CREATE:
-                        try {
-                            categoryRepository.insert(mCategory);
-                        } catch (CategoryCouldNotBeCreatedException e) {
-                            Toast.makeText(CreateCategory.this, getString(R.string.cannot_create_category), Toast.LENGTH_SHORT).show();
-                        }
-                        break;
-                    case INTENT_MODE_UPDATE:
-
-                        try {
-                            categoryRepository.update(mCategory);
-                        } catch (CategoryNotFoundException e) {
-
-                            Toast.makeText(CreateCategory.this, getString(R.string.cannot_update_category), Toast.LENGTH_SHORT).show();
-                            // TODO: Fehlerbehandlung wenn versucht wird eine nicht existierende Kategorie zu updaten
-                        }
-                        break;
-                }
-
-                finish();
+        return v -> {
+            if (!isCategorySavable()) {
+                showCloseScreenDialog();
+                return;
             }
+
+            BundleUtils bundle = new BundleUtils(getIntent().getExtras());
+
+            switch (bundle.getString(INTENT_MODE, INTENT_MODE_CREATE)) {
+                case INTENT_MODE_CREATE:
+                    categoryRepo.insert(mCategory);
+                    break;
+                case INTENT_MODE_UPDATE:
+                    categoryRepo.update(mCategory);
+                    break;
+            }
+
+            finish();
         };
     }
 
@@ -177,19 +136,16 @@ public class CreateCategory extends AbstractAppCompatActivity {
 
         ConfirmationDialog confirmationDialog = new ConfirmationDialog();
         confirmationDialog.setArguments(bundle);
-        confirmationDialog.setOnConfirmationListener(new ConfirmationDialog.OnConfirmationResult() {
-            @Override
-            public void onConfirmationResult(boolean closeScreen) {
-                if (closeScreen)
-                    finish();
-            }
+        confirmationDialog.setOnConfirmationListener(closeScreen -> {
+            if (closeScreen)
+                finish();
         });
         confirmationDialog.show(getFragmentManager(), "create_category_exit");
     }
 
     private void setCategoryTitle(String title) {
         mCategory.setName(title);
-        mTitleBtn.setText(mCategory.getTitle());
+        mTitleBtn.setText(mCategory.getName());
 
         if (isCategorySavable()) {
             runCrossToCheckAnimation();

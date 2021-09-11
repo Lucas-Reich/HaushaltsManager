@@ -4,9 +4,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ParentBooking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.ExpenseType;
+import com.example.lucas.haushaltsmanager.Entities.Booking.ParentBooking;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBookingItem.ChildExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
@@ -54,7 +54,7 @@ public class RecyclerViewExpandableItemHandlerTest {
     public void testInsertChildToExistingAndCollapsedParent() {
         DateItem parent = new DateItem(createSimpleDate(10, Calendar.JUNE, 2019));
 
-        ParentBookingItem parentBookingItem = new ParentBookingItem(getParentExpenseObject(2), parent);
+        ParentBookingItem parentBookingItem = new ParentBookingItem(getParentExpense(2), parent);
         ChildExpenseItem expectedChildItem = new ChildExpenseItem(parentBookingItem.getContent().getChildren().get(1), parentBookingItem);
         parentBookingItem.getChildren().remove(1);
 
@@ -71,7 +71,7 @@ public class RecyclerViewExpandableItemHandlerTest {
     public void testInsertChildToExistingAndExpandedParent() {
         DateItem parent = new DateItem(createSimpleDate(10, Calendar.JUNE, 2019));
 
-        ParentBookingItem parentBookingItem = new ParentBookingItem(getParentExpenseObject(2), parent);
+        ParentBookingItem parentBookingItem = new ParentBookingItem(getParentExpense(2), parent);
         ChildExpenseItem expectedChildItem = new ChildExpenseItem(parentBookingItem.getContent().getChildren().get(1), parentBookingItem);
         parentBookingItem.getChildren().remove(1);
 
@@ -88,7 +88,7 @@ public class RecyclerViewExpandableItemHandlerTest {
     @Test
     public void testInsertChildToNotExistingParentShouldInsertChildAsExpenseItem() {
         DateItem date = new DateItem(createSimpleDate(10, Calendar.JUNE, 2019));
-        ParentBooking parentExpense = getParentExpenseObject(1);
+        ParentBooking parentExpense = getParentExpense(1);
         ChildExpenseItem childItem = new ChildExpenseItem(parentExpense.getChildren().get(0), new ParentBookingItem(parentExpense, date));
 
         mItemHandler.insertItem(childItem);
@@ -101,7 +101,7 @@ public class RecyclerViewExpandableItemHandlerTest {
     public void testRemoveChildItemShouldSucceed() {
         DateItem parent = new DateItem(createSimpleDate(10, Calendar.JUNE, 2019));
 
-        ParentBookingItem expectedParentBookingItem = new ParentBookingItem(getParentExpenseObject(3), parent);
+        ParentBookingItem expectedParentBookingItem = new ParentBookingItem(getParentExpense(3), parent);
 
         mItemHandler.insertItem(expectedParentBookingItem);
         mItemHandler.toggleExpansion(1);
@@ -121,7 +121,7 @@ public class RecyclerViewExpandableItemHandlerTest {
     public void testRemoveLastChildOfParentShouldRemoveParent() {
         DateItem date = new DateItem(createSimpleDate(10, Calendar.MAY, 2019));
 
-        mItemHandler.insertItem(new ParentBookingItem(getParentExpenseObject(1), date));
+        mItemHandler.insertItem(new ParentBookingItem(getParentExpense(1), date));
         mItemHandler.insertItem(new ExpenseItem(createSimpleExpense(date.getContent()), date));
         mItemHandler.toggleExpansion(2);
         assertSame(4, mItemHandler.getItemCount());
@@ -133,7 +133,7 @@ public class RecyclerViewExpandableItemHandlerTest {
 
     @Test
     public void testRemoveLastChildOfParentAsLastItemOfDateShouldRemoveAll() {
-        ParentBooking parentBooking = getParentExpenseObject(1);
+        ParentBooking parentBooking = getParentExpense(1);
 
         DateItem parent = new DateItem(createSimpleDate(10, Calendar.JUNE, 2019));
 
@@ -150,7 +150,7 @@ public class RecyclerViewExpandableItemHandlerTest {
     public void testToggleExpansionShouldOpenParentAndAddChildren() {
         DateItem parent = new DateItem(createSimpleDate(10, Calendar.JUNE, 2019));
 
-        ParentBookingItem expectedParentBookingItem = new ParentBookingItem(getParentExpenseObject(2), parent);
+        ParentBookingItem expectedParentBookingItem = new ParentBookingItem(getParentExpense(2), parent);
 
         mItemHandler.insertItem(expectedParentBookingItem);
         assertSame(2, mItemHandler.getItemCount());
@@ -168,7 +168,7 @@ public class RecyclerViewExpandableItemHandlerTest {
     public void testToggleExpansionShouldCloseParentAndRemoveChildren() {
         DateItem parent = new DateItem(createSimpleDate(10, Calendar.JUNE, 2019));
 
-        ParentBookingItem expectedParentBookingItem = new ParentBookingItem(getParentExpenseObject(2), parent);
+        ParentBookingItem expectedParentBookingItem = new ParentBookingItem(getParentExpense(2), parent);
 
         mItemHandler.insertItem(expectedParentBookingItem);
         mItemHandler.toggleExpansion(1);
@@ -206,21 +206,15 @@ public class RecyclerViewExpandableItemHandlerTest {
         assertSame(2, mItemHandler.getItemCount());
     }
 
-    private ParentBooking getParentExpenseObject(int childCount) {
-        ExpenseObject parentExpense = getParentExpenseWithChildren(childCount);
-
-        return new ParentBooking(
-                parentExpense.getId(),
-                parentExpense.getTitle(),
-                parentExpense.getDate(),
-                parentExpense.getChildren()
-        );
-    }
-
-    private ExpenseObject getParentExpenseWithChildren(int childrenCount) {
+    private ParentBooking getParentExpense(int childrenCount) {
         Calendar date = createSimpleDate(11, Calendar.JUNE, 2019);
 
-        ExpenseObject parent = createSimpleExpense(date);
+        ParentBooking parent = new ParentBooking(
+                UUID.randomUUID(),
+                "",
+                date,
+                new ArrayList<>()
+        );
 
         for (int i = 0; i < childrenCount; i++) {
             parent.addChild(createSimpleExpense(date));
@@ -236,8 +230,8 @@ public class RecyclerViewExpandableItemHandlerTest {
         return date;
     }
 
-    private ExpenseObject createSimpleExpense(Calendar date) {
-        return new ExpenseObject(
+    private Booking createSimpleExpense(Calendar date) {
+        return new Booking(
                 UUID.randomUUID(),
                 "Ich bin eine Ausgabe",
                 new Price(new Random().nextInt(), true),
@@ -245,8 +239,7 @@ public class RecyclerViewExpandableItemHandlerTest {
                 new Category("Kategorie", Color.black(), ExpenseType.expense()),
                 "",
                 UUID.randomUUID(),
-                ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE,
-                new ArrayList<ExpenseObject>()
+                Booking.EXPENSE_TYPES.NORMAL_EXPENSE
         );
     }
 }

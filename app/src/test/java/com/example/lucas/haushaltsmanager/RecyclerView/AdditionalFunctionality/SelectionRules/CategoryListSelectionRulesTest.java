@@ -2,7 +2,7 @@ package com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.
 
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
+import com.example.lucas.haushaltsmanager.Entities.Booking.ExpenseType;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.CategoryItem.CategoryItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 

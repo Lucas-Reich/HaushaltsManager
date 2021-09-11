@@ -1,9 +1,6 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.SavingService;
 
-import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepositoryInterface;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountCouldNotBeCreatedException;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.CannotDeleteAccountException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountDAO;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 
 import java.util.ArrayList;
@@ -12,16 +9,16 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
-public class CachedInsertAccountRepositoryDecorator implements AccountRepositoryInterface {
-    private AccountRepositoryInterface repository;
-    private List<Account> cachedAccounts = new ArrayList<>();
+public class CachedInsertAccountRepositoryDecorator implements AccountDAO {
+    private final AccountDAO repository;
+    private final List<Account> cachedAccounts = new ArrayList<>();
 
-    CachedInsertAccountRepositoryDecorator(AccountRepositoryInterface repository) {
+    CachedInsertAccountRepositoryDecorator(AccountDAO repository) {
         this.repository = repository;
     }
 
     @Override
-    public void insert(Account account) throws AccountCouldNotBeCreatedException {
+    public void insert(Account account) {
         Account createdAccount = getAccountFromList(account);
 
         if (null != createdAccount) {
@@ -38,17 +35,17 @@ public class CachedInsertAccountRepositoryDecorator implements AccountRepository
     }
 
     @Override
-    public void delete(Account account) throws CannotDeleteAccountException {
+    public void delete(Account account) {
         repository.delete(account);
     }
 
     @Override
-    public void update(Account account) throws AccountNotFoundException {
+    public void update(Account account) {
         repository.update(account);
     }
 
     @Override
-    public Account get(UUID index) throws AccountNotFoundException {
+    public Account get(UUID index) {
         return repository.get(index);
     }
 
@@ -65,7 +62,7 @@ public class CachedInsertAccountRepositoryDecorator implements AccountRepository
 
     private boolean areEquals(Account one, Account other) {
         return one.getId().equals(other.getId())
-                && one.getTitle().equals(other.getTitle())
-                && one.getBalance().equals(other.getBalance());
+                && one.getName().equals(other.getName())
+                && one.getPrice().equals(other.getPrice());
     }
 }

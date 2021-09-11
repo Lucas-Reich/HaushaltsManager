@@ -2,8 +2,8 @@ package com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.
 
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.ExpenseType;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.Entities.TemplateBooking;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.BookingItem.ExpenseItem;
@@ -60,8 +60,8 @@ public class TemplateBookingListInsertStrategyTest {
         return new TemplateBooking(getDummyExpense());
     }
 
-    private ExpenseObject getDummyExpense() {
-        return new ExpenseObject(
+    private Booking getDummyExpense() {
+        return new Booking(
                 "Ausgabe",
                 new Price(100, false),
                 new Category("Kategorie", new Color(Color.WHITE), ExpenseType.expense()),

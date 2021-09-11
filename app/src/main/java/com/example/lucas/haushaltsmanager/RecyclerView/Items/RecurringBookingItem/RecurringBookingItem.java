@@ -1,6 +1,6 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.Items.RecurringBookingItem;
 
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
 import com.example.lucas.haushaltsmanager.Entities.RecurringBooking;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBookingItem.ChildExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IParentRecyclerItem;
@@ -12,15 +12,13 @@ import java.util.List;
 public class RecurringBookingItem implements IParentRecyclerItem {
     public static final int VIEW_TYPE = 5;
 
-    private RecurringBooking recurringBooking;
+    private final RecurringBooking recurringBooking;
     private List<IRecyclerItem> children;
     private boolean mIsExpanded;
 
     public RecurringBookingItem(RecurringBooking recurringBooking) {
         this.recurringBooking = recurringBooking;
         mIsExpanded = false;
-
-        createChildren(recurringBooking.getBooking().getChildren());
     }
 
     @Override
@@ -68,10 +66,10 @@ public class RecurringBookingItem implements IParentRecyclerItem {
         // Do nothing
     }
 
-    private void createChildren(List<ExpenseObject> children) {
+    private void createChildren(List<Booking> children) {
         this.children = new ArrayList<>();
 
-        for (ExpenseObject child : children) {
+        for (Booking child : children) {
             this.children.add(new ChildExpenseItem(child, this));
         }
     }

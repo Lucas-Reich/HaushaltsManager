@@ -1,53 +1,51 @@
-package com.example.lucas.haushaltsmanager.Entities.Expense;
+package com.example.lucas.haushaltsmanager.Entities.Booking;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
 
-import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Category;
-import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.Entities.Price;
-import com.example.lucas.haushaltsmanager.R;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
-public class ExpenseObject implements Parcelable, IBooking {
-    public static final Parcelable.Creator<ExpenseObject> CREATOR = new Parcelable.Creator<ExpenseObject>() {
+public class Booking implements Parcelable, IBooking {
+    public static final Parcelable.Creator<Booking> CREATOR = new Parcelable.Creator<Booking>() {
 
         @Override
-        public ExpenseObject createFromParcel(Parcel in) {
+        public Booking createFromParcel(Parcel in) {
 
-            return new ExpenseObject(in);
+            return new Booking(in);
         }
 
         @Override
-        public ExpenseObject[] newArray(int size) {
+        public Booking[] newArray(int size) {
 
-            return new ExpenseObject[size];
+            return new Booking[size];
         }
     };
 
+    private UUID id;
     private EXPENSE_TYPES expenseType;
-    private final UUID id;
     private String title;
     private Price price;
     private Calendar date;
     private Category category;
     private String notice;
     private UUID accountId;
-    private List<ExpenseObject> children = new ArrayList<>();
 
-    public ExpenseObject(
+    public Booking(
             @NonNull UUID id,
             @NonNull String expenseName,
             @NonNull Price price,
@@ -55,8 +53,7 @@ public class ExpenseObject implements Parcelable, IBooking {
             @NonNull Category category,
             String notice,
             @NonNull UUID accountId,
-            @NonNull EXPENSE_TYPES expenseType,
-            @NonNull List<ExpenseObject> children
+            @NonNull EXPENSE_TYPES expenseType
     ) {
         this.id = id;
         setTitle(expenseName);
@@ -66,10 +63,9 @@ public class ExpenseObject implements Parcelable, IBooking {
         setNotice(notice != null ? notice : "");
         this.accountId = accountId;
         setExpenseType(expenseType);
-        addChildren(children);
     }
 
-    public ExpenseObject(
+    public Booking(
             @NonNull String title,
             @NonNull Price price,
             @NonNull Category category,
@@ -83,12 +79,11 @@ public class ExpenseObject implements Parcelable, IBooking {
                 category,
                 "",
                 accountId,
-                EXPENSE_TYPES.NORMAL_EXPENSE,
-                new ArrayList<ExpenseObject>()
+                EXPENSE_TYPES.NORMAL_EXPENSE
         );
     }
 
-    private ExpenseObject(Parcel source) {
+    private Booking(Parcel source) {
 
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(source.readLong());
@@ -99,60 +94,35 @@ public class ExpenseObject implements Parcelable, IBooking {
         setCategory((Category) source.readParcelable(Category.class.getClassLoader()));
         setNotice(source.readString());
         accountId = UUID.fromString(source.readString());
-        source.readList(this.children, ExpenseObject.class.getClassLoader());
         setExpenseType(EXPENSE_TYPES.valueOf(source.readString()));
-    }
-
-    public static ExpenseObject createDummyExpense() {
-        Category category = new Category(
-                app.getContext().getString(R.string.no_name),
-                Color.black(),
-                ExpenseType.expense()
-        );
-
-        return new ExpenseObject(
-                UUID.randomUUID(),
-                app.getContext().getString(R.string.no_name),
-                new Price(0, false),
-                Calendar.getInstance(),
-                category,
-                null,
-                UUID.randomUUID(),
-                EXPENSE_TYPES.DUMMY_EXPENSE,
-                new ArrayList<ExpenseObject>()
-        );
     }
 
     @NonNull
     public Calendar getDate() {
-
         return this.date;
     }
 
     @Override
     public void setDate(@NonNull Calendar date) {
-
         this.date = date;
     }
 
     @NonNull
     public String getTitle() {
-
         return title;
     }
 
     public void setTitle(@NonNull String title) {
-
         this.title = title;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof ExpenseObject)) {
+        if (!(obj instanceof Booking)) {
             return false;
         }
 
-        ExpenseObject otherExpense = (ExpenseObject) obj;
+        Booking otherExpense = (Booking) obj;
 
         boolean result = getTitle().equals(otherExpense.getTitle());
         result = result && (getUnsignedPrice() == otherExpense.getUnsignedPrice());
@@ -161,10 +131,6 @@ public class ExpenseObject implements Parcelable, IBooking {
         result = result && getDate().getTimeInMillis() == otherExpense.getDate().getTimeInMillis();
         result = result && getNotice().equals(otherExpense.getNotice());
         result = result && getCategory().getId() == otherExpense.getCategory().getId();//ich kann die objekte nicht vergleichen da parent buchungen nur dummies bekommen
-
-        for (ExpenseObject child : getChildren()) {
-            result = result && otherExpense.getChildren().contains(child);
-        }
 
         return result;
     }
@@ -195,20 +161,25 @@ public class ExpenseObject implements Parcelable, IBooking {
         dest.writeParcelable(category, flags);
         dest.writeString(notice);
         dest.writeString(accountId.toString());
-        dest.writeList(children);
         dest.writeString(expenseType.name());
     }
 
+    @NonNull
     public Price getPrice() {
         return price;
     }
 
-    public void setPrice(Price price) {
+    public void setPrice(@NonNull Price price) {
         this.price = price;
     }
 
+    @NonNull
     public UUID getId() {
         return id;
+    }
+
+    public void setId(@NonNull UUID id) {
+        this.id = id;
     }
 
     @NonNull
@@ -229,17 +200,7 @@ public class ExpenseObject implements Parcelable, IBooking {
     }
 
     public double getSignedPrice() {
-        if (!isParent()) {
-            return price.getSignedValue();
-        }
-
-
-        double calcPrice = 0;
-        for (ExpenseObject child : children) {
-            calcPrice += child.getSignedPrice();
-        }
-
-        return calcPrice;
+        return price.getSignedValue();
     }
 
     public boolean isExpenditure() {
@@ -269,54 +230,22 @@ public class ExpenseObject implements Parcelable, IBooking {
         this.notice = notice;
     }
 
+    @NonNull
     public UUID getAccountId() {
         return accountId;
     }
 
+    public void setAccountId(@NonNull UUID accountId) {
+        this.accountId = accountId;
+    }
+
     public void setAccount(Account account) {
-        accountId = account.getId();
-    }
-
-    public void removeChild(ExpenseObject child) {
-
-        this.children.remove(child);
-        if (children.size() == 0) {
-            setExpenseType(EXPENSE_TYPES.NORMAL_EXPENSE);
-        }
-    }
-
-    public void removeChildren() {
-        children.clear();
-    }
-
-    public ExpenseObject addChild(@NonNull ExpenseObject child) {
-
-        child.setExpenseType(EXPENSE_TYPES.CHILD_EXPENSE);
-        children.add(child);
-        setExpenseType(EXPENSE_TYPES.PARENT_EXPENSE);
-
-        return this;
-    }
-
-    public void addChildren(@NonNull List<ExpenseObject> children) {
-        for (ExpenseObject childExpense : children)
-            addChild(childExpense);
-    }
-
-    @NonNull
-    public List<ExpenseObject> getChildren() {
-
-        return this.children;
-    }
-
-    public boolean isParent() {
-
-        return expenseType == EXPENSE_TYPES.PARENT_EXPENSE;
+        setAccountId(account.getId());
     }
 
     @Deprecated
     public boolean isSet() {
-        return !this.title.equals(app.getContext().getString(R.string.no_name))
+        return !this.title.isEmpty()
                 && price != null
                 && this.category.isSet();
     }
@@ -333,8 +262,6 @@ public class ExpenseObject implements Parcelable, IBooking {
     }
 
     public enum EXPENSE_TYPES {
-        DUMMY_EXPENSE,
-        DATE_PLACEHOLDER,
         PARENT_EXPENSE,
         NORMAL_EXPENSE,
         TRANSFER_EXPENSE, // TODO: Only used in TransferActivity

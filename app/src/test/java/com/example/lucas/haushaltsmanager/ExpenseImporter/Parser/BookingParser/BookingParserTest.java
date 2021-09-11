@@ -1,7 +1,6 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.BookingParser;
 
-import com.example.lucas.haushaltsmanager.App.app;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Delimiter.Comma;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Delimiter.IDelimiter;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.InvalidInputException;
@@ -56,7 +55,7 @@ public class BookingParserTest {
         Line line = buildLine(expectedBookingTitle, "-100", "06.09.2019", "any string");
 
         // Act
-        ExpenseObject booking = parser.parse(line, createBookingMappingList());
+        Booking booking = parser.parse(line, createBookingMappingList());
 
         // Assert
         assertEquals(expectedBookingTitle, booking.getTitle());

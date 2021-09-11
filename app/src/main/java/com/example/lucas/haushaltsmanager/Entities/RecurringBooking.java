@@ -2,8 +2,8 @@ package com.example.lucas.haushaltsmanager.Entities;
 
 import androidx.annotation.NonNull;
 
-import com.example.lucas.haushaltsmanager.Entities.Expense.IBooking;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Booking.IBooking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
 
 import java.util.Calendar;
 import java.util.UUID;
@@ -59,8 +59,8 @@ public class RecurringBooking {
         return id;
     }
 
-    public ExpenseObject getBooking() {
-        return (ExpenseObject) templateBooking;
+    public Booking getBooking() {
+        return (Booking) templateBooking;
     }
 
     public Frequency getFrequency() {

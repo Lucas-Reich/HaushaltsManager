@@ -44,7 +44,7 @@ public class AccountParserTest {
         Account account = parser.parse(line, createAccountMappingList());
 
         // Assert
-        assertEquals(expectedAccountTitel, account.getTitle());
+        assertEquals(expectedAccountTitel, account.getName());
     }
 
     @Test

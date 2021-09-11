@@ -6,17 +6,18 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.room.Room;
 
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
+import com.example.lucas.haushaltsmanager.Database.AppDatabase;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountDAO;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseDAO;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.AddChildToChildException;
@@ -27,11 +28,12 @@ import com.example.lucas.haushaltsmanager.Dialogs.DatePickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.SingleChoiceDialog;
 import com.example.lucas.haushaltsmanager.Entities.Account;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.BookingWithCategory;
+import com.example.lucas.haushaltsmanager.Entities.Booking.ExpenseType;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
@@ -53,13 +55,15 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
     public static final String INTENT_MODE_CREATE_BOOKING = "createBooking";
     private static final String TAG = ExpenseScreen.class.getSimpleName();
     private Button mPriceBtn, mTitleTxt, mNoticeTxt, mAccountTxt, mCategoryTxt, mDateTxt, mIncomeBtn, mExpenseBtn, mCurrencyBtn;
-    private ExpenseObject mExpense, mParentBooking;
+    private Booking mExpense, mParentBooking;
+    private BookingWithCategory bookingWithCategory;
 
     private UserSettingsPreferences mUserPreferences;
 
     private ExpenseRepository mExpenseRepo;
     private ChildExpenseRepository mChildExpenseRepo;
-    private AccountRepository mAccountRepo;
+    private AccountDAO accountRepo;
+    private ExpenseDAO bookingRepo;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -70,7 +74,12 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
 
         mExpenseRepo = new ExpenseRepository(this);
         mChildExpenseRepo = new ChildExpenseRepository(this);
-        mAccountRepo = new AccountRepository(this);
+        accountRepo = Room.databaseBuilder(this, AppDatabase.class, "expenses")
+                .allowMainThreadQueries() // TODO: Remove
+                .build().accountDAO();
+        bookingRepo = Room.databaseBuilder(this, AppDatabase.class, "expenses")
+                .allowMainThreadQueries() // TODO: Remove
+                .build().bookingDAO();
 
         initializeToolbar();
 
@@ -92,136 +101,88 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        mPriceBtn.setHint(String.format(getResources().getConfiguration().locale, "%.2f", mExpense.getUnsignedPrice()));
-        mPriceBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Bundle bundle = new Bundle();
-                bundle.putString(PriceInputDialog.TITLE, getString(R.string.input_price));
-                bundle.putParcelable(PriceInputDialog.HINT, mExpense.getPrice());
+        mPriceBtn.setHint(String.format(getResources().getConfiguration().locale, "%.2f", bookingWithCategory.getUnsignedPrice()));
+        mPriceBtn.setOnClickListener(v -> {
+            Bundle bundle = new Bundle();
+            bundle.putString(PriceInputDialog.TITLE, getString(R.string.input_price));
+            bundle.putParcelable(PriceInputDialog.HINT, bookingWithCategory.getPrice());
 
-                PriceInputDialog priceInput = new PriceInputDialog();
-                priceInput.setArguments(bundle);
-                priceInput.setOnPriceSelectedListener(new PriceInputDialog.OnPriceSelected() {
-                    @Override
-                    public void onPriceSelected(Price price) {
-                        setPrice(price);
-                    }
-                });
-                priceInput.show(getFragmentManager(), "expense_screen_price");
-            }
+            PriceInputDialog priceInput = new PriceInputDialog();
+            priceInput.setArguments(bundle);
+            priceInput.setOnPriceSelectedListener(this::setPrice);
+            priceInput.show(getFragmentManager(), "expense_screen_price");
         });
 
         setExpenseCurrency();
 
-        mTitleTxt.setHint(mExpense.getTitle());
-        mTitleTxt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Bundle bundle = new Bundle();
-                bundle.putString(BasicTextInputDialog.TITLE, getString(R.string.input_title));
-                bundle.putString(BasicTextInputDialog.HINT, mExpense.getTitle());
+        mTitleTxt.setHint(bookingWithCategory.getTitle());
+        mTitleTxt.setOnClickListener(v -> {
+            Bundle bundle = new Bundle();
+            bundle.putString(BasicTextInputDialog.TITLE, getString(R.string.input_title));
+            bundle.putString(BasicTextInputDialog.HINT, bookingWithCategory.getTitle());
 
-                BasicTextInputDialog titleDialog = new BasicTextInputDialog();
-                titleDialog.setArguments(bundle);
-                titleDialog.setOnTextInputListener(new BasicTextInputDialog.OnTextInput() {
-                    @Override
-                    public void onTextInput(String textInput) {
-                        setTitle(textInput);
-                    }
-                });
-                titleDialog.show(getFragmentManager(), "expense_screen_title");
-            }
+            BasicTextInputDialog titleDialog = new BasicTextInputDialog();
+            titleDialog.setArguments(bundle);
+            titleDialog.setOnTextInputListener(this::setTitle);
+            titleDialog.show(getFragmentManager(), "expense_screen_title");
         });
 
-        mCategoryTxt.setHint(mExpense.getCategory().getTitle());
-        mCategoryTxt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent categoryIntent = new Intent(ExpenseScreen.this, CategoryList.class);
-                startActivityForResult(categoryIntent, 1);
-            }
+        mCategoryTxt.setHint(bookingWithCategory.getCategory().getName());
+        mCategoryTxt.setOnClickListener(v -> {
+            Intent categoryIntent = new Intent(ExpenseScreen.this, CategoryList.class);
+            startActivityForResult(categoryIntent, 1);
         });
 
-        mDateTxt.setHint(mExpense.getDisplayableDateTime());
-        mDateTxt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DatePickerDialog datePicker = new DatePickerDialog();
-                datePicker.setOnDateSelectedListener(new DatePickerDialog.OnDateSelected() {
-                    @Override
-                    public void onDateSelected(Calendar date) {
-                        setDate(date);
-                    }
-                });
-                datePicker.show(getFragmentManager(), "expense_screen_date");
-            }
+        mDateTxt.setHint(bookingWithCategory.getDisplayableDateTime());
+        mDateTxt.setOnClickListener(v -> {
+            DatePickerDialog datePicker = new DatePickerDialog();
+            datePicker.setOnDateSelectedListener(this::setDate);
+            datePicker.show(getFragmentManager(), "expense_screen_date");
         });
 
-        mNoticeTxt.setHint(mExpense.getNotice());
-        mNoticeTxt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Bundle bundle = new Bundle();
-                bundle.putString(BasicTextInputDialog.TITLE, getString(R.string.input_notice));
-                bundle.putString(BasicTextInputDialog.HINT, mExpense.getNotice());
+        mNoticeTxt.setHint(bookingWithCategory.getNotice());
+        mNoticeTxt.setOnClickListener(v -> {
+            Bundle bundle = new Bundle();
+            bundle.putString(BasicTextInputDialog.TITLE, getString(R.string.input_notice));
+            bundle.putString(BasicTextInputDialog.HINT, bookingWithCategory.getNotice());
 
-                BasicTextInputDialog noticeDialog = new BasicTextInputDialog();
-                noticeDialog.setArguments(bundle);
-                noticeDialog.setOnTextInputListener(new BasicTextInputDialog.OnTextInput() {
-                    @Override
-                    public void onTextInput(String textInput) {
-                        setNotice(textInput);
-                    }
-                });
-                noticeDialog.show(getFragmentManager(), "expense_screen_notice");
-            }
+            BasicTextInputDialog noticeDialog = new BasicTextInputDialog();
+            noticeDialog.setArguments(bundle);
+            noticeDialog.setOnTextInputListener(this::setNotice);
+            noticeDialog.show(getFragmentManager(), "expense_screen_notice");
         });
 
-        mAccountTxt.setHint(getExpenseAccount(mExpense.getAccountId()).getTitle());
-        mAccountTxt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                List<Account> accounts = mAccountRepo.getAll();
+        mAccountTxt.setHint(getExpenseAccount(bookingWithCategory.getAccountId()).getName());
+        mAccountTxt.setOnClickListener(v -> {
+            List<Account> accounts = accountRepo.getAll();
 
-                SingleChoiceDialog<Account> accountPicker = new SingleChoiceDialog<>();
-                accountPicker.createBuilder(ExpenseScreen.this);
-                accountPicker.setTitle(getString(R.string.input_account));
-                accountPicker.setContent(accounts, accounts.indexOf(getExpenseAccount(mExpense.getAccountId())));
-                accountPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
-                    @Override
-                    public void onPositiveClick(Object account) {
+            SingleChoiceDialog<Account> accountPicker = new SingleChoiceDialog<>();
+            accountPicker.createBuilder(ExpenseScreen.this);
+            accountPicker.setTitle(getString(R.string.input_account));
+            accountPicker.setContent(accounts, accounts.indexOf(getExpenseAccount(bookingWithCategory.getAccountId())));
+            accountPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
+                @Override
+                public void onPositiveClick(Object account) {
 
-                        setAccount((Account) account);
-                    }
+                    setAccount((Account) account);
+                }
 
-                    @Override
-                    public void onNeutralClick() {
+                @Override
+                public void onNeutralClick() {
 
-                        //do nothing
-                    }
-                });
-                accountPicker.show(getFragmentManager(), "expense_screen_account");
-            }
+                    //do nothing
+                }
+            });
+            accountPicker.show(getFragmentManager(), "expense_screen_account");
         });
 
         SaveFloatingActionButton saveFab = findViewById(R.id.expense_screen_save);
         saveFab.setOnClickListener(getOnSaveClickListener());
 
         showExpenditureType();
-        mIncomeBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setPrice(new Price(mExpense.getUnsignedPrice(), false));
-            }
-        });
+        mIncomeBtn.setOnClickListener(v -> setPrice(new Price(bookingWithCategory.getUnsignedPrice(), false)));
 
-        mExpenseBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setPrice(new Price(mExpense.getUnsignedPrice(), true));
-            }
-        });
+        mExpenseBtn.setOnClickListener(v -> setPrice(new Price(bookingWithCategory.getUnsignedPrice(), true)));
 
         enableFabIfBookingIsSaveable();
     }
@@ -239,7 +200,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
 
                 break;
             case 2:
-                ExpenseObject template = data.getParcelableExtra("templateObj");
+                Booking template = data.getParcelableExtra("templateObj");
                 showExpenseOnScreen(template);
 
                 break;
@@ -279,10 +240,10 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
         switch (bundle.getString(INTENT_MODE, INTENT_MODE_CREATE_BOOKING)) {
             case INTENT_MODE_UPDATE_PARENT:
             case INTENT_MODE_UPDATE_CHILD:
-                mExpense = (ExpenseObject) bundle.getParcelable(INTENT_BOOKING, null);
+                mExpense = (Booking) bundle.getParcelable(INTENT_BOOKING, null);
                 break;
             case INTENT_MODE_ADD_CHILD:
-                mParentBooking = (ExpenseObject) bundle.getParcelable(INTENT_BOOKING, null);
+                mParentBooking = (Booking) bundle.getParcelable(INTENT_BOOKING, null);
             case INTENT_MODE_CREATE_BOOKING:
                 Category category = new Category(
                         getString(R.string.no_name),
@@ -290,7 +251,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
                         ExpenseType.expense()
                 );
 
-                mExpense = new ExpenseObject(
+                bookingWithCategory = new BookingWithCategory(
                         getString(R.string.no_name),
                         new Price(0D, true),
                         category,
@@ -305,8 +266,8 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
     private Account getExpenseAccount(UUID accountId) {
         try {
 
-            return mAccountRepo.get(accountId);
-        } catch (AccountNotFoundException e) {
+            return accountRepo.get(accountId);
+        } catch (Exception e) {
 
             return mUserPreferences.getActiveAccount();
         }
@@ -319,12 +280,9 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
 
         ConfirmationDialog confirmationDialog = new ConfirmationDialog();
         confirmationDialog.setArguments(bundle);
-        confirmationDialog.setOnConfirmationListener(new ConfirmationDialog.OnConfirmationResult() {
-            @Override
-            public void onConfirmationResult(boolean closeScreen) {
-                if (closeScreen)
-                    finish();
-            }
+        confirmationDialog.setOnConfirmationListener(closeScreen -> {
+            if (closeScreen)
+                finish();
         });
         confirmationDialog.show(getFragmentManager(), "expense_screen_exit");
     }
@@ -364,7 +322,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
                         break;
                     case INTENT_MODE_ADD_CHILD:
 
-                        mExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.CHILD_EXPENSE);
+                        mExpense.setExpenseType(Booking.EXPENSE_TYPES.CHILD_EXPENSE);
                         try {
                             mChildExpenseRepo.addChildToBooking(mExpense, mParentBooking);
                         } catch (AddChildToChildException e) {
@@ -375,7 +333,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
                         break;
                     case INTENT_MODE_CREATE_BOOKING:
 
-                        mExpenseRepo.insert(mExpense);
+                        bookingRepo.insert(bookingWithCategory);
                         break;
                     default:
                         throw new UnsupportedOperationException("Could not handle intent mode " + bundle.getString(INTENT_MODE, null));
@@ -387,7 +345,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
         };
     }
 
-    private void showExpenseOnScreen(ExpenseObject expense) {
+    private void showExpenseOnScreen(Booking expense) {
         setPrice(expense.getPrice());
         setTitle(expense.getTitle());
         setCategory(expense.getCategory());
@@ -398,14 +356,14 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
     }
 
     private void setPrice(Price price) {
-        mExpense.setPrice(price);
+        bookingWithCategory.setPrice(price);
 
         showPrice();
         showExpenditureType();
     }
 
     private void showPrice() {
-        mPriceBtn.setText(MoneyUtils.formatHumanReadable(mExpense.getPrice(), Locale.getDefault()));
+        mPriceBtn.setText(MoneyUtils.formatHumanReadable(bookingWithCategory.getPrice(), Locale.getDefault()));
 
         enableFabIfBookingIsSaveable();
     }
@@ -417,48 +375,48 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
     private void showExpenditureType() {
         LinearLayout ll = findViewById(R.id.expense_screen_bottom_toolbar);
         ll.setBackgroundColor(
-                mExpense.isExpenditure()
+                bookingWithCategory.isExpenditure()
                         ? getColorRes(R.color.booking_expense)
                         : getColorRes(R.color.booking_income)
         );
     }
 
     private void setCategory(Category category) {
-        mExpense.setCategory(category);
-        mCategoryTxt.setText(mExpense.getCategory().getTitle());
+        bookingWithCategory.setCategory(category);
+        mCategoryTxt.setText(bookingWithCategory.getCategory().getName());
 
         // Es kann sein, dass der DefaultExpenseType der Kategorie anders ist, als der der Buchung, von daher muss hier der Preis neu gesetzt werden
-        setPrice(new Price(mExpense.getPrice().getUnsignedValue(), mExpense.getCategory().getDefaultExpenseType().value()));
+        setPrice(new Price(bookingWithCategory.getPrice().getUnsignedValue(), bookingWithCategory.getCategory().getDefaultExpenseType().value()));
 
         enableFabIfBookingIsSaveable();
     }
 
     private void setTitle(String title) {
-        mExpense.setTitle(title);
-        mTitleTxt.setText(mExpense.getTitle());
+        bookingWithCategory.setTitle(title);
+        mTitleTxt.setText(bookingWithCategory.getTitle());
 
         enableFabIfBookingIsSaveable();
     }
 
     private void setDate(Calendar date) {
-        mExpense.setDate(date);
-        mDateTxt.setText(mExpense.getDisplayableDateTime());
+        bookingWithCategory.setDate(date);
+        mDateTxt.setText(bookingWithCategory.getDisplayableDateTime());
     }
 
     private void setNotice(String notice) {
-        mExpense.setNotice(notice);
-        mNoticeTxt.setText(mExpense.getNotice());
+        bookingWithCategory.setNotice(notice);
+        mNoticeTxt.setText(bookingWithCategory.getNotice());
     }
 
     private void setAccount(Account account) {
-        mExpense.setAccount(account);
-        mAccountTxt.setText(account.getTitle());
+        bookingWithCategory.setAccount(account);
+        mAccountTxt.setText(account.getName());
     }
 
     private void enableFabIfBookingIsSaveable() {
         SaveFloatingActionButton saveFab = findViewById(R.id.expense_screen_save);
 
-        if (mExpense.isSet()) {
+        if (bookingWithCategory.isSet()) {
             saveFab.enable();
         } else {
             saveFab.disable();

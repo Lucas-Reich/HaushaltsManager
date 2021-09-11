@@ -7,7 +7,7 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Excepti
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.CannotDeleteChildExpenseException;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.ActionPayload;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.ActionKey;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.IActionKey;
@@ -75,7 +75,7 @@ public class DeleteExpenseMenuItem implements IMenuItem {
     }
 
     private void deleteChild(ChildExpenseItem item) {
-        ExpenseObject child = item.getContent();
+        Booking child = item.getContent();
 
         try {
             mChildExpenseRepo.delete(child);
@@ -90,7 +90,7 @@ public class DeleteExpenseMenuItem implements IMenuItem {
     }
 
     private void deleteExpense(ExpenseItem item) {
-        ExpenseObject expense = item.getContent();
+        Booking expense = item.getContent();
 
         try {
             mExpenseRepo.delete(expense);

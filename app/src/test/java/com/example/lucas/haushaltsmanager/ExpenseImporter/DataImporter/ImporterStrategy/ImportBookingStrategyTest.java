@@ -1,7 +1,7 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.DataImporter.ImporterStrategy;
 
 import com.example.lucas.haushaltsmanager.Entities.Account;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.DataImporter.ImportStrategies.ImportBookingStrategy;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Delimiter.Comma;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.InvalidInputException;
@@ -101,7 +101,7 @@ public class ImportBookingStrategyTest {
 
         // Assert
         verify(mockSaver, times(1))
-                .persist(any(ExpenseObject.class), any(Account.class));
+                .persist(any(Booking.class), any(Account.class));
     }
 
     @Test

@@ -11,7 +11,9 @@ import androidx.cardview.widget.CardView;
 
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Entities.Category;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.IBooking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.ParentBooking;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.Entities.Report.ReportInterface;
 import com.example.lucas.haushaltsmanager.R;
@@ -79,7 +81,7 @@ public class TimeFrameCardPopulator {
 
     private void setCategory(Category category) {
         mViewHolder.mCategoryColor.setCircleColor(category.getColor().getColorString());
-        mViewHolder.mCategoryTitle.setText(category.getTitle());
+        mViewHolder.mCategoryTitle.setText(category.getName());
     }
 
     private void setPieChart(ReportInterface report) {
@@ -110,7 +112,7 @@ public class TimeFrameCardPopulator {
         }
 
         List<PieEntry> pieData = new ArrayList<>();
-        List<ExpenseObject> expenses = flattenExpenses(report.getExpenses());
+        List<Booking> expenses = flattenExpenses(report.getExpenses());
         for (Map.Entry<Boolean, Double> entry : sumByExpenseType(expenses).entrySet()) {
             pieData.add(dataSetFrom(entry));
         }
@@ -140,20 +142,20 @@ public class TimeFrameCardPopulator {
         return mResources.getString(string);
     }
 
-    private List<ExpenseObject> flattenExpenses(List<ExpenseObject> expenses) {
-        List<ExpenseObject> extractedChildren = new ArrayList<>();
+    private List<Booking> flattenExpenses(List<IBooking> bookings) {
+        List<Booking> extractedChildren = new ArrayList<>();
 
-        for (ExpenseObject expense : expenses) {
-            if (expense.isParent())
-                extractedChildren.addAll(expense.getChildren());
+        for (IBooking booking : bookings) {
+            if (booking instanceof ParentBooking)
+                extractedChildren.addAll(((ParentBooking) booking).getChildren());
             else
-                extractedChildren.add(expense);
+                extractedChildren.add((Booking) booking);
         }
 
         return extractedChildren;
     }
 
-    private HashMap<Boolean, Double> sumByExpenseType(List<ExpenseObject> expenses) {
+    private HashMap<Boolean, Double> sumByExpenseType(List<Booking> expenses) {
         ExpenseSum expenseSum = new ExpenseSum();
 
         HashMap<Boolean, Double> summedExpenses = new HashMap<>();

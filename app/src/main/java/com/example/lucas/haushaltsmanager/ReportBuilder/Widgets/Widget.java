@@ -2,7 +2,7 @@ package com.example.lucas.haushaltsmanager.ReportBuilder.Widgets;
 
 import android.view.View;
 
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
 
 import java.util.List;
 
@@ -11,7 +11,7 @@ public interface Widget {
 
     View getView();
 
-    void setData(List<ExpenseObject> expenses);
+    void setData(List<Booking> expenses);
 
     int getIcon();
 }

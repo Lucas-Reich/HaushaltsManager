@@ -1,8 +1,8 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.Strategies;
 
-import com.example.lucas.haushaltsmanager.Entities.Expense.IBooking;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ParentBooking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.IBooking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.ParentBooking;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.BookingItem.ExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ParentBookingItem.ParentBookingItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
@@ -13,12 +13,12 @@ import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSorter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CreateBookingItemsStrategy implements RecyclerItemCreatorStrategyInterface<ExpenseObject> {
+public class CreateBookingItemsStrategy implements RecyclerItemCreatorStrategyInterface<IBooking> {
     private static final String SORT_DESC = "DESC";
     private static final String SORT_ASC = "ASC";
 
     @Override
-    public List<IRecyclerItem> create(List<ExpenseObject> bookings) {
+    public List<IRecyclerItem> create(List<IBooking> bookings) {
         if (bookings.isEmpty()) {
             return new ArrayList<>();
         }
@@ -57,15 +57,6 @@ public class CreateBookingItemsStrategy implements RecyclerItemCreatorStrategyIn
             return new ParentBookingItem((ParentBooking) booking, currentDate);
         }
 
-        if (booking instanceof ExpenseObject && ((ExpenseObject) booking).isParent()) {
-            return new ParentBookingItem(new ParentBooking(
-                    booking.getId(),
-                    booking.getTitle(),
-                    booking.getDate(),
-                    ((ExpenseObject) booking).getChildren()
-            ), currentDate);
-        }
-
-        return new ExpenseItem((ExpenseObject) booking, currentDate);
+        return new ExpenseItem((Booking) booking, currentDate);
     }
 }

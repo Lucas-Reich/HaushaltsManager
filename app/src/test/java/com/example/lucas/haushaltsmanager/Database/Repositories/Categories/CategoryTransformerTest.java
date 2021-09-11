@@ -6,7 +6,7 @@ import android.database.MatrixCursor;
 
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
+import com.example.lucas.haushaltsmanager.Entities.Booking.ExpenseType;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +31,7 @@ public class CategoryTransformerTest {
 
         Cursor cursor = createCursor(new HashMap<String, Object>() {{
             put("id", expectedCategory.getId().toString());
-            put("name", expectedCategory.getTitle());
+            put("name", expectedCategory.getName());
             put("color", expectedCategory.getColor().getColorString());
             put("default_expense_type", expectedCategory.getDefaultExpenseType().value() ? 1 : 0);
         }});
@@ -50,7 +50,7 @@ public class CategoryTransformerTest {
 
         Cursor cursor = createCursor(new HashMap<String, Object>() {{
             put("id", expectedCategory.getId().toString());
-            put("name", expectedCategory.getTitle());
+            put("name", expectedCategory.getName());
             // No color information in Cursor
             put("default_expense_type", expectedCategory.getDefaultExpenseType().value() ? 1 : 0);
         }});

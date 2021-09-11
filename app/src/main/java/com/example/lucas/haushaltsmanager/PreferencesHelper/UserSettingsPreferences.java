@@ -3,9 +3,11 @@ package com.example.lucas.haushaltsmanager.PreferencesHelper;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import androidx.room.Room;
+
 import com.example.lucas.haushaltsmanager.Activities.Settings;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
+import com.example.lucas.haushaltsmanager.Database.AppDatabase;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountDAO;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.Entities.Time;
 import com.example.lucas.haushaltsmanager.Utils.WeekdayUtils;
@@ -24,13 +26,15 @@ public class UserSettingsPreferences {
 
     private final SharedPreferences mPreferences;
     private final Context mContext;
-    private final AccountRepository mAccountRepo;
+    private final AccountDAO accountRepo;
 
     public UserSettingsPreferences(Context context) {
 
         mPreferences = context.getSharedPreferences(USER_SETTINGS, Context.MODE_PRIVATE);
         mContext = context;
-        mAccountRepo = new AccountRepository(context);
+        accountRepo = Room.databaseBuilder(context, AppDatabase.class, "expenses")
+                .allowMainThreadQueries() // TODO: Remove
+                .build().accountDAO();
     }
 
     public int getMaxBackupCount() {
@@ -91,22 +95,11 @@ public class UserSettingsPreferences {
     public Account getActiveAccount() {
         String rawAccountId = mPreferences.getString(ACTIVE_ACCOUNT, "00000000-0000-0000-0000-000000000000");
 
-        return fetchAccount(UUID.fromString(rawAccountId));
+        return accountRepo.get(UUID.fromString(rawAccountId));
     }
 
     public void setActiveAccount(Account account) {
 
         mPreferences.edit().putString(ACTIVE_ACCOUNT, account.getId().toString()).apply();
-    }
-
-    private Account fetchAccount(UUID accountId) {
-        try {
-
-            return mAccountRepo.get(accountId);
-        } catch (AccountNotFoundException e) {
-
-            // TODO: Wenn der Benutzer noch kein Konto erstellt hat, dann wird NULL zurückgegeben.
-            return null;
-        }
     }
 }

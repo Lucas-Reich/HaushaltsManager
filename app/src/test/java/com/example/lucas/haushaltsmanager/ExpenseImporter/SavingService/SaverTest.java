@@ -1,13 +1,12 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.SavingService;
 
 import com.example.lucas.haushaltsmanager.Backup.Handler.Decorator.DataImporterBackupHandler;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepositoryInterface;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountCouldNotBeCreatedException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountDAO;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepositoryInterface;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryDAO;
 import com.example.lucas.haushaltsmanager.Entities.Account;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
 import com.example.lucas.haushaltsmanager.Entities.Category;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences.ActiveAccountsPreferences;
 
 import org.junit.Before;
@@ -19,7 +18,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class SaverTest {
-    private AccountRepositoryInterface mockAccountRepository;
+    private AccountDAO mockAccountRepository;
     private ExpenseRepository mockExpenseRepository;
     private ActiveAccountsPreferences accountPreferences;
     private DataImporterBackupHandler backupHandler;
@@ -28,14 +27,14 @@ public class SaverTest {
 
     @Before
     public void setUp() {
-        mockAccountRepository = mock(AccountRepositoryInterface.class);
+        mockAccountRepository = mock(AccountDAO.class);
         mockExpenseRepository = mock(ExpenseRepository.class);
         accountPreferences = mock(ActiveAccountsPreferences.class);
         backupHandler = mock(DataImporterBackupHandler.class);
 
         saver = new Saver(
                 mockAccountRepository,
-                mock(CategoryRepositoryInterface.class),
+                mock(CategoryDAO.class),
                 mockExpenseRepository,
                 accountPreferences,
                 backupHandler
@@ -43,13 +42,13 @@ public class SaverTest {
     }
 
     @Test
-    public void expenseIsSavedWithNewlyCreatedAccountAndCategory() throws AccountCouldNotBeCreatedException {
+    public void expenseIsSavedWithNewlyCreatedAccountAndCategory() {
         // SetUp
         Account account = mock(Account.class);
 
         Category expectedCategory = mock(Category.class);
 
-        ExpenseObject booking = mock(ExpenseObject.class);
+        Booking booking = mock(Booking.class);
         when(booking.getCategory()).thenReturn(mock(Category.class));
 
 

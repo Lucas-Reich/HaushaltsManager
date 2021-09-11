@@ -5,7 +5,7 @@ import android.content.Context;
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Templates.Exceptions.TemplateCouldNotBeCreatedException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Templates.TemplateRepository;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
 import com.example.lucas.haushaltsmanager.Entities.TemplateBooking;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.ActionPayload;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.ActionKey;
@@ -46,13 +46,13 @@ public class TemplateMenuItem implements IMenuItem {
 
     @Override
     public void handleClick(ActionPayload actionPayload, Context context) {
-        ExpenseObject templateExpense = extractExpenseFromPayload(actionPayload);
+        Booking templateExpense = extractExpenseFromPayload(actionPayload);
 
         saveAsTemplate(new TemplateBooking(templateExpense));
     }
 
-    private ExpenseObject extractExpenseFromPayload(ActionPayload actionPayload) {
-        return (ExpenseObject) actionPayload.getFirstItem().getContent();
+    private Booking extractExpenseFromPayload(ActionPayload actionPayload) {
+        return (Booking) actionPayload.getFirstItem().getContent();
     }
 
     private void saveAsTemplate(TemplateBooking templateBooking) {

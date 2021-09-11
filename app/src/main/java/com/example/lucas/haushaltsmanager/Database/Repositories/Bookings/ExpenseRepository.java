@@ -4,15 +4,15 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
+
+import androidx.room.Room;
 
 import com.example.lucas.haushaltsmanager.App.app;
+import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.QueryInterface;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepositoryInterface;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountDAO;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.CannotDeleteExpenseException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryTransformer;
@@ -20,9 +20,9 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Ch
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepositoryInterface;
 import com.example.lucas.haushaltsmanager.Database.TransformerInterface;
 import com.example.lucas.haushaltsmanager.Entities.Account;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
-import com.example.lucas.haushaltsmanager.Entities.Expense.IBooking;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ParentBooking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.IBooking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.ParentBooking;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 
 import java.util.ArrayList;
@@ -31,12 +31,11 @@ import java.util.List;
 import java.util.UUID;
 
 public class ExpenseRepository {
-    private static final String TAG = ExpenseRepository.class.getSimpleName();
     private static final String TABLE = "BOOKINGS";
 
     private final SQLiteDatabase mDatabase;
-    private final TransformerInterface<ExpenseObject> transformer;
-    private final AccountRepositoryInterface accountRepository;
+    private final TransformerInterface<IBooking> transformer;
+    private final AccountDAO accountRepo;
 
     public ExpenseRepository(Context context) {
         DatabaseManager.initializeInstance(new ExpensesDbHelper(context));
@@ -45,30 +44,31 @@ public class ExpenseRepository {
         transformer = new BookingTransformer(
                 new CategoryTransformer()
         );
-        accountRepository = new AccountRepository(context);
+        accountRepo = Room.databaseBuilder(context, AppDatabase.class, "expenses")
+                .build().accountDAO();
     }
 
-    public ExpenseObject get(UUID id) throws ExpenseNotFoundException {
+    public IBooking getNew(UUID id) throws ExpenseNotFoundException {
         Cursor c = executeRaw(new GetBookingQuery(id));
 
         if (!c.moveToFirst()) {
             throw ExpenseNotFoundException.expenseNotFoundException(id);
         }
 
-        ExpenseObject expense = transformer.transform(c);
+        IBooking expense = transformer.transform(c);
 
         c.close();
         return expense;
     }
 
-    public List<ExpenseObject> getAll() {
+    public List<IBooking> getAll() {
         Cursor c = executeRaw(new GetAllBookingsQuery(
                 0,
                 Calendar.getInstance().getTimeInMillis()
         ));
 
         c.moveToFirst();
-        ArrayList<ExpenseObject> bookings = new ArrayList<>();
+        ArrayList<IBooking> bookings = new ArrayList<>();
         while (!c.isAfterLast()) {
 
             bookings.add(transformer.transform(c));
@@ -83,7 +83,7 @@ public class ExpenseRepository {
     public void insert(ParentBooking parentBooking) {
         ContentValues values = new ContentValues();
         values.put("id", parentBooking.getId().toString());
-        values.put("expense_type", ExpenseObject.EXPENSE_TYPES.PARENT_EXPENSE.name());
+        values.put("expense_type", Booking.EXPENSE_TYPES.PARENT_EXPENSE.name());
 
         values.put("price", parentBooking.getPrice().getUnsignedValue());
         values.put("expenditure", parentBooking.getPrice().isNegative() ? 1 : 0);
@@ -101,12 +101,12 @@ public class ExpenseRepository {
         );
 
         ChildExpenseRepositoryInterface childRepo = new ChildExpenseRepository(app.getContext());
-        for (ExpenseObject child : parentBooking.getChildren()) {
+        for (Booking child : parentBooking.getChildren()) {
             childRepo.insert(parentBooking, child);
         }
     }
 
-    public void insert(ExpenseObject expense) {
+    public void insert(Booking expense) {
         // TODO: Method could fail with SQLException when referenced Account/Currency/Category is not existing
 
         ContentValues values = new ContentValues();
@@ -121,32 +121,20 @@ public class ExpenseRepository {
         values.put("account_id", expense.getAccountId().toString());
         values.put("hidden", 0);
 
-        try {
-            // TODO: Use Transaction to insert booking and update account balance
-            if (expense.getExpenseType() != ExpenseObject.EXPENSE_TYPES.DUMMY_EXPENSE && expense.getExpenseType() != ExpenseObject.EXPENSE_TYPES.DATE_PLACEHOLDER && expense.getExpenseType() != ExpenseObject.EXPENSE_TYPES.PARENT_EXPENSE) {
-                updateAccountBalance(
-                        expense.getAccountId(),
-                        expense.getSignedPrice()
-                );
-            }
-        } catch (AccountNotFoundException e) {
-
-            Log.e(TAG, "Could not find account", e);
-            //Sollte eigentlich nicht passieren können da der User nur aus existierenden Konten auswählen kann.
-        }
+        // TODO: Use Transaction to insert booking and update account balance
+        updateAccountBalance(
+                expense.getAccountId(),
+                expense.getSignedPrice()
+        );
 
         mDatabase.insertOrThrow(
                 TABLE,
                 null,
                 values
         );
-
-        for (ExpenseObject child : expense.getChildren()) {
-            new ChildExpenseRepository(app.getContext()).insert(expense, child);
-        }
     }
 
-    public void delete(ExpenseObject expense) throws CannotDeleteExpenseException {
+    public void delete(IBooking expense) throws CannotDeleteExpenseException {
         if (hasChildren(expense)) {
             throw CannotDeleteExpenseException.BookingAttachedToChildException(expense);
         }
@@ -160,21 +148,20 @@ public class ExpenseRepository {
                     new String[]{expense.getId().toString()}
             );
 
-            updateAccountBalance(
-                    expense.getAccountId(),
-                    -expense.getSignedPrice()
-            );
+            if (expense instanceof Booking) {
+                updateAccountBalance(
+                        ((Booking) expense).getAccountId(),
+                        -((Booking) expense).getSignedPrice()
+                );
+            }
 
             mDatabase.setTransactionSuccessful();
-        } catch (AccountNotFoundException e) {
-
-            Log.e(TAG, "Could not delete Booking " + expense.getTitle() + " attached Account " + expense.getAccountId() + " does not exist");
         } finally {
             mDatabase.endTransaction();
         }
     }
 
-    public void update(ExpenseObject expense) throws ExpenseNotFoundException {
+    public void update(Booking expense) throws ExpenseNotFoundException {
         ContentValues updatedExpense = new ContentValues();
         updatedExpense.put("expense_type", expense.getExpenseType().name());
         updatedExpense.put("price", expense.getUnsignedPrice());
@@ -185,32 +172,27 @@ public class ExpenseRepository {
         updatedExpense.put("category_id", expense.getCategory().getId().toString());
         updatedExpense.put("account_id", expense.getAccountId().toString());
 
-        try {
-            ExpenseObject oldExpense = get(expense.getId());
+        Booking oldExpense = (Booking) getNew(expense.getId());
 
-            updateAccountBalance(
-                    expense.getAccountId(),
-                    expense.getSignedPrice() - oldExpense.getSignedPrice()
-            );
+        updateAccountBalance(
+                expense.getAccountId(),
+                expense.getSignedPrice() - oldExpense.getSignedPrice()
+        );
 
-            int affectedRows = mDatabase.update(
-                    TABLE,
-                    updatedExpense,
-                    "id = ?",
-                    new String[]{expense.getId().toString()}
-            );
+        int affectedRows = mDatabase.update(
+                TABLE,
+                updatedExpense,
+                "id = ?",
+                new String[]{expense.getId().toString()}
+        );
 
 
-            if (affectedRows == 0) {
-                throw ExpenseNotFoundException.couldNotUpdateReferencedExpense(expense.getId());
-            }
-
-        } catch (AccountNotFoundException e) {
-            // Do nothing
+        if (affectedRows == 0) {
+            throw ExpenseNotFoundException.couldNotUpdateReferencedExpense(expense.getId());
         }
     }
 
-    public void hide(ExpenseObject expense) throws ExpenseNotFoundException {
+    public void hide(IBooking booking) throws ExpenseNotFoundException {
 
         ContentValues values = new ContentValues();
         values.put("hidden", 1);
@@ -219,27 +201,24 @@ public class ExpenseRepository {
                 TABLE,
                 values,
                 "id = ?",
-                new String[]{expense.getId().toString()}
+                new String[]{booking.getId().toString()}
         );
 
         if (affectedRows == 0) {
-            throw ExpenseNotFoundException.expenseNotFoundException(expense.getId());
+            throw ExpenseNotFoundException.expenseNotFoundException(booking.getId());
         }
 
-        if (!expense.isParent()) {
+        if (booking instanceof Booking) {
             // TODO: Use Transaction to update booking and update account balance
-            try {
-                updateAccountBalance(
-                        expense.getAccountId(),
-                        -expense.getSignedPrice()
-                );
-            } catch (AccountNotFoundException e) {
-                // Do nothing
-            }
+            updateAccountBalance(
+                    ((Booking) booking).getAccountId(),
+                    -((Booking) booking).getSignedPrice()
+            );
         }
     }
 
-    public boolean isHidden(ExpenseObject expense) throws ExpenseNotFoundException {
+    // TODO: Only used in tests
+    public boolean isHidden(IBooking expense) throws ExpenseNotFoundException {
         Cursor c = executeRaw(new IsBookingHiddenQuery(expense));
 
         if (!c.moveToFirst()) {
@@ -265,16 +244,16 @@ public class ExpenseRepository {
      * @param accountId Konto welches angepasst werden soll
      * @param amount    Betrag der angezogen oder hinzugefügt werden soll
      */
-    private void updateAccountBalance(UUID accountId, double amount) throws AccountNotFoundException {
-        Account account = accountRepository.get(accountId);
+    private void updateAccountBalance(UUID accountId, double amount) {
+        Account account = accountRepo.get(accountId);
 
-        double newBalance = account.getBalance().getSignedValue() + amount;
-        account.setBalance(new Price(newBalance));
-        accountRepository.update(account);
+        double newBalance = account.getPrice().getSignedValue() + amount;
+        account.setPrice(new Price(newBalance));
+        accountRepo.update(account);
     }
 
-    private boolean hasChildren(ExpenseObject expense) {
-        Cursor c = executeRaw(new HasBookingChildrenQuery(expense));
+    private boolean hasChildren(IBooking booking) {
+        Cursor c = executeRaw(new HasBookingChildrenQuery(booking));
 
         if (c.moveToFirst()) {
 

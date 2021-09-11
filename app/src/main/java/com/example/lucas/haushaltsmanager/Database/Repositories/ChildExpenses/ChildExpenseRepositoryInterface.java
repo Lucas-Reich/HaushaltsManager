@@ -3,32 +3,33 @@ package com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.AddChildToChildException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.CannotDeleteChildExpenseException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.ChildExpenseNotFoundException;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ParentBooking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.IBooking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.ParentBooking;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface ChildExpenseRepositoryInterface {
-    boolean exists(ExpenseObject childExpense);
+    boolean exists(Booking childExpense);
 
-    ExpenseObject addChildToBooking(ExpenseObject childExpense, ExpenseObject parentBooking) throws AddChildToChildException;
+    Booking addChildToBooking(Booking childExpense, IBooking parentBooking) throws AddChildToChildException;
 
-    ExpenseObject extractChildFromBooking(ExpenseObject childExpense) throws ChildExpenseNotFoundException;
+    Booking extractChildFromBooking(Booking childExpense) throws ChildExpenseNotFoundException;
 
-    ExpenseObject get(UUID childExpenseId) throws ChildExpenseNotFoundException;
+    Booking get(UUID childExpenseId) throws ChildExpenseNotFoundException;
 
-    List<ExpenseObject> getAll(UUID parentExpenseId);
+    List<Booking> getAll(UUID parentExpenseId);
 
-    void insert(ParentBooking parent, ExpenseObject child);
+    void insert(ParentBooking parent, Booking child);
 
-    void insert(ExpenseObject parentExpense, ExpenseObject childExpense);
+    void insert(Booking parentExpense, Booking childExpense);
 
-    void update(ExpenseObject childExpense) throws ChildExpenseNotFoundException;
+    void update(Booking childExpense) throws ChildExpenseNotFoundException;
 
-    void delete(ExpenseObject childExpense) throws CannotDeleteChildExpenseException;
+    void delete(Booking childExpense) throws CannotDeleteChildExpenseException;
 
-    void hide(ExpenseObject childExpense) throws ChildExpenseNotFoundException;
+    void hide(Booking childExpense) throws ChildExpenseNotFoundException;
 
     void closeDatabase();
 }

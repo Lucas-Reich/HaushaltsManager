@@ -4,13 +4,16 @@ import android.content.Context;
 import android.os.Environment;
 
 import androidx.annotation.StringRes;
+import androidx.room.Room;
 
 import com.example.lucas.haushaltsmanager.App.app;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepositoryInterface;
+import com.example.lucas.haushaltsmanager.Database.AppDatabase;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountDAO;
 import com.example.lucas.haushaltsmanager.Entities.Account;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.IBooking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.ParentBooking;
 import com.example.lucas.haushaltsmanager.Entities.Currency;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -31,20 +34,21 @@ public class CsvBookingExporter {
         guardAgainstInvalidDirectory(targetDirectory);
         this.targetDirectory = targetDirectory;
 
-        AccountRepositoryInterface accountRepository = new AccountRepository(context);
-        accounts = accountRepository.getAll();
+        AccountDAO accountRepo = Room.databaseBuilder(context, AppDatabase.class, "expenses")
+                .build().accountDAO();
+        accounts = accountRepo.getAll();
     }
 
     /**
      * Methode die eine Liste von Buchungen nimmt und diese in eine Datei schreibt.
      *
-     * @param expenses Buchungen die in eine Datei geschrieben werden sollen.
+     * @param bookings Buchungen die in eine Datei geschrieben werden sollen.
      * @return Die erstellte Datei wird zurückgegeben. Falls die Datei nicht erstellt werden konnte wird NULL zurückgegeben.
      */
-    public File writeToFile(List<ExpenseObject> expenses) {
+    public File writeToFile(List<IBooking> bookings) {
         File file = createFile(targetDirectory);
 
-        if (file != null && writeExpensesToFile(expenses, file)) {
+        if (file != null && writeExpensesToFile(bookings, file)) {
             return file;
         }
 
@@ -65,11 +69,11 @@ public class CsvBookingExporter {
     /**
      * Methode um eine Liste von Buchungen in eine Komma seperierten String zu konvertieren.
      *
-     * @param expenses Umzuwandelnde Buchungen.
+     * @param bookings Umzuwandelnde Buchungen.
      * @param file     Datei in der die Buchungen gespeichert werden sollen.
      * @return True wenn die Buchungen erfolgreich in die Datei geschrieben werden konnten, False wenn nicht.
      */
-    private boolean writeExpensesToFile(List<ExpenseObject> expenses, File file) {
+    private boolean writeExpensesToFile(List<IBooking> bookings, File file) {
         FileOutputStream fileOutput = null;
 
         try {
@@ -77,7 +81,7 @@ public class CsvBookingExporter {
             fileOutput = new FileOutputStream(file);
 
             fileOutput.write(getCsvHeader().getBytes());
-            for (ExpenseObject expense : expenses) {
+            for (IBooking expense : bookings) {
 
                 fileOutput.write(expenseToString(expense).getBytes());
             }
@@ -120,26 +124,28 @@ public class CsvBookingExporter {
     /**
      * Methode um ein ExpenseObject und alle seine Kinder in ein String zu transformieren
      *
-     * @param expense ExpenseObject das umgewandelt werden soll
+     * @param booking ExpenseObject das umgewandelt werden soll
      * @return ExpenseObject mit allen Kindern als String
      */
-    private String expenseToString(ExpenseObject expense) {
+    private String expenseToString(IBooking booking) {
         StringBuilder expenseString = new StringBuilder();
 
-        expenseString.append(expense.getUnsignedPrice()).append(",");
-        expenseString.append(expense.isExpenditure()).append(",");
-        expenseString.append(expense.getTitle()).append(",");
-        expenseString.append(expense.getDateString()).append(",");
-        expenseString.append(expense.getNotice()).append(",");
-        expenseString.append(new Currency().getName()).append(",");
-        expenseString.append(expense.getCategory().getTitle()).append(",");
-        Account account = getAccount(expense.getAccountId());
-        expenseString.append(account != null ? account.getTitle() : "").append("\r\n");
-
-        for (ExpenseObject child : expense.getChildren()) {
-
-            expenseString.append(expenseToString(child));
+        if (booking instanceof ParentBooking) {
+            for (Booking child : ((ParentBooking) booking).getChildren()) {
+                expenseString.append(expenseToString(child));
+            }
         }
+
+        Booking writableBooking = (Booking) booking;
+        expenseString.append(writableBooking.getUnsignedPrice()).append(",");
+        expenseString.append(writableBooking.isExpenditure()).append(",");
+        expenseString.append(writableBooking.getTitle()).append(",");
+        expenseString.append(writableBooking.getDateString()).append(",");
+        expenseString.append(writableBooking.getNotice()).append(",");
+        expenseString.append(new Currency().getName()).append(",");
+        expenseString.append(writableBooking.getCategory().getName()).append(",");
+        Account account = getAccount(writableBooking.getAccountId());
+        expenseString.append(account != null ? account.getName() : "").append("\r\n");
 
         return expenseString.toString();
     }

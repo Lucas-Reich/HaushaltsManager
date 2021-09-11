@@ -1,7 +1,7 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.DataImporter.ImportStrategies;
 
 import com.example.lucas.haushaltsmanager.Entities.Account;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.InvalidInputException;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.NoMappingFoundException;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Line.Line;
@@ -37,7 +37,7 @@ public class ImportBookingStrategy implements IImportStrategy {
     }
 
     public void handle(Line line, MappingList mapping) throws NoMappingFoundException, InvalidInputException {
-        ExpenseObject booking = bookingParser.parse(line, mapping);
+        Booking booking = bookingParser.parse(line, mapping);
 
         Account account = accountParser.parse(line, mapping);
 

@@ -12,13 +12,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.room.Room;
 
-import com.example.lucas.haushaltsmanager.Activities.DragAndDropActivity;
 import com.example.lucas.haushaltsmanager.Activities.ExpenseScreen;
+import com.example.lucas.haushaltsmanager.Database.AppDatabase;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseDAO;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ParentBooking;
-import com.example.lucas.haushaltsmanager.Entities.TemplateBooking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.BookingWithoutCategory;
+import com.example.lucas.haushaltsmanager.Entities.Booking.IBooking;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.ActionPayload;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.AddChildMenuItem;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.CombineMenuItem;
@@ -31,7 +33,6 @@ import com.example.lucas.haushaltsmanager.FABToolbar.FABToolbarWithActionHandler
 import com.example.lucas.haushaltsmanager.FABToolbar.OnFABToolbarFABClickListener;
 import com.example.lucas.haushaltsmanager.FABToolbar.OnFABToolbarItemClickListener;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences.ActiveAccountsPreferences;
-import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.EndlessRecyclerViewScrollListener;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.RecyclerItemClickListener;
@@ -106,33 +107,26 @@ public class TabOneBookings extends AbstractTab implements
             public void onLoadMore(int page, final int offset, RecyclerView view) {
                 // Methode muss darf erst nach einer bestimmten Zeit ausgeführt werden, da sonst die Liste falsch geupdated wird
                 // Link: https://stackoverflow.com/a/39981688
-                mRecyclerView.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mAdapter.insertAll(loadData(
-                                offset
-                        ));
-                    }
-                });
+                mRecyclerView.post(() -> mAdapter.insertAll(loadData(offset)));
             }
         });
     }
 
     @Override
     public void onFabClick() {
-//        if (noAccountExists()) {
-//            Toast.makeText(getContext(), getString(R.string.no_account), Toast.LENGTH_SHORT).show();
-//            // TODO: Open dialog which prompts the user to add an account
-//
-//            return;
-//        }
-//
-//        Intent createExpenseIntent = new Intent(getContext(), ExpenseScreen.class);
-//        createExpenseIntent.putExtra(ExpenseScreen.INTENT_MODE, ExpenseScreen.INTENT_MODE_CREATE_BOOKING);
-//        startActivity(createExpenseIntent);
+        if (noAccountExists()) {
+            Toast.makeText(getContext(), getString(R.string.no_account), Toast.LENGTH_SHORT).show();
+            // TODO: Open dialog which prompts the user to add an account
 
-        Intent openDnD = new Intent(getContext(), DragAndDropActivity.class);
-        startActivity(openDnD);
+            return;
+        }
+
+        Intent createExpenseIntent = new Intent(getContext(), ExpenseScreen.class);
+        createExpenseIntent.putExtra(ExpenseScreen.INTENT_MODE, ExpenseScreen.INTENT_MODE_CREATE_BOOKING);
+        startActivity(createExpenseIntent);
+
+//        Intent openDnD = new Intent(getContext(), DragAndDropActivity.class);
+//        startActivity(openDnD);
     }
 
     @Override
@@ -213,11 +207,18 @@ public class TabOneBookings extends AbstractTab implements
         updateFABToolbar();
     }
 
-    private List<ExpenseObject> getVisibleExpenses(int offset) {
-        ExpenseRepository repository = new ExpenseRepository(getContext());
+    public boolean noAccountExists() {
+        return false; // TODO: Check if at least one account exists
+    }
 
-        List<ExpenseObject> visibleExpenses = new ExpenseFilter().byAccountWithParents(
-                repository.getAll(),
+    private List<IBooking> getVisibleExpenses(int offset) {
+        ExpenseRepository repository = new ExpenseRepository(getContext());
+        ExpenseDAO bookingDAO = Room.databaseBuilder(getContext(), AppDatabase.class, "expenses")
+                .allowMainThreadQueries() // TODO: Remove
+                .build().bookingDAO();
+
+        List<IBooking> visibleExpenses = new ExpenseFilter().byAccountWithParents(
+                (List<IBooking>) (Object) bookingDAO.getAll(),
                 activeAccounts.getActiveAccounts()
         );
 
@@ -232,57 +233,36 @@ public class TabOneBookings extends AbstractTab implements
         return visibleExpenses.subList(offset, offset + BATCH_SIZE);
     }
 
-    private boolean noAccountExists() {
-        UserSettingsPreferences userSettings = new UserSettingsPreferences(getContext());
-
-        return null == userSettings.getActiveAccount();
-    }
-
     private List<IRecyclerItem> loadData(int offset) {
-        List<ExpenseObject> visibleExpenses = getVisibleExpenses(offset);
+        List<IBooking> visibleExpenses = getVisibleExpenses(offset);
 
-        return ItemCreator.createExpenseItems(visibleExpenses);
+        return ItemCreator.createBookingItems(visibleExpenses);
     }
 
     private void configureFabToolbar() {
-        mFABToolbar.addMenuItem(new ExtractMenuItem(new ExtractMenuItem.OnSuccessCallback() {
-            @Override
-            public void onSuccess(IRecyclerItem extractedItem, ExpenseObject extractedExpense) {
-                mAdapter.removeItem(extractedItem);
+        mFABToolbar.addMenuItem(new ExtractMenuItem((extractedItem, extractedExpense) -> {
+            mAdapter.removeItem(extractedItem);
 
-                mAdapter.insertItem(new ExpenseItem(extractedExpense, (DateItem) extractedItem.getParent().getParent()));
-            }
+            mAdapter.insertItem(new ExpenseItem(extractedExpense, (DateItem) extractedItem.getParent().getParent()));
         }), this);
 
-        mFABToolbar.addMenuItem(new CombineMenuItem(new CombineMenuItem.OnSuccessCallback() {
-            @Override
-            public void onSuccess(ParentBooking combinedExpense, List<IRecyclerItem> removedItems) {
-                for (IRecyclerItem removedItem : removedItems) {
-                    mAdapter.removeItem(removedItem);
-                }
-
-                mAdapter.insertItem(new ParentBookingItem(combinedExpense, (DateItem) removedItems.get(0).getParent()));
+        mFABToolbar.addMenuItem(new CombineMenuItem((combinedExpense, removedItems) -> {
+            for (IRecyclerItem removedItem : removedItems) {
+                mAdapter.removeItem(removedItem);
             }
+
+            mAdapter.insertItem(new ParentBookingItem(combinedExpense, (DateItem) removedItems.get(0).getParent()));
         }), this);
 
         mFABToolbar.addMenuItem(new AddChildMenuItem(), this);
 
-        mFABToolbar.addMenuItem(new DeleteExpenseMenuItem(new DeleteExpenseMenuItem.OnSuccessCallback() {
-            @Override
-            public void onSuccess(IRecyclerItem deletedItem) {
-                mAdapter.removeItem(deletedItem);
+        mFABToolbar.addMenuItem(new DeleteExpenseMenuItem(deletedItem -> {
+            mAdapter.removeItem(deletedItem);
 
-                mRevertDeletionSnackbar.addItem(deletedItem);
-            }
+            mRevertDeletionSnackbar.addItem(deletedItem);
         }), this);
 
-        mFABToolbar.addMenuItem(new TemplateMenuItem(new TemplateMenuItem.OnSuccessCallback() {
-            @Override
-            public void onSuccess(TemplateBooking templateBooking) {
-
-                Toast.makeText(getContext(), R.string.saved_as_template, Toast.LENGTH_SHORT).show();
-            }
-        }), this);
+        mFABToolbar.addMenuItem(new TemplateMenuItem(templateBooking -> Toast.makeText(getContext(), R.string.saved_as_template, Toast.LENGTH_SHORT).show()), this);
 
         mFABToolbar.addMenuItem(new RecurringMenuItem(), this);
     }
@@ -335,7 +315,7 @@ public class TabOneBookings extends AbstractTab implements
 
             Intent updateBookingIntent = new Intent(getContext(), ExpenseScreen.class);
             updateBookingIntent.putExtra(ExpenseScreen.INTENT_MODE, intentMode);
-            updateBookingIntent.putExtra(ExpenseScreen.INTENT_BOOKING, (ExpenseObject) item.getContent());
+            updateBookingIntent.putExtra(ExpenseScreen.INTENT_BOOKING, (Booking) item.getContent());
 
             startActivity(updateBookingIntent);
         }
@@ -344,11 +324,6 @@ public class TabOneBookings extends AbstractTab implements
     private void initializeRevertDeletionSnackbar() {
         mRevertDeletionSnackbar = new RevertExpenseDeletionSnackbar(getContext());
         mRevertDeletionSnackbar.setMessage(getString(R.string.revert_deletion));
-        mRevertDeletionSnackbar.setOnExpenseRestoredListener(new RevertExpenseDeletionSnackbar.OnExpenseRestoredListener() {
-            @Override
-            public void onExpenseRestored(IRecyclerItem item) {
-                mAdapter.insertItem(item);
-            }
-        });
+        mRevertDeletionSnackbar.setOnExpenseRestoredListener(item -> mAdapter.insertItem(item));
     }
 }

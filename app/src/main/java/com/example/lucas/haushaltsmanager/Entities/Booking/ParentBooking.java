@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager.Entities.Expense;
+package com.example.lucas.haushaltsmanager.Entities.Booking;
 
 import androidx.annotation.NonNull;
 
@@ -13,19 +13,19 @@ public class ParentBooking implements IBooking {
     private final UUID id;
     private Calendar date;
     private final String title;
-    private final List<ExpenseObject> children;
+    private final List<Booking> children;
 
     public ParentBooking(
             @NonNull String title
     ) {
-        this(UUID.randomUUID(), title, Calendar.getInstance(), new ArrayList<ExpenseObject>());
+        this(UUID.randomUUID(), title, Calendar.getInstance(), new ArrayList<>());
     }
 
     public ParentBooking(
             @NonNull UUID id,
             @NonNull String title,
             @NonNull Calendar date,
-            @NonNull List<ExpenseObject> children
+            @NonNull List<Booking> children
     ) {
         this.id = id;
         this.title = title;
@@ -65,7 +65,7 @@ public class ParentBooking implements IBooking {
         return new Price(calcChildrenPrice());
     }
 
-    public void addChild(ExpenseObject booking) {
+    public void addChild(Booking booking) {
         if (children.contains(booking)) {
             return;
         }
@@ -73,13 +73,13 @@ public class ParentBooking implements IBooking {
         children.add(booking);
     }
 
-    public List<ExpenseObject> getChildren() {
+    public List<Booking> getChildren() {
         return children;
     }
 
     private double calcChildrenPrice() {
         double calcPrice = 0;
-        for (ExpenseObject child : children) {
+        for (Booking child : children) {
 
             calcPrice += child.getSignedPrice();
         }

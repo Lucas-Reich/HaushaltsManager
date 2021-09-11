@@ -5,17 +5,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 
 import com.example.lucas.haushaltsmanager.CardPopulator.LineChartCardPopulator;
 import com.example.lucas.haushaltsmanager.CardPopulator.PieChartCardPopulator;
 import com.example.lucas.haushaltsmanager.CardPopulator.TimeFrameCardPopulator;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Booking.IBooking;
 import com.example.lucas.haushaltsmanager.Entities.Report.Report;
 import com.example.lucas.haushaltsmanager.Entities.Report.ReportInterface;
-import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences.ActiveAccountsPreferences;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.CalendarUtils;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseGrouper;
@@ -25,23 +23,15 @@ import java.util.HashMap;
 import java.util.List;
 
 public class TabThreeYearlyReports extends AbstractTab {
-    private ActiveAccountsPreferences activeAccounts;
     private LineChartCardPopulator mLineChartPopulator;
     private PieChartCardPopulator mIncomeCardPopulator, mExpenseCardPopulator;
     private TimeFrameCardPopulator mTimeFrameCardPopulator;
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        activeAccounts = new ActiveAccountsPreferences(getActivity());
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstances) {
         View rootView = inflater.inflate(R.layout.tab_three_yearly_reports, container, false);
 
-        List<ExpenseObject> expenses = getVisibleExpenses();
+        List<IBooking> bookings = getVisibleExpenses();
 
         mTimeFrameCardPopulator = new TimeFrameCardPopulator(
                 (CardView) rootView.findViewById(R.id.tab_three_timeframe_report_card),
@@ -49,7 +39,7 @@ public class TabThreeYearlyReports extends AbstractTab {
         );
         mTimeFrameCardPopulator.setData(createReport(
                 getStringifiedYear(),
-                expenses
+                bookings
         ));
 
         mIncomeCardPopulator = new PieChartCardPopulator(
@@ -58,7 +48,7 @@ public class TabThreeYearlyReports extends AbstractTab {
         mIncomeCardPopulator.showIncome();
         mIncomeCardPopulator.setData(createReport(
                 getString(R.string.income),
-                expenses
+                bookings
         ));
 
         mExpenseCardPopulator = new PieChartCardPopulator(
@@ -67,17 +57,17 @@ public class TabThreeYearlyReports extends AbstractTab {
         mExpenseCardPopulator.showExpense();
         mExpenseCardPopulator.setData(createReport(
                 getString(R.string.expense),
-                expenses
+                bookings
         ));
 
         mLineChartPopulator = new LineChartCardPopulator(
                 (CardView) rootView.findViewById(R.id.tab_three_line_chart),
-                getLastYearAccountBalance(CalendarUtils.getCurrentYear(), expenses)
+                getLastYearAccountBalance(CalendarUtils.getCurrentYear(), bookings)
         );
         mLineChartPopulator.setResources(getResources(), CalendarUtils.getCurrentYear());
         mLineChartPopulator.setData(createReport(
                 getString(R.string.account_balance),
-                expenses
+                bookings
         ));
 
         return rootView;
@@ -99,14 +89,14 @@ public class TabThreeYearlyReports extends AbstractTab {
         mExpenseCardPopulator.setData(report);
     }
 
-    private List<ExpenseObject> getVisibleExpenses() {
+    private List<IBooking> getVisibleExpenses() {
         ExpenseRepository repository = new ExpenseRepository(getContext());
 
         return repository.getAll();
     }
 
-    private double getLastYearAccountBalance(int currentYear, List<ExpenseObject> expenses) {
-        HashMap<Integer, Double> mAccountBalanceYear = new ExpenseSum().byYear(expenses);
+    private double getLastYearAccountBalance(int currentYear, List<IBooking> bookings) {
+        HashMap<Integer, Double> mAccountBalanceYear = new ExpenseSum().byYear(bookings);
 
         int lastYear = currentYear - 1;
 
@@ -117,15 +107,15 @@ public class TabThreeYearlyReports extends AbstractTab {
         return 0d;
     }
 
-    private ReportInterface createReport(String title, List<ExpenseObject> expenses) {
+    private ReportInterface createReport(String title, List<IBooking> expenses) {
         return new Report(
                 title,
                 filterByYear(expenses, CalendarUtils.getCurrentYear())
         );
     }
 
-    private List<ExpenseObject> filterByYear(List<ExpenseObject> expenses, int year) {
-        return new ExpenseGrouper().byYear(expenses, year);
+    private List<IBooking> filterByYear(List<IBooking> expenses, int year) {
+        return new ExpenseGrouper().byYearNew(expenses, year);
     }
 
     private String getStringifiedYear() {

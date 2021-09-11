@@ -1,10 +1,9 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.SavingService;
 
-import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepositoryInterface;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.Exceptions.CategoryCouldNotBeCreatedException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryDAO;
+import com.example.lucas.haushaltsmanager.Entities.Booking.ExpenseType;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -19,12 +18,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
 public class CachedInsertChildCategoryRepositoryDecoratorTest {
-    private CategoryRepositoryInterface repository;
+    private CategoryDAO repository;
     private CachedInsertCategoryRepositoryDecorator decorator;
 
     @Before
     public void setUp() {
-        repository = mock(CategoryRepositoryInterface.class);
+        repository = mock(CategoryDAO.class);
         decorator = new CachedInsertCategoryRepositoryDecorator(repository);
     }
 
@@ -42,7 +41,7 @@ public class CachedInsertChildCategoryRepositoryDecoratorTest {
     }
 
     @Test
-    public void whenChildCategoryIsNotCachedADatabaseCallIsMade() throws CategoryCouldNotBeCreatedException {
+    public void whenChildCategoryIsNotCachedADatabaseCallIsMade() {
         // SetUp
         Category category = mock(Category.class);
 

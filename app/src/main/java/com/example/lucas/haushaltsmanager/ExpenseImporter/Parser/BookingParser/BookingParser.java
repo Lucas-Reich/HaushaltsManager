@@ -1,7 +1,6 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.BookingParser;
 
-import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.InvalidInputException;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.NoMappingFoundException;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Line.Line;
@@ -17,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class BookingParser implements IParser<ExpenseObject> {
+public class BookingParser implements IParser<Booking> {
     public static final IRequiredField BOOKING_TITLE_KEY = new Title();
 
     private PriceParser priceParser;
@@ -40,11 +39,11 @@ public class BookingParser implements IParser<ExpenseObject> {
         }};
     }
 
-    public ExpenseObject parse(Line line, MappingList mapping) throws NoMappingFoundException, InvalidInputException {
+    public Booking parse(Line line, MappingList mapping) throws NoMappingFoundException, InvalidInputException {
         String bookingTitle = line.getAsString(mapping.getMappingForKey(BOOKING_TITLE_KEY));
         assertNotEmpty(bookingTitle);
 
-        return new ExpenseObject(
+        return new Booking(
                 UUID.randomUUID(),
                 bookingTitle,
                 priceParser.parse(line, mapping),
@@ -52,8 +51,7 @@ public class BookingParser implements IParser<ExpenseObject> {
                 categoryParser.parse(line, mapping),
                 "",
                 UUID.randomUUID(),
-                ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE,
-                new ArrayList<ExpenseObject>()
+                Booking.EXPENSE_TYPES.NORMAL_EXPENSE
         );
     }
 
@@ -62,6 +60,6 @@ public class BookingParser implements IParser<ExpenseObject> {
             return;
         }
 
-        throw InvalidInputException.emptyInput(ExpenseObject.class);
+        throw InvalidInputException.emptyInput(Booking.class);
     }
 }

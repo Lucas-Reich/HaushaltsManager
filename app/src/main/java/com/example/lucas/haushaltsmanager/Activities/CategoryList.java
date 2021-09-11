@@ -1,5 +1,9 @@
 package com.example.lucas.haushaltsmanager.Activities;
 
+import static com.example.lucas.haushaltsmanager.Activities.CreateCategory.INTENT_CATEGORY;
+import static com.example.lucas.haushaltsmanager.Activities.CreateCategory.INTENT_MODE;
+import static com.example.lucas.haushaltsmanager.Activities.CreateCategory.INTENT_MODE_UPDATE;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,9 +11,10 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.room.Room;
 
-import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepositoryInterface;
+import com.example.lucas.haushaltsmanager.Database.AppDatabase;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryDAO;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.ActionPayload;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.DeleteCategoryMenuItem;
@@ -23,13 +28,8 @@ import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.ItemCreator;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.CategoryItem.CategoryItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.CategoryListRecyclerViewAdapter;
-import com.github.fafaldo.fabtoolbar.widget.FABToolbarLayout;
 
 import java.util.List;
-
-import static com.example.lucas.haushaltsmanager.Activities.CreateCategory.INTENT_CATEGORY;
-import static com.example.lucas.haushaltsmanager.Activities.CreateCategory.INTENT_MODE;
-import static com.example.lucas.haushaltsmanager.Activities.CreateCategory.INTENT_MODE_UPDATE;
 
 public class CategoryList extends AbstractAppCompatActivity implements
         RecyclerItemClickListener.OnRecyclerItemClickListener,
@@ -38,7 +38,7 @@ public class CategoryList extends AbstractAppCompatActivity implements
     private RecyclerView mRecyclerView;
     private FABToolbarWithActionHandler mFabToolbar;
     private CategoryListRecyclerViewAdapter mRecyclerViewAdapter;
-    private CategoryRepositoryInterface categoryRepository;
+    private CategoryDAO categoryRepo;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -49,11 +49,11 @@ public class CategoryList extends AbstractAppCompatActivity implements
         mRecyclerView.setLayoutManager(LayoutManagerFactory.vertical(this));
         mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, mRecyclerView, this));
 
-        categoryRepository = new CategoryRepository(this);
+        categoryRepo = Room.databaseBuilder(this, AppDatabase.class, "expenses")
+                .allowMainThreadQueries() // TODO: Remove
+                .build().categoryDAO();
 
-        mFabToolbar = new FABToolbarWithActionHandler(
-                (FABToolbarLayout) findViewById(R.id.category_list_fab_toolbar)
-        );
+        mFabToolbar = new FABToolbarWithActionHandler(findViewById(R.id.category_list_fab_toolbar));
         mFabToolbar.setOnFabClickListener(this);
 
         setActionHandler();
@@ -150,18 +150,12 @@ public class CategoryList extends AbstractAppCompatActivity implements
     }
 
     private List<IRecyclerItem> loadData() {
-        List<Category> categories = categoryRepository.getAll();
+        List<Category> categories = categoryRepo.getAll();
 
         return ItemCreator.createCategoryItems(categories);
     }
 
     private void setActionHandler() {
-        mFabToolbar.addMenuItem(new DeleteCategoryMenuItem(new DeleteCategoryMenuItem.OnSuccessCallback() {
-            @Override
-            public void onSuccess(IRecyclerItem deletedItem) {
-
-                mRecyclerViewAdapter.removeItem(deletedItem);
-            }
-        }, new CategoryRepository(this)), this);
+        mFabToolbar.addMenuItem(new DeleteCategoryMenuItem(deletedItem -> mRecyclerViewAdapter.removeItem(deletedItem), categoryRepo), this);
     }
 }

@@ -3,7 +3,7 @@ package com.example.lucas.haushaltsmanager.ReportBuilder.Widgets;
 import android.content.Context;
 import android.view.View;
 
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
 import com.example.lucas.haushaltsmanager.R;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
@@ -26,7 +26,7 @@ public class LineChartWidget implements Widget {
     }
 
     @Override
-    public void setData(List<ExpenseObject> expenses) {
+    public void setData(List<Booking> expenses) {
         // TODO: Update data
         chart.invalidate();
     }

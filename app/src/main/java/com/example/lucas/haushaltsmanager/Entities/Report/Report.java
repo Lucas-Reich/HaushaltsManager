@@ -6,9 +6,9 @@ import androidx.annotation.StringRes;
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
-import com.example.lucas.haushaltsmanager.Entities.Expense.IBooking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.ExpenseType;
+import com.example.lucas.haushaltsmanager.Entities.Booking.IBooking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.ParentBooking;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSum;
 
@@ -18,19 +18,19 @@ import java.util.Map;
 
 public class Report implements ReportInterface {
     private String mCardTitle;
-    private List<ExpenseObject> mExpenses;
+    private final List<IBooking> bookings;
 
     public Report(
             @NonNull String cardTitle,
-            @NonNull List<ExpenseObject> expenses
+            @NonNull List<IBooking> bookings
     ) {
         setCardTitle(cardTitle);
-        mExpenses = expenses;
+        this.bookings = bookings;
     }
 
     @NonNull
-    public List<ExpenseObject> getExpenses() {
-        return mExpenses;
+    public List<IBooking> getExpenses() {
+        return bookings;
     }
 
     @Override
@@ -43,19 +43,19 @@ public class Report implements ReportInterface {
     public double getIncoming() {
         ExpenseSum expenseSum = new ExpenseSum();
 
-        return expenseSum.byExpenditureType(false, mExpenses);
+        return expenseSum.byExpenditureTypeNew(false, bookings);
     }
 
     @Override
     public double getOutgoing() {
         ExpenseSum expenseSum = new ExpenseSum();
 
-        return expenseSum.byExpenditureType(true, mExpenses);
+        return expenseSum.byExpenditureTypeNew(true, bookings);
     }
 
     @Override
     public int getBookingCount() {
-        return getExpensesCount(mExpenses);
+        return getExpensesCount(bookings);
     }
 
     @Override
@@ -80,7 +80,7 @@ public class Report implements ReportInterface {
     }
 
     public List<IBooking> getBookings() {
-        return (List<IBooking>) (List<?>) mExpenses;
+        return bookings;
     }
 
     private String getResourceString(@StringRes int stringRes) {
@@ -98,7 +98,7 @@ public class Report implements ReportInterface {
     private HashMap<Category, Double> sumExpensesByCategory() {
         ExpenseSum expenseSum = new ExpenseSum();
 
-        return expenseSum.byCategory(mExpenses);
+        return expenseSum.byCategoryNew(bookings);
     }
 
     private Map.Entry<Category, Double> getMaxEntry(HashMap<Category, Double> categoryDoubleHashMap) {
@@ -113,14 +113,15 @@ public class Report implements ReportInterface {
         return minCategory;
     }
 
-    private int getExpensesCount(List<ExpenseObject> expenses) {
+    private int getExpensesCount(List<IBooking> bookings) {
         int count = 0;
 
-        for (ExpenseObject expense : expenses) {
-            if (expense.isParent())
-                count += expense.getChildren().size();
-            else
+        for (IBooking booking : bookings) {
+            if (booking instanceof ParentBooking) {
+                count += ((ParentBooking) booking).getChildren().size();
+            } else {
                 count += 1;
+            }
         }
 
         return count;

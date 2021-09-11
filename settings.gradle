@@ -1,1 +1,1 @@
-include ':app', ':changelogdialog', ':androidcharts'
+include ':app', ':changelogdialog'

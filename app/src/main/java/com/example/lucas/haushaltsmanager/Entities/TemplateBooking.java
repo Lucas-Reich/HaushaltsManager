@@ -5,7 +5,7 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
 
 import java.util.UUID;
 
@@ -24,23 +24,23 @@ public class TemplateBooking implements Parcelable {
     };
 
     private final UUID id;
-    private final ExpenseObject template;
+    private final Booking template;
 
     public TemplateBooking(
             @NonNull UUID id,
-            @NonNull ExpenseObject template
+            @NonNull Booking template
     ) {
         this.id = id;
         this.template = template;
     }
 
-    public TemplateBooking(@NonNull ExpenseObject template) {
+    public TemplateBooking(@NonNull Booking template) {
         this(UUID.randomUUID(), template);
     }
 
     private TemplateBooking(Parcel source) {
         this.id = UUID.fromString(source.readString());
-        this.template = (ExpenseObject) source.readParcelable(ExpenseObject.class.getClassLoader());
+        this.template = (Booking) source.readParcelable(Booking.class.getClassLoader());
     }
 
     @Override
@@ -70,7 +70,7 @@ public class TemplateBooking implements Parcelable {
         return id;
     }
 
-    public ExpenseObject getTemplate() {
+    public Booking getTemplate() {
         return template;
     }
 

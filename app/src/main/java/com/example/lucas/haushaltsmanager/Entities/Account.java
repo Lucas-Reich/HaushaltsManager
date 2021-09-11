@@ -4,11 +4,15 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
 
 import java.util.UUID;
 
-// TODO: Should I add all bookings for one account into a parameters within the Account class?
+@Entity(tableName = "accounts")
 public class Account implements Parcelable {
+    @Ignore
     public static final Parcelable.Creator<Account> CREATOR = new Parcelable.Creator<Account>() {
 
         @Override
@@ -23,20 +27,24 @@ public class Account implements Parcelable {
             return new Account[size];
         }
     };
-    private final UUID id;
+
+    @PrimaryKey
+    @NonNull
+    private UUID id;
     private String name;
-    private Price balance;
+    private Price price;
 
     public Account(
             @NonNull UUID id,
             @NonNull String name,
-            @NonNull Price balance
+            @NonNull Price price
     ) {
         this.id = id;
         this.name = name;
-        this.balance = balance;
+        this.price = price;
     }
 
+    @Ignore
     public Account(@NonNull String accountName, Price price) {
         this(UUID.randomUUID(), accountName, price);
     }
@@ -49,10 +57,11 @@ public class Account implements Parcelable {
      *
      * @param source .
      */
+    @Ignore
     public Account(Parcel source) {
         this.id = UUID.fromString(source.readString());
         setName(source.readString());
-        setBalance((Price) source.readParcelable(Price.class.getClassLoader()));
+        setPrice(source.readParcelable(Price.class.getClassLoader()));
     }
 
     @Override
@@ -63,7 +72,7 @@ public class Account implements Parcelable {
 
         Account otherAccount = (Account) obj;
 
-        return name.equals(otherAccount.getTitle())
+        return name.equals(otherAccount.getName())
                 && id.equals(otherAccount.getId());
     }
 
@@ -71,7 +80,7 @@ public class Account implements Parcelable {
     @NonNull
     public String toString() {
 
-        return getTitle();
+        return getName();
     }
 
     @Override
@@ -88,33 +97,36 @@ public class Account implements Parcelable {
      */
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-
         dest.writeString(id.toString());
         dest.writeString(name);
-        dest.writeParcelable(balance, flags);
+        dest.writeParcelable(price, flags);
     }
 
+    @NonNull
     public UUID getId() {
         return id;
     }
 
-    @NonNull
-    public String getTitle() {
+    public void setId(@NonNull UUID id) {
+        this.id = id;
+    }
 
+    @NonNull
+    public String getName() {
         return name;
     }
 
     public void setName(@NonNull String accountName) {
-
         this.name = accountName;
     }
 
-    public Price getBalance() {
-        return balance;
+    @NonNull
+    public Price getPrice() {
+        return price;
     }
 
-    public void setBalance(Price balance) {
-        this.balance = balance;
+    public void setPrice(@NonNull Price price) {
+        this.price = price;
     }
 
     /**
@@ -125,6 +137,6 @@ public class Account implements Parcelable {
      */
     public boolean isSet() {
 
-        return !getTitle().equals("");
+        return !getName().equals("");
     }
 }

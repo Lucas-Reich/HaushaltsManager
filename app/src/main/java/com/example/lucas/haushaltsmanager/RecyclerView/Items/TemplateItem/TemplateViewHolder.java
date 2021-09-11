@@ -46,7 +46,7 @@ public class TemplateViewHolder extends AbstractViewHolder {
 
     private void setRoundedTextView(Category category) {
         roundedTextView.setCircleColorConsiderBrightness(category.getColor().getColorInt());
-        roundedTextView.setCenterText(category.getTitle().charAt(0) + "");
+        roundedTextView.setCenterText(category.getName().charAt(0) + "");
     }
 
     private void setTitle(String title) {

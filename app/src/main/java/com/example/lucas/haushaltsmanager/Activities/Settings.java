@@ -3,7 +3,6 @@ package com.example.lucas.haushaltsmanager.Activities;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
@@ -35,12 +34,11 @@ import com.example.lucas.haushaltsmanager.Worker.WorkRequestBuilder;
 import java.util.Arrays;
 
 public class Settings extends AbstractAppCompatActivity {
-
     /**
      * Maximale Anzahl von gleichzeitig existierenden Backups.
      */
     public static final int DEFAULT_BACKUP_CAP = 20;
-    public static final int DEFAULT_WEEKDAY = WeekdayUtils.MONDAY;
+    public static final int DEFAULT_WEEKDAY = 0; // Monday
     public static final boolean DEFAULT_BACKUP_STATUS = true;
     public static final boolean DEFAULT_REMINDER_STATUS = false;
     public static final Time DEFAULT_REMINDER_TIME = new Time(10, 0);
@@ -50,7 +48,7 @@ public class Settings extends AbstractAppCompatActivity {
     private CheckBox createBackupsChk, allowReminderChk;
     private TextView firstDayOfWeekTxt, maxBackupCountTxt, backupCountTextTxt, notificationTimeTxt, notificationTimeTextTxt, backupLocationTxt, backupLocationHeadingTxt;
     private UserSettingsPreferences mUserSettings;
-    private WeekdayUtils mWeekdayUtils;
+    private WeekdayUtils mWeekdayUtilsKt;
     private AppInternalPreferences mInternalPreferences;
 
     @Override
@@ -85,161 +83,124 @@ public class Settings extends AbstractAppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        mWeekdayUtils = new WeekdayUtils(this);
+        mWeekdayUtilsKt = new WeekdayUtils(this);
 
         mInternalPreferences = new AppInternalPreferences(this);
 
-        setFirstDayOfWeek(mWeekdayUtils.getWeekday(mUserSettings.getFirstDayOfWeek()));
-        firstDayLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        setFirstDayOfWeek(mWeekdayUtilsKt.getWeekday(mUserSettings.getFirstDayOfWeek()));
+        firstDayLayout.setOnClickListener(view -> {
 
-                SingleChoiceDialog<String> weekdayPicker = new SingleChoiceDialog<>();
-                weekdayPicker.createBuilder(Settings.this);
-                weekdayPicker.setTitle(getString(R.string.choose_weekday));
-                weekdayPicker.setContent(Arrays.asList(mWeekdayUtils.getWeekdays()), mUserSettings.getFirstDayOfWeek());
-                weekdayPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
-                    @Override
-                    public void onPositiveClick(Object weekday) {
+            SingleChoiceDialog<String> weekdayPicker = new SingleChoiceDialog<>();
+            weekdayPicker.createBuilder(Settings.this);
+            weekdayPicker.setTitle(getString(R.string.choose_weekday));
+            weekdayPicker.setContent(Arrays.asList(mWeekdayUtilsKt.getWeekdays()), mUserSettings.getFirstDayOfWeek());
+            weekdayPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
+                @Override
+                public void onPositiveClick(Object weekday) {
 
-                        setFirstDayOfWeek((String) weekday);
-                    }
+                    setFirstDayOfWeek((String) weekday);
+                }
 
-                    @Override
-                    public void onNeutralClick() {
+                @Override
+                public void onNeutralClick() {
 
-                        //do nothing
-                    }
-                });
-                weekdayPicker.show(getFragmentManager(), "settings_choose_weekday");
-            }
+                    //do nothing
+                }
+            });
+            weekdayPicker.show(getFragmentManager(), "settings_choose_weekday");
         });
 
         setAutomaticBackupStatus(mUserSettings.getAutomaticBackupStatus());
-        createBkpLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                setAutomaticBackupStatus(!createBackupsChk.isChecked());
-            }
-        });
+        createBkpLayout.setOnClickListener(view -> setAutomaticBackupStatus(!createBackupsChk.isChecked()));
 
         setBackupLocation(mInternalPreferences.getBackupDirectory());
-        backupLocationLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        backupLocationLayout.setOnClickListener(v -> {
 
-                if (!hasFilePermission())
-                    requestFilePermission();
+            if (!hasFilePermission())
+                requestFilePermission();
 
-                StorageChooser storageChooser = new StorageChooser.Builder()
-                        .withActivity(Settings.this)
-                        .withFragmentManager(getFragmentManager())
-                        .withMemoryBar(true)
-                        .allowAddFolder(true)
-                        .allowCustomPath(true)
-                        .setType(StorageChooser.DIRECTORY_CHOOSER)
-                        .build();
+            StorageChooser storageChooser = new StorageChooser.Builder()
+                    .withActivity(Settings.this)
+                    .withFragmentManager(getFragmentManager())
+                    .withMemoryBar(true)
+                    .allowAddFolder(true)
+                    .allowCustomPath(true)
+                    .setType(StorageChooser.DIRECTORY_CHOOSER)
+                    .build();
 
-                storageChooser.show();
-                storageChooser.setOnSelectListener(new StorageChooser.OnSelectListener() {
-                    @Override
-                    public void onSelect(String directory) {
-
-                        setBackupLocation(new Directory(directory));
-                    }
-                });
-            }
+            storageChooser.show();
+            storageChooser.setOnSelectListener(directory -> setBackupLocation(new Directory(directory)));
         });
 
         setMaxBackupCount(mUserSettings.getMaxBackupCount());
-        concurrentBackupsLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        concurrentBackupsLayout.setOnClickListener(view -> {
 
-                SingleChoiceDialog<String> concurrentBackupCount = new SingleChoiceDialog<>();
-                concurrentBackupCount.createBuilder(Settings.this);
-                concurrentBackupCount.setTitle(getString(R.string.choose_backup_amount));
-                concurrentBackupCount.setContent(Arrays.asList(getConcurrentBackupCountOptions()), -1);
-                concurrentBackupCount.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
-                    @Override
-                    public void onPositiveClick(Object count) {
+            SingleChoiceDialog<String> concurrentBackupCount = new SingleChoiceDialog<>();
+            concurrentBackupCount.createBuilder(Settings.this);
+            concurrentBackupCount.setTitle(getString(R.string.choose_backup_amount));
+            concurrentBackupCount.setContent(Arrays.asList(getConcurrentBackupCountOptions()), -1);
+            concurrentBackupCount.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
+                @Override
+                public void onPositiveClick(Object count) {
 
-                        setMaxBackupCount(Integer.parseInt((String) count));
-                    }
+                    setMaxBackupCount(Integer.parseInt((String) count));
+                }
 
-                    @Override
-                    public void onNeutralClick() {
+                @Override
+                public void onNeutralClick() {
 
-                        //do nothing
-                    }
-                });
-                concurrentBackupCount.show(getFragmentManager(), "settings_concurrent_backups");
-            }
+                    //do nothing
+                }
+            });
+            concurrentBackupCount.show(getFragmentManager(), "settings_concurrent_backups");
         });
 
         setReminderStatus(mUserSettings.getReminderStatus());
-        allowReminderChk.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                setReminderStatus(allowReminderChk.isChecked());
-            }
-        });
+        allowReminderChk.setOnClickListener(v -> setReminderStatus(allowReminderChk.isChecked()));
 
         setReminderTime(mUserSettings.getReminderTime());
-        notificationTimeLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        notificationTimeLayout.setOnClickListener(view -> {
 
-                SingleChoiceDialog<String> timePicker = new SingleChoiceDialog<>();
-                timePicker.createBuilder(Settings.this);
-                timePicker.setTitle(getString(R.string.choose_time));
-                timePicker.setContent(Arrays.asList(getTimeArray()), -1);
-                timePicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
-                    @Override
-                    public void onPositiveClick(Object time) {
+            SingleChoiceDialog<String> timePicker = new SingleChoiceDialog<>();
+            timePicker.createBuilder(Settings.this);
+            timePicker.setTitle(getString(R.string.choose_time));
+            timePicker.setContent(Arrays.asList(getTimeArray()), -1);
+            timePicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
+                @Override
+                public void onPositiveClick(Object time) {
 
-                        setReminderTime(Time.fromString((String) time));
-                    }
+                    setReminderTime(Time.fromString((String) time));
+                }
 
-                    @Override
-                    public void onNeutralClick() {
+                @Override
+                public void onNeutralClick() {
 
-                        //do nothing
-                    }
-                });
-                timePicker.show(getFragmentManager(), "settings_choose_notification_time");
-            }
+                    //do nothing
+                }
+            });
+            timePicker.show(getFragmentManager(), "settings_choose_notification_time");
         });
 
-        resetSettingsBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Bundle bundle = new Bundle();
-                bundle.putString(ConfirmationDialog.TITLE, getString(R.string.attention));
-                bundle.putString(ConfirmationDialog.CONTENT, getString(R.string.reset_settings_alert_message));
+        resetSettingsBtn.setOnClickListener(view -> {
+            Bundle bundle = new Bundle();
+            bundle.putString(ConfirmationDialog.TITLE, getString(R.string.attention));
+            bundle.putString(ConfirmationDialog.CONTENT, getString(R.string.reset_settings_alert_message));
 
-                ConfirmationDialog confirmationDialog = new ConfirmationDialog();
-                confirmationDialog.setArguments(bundle);
-                confirmationDialog.setOnConfirmationListener(new ConfirmationDialog.OnConfirmationResult() {
-                    @Override
-                    public void onConfirmationResult(boolean reset) {
+            ConfirmationDialog confirmationDialog = new ConfirmationDialog();
+            confirmationDialog.setArguments(bundle);
+            confirmationDialog.setOnConfirmationListener(reset -> {
+                if (reset) {
 
-                        if (reset) {
+                    setFirstDayOfWeek(mWeekdayUtilsKt.getWeekday(DEFAULT_WEEKDAY));
+                    setAutomaticBackupStatus(DEFAULT_BACKUP_STATUS);
+                    setMaxBackupCount(DEFAULT_BACKUP_CAP);
+                    setReminderStatus(DEFAULT_REMINDER_STATUS);
+                    setReminderTime(DEFAULT_REMINDER_TIME);
+                    //die Hauptwährung auch zurücksetzen?
+                }
+            });
 
-                            setFirstDayOfWeek(mWeekdayUtils.getWeekday(DEFAULT_WEEKDAY));
-                            setAutomaticBackupStatus(DEFAULT_BACKUP_STATUS);
-                            setMaxBackupCount(DEFAULT_BACKUP_CAP);
-                            setReminderStatus(DEFAULT_REMINDER_STATUS);
-                            setReminderTime(DEFAULT_REMINDER_TIME);
-                            //die Hauptwährung auch zurücksetzen?
-                        }
-                    }
-                });
-
-                confirmationDialog.show(getFragmentManager(), "settings_confirm_reset");
-            }
+            confirmationDialog.show(getFragmentManager(), "settings_confirm_reset");
         });
     }
 

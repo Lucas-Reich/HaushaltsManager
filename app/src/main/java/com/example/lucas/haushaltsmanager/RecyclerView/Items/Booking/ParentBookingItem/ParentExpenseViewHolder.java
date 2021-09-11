@@ -4,8 +4,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.example.lucas.haushaltsmanager.Entities.Category;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ParentBooking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.ParentBooking;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.AbstractViewHolder;
@@ -61,7 +61,7 @@ public class ParentExpenseViewHolder extends AbstractViewHolder {
         ));
     }
 
-    private void setPieChart(List<ExpenseObject> bookings) {
+    private void setPieChart(List<Booking> bookings) {
         PieData data = createPieData(bookings);
 
         pieChart.setData(data);
@@ -73,7 +73,7 @@ public class ParentExpenseViewHolder extends AbstractViewHolder {
         pieChart.setDrawHoleEnabled(false);
     }
 
-    private PieData createPieData(List<ExpenseObject> bookings) {
+    private PieData createPieData(List<Booking> bookings) {
         HashMap<Category, Double> map = new ExpenseSum().byCategory(bookings);
 
         List<PieEntry> entries = new ArrayList<>();

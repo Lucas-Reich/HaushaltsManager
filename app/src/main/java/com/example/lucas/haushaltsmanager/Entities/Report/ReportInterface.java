@@ -1,8 +1,7 @@
 package com.example.lucas.haushaltsmanager.Entities.Report;
 
 import com.example.lucas.haushaltsmanager.Entities.Category;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
-import com.example.lucas.haushaltsmanager.Entities.Expense.IBooking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.IBooking;
 
 import java.util.List;
 
@@ -21,5 +20,5 @@ public interface ReportInterface {
 
     void setCardTitle(String title);
 
-    List<ExpenseObject> getExpenses();
+    List<IBooking> getExpenses();
 }

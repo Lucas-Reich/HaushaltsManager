@@ -9,13 +9,12 @@ import androidx.annotation.StringRes;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.res.ResourcesCompat;
 
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Booking.IBooking;
 import com.example.lucas.haushaltsmanager.Entities.Report.ReportInterface;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseGrouper;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSum;
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
@@ -106,12 +105,7 @@ public class LineChartCardPopulator {
     private IAxisValueFormatter getXAxisLabels() {
         final String[] month = getMonthsShortened();
 
-        return new IAxisValueFormatter() {
-            @Override
-            public String getFormattedValue(float value, AxisBase axis) {
-                return month[(int) value - 1];
-            }
-        };
+        return (value, axis) -> month[(int) value - 1];
     }
 
     private String[] getMonthsShortened() {
@@ -124,10 +118,10 @@ public class LineChartCardPopulator {
         return months;
     }
 
-    private List<Entry> getChartEntries(List<ExpenseObject> expenses) {
+    private List<Entry> getChartEntries(List<IBooking> bookings) {
         List<Entry> entries = new ArrayList<>();
 
-        List<List<ExpenseObject>> groupedValues = getAccountBalances(expenses);
+        List<List<IBooking>> groupedValues = getAccountBalances(bookings);
 
         float lastValue = (float) mLastYearAccountBalance;
         for (int i = 0; i < 12; i++) {
@@ -140,11 +134,11 @@ public class LineChartCardPopulator {
         return entries;
     }
 
-    private double sum(List<ExpenseObject> expenses) {
-        return new ExpenseSum().sum(expenses);
+    private double sum(List<IBooking> bookings) {
+        return new ExpenseSum().sumNew(bookings);
     }
 
-    private List<List<ExpenseObject>> getAccountBalances(List<ExpenseObject> expenses) {
+    private List<List<IBooking>> getAccountBalances(List<IBooking> expenses) {
         return new ExpenseGrouper().byMonths(expenses, mCurrentYear);
     }
 

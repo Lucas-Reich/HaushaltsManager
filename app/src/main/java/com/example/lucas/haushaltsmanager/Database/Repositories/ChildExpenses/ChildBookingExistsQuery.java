@@ -1,12 +1,12 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses;
 
 import com.example.lucas.haushaltsmanager.Database.QueryInterface;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
 
 class ChildBookingExistsQuery implements QueryInterface {
-    private final ExpenseObject childBooking;
+    private final Booking childBooking;
 
-    public ChildBookingExistsQuery(ExpenseObject childBooking) {
+    public ChildBookingExistsQuery(Booking childBooking) {
         this.childBooking = childBooking;
     }
 

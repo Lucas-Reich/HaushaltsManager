@@ -6,7 +6,7 @@ import android.content.Intent;
 import androidx.annotation.DrawableRes;
 
 import com.example.lucas.haushaltsmanager.Activities.ExpenseScreen;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.ActionPayload;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.ActionKey;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.IActionKey;
@@ -42,12 +42,12 @@ public class AddChildMenuItem implements IMenuItem {
 
     @Override
     public void handleClick(ActionPayload payload, Context context) {
-        ExpenseObject parent = (ExpenseObject) payload.getFirstItem().getContent();
+        Booking parent = (Booking) payload.getFirstItem().getContent();
 
         context.startActivity(createIntent(parent, context));
     }
 
-    private Intent createIntent(ExpenseObject expense, Context context) {
+    private Intent createIntent(Booking expense, Context context) {
         Intent addChildIntent = new Intent(context, ExpenseScreen.class);
         addChildIntent.putExtra(ExpenseScreen.INTENT_MODE, ExpenseScreen.INTENT_MODE_ADD_CHILD);
         addChildIntent.putExtra(ExpenseScreen.INTENT_BOOKING, expense);

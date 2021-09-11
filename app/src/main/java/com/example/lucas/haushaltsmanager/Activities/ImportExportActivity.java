@@ -18,7 +18,7 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Expense
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ErrorAlertDialog;
 import com.example.lucas.haushaltsmanager.Entities.Directory;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Booking.IBooking;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.RecyclerItemClickListener;
 import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.ItemCreator;
@@ -190,12 +190,7 @@ public class ImportExportActivity extends AbstractAppCompatActivity implements R
         );
     }
 
-    /**
-     * Methode um alle Buchungen aus der Datenbank abzufragen.
-     *
-     * @return Alle Buchungen
-     */
-    private List<ExpenseObject> getAllExpenses() {
+    private List<IBooking> getAllExpenses() {
         // IMPROVEMENT: Den User fragen, welche Buchung genau exportiert werden sollen (welches Konto, Zeitraum, ...)
         ExpenseRepository repo = new ExpenseRepository(this);
 

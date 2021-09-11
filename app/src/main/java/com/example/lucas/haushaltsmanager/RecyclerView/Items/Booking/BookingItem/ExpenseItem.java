@@ -2,17 +2,17 @@ package com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.BookingIte
 
 import androidx.annotation.NonNull;
 
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.IBookingItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
 
 public class ExpenseItem implements IBookingItem {
     public static final int VIEW_TYPE = 1;
 
-    private final ExpenseObject expense;
+    private final Booking expense;
     private final DateItem parent;
 
-    public ExpenseItem(ExpenseObject expense, DateItem parent) {
+    public ExpenseItem(Booking expense, DateItem parent) {
         this.expense = expense;
         this.parent = parent;
     }
@@ -23,7 +23,7 @@ public class ExpenseItem implements IBookingItem {
     }
 
     @Override
-    public ExpenseObject getContent() {
+    public Booking getContent() {
         return expense;
     }
 

@@ -4,12 +4,11 @@ import android.database.Cursor;
 
 import com.example.lucas.haushaltsmanager.Database.TransformerInterface;
 import com.example.lucas.haushaltsmanager.Entities.Category;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
 import com.example.lucas.haushaltsmanager.Entities.Frequency;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.Entities.RecurringBooking;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.UUID;
 
@@ -55,11 +54,11 @@ public class RecurringBookingTransformer implements TransformerInterface<Recurri
         return createFromMillis(rawEnd);
     }
 
-    private ExpenseObject extractExpense(Cursor c) {
+    private Booking extractExpense(Cursor c) {
         String title = c.getString(c.getColumnIndex("title"));
         Category category = categoryTransformer.transform(c);
 
-        return new ExpenseObject(
+        return new Booking(
                 new UUID(0, 0),
                 title,
                 extractPrice(c),
@@ -67,8 +66,7 @@ public class RecurringBookingTransformer implements TransformerInterface<Recurri
                 category,
                 "",
                 getAccountId(c),
-                extractExpenseType(c),
-                new ArrayList<ExpenseObject>()
+                extractExpenseType(c)
         );
     }
 
@@ -78,10 +76,10 @@ public class RecurringBookingTransformer implements TransformerInterface<Recurri
         return UUID.fromString(rawAccountId);
     }
 
-    private ExpenseObject.EXPENSE_TYPES extractExpenseType(Cursor c) {
+    private Booking.EXPENSE_TYPES extractExpenseType(Cursor c) {
         String rawExpenseType = c.getString(c.getColumnIndex("expense_type"));
 
-        return ExpenseObject.EXPENSE_TYPES.valueOf(rawExpenseType);
+        return Booking.EXPENSE_TYPES.valueOf(rawExpenseType);
     }
 
     private Calendar extractDate(Cursor c) {

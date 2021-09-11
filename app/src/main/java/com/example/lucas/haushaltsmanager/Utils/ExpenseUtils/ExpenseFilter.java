@@ -1,25 +1,19 @@
 package com.example.lucas.haushaltsmanager.Utils.ExpenseUtils;
 
-import androidx.annotation.NonNull;
-
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
-import com.example.lucas.haushaltsmanager.Entities.Expense.IBooking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.IBooking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.ParentBooking;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
 
 public class ExpenseFilter {
 
-    public List<ExpenseObject> byExpenditureType(List<ExpenseObject> expenses, boolean filter) {
-        List<ExpenseObject> filteredExpenses = new ArrayList<>();
+    public List<Booking> byExpenditureType(List<Booking> expenses, boolean filter) {
+        List<Booking> filteredExpenses = new ArrayList<>();
 
-        for (ExpenseObject expense : expenses) {
-            if (expense.isParent()) {
-                continue;
-            }
-
+        for (Booking expense : expenses) {
             if (expense.getPrice().isNegative() != filter) {
                 continue;
             }
@@ -30,29 +24,11 @@ public class ExpenseFilter {
         return filteredExpenses;
     }
 
-    public List<ExpenseObject> byMonth(List<ExpenseObject> expenses, int month, int year) {
-        List<ExpenseObject> filteredExpenses = new ArrayList<>();
+    public List<IBooking> byAccountWithParents(List<IBooking> bookings, List<UUID> accounts) {
+        List<IBooking> filteredExpenses = new ArrayList<>();
 
-        for (ExpenseObject expense : expenses) {
-            if (expense.isParent()) {
-                continue;
-            }
-
-            if (!isInMonth(expense, month) || !isInYear(expense, year)) {
-                continue;
-            }
-
-            filteredExpenses.add(expense);
-        }
-
-        return filteredExpenses;
-    }
-
-    public List<ExpenseObject> byAccountWithParents(List<ExpenseObject> expenses, List<UUID> accounts) {
-        List<ExpenseObject> filteredExpenses = new ArrayList<>();
-
-        for (ExpenseObject expense : expenses) {
-            ExpenseObject visibleExpense = getVisibleExpense(expense, accounts);
+        for (IBooking booking : bookings) {
+            IBooking visibleExpense = getVisibleExpense(booking, accounts);
             if (null != visibleExpense) {
                 filteredExpenses.add(visibleExpense);
             }
@@ -61,84 +37,78 @@ public class ExpenseFilter {
         return filteredExpenses;
     }
 
-    @Deprecated
-    public List<ExpenseObject> byAccountWithChildren(
-            @NonNull List<ExpenseObject> expenses,
-            @NonNull List<UUID> accounts
-    ) {
-        return byAccount(pullChildrenUp(expenses), accounts);
-    }
+    public List<IBooking> byAccountNew(List<IBooking> bookings, List<UUID> accounts) {
+        List<IBooking> filteredExpenses = new ArrayList<>();
 
-    public List<ExpenseObject> byAccount(List<ExpenseObject> expenses, List<UUID> accounts) {
-        List<ExpenseObject> filteredExpenses = new ArrayList<>();
-
-        for (ExpenseObject expense : expenses) {
-            if (expense.isParent()) {
+        for (IBooking booking : bookings) {
+            if (booking instanceof ParentBooking) {
+                ParentBooking parent = byAccount((ParentBooking) booking, accounts);
+                filteredExpenses.add(parent);
                 continue;
             }
 
-            if (!hasAccount(expense, accounts)) {
+            if (!hasAccount((Booking) booking, accounts)) {
                 continue;
             }
 
-            filteredExpenses.add(expense);
+            filteredExpenses.add(booking);
         }
 
         return filteredExpenses;
     }
 
-    private List<ExpenseObject> pullChildrenUp(List<ExpenseObject> expenses) {
-        List<ExpenseObject> extractedExpenses = new ArrayList<>();
+    private ParentBooking byAccount(ParentBooking parent, List<UUID> accountIds) {
+        List<Booking> childrenWithCorrectAccount = new ArrayList<>();
 
-        for (ExpenseObject expense : expenses) {
-            if (expense.isParent())
-                extractedExpenses.addAll(expense.getChildren());
-            else
-                extractedExpenses.add(expense);
+        for (Booking child : parent.getChildren()) {
+            if (!hasAccount(child, accountIds)) {
+                continue;
+            }
+
+            childrenWithCorrectAccount.add(child);
         }
 
-        return extractedExpenses;
+        return new ParentBooking(
+                parent.getId(),
+                parent.getTitle(),
+                parent.getDate(),
+                childrenWithCorrectAccount
+        );
     }
 
-    private boolean hasAccount(ExpenseObject expense, List<UUID> accounts) {
+    private boolean hasAccount(Booking expense, List<UUID> accounts) {
         return accounts.contains(expense.getAccountId());
     }
 
-    private ExpenseObject getVisibleExpense(ExpenseObject expense, List<UUID> accounts) {
-        if (expense.isParent()) {
-            ExpenseObject expenseWithVisibleChildren = removeInvisibleChildren(expense, accounts);
+    private IBooking getVisibleExpense(IBooking booking, List<UUID> accounts) {
+        if (booking instanceof ParentBooking) {
+            ParentBooking parent = removeInvisibleChildren((ParentBooking) booking, accounts);
 
-            if (expenseWithVisibleChildren.getChildren().size() != 0) {
-                return expenseWithVisibleChildren;
+            if (parent.getChildren().size() != 0) {
+                return parent;
             }
         } else {
-            if (hasAccount(expense, accounts)) {
-                return expense;
+            if (hasAccount((Booking) booking, accounts)) {
+                return booking;
             }
         }
 
         return null;
     }
 
-    private ExpenseObject removeInvisibleChildren(ExpenseObject expense, List<UUID> accounts) {
-        List<ExpenseObject> visibleChildren = new ArrayList<>();
-        for (ExpenseObject child : expense.getChildren()) {
+    private ParentBooking removeInvisibleChildren(ParentBooking expense, List<UUID> accounts) {
+        List<Booking> visibleChildren = new ArrayList<>();
+        for (Booking child : expense.getChildren()) {
             if (hasAccount(child, accounts)) {
                 visibleChildren.add(child);
             }
         }
 
-        expense.removeChildren();
-        expense.addChildren(visibleChildren);
-
-        return expense;
-    }
-
-    private boolean isInMonth(IBooking expense, int month) {
-        return expense.getDate().get(Calendar.MONTH) == month;
-    }
-
-    private boolean isInYear(IBooking expense, int year) {
-        return expense.getDate().get(Calendar.YEAR) == year;
+        return new ParentBooking(
+                expense.getId(),
+                expense.getTitle(),
+                expense.getDate(),
+                visibleChildren
+        );
     }
 }

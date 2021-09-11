@@ -5,17 +5,16 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.room.Room;
 
 import com.example.lucas.haushaltsmanager.Activities.CreateAccountActivity;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.CannotDeleteAccountException;
+import com.example.lucas.haushaltsmanager.Database.AppDatabase;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountDAO;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences.ActiveAccountsPreferences;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
@@ -29,26 +28,28 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Acco
     private OnSelectedAccount mCallback;
     private ListView mListView;
     private Map<Account, Boolean> mInitialAccountState;
-    private AccountRepository mAccountRepo;
+    private AccountDAO accountRepo;
     private ActiveAccountsPreferences mAccountPreferences;
     private UserSettingsPreferences mUserPreferences;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mAccountRepo = new AccountRepository(getActivity());
+        accountRepo = Room.databaseBuilder(getActivity(), AppDatabase.class, "expenses")
+                .allowMainThreadQueries()
+                .build().accountDAO();
 
         mAccountPreferences = new ActiveAccountsPreferences(getActivity());
         mUserPreferences = new UserSettingsPreferences(getActivity());
-
-        mInitialAccountState = new HashMap<>();
-
-        for (Account account : mAccountRepo.getAll())
-            mInitialAccountState.put(account, mAccountPreferences.isActive(account));
     }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        mInitialAccountState = new HashMap<>();
+
+        for (Account account : accountRepo.getAll()) {
+            mInitialAccountState.put(account, mAccountPreferences.isActive(account));
+        }
 
         prepareListView();
 
@@ -58,32 +59,17 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Acco
 
         builder.setView(mListView);
 
-        builder.setPositiveButton(R.string.btn_ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
+        builder.setPositiveButton(R.string.btn_ok, (dialog, which) -> dismiss());
 
-                dismiss();
-            }
+        builder.setNegativeButton(R.string.btn_cancel, (dialog, which) -> {
+            revertUserInteractions();
+            dismiss();
         });
 
-        builder.setNegativeButton(R.string.btn_cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-                revertUserInteractions();
-                dismiss();
-            }
-        });
-
-        builder.setNeutralButton(R.string.btn_new_acc, new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-                Intent newAccountIntent = new Intent(getActivity(), CreateAccountActivity.class);
-                newAccountIntent.putExtra(CreateAccountActivity.INTENT_MODE, CreateAccountActivity.INTENT_MODE_CREATE);
-                getActivity().startActivity(newAccountIntent);
-            }
+        builder.setNeutralButton(R.string.btn_new_acc, (dialog, which) -> {
+            Intent newAccountIntent = new Intent(getActivity(), CreateAccountActivity.class);
+            newAccountIntent.putExtra(CreateAccountActivity.INTENT_MODE, CreateAccountActivity.INTENT_MODE_CREATE);
+            getActivity().startActivity(newAccountIntent);
         });
 
         return builder.create();
@@ -96,25 +82,19 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Acco
      */
     @Override
     public void onDeleteAccountSelected(Account account) {
+        if (isCurrentMainAccount(account)) {
 
-        try {
-            if (isCurrentMainAccount(account)) {
+            deleteAccount(account);
 
-                deleteAccount(account);
+            Account newMainAccount = getNewMainAccountSafe();
+            if (newMainAccount != null)
+                makeAccountMain(newMainAccount);
+        } else {
 
-                Account newMainAccount = getNewMainAccountSafe();
-                if (newMainAccount != null)
-                    makeAccountMain(newMainAccount);
-            } else {
-
-                deleteAccount(account);
-            }
-
-            Toast.makeText(getActivity(), getString(R.string.deleted_account), Toast.LENGTH_SHORT).show();
-        } catch (CannotDeleteAccountException e) {
-
-            Toast.makeText(getActivity(), getString(R.string.failed_to_delete_account), Toast.LENGTH_SHORT).show();
+            deleteAccount(account);
         }
+
+        Toast.makeText(getActivity(), getString(R.string.deleted_account), Toast.LENGTH_SHORT).show();
 
         dismiss();
     }
@@ -127,7 +107,7 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Acco
     @Override
     public void onAccountSetMain(Account account) {
         makeAccountMain(account);
-        Toast.makeText(getActivity(), account.getTitle() + getString(R.string.changed_main_account), Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), account.getName() + getString(R.string.changed_main_account), Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -154,15 +134,12 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Acco
         mListView.setDividerHeight(0);
         mListView.setItemsCanFocus(false);
         mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                CheckBox accountChk = view.findViewById(R.id.listview_account_item_chkbox);
-                boolean newVisibilityState = !accountChk.isChecked();
+        mListView.setOnItemClickListener((parent, view, position, id) -> {
+            CheckBox accountChk = view.findViewById(R.id.listview_account_item_chkbox);
+            boolean newVisibilityState = !accountChk.isChecked();
 
-                accountChk.setChecked(newVisibilityState);
-                setAccountVisibility(getAccountAtPosition(position), newVisibilityState);
-            }
+            accountChk.setChecked(newVisibilityState);
+            setAccountVisibility(getAccountAtPosition(position), newVisibilityState);
         });
     }
 
@@ -198,8 +175,8 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Acco
      *
      * @param account Konto, welches gelöscht werden soll
      */
-    private void deleteAccount(Account account) throws CannotDeleteAccountException {
-        mAccountRepo.delete(account);
+    private void deleteAccount(Account account) {
+        accountRepo.delete(account);
 
         mAccountPreferences.removeAccount(account);
 

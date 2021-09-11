@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lucas.haushaltsmanager.Activities.LayoutManagerFactory;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Booking.IBooking;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences.ActiveAccountsPreferences;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.ItemCreator;
@@ -52,11 +52,11 @@ public class TabTwoMonthlyReports extends AbstractTab {
         adapter.notifyDataSetChanged();
     }
 
-    private List<ExpenseObject> getVisibleExpenses() {
+    private List<IBooking> getVisibleExpenses() {
         ExpenseRepository repository = new ExpenseRepository(getContext());
 
-        List<ExpenseObject> expenses = repository.getAll();
+        List<IBooking> bookings = repository.getAll();
 
-        return new ExpenseFilter().byAccountWithChildren(expenses, activeAccounts.getActiveAccounts());
+        return new ExpenseFilter().byAccountNew(bookings, activeAccounts.getActiveAccounts());
     }
 }

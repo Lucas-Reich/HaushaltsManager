@@ -2,9 +2,9 @@ package com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality;
 
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ParentBooking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.ExpenseType;
+import com.example.lucas.haushaltsmanager.Entities.Booking.ParentBooking;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.InsertStrategy.MockInsertStrategy;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.SelectionRules.MockSelectionRules;
@@ -107,7 +107,7 @@ public class RecyclerViewSelectedItemHandlerTest {
                         UUID.randomUUID(),
                         "Ausgabe",
                         Calendar.getInstance(),
-                        new ArrayList<ExpenseObject>()
+                        new ArrayList<Booking>()
                 ), getDummyDate());
     }
 
@@ -117,8 +117,8 @@ public class RecyclerViewSelectedItemHandlerTest {
         );
     }
 
-    private ExpenseObject getDummyExpense() {
-        return new ExpenseObject(
+    private Booking getDummyExpense() {
+        return new Booking(
                 "Ausgabe",
                 new Price(100),
                 new Category("Kategorie", new Color(Color.WHITE), ExpenseType.expense()),

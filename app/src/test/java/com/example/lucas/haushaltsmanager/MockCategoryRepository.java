@@ -1,14 +1,12 @@
 package com.example.lucas.haushaltsmanager;
 
-import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryRepositoryInterface;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.Exceptions.CategoryNotFoundException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryDAO;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
-public class MockCategoryRepository implements CategoryRepositoryInterface {
+public class MockCategoryRepository implements CategoryDAO {
     @Override
     public List<Category> getAll() {
         return null;
@@ -20,17 +18,17 @@ public class MockCategoryRepository implements CategoryRepositoryInterface {
     }
 
     @Override
-    public void update(Category updatedCategory) throws CategoryNotFoundException {
+    public void update(Category updatedCategory) {
 
     }
 
     @Override
-    public void delete(Category category) throws SQLException {
+    public void delete(Category category) {
 
     }
 
     @Override
-    public Category get(UUID id) throws CategoryNotFoundException {
+    public Category get(UUID id) {
         return null;
     }
 }

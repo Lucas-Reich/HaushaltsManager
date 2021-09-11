@@ -14,8 +14,8 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Expense
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.CannotDeleteChildExpenseException;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ParentBooking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.ParentBooking;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.ActionPayload;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.ActionKey;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.IActionKey;
@@ -105,7 +105,7 @@ public class CombineMenuItem implements IMenuItem {
 
                     if (null != deletedChild) {
                         removedItems.add(deletedChild);
-                        parent.addChild((ExpenseObject) deletedChild.getContent());
+                        parent.addChild((Booking) deletedChild.getContent());
                     }
                 }
 
@@ -134,11 +134,11 @@ public class CombineMenuItem implements IMenuItem {
         } catch (CannotDeleteChildExpenseException e) {
 
             // TODO was soll passieren
-            Log.e(TAG, "Could not delete ChildExpense " + ((ExpenseObject) item.getContent()).getTitle());
+            Log.e(TAG, "Could not delete ChildExpense " + ((Booking) item.getContent()).getTitle());
         } catch (CannotDeleteExpenseException e) {
 
             // TODO was soll passieren
-            Log.e(TAG, "Could not delete Booking " + ((ExpenseObject) item.getContent()).getTitle());
+            Log.e(TAG, "Could not delete Booking " + ((Booking) item.getContent()).getTitle());
         }
 
         return null;

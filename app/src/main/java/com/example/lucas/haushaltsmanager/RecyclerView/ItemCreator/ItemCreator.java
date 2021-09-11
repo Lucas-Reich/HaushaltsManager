@@ -1,8 +1,7 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator;
 
 import com.example.lucas.haushaltsmanager.Entities.Category;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
-import com.example.lucas.haushaltsmanager.Entities.Expense.IBooking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.IBooking;
 import com.example.lucas.haushaltsmanager.Entities.TemplateBooking;
 import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.Strategies.CreateBookingItemsStrategy;
 import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.Strategies.CreateCategoryItemsStrategy;
@@ -15,7 +14,7 @@ import java.io.File;
 import java.util.List;
 
 public class ItemCreator {
-    public static List<IRecyclerItem> createExpenseItems(List<ExpenseObject> bookings) {
+    public static List<IRecyclerItem> createBookingItems(List<IBooking> bookings) {
         return new CreateBookingItemsStrategy().create(bookings);
     }
 
@@ -31,7 +30,7 @@ public class ItemCreator {
         return new CreateFileItemsStrategy().create(files);
     }
 
-    public static List<IRecyclerItem> createReportItems(List<ExpenseObject> flatBookingList) {
-        return new CreateReportItemsStrategy().create(flatBookingList);
+    public static List<IRecyclerItem> createReportItems(List<IBooking> bookings) {
+        return new CreateReportItemsStrategy().create(bookings);
     }
 }

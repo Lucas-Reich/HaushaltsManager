@@ -4,11 +4,11 @@ import android.content.Context;
 import android.util.Log;
 import android.view.View;
 
-import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.AddChildToChildException;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.ParentBooking;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.BookingItem.ExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBookingItem.ChildExpenseItem;
@@ -71,7 +71,7 @@ public class RevertExpenseDeletionSnackbar {
     }
 
     private void restoreExpense(ExpenseItem item) {
-        ExpenseObject expense = item.getContent();
+        Booking expense = item.getContent();
 
         Log.i(TAG, "Restoring ParentExpense " + expense.getTitle());
         mExpenseRepo.insert(expense);
@@ -82,14 +82,14 @@ public class RevertExpenseDeletionSnackbar {
     }
 
     private void restoreChildExpenses(ChildExpenseItem child) {
-        ExpenseObject childExpense = child.getContent();
+        Booking childExpense = child.getContent();
         ParentBookingItem parentExpense = (ParentBookingItem) child.getParent();
 
         try {
-            ExpenseObject parent = mExpenseRepo.get(parentExpense.getContent().getId());
+            ParentBooking parent = parentExpense.getContent();
 
             Log.i(TAG, "Restoring ChildExpense " + childExpense.getTitle() + " and attaching it to ParentExpense " + parent.getTitle());
-            ExpenseObject restoredChild = mChildExpenseRepo.addChildToBooking(childExpense, parent);
+            Booking restoredChild = mChildExpenseRepo.addChildToBooking(childExpense, parent);
 
             if (mBetterListener != null) {
                 mBetterListener.onExpenseRestored(new ChildExpenseItem(restoredChild, child.getParent()));
@@ -97,8 +97,6 @@ public class RevertExpenseDeletionSnackbar {
 
         } catch (AddChildToChildException e) {
             Log.e(TAG, "Could not restore ChildExpense " + childExpense.getTitle(), e);
-        } catch (ExpenseNotFoundException e) {
-            Log.e(TAG, "Could not find ParentExpense for Child" + childExpense.getTitle(), e);
         }
     }
 

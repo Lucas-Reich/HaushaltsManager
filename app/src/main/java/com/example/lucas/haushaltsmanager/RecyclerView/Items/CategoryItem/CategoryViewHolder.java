@@ -26,8 +26,8 @@ public class CategoryViewHolder extends AbstractViewHolder {
     public void bind(IRecyclerItem item) {
         Category category = getCategoryFromContent(item);
 
-        setRoundedTextView(category.getColor().getColorInt(), category.getTitle().charAt(0));
-        setTitle(category.getTitle());
+        setRoundedTextView(category.getColor().getColorInt(), category.getName().charAt(0));
+        setTitle(category.getName());
     }
 
     private Category getCategoryFromContent(IRecyclerItem item) throws IllegalArgumentException {

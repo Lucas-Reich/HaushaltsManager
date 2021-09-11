@@ -2,14 +2,13 @@ package com.example.lucas.haushaltsmanager.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
+
+import androidx.room.Room;
 
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountCouldNotBeCreatedException;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
+import com.example.lucas.haushaltsmanager.Database.AppDatabase;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountDAO;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
@@ -33,7 +32,7 @@ public class CreateAccountActivity extends AbstractAppCompatActivity implements 
 
     private Button mAccountNameBtn, mAccountBalanceBtn, mAccountCurrencyBtn;
     private Account mAccount;
-    private AccountRepository mAccountRepo;
+    private AccountDAO accountRepo;
     private AddAndSetDefaultDecorator addAndSetDefaultDecorator;
 
     @Override
@@ -41,7 +40,9 @@ public class CreateAccountActivity extends AbstractAppCompatActivity implements 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_account);
 
-        mAccountRepo = new AccountRepository(this);
+        accountRepo = Room.databaseBuilder(this, AppDatabase.class, "expenses")
+                .allowMainThreadQueries() // TODO: Remove
+                .build().accountDAO();
 
         mAccountNameBtn = findViewById(R.id.new_account_name);
         mAccountBalanceBtn = findViewById(R.id.new_account_balance);
@@ -58,59 +59,40 @@ public class CreateAccountActivity extends AbstractAppCompatActivity implements 
     protected void onStart() {
         super.onStart();
 
-        if (!mAccount.getTitle().equals("")) {
-            mAccountNameBtn.setHint(mAccount.getTitle());
+        if (!mAccount.getName().equals("")) {
+            mAccountNameBtn.setHint(mAccount.getName());
         }
-        mAccountNameBtn.setOnClickListener(new View.OnClickListener() {
+        mAccountNameBtn.setOnClickListener(v -> {
+            Bundle args = new Bundle();
+            args.putString(BasicTextInputDialog.TITLE, getString(R.string.set_account_title));
+            args.putString(BasicTextInputDialog.HINT, mAccount.getName());
 
-            @Override
-            public void onClick(View v) {
+            BasicTextInputDialog basicDialog = new BasicTextInputDialog();
+            basicDialog.setArguments(args);
+            basicDialog.setOnTextInputListener(textInput -> {
+                mAccount.setName(textInput);
+                mAccountNameBtn.setText(mAccount.getName());
 
-                Bundle args = new Bundle();
-                args.putString(BasicTextInputDialog.TITLE, getString(R.string.set_account_title));
-                args.putString(BasicTextInputDialog.HINT, mAccount.getTitle());
-
-                BasicTextInputDialog basicDialog = new BasicTextInputDialog();
-                basicDialog.setArguments(args);
-                basicDialog.setOnTextInputListener(new BasicTextInputDialog.OnTextInput() {
-
-                    @Override
-                    public void onTextInput(String textInput) {
-
-                        mAccount.setName(textInput);
-                        mAccountNameBtn.setText(mAccount.getTitle());
-
-                        enableFabIfAccountIsSaveable(mAccount);
-                    }
-                });
-                basicDialog.show(getFragmentManager(), "create_account_name");
-            }
+                enableFabIfAccountIsSaveable(mAccount);
+            });
+            basicDialog.show(getFragmentManager(), "create_account_name");
         });
 
-        mAccountBalanceBtn.setHint(MoneyUtils.formatHumanReadable(mAccount.getBalance(), Locale.getDefault()));
-        mAccountBalanceBtn.setOnClickListener(new View.OnClickListener() {
+        mAccountBalanceBtn.setHint(MoneyUtils.formatHumanReadable(mAccount.getPrice(), Locale.getDefault()));
+        mAccountBalanceBtn.setOnClickListener(v -> {
+            Bundle args = new Bundle();
+            args.putString(PriceInputDialog.TITLE, getString(R.string.set_Account_balance));
+            args.putParcelable(PriceInputDialog.HINT, mAccount.getPrice());
 
-            @Override
-            public void onClick(View v) {
+            PriceInputDialog priceInputDialog = new PriceInputDialog();
+            priceInputDialog.setArguments(args);
+            priceInputDialog.setOnPriceSelectedListener(price -> {
+                mAccount.setPrice(price);
+                mAccountBalanceBtn.setText(MoneyUtils.formatHumanReadable(mAccount.getPrice(), Locale.getDefault()));
 
-                Bundle args = new Bundle();
-                args.putString(PriceInputDialog.TITLE, getString(R.string.set_Account_balance));
-                args.putParcelable(PriceInputDialog.HINT, mAccount.getBalance());
-
-                PriceInputDialog priceInputDialog = new PriceInputDialog();
-                priceInputDialog.setArguments(args);
-                priceInputDialog.setOnPriceSelectedListener(new PriceInputDialog.OnPriceSelected() {
-                    @Override
-                    public void onPriceSelected(Price price) {
-
-                        mAccount.setBalance(price);
-                        mAccountBalanceBtn.setText(MoneyUtils.formatHumanReadable(mAccount.getBalance(), Locale.getDefault()));
-
-                        enableFabIfAccountIsSaveable(mAccount);
-                    }
-                });
-                priceInputDialog.show(getFragmentManager(), "create_account_price");
-            }
+                enableFabIfAccountIsSaveable(mAccount);
+            });
+            priceInputDialog.show(getFragmentManager(), "create_account_price");
         });
 
         mAccountCurrencyBtn.setText(new Currency().getShortName().toUpperCase());
@@ -130,23 +112,13 @@ public class CreateAccountActivity extends AbstractAppCompatActivity implements 
         switch (bundle.getString(INTENT_MODE, INTENT_MODE_CREATE)) {
             case INTENT_MODE_CREATE:
 
-                try {
-                    mAccountRepo.insert(mAccount);
+                accountRepo.insert(mAccount);
 
-                    addAndSetDefaultDecorator.addAccount(mAccount);
-                } catch (AccountCouldNotBeCreatedException e) {
-                    Toast.makeText(CreateAccountActivity.this, getString(R.string.cannot_create_account), Toast.LENGTH_LONG).show();
-                }
+                addAndSetDefaultDecorator.addAccount(mAccount);
                 break;
             case INTENT_MODE_UPDATE:
 
-                try {
-                    mAccountRepo.update(mAccount);
-
-                } catch (AccountNotFoundException e) {
-
-                    Toast.makeText(CreateAccountActivity.this, getString(R.string.cannot_update_account), Toast.LENGTH_SHORT).show();
-                }
+                accountRepo.update(mAccount);
                 break;
         }
 

@@ -5,7 +5,7 @@ import android.util.Log;
 
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.ChildExpenseNotFoundException;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.ActionPayload;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.ActionKey;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.IActionKey;
@@ -62,7 +62,7 @@ public class ExtractMenuItem implements IMenuItem {
 
     private void extractChild(ChildExpenseItem child) {
         try {
-            ExpenseObject newExpense = mChildExpenseRepo.extractChildFromBooking(child.getContent());
+            Booking newExpense = mChildExpenseRepo.extractChildFromBooking(child.getContent());
 
             if (null != mCallback) {
                 mCallback.onSuccess(child, newExpense);
@@ -74,6 +74,6 @@ public class ExtractMenuItem implements IMenuItem {
     }
 
     public interface OnSuccessCallback {
-        void onSuccess(IRecyclerItem extractedItem, ExpenseObject newExpense);
+        void onSuccess(IRecyclerItem extractedItem, Booking newExpense);
     }
 }

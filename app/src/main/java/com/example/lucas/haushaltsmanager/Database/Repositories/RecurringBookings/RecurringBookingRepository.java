@@ -13,7 +13,7 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.Categ
 import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.Exceptions.RecurringBookingCouldNotBeCreatedException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.Exceptions.RecurringBookingNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.TransformerInterface;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
 import com.example.lucas.haushaltsmanager.Entities.RecurringBooking;
 
 import java.util.ArrayList;
@@ -37,7 +37,7 @@ public class RecurringBookingRepository {
     }
 
     public void insert(RecurringBooking recurringBooking) throws RecurringBookingCouldNotBeCreatedException {
-        ExpenseObject booking = recurringBooking.getBooking();
+        Booking booking = recurringBooking.getBooking();
 
         ContentValues values = new ContentValues();
         values.put("id", recurringBooking.getId().toString());
@@ -88,7 +88,7 @@ public class RecurringBookingRepository {
     }
 
     public boolean update(RecurringBooking recurringBooking) {
-        ExpenseObject booking = recurringBooking.getBooking();
+        Booking booking = recurringBooking.getBooking();
 
         ContentValues values = new ContentValues();
         values.put("expense_type", booking.getExpenseType().name());

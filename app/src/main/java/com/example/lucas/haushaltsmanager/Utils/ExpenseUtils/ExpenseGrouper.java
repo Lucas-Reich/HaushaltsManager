@@ -1,8 +1,8 @@
 package com.example.lucas.haushaltsmanager.Utils.ExpenseUtils;
 
 import com.example.lucas.haushaltsmanager.Entities.Category;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
-import com.example.lucas.haushaltsmanager.Entities.Expense.IBooking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.IBooking;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -10,15 +10,14 @@ import java.util.HashMap;
 import java.util.List;
 
 public class ExpenseGrouper {
-
     /**
      * Kindbuchungen werden von der Funktion nicht beachtet.
      */
     // TODO: Kann ich die Funktion durch byYears() ersetzen?
-    public List<ExpenseObject> byYear(List<ExpenseObject> expenses, int year) {
-        List<ExpenseObject> groupedExpenses = new ArrayList<>();
+    public List<IBooking> byYearNew(List<IBooking> expenses, int year) {
+        List<IBooking> groupedExpenses = new ArrayList<>();
 
-        for (ExpenseObject expense : expenses) {
+        for (IBooking expense : expenses) {
             if (isInYear(expense, year)) {
                 groupedExpenses.add(expense);
             }
@@ -27,14 +26,14 @@ public class ExpenseGrouper {
         return groupedExpenses;
     }
 
-    public HashMap<Integer, List<ExpenseObject>> byYears(List<ExpenseObject> expenses) {
-        HashMap<Integer, List<ExpenseObject>> groupedExpenses = new HashMap<>();
+    public HashMap<Integer, List<Booking>> byYears(List<Booking> expenses) {
+        HashMap<Integer, List<Booking>> groupedExpenses = new HashMap<>();
 
-        for (ExpenseObject expense : expenses) {
+        for (Booking expense : expenses) {
             int expenseYear = expense.getDate().get(Calendar.YEAR);
 
             if (!groupedExpenses.containsKey(expenseYear))
-                groupedExpenses.put(expenseYear, new ArrayList<ExpenseObject>());
+                groupedExpenses.put(expenseYear, new ArrayList<>());
 
             groupedExpenses.get(expenseYear).add(expense);
         }
@@ -45,14 +44,14 @@ public class ExpenseGrouper {
     /**
      * Kindbuchungen werden von der Funktion nicht beachtet.
      */
-    public HashMap<Category, List<ExpenseObject>> byCategory(List<ExpenseObject> expenses) {
-        HashMap<Category, List<ExpenseObject>> groupedExpenses = new HashMap<>();
+    public HashMap<Category, List<Booking>> byCategory(List<Booking> expenses) {
+        HashMap<Category, List<Booking>> groupedExpenses = new HashMap<>();
 
-        for (ExpenseObject expense : expenses) {
+        for (Booking expense : expenses) {
             Category expenseCategory = expense.getCategory();
 
             if (!groupedExpenses.containsKey(expenseCategory))
-                groupedExpenses.put(expenseCategory, new ArrayList<ExpenseObject>());
+                groupedExpenses.put(expenseCategory, new ArrayList<>());
 
             groupedExpenses.get(expenseCategory).add(expense);
         }
@@ -60,29 +59,22 @@ public class ExpenseGrouper {
         return groupedExpenses;
     }
 
-    public List<ExpenseObject> byMonth(List<ExpenseObject> expenses, int month, int year) {
-        List<ExpenseObject> groupedExpenses = new ArrayList<>();
-
-        for (ExpenseObject expense : expenses) {
-            if (isInMonth(expense, month) && isInYear(expense, year))
-                groupedExpenses.add(expense);
-        }
-
-        return groupedExpenses;
+    public List<IBooking> byMonth(List<IBooking> bookings, int month, int year) {
+        return byMonths(bookings, year).get(month);
     }
 
-    public List<List<ExpenseObject>> byMonths(List<ExpenseObject> expenses, int year) {
-        List<List<ExpenseObject>> groupedExpenses = new ArrayList<>();
+    public List<List<IBooking>> byMonths(List<IBooking> bookings, int year) {
+        List<List<IBooking>> groupedExpenses = new ArrayList<>();
         for (int i = 0; i < 12; i++) {
-            groupedExpenses.add(new ArrayList<ExpenseObject>());
+            groupedExpenses.add(new ArrayList<>());
         }
 
-        for (ExpenseObject expense : expenses) {
-            if (!isInYear(expense, year)) {
+        for (IBooking booking : bookings) {
+            if (!isInYear(booking, year)) {
                 continue;
             }
 
-            groupedExpenses.get(extractMonth(expense)).add(expense);
+            groupedExpenses.get(extractMonth(booking)).add(booking);
         }
 
         return groupedExpenses;
@@ -90,10 +82,6 @@ public class ExpenseGrouper {
 
     private int extractMonth(IBooking expense) {
         return expense.getDate().get(Calendar.MONTH);
-    }
-
-    private boolean isInMonth(IBooking expense, int month) {
-        return expense.getDate().get(Calendar.MONTH) == month;
     }
 
     private boolean isInYear(IBooking expense, int year) {

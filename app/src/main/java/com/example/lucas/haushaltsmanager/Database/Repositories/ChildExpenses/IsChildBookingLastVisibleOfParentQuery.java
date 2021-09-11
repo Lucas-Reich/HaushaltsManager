@@ -1,12 +1,12 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses;
 
 import com.example.lucas.haushaltsmanager.Database.QueryInterface;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Booking.ParentBooking;
 
 class IsChildBookingLastVisibleOfParentQuery implements QueryInterface {
-    private final ExpenseObject parentBooking;
+    private final ParentBooking parentBooking;
 
-    public IsChildBookingLastVisibleOfParentQuery(ExpenseObject parentBooking) {
+    public IsChildBookingLastVisibleOfParentQuery(ParentBooking parentBooking) {
         this.parentBooking = parentBooking;
     }
 

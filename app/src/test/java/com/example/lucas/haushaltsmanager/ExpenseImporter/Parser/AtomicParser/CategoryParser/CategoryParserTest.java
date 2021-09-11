@@ -7,7 +7,6 @@ import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.InvalidInput
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.NoMappingFoundException;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Line.Line;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.MappingList;
-import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.CategoryParser.CategoryParser;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.CategoryParser.RequiredFields.Title;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.IRequiredField;
 
@@ -45,7 +44,7 @@ public class CategoryParserTest {
         Category category = parser.parse(line, createCategoryMappingList());
 
         // Assert
-        assertEquals(expectedCategoryTitle, category.getTitle());
+        assertEquals(expectedCategoryTitle, category.getName());
     }
 
     @Test

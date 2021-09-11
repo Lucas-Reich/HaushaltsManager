@@ -7,8 +7,8 @@ import android.database.MatrixCursor;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryTransformer;
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.ExpenseType;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 
 import org.junit.Test;
@@ -31,8 +31,8 @@ public class ChildExpenseTransformerTest {
     @Test
     public void testCursorToChildBookingWithValidCursorShouldSucceed() {
         // Arrange
-        final ExpenseObject expectedChildExpense = getSimpleExpense();
-        expectedChildExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.CHILD_EXPENSE);
+        final Booking expectedChildExpense = getSimpleExpense();
+        expectedChildExpense.setExpenseType(Booking.EXPENSE_TYPES.CHILD_EXPENSE);
 
         Cursor cursor = createCursor(new HashMap<String, Object>() {{
             put("BOOKINGS.id", expectedChildExpense.getId().toString());
@@ -43,13 +43,13 @@ public class ChildExpenseTransformerTest {
             put("BOOKINGS.notice", expectedChildExpense.getNotice());
             put("BOOKINGS.account_id", expectedChildExpense.getAccountId());
             put("CATEGORIES.id", expectedChildExpense.getCategory().getId().toString());
-            put("CATEGORIES.name", expectedChildExpense.getCategory().getTitle());
+            put("CATEGORIES.name", expectedChildExpense.getCategory().getName());
             put("CATEGORIES.color", expectedChildExpense.getCategory().getColor().getColorString());
             put("CATEGORIES.default_expense_type", expectedChildExpense.getCategory().getDefaultExpenseType().value() ? 1 : 0);
         }});
 
         // Act
-        ExpenseObject transformedChildExpense = transformer.transform(cursor);
+        Booking transformedChildExpense = transformer.transform(cursor);
 
         // Assert
         assertEquals(expectedChildExpense, transformedChildExpense);
@@ -57,8 +57,8 @@ public class ChildExpenseTransformerTest {
 
     @Test(expected = CursorIndexOutOfBoundsException.class)
     public void testCursorToChildBookingWithInvalidCursorShouldThrowCursorIndexOutOfBoundsException() {
-        final ExpenseObject expectedChildExpense = getSimpleExpense();
-        expectedChildExpense.setExpenseType(ExpenseObject.EXPENSE_TYPES.CHILD_EXPENSE);
+        final Booking expectedChildExpense = getSimpleExpense();
+        expectedChildExpense.setExpenseType(Booking.EXPENSE_TYPES.CHILD_EXPENSE);
 
         Cursor cursor = createCursor(new HashMap<String, Object>() {{
             put("BOOKINGS.id", expectedChildExpense.getId().toString());
@@ -69,7 +69,7 @@ public class ChildExpenseTransformerTest {
             put("BOOKINGS.notice", expectedChildExpense.getNotice());
             put("BOOKINGS.account_id", expectedChildExpense.getAccountId());
             put("CATEGORIES.id", expectedChildExpense.getCategory().getId().toString());
-            put("CATEGORIES.name", expectedChildExpense.getCategory().getTitle());
+            put("CATEGORIES.name", expectedChildExpense.getCategory().getName());
             put("CATEGORIES.color", expectedChildExpense.getCategory().getColor().getColorString());
             put("CATEGORIES.default_expense_type", expectedChildExpense.getCategory().getDefaultExpenseType().value() ? 1 : 0);
         }});
@@ -91,10 +91,10 @@ public class ChildExpenseTransformerTest {
         return cursor;
     }
 
-    private ExpenseObject getSimpleExpense() {
+    private Booking getSimpleExpense() {
         Category category = new Category("Kategorie", new Color("#121212"), ExpenseType.expense());
 
-        return new ExpenseObject(
+        return new Booking(
                 "Ausgabe",
                 new Price(3135, false),
                 category,

@@ -7,7 +7,7 @@ import androidx.annotation.ColorRes;
 
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Entities.Category;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.Entities.RecurringBooking;
 import com.example.lucas.haushaltsmanager.R;
@@ -41,7 +41,7 @@ public class RecurringBookingViewHolder extends AbstractViewHolder {
             throw new IllegalArgumentException(String.format("Could not attach %s to %s", item.getClass().getSimpleName(), TAG));
         }
 
-        ExpenseObject expense = ((RecurringBooking) item.getContent()).getBooking();
+        Booking expense = ((RecurringBooking) item.getContent()).getBooking();
 
         setRoundedTextViewText(expense.getCategory());
         setTitle(expense.getTitle());
@@ -60,7 +60,7 @@ public class RecurringBookingViewHolder extends AbstractViewHolder {
 
     private void setRoundedTextViewText(Category category) {
         mRoundedTextView.setCircleColorConsiderBrightness(category.getColor().getColorInt());
-        mRoundedTextView.setCenterText(category.getTitle().charAt(0) + "");
+        mRoundedTextView.setCenterText(category.getName().charAt(0) + "");
     }
 
     private void setTitle(String title) {

@@ -1,9 +1,9 @@
 package com.example.lucas.haushaltsmanager.Entities;
 
 
-import com.example.lucas.haushaltsmanager.Entities.Expense.IBooking;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
+import com.example.lucas.haushaltsmanager.Entities.Booking.IBooking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.ExpenseType;
 
 import org.junit.Test;
 
@@ -283,7 +283,7 @@ public class RecurringBookingTest {
     }
 
     private IBooking getBooking() {
-        return new ExpenseObject(
+        return new Booking(
                 UUID.randomUUID(),
                 "Ausgabe",
                 new Price(150, true),
@@ -291,8 +291,7 @@ public class RecurringBookingTest {
                 new Category("Kategorie", Color.black(), ExpenseType.expense()),
                 "",
                 UUID.randomUUID(),
-                ExpenseObject.EXPENSE_TYPES.NORMAL_EXPENSE,
-                new ArrayList<ExpenseObject>()
+                Booking.EXPENSE_TYPES.NORMAL_EXPENSE
         );
     }
 

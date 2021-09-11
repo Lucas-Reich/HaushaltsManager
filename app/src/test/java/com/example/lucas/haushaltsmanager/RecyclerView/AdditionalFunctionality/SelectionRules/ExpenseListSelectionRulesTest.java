@@ -2,9 +2,9 @@ package com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.
 
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ParentBooking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.ExpenseType;
+import com.example.lucas.haushaltsmanager.Entities.Booking.ParentBooking;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBookingItem.ChildExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
@@ -116,8 +116,8 @@ public class ExpenseListSelectionRulesTest {
         return new ParentBookingItem(getDummyParentExpense(), getDummyDateItem());
     }
 
-    private ExpenseObject getDummyExpense() {
-        return new ExpenseObject(
+    private Booking getDummyExpense() {
+        return new Booking(
                 "Ausgabe",
                 new Price(100),
                 new Category("Kategorie", new Color(Color.BLACK), ExpenseType.expense()),
@@ -130,7 +130,7 @@ public class ExpenseListSelectionRulesTest {
                 UUID.randomUUID(),
                 "Parent Ausgabe",
                 Calendar.getInstance(),
-                new ArrayList<ExpenseObject>()
+                new ArrayList<Booking>()
         );
     }
 

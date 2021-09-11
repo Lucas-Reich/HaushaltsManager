@@ -2,8 +2,8 @@ package com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ParentBook
 
 import androidx.annotation.NonNull;
 
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ParentBooking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.ParentBooking;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBookingItem.ChildExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.IBookingItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
@@ -42,7 +42,7 @@ public class ParentBookingItem implements IParentRecyclerItem, IBookingItem {
     public List<IRecyclerItem> getChildren() {
         List<IRecyclerItem> childItems = new ArrayList<>();
 
-        for (ExpenseObject child : booking.getChildren()) {
+        for (Booking child : booking.getChildren()) {
             childItems.add(new ChildExpenseItem(child, this));
         }
 
@@ -83,11 +83,11 @@ public class ParentBookingItem implements IParentRecyclerItem, IBookingItem {
 
     @Override
     public void addChild(IRecyclerItem child) {
-        booking.addChild((ExpenseObject) child.getContent());
+        booking.addChild((Booking) child.getContent());
     }
 
     @Override
     public void removeChild(IRecyclerItem child) {
-        booking.getChildren().remove((ExpenseObject) child.getContent());
+        booking.getChildren().remove((Booking) child.getContent());
     }
 }

@@ -4,14 +4,13 @@ import android.database.Cursor;
 
 import com.example.lucas.haushaltsmanager.Database.TransformerInterface;
 import com.example.lucas.haushaltsmanager.Entities.Category;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.UUID;
 
-public class ChildExpenseTransformer implements TransformerInterface<ExpenseObject> {
+public class ChildExpenseTransformer implements TransformerInterface<Booking> {
     private final TransformerInterface<Category> categoryTransformer;
 
     public ChildExpenseTransformer(
@@ -21,7 +20,7 @@ public class ChildExpenseTransformer implements TransformerInterface<ExpenseObje
     }
 
     @Override
-    public ExpenseObject transform(Cursor c) {
+    public Booking transform(Cursor c) {
         UUID id = getId(c);
         String title = c.getString(c.getColumnIndex("title"));
         String notice = c.getString(c.getColumnIndex("notice"));
@@ -34,7 +33,7 @@ public class ChildExpenseTransformer implements TransformerInterface<ExpenseObje
             c.close();
         }
 
-        return new ExpenseObject(
+        return new Booking(
                 id,
                 title,
                 price,
@@ -42,8 +41,7 @@ public class ChildExpenseTransformer implements TransformerInterface<ExpenseObje
                 expenseCategory,
                 notice,
                 accountId,
-                ExpenseObject.EXPENSE_TYPES.CHILD_EXPENSE,
-                new ArrayList<ExpenseObject>()
+                Booking.EXPENSE_TYPES.CHILD_EXPENSE
         );
     }
 

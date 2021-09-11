@@ -2,7 +2,9 @@ package com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPrefe
 
 import android.content.Context;
 
-import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountRepository;
+import androidx.room.Room;
+
+import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.Entities.Account;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.RebuildStrategyInterface;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.SharedPreferences;
@@ -18,7 +20,8 @@ public class ActiveAccountsPreferencesRebuildStrategy implements RebuildStrategy
     }
 
     private List<Account> getAccountsList(Context context) {
-        return new AccountRepository(context).getAll();
+        return Room.databaseBuilder(context, AppDatabase.class, "expenses")
+                .build().accountDAO().getAll();
     }
 
     private void addAccountsToPreferences(Context context, List<Account> accounts) {

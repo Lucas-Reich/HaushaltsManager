@@ -2,9 +2,9 @@ package com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.
 
 import com.example.lucas.haushaltsmanager.Entities.Category;
 import com.example.lucas.haushaltsmanager.Entities.Color;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseObject;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ExpenseType;
-import com.example.lucas.haushaltsmanager.Entities.Expense.ParentBooking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.Entities.Booking.ExpenseType;
+import com.example.lucas.haushaltsmanager.Entities.Booking.ParentBooking;
 import com.example.lucas.haushaltsmanager.Entities.Price;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBookingItem.ChildExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
@@ -146,12 +146,12 @@ public class ExpenseListInsertStrategyTest {
                 UUID.randomUUID(),
                 "ParentAusgabe",
                 createDate(1, Calendar.JANUARY, 2019),
-                new ArrayList<ExpenseObject>()
+                new ArrayList<Booking>()
         );
     }
 
-    private ExpenseObject createDummyExpense() {
-        return new ExpenseObject(
+    private Booking createDummyExpense() {
+        return new Booking(
                 "Ausgabe",
                 new Price(100, false),
                 new Category("Kategorie", new Color(Color.WHITE), ExpenseType.expense()),
