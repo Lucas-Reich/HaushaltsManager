@@ -37,7 +37,7 @@ public class Converters {
 
     @TypeConverter
     public static String colorToString(Color color) {
-        return color.getColorString();
+        return color.getColor();
     }
 
     @TypeConverter

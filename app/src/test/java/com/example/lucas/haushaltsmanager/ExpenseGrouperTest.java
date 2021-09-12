@@ -139,7 +139,7 @@ public class ExpenseGrouperTest {
     private Category getSimpleCategory(String name) {
         return new Category(
                 name,
-                Color.black(),
+                Color.Companion.black(),
                 ExpenseType.Companion.deposit()
         );
     }

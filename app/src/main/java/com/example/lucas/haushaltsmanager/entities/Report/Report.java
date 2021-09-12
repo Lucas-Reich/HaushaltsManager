@@ -90,7 +90,7 @@ public class Report implements ReportInterface {
     private Category getPlaceholderCategory(@StringRes int titleRes) {
         return new Category(
                 getResourceString(titleRes),
-                Color.white(),
+                Color.Companion.white(),
                 ExpenseType.Companion.deposit()
         );
     }

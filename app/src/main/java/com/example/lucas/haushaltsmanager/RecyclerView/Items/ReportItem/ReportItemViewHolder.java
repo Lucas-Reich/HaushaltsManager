@@ -114,7 +114,7 @@ public class ReportItemViewHolder extends AbstractViewHolder {
     }
 
     private void setCategory(Category category) {
-        categoryColor.setCircleColor(category.getColor().getColorString());
+        categoryColor.setCircleColor(category.getColor().getColor());
         categoryTitle.setText(category.getName());
     }
 

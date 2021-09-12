@@ -32,7 +32,7 @@ public class CategoryTransformerTest {
         Cursor cursor = createCursor(new HashMap<String, Object>() {{
             put("id", expectedCategory.getId().toString());
             put("name", expectedCategory.getName());
-            put("color", expectedCategory.getColor().getColorString());
+            put("color", expectedCategory.getColor().getColor());
             put("default_expense_type", expectedCategory.getDefaultExpenseType().getType() ? 1 : 0);
         }});
 
@@ -75,7 +75,7 @@ public class CategoryTransformerTest {
     private Category getSimpleCategory() {
         return new Category(
                 "Category Name",
-                Color.black(),
+                Color.Companion.black(),
                 ExpenseType.Companion.deposit()
         );
     }

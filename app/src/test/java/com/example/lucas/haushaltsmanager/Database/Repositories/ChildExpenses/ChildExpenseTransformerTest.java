@@ -44,7 +44,7 @@ public class ChildExpenseTransformerTest {
             put("BOOKINGS.account_id", expectedChildExpense.getAccountId());
             put("CATEGORIES.id", expectedChildExpense.getCategory().getId().toString());
             put("CATEGORIES.name", expectedChildExpense.getCategory().getName());
-            put("CATEGORIES.color", expectedChildExpense.getCategory().getColor().getColorString());
+            put("CATEGORIES.color", expectedChildExpense.getCategory().getColor().getColor());
             put("CATEGORIES.default_expense_type", expectedChildExpense.getCategory().getDefaultExpenseType().getType() ? 1 : 0);
         }});
 
@@ -70,7 +70,7 @@ public class ChildExpenseTransformerTest {
             put("BOOKINGS.account_id", expectedChildExpense.getAccountId());
             put("CATEGORIES.id", expectedChildExpense.getCategory().getId().toString());
             put("CATEGORIES.name", expectedChildExpense.getCategory().getName());
-            put("CATEGORIES.color", expectedChildExpense.getCategory().getColor().getColorString());
+            put("CATEGORIES.color", expectedChildExpense.getCategory().getColor().getColor());
             put("CATEGORIES.default_expense_type", expectedChildExpense.getCategory().getDefaultExpenseType().getType() ? 1 : 0);
         }});
 

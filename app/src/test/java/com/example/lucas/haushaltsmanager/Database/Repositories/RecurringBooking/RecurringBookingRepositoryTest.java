@@ -61,7 +61,7 @@ public class RecurringBookingRepositoryTest {
         return new Booking(
                 "Ausgabe",
                 new Price(150, true),
-                new Category("Kategorie", Color.black(), ExpenseType.Companion.expense()),
+                new Category("Kategorie", Color.Companion.black(), ExpenseType.Companion.expense()),
                 UUID.randomUUID()
         );
     }

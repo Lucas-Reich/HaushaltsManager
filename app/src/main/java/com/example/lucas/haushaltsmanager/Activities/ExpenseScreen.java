@@ -178,7 +178,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode != Activity.RESULT_OK) {
-            return;
+            super.onActivityResult(requestCode, resultCode, data);
         }
 
         switch (requestCode) {
@@ -235,7 +235,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
             case INTENT_MODE_CREATE_BOOKING:
                 Category category = new Category(
                         getString(R.string.no_name),
-                        Color.black(),
+                        Color.Companion.black(),
                         ExpenseType.Companion.expense()
                 );
 

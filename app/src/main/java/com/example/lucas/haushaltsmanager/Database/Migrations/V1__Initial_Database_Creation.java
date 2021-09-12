@@ -102,7 +102,7 @@ final class V1__Initial_Database_Creation implements IMigration {
         ContentValues values = new ContentValues();
         values.put("id", app.transferCategoryId.toString());
         values.put("name", app.getContext().getString(R.string.category_transfer));
-        values.put("color", color.getColorString());
+        values.put("color", color.getColor());
         values.put("default_expense_type", ExpenseType.Companion.expense().getType());
         values.put("hidden", 1);
         db.insert("CATEGORIES", null, values);
@@ -119,7 +119,7 @@ final class V1__Initial_Database_Creation implements IMigration {
         ContentValues values = new ContentValues();
         values.put("id", app.unassignedCategoryId.toString());
         values.put("name", "Not Assigned");
-        values.put("color", color.getColorString());
+        values.put("color", color.getColor());
         values.put("default_expense_type", ExpenseType.Companion.expense().getType());
         values.put("hidden", 1);
         db.insert("CATEGORIES", null, values);

@@ -1,11 +1,10 @@
 package com.example.lucas.haushaltsmanager.entities;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+
+import org.junit.Assert;
+import org.junit.Test;
 
 public class ColorTest {
     private static final String WHITE = "#ffffffff";
@@ -15,7 +14,7 @@ public class ColorTest {
     public void colorCanBeCreatedFromValidStringInput() {
         Color color = new Color(WHITE);
 
-        assertEquals(WHITE, color.getColorString());
+        assertEquals(WHITE, color.getColor());
     }
 
     @Test
@@ -25,25 +24,11 @@ public class ColorTest {
         // Cannot check if color int is the same as input since the method "getColorInt" uses Color.parseColor which cannot be mocked
     }
 
-    // Cannot menuItemHasCorrectActionKey Int to String conversion, since the Color.parseColor() method cannot be mocked
-
-    @Test
-    public void colorCanBeRandomlyCreated() {
-        try {
-            Color randomColor = Color.random();
-
-            assertTrue(randomColor.getColorString().matches(Color.VALID_COLOR_PATTERN));
-        } catch (IllegalArgumentException e) {
-
-            Assert.fail("Could not create random color.");
-        }
-    }
-
     @Test
     public void intColorCanBeTransformerToString() {
         Color color = new Color(Color.WHITE);
 
-        assertEquals(WHITE, color.getColorString());
+        assertEquals(WHITE, color.getColor());
     }
 
     @Test

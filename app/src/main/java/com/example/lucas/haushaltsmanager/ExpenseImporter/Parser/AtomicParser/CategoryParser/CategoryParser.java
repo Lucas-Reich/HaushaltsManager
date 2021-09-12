@@ -29,7 +29,7 @@ public class CategoryParser implements IParser<Category> {
 
         return new Category(
                 categoryTitle,
-                Color.random(),
+                Color.Companion.random(),
                 ExpenseType.Companion.expense()
         );
     }

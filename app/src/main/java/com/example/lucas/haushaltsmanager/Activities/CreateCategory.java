@@ -98,7 +98,7 @@ public class CreateCategory extends AbstractAppCompatActivity {
             case INTENT_MODE_CREATE:
                 mCategory = new Category(
                         getString(R.string.no_name),
-                        Color.black(),
+                        Color.Companion.black(),
                         ExpenseType.Companion.expense()
                 );
                 break;
@@ -156,7 +156,7 @@ public class CreateCategory extends AbstractAppCompatActivity {
 
     private void setColor(Color color) {
         mCategory.setColor(color);
-        mColorView.setCircleColor(mCategory.getColor().getColorString());
+        mColorView.setCircleColor(mCategory.getColor().getColor());
     }
 
     private void setExpenditureType(ExpenseType expenditureType) {

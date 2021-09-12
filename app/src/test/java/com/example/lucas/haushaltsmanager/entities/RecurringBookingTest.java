@@ -288,7 +288,7 @@ public class RecurringBookingTest {
                 "Ausgabe",
                 new Price(150, true),
                 getDate(1, Calendar.JANUARY, 2019),
-                new Category("Kategorie", Color.black(), ExpenseType.Companion.expense()),
+                new Category("Kategorie", Color.Companion.black(), ExpenseType.Companion.expense()),
                 "",
                 UUID.randomUUID(),
                 Booking.EXPENSE_TYPES.NORMAL_EXPENSE
