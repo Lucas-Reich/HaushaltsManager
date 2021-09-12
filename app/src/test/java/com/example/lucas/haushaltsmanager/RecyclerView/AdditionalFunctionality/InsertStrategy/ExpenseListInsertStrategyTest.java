@@ -1,9 +1,9 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.InsertStrategy;
 
+import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType;
 import com.example.lucas.haushaltsmanager.entities.Category;
 import com.example.lucas.haushaltsmanager.entities.Color;
 import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
-import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType;
 import com.example.lucas.haushaltsmanager.entities.Booking.ParentBooking;
 import com.example.lucas.haushaltsmanager.entities.Price;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBookingItem.ChildExpenseItem;
@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class ExpenseListInsertStrategyTest {
-    private ExpenseListInsertStrategy insertStrategy = new ExpenseListInsertStrategy();
+    private final ExpenseListInsertStrategy insertStrategy = new ExpenseListInsertStrategy();
 
     @Test
     public void newDateItemIsInsertedAtCorrectPosition() {
@@ -154,7 +154,7 @@ public class ExpenseListInsertStrategyTest {
         return new Booking(
                 "Ausgabe",
                 new Price(100, false),
-                new Category("Kategorie", new Color(Color.WHITE), ExpenseType.expense()),
+                new Category("Kategorie", new Color(Color.WHITE), ExpenseType.Companion.expense()),
                 UUID.randomUUID()
         );
     }

@@ -5,8 +5,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.example.lucas.haushaltsmanager.App.app;
-import com.example.lucas.haushaltsmanager.entities.Color;
 import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType;
+import com.example.lucas.haushaltsmanager.entities.Color;
 import com.example.lucas.haushaltsmanager.R;
 
 final class V1__Initial_Database_Creation implements IMigration {
@@ -103,7 +103,7 @@ final class V1__Initial_Database_Creation implements IMigration {
         values.put("id", app.transferCategoryId.toString());
         values.put("name", app.getContext().getString(R.string.category_transfer));
         values.put("color", color.getColorString());
-        values.put("default_expense_type", ExpenseType.expense().value());
+        values.put("default_expense_type", ExpenseType.Companion.expense().getType());
         values.put("hidden", 1);
         db.insert("CATEGORIES", null, values);
 
@@ -120,7 +120,7 @@ final class V1__Initial_Database_Creation implements IMigration {
         values.put("id", app.unassignedCategoryId.toString());
         values.put("name", "Not Assigned");
         values.put("color", color.getColorString());
-        values.put("default_expense_type", ExpenseType.expense().value());
+        values.put("default_expense_type", ExpenseType.Companion.expense().getType());
         values.put("hidden", 1);
         db.insert("CATEGORIES", null, values);
 

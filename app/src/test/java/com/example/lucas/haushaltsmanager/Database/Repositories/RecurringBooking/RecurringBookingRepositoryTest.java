@@ -3,11 +3,11 @@ package com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookin
 import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.Exceptions.RecurringBookingCouldNotBeCreatedException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.Exceptions.RecurringBookingNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.RecurringBookingRepository;
+import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType;
 import com.example.lucas.haushaltsmanager.entities.Category;
 import com.example.lucas.haushaltsmanager.entities.Color;
 import com.example.lucas.haushaltsmanager.entities.Booking.IBooking;
 import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
-import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType;
 import com.example.lucas.haushaltsmanager.entities.Frequency;
 import com.example.lucas.haushaltsmanager.entities.Price;
 import com.example.lucas.haushaltsmanager.entities.RecurringBooking;
@@ -61,7 +61,7 @@ public class RecurringBookingRepositoryTest {
         return new Booking(
                 "Ausgabe",
                 new Price(150, true),
-                new Category("Kategorie", Color.black(), ExpenseType.expense()),
+                new Category("Kategorie", Color.black(), ExpenseType.Companion.expense()),
                 UUID.randomUUID()
         );
     }

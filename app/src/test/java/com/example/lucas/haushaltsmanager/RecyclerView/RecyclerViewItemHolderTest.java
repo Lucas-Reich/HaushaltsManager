@@ -2,10 +2,10 @@ package com.example.lucas.haushaltsmanager.RecyclerView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType;
 import com.example.lucas.haushaltsmanager.entities.Category;
 import com.example.lucas.haushaltsmanager.entities.Color;
 import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
-import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType;
 import com.example.lucas.haushaltsmanager.entities.Price;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.BookingItem.ExpenseItem;
@@ -41,7 +41,7 @@ public class RecyclerViewItemHolderTest {
 
     @Before
     public void setUp() {
-        mItemHandler = new ExpenseListRecyclerViewAdapter(new ArrayList<IRecyclerItem>());
+        mItemHandler = new ExpenseListRecyclerViewAdapter(new ArrayList<>());
 
         RecyclerView rView = new RecyclerView(RuntimeEnvironment.application);
         rView.setAdapter(mItemHandler);
@@ -246,7 +246,7 @@ public class RecyclerViewItemHolderTest {
                 "Ich bin eine Ausgabe",
                 new Price(105, true),
                 expenseDate,
-                new Category("Kategorie", Color.black(), ExpenseType.expense()),
+                new Category("Kategorie", Color.black(), ExpenseType.Companion.expense()),
                 "",
                 UUID.randomUUID(),
                 Booking.EXPENSE_TYPES.NORMAL_EXPENSE

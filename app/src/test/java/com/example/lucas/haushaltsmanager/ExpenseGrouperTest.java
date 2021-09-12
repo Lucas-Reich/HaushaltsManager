@@ -1,9 +1,9 @@
 package com.example.lucas.haushaltsmanager;
 
+import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType;
 import com.example.lucas.haushaltsmanager.entities.Category;
 import com.example.lucas.haushaltsmanager.entities.Color;
 import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
-import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType;
 import com.example.lucas.haushaltsmanager.entities.Booking.IBooking;
 import com.example.lucas.haushaltsmanager.entities.Price;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseGrouper;
@@ -140,7 +140,7 @@ public class ExpenseGrouperTest {
         return new Category(
                 name,
                 Color.black(),
-                ExpenseType.deposit()
+                ExpenseType.Companion.deposit()
         );
     }
 }

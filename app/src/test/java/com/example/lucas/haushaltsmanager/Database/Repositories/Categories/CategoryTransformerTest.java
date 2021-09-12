@@ -4,9 +4,9 @@ import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
 import android.database.MatrixCursor;
 
+import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType;
 import com.example.lucas.haushaltsmanager.entities.Category;
 import com.example.lucas.haushaltsmanager.entities.Color;
-import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -33,7 +33,7 @@ public class CategoryTransformerTest {
             put("id", expectedCategory.getId().toString());
             put("name", expectedCategory.getName());
             put("color", expectedCategory.getColor().getColorString());
-            put("default_expense_type", expectedCategory.getDefaultExpenseType().value() ? 1 : 0);
+            put("default_expense_type", expectedCategory.getDefaultExpenseType().getType() ? 1 : 0);
         }});
 
         // Act
@@ -52,7 +52,7 @@ public class CategoryTransformerTest {
             put("id", expectedCategory.getId().toString());
             put("name", expectedCategory.getName());
             // No color information in Cursor
-            put("default_expense_type", expectedCategory.getDefaultExpenseType().value() ? 1 : 0);
+            put("default_expense_type", expectedCategory.getDefaultExpenseType().getType() ? 1 : 0);
         }});
 
         // Act
@@ -76,7 +76,7 @@ public class CategoryTransformerTest {
         return new Category(
                 "Category Name",
                 Color.black(),
-                ExpenseType.deposit()
+                ExpenseType.Companion.deposit()
         );
     }
 }

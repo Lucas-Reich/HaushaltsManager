@@ -56,7 +56,7 @@ public class CachedInsertChildCategoryRepositoryDecoratorTest {
         return new Category(
                 "any string",
                 mock(Color.class),
-                ExpenseType.expense()
+                ExpenseType.Companion.expense()
         );
     }
 

@@ -1,9 +1,9 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality;
 
+import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType;
 import com.example.lucas.haushaltsmanager.entities.Category;
 import com.example.lucas.haushaltsmanager.entities.Color;
 import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
-import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType;
 import com.example.lucas.haushaltsmanager.entities.Booking.ParentBooking;
 import com.example.lucas.haushaltsmanager.entities.Price;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.InsertStrategy.MockInsertStrategy;
@@ -121,7 +121,7 @@ public class RecyclerViewSelectedItemHandlerTest {
         return new Booking(
                 "Ausgabe",
                 new Price(100),
-                new Category("Kategorie", new Color(Color.WHITE), ExpenseType.expense()),
+                new Category("Kategorie", new Color(Color.WHITE), ExpenseType.Companion.expense()),
                 UUID.randomUUID()
         );
     }

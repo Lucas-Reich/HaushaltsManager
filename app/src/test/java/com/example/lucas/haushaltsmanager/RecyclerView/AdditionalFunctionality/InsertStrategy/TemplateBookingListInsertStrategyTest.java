@@ -1,9 +1,9 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.InsertStrategy;
 
+import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType;
 import com.example.lucas.haushaltsmanager.entities.Category;
 import com.example.lucas.haushaltsmanager.entities.Color;
 import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
-import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType;
 import com.example.lucas.haushaltsmanager.entities.Price;
 import com.example.lucas.haushaltsmanager.entities.TemplateBooking;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.BookingItem.ExpenseItem;
@@ -20,7 +20,7 @@ import java.util.UUID;
 import static org.junit.Assert.assertEquals;
 
 public class TemplateBookingListInsertStrategyTest {
-    private TemplateListInsertStrategy insertStrategy = new TemplateListInsertStrategy();
+    private final TemplateListInsertStrategy insertStrategy = new TemplateListInsertStrategy();
 
 
     @Test
@@ -64,7 +64,7 @@ public class TemplateBookingListInsertStrategyTest {
         return new Booking(
                 "Ausgabe",
                 new Price(100, false),
-                new Category("Kategorie", new Color(Color.WHITE), ExpenseType.expense()),
+                new Category("Kategorie", new Color(Color.WHITE), ExpenseType.Companion.expense()),
                 UUID.randomUUID()
         );
     }

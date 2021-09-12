@@ -1,19 +1,19 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.SelectionRules;
 
-import com.example.lucas.haushaltsmanager.entities.Category;
-import com.example.lucas.haushaltsmanager.entities.Color;
-import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.CategoryItem.CategoryItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
+import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType;
+import com.example.lucas.haushaltsmanager.entities.Category;
+import com.example.lucas.haushaltsmanager.entities.Color;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 public class CategoryListSelectionRulesTest {
     private CategoryListSelectionRules selectionRules;
@@ -27,7 +27,7 @@ public class CategoryListSelectionRulesTest {
     public void parentCategoryItemCannotBeSelected() {
         CategoryItem categoryItem = new CategoryItem(getDummyCategory());
 
-        boolean parentCanBeSelected = selectionRules.canBeSelected(categoryItem, new ArrayList<IRecyclerItem>());
+        boolean parentCanBeSelected = selectionRules.canBeSelected(categoryItem, new ArrayList<>());
 
         assertFalse(parentCanBeSelected);
     }
@@ -48,7 +48,7 @@ public class CategoryListSelectionRulesTest {
     public void childCategoryItemCanBeSelected() {
         CategoryItem childCategoryItem = new CategoryItem(getDummyCategory());
 
-        boolean childCanBeSelected = selectionRules.canBeSelected(childCategoryItem, new ArrayList<IRecyclerItem>());
+        boolean childCanBeSelected = selectionRules.canBeSelected(childCategoryItem, new ArrayList<>());
 
         assertTrue(childCanBeSelected);
     }
@@ -57,7 +57,7 @@ public class CategoryListSelectionRulesTest {
         return new Category(
                 "Kategorie",
                 new Color(Color.BLACK),
-                ExpenseType.expense()
+                ExpenseType.Companion.expense()
         );
     }
 }

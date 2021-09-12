@@ -81,9 +81,9 @@ public class CreateCategory extends AbstractAppCompatActivity {
 
         setExpenditureType(mCategory.getDefaultExpenseType());
 
-        mIncomeBtn.setOnClickListener(v -> setExpenditureType(ExpenseType.deposit()));
+        mIncomeBtn.setOnClickListener(v -> setExpenditureType(ExpenseType.Companion.deposit()));
 
-        mExpenseBtn.setOnClickListener(v -> setExpenditureType(ExpenseType.expense()));
+        mExpenseBtn.setOnClickListener(v -> setExpenditureType(ExpenseType.Companion.expense()));
 
         mSaveFAB.setOnClickListener(getOnSaveClickListener());
     }
@@ -99,7 +99,7 @@ public class CreateCategory extends AbstractAppCompatActivity {
                 mCategory = new Category(
                         getString(R.string.no_name),
                         Color.black(),
-                        ExpenseType.expense()
+                        ExpenseType.Companion.expense()
                 );
                 break;
             default:
@@ -163,7 +163,7 @@ public class CreateCategory extends AbstractAppCompatActivity {
         mCategory.setDefaultExpenseType(expenditureType);
 
         LinearLayout ll = findViewById(R.id.create_category_bottom_bar);
-        ll.setBackgroundColor(expenditureType.value()
+        ll.setBackgroundColor(expenditureType.getType()
                 ? getColorRes(R.color.booking_expense)
                 : getColorRes(R.color.booking_income)
         );

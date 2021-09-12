@@ -37,6 +37,6 @@ public class CategoryTransformer implements TransformerInterface<Category> {
     private ExpenseType getExpenseType(Cursor c) {
         boolean rawExpenseType = c.getInt(c.getColumnIndex("default_expense_type")) == 1;
 
-        return ExpenseType.load(rawExpenseType);
+        return ExpenseType.Companion.load(rawExpenseType);
     }
 }

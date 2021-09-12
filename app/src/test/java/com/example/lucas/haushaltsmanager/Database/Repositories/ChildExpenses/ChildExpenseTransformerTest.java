@@ -5,10 +5,10 @@ import android.database.CursorIndexOutOfBoundsException;
 import android.database.MatrixCursor;
 
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryTransformer;
+import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType;
 import com.example.lucas.haushaltsmanager.entities.Category;
 import com.example.lucas.haushaltsmanager.entities.Color;
 import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
-import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType;
 import com.example.lucas.haushaltsmanager.entities.Price;
 
 import org.junit.Test;
@@ -45,7 +45,7 @@ public class ChildExpenseTransformerTest {
             put("CATEGORIES.id", expectedChildExpense.getCategory().getId().toString());
             put("CATEGORIES.name", expectedChildExpense.getCategory().getName());
             put("CATEGORIES.color", expectedChildExpense.getCategory().getColor().getColorString());
-            put("CATEGORIES.default_expense_type", expectedChildExpense.getCategory().getDefaultExpenseType().value() ? 1 : 0);
+            put("CATEGORIES.default_expense_type", expectedChildExpense.getCategory().getDefaultExpenseType().getType() ? 1 : 0);
         }});
 
         // Act
@@ -71,7 +71,7 @@ public class ChildExpenseTransformerTest {
             put("CATEGORIES.id", expectedChildExpense.getCategory().getId().toString());
             put("CATEGORIES.name", expectedChildExpense.getCategory().getName());
             put("CATEGORIES.color", expectedChildExpense.getCategory().getColor().getColorString());
-            put("CATEGORIES.default_expense_type", expectedChildExpense.getCategory().getDefaultExpenseType().value() ? 1 : 0);
+            put("CATEGORIES.default_expense_type", expectedChildExpense.getCategory().getDefaultExpenseType().getType() ? 1 : 0);
         }});
 
         // Act
@@ -92,7 +92,7 @@ public class ChildExpenseTransformerTest {
     }
 
     private Booking getSimpleExpense() {
-        Category category = new Category("Kategorie", new Color("#121212"), ExpenseType.expense());
+        Category category = new Category("Kategorie", new Color("#121212"), ExpenseType.Companion.expense());
 
         return new Booking(
                 "Ausgabe",

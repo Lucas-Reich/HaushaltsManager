@@ -4,9 +4,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 
 import com.example.lucas.haushaltsmanager.App.app;
+import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType;
 import com.example.lucas.haushaltsmanager.entities.Category;
 import com.example.lucas.haushaltsmanager.entities.Color;
-import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType;
 import com.example.lucas.haushaltsmanager.entities.Booking.IBooking;
 import com.example.lucas.haushaltsmanager.entities.Booking.ParentBooking;
 import com.example.lucas.haushaltsmanager.R;
@@ -91,7 +91,7 @@ public class Report implements ReportInterface {
         return new Category(
                 getResourceString(titleRes),
                 Color.white(),
-                ExpenseType.deposit()
+                ExpenseType.Companion.deposit()
         );
     }
 

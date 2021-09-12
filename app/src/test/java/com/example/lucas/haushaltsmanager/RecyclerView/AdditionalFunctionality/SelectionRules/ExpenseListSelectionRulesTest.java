@@ -1,16 +1,19 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.SelectionRules;
 
-import com.example.lucas.haushaltsmanager.entities.Category;
-import com.example.lucas.haushaltsmanager.entities.Color;
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertFalse;
+
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.BookingItem.ExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBookingItem.ChildExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ParentBookingItem.ParentBookingItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
 import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType;
 import com.example.lucas.haushaltsmanager.entities.Booking.ParentBooking;
+import com.example.lucas.haushaltsmanager.entities.Category;
+import com.example.lucas.haushaltsmanager.entities.Color;
 import com.example.lucas.haushaltsmanager.entities.Price;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBookingItem.ChildExpenseItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.BookingItem.ExpenseItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ParentBookingItem.ParentBookingItem;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -19,9 +22,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
-
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertFalse;
 
 public class ExpenseListSelectionRulesTest {
     private ExpenseListSelectionRules selectionRules;
@@ -35,7 +35,7 @@ public class ExpenseListSelectionRulesTest {
     public void parentCategoryItemCannotBeSelected() {
         ParentBookingItem parentCategoryItem = new ParentBookingItem(getDummyParentExpense(), getDummyDateItem());
 
-        boolean parentCanBeSelected = selectionRules.canBeSelected(parentCategoryItem, new ArrayList<IRecyclerItem>());
+        boolean parentCanBeSelected = selectionRules.canBeSelected(parentCategoryItem, new ArrayList<>());
 
         assertFalse(parentCanBeSelected);
     }
@@ -44,7 +44,7 @@ public class ExpenseListSelectionRulesTest {
     public void dateItemCannotBeSelected() {
         DateItem dateItem = getDummyDateItem();
 
-        boolean dateItemCanBeSelected = selectionRules.canBeSelected(dateItem, new ArrayList<IRecyclerItem>());
+        boolean dateItemCanBeSelected = selectionRules.canBeSelected(dateItem, new ArrayList<>());
 
         assertFalse(dateItemCanBeSelected);
     }
@@ -65,7 +65,7 @@ public class ExpenseListSelectionRulesTest {
     public void expenseItemCanBeSelected() {
         ExpenseItem expenseItem = new ExpenseItem(getDummyExpense(), getDummyDateItem());
 
-        boolean expenseItemCanBeSelected = selectionRules.canBeSelected(expenseItem, new ArrayList<IRecyclerItem>());
+        boolean expenseItemCanBeSelected = selectionRules.canBeSelected(expenseItem, new ArrayList<>());
 
         assertTrue(expenseItemCanBeSelected);
     }
@@ -74,7 +74,7 @@ public class ExpenseListSelectionRulesTest {
     public void childExpenseItemCanBeSelected() {
         ChildExpenseItem childExpenseItem = new ChildExpenseItem(getDummyExpense(), getDummyParentItem());
 
-        boolean childCanBeSelected = selectionRules.canBeSelected(childExpenseItem, new ArrayList<IRecyclerItem>());
+        boolean childCanBeSelected = selectionRules.canBeSelected(childExpenseItem, new ArrayList<>());
 
         assertTrue(childCanBeSelected);
     }
@@ -120,7 +120,7 @@ public class ExpenseListSelectionRulesTest {
         return new Booking(
                 "Ausgabe",
                 new Price(100),
-                new Category("Kategorie", new Color(Color.BLACK), ExpenseType.expense()),
+                new Category("Kategorie", new Color(Color.BLACK), ExpenseType.Companion.expense()),
                 UUID.randomUUID()
         );
     }
@@ -130,7 +130,7 @@ public class ExpenseListSelectionRulesTest {
                 UUID.randomUUID(),
                 "Parent Ausgabe",
                 Calendar.getInstance(),
-                new ArrayList<Booking>()
+                new ArrayList<>()
         );
     }
 

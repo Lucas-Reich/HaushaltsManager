@@ -2,8 +2,8 @@ package com.example.lucas.haushaltsmanager.Database.Repositories;
 
 import androidx.room.TypeConverter;
 
-import com.example.lucas.haushaltsmanager.entities.Color;
 import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType;
+import com.example.lucas.haushaltsmanager.entities.Color;
 import com.example.lucas.haushaltsmanager.entities.Price;
 
 import java.util.Calendar;
@@ -42,12 +42,12 @@ public class Converters {
 
     @TypeConverter
     public static ExpenseType expenseTypeFromBool(boolean expenseType) {
-        return ExpenseType.load(expenseType);
+        return ExpenseType.Companion.load(expenseType);
     }
 
     @TypeConverter
     public static boolean expenseTypeToBool(ExpenseType expenseType) {
-        return expenseType.value();
+        return expenseType.getType();
     }
 
     @TypeConverter

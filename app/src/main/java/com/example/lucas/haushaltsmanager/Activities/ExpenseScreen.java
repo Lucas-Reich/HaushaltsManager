@@ -236,7 +236,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
                 Category category = new Category(
                         getString(R.string.no_name),
                         Color.black(),
-                        ExpenseType.expense()
+                        ExpenseType.Companion.expense()
                 );
 
                 bookingWithCategory = new BookingWithCategory(
@@ -374,7 +374,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
         mCategoryTxt.setText(bookingWithCategory.getCategory().getName());
 
         // Es kann sein, dass der DefaultExpenseType der Kategorie anders ist, als der der Buchung, von daher muss hier der Preis neu gesetzt werden
-        setPrice(new Price(bookingWithCategory.getPrice().getUnsignedValue(), bookingWithCategory.getCategory().getDefaultExpenseType().value()));
+        setPrice(new Price(bookingWithCategory.getPrice().getUnsignedValue(), bookingWithCategory.getCategory().getDefaultExpenseType().getType()));
 
         enableFabIfBookingIsSaveable();
     }
