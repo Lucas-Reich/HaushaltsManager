@@ -4,10 +4,10 @@ import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkRequest;
 
-import com.example.lucas.haushaltsmanager.Entities.Backup;
-import com.example.lucas.haushaltsmanager.Entities.Delay;
-import com.example.lucas.haushaltsmanager.Entities.NotificationVO;
-import com.example.lucas.haushaltsmanager.Entities.RecurringBooking;
+import com.example.lucas.haushaltsmanager.entities.Backup;
+import com.example.lucas.haushaltsmanager.entities.Delay;
+import com.example.lucas.haushaltsmanager.entities.NotificationVO;
+import com.example.lucas.haushaltsmanager.entities.RecurringBooking;
 import com.example.lucas.haushaltsmanager.Worker.PeriodicWorker.BackupWorker;
 import com.example.lucas.haushaltsmanager.Worker.PeriodicWorker.NotificationWorker;
 import com.example.lucas.haushaltsmanager.Worker.PeriodicWorker.RecurringBookingWorker;

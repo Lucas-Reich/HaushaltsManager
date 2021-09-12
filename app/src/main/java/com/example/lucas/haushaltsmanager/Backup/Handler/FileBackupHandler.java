@@ -2,7 +2,7 @@ package com.example.lucas.haushaltsmanager.Backup.Handler;
 
 import androidx.annotation.NonNull;
 
-import com.example.lucas.haushaltsmanager.Entities.Directory;
+import com.example.lucas.haushaltsmanager.entities.Directory;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.InvalidFileException;
 import com.example.lucas.haushaltsmanager.Utils.FileUtils;
 

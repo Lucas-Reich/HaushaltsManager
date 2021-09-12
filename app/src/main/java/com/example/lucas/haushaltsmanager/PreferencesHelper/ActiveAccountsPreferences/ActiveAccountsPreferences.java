@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.example.lucas.haushaltsmanager.App.app;
-import com.example.lucas.haushaltsmanager.Entities.Account;
+import com.example.lucas.haushaltsmanager.entities.Account;
 
 import java.util.ArrayList;
 import java.util.List;

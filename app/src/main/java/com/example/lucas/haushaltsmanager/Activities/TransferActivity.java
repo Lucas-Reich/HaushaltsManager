@@ -1,15 +1,12 @@
 package com.example.lucas.haushaltsmanager.Activities;
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Button;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.room.Room;
 
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
@@ -22,12 +19,12 @@ import com.example.lucas.haushaltsmanager.Dialogs.DatePickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ErrorAlertDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.SingleChoiceDialog;
-import com.example.lucas.haushaltsmanager.Entities.Account;
-import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
-import com.example.lucas.haushaltsmanager.Entities.Booking.ParentBooking;
-import com.example.lucas.haushaltsmanager.Entities.Category;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
-import com.example.lucas.haushaltsmanager.Entities.Price;
+import com.example.lucas.haushaltsmanager.entities.Account;
+import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.entities.Booking.ParentBooking;
+import com.example.lucas.haushaltsmanager.entities.Category;
+import com.example.lucas.haushaltsmanager.entities.Currency;
+import com.example.lucas.haushaltsmanager.entities.Price;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.text.DateFormat;
@@ -36,7 +33,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-public class TransferActivity extends AppCompatActivity {
+public class TransferActivity extends AbstractAppCompatActivity {
     private static final String TAG = TransferActivity.class.getSimpleName();
 
     private Button mDateBtn, mFromAccountBtn, mToAccountBtn, mCreateTransferBtn, mAmountBtn;
@@ -83,19 +80,9 @@ public class TransferActivity extends AppCompatActivity {
             List<Account> accounts = accountRepo.getAll();
             accounts.remove(mToAccount);
             accountPicker.setContent(accounts, -1);
-            accountPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
-                @Override
-                public void onPositiveClick(Object fromAccount) {
-
-                    setFromAccount((Account) fromAccount);
-                    setToExpense(mFromExpense.getUnsignedPrice());
-                }
-
-                @Override
-                public void onNeutralClick() {
-
-                    //do nothing
-                }
+            accountPicker.setOnEntrySelectedListener(fromAccount -> {
+                setFromAccount((Account) fromAccount);
+                setToExpense(mFromExpense.getUnsignedPrice());
             });
             accountPicker.show(getFragmentManager(), "transfers_from_account");
         });
@@ -109,19 +96,9 @@ public class TransferActivity extends AppCompatActivity {
             List<Account> accounts = accountRepo.getAll();
             accounts.remove(mFromAccount);
             accountPicker.setContent(accounts, -1);
-            accountPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
-                @Override
-                public void onPositiveClick(Object toAccount) {
-
-                    setToAccount((Account) toAccount);
-                    setToExpense(mFromExpense.getUnsignedPrice());
-                }
-
-                @Override
-                public void onNeutralClick() {
-
-                    //do nothing
-                }
+            accountPicker.setOnEntrySelectedListener(toAccount -> {
+                setToAccount((Account) toAccount);
+                setToExpense(mFromExpense.getUnsignedPrice());
             });
             accountPicker.show(getFragmentManager(), "transfers_to_account");
         });
@@ -206,33 +183,16 @@ public class TransferActivity extends AppCompatActivity {
 
         Bundle bundle = getIntent().getExtras();
         if (bundle != null && bundle.containsKey("from_account"))
-            setFromAccount((Account) bundle.getParcelable("from_account"));
+            setFromAccount(bundle.getParcelable("from_account"));
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-
-                onBackPressed();
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    /**
-     * Methode um eine Toolbar anzuzeigen die den Titel und einen Zurückbutton enthält.
-     */
-    private void initializeToolbar() {
-        Toolbar toolbar = findViewById(R.id.toolbar);
-
-        //schatten der toolbar
-        if (Build.VERSION.SDK_INT >= 21)
-            toolbar.setElevation(10.f);
-
-        setSupportActionBar(toolbar);
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     private Category getTransferCategory() {

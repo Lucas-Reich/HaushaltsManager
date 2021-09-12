@@ -2,7 +2,7 @@ package com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPrefe
 
 import android.content.Context;
 
-import com.example.lucas.haushaltsmanager.Entities.Account;
+import com.example.lucas.haushaltsmanager.entities.Account;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 
 import java.util.List;

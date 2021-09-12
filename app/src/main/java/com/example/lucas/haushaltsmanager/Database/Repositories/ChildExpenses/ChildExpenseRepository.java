@@ -22,11 +22,11 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Ex
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.CannotDeleteChildExpenseException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.ChildExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.TransformerInterface;
-import com.example.lucas.haushaltsmanager.Entities.Account;
-import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
-import com.example.lucas.haushaltsmanager.Entities.Booking.IBooking;
-import com.example.lucas.haushaltsmanager.Entities.Booking.ParentBooking;
-import com.example.lucas.haushaltsmanager.Entities.Price;
+import com.example.lucas.haushaltsmanager.entities.Account;
+import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.entities.Booking.IBooking;
+import com.example.lucas.haushaltsmanager.entities.Booking.ParentBooking;
+import com.example.lucas.haushaltsmanager.entities.Price;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +35,7 @@ import java.util.UUID;
 public class ChildExpenseRepository implements ChildExpenseRepositoryInterface {
     private static final String TABLE = "BOOKINGS";
 
-    private SQLiteDatabase mDatabase;
+    private final SQLiteDatabase mDatabase;
     private final ExpenseRepository mBookingRepo;
     private final AccountDAO accountRepo;
     private final ChildExpenseTransformer transformer;

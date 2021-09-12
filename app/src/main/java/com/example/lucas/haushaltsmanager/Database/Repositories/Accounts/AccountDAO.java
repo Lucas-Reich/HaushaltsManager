@@ -6,7 +6,7 @@ import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import com.example.lucas.haushaltsmanager.Entities.Account;
+import com.example.lucas.haushaltsmanager.entities.Account;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,7 +20,7 @@ public interface AccountDAO {
     List<Account> getAll();
 
     @Insert
-    void insert(Account entity);
+    void insert(Account account);
 
     @Delete
     void delete(Account account);

@@ -19,10 +19,10 @@ import androidx.work.WorkRequest;
 import com.codekidlabs.storagechooser.StorageChooser;
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.SingleChoiceDialog;
-import com.example.lucas.haushaltsmanager.Entities.Backup;
-import com.example.lucas.haushaltsmanager.Entities.Directory;
-import com.example.lucas.haushaltsmanager.Entities.NotificationVO;
-import com.example.lucas.haushaltsmanager.Entities.Time;
+import com.example.lucas.haushaltsmanager.entities.Backup;
+import com.example.lucas.haushaltsmanager.entities.Directory;
+import com.example.lucas.haushaltsmanager.entities.NotificationVO;
+import com.example.lucas.haushaltsmanager.entities.Time;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.AppInternalPreferences;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
@@ -94,19 +94,7 @@ public class Settings extends AbstractAppCompatActivity {
             weekdayPicker.createBuilder(Settings.this);
             weekdayPicker.setTitle(getString(R.string.choose_weekday));
             weekdayPicker.setContent(Arrays.asList(mWeekdayUtilsKt.getWeekdays()), mUserSettings.getFirstDayOfWeek());
-            weekdayPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
-                @Override
-                public void onPositiveClick(Object weekday) {
-
-                    setFirstDayOfWeek((String) weekday);
-                }
-
-                @Override
-                public void onNeutralClick() {
-
-                    //do nothing
-                }
-            });
+            weekdayPicker.setOnEntrySelectedListener(weekday -> setFirstDayOfWeek((String) weekday));
             weekdayPicker.show(getFragmentManager(), "settings_choose_weekday");
         });
 
@@ -139,19 +127,7 @@ public class Settings extends AbstractAppCompatActivity {
             concurrentBackupCount.createBuilder(Settings.this);
             concurrentBackupCount.setTitle(getString(R.string.choose_backup_amount));
             concurrentBackupCount.setContent(Arrays.asList(getConcurrentBackupCountOptions()), -1);
-            concurrentBackupCount.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
-                @Override
-                public void onPositiveClick(Object count) {
-
-                    setMaxBackupCount(Integer.parseInt((String) count));
-                }
-
-                @Override
-                public void onNeutralClick() {
-
-                    //do nothing
-                }
-            });
+            concurrentBackupCount.setOnEntrySelectedListener(count -> setMaxBackupCount(Integer.parseInt((String) count)));
             concurrentBackupCount.show(getFragmentManager(), "settings_concurrent_backups");
         });
 
@@ -165,19 +141,7 @@ public class Settings extends AbstractAppCompatActivity {
             timePicker.createBuilder(Settings.this);
             timePicker.setTitle(getString(R.string.choose_time));
             timePicker.setContent(Arrays.asList(getTimeArray()), -1);
-            timePicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
-                @Override
-                public void onPositiveClick(Object time) {
-
-                    setReminderTime(Time.fromString((String) time));
-                }
-
-                @Override
-                public void onNeutralClick() {
-
-                    //do nothing
-                }
-            });
+            timePicker.setOnEntrySelectedListener(time -> setReminderTime(Time.fromString((String) time)));
             timePicker.show(getFragmentManager(), "settings_choose_notification_time");
         });
 

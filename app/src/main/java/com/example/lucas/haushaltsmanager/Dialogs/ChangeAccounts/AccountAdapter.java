@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -18,7 +17,7 @@ import androidx.appcompat.widget.PopupMenu;
 
 import com.example.lucas.haushaltsmanager.Activities.CreateAccountActivity;
 import com.example.lucas.haushaltsmanager.Activities.TransferActivity;
-import com.example.lucas.haushaltsmanager.Entities.Account;
+import com.example.lucas.haushaltsmanager.entities.Account;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.MoneyUtils;
 
@@ -27,19 +26,8 @@ import java.util.Locale;
 import java.util.Map;
 
 public class AccountAdapter extends ArrayAdapter<Account> {
-    @SuppressWarnings("unused")
-    private static final String TAG = AccountAdapter.class.getSimpleName();
-
     private OnDeleteAccountSelected mCallback;
-    private Map<Account, Boolean> mAccountStates;
-
-    private static class ViewHolder {
-        LinearLayout layout;
-        CheckBox account_chk;
-        TextView account_name;
-        TextView account_balance;
-        ImageView account_overflow_menu;
-    }
+    private final Map<Account, Boolean> mAccountStates;
 
     AccountAdapter(Map<Account, Boolean> data, Context context) {
         super(context, R.layout.list_view_account_item, new ArrayList<>(data.keySet()));
@@ -48,7 +36,6 @@ public class AccountAdapter extends ArrayAdapter<Account> {
 
     @Override
     @NonNull
-    @SuppressWarnings("ConstantConditions")
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
 
         Account account = getItem(position);
@@ -90,6 +77,14 @@ public class AccountAdapter extends ArrayAdapter<Account> {
         mCallback = listener;
     }
 
+    private static class ViewHolder {
+        LinearLayout layout;
+        CheckBox account_chk;
+        TextView account_name;
+        TextView account_balance;
+        ImageView account_overflow_menu;
+    }
+
     public interface OnDeleteAccountSelected {
         void onDeleteAccountSelected(Account account);
 
@@ -101,14 +96,12 @@ public class AccountAdapter extends ArrayAdapter<Account> {
      * die bei einem click auf ein MenuItem ausgelöst wird.
      */
     public class OnAccountOverflowSelectedListener implements View.OnClickListener {
+        private final String TAG = OnAccountOverflowSelectedListener.class.getSimpleName();
 
-        private String TAG = OnAccountOverflowSelectedListener.class.getSimpleName();
-
-        private Account mAccount;
-        private Context mContext;
+        private final Account mAccount;
+        private final Context mContext;
 
         OnAccountOverflowSelectedListener(Context context, Account account) {
-
             mAccount = account;
             mContext = context;
         }
@@ -124,46 +117,41 @@ public class AccountAdapter extends ArrayAdapter<Account> {
 
             PopupMenu popupMenu = new PopupMenu(mContext, view);
 
-            popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            popupMenu.setOnMenuItemClickListener(item -> {
+                switch (item.getItemId()) {
 
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
+                    case R.id.edit_account_delete:
 
-                    switch (item.getItemId()) {
+                        //user wird nicht noch einmal um bestätigung gefragt!
+                        mCallback.onDeleteAccountSelected(mAccount);
 
-                        case R.id.edit_account_delete:
+                        Log.d(TAG, "onFABMenuItemClick: deleteAll selected");
+                        return true;
+                    case R.id.edit_account_edit:
 
-                            //user wird nicht noch einmal um bestätigung gefragt!
-                            mCallback.onDeleteAccountSelected(mAccount);
+                        Intent updateAccountIntent = new Intent(mContext, CreateAccountActivity.class);
+                        updateAccountIntent.putExtra(CreateAccountActivity.INTENT_MODE, CreateAccountActivity.INTENT_MODE_UPDATE);
+                        updateAccountIntent.putExtra(CreateAccountActivity.INTENT_ACCOUNT, mAccount);
+                        mContext.startActivity(updateAccountIntent);
 
-                            Log.d(TAG, "onFABMenuItemClick: deleteAll selected");
-                            return true;
-                        case R.id.edit_account_edit:
+                        Log.d(TAG, "onMenuItemSelected: edit selected");
+                        return true;
+                    case R.id.edit_account_transfer:
 
-                            Intent updateAccountIntent = new Intent(mContext, CreateAccountActivity.class);
-                            updateAccountIntent.putExtra(CreateAccountActivity.INTENT_MODE, CreateAccountActivity.INTENT_MODE_UPDATE);
-                            updateAccountIntent.putExtra(CreateAccountActivity.INTENT_ACCOUNT, mAccount);
-                            mContext.startActivity(updateAccountIntent);
+                        Intent transferMoneyBetweenAccountsIntent = new Intent(mContext, TransferActivity.class);
+                        transferMoneyBetweenAccountsIntent.putExtra("from_account", mAccount);
+                        mContext.startActivity(transferMoneyBetweenAccountsIntent);
 
-                            Log.d(TAG, "onMenuItemSelected: edit selected");
-                            return true;
-                        case R.id.edit_account_transfer:
+                        Log.d(TAG, "onMenuItemSelected: empty selected");
+                        return true;
+                    case R.id.edit_account_set_main:
 
-                            Intent transferMoneyBetweenAccountsIntent = new Intent(mContext, TransferActivity.class);
-                            transferMoneyBetweenAccountsIntent.putExtra("from_account", mAccount);
-                            mContext.startActivity(transferMoneyBetweenAccountsIntent);
+                        mCallback.onAccountSetMain(mAccount);
 
-                            Log.d(TAG, "onMenuItemSelected: empty selected");
-                            return true;
-                        case R.id.edit_account_set_main:
-
-                            mCallback.onAccountSetMain(mAccount);
-
-                            Log.d(TAG, "onFABMenuItemClick: make main selected");
-                            return true;
-                        default:
-                            return false;
-                    }
+                        Log.d(TAG, "onFABMenuItemClick: make main selected");
+                        return true;
+                    default:
+                        return false;
                 }
             });
 

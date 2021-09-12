@@ -1,22 +1,16 @@
-package com.example.lucas.haushaltsmanager.Entities.Booking;
+package com.example.lucas.haushaltsmanager.entities.Booking;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
-import androidx.room.ColumnInfo;
-import androidx.room.Entity;
-import androidx.room.Ignore;
-import androidx.room.PrimaryKey;
 
-import com.example.lucas.haushaltsmanager.Entities.Account;
-import com.example.lucas.haushaltsmanager.Entities.Category;
-import com.example.lucas.haushaltsmanager.Entities.Price;
+import com.example.lucas.haushaltsmanager.entities.Account;
+import com.example.lucas.haushaltsmanager.entities.Category;
+import com.example.lucas.haushaltsmanager.entities.Price;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -90,8 +84,8 @@ public class Booking implements Parcelable, IBooking {
         setDate(cal);
         setTitle(source.readString());
         this.id = UUID.fromString(source.readString());
-        setPrice((Price) source.readParcelable(Price.class.getClassLoader()));
-        setCategory((Category) source.readParcelable(Category.class.getClassLoader()));
+        setPrice(source.readParcelable(Price.class.getClassLoader()));
+        setCategory(source.readParcelable(Category.class.getClassLoader()));
         setNotice(source.readString());
         accountId = UUID.fromString(source.readString());
         setExpenseType(EXPENSE_TYPES.valueOf(source.readString()));
@@ -186,12 +180,6 @@ public class Booking implements Parcelable, IBooking {
     public String getDateString() {
 
         return new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(getDate().getTime());
-    }
-
-    @NonNull
-    public String getDisplayableDateTime() {
-
-        return DateFormat.getDateInstance(DateFormat.SHORT).format(new Date(getDate().getTimeInMillis()));
     }
 
     public double getUnsignedPrice() {

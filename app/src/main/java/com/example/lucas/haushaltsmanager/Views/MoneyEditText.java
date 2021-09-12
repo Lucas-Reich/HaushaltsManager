@@ -4,7 +4,7 @@ import android.content.Context;
 import android.text.InputType;
 import android.util.AttributeSet;
 
-import com.example.lucas.haushaltsmanager.Entities.Price;
+import com.example.lucas.haushaltsmanager.entities.Price;
 import com.example.lucas.haushaltsmanager.Utils.MoneyUtils;
 
 import java.util.Locale;

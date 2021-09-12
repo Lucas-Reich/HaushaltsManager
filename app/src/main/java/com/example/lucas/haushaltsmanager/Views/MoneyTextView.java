@@ -6,9 +6,8 @@ import android.util.AttributeSet;
 import androidx.annotation.ColorInt;
 import androidx.annotation.ColorRes;
 
-import com.example.lucas.haushaltsmanager.App.app;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
-import com.example.lucas.haushaltsmanager.Entities.Price;
+import com.example.lucas.haushaltsmanager.entities.Currency;
+import com.example.lucas.haushaltsmanager.entities.Price;
 import com.example.lucas.haushaltsmanager.Utils.MoneyUtils;
 
 import java.util.Locale;

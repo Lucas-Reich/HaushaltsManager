@@ -1,8 +1,8 @@
 package com.example.lucas.haushaltsmanager.Utils.ExpenseUtils;
 
-import com.example.lucas.haushaltsmanager.Entities.Category;
-import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
-import com.example.lucas.haushaltsmanager.Entities.Booking.IBooking;
+import com.example.lucas.haushaltsmanager.entities.Category;
+import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.entities.Booking.IBooking;
 
 import java.util.ArrayList;
 import java.util.Calendar;

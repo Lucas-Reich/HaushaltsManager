@@ -9,8 +9,8 @@ import androidx.annotation.StringRes;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.res.ResourcesCompat;
 
-import com.example.lucas.haushaltsmanager.Entities.Booking.IBooking;
-import com.example.lucas.haushaltsmanager.Entities.Report.ReportInterface;
+import com.example.lucas.haushaltsmanager.entities.Booking.IBooking;
+import com.example.lucas.haushaltsmanager.entities.Report.ReportInterface;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseGrouper;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSum;

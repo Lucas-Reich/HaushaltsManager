@@ -2,7 +2,7 @@ package com.example.lucas.haushaltsmanager.ReportBuilder.Widgets;
 
 import android.view.View;
 
-import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
 
 import java.util.List;
 

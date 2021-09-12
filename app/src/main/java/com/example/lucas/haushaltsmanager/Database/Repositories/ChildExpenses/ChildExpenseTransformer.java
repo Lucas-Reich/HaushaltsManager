@@ -3,9 +3,9 @@ package com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses;
 import android.database.Cursor;
 
 import com.example.lucas.haushaltsmanager.Database.TransformerInterface;
-import com.example.lucas.haushaltsmanager.Entities.Category;
-import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
-import com.example.lucas.haushaltsmanager.Entities.Price;
+import com.example.lucas.haushaltsmanager.entities.Category;
+import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.entities.Price;
 
 import java.util.Calendar;
 import java.util.UUID;

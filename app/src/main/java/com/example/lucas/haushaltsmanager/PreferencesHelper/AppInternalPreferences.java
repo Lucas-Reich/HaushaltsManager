@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import com.example.lucas.haushaltsmanager.Entities.Directory;
+import com.example.lucas.haushaltsmanager.entities.Directory;
 
 import java.io.File;
 

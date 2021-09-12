@@ -13,8 +13,8 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.Categ
 import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.Exceptions.RecurringBookingCouldNotBeCreatedException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.Exceptions.RecurringBookingNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.TransformerInterface;
-import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
-import com.example.lucas.haushaltsmanager.Entities.RecurringBooking;
+import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.entities.RecurringBooking;
 
 import java.util.ArrayList;
 import java.util.Calendar;

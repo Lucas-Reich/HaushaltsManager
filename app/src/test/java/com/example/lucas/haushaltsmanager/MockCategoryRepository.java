@@ -1,7 +1,7 @@
 package com.example.lucas.haushaltsmanager;
 
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryDAO;
-import com.example.lucas.haushaltsmanager.Entities.Category;
+import com.example.lucas.haushaltsmanager.entities.Category;
 
 import java.util.List;
 import java.util.UUID;

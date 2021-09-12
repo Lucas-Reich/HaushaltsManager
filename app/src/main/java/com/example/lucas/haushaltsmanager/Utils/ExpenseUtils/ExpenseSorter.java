@@ -1,6 +1,6 @@
 package com.example.lucas.haushaltsmanager.Utils.ExpenseUtils;
 
-import com.example.lucas.haushaltsmanager.Entities.Booking.IBooking;
+import com.example.lucas.haushaltsmanager.entities.Booking.IBooking;
 
 import java.util.Collections;
 import java.util.Comparator;

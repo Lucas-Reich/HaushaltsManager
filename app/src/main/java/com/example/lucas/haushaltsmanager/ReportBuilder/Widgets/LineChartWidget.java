@@ -3,7 +3,7 @@ package com.example.lucas.haushaltsmanager.ReportBuilder.Widgets;
 import android.content.Context;
 import android.view.View;
 
-import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
 import com.example.lucas.haushaltsmanager.R;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;

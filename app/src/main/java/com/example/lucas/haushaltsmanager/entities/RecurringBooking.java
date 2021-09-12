@@ -1,9 +1,9 @@
-package com.example.lucas.haushaltsmanager.Entities;
+package com.example.lucas.haushaltsmanager.entities;
 
 import androidx.annotation.NonNull;
 
-import com.example.lucas.haushaltsmanager.Entities.Booking.IBooking;
-import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.entities.Booking.IBooking;
+import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
 
 import java.util.Calendar;
 import java.util.UUID;

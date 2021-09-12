@@ -1,7 +1,7 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions;
 
-import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
-import com.example.lucas.haushaltsmanager.Entities.Booking.IBooking;
+import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.entities.Booking.IBooking;
 
 public class AddChildToChildException extends Exception {
     public AddChildToChildException(Booking child, IBooking parent) {

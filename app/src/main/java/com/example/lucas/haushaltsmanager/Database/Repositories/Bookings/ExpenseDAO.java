@@ -7,8 +7,8 @@ import androidx.room.Query;
 import androidx.room.Transaction;
 import androidx.room.Update;
 
-import com.example.lucas.haushaltsmanager.Entities.Booking.BookingWithCategory;
-import com.example.lucas.haushaltsmanager.Entities.Booking.BookingWithoutCategory;
+import com.example.lucas.haushaltsmanager.entities.Booking.BookingWithCategory;
+import com.example.lucas.haushaltsmanager.entities.Booking.BookingWithoutCategory;
 
 import java.util.List;
 import java.util.UUID;

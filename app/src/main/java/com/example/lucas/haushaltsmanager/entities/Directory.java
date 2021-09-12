@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager.Entities;
+package com.example.lucas.haushaltsmanager.entities;
 
 import android.os.Parcel;
 import android.os.Parcelable;

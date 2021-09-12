@@ -1,6 +1,6 @@
 package com.example.lucas.haushaltsmanager.Backup;
 
-import com.example.lucas.haushaltsmanager.Entities.Directory;
+import com.example.lucas.haushaltsmanager.entities.Directory;
 import com.example.lucas.haushaltsmanager.Utils.FileUtils;
 
 import java.io.File;

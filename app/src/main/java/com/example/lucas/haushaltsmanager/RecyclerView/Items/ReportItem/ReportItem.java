@@ -2,7 +2,7 @@ package com.example.lucas.haushaltsmanager.RecyclerView.Items.ReportItem;
 
 import androidx.annotation.NonNull;
 
-import com.example.lucas.haushaltsmanager.Entities.Report.ReportInterface;
+import com.example.lucas.haushaltsmanager.entities.Report.ReportInterface;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IParentRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 

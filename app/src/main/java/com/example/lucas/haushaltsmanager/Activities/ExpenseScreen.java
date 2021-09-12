@@ -27,14 +27,14 @@ import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.DatePickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.SingleChoiceDialog;
-import com.example.lucas.haushaltsmanager.Entities.Account;
-import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
-import com.example.lucas.haushaltsmanager.Entities.Booking.BookingWithCategory;
-import com.example.lucas.haushaltsmanager.Entities.Booking.ExpenseType;
-import com.example.lucas.haushaltsmanager.Entities.Category;
-import com.example.lucas.haushaltsmanager.Entities.Color;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
-import com.example.lucas.haushaltsmanager.Entities.Price;
+import com.example.lucas.haushaltsmanager.entities.Account;
+import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.entities.Booking.BookingWithCategory;
+import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType;
+import com.example.lucas.haushaltsmanager.entities.Category;
+import com.example.lucas.haushaltsmanager.entities.Color;
+import com.example.lucas.haushaltsmanager.entities.Currency;
+import com.example.lucas.haushaltsmanager.entities.Price;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
@@ -160,19 +160,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
             accountPicker.createBuilder(ExpenseScreen.this);
             accountPicker.setTitle(getString(R.string.input_account));
             accountPicker.setContent(accounts, accounts.indexOf(getExpenseAccount(bookingWithCategory.getAccountId())));
-            accountPicker.setOnEntrySelectedListener(new SingleChoiceDialog.OnEntrySelected() {
-                @Override
-                public void onPositiveClick(Object account) {
-
-                    setAccount((Account) account);
-                }
-
-                @Override
-                public void onNeutralClick() {
-
-                    //do nothing
-                }
-            });
+            accountPicker.setOnEntrySelectedListener(account -> setAccount((Account) account));
             accountPicker.show(getFragmentManager(), "expense_screen_account");
         });
 

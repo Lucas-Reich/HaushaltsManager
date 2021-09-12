@@ -1,6 +1,6 @@
 package com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences;
 
-import com.example.lucas.haushaltsmanager.Entities.Account;
+import com.example.lucas.haushaltsmanager.entities.Account;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.SharedPreferences;
 
 import java.util.List;

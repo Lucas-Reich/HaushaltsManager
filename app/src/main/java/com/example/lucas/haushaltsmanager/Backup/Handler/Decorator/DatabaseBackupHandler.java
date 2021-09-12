@@ -9,7 +9,7 @@ import com.example.lucas.haushaltsmanager.Backup.BackupUtils;
 import com.example.lucas.haushaltsmanager.Backup.Exceptions.SQLiteOpenDatabaseFileException;
 import com.example.lucas.haushaltsmanager.Backup.Handler.FileBackupHandler;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
-import com.example.lucas.haushaltsmanager.Entities.Directory;
+import com.example.lucas.haushaltsmanager.entities.Directory;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.InvalidFileException;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences.ActiveAccountsPreferences;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences.ActiveAccountsPreferencesRebuildStrategy;

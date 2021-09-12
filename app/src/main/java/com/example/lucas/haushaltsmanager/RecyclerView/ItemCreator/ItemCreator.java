@@ -1,8 +1,8 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator;
 
-import com.example.lucas.haushaltsmanager.Entities.Category;
-import com.example.lucas.haushaltsmanager.Entities.Booking.IBooking;
-import com.example.lucas.haushaltsmanager.Entities.TemplateBooking;
+import com.example.lucas.haushaltsmanager.entities.Category;
+import com.example.lucas.haushaltsmanager.entities.Booking.IBooking;
+import com.example.lucas.haushaltsmanager.entities.TemplateBooking;
 import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.Strategies.CreateBookingItemsStrategy;
 import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.Strategies.CreateCategoryItemsStrategy;
 import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.Strategies.CreateFileItemsStrategy;

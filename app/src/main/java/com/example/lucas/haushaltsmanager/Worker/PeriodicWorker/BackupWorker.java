@@ -9,8 +9,8 @@ import androidx.work.WorkerParameters;
 import com.example.lucas.haushaltsmanager.Backup.BackupUtils;
 import com.example.lucas.haushaltsmanager.Backup.Handler.Decorator.DatabaseBackupHandler;
 import com.example.lucas.haushaltsmanager.Backup.Handler.FileBackupHandler;
-import com.example.lucas.haushaltsmanager.Entities.Backup;
-import com.example.lucas.haushaltsmanager.Entities.Directory;
+import com.example.lucas.haushaltsmanager.entities.Backup;
+import com.example.lucas.haushaltsmanager.entities.Directory;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.AppInternalPreferences;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 

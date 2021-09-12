@@ -8,8 +8,8 @@ import androidx.room.Room;
 import com.example.lucas.haushaltsmanager.Activities.Settings;
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountDAO;
-import com.example.lucas.haushaltsmanager.Entities.Account;
-import com.example.lucas.haushaltsmanager.Entities.Time;
+import com.example.lucas.haushaltsmanager.entities.Account;
+import com.example.lucas.haushaltsmanager.entities.Time;
 import com.example.lucas.haushaltsmanager.Utils.WeekdayUtils;
 
 import java.util.UUID;

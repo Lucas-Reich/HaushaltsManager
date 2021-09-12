@@ -1,7 +1,7 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.SavingService;
 
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountDAO;
-import com.example.lucas.haushaltsmanager.Entities.Account;
+import com.example.lucas.haushaltsmanager.entities.Account;
 
 import java.util.ArrayList;
 import java.util.List;

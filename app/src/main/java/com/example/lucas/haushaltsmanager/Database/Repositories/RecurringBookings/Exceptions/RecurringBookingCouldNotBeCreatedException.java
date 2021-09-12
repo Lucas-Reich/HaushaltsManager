@@ -1,7 +1,7 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.Exceptions;
 
 import com.example.lucas.haushaltsmanager.Database.Exceptions.EntityCouldNotBeCreatedException;
-import com.example.lucas.haushaltsmanager.Entities.RecurringBooking;
+import com.example.lucas.haushaltsmanager.entities.RecurringBooking;
 
 public class RecurringBookingCouldNotBeCreatedException extends EntityCouldNotBeCreatedException {
     public RecurringBookingCouldNotBeCreatedException(RecurringBooking recurringBooking, Throwable previous) {

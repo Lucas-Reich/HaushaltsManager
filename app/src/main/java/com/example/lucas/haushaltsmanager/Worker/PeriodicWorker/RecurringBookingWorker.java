@@ -9,7 +9,7 @@ import androidx.work.WorkerParameters;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.Exceptions.RecurringBookingNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.RecurringBookingRepository;
-import com.example.lucas.haushaltsmanager.Entities.RecurringBooking;
+import com.example.lucas.haushaltsmanager.entities.RecurringBooking;
 
 import java.util.UUID;
 

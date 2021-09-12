@@ -18,9 +18,6 @@ import com.example.lucas.haushaltsmanager.Activities.ExpenseScreen;
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseDAO;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
-import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
-import com.example.lucas.haushaltsmanager.Entities.Booking.BookingWithoutCategory;
-import com.example.lucas.haushaltsmanager.Entities.Booking.IBooking;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.ActionPayload;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.AddChildMenuItem;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.CombineMenuItem;
@@ -45,7 +42,8 @@ import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.ExpenseListRecyclerViewAdapter;
 import com.example.lucas.haushaltsmanager.RevertExpenseDeletionSnackbar.RevertExpenseDeletionSnackbar;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseFilter;
-import com.github.fafaldo.fabtoolbar.widget.FABToolbarLayout;
+import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.entities.Booking.IBooking;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -84,9 +82,7 @@ public class TabOneBookings extends AbstractTab implements
 
         updateView(rootView);
 
-        mFABToolbar = new FABToolbarWithActionHandler(
-                (FABToolbarLayout) rootView.findViewById(R.id.recycler_view_fab_toolbar)
-        );
+        mFABToolbar = new FABToolbarWithActionHandler(rootView.findViewById(R.id.recycler_view_fab_toolbar));
 
         mFABToolbar.setOnFabClickListener(this);
 
@@ -212,7 +208,6 @@ public class TabOneBookings extends AbstractTab implements
     }
 
     private List<IBooking> getVisibleExpenses(int offset) {
-        ExpenseRepository repository = new ExpenseRepository(getContext());
         ExpenseDAO bookingDAO = Room.databaseBuilder(getContext(), AppDatabase.class, "expenses")
                 .allowMainThreadQueries() // TODO: Remove
                 .build().bookingDAO();

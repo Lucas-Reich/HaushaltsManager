@@ -1,6 +1,9 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.AccountParser;
 
-import com.example.lucas.haushaltsmanager.Entities.Account;
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertTrue;
+
+import com.example.lucas.haushaltsmanager.entities.Account;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Delimiter.Comma;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Delimiter.IDelimiter;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.InvalidInputException;
@@ -14,9 +17,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
-
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
 
 public class AccountParserTest {
     private AccountParser parser;
@@ -37,14 +37,14 @@ public class AccountParserTest {
     @Test
     public void parserCreatesAccount() {
         // SetUp
-        String expectedAccountTitel = "any string";
-        Line line = buildLine(expectedAccountTitel);
+        String expectedAccountTitle = "any string";
+        Line line = buildLine(expectedAccountTitle);
 
         // Act
         Account account = parser.parse(line, createAccountMappingList());
 
         // Assert
-        assertEquals(expectedAccountTitel, account.getName());
+        assertEquals(expectedAccountTitle, account.getName());
     }
 
     @Test

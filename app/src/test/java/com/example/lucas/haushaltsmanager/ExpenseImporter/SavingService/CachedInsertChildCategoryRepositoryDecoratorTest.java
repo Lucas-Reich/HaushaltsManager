@@ -1,9 +1,9 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.SavingService;
 
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryDAO;
-import com.example.lucas.haushaltsmanager.Entities.Booking.ExpenseType;
-import com.example.lucas.haushaltsmanager.Entities.Category;
-import com.example.lucas.haushaltsmanager.Entities.Color;
+import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType;
+import com.example.lucas.haushaltsmanager.entities.Category;
+import com.example.lucas.haushaltsmanager.entities.Color;
 
 import org.junit.Before;
 import org.junit.Test;

@@ -15,7 +15,7 @@ import androidx.room.Room;
 
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryDAO;
-import com.example.lucas.haushaltsmanager.Entities.Category;
+import com.example.lucas.haushaltsmanager.entities.Category;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.ActionPayload;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.DeleteCategoryMenuItem;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.IMenuItem;

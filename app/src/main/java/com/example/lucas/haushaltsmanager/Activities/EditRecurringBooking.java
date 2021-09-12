@@ -14,9 +14,9 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBooking
 import com.example.lucas.haushaltsmanager.Dialogs.DatePickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.FrequencyInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
-import com.example.lucas.haushaltsmanager.Entities.Booking.IBooking;
-import com.example.lucas.haushaltsmanager.Entities.Frequency;
-import com.example.lucas.haushaltsmanager.Entities.RecurringBooking;
+import com.example.lucas.haushaltsmanager.entities.Booking.IBooking;
+import com.example.lucas.haushaltsmanager.entities.Frequency;
+import com.example.lucas.haushaltsmanager.entities.RecurringBooking;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
 import com.example.lucas.haushaltsmanager.Utils.CalendarUtils;

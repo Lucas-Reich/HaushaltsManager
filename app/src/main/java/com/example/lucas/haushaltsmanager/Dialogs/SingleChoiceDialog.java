@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 
 import com.example.lucas.haushaltsmanager.R;
@@ -17,6 +16,22 @@ public class SingleChoiceDialog<T> extends DialogFragment {
     private T mSelectedEntry;
     private AlertDialog.Builder builder;
 
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+        builder.setPositiveButton(R.string.btn_choose, (dialogInterface, i) -> {
+
+            if (mCallback != null && mSelectedEntry != null)
+                mCallback.onPositiveClick(mSelectedEntry);
+
+            dismiss();
+        });
+
+        builder.setNegativeButton(R.string.btn_cancel, (dialogInterface, i) -> dismiss());
+
+        return builder.create();
+    }
+
     /**
      * Methode um den Builder zu initialisieren.
      * Ich musste diese Funktion erstellen, da ich hier keinen Konstruktor benutzen kann.
@@ -27,31 +42,6 @@ public class SingleChoiceDialog<T> extends DialogFragment {
         builder = new AlertDialog.Builder(context);
     }
 
-    @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-
-        builder.setPositiveButton(R.string.btn_choose, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-
-                if (mCallback != null && mSelectedEntry != null)
-                    mCallback.onPositiveClick(mSelectedEntry);
-
-                dismiss();
-            }
-        });
-
-        builder.setNegativeButton(R.string.btn_cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-
-                dismiss();
-            }
-        });
-
-        return builder.create();
-    }
-
     /**
      * Inhalt, welcher in der SingleChoice lister angezeigt wird.
      *
@@ -60,45 +50,7 @@ public class SingleChoiceDialog<T> extends DialogFragment {
     public void setContent(List<T> content, int selectedEntry) {
         mEntrySet = content;
 
-        builder.setSingleChoiceItems(stringfy(content), selectedEntry, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-
-                mSelectedEntry = mEntrySet.get(i);
-            }
-        });
-    }
-
-    /**
-     * Methode um die anzuzeigenden Objekte in ein Stringarray umzuwandeln.
-     *
-     * @param entries Anzuzeigende Objekte
-     * @return String repräsentation der anzuzigenden Objekte
-     */
-    private String[] stringfy(List<T> entries) {
-        String[] stringEntries = new String[entries.size()];
-
-        for (int i = 0; i < entries.size(); i++) {
-            stringEntries[i] = entries.get(i).toString();
-        }
-
-        return stringEntries;
-    }
-
-    /**
-     * Methode um den Neutralen Button des AlertDialogs anzuzeigen.
-     *
-     * @param buttonText Text, welcher vom Button angezeigt wird
-     */
-    public void setNeutralButton(String buttonText) {
-        builder.setNeutralButton(buttonText, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-
-                if (mCallback != null)
-                    mCallback.onNeutralClick();
-            }
-        });
+        builder.setSingleChoiceItems(stringfy(content), selectedEntry, (dialogInterface, i) -> mSelectedEntry = mEntrySet.get(i));
     }
 
     /**
@@ -119,9 +71,23 @@ public class SingleChoiceDialog<T> extends DialogFragment {
         mCallback = listener;
     }
 
+    /**
+     * Methode um die anzuzeigenden Objekte in ein Stringarray umzuwandeln.
+     *
+     * @param entries Anzuzeigende Objekte
+     * @return String repräsentation der anzuzigenden Objekte
+     */
+    private String[] stringfy(List<T> entries) {
+        String[] stringEntries = new String[entries.size()];
+
+        for (int i = 0; i < entries.size(); i++) {
+            stringEntries[i] = entries.get(i).toString();
+        }
+
+        return stringEntries;
+    }
+
     public interface OnEntrySelected<T> {
         void onPositiveClick(T entry);
-
-        void onNeutralClick();
     }
 }

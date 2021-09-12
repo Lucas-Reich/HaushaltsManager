@@ -1,9 +1,9 @@
-package com.example.lucas.haushaltsmanager.Entities;
+package com.example.lucas.haushaltsmanager.entities;
 
 
-import com.example.lucas.haushaltsmanager.Entities.Booking.IBooking;
-import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
-import com.example.lucas.haushaltsmanager.Entities.Booking.ExpenseType;
+import com.example.lucas.haushaltsmanager.entities.Booking.IBooking;
+import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType;
 
 import org.junit.Test;
 

@@ -1,7 +1,7 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions;
 
 import com.example.lucas.haushaltsmanager.Database.Exceptions.EntityNotExistingException;
-import com.example.lucas.haushaltsmanager.Entities.Booking.IBooking;
+import com.example.lucas.haushaltsmanager.entities.Booking.IBooking;
 
 import java.util.UUID;
 

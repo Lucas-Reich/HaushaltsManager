@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager.Entities.Booking;
+package com.example.lucas.haushaltsmanager.entities.Booking;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -8,15 +8,13 @@ import androidx.room.Embedded;
 import androidx.room.Ignore;
 import androidx.room.Relation;
 
-import com.example.lucas.haushaltsmanager.Entities.Account;
-import com.example.lucas.haushaltsmanager.Entities.Category;
-import com.example.lucas.haushaltsmanager.Entities.Price;
+import com.example.lucas.haushaltsmanager.entities.Account;
+import com.example.lucas.haushaltsmanager.entities.Category;
+import com.example.lucas.haushaltsmanager.entities.Price;
 
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 import java.util.UUID;
 
 public class BookingWithCategory implements IBooking, Parcelable {
@@ -51,10 +49,6 @@ public class BookingWithCategory implements IBooking, Parcelable {
     ) {
         this.booking = booking;
         this.category = category;
-    }
-
-    public void setBooking(BookingWithoutCategory booking) {
-        this.booking = booking;
     }
 
     @Ignore
@@ -102,8 +96,8 @@ public class BookingWithCategory implements IBooking, Parcelable {
 
     @Ignore
     private BookingWithCategory(Parcel source) {
-        booking = (BookingWithoutCategory) source.readParcelable(BookingWithoutCategory.class.getClassLoader());
-        category = (Category) source.readParcelable(Category.class.getClassLoader());
+        booking = source.readParcelable(BookingWithoutCategory.class.getClassLoader());
+        category = source.readParcelable(Category.class.getClassLoader());
     }
 
     @Override
@@ -166,12 +160,6 @@ public class BookingWithCategory implements IBooking, Parcelable {
     }
 
     @NonNull
-    public String getDateString() {
-        return new SimpleDateFormat("yyyy-MM-dd", Locale.US)
-                .format(getDate().getTime());
-    }
-
-    @NonNull
     public String getDisplayableDateTime() {
         return DateFormat.getDateInstance(DateFormat.SHORT)
                 .format(new Date(getDate().getTimeInMillis()));
@@ -179,10 +167,6 @@ public class BookingWithCategory implements IBooking, Parcelable {
 
     public double getUnsignedPrice() {
         return getPrice().getUnsignedValue();
-    }
-
-    public double getSignedPrice() {
-        return getPrice().getSignedValue();
     }
 
     public boolean isExpenditure() {
@@ -237,5 +221,9 @@ public class BookingWithCategory implements IBooking, Parcelable {
 
     public BookingWithoutCategory getBooking() {
         return booking;
+    }
+
+    public void setBooking(BookingWithoutCategory booking) {
+        this.booking = booking;
     }
 }

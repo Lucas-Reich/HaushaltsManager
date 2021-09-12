@@ -1,6 +1,6 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.Strategies;
 
-import com.example.lucas.haushaltsmanager.Entities.TemplateBooking;
+import com.example.lucas.haushaltsmanager.entities.TemplateBooking;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.TemplateItem.TemplateItem;
 

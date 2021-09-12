@@ -1,7 +1,7 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.Templates.Exceptions;
 
 import com.example.lucas.haushaltsmanager.Database.Exceptions.EntityCouldNotBeCreatedException;
-import com.example.lucas.haushaltsmanager.Entities.TemplateBooking;
+import com.example.lucas.haushaltsmanager.entities.TemplateBooking;
 
 public class TemplateCouldNotBeCreatedException extends EntityCouldNotBeCreatedException {
     public TemplateCouldNotBeCreatedException(TemplateBooking template, Throwable previous) {

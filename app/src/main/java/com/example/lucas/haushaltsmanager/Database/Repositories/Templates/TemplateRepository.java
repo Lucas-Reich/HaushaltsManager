@@ -12,8 +12,8 @@ import com.example.lucas.haushaltsmanager.Database.QueryInterface;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryTransformer;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Templates.Exceptions.TemplateCouldNotBeCreatedException;
 import com.example.lucas.haushaltsmanager.Database.TransformerInterface;
-import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
-import com.example.lucas.haushaltsmanager.Entities.TemplateBooking;
+import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.entities.TemplateBooking;
 
 import java.util.ArrayList;
 import java.util.List;

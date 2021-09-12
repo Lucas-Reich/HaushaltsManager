@@ -15,7 +15,7 @@ import androidx.room.Room;
 import com.example.lucas.haushaltsmanager.Activities.CreateAccountActivity;
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountDAO;
-import com.example.lucas.haushaltsmanager.Entities.Account;
+import com.example.lucas.haushaltsmanager.entities.Account;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences.ActiveAccountsPreferences;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
@@ -78,7 +78,7 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Acco
     /**
      * Methode die den Callback des AccountAdapters implementiert, wenn ein Konto gelöscht werden soll
      *
-     * @param account Zu löschendes Konto
+     * @param account Account to delete
      */
     @Override
     public void onDeleteAccountSelected(Account account) {

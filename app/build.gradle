@@ -1,9 +1,9 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-parcelize'
 
 android {
     compileSdkVersion 30
-    buildToolsVersion '29.0.2'
     defaultConfig {
         applicationId "com.lucas.ausgabenmanager"
         minSdkVersion 21
@@ -45,8 +45,6 @@ dependencies {
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0-alpha'
     // Ein FAB der sich zu einer Toolbar werden kann
     implementation 'com.github.fafaldo:fab-toolbar:1.2.0'
-    // API welche ich benutze um Hintergrundaufgaben laufen zu lassen
-    implementation 'androidx.work:work-runtime:2.6.0-beta01'
     // AlertDialog zum anzeigen der von mir genutzten OpenSource Pakete
     // TODO: Kann irgendwie nicht weiter upgraden
     implementation 'de.psdev.licensesdialog:licensesdialog:1.8.3'
@@ -71,7 +69,11 @@ dependencies {
 
     // Dependencies welche benötigt werden, um die AndroidTests auszuführen
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-    androidTestImplementation 'androidx.work:work-testing:2.6.0-beta01'
+
+    // API welche ich benutze um Hintergrundaufgaben laufen zu lassen
+    def work_manager_version = "2.6.0"
+    implementation "androidx.work:work-runtime:$work_manager_version"
+    androidTestImplementation "androidx.work:work-testing:$work_manager_version"
 
 
     // TODO: Replace ColorPicker with one of https://android-arsenal.com/tag/18?sort=created
@@ -80,6 +82,7 @@ dependencies {
     // Zum mocken einzelener Klassen
     testImplementation 'org.mockito:mockito-core:2.20.0'
     testImplementation 'junit:junit:4.12'
-    implementation "androidx.core:core-ktx:+"
+
+    implementation "androidx.core:core-ktx:1.6.0"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }

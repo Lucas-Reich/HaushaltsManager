@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager.Entities.Booking;
+package com.example.lucas.haushaltsmanager.entities.Booking;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -9,7 +9,7 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
-import com.example.lucas.haushaltsmanager.Entities.Price;
+import com.example.lucas.haushaltsmanager.entities.Price;
 
 import java.util.Calendar;
 import java.util.UUID;

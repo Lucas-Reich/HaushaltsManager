@@ -2,7 +2,7 @@ package com.example.lucas.haushaltsmanager.Utils;
 
 import android.util.Log;
 
-import com.example.lucas.haushaltsmanager.Entities.Directory;
+import com.example.lucas.haushaltsmanager.entities.Directory;
 
 import java.io.File;
 import java.io.FileInputStream;

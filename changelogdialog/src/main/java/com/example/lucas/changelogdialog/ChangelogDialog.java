@@ -4,22 +4,17 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
-import androidx.annotation.StringRes;
 import android.view.View;
 import android.widget.ListView;
+
+import androidx.annotation.StringRes;
 
 public class ChangelogDialog extends DialogFragment {
     private AlertDialog.Builder mBuilder;
     private ReleaseHistory mReleaseHistory;
     @StringRes
     private int mCloseBtnTxt = R.string.close;
-
-    public void createBuilder(Context context) {
-
-        mBuilder = new AlertDialog.Builder(context);
-    }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -30,15 +25,14 @@ public class ChangelogDialog extends DialogFragment {
 
         mBuilder.setView(view);
 
-        mBuilder.setPositiveButton(mCloseBtnTxt, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-
-                dismiss();
-            }
-        });
+        mBuilder.setPositiveButton(mCloseBtnTxt, (dialogInterface, i) -> dismiss());
 
         return mBuilder.create();
+    }
+
+    public void createBuilder(Context context) {
+
+        mBuilder = new AlertDialog.Builder(context);
     }
 
     public void setCloseBtnText(@StringRes int btnText) {

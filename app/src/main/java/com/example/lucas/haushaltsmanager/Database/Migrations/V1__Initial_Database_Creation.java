@@ -5,8 +5,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.example.lucas.haushaltsmanager.App.app;
-import com.example.lucas.haushaltsmanager.Entities.Color;
-import com.example.lucas.haushaltsmanager.Entities.Booking.ExpenseType;
+import com.example.lucas.haushaltsmanager.entities.Color;
+import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType;
 import com.example.lucas.haushaltsmanager.R;
 
 final class V1__Initial_Database_Creation implements IMigration {

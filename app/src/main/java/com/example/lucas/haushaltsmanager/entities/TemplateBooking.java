@@ -1,11 +1,11 @@
-package com.example.lucas.haushaltsmanager.Entities;
+package com.example.lucas.haushaltsmanager.entities;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
-import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
 
 import java.util.UUID;
 

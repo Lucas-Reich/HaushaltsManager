@@ -3,14 +3,14 @@ package com.example.lucas.haushaltsmanager.RecyclerView.Items.TemplateItem;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.example.lucas.haushaltsmanager.Entities.TemplateBooking;
+import com.example.lucas.haushaltsmanager.entities.TemplateBooking;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IParentRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 
 public class TemplateItem implements IRecyclerItem {
     public static final int VIEW_TYPE = 8;
 
-    private TemplateBooking templateBooking;
+    private final TemplateBooking templateBooking;
 
     public TemplateItem(TemplateBooking templateBooking) {
         this.templateBooking = templateBooking;
@@ -22,7 +22,7 @@ public class TemplateItem implements IRecyclerItem {
     }
 
     @Override
-    public Object getContent() {
+    public TemplateBooking getContent() {
         return templateBooking;
     }
 

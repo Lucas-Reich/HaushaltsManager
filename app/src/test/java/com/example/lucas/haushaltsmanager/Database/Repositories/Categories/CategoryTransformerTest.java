@@ -4,9 +4,9 @@ import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
 import android.database.MatrixCursor;
 
-import com.example.lucas.haushaltsmanager.Entities.Category;
-import com.example.lucas.haushaltsmanager.Entities.Color;
-import com.example.lucas.haushaltsmanager.Entities.Booking.ExpenseType;
+import com.example.lucas.haushaltsmanager.entities.Category;
+import com.example.lucas.haushaltsmanager.entities.Color;
+import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType;
 
 import org.junit.Before;
 import org.junit.Test;

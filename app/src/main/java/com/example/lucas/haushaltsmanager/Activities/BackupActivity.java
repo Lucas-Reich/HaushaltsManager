@@ -21,7 +21,7 @@ import com.example.lucas.haushaltsmanager.Backup.Handler.Decorator.DatabaseBacku
 import com.example.lucas.haushaltsmanager.Backup.Handler.FileBackupHandler;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
-import com.example.lucas.haushaltsmanager.Entities.Directory;
+import com.example.lucas.haushaltsmanager.entities.Directory;
 import com.example.lucas.haushaltsmanager.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 

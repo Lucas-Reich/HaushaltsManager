@@ -1,7 +1,7 @@
-package com.example.lucas.haushaltsmanager.Entities.Report;
+package com.example.lucas.haushaltsmanager.entities.Report;
 
-import com.example.lucas.haushaltsmanager.Entities.Category;
-import com.example.lucas.haushaltsmanager.Entities.Booking.IBooking;
+import com.example.lucas.haushaltsmanager.entities.Category;
+import com.example.lucas.haushaltsmanager.entities.Booking.IBooking;
 
 import java.util.List;
 

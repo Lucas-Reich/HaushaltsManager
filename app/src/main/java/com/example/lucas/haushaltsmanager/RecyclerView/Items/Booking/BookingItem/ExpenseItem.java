@@ -2,7 +2,7 @@ package com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.BookingIte
 
 import androidx.annotation.NonNull;
 
-import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.IBookingItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
 

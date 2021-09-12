@@ -7,7 +7,7 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.AlertDialog;
 
-import com.example.lucas.haushaltsmanager.Entities.Frequency;
+import com.example.lucas.haushaltsmanager.entities.Frequency;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
 

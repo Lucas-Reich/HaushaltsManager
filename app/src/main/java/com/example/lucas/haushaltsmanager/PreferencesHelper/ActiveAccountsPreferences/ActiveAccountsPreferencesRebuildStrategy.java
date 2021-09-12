@@ -5,7 +5,7 @@ import android.content.Context;
 import androidx.room.Room;
 
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
-import com.example.lucas.haushaltsmanager.Entities.Account;
+import com.example.lucas.haushaltsmanager.entities.Account;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.RebuildStrategyInterface;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.SharedPreferences;
 

@@ -19,11 +19,11 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.Categ
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepositoryInterface;
 import com.example.lucas.haushaltsmanager.Database.TransformerInterface;
-import com.example.lucas.haushaltsmanager.Entities.Account;
-import com.example.lucas.haushaltsmanager.Entities.Booking.Booking;
-import com.example.lucas.haushaltsmanager.Entities.Booking.IBooking;
-import com.example.lucas.haushaltsmanager.Entities.Booking.ParentBooking;
-import com.example.lucas.haushaltsmanager.Entities.Price;
+import com.example.lucas.haushaltsmanager.entities.Account;
+import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.entities.Booking.IBooking;
+import com.example.lucas.haushaltsmanager.entities.Booking.ParentBooking;
+import com.example.lucas.haushaltsmanager.entities.Price;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -215,20 +215,6 @@ public class ExpenseRepository {
                     -((Booking) booking).getSignedPrice()
             );
         }
-    }
-
-    // TODO: Only used in tests
-    public boolean isHidden(IBooking expense) throws ExpenseNotFoundException {
-        Cursor c = executeRaw(new IsBookingHiddenQuery(expense));
-
-        if (!c.moveToFirst()) {
-            throw ExpenseNotFoundException.expenseNotFoundException(expense.getId());
-        }
-
-        boolean isHidden = c.getInt(c.getColumnIndex("hidden")) == 1;
-        c.close();
-
-        return isHidden;
     }
 
     private Cursor executeRaw(QueryInterface query) {

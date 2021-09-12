@@ -1,7 +1,7 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses;
 
 import com.example.lucas.haushaltsmanager.Database.QueryInterface;
-import com.example.lucas.haushaltsmanager.Entities.Booking.ParentBooking;
+import com.example.lucas.haushaltsmanager.entities.Booking.ParentBooking;
 
 class IsChildBookingLastVisibleOfParentQuery implements QueryInterface {
     private final ParentBooking parentBooking;

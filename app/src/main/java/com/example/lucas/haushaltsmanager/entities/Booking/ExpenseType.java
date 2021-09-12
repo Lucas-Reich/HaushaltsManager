@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager.Entities.Booking;
+package com.example.lucas.haushaltsmanager.entities.Booking;
 
 import androidx.annotation.NonNull;
 

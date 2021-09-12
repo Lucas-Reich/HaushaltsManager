@@ -13,7 +13,7 @@ import androidx.work.WorkerParameters;
 
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.App.app;
-import com.example.lucas.haushaltsmanager.Entities.NotificationVO;
+import com.example.lucas.haushaltsmanager.entities.NotificationVO;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.util.Random;

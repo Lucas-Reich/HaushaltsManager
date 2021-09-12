@@ -12,9 +12,9 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Account
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
-import com.example.lucas.haushaltsmanager.Entities.Account;
-import com.example.lucas.haushaltsmanager.Entities.Currency;
-import com.example.lucas.haushaltsmanager.Entities.Price;
+import com.example.lucas.haushaltsmanager.entities.Account;
+import com.example.lucas.haushaltsmanager.entities.Currency;
+import com.example.lucas.haushaltsmanager.entities.Price;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences.ActiveAccountsPreferences;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences.AddAndSetDefaultDecorator;
 import com.example.lucas.haushaltsmanager.R;
@@ -59,7 +59,7 @@ public class CreateAccountActivity extends AbstractAppCompatActivity implements 
     protected void onStart() {
         super.onStart();
 
-        if (!mAccount.getName().equals("")) {
+        if (!mAccount.isSet()) {
             mAccountNameBtn.setHint(mAccount.getName());
         }
         mAccountNameBtn.setOnClickListener(v -> {
@@ -151,11 +151,9 @@ public class CreateAccountActivity extends AbstractAppCompatActivity implements 
 
         ConfirmationDialog confirmationDialog = new ConfirmationDialog();
         confirmationDialog.setArguments(bundle);
-        confirmationDialog.setOnConfirmationListener(new ConfirmationDialog.OnConfirmationResult() {
-            @Override
-            public void onConfirmationResult(boolean closeScreen) {
-                if (closeScreen)
-                    finish();
+        confirmationDialog.setOnConfirmationListener(closeScreen -> {
+            if (closeScreen) {
+                finish();
             }
         });
         confirmationDialog.show(getFragmentManager(), "new_account_exit");

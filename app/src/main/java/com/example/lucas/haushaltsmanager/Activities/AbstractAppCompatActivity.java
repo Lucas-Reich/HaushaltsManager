@@ -9,6 +9,7 @@ import androidx.annotation.ColorRes;
 import androidx.annotation.DrawableRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.example.lucas.haushaltsmanager.R;
 
@@ -22,9 +23,7 @@ public abstract class AbstractAppCompatActivity extends AppCompatActivity {
 
         assertActivityHasToolbar(toolbar);
 
-        // Toolbarschatten ist vor Androidversion 21 nicht verfügbar
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            toolbar.setElevation(10.f);
+        toolbar.setElevation(10.f);
 
         setSupportActionBar(toolbar);
 
@@ -38,10 +37,10 @@ public abstract class AbstractAppCompatActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
+        if (item.getItemId() == android.R.id.home) {
+            finish();
         }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -51,6 +50,6 @@ public abstract class AbstractAppCompatActivity extends AppCompatActivity {
     }
 
     public Drawable getDrawableRes(@DrawableRes int drawableId) {
-        return getResources().getDrawable(drawableId);
+        return ResourcesCompat.getDrawable(getResources(), drawableId, null);
     }
 }
