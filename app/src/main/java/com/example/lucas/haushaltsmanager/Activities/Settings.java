@@ -21,7 +21,7 @@ import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.SingleChoiceDialog;
 import com.example.lucas.haushaltsmanager.entities.Backup;
 import com.example.lucas.haushaltsmanager.entities.Directory;
-import com.example.lucas.haushaltsmanager.entities.NotificationVO;
+import com.example.lucas.haushaltsmanager.entities.Notification;
 import com.example.lucas.haushaltsmanager.entities.Time;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.AppInternalPreferences;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
@@ -333,7 +333,7 @@ public class Settings extends AbstractAppCompatActivity {
      * Methode um den NotificationWorker zu starten
      */
     private void scheduleNotificationWorker() {
-        NotificationVO notification = new NotificationVO(
+        Notification notification = new Notification(
                 getString(R.string.remind_notification_title),
                 getString(R.string.remind_notification_body),
                 R.mipmap.ic_launcher

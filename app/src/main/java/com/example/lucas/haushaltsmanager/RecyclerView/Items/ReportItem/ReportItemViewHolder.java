@@ -10,18 +10,18 @@ import androidx.annotation.ColorRes;
 import androidx.annotation.StringRes;
 
 import com.example.lucas.haushaltsmanager.App.app;
-import com.example.lucas.haushaltsmanager.entities.Category;
-import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
-import com.example.lucas.haushaltsmanager.entities.Booking.IBooking;
-import com.example.lucas.haushaltsmanager.entities.Booking.ParentBooking;
-import com.example.lucas.haushaltsmanager.entities.Price;
-import com.example.lucas.haushaltsmanager.entities.Report.ReportInterface;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.AbstractViewHolder;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSum;
 import com.example.lucas.haushaltsmanager.Views.MoneyTextView;
 import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
+import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.entities.Booking.IBooking;
+import com.example.lucas.haushaltsmanager.entities.Booking.ParentBooking;
+import com.example.lucas.haushaltsmanager.entities.Category;
+import com.example.lucas.haushaltsmanager.entities.Price;
+import com.example.lucas.haushaltsmanager.entities.Report;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.PieData;
@@ -70,9 +70,9 @@ public class ReportItemViewHolder extends AbstractViewHolder {
 
     @Override
     public void bind(IRecyclerItem item) {
-        ReportInterface report = castToReportItem(item).getContent();
+        Report report = castToReportItem(item).getContent();
 
-        setCardTitle(report.getCardTitle());
+        setCardTitle(report.getTitle());
         setIncome(new Price(report.getIncoming()));
         setOutgoing(new Price(report.getOutgoing()));
         setTotal(new Price(report.getTotal()));
@@ -118,7 +118,7 @@ public class ReportItemViewHolder extends AbstractViewHolder {
         categoryTitle.setText(category.getName());
     }
 
-    private void setPieChart(ReportInterface report) {
+    private void setPieChart(Report report) {
         pieChart.setData(preparePieData(report));
         pieChart.setDrawHoleEnabled(false);
         pieChart.getLegend().setEnabled(false);
@@ -140,13 +140,13 @@ public class ReportItemViewHolder extends AbstractViewHolder {
         });
     }
 
-    private PieData preparePieData(ReportInterface report) {
+    private PieData preparePieData(Report report) {
         if (report.getBookingCount() == 0) {
             return null;
         }
 
         List<PieEntry> pieData = new ArrayList<>();
-        List<Booking> expenses = flattenExpenses(report.getExpenses());
+        List<Booking> expenses = flattenExpenses(report.getBookings());
         for (Map.Entry<Boolean, Double> entry : sumByExpenseType(expenses).entrySet()) {
             pieData.add(dataSetFrom(entry));
         }

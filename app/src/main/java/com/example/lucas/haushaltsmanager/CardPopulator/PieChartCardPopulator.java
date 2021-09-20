@@ -7,14 +7,14 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 
 import com.example.lucas.haushaltsmanager.App.app;
-import com.example.lucas.haushaltsmanager.entities.Category;
-import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
-import com.example.lucas.haushaltsmanager.entities.Booking.IBooking;
-import com.example.lucas.haushaltsmanager.entities.Booking.ParentBooking;
-import com.example.lucas.haushaltsmanager.entities.Report.ReportInterface;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseFilter;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSum;
+import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.entities.Booking.IBooking;
+import com.example.lucas.haushaltsmanager.entities.Booking.ParentBooking;
+import com.example.lucas.haushaltsmanager.entities.Category;
+import com.example.lucas.haushaltsmanager.entities.Report;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
@@ -42,8 +42,8 @@ public class PieChartCardPopulator {
         mRootView.setOnClickListener(listener);
     }
 
-    public void setData(ReportInterface report) {
-        setCardTitle(report.getCardTitle());
+    public void setData(Report report) {
+        setCardTitle(report.getTitle());
 
         setPieChart(report);
     }
@@ -60,9 +60,9 @@ public class PieChartCardPopulator {
         mViewHolder.titleTxt.setText(title);
     }
 
-    private void setPieChart(ReportInterface report) {
+    private void setPieChart(Report report) {
         mViewHolder.pieChart.setNoDataText(app.getContext().getString(R.string.no_bookings_in_year));
-        mViewHolder.pieChart.setData(createDataSet(report.getExpenses()));
+        mViewHolder.pieChart.setData(createDataSet(report.getBookings()));
     }
 
 

@@ -2,16 +2,16 @@ package com.example.lucas.haushaltsmanager.RecyclerView.Items.ReportItem;
 
 import androidx.annotation.NonNull;
 
-import com.example.lucas.haushaltsmanager.entities.Report.ReportInterface;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IParentRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
+import com.example.lucas.haushaltsmanager.entities.Report;
 
 public class ReportItem implements IRecyclerItem {
     public static final int VIEW_TYPE = 11;
 
-    private final ReportInterface report;
+    private final Report report;
 
-    public ReportItem(ReportInterface report) {
+    public ReportItem(Report report) {
         this.report = report;
     }
 
@@ -21,7 +21,7 @@ public class ReportItem implements IRecyclerItem {
     }
 
     @Override
-    public ReportInterface getContent() {
+    public Report getContent() {
         return report;
     }
 

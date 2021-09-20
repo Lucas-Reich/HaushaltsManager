@@ -13,7 +13,7 @@ import androidx.work.WorkerParameters;
 
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.App.app;
-import com.example.lucas.haushaltsmanager.entities.NotificationVO;
+import com.example.lucas.haushaltsmanager.entities.Notification;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.util.Random;
@@ -25,7 +25,7 @@ public class NotificationWorker extends AbstractRecurringWorker {
     public static final String CONTENT = "content";
     public static final String ICON = "icon";
 
-    private final NotificationVO notification;
+    private final Notification notification;
 
     /**
      * Source: https://developer.android.com/training/notify-user/build-notification
@@ -33,7 +33,7 @@ public class NotificationWorker extends AbstractRecurringWorker {
     public NotificationWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
 
-        notification = new NotificationVO(
+        notification = new Notification(
                 getInputData().getString(TITLE),
                 getInputData().getString(CONTENT),
                 getInputData().getInt(ICON, R.mipmap.ic_launcher)

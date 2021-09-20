@@ -9,11 +9,11 @@ import androidx.annotation.StringRes;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.res.ResourcesCompat;
 
-import com.example.lucas.haushaltsmanager.entities.Booking.IBooking;
-import com.example.lucas.haushaltsmanager.entities.Report.ReportInterface;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseGrouper;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSum;
+import com.example.lucas.haushaltsmanager.entities.Booking.IBooking;
+import com.example.lucas.haushaltsmanager.entities.Report;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.XAxis;
@@ -45,8 +45,8 @@ public class LineChartCardPopulator {
         mRootView.setOnClickListener(listener);
     }
 
-    public void setData(ReportInterface report) {
-        setCardTitle(report.getCardTitle());
+    public void setData(Report report) {
+        setCardTitle(report.getTitle());
 
         setLineChart(report);
     }
@@ -60,7 +60,7 @@ public class LineChartCardPopulator {
         mViewHolder.mTitle.setText(title);
     }
 
-    private void setLineChart(ReportInterface report) {
+    private void setLineChart(Report report) {
         mViewHolder.mLineChart.setData(prepareLineData(report));
         mViewHolder.mLineChart.setBackgroundColor(getColorResource(R.color.primaryBackgroundColorBright));
 
@@ -93,8 +93,8 @@ public class LineChartCardPopulator {
         return mResources.getString(string);
     }
 
-    private LineData prepareLineData(ReportInterface report) {
-        LineDataSet lds = new LineDataSet(getChartEntries(report.getExpenses()), "");
+    private LineData prepareLineData(Report report) {
+        LineDataSet lds = new LineDataSet(getChartEntries(report.getBookings()), "");
         lds.setColor(getColorResource(R.color.colorPrimary));
         lds.setCircleColor(getColorResource(R.color.colorPrimary));
         lds.setValueTextColor(getColorResource(R.color.primary_text_color));

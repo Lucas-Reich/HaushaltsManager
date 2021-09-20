@@ -3,8 +3,6 @@ package com.example.lucas.haushaltsmanager.Activities;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -21,8 +19,8 @@ import com.example.lucas.haushaltsmanager.Backup.Handler.Decorator.DatabaseBacku
 import com.example.lucas.haushaltsmanager.Backup.Handler.FileBackupHandler;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
-import com.example.lucas.haushaltsmanager.entities.Directory;
 import com.example.lucas.haushaltsmanager.R;
+import com.example.lucas.haushaltsmanager.entities.Directory;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;
@@ -57,91 +55,68 @@ public class BackupActivity extends AbstractAppCompatActivity {
         updateListView();
 
         mChooseDirectoryBtn.setHint(mBackupDirectory.getName());
-        mChooseDirectoryBtn.setOnClickListener(new View.OnClickListener() {
+        mChooseDirectoryBtn.setOnClickListener(v -> {
+            if (!hasFilePermission())
+                requestFilePermission();
 
-            @Override
-            public void onClick(View v) {
-                if (!hasFilePermission())
-                    requestFilePermission();
+            StorageChooser storageChooser = new StorageChooser.Builder()
+                    .withActivity(BackupActivity.this)
+                    .withFragmentManager(getFragmentManager())
+                    .withMemoryBar(true)
+                    .allowAddFolder(true)
+                    .allowCustomPath(true)
+                    .setType(StorageChooser.DIRECTORY_CHOOSER)
+                    .build();
 
-                StorageChooser storageChooser = new StorageChooser.Builder()
-                        .withActivity(BackupActivity.this)
-                        .withFragmentManager(getFragmentManager())
-                        .withMemoryBar(true)
-                        .allowAddFolder(true)
-                        .allowCustomPath(true)
-                        .setType(StorageChooser.DIRECTORY_CHOOSER)
-                        .build();
+            storageChooser.show();
+            storageChooser.setOnSelectListener(directory -> {
 
-                storageChooser.show();
-                storageChooser.setOnSelectListener(new StorageChooser.OnSelectListener() {
+                mBackupDirectory = new Directory(directory);
+                mChooseDirectoryBtn.setText(mBackupDirectory.getName());
 
-                    @Override
-                    public void onSelect(String directory) {
-
-                        mBackupDirectory = new Directory(directory);
-                        mChooseDirectoryBtn.setText(mBackupDirectory.getName());
-
-                        updateListView();
-                    }
-                });
-            }
+                updateListView();
+            });
         });
 
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mListView.setOnItemClickListener((parent, view, position, id) -> {
+            final File file = new File(mBackupDirectory + "/" + mListView.getItemAtPosition(position));
+            Bundle bundle = new Bundle();
+            bundle.putString(ConfirmationDialog.TITLE, getString(R.string.restoreBackup));
+            bundle.putString(ConfirmationDialog.CONTENT, getString(R.string.restore_backup_confirmation));
 
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                final File file = new File(mBackupDirectory + "/" + mListView.getItemAtPosition(position));
-                Bundle bundle = new Bundle();
-                bundle.putString(ConfirmationDialog.TITLE, getString(R.string.restoreBackup));
-                bundle.putString(ConfirmationDialog.CONTENT, getString(R.string.restore_backup_confirmation));
+            ConfirmationDialog confirmationDialog = new ConfirmationDialog();
+            confirmationDialog.setOnConfirmationListener(restoreDatabase -> {
+                if (restoreDatabase) {
+                    DatabaseBackupHandler backupHandler = new DatabaseBackupHandler(BackupActivity.this, new FileBackupHandler());
+                    boolean successful = backupHandler.restore(file);
 
-                ConfirmationDialog confirmationDialog = new ConfirmationDialog();
-                confirmationDialog.setOnConfirmationListener(new ConfirmationDialog.OnConfirmationResult() {
-                    @Override
-                    public void onConfirmationResult(boolean restoreDatabase) {
-                        if (restoreDatabase) {
-                            DatabaseBackupHandler backupHandler = new DatabaseBackupHandler(BackupActivity.this, new FileBackupHandler());
-                            boolean successful = backupHandler.restore(file);
-
-                            showToast(successful ? R.string.backup_restoring_successful : R.string.backup_restoring_failed);
-                        }
-                    }
-                });
-                confirmationDialog.setArguments(bundle);
-                confirmationDialog.show(getFragmentManager(), "backup_confirm_restore");
-            }
+                    showToast(successful ? R.string.backup_restoring_successful : R.string.backup_restoring_failed);
+                }
+            });
+            confirmationDialog.setArguments(bundle);
+            confirmationDialog.show(getFragmentManager(), "backup_confirm_restore");
         });
 
-        mCreateBackupFab.setOnClickListener(new View.OnClickListener() {
+        mCreateBackupFab.setOnClickListener(v -> {
+            Bundle bundle = new Bundle();
+            bundle.putString(BasicTextInputDialog.TITLE, getString(R.string.choose_new_backup_name));
+            bundle.putString(BasicTextInputDialog.HINT, BackupUtils.getDefaultBackupName());
 
-            @Override
-            public void onClick(View v) {
-                Bundle bundle = new Bundle();
-                bundle.putString(BasicTextInputDialog.TITLE, getString(R.string.choose_new_backup_name));
-                bundle.putString(BasicTextInputDialog.HINT, BackupUtils.getDefaultBackupName());
+            BasicTextInputDialog basicDialog = new BasicTextInputDialog();
+            basicDialog.setOnTextInputListener(backupName -> {
 
-                BasicTextInputDialog basicDialog = new BasicTextInputDialog();
-                basicDialog.setOnTextInputListener(new BasicTextInputDialog.OnTextInput() {
+                DatabaseBackupHandler backupHandler = new DatabaseBackupHandler(BackupActivity.this, new FileBackupHandler());
+                boolean successful = backupHandler.backup(mBackupDirectory, backupName);
 
-                    @Override
-                    public void onTextInput(String backupName) {
+                if (successful)
+                    showToast(R.string.created_backup);
+                else
+                    showToast(R.string.could_not_create_backup);
 
-                        DatabaseBackupHandler backupHandler = new DatabaseBackupHandler(BackupActivity.this, new FileBackupHandler());
-                        boolean successful = backupHandler.backup(mBackupDirectory, backupName);
-
-                        if (successful)
-                            showToast(R.string.created_backup);
-                        else
-                            showToast(R.string.could_not_create_backup);
-
-                        updateListView();
-                    }
-                });
-                basicDialog.setArguments(bundle);
-                basicDialog.show(getFragmentManager(), "backup_name");
-            }
+                updateListView();
+            });
+            basicDialog.setArguments(bundle);
+            basicDialog.show(getFragmentManager(), "backup_name");
         });
     }
 

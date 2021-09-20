@@ -11,13 +11,12 @@ import com.example.lucas.haushaltsmanager.CardPopulator.LineChartCardPopulator;
 import com.example.lucas.haushaltsmanager.CardPopulator.PieChartCardPopulator;
 import com.example.lucas.haushaltsmanager.CardPopulator.TimeFrameCardPopulator;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
-import com.example.lucas.haushaltsmanager.entities.Booking.IBooking;
-import com.example.lucas.haushaltsmanager.entities.Report.Report;
-import com.example.lucas.haushaltsmanager.entities.Report.ReportInterface;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.CalendarUtils;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseGrouper;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSum;
+import com.example.lucas.haushaltsmanager.entities.Booking.IBooking;
+import com.example.lucas.haushaltsmanager.entities.Report;
 
 import java.util.HashMap;
 import java.util.List;
@@ -74,18 +73,18 @@ public class TabThreeYearlyReports extends AbstractTab {
     }
 
     public void updateView(View rootView) {
-        ReportInterface report = createReport("", getVisibleExpenses());
+        Report report = createReport("", getVisibleExpenses());
 
-        report.setCardTitle(getStringifiedYear());
+        report.setTitle(getStringifiedYear());
         mTimeFrameCardPopulator.setData(report);
 
-        report.setCardTitle(getString(R.string.account_balance));
+        report.setTitle(getString(R.string.account_balance));
         mLineChartPopulator.setData(report);
 
-        report.setCardTitle(getString(R.string.income));
+        report.setTitle(getString(R.string.income));
         mIncomeCardPopulator.setData(report);
 
-        report.setCardTitle(getString(R.string.expense));
+        report.setTitle(getString(R.string.expense));
         mExpenseCardPopulator.setData(report);
     }
 
@@ -107,7 +106,7 @@ public class TabThreeYearlyReports extends AbstractTab {
         return 0d;
     }
 
-    private ReportInterface createReport(String title, List<IBooking> expenses) {
+    private Report createReport(String title, List<IBooking> expenses) {
         return new Report(
                 title,
                 filterByYear(expenses, CalendarUtils.getCurrentYear())

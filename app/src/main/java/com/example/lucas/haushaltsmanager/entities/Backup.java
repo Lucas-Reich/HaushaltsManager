@@ -9,14 +9,9 @@ import javax.annotation.Nullable;
 
 public class Backup {
     public static final String BACKUP_FILE_EXTENSION = "sdf"; //.SaveDataFile
-
-    // Backups sollten immer um 23:59 erstellt werden
     private static final Time executionTime = new Time(23, 59);
 
-    /**
-     * Title could be NULL if it should have standard structure
-     */
-    private String title;
+    private final String title;
 
     public Backup(@Nullable String title) {
         this.title = title;

@@ -10,16 +10,16 @@ import androidx.annotation.StringRes;
 import androidx.cardview.widget.CardView;
 
 import com.example.lucas.haushaltsmanager.App.app;
-import com.example.lucas.haushaltsmanager.entities.Category;
-import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
-import com.example.lucas.haushaltsmanager.entities.Booking.IBooking;
-import com.example.lucas.haushaltsmanager.entities.Booking.ParentBooking;
-import com.example.lucas.haushaltsmanager.entities.Price;
-import com.example.lucas.haushaltsmanager.entities.Report.ReportInterface;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSum;
 import com.example.lucas.haushaltsmanager.Views.MoneyTextView;
 import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
+import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.entities.Booking.IBooking;
+import com.example.lucas.haushaltsmanager.entities.Booking.ParentBooking;
+import com.example.lucas.haushaltsmanager.entities.Category;
+import com.example.lucas.haushaltsmanager.entities.Price;
+import com.example.lucas.haushaltsmanager.entities.Report;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.PieData;
@@ -43,8 +43,8 @@ public class TimeFrameCardPopulator {
         mResources = resources;
     }
 
-    public void setData(ReportInterface report) {
-        setCardTitle(report.getCardTitle());
+    public void setData(Report report) {
+        setCardTitle(report.getTitle());
 
         setIncome(new Price(report.getIncoming()));
 
@@ -84,7 +84,7 @@ public class TimeFrameCardPopulator {
         mViewHolder.mCategoryTitle.setText(category.getName());
     }
 
-    private void setPieChart(ReportInterface report) {
+    private void setPieChart(Report report) {
         mViewHolder.mPieChart.setData(preparePieData(report));
         mViewHolder.mPieChart.setDrawHoleEnabled(false);
         mViewHolder.mPieChart.getLegend().setEnabled(false);
@@ -106,13 +106,13 @@ public class TimeFrameCardPopulator {
         });
     }
 
-    private PieData preparePieData(ReportInterface report) {
+    private PieData preparePieData(Report report) {
         if (report.getBookingCount() == 0) {
             return null;
         }
 
         List<PieEntry> pieData = new ArrayList<>();
-        List<Booking> expenses = flattenExpenses(report.getExpenses());
+        List<Booking> expenses = flattenExpenses(report.getBookings());
         for (Map.Entry<Boolean, Double> entry : sumByExpenseType(expenses).entrySet()) {
             pieData.add(dataSetFrom(entry));
         }

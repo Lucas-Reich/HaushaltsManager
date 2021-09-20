@@ -6,7 +6,7 @@ import androidx.work.WorkRequest;
 
 import com.example.lucas.haushaltsmanager.entities.Backup;
 import com.example.lucas.haushaltsmanager.entities.Delay;
-import com.example.lucas.haushaltsmanager.entities.NotificationVO;
+import com.example.lucas.haushaltsmanager.entities.Notification;
 import com.example.lucas.haushaltsmanager.entities.RecurringBooking;
 import com.example.lucas.haushaltsmanager.Worker.PeriodicWorker.BackupWorker;
 import com.example.lucas.haushaltsmanager.Worker.PeriodicWorker.NotificationWorker;
@@ -20,8 +20,8 @@ public class WorkRequestBuilder {
             return workRequestBuilder.fromRecurringBooking((RecurringBooking) object);
         }
 
-        if (object instanceof NotificationVO) {
-            return workRequestBuilder.fromNotification((NotificationVO) object);
+        if (object instanceof Notification) {
+            return workRequestBuilder.fromNotification((Notification) object);
         }
 
         if (object instanceof Backup) {
@@ -47,7 +47,7 @@ public class WorkRequestBuilder {
                 .build();
     }
 
-    private WorkRequest fromNotification(NotificationVO notification) {
+    private WorkRequest fromNotification(Notification notification) {
         Delay delay = notification.getDelay();
 
         return new OneTimeWorkRequest.Builder(NotificationWorker.class)
@@ -57,7 +57,7 @@ public class WorkRequestBuilder {
                 .build();
     }
 
-    private Data buildInputData(NotificationVO notification) {
+    private Data buildInputData(Notification notification) {
         return new Data.Builder()
                 .putString(NotificationWorker.TITLE, notification.getTitle())
                 .putString(NotificationWorker.CONTENT, notification.getContent())
