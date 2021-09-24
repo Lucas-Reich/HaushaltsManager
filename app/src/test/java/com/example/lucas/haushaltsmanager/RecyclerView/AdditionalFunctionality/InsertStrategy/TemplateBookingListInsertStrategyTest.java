@@ -1,14 +1,16 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.InsertStrategy;
 
-import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType;
-import com.example.lucas.haushaltsmanager.entities.Category;
-import com.example.lucas.haushaltsmanager.entities.Color;
-import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
-import com.example.lucas.haushaltsmanager.entities.Price;
-import com.example.lucas.haushaltsmanager.entities.TemplateBooking;
+import static org.junit.Assert.assertEquals;
+
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.BookingItem.ExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.TemplateItem.TemplateItem;
+import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType;
+import com.example.lucas.haushaltsmanager.entities.Category;
+import com.example.lucas.haushaltsmanager.entities.Color;
+import com.example.lucas.haushaltsmanager.entities.Price;
+import com.example.lucas.haushaltsmanager.entities.TemplateBooking;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -16,8 +18,6 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import static org.junit.Assert.assertEquals;
 
 public class TemplateBookingListInsertStrategyTest {
     private final TemplateListInsertStrategy insertStrategy = new TemplateListInsertStrategy();
@@ -64,7 +64,7 @@ public class TemplateBookingListInsertStrategyTest {
         return new Booking(
                 "Ausgabe",
                 new Price(100, false),
-                new Category("Kategorie", new Color(Color.WHITE), ExpenseType.Companion.expense()),
+                new Category("Kategorie", Color.Companion.white(), ExpenseType.Companion.expense()),
                 UUID.randomUUID()
         );
     }

@@ -2,6 +2,7 @@ package com.example.lucas.haushaltsmanager.Database.Repositories;
 
 import androidx.room.TypeConverter;
 
+import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
 import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType;
 import com.example.lucas.haushaltsmanager.entities.Color;
 import com.example.lucas.haushaltsmanager.entities.Price;
@@ -61,5 +62,15 @@ public class Converters {
     @TypeConverter
     public static long calendarToLong(Calendar calendar) {
         return calendar.getTimeInMillis();
+    }
+
+    @TypeConverter
+    public static Booking.EXPENSE_TYPES expenseTypesFromString(String expenseTypes) {
+        return Booking.EXPENSE_TYPES.valueOf(expenseTypes);
+    }
+
+    @TypeConverter
+    public static String expenseTypesToString(Booking.EXPENSE_TYPES expenseType) {
+        return expenseType.name();
     }
 }

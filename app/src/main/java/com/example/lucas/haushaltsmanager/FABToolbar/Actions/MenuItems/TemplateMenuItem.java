@@ -2,26 +2,30 @@ package com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems;
 
 import android.content.Context;
 
+import androidx.room.Room;
+
 import com.example.lucas.haushaltsmanager.App.app;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Templates.Exceptions.TemplateCouldNotBeCreatedException;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Templates.TemplateRepository;
-import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
-import com.example.lucas.haushaltsmanager.entities.TemplateBooking;
+import com.example.lucas.haushaltsmanager.Database.AppDatabase;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Templates.TemplateBookingDAO;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.ActionPayload;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.ActionKey;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.IActionKey;
 import com.example.lucas.haushaltsmanager.R;
+import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.entities.TemplateBooking;
 
 public class TemplateMenuItem implements IMenuItem {
     public static final String ACTION_KEY = "templateAction";
 
     private final OnSuccessCallback mCallback;
     private final IActionKey mActionKey = new ActionKey(ACTION_KEY);
-    private final TemplateRepository templateRepository;
+    private final TemplateBookingDAO templateRepository;
 
     public TemplateMenuItem(OnSuccessCallback callback) {
         mCallback = callback;
-        templateRepository = new TemplateRepository(app.getContext());
+        templateRepository = Room.databaseBuilder(app.getContext(), AppDatabase.class, "expenses")
+                .allowMainThreadQueries() // TODO: Remove
+                .build().templateBookingDAO();
     }
 
     @Override
@@ -56,14 +60,10 @@ public class TemplateMenuItem implements IMenuItem {
     }
 
     private void saveAsTemplate(TemplateBooking templateBooking) {
-        try {
-            templateRepository.insert(templateBooking);
+        templateRepository.insert(templateBooking);
 
-            if (null != mCallback) {
-                mCallback.onSuccess(templateBooking);
-            }
-        } catch (TemplateCouldNotBeCreatedException e) {
-            // TODO:  Do nothing?
+        if (null != mCallback) {
+            mCallback.onSuccess(templateBooking);
         }
     }
 

@@ -3,23 +3,29 @@ package com.example.lucas.haushaltsmanager.RecyclerView.Items.TemplateItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.example.lucas.haushaltsmanager.entities.Category;
-import com.example.lucas.haushaltsmanager.entities.Price;
-import com.example.lucas.haushaltsmanager.entities.TemplateBooking;
+import androidx.room.Room;
+
+import com.example.lucas.haushaltsmanager.App.app;
+import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.AbstractViewHolder;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.Views.MoneyTextView;
 import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
+import com.example.lucas.haushaltsmanager.entities.Category;
+import com.example.lucas.haushaltsmanager.entities.Price;
+import com.example.lucas.haushaltsmanager.entities.TemplateBooking;
+
+import java.util.UUID;
 
 public class TemplateViewHolder extends AbstractViewHolder {
     // TODO: Diese Klasse ist fast die gleiche wie ExpenseItemViewHolder.
     //  Kann ich die beiden zusammenführen?
     private static final String TAG = TemplateViewHolder.class.getSimpleName();
 
-    private RoundedTextView roundedTextView;
-    private TextView title, user;
-    private MoneyTextView money;
+    private final RoundedTextView roundedTextView;
+    private final TextView title, user;
+    private final MoneyTextView money;
 
     public TemplateViewHolder(View itemView) {
         super(itemView);
@@ -38,10 +44,16 @@ public class TemplateViewHolder extends AbstractViewHolder {
 
         TemplateBooking templateBooking = (TemplateBooking) item.getContent();
 
-        setRoundedTextView(templateBooking.getCategory());
+        setRoundedTextView(getCategory(templateBooking.getCategoryId()));
         setTitle(templateBooking.getTitle());
         setPrice(templateBooking.getPrice());
         setUser("");
+    }
+
+    private Category getCategory(UUID categoryId) {
+        return Room.databaseBuilder(app.getContext(), AppDatabase.class, "expenses")
+                .allowMainThreadQueries() // TODO: Remove
+                .build().categoryDAO().get(categoryId);
     }
 
     private void setRoundedTextView(Category category) {

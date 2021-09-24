@@ -6,27 +6,31 @@ import android.os.Bundle;
 import android.view.View;
 
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.room.Room;
 
-import com.example.lucas.haushaltsmanager.Database.Repositories.Templates.TemplateRepository;
-import com.example.lucas.haushaltsmanager.entities.TemplateBooking;
+import com.example.lucas.haushaltsmanager.Database.AppDatabase;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Templates.TemplateBookingDAO;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.RecyclerItemClickListener;
 import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.ItemCreator;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.TemplateItem.TemplateItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.TemplateListRecyclerViewAdapter;
+import com.example.lucas.haushaltsmanager.entities.TemplateBooking;
 
 import java.util.List;
 
 public class TemplatesActivity extends AbstractAppCompatActivity implements RecyclerItemClickListener.OnRecyclerItemClickListener {
-    private TemplateRepository mTemplateRepo;
+    private TemplateBookingDAO templateBookingsRepository;
     private RecyclerView recyclerView;
 
     @Override
     protected void onStart() {
         super.onStart();
 
-        mTemplateRepo = new TemplateRepository(this);
+        templateBookingsRepository = Room.databaseBuilder(this, AppDatabase.class, "expenses")
+                .allowMainThreadQueries() // TODO: Remove
+                .build().templateBookingDAO();
 
         updateListView();
     }
@@ -58,7 +62,7 @@ public class TemplatesActivity extends AbstractAppCompatActivity implements Recy
         //  Außerdem sollte man Templates auch löschen können.
 
         Intent returnTemplateIntent = new Intent();
-        returnTemplateIntent.putExtra("templateObj", ((TemplateBooking) item.getContent()).getTemplate());
+        returnTemplateIntent.putExtra("templateObj", (TemplateBooking) item.getContent());
         setResult(Activity.RESULT_OK, returnTemplateIntent);
         finish();
     }
@@ -77,7 +81,7 @@ public class TemplatesActivity extends AbstractAppCompatActivity implements Recy
     }
 
     private List<IRecyclerItem> loadData() {
-        List<TemplateBooking> templateBookings = mTemplateRepo.getAll();
+        List<TemplateBooking> templateBookings = templateBookingsRepository.getAll();
 
         return ItemCreator.createTemplateItems(templateBookings);
     }
