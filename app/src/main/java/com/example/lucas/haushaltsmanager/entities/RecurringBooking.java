@@ -1,8 +1,10 @@
 package com.example.lucas.haushaltsmanager.entities;
 
 import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
-import com.example.lucas.haushaltsmanager.entities.Booking.IBooking;
 import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
 
 import java.util.Calendar;
@@ -11,33 +13,73 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
+@Entity(tableName = "recurring_bookings")
 public class RecurringBooking {
+    @PrimaryKey
     private final UUID id;
-    private Calendar start, endDate;
+    @ColumnInfo(name = "end_date")
+    private final Calendar endDate;
     private final Frequency frequency;
-    private final IBooking templateBooking;
+
+    private final String title;
+    @ColumnInfo(name = "expense_type")
+    private final Booking.EXPENSE_TYPES expenseType;
+    private final Price price;
+    private final Calendar date;
+    @ColumnInfo(name = "category_id")
+    private final UUID categoryId;
+    private final String notice;
+    @ColumnInfo(name = "account_id")
+    private final UUID accountId;
 
     public RecurringBooking(
             @NonNull UUID id,
-            @NonNull Calendar start,
+            @NonNull Calendar date,
             @NonNull Calendar end,
             @NonNull Frequency frequency,
-            @NonNull IBooking booking
+            @NonNull String title,
+            @NonNull Booking.EXPENSE_TYPES expenseType,
+            @NonNull Price price,
+            @NonNull UUID categoryId,
+            @NonNull String notice,
+            @NonNull UUID accountId
     ) {
         this.id = id;
-        this.templateBooking = booking;
-        setExecutionDate(start);
+        this.date = date;
         this.endDate = end;
         this.frequency = frequency;
+
+        this.title = title;
+        this.expenseType = expenseType;
+        this.price = price;
+        this.categoryId = categoryId;
+        this.notice = notice;
+        this.accountId = accountId;
     }
 
     public RecurringBooking(
             @NonNull Calendar start,
             @NonNull Calendar end,
             @NonNull Frequency frequency,
-            @NonNull IBooking booking
+            @NonNull String title,
+            @NonNull Booking.EXPENSE_TYPES expenseType,
+            @NonNull Price price,
+            @NonNull UUID categoryId,
+            @NonNull String notice,
+            @NonNull UUID accountId
     ) {
-        this(UUID.randomUUID(), start, end, frequency, booking);
+        this(
+                UUID.randomUUID(),
+                start,
+                end,
+                frequency,
+                title,
+                expenseType,
+                price,
+                categoryId,
+                notice,
+                accountId
+        );
     }
 
     @Nullable
@@ -51,7 +93,12 @@ public class RecurringBooking {
                 start,
                 recurringBooking.getEnd(),
                 recurringBooking.getFrequency(),
-                recurringBooking.getBooking()
+                recurringBooking.title,
+                recurringBooking.expenseType,
+                recurringBooking.price,
+                recurringBooking.categoryId,
+                recurringBooking.notice,
+                recurringBooking.accountId
         );
     }
 
@@ -59,21 +106,12 @@ public class RecurringBooking {
         return id;
     }
 
-    public Booking getBooking() {
-        return (Booking) templateBooking;
-    }
-
     public Frequency getFrequency() {
         return frequency;
     }
 
-    public Calendar getExecutionDate() {
-        return start;
-    }
-
-    public void setExecutionDate(Calendar executionDate) {
-        this.start = executionDate;
-        templateBooking.setDate(executionDate);
+    public Calendar getDate() {
+        return date;
     }
 
     public Calendar getEnd() {
@@ -81,7 +119,7 @@ public class RecurringBooking {
     }
 
     public Delay getDelayUntilNextExecution() {
-        long timeBetween = getTimeBetweenNowAnd(start);
+        long timeBetween = getTimeBetweenNowAnd(date);
         if (timeBetween < 0) {
             timeBetween = getTimeBetweenNowAnd(getNextOccurrence());
         }
@@ -92,8 +130,32 @@ public class RecurringBooking {
         );
     }
 
+    public String getTitle() {
+        return title;
+    }
+
+    public Booking.EXPENSE_TYPES getExpenseType() {
+        return expenseType;
+    }
+
+    public Price getPrice() {
+        return price;
+    }
+
+    public UUID getCategoryId() {
+        return categoryId;
+    }
+
+    public String getNotice() {
+        return notice;
+    }
+
+    public UUID getAccountId() {
+        return accountId;
+    }
+
     private Calendar getNextOccurrence() {
-        Calendar nextOccurrence = (Calendar) start.clone();
+        Calendar nextOccurrence = (Calendar) date.clone();
 
         increaseByFrequency(nextOccurrence, frequency);
 

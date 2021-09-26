@@ -1,7 +1,9 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.SavingService;
 
-import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountDAO;
+import com.example.lucas.haushaltsmanager.Database.Repositories.AccountDAO;
 import com.example.lucas.haushaltsmanager.entities.Account;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +42,7 @@ public class CachedInsertAccountRepositoryDecorator implements AccountDAO {
     }
 
     @Override
-    public void update(Account account) {
+    public void update(@NotNull Account account) {
         repository.update(account);
     }
 

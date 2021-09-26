@@ -11,8 +11,8 @@ import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.QueryInterface;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountDAO;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions.AccountNotFoundException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.AccountDAO;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.BookingTransformer;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.CannotDeleteExpenseException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
@@ -182,54 +182,6 @@ public class ChildExpenseRepository implements ChildExpenseRepositoryInterface {
         }
     }
 
-    public void hide(Booking childExpense) throws ChildExpenseNotFoundException {
-        // REFACTOR: Kann durch die Methode des parents ersetzt werden.
-
-        try {
-            if (isLastVisibleChildOfParent(childExpense)) {
-
-                ParentBooking parentExpense = getParent(childExpense);
-                mBookingRepo.hide(parentExpense);
-            }
-
-            ContentValues values = new ContentValues();
-            values.put("hidden", 1);
-
-            int affectedRows = mDatabase.update(
-                    TABLE,
-                    values,
-                    "id = ?",
-                    new String[]{childExpense.getId().toString()}
-            );
-
-            if (affectedRows == 0) {
-                throw new ChildExpenseNotFoundException(childExpense.getId());
-            }
-
-            try {
-                updateAccountBalance(
-                        childExpense.getAccountId(),
-                        -childExpense.getSignedPrice()
-                );
-            } catch (AccountNotFoundException e) {
-
-                // TODO: Wenn der Kontostand nicht geupdated werden kann muss die gesamte Transaktion zurückgenommen werden
-            }
-        } catch (ExpenseNotFoundException e) {
-
-            // TODO: Dem aufrufenden Code mitteilen dass die Buchung nicht versteckt werden konnte
-        }
-    }
-
-    public void closeDatabase() {
-        //3 Mal weil 3 Datenbankverbindungen (ChildExpenseRepo, AccountRepo, BookingTagRepo, BookingRepo) geöffnet werden
-
-        DatabaseManager.getInstance().closeDatabase();
-        DatabaseManager.getInstance().closeDatabase();
-        DatabaseManager.getInstance().closeDatabase();
-        DatabaseManager.getInstance().closeDatabase();
-    }
-
     public Booking get(UUID id) throws ChildExpenseNotFoundException {
         Cursor c = executeRaw(new GetChildBookingQuery(id));
 
@@ -365,21 +317,6 @@ public class ChildExpenseRepository implements ChildExpenseRepositoryInterface {
 
     private boolean isLastChildOfParent(Booking childExpense) {
         Cursor c = executeRaw(new IsChildBookingLastOfParentQuery(childExpense));
-
-        if (c.getCount() == 1) {
-
-            c.close();
-            return true;
-        }
-
-        c.close();
-        return false;
-    }
-
-    private boolean isLastVisibleChildOfParent(Booking childExpense) throws ChildExpenseNotFoundException, ExpenseNotFoundException {
-        ParentBooking parentExpense = getParent(childExpense);
-
-        Cursor c = executeRaw(new IsChildBookingLastVisibleOfParentQuery(parentExpense));
 
         if (c.getCount() == 1) {
 

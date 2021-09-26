@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Dao
-public abstract class ExpenseDAO {
+public abstract class BookingDAO {
     @Query("SELECT * FROM bookings WHERE id = :id")
     public abstract BookingWithoutCategory get(UUID id);
 
@@ -45,10 +45,6 @@ public abstract class ExpenseDAO {
     public void update(BookingWithCategory booking) {
         update(booking.getBooking());
     }
-//
-//    void hide(Booking expense);
-//
-//    boolean isHidden(Booking expense);
 //
 //    void insert(ParentBooking booking);
 }

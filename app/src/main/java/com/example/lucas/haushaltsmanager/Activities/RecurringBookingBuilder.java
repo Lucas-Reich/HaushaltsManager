@@ -1,6 +1,6 @@
 package com.example.lucas.haushaltsmanager.Activities;
 
-import com.example.lucas.haushaltsmanager.entities.Booking.IBooking;
+import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
 import com.example.lucas.haushaltsmanager.entities.Frequency;
 import com.example.lucas.haushaltsmanager.entities.RecurringBooking;
 
@@ -10,7 +10,7 @@ public class RecurringBookingBuilder {
     private Calendar start;
     private Calendar end;
     private Frequency frequency;
-    private IBooking booking;
+    private Booking booking;
 
     public void setStart(Calendar start) {
         this.start = start;
@@ -24,7 +24,7 @@ public class RecurringBookingBuilder {
         this.frequency = frequency;
     }
 
-    public void setBooking(IBooking booking) {
+    public void setBooking(Booking booking) {
         this.booking = booking;
     }
 
@@ -37,7 +37,12 @@ public class RecurringBookingBuilder {
                 start,
                 end,
                 frequency,
-                booking
+                booking.getTitle(),
+                booking.getExpenseType(),
+                booking.getPrice(),
+                booking.getCategory().getId(),
+                booking.getNotice(),
+                booking.getAccountId()
         );
     }
 

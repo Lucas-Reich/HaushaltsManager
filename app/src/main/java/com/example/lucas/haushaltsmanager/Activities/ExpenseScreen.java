@@ -11,13 +11,12 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.room.Room;
 
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountDAO;
+import com.example.lucas.haushaltsmanager.Database.Repositories.AccountDAO;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseDAO;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.BookingDAO;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.AddChildToChildException;
@@ -63,7 +62,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
     private ExpenseRepository mExpenseRepo;
     private ChildExpenseRepository mChildExpenseRepo;
     private AccountDAO accountRepo;
-    private ExpenseDAO bookingRepo;
+    private BookingDAO bookingRepo;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -74,12 +73,8 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
 
         mExpenseRepo = new ExpenseRepository(this);
         mChildExpenseRepo = new ChildExpenseRepository(this);
-        accountRepo = Room.databaseBuilder(this, AppDatabase.class, "expenses")
-                .allowMainThreadQueries() // TODO: Remove
-                .build().accountDAO();
-        bookingRepo = Room.databaseBuilder(this, AppDatabase.class, "expenses")
-                .allowMainThreadQueries() // TODO: Remove
-                .build().bookingDAO();
+        accountRepo = AppDatabase.getDatabase(this).accountDAO();
+        bookingRepo = AppDatabase.getDatabase(this).bookingDAO();
 
         initializeToolbar();
 

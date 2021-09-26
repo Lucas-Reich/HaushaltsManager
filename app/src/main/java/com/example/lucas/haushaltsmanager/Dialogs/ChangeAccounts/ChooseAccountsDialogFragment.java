@@ -10,11 +10,10 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.room.Room;
 
 import com.example.lucas.haushaltsmanager.Activities.CreateAccountActivity;
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountDAO;
+import com.example.lucas.haushaltsmanager.Database.Repositories.AccountDAO;
 import com.example.lucas.haushaltsmanager.entities.Account;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences.ActiveAccountsPreferences;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
@@ -35,9 +34,7 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Acco
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        accountRepo = Room.databaseBuilder(getActivity(), AppDatabase.class, "expenses")
-                .allowMainThreadQueries()
-                .build().accountDAO();
+        accountRepo = AppDatabase.getDatabase(getActivity()).accountDAO();
 
         mAccountPreferences = new ActiveAccountsPreferences(getActivity());
         mUserPreferences = new UserSettingsPreferences(getActivity());

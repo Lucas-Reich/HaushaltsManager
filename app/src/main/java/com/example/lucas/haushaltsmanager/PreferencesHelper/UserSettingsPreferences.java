@@ -3,11 +3,9 @@ package com.example.lucas.haushaltsmanager.PreferencesHelper;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import androidx.room.Room;
-
 import com.example.lucas.haushaltsmanager.Activities.Settings;
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountDAO;
+import com.example.lucas.haushaltsmanager.Database.Repositories.AccountDAO;
 import com.example.lucas.haushaltsmanager.entities.Account;
 import com.example.lucas.haushaltsmanager.entities.Time;
 import com.example.lucas.haushaltsmanager.Utils.WeekdayUtils;
@@ -32,9 +30,7 @@ public class UserSettingsPreferences {
 
         mPreferences = context.getSharedPreferences(USER_SETTINGS, Context.MODE_PRIVATE);
         mContext = context;
-        accountRepo = Room.databaseBuilder(context, AppDatabase.class, "expenses")
-                .allowMainThreadQueries() // TODO: Remove
-                .build().accountDAO();
+        accountRepo = AppDatabase.getDatabase(context).accountDAO();
     }
 
     public int getMaxBackupCount() {
@@ -84,7 +80,7 @@ public class UserSettingsPreferences {
                 Settings.DEFAULT_REMINDER_TIME.toString()
         );
 
-        return Time.fromString(reminderTime);
+        return Time.Companion.fromString(reminderTime);
     }
 
     public void setReminderTime(Time reminderTime) {

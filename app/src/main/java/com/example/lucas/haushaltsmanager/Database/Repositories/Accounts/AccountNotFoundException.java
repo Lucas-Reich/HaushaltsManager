@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.Exceptions;
+package com.example.lucas.haushaltsmanager.Database.Repositories.Accounts;
 
 import com.example.lucas.haushaltsmanager.Database.Exceptions.EntityNotExistingException;
 

@@ -8,7 +8,7 @@ import androidx.room.Room;
 
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountDAO;
+import com.example.lucas.haushaltsmanager.Database.Repositories.AccountDAO;
 import com.example.lucas.haushaltsmanager.entities.Account;
 import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
 import com.example.lucas.haushaltsmanager.entities.Booking.IBooking;

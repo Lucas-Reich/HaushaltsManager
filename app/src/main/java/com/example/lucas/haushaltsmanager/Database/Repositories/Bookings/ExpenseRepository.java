@@ -12,7 +12,7 @@ import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
 import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.Database.QueryInterface;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountDAO;
+import com.example.lucas.haushaltsmanager.Database.Repositories.AccountDAO;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.CannotDeleteExpenseException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryTransformer;
@@ -189,31 +189,6 @@ public class ExpenseRepository {
 
         if (affectedRows == 0) {
             throw ExpenseNotFoundException.couldNotUpdateReferencedExpense(expense.getId());
-        }
-    }
-
-    public void hide(IBooking booking) throws ExpenseNotFoundException {
-
-        ContentValues values = new ContentValues();
-        values.put("hidden", 1);
-
-        int affectedRows = mDatabase.update(
-                TABLE,
-                values,
-                "id = ?",
-                new String[]{booking.getId().toString()}
-        );
-
-        if (affectedRows == 0) {
-            throw ExpenseNotFoundException.expenseNotFoundException(booking.getId());
-        }
-
-        if (booking instanceof Booking) {
-            // TODO: Use Transaction to update booking and update account balance
-            updateAccountBalance(
-                    ((Booking) booking).getAccountId(),
-                    -((Booking) booking).getSignedPrice()
-            );
         }
     }
 

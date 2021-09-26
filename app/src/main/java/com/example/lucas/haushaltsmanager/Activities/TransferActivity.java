@@ -7,14 +7,13 @@ import android.view.MenuItem;
 import android.widget.Button;
 
 import androidx.annotation.Nullable;
-import androidx.room.Room;
 
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountDAO;
+import com.example.lucas.haushaltsmanager.Database.Repositories.AccountDAO;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryDAO;
+import com.example.lucas.haushaltsmanager.Database.Repositories.CategoryDAO;
 import com.example.lucas.haushaltsmanager.Dialogs.DatePickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ErrorAlertDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
@@ -147,12 +146,8 @@ public class TransferActivity extends AbstractAppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_transfers);
 
-        accountRepo = Room.databaseBuilder(this, AppDatabase.class, "expenses")
-                .allowMainThreadQueries() // TODO: Remove
-                .build().accountDAO();
-        categoryRepo = Room.databaseBuilder(this, AppDatabase.class, "expenses")
-                .allowMainThreadQueries() // TODO: Remove
-                .build().categoryDAO();
+        accountRepo = AppDatabase.getDatabase(this).accountDAO();
+        categoryRepo = AppDatabase.getDatabase(this).categoryDAO();
         mBookingRepo = new ExpenseRepository(this);
 
         mCalendar = Calendar.getInstance();

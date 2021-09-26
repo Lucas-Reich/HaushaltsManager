@@ -5,10 +5,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
-import androidx.room.Room;
-
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryDAO;
+import com.example.lucas.haushaltsmanager.Database.Repositories.CategoryDAO;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ColorPickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
@@ -39,9 +37,7 @@ public class CreateCategory extends AbstractAppCompatActivity {
         super.onCreate(savedInstances);
         setContentView(R.layout.activity_new_category);
 
-        categoryRepo = Room.databaseBuilder(this, AppDatabase.class, "expenses")
-                .allowMainThreadQueries() // TODO: Remove
-                .build().categoryDAO();
+        categoryRepo = AppDatabase.getDatabase(this).categoryDAO();
 
         initializeToolbar();
 

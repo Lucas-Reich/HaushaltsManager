@@ -28,8 +28,4 @@ public interface ChildExpenseRepositoryInterface {
     void update(Booking childExpense) throws ChildExpenseNotFoundException;
 
     void delete(Booking childExpense) throws CannotDeleteChildExpenseException;
-
-    void hide(Booking childExpense) throws ChildExpenseNotFoundException;
-
-    void closeDatabase();
 }

@@ -6,9 +6,12 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.work.WorkerParameters;
 
+import com.example.lucas.haushaltsmanager.App.app;
+import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.Exceptions.RecurringBookingNotFoundException;
-import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.RecurringBookingRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookingDAO;
+import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.entities.Category;
 import com.example.lucas.haushaltsmanager.entities.RecurringBooking;
 
 import java.util.UUID;
@@ -17,13 +20,17 @@ public class RecurringBookingWorker extends AbstractRecurringWorker {
     public static final String RECURRING_BOOKING = "recurringBookingId";
     private static final String TAG = RecurringBookingWorker.class.getSimpleName();
 
+    private final RecurringBookingDAO recurringBookingRepository;
+
     private final RecurringBooking mRecurringBooking;
 
     public RecurringBookingWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
 
+        recurringBookingRepository = AppDatabase.getDatabase(context).recurringBookingDAO();
+
         UUID recurringBookingId = extractIdFromParameters(workerParams);
-        mRecurringBooking = getRecurringBookingById(recurringBookingId);
+        mRecurringBooking = recurringBookingRepository.get(recurringBookingId);
     }
 
     @NonNull
@@ -37,13 +44,12 @@ public class RecurringBookingWorker extends AbstractRecurringWorker {
         saveBooking(mRecurringBooking);
 
         RecurringBooking nextRecurringBooking = RecurringBooking.createNextRecurringBooking(mRecurringBooking);
-
-        if (hasNextRecurringBooking(mRecurringBooking)) {
-            updateExecutionDateOfRecurringBooking(nextRecurringBooking);
+        if (null != nextRecurringBooking) {
+            recurringBookingRepository.update(nextRecurringBooking);
 
             scheduleNextWorker(nextRecurringBooking);
         } else {
-            deleteFinishedRecurringBooking();
+            recurringBookingRepository.delete(mRecurringBooking);
         }
 
         return Result.success();
@@ -54,35 +60,26 @@ public class RecurringBookingWorker extends AbstractRecurringWorker {
         return "RecurringBookingWorker";
     }
 
-    private boolean hasNextRecurringBooking(RecurringBooking recurringBooking) {
-        return null != RecurringBooking.createNextRecurringBooking(recurringBooking);
-    }
-
-    private void deleteFinishedRecurringBooking() {
-        new RecurringBookingRepository(getApplicationContext()).delete(mRecurringBooking);
-    }
-
-    private void updateExecutionDateOfRecurringBooking(RecurringBooking updatedRecurringBooking) {
-        new RecurringBookingRepository(getApplicationContext()).update(updatedRecurringBooking);
-    }
-
     private void saveBooking(RecurringBooking recurringBooking) {
-        new ExpenseRepository(getApplicationContext()).insert(recurringBooking.getBooking());
+        new ExpenseRepository(getApplicationContext()).insert(new Booking(
+                UUID.randomUUID(),
+                recurringBooking.getTitle(),
+                recurringBooking.getPrice(),
+                recurringBooking.getDate(),
+                getCategory(recurringBooking.getCategoryId()),
+                recurringBooking.getNotice(),
+                recurringBooking.getAccountId(),
+                recurringBooking.getExpenseType()
+        ));
+    }
+
+    private Category getCategory(UUID categoryId) {
+        return AppDatabase.getDatabase(app.getContext()).categoryDAO().get(categoryId);
     }
 
     private UUID extractIdFromParameters(WorkerParameters workerParams) {
         String rawId = workerParams.getInputData().getString(RECURRING_BOOKING);
 
         return UUID.fromString(rawId);
-    }
-
-    private RecurringBooking getRecurringBookingById(UUID recurringBookingId) {
-        try {
-            return new RecurringBookingRepository(getApplicationContext()).get(recurringBookingId);
-        } catch (RecurringBookingNotFoundException e) {
-
-            Log.e(TAG, String.format("Could not find referenced RecurringBooking '%s'.", recurringBookingId));
-            return null;
-        }
     }
 }

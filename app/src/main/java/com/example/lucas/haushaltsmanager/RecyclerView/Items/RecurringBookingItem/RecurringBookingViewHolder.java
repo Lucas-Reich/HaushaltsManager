@@ -6,6 +6,7 @@ import android.widget.TextView;
 import androidx.annotation.ColorRes;
 
 import com.example.lucas.haushaltsmanager.App.app;
+import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.entities.Category;
 import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
 import com.example.lucas.haushaltsmanager.entities.Price;
@@ -15,6 +16,8 @@ import com.example.lucas.haushaltsmanager.RecyclerView.Items.AbstractViewHolder;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.Views.MoneyTextView;
 import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
+
+import java.util.UUID;
 
 public class RecurringBookingViewHolder extends AbstractViewHolder {
     // TODO: Dieser ViewHolder hat exakt die gleiche Struktur die auch der ExpenseViewHolder hat
@@ -41,11 +44,11 @@ public class RecurringBookingViewHolder extends AbstractViewHolder {
             throw new IllegalArgumentException(String.format("Could not attach %s to %s", item.getClass().getSimpleName(), TAG));
         }
 
-        Booking expense = ((RecurringBooking) item.getContent()).getBooking();
+        RecurringBooking recurringBooking = (RecurringBooking) item.getContent();
 
-        setRoundedTextViewText(expense.getCategory());
-        setTitle(expense.getTitle());
-        setPrice(expense.getPrice());
+        setRoundedTextViewText(getCategory(recurringBooking.getCategoryId()));
+        setTitle(recurringBooking.getTitle());
+        setPrice(recurringBooking.getPrice());
         setPerson("");
 
         setBackgroundColor();
@@ -61,6 +64,10 @@ public class RecurringBookingViewHolder extends AbstractViewHolder {
     private void setRoundedTextViewText(Category category) {
         mRoundedTextView.setCircleColorConsiderBrightness(category.getColor().getColorInt());
         mRoundedTextView.setCenterText(category.getName().charAt(0) + "");
+    }
+
+    private Category getCategory(UUID categoryId) {
+        return AppDatabase.getDatabase(app.getContext()).categoryDAO().get(categoryId);
     }
 
     private void setTitle(String title) {

@@ -2,14 +2,12 @@ package com.example.lucas.haushaltsmanager.ExpenseImporter.SavingService;
 
 import android.content.Context;
 
-import androidx.room.Room;
-
 import com.example.lucas.haushaltsmanager.Backup.Handler.Decorator.DataImporterBackupHandler;
 import com.example.lucas.haushaltsmanager.Backup.Handler.FileBackupHandler;
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountDAO;
+import com.example.lucas.haushaltsmanager.Database.Repositories.AccountDAO;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryDAO;
+import com.example.lucas.haushaltsmanager.Database.Repositories.CategoryDAO;
 import com.example.lucas.haushaltsmanager.entities.Account;
 import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences.ActiveAccountsPreferences;
@@ -42,13 +40,9 @@ public class Saver implements ISaver {
     }
 
     public static Saver create(Context context) {
-        AccountDAO accountRepo = Room.databaseBuilder(context, AppDatabase.class, "expenses")
-                .allowMainThreadQueries() // TODO: Remove
-                .build().accountDAO();
+        AccountDAO accountRepo = AppDatabase.getDatabase(context).accountDAO();
 
-        CategoryDAO categoryRepo = Room.databaseBuilder(context, AppDatabase.class, "expenses")
-                .allowMainThreadQueries() // TODO: Remove
-                .build().categoryDAO();
+        CategoryDAO categoryRepo = AppDatabase.getDatabase(context).categoryDAO();
 
         return new Saver(
                 new CachedInsertAccountRepositoryDecorator(accountRepo),

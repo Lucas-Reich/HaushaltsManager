@@ -2,11 +2,9 @@ package com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems;
 
 import android.content.Context;
 
-import androidx.room.Room;
-
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Templates.TemplateBookingDAO;
+import com.example.lucas.haushaltsmanager.Database.Repositories.TemplateBookingDAO;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.ActionPayload;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.ActionKey;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.IActionKey;
@@ -23,9 +21,7 @@ public class TemplateMenuItem implements IMenuItem {
 
     public TemplateMenuItem(OnSuccessCallback callback) {
         mCallback = callback;
-        templateRepository = Room.databaseBuilder(app.getContext(), AppDatabase.class, "expenses")
-                .allowMainThreadQueries() // TODO: Remove
-                .build().templateBookingDAO();
+        templateRepository = AppDatabase.getDatabase(app.getContext()).templateBookingDAO();
     }
 
     @Override

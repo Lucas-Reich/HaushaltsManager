@@ -6,10 +6,9 @@ import android.os.Bundle;
 import android.view.View;
 
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.room.Room;
 
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Templates.TemplateBookingDAO;
+import com.example.lucas.haushaltsmanager.Database.Repositories.TemplateBookingDAO;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.RecyclerItemClickListener;
 import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.ItemCreator;
@@ -28,9 +27,7 @@ public class TemplatesActivity extends AbstractAppCompatActivity implements Recy
     protected void onStart() {
         super.onStart();
 
-        templateBookingsRepository = Room.databaseBuilder(this, AppDatabase.class, "expenses")
-                .allowMainThreadQueries() // TODO: Remove
-                .build().templateBookingDAO();
+        templateBookingsRepository = AppDatabase.getDatabase(this).templateBookingDAO();
 
         updateListView();
     }
@@ -45,7 +42,6 @@ public class TemplatesActivity extends AbstractAppCompatActivity implements Recy
         recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, recyclerView, this));
 
         initializeToolbar();
-
     }
 
     @Override

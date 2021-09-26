@@ -30,9 +30,9 @@ public class RecurringBookingTest {
 
         RecurringBooking nextRecurringBooking = RecurringBooking.createNextRecurringBooking(recurringBooking);
 
-        assertEquals(2, nextRecurringBooking.getExecutionDate().get(Calendar.DAY_OF_MONTH));
-        assertEquals(Calendar.JANUARY, nextRecurringBooking.getExecutionDate().get(Calendar.MONTH));
-        assertEquals(2018, nextRecurringBooking.getExecutionDate().get(Calendar.YEAR));
+        assertEquals(2, nextRecurringBooking.getDate().get(Calendar.DAY_OF_MONTH));
+        assertEquals(Calendar.JANUARY, nextRecurringBooking.getDate().get(Calendar.MONTH));
+        assertEquals(2018, nextRecurringBooking.getDate().get(Calendar.YEAR));
     }
 
     /**
@@ -49,9 +49,9 @@ public class RecurringBookingTest {
 
         RecurringBooking nextRecurringBooking = RecurringBooking.createNextRecurringBooking(recurringBooking);
 
-        assertEquals(1, nextRecurringBooking.getExecutionDate().get(Calendar.DAY_OF_MONTH));
-        assertEquals(Calendar.FEBRUARY, nextRecurringBooking.getExecutionDate().get(Calendar.MONTH));
-        assertEquals(2018, nextRecurringBooking.getExecutionDate().get(Calendar.YEAR));
+        assertEquals(1, nextRecurringBooking.getDate().get(Calendar.DAY_OF_MONTH));
+        assertEquals(Calendar.FEBRUARY, nextRecurringBooking.getDate().get(Calendar.MONTH));
+        assertEquals(2018, nextRecurringBooking.getDate().get(Calendar.YEAR));
     }
 
     /**
@@ -68,9 +68,9 @@ public class RecurringBookingTest {
 
         RecurringBooking nextRecurringBooking = RecurringBooking.createNextRecurringBooking(recurringBooking);
 
-        assertEquals(8, nextRecurringBooking.getExecutionDate().get(Calendar.DAY_OF_MONTH));
-        assertEquals(Calendar.JANUARY, nextRecurringBooking.getExecutionDate().get(Calendar.MONTH));
-        assertEquals(2018, nextRecurringBooking.getExecutionDate().get(Calendar.YEAR));
+        assertEquals(8, nextRecurringBooking.getDate().get(Calendar.DAY_OF_MONTH));
+        assertEquals(Calendar.JANUARY, nextRecurringBooking.getDate().get(Calendar.MONTH));
+        assertEquals(2018, nextRecurringBooking.getDate().get(Calendar.YEAR));
     }
 
     /**
@@ -87,9 +87,9 @@ public class RecurringBookingTest {
 
         RecurringBooking nextRecurringBooking = RecurringBooking.createNextRecurringBooking(recurringBooking);
 
-        assertEquals(4, nextRecurringBooking.getExecutionDate().get(Calendar.DAY_OF_MONTH));
-        assertEquals(Calendar.FEBRUARY, nextRecurringBooking.getExecutionDate().get(Calendar.MONTH));
-        assertEquals(2018, nextRecurringBooking.getExecutionDate().get(Calendar.YEAR));
+        assertEquals(4, nextRecurringBooking.getDate().get(Calendar.DAY_OF_MONTH));
+        assertEquals(Calendar.FEBRUARY, nextRecurringBooking.getDate().get(Calendar.MONTH));
+        assertEquals(2018, nextRecurringBooking.getDate().get(Calendar.YEAR));
     }
 
     /**
@@ -106,9 +106,9 @@ public class RecurringBookingTest {
 
         RecurringBooking nextRecurringBooking = RecurringBooking.createNextRecurringBooking(recurringBooking);
 
-        assertEquals(1, nextRecurringBooking.getExecutionDate().get(Calendar.DAY_OF_MONTH));
-        assertEquals(Calendar.FEBRUARY, nextRecurringBooking.getExecutionDate().get(Calendar.MONTH));
-        assertEquals(2018, nextRecurringBooking.getExecutionDate().get(Calendar.YEAR));
+        assertEquals(1, nextRecurringBooking.getDate().get(Calendar.DAY_OF_MONTH));
+        assertEquals(Calendar.FEBRUARY, nextRecurringBooking.getDate().get(Calendar.MONTH));
+        assertEquals(2018, nextRecurringBooking.getDate().get(Calendar.YEAR));
     }
 
     /**
@@ -125,9 +125,9 @@ public class RecurringBookingTest {
 
         RecurringBooking nextRecurringBooking = RecurringBooking.createNextRecurringBooking(recurringBooking);
 
-        assertEquals(28, nextRecurringBooking.getExecutionDate().get(Calendar.DAY_OF_MONTH));
-        assertEquals(Calendar.FEBRUARY, nextRecurringBooking.getExecutionDate().get(Calendar.MONTH));
-        assertEquals(2018, nextRecurringBooking.getExecutionDate().get(Calendar.YEAR));
+        assertEquals(28, nextRecurringBooking.getDate().get(Calendar.DAY_OF_MONTH));
+        assertEquals(Calendar.FEBRUARY, nextRecurringBooking.getDate().get(Calendar.MONTH));
+        assertEquals(2018, nextRecurringBooking.getDate().get(Calendar.YEAR));
     }
 
     /**
@@ -144,9 +144,9 @@ public class RecurringBookingTest {
 
         RecurringBooking nextRecurringBooking = RecurringBooking.createNextRecurringBooking(recurringBooking);
 
-        assertEquals(31, nextRecurringBooking.getExecutionDate().get(Calendar.DAY_OF_MONTH));
-        assertEquals(Calendar.JANUARY, nextRecurringBooking.getExecutionDate().get(Calendar.MONTH));
-        assertEquals(2019, nextRecurringBooking.getExecutionDate().get(Calendar.YEAR));
+        assertEquals(31, nextRecurringBooking.getDate().get(Calendar.DAY_OF_MONTH));
+        assertEquals(Calendar.JANUARY, nextRecurringBooking.getDate().get(Calendar.MONTH));
+        assertEquals(2019, nextRecurringBooking.getDate().get(Calendar.YEAR));
     }
 
     /**
@@ -163,9 +163,9 @@ public class RecurringBookingTest {
 
         RecurringBooking nextRecurringBooking = RecurringBooking.createNextRecurringBooking(recurringBooking);
 
-        assertEquals(28, nextRecurringBooking.getExecutionDate().get(Calendar.DAY_OF_MONTH));
-        assertEquals(Calendar.FEBRUARY, nextRecurringBooking.getExecutionDate().get(Calendar.MONTH));
-        assertEquals(2017, nextRecurringBooking.getExecutionDate().get(Calendar.YEAR));
+        assertEquals(28, nextRecurringBooking.getDate().get(Calendar.DAY_OF_MONTH));
+        assertEquals(Calendar.FEBRUARY, nextRecurringBooking.getDate().get(Calendar.MONTH));
+        assertEquals(2017, nextRecurringBooking.getDate().get(Calendar.YEAR));
     }
 
     /**
@@ -279,7 +279,7 @@ public class RecurringBookingTest {
     private long getTimeBetweenNowAndNextRecurringBooking(RecurringBooking recurringBooking) {
         Calendar now = Calendar.getInstance();
 
-        return RecurringBooking.createNextRecurringBooking(recurringBooking).getExecutionDate().getTimeInMillis() - now.getTimeInMillis();
+        return RecurringBooking.createNextRecurringBooking(recurringBooking).getDate().getTimeInMillis() - now.getTimeInMillis();
     }
 
     private IBooking getBooking() {

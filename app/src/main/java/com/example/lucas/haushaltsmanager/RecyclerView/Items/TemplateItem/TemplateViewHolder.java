@@ -3,8 +3,6 @@ package com.example.lucas.haushaltsmanager.RecyclerView.Items.TemplateItem;
 import android.view.View;
 import android.widget.TextView;
 
-import androidx.room.Room;
-
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.R;
@@ -51,9 +49,7 @@ public class TemplateViewHolder extends AbstractViewHolder {
     }
 
     private Category getCategory(UUID categoryId) {
-        return Room.databaseBuilder(app.getContext(), AppDatabase.class, "expenses")
-                .allowMainThreadQueries() // TODO: Remove
-                .build().categoryDAO().get(categoryId);
+        return AppDatabase.getDatabase(app.getContext()).categoryDAO().get(categoryId);
     }
 
     private void setRoundedTextView(Category category) {

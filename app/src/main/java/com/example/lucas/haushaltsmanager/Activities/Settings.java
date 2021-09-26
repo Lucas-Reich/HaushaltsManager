@@ -141,7 +141,7 @@ public class Settings extends AbstractAppCompatActivity {
             timePicker.createBuilder(Settings.this);
             timePicker.setTitle(getString(R.string.choose_time));
             timePicker.setContent(Arrays.asList(getTimeArray()), -1);
-            timePicker.setOnEntrySelectedListener(time -> setReminderTime(Time.fromString((String) time)));
+            timePicker.setOnEntrySelectedListener(time -> setReminderTime(Time.Companion.fromString((String) time)));
             timePicker.show(getFragmentManager(), "settings_choose_notification_time");
         });
 
@@ -184,7 +184,7 @@ public class Settings extends AbstractAppCompatActivity {
     /**
      * Methode um ein String Array mit Zahlen zwischen 1 und DEFAULT_BACKUP_CAP zu füllen
      *
-     * @return Stringarray
+     * @return String array
      */
     private String[] getConcurrentBackupCountOptions() {
         String[] options = new String[DEFAULT_BACKUP_CAP];
@@ -199,7 +199,7 @@ public class Settings extends AbstractAppCompatActivity {
     /**
      * Methode um ein Stringarray mit Uhrzeiten zu bekommen.
      *
-     * @return Stringarray
+     * @return String array
      */
     private String[] getTimeArray() {
         String[] timeArray = new String[24];

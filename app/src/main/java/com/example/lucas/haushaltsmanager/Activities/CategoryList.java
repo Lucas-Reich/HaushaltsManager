@@ -11,10 +11,9 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.room.Room;
 
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryDAO;
+import com.example.lucas.haushaltsmanager.Database.Repositories.CategoryDAO;
 import com.example.lucas.haushaltsmanager.entities.Category;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.ActionPayload;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.DeleteCategoryMenuItem;
@@ -49,9 +48,7 @@ public class CategoryList extends AbstractAppCompatActivity implements
         mRecyclerView.setLayoutManager(LayoutManagerFactory.vertical(this));
         mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, mRecyclerView, this));
 
-        categoryRepo = Room.databaseBuilder(this, AppDatabase.class, "expenses")
-                .allowMainThreadQueries() // TODO: Remove
-                .build().categoryDAO();
+        categoryRepo = AppDatabase.getDatabase(this).categoryDAO();
 
         mFabToolbar = new FABToolbarWithActionHandler(findViewById(R.id.category_list_fab_toolbar));
         mFabToolbar.setOnFabClickListener(this);

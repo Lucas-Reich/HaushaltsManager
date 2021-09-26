@@ -4,7 +4,8 @@ import android.os.Bundle;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookings.RecurringBookingRepository;
+import com.example.lucas.haushaltsmanager.Database.AppDatabase;
+import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookingDAO;
 import com.example.lucas.haushaltsmanager.entities.RecurringBooking;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
@@ -16,7 +17,7 @@ import java.util.Calendar;
 import java.util.List;
 
 public class RecurringBookingList extends AbstractAppCompatActivity {
-    private RecurringBookingRepository mRecurringBookingRepo;
+    private RecurringBookingDAO recurringBookingRepository;
     private RecyclerView mRecyclerView;
 
     @Override
@@ -36,7 +37,7 @@ public class RecurringBookingList extends AbstractAppCompatActivity {
         mRecyclerView = findViewById(R.id.recurring_bookings_rec_view);
         mRecyclerView.setLayoutManager(LayoutManagerFactory.vertical(this));
 
-        mRecurringBookingRepo = new RecurringBookingRepository(this);
+        recurringBookingRepository = AppDatabase.getDatabase(this).recurringBookingDAO();
     }
 
     private void updateListView() {
@@ -46,7 +47,7 @@ public class RecurringBookingList extends AbstractAppCompatActivity {
     }
 
     private List<IRecyclerItem> loadData() {
-        List<RecurringBooking> recurringBookings = mRecurringBookingRepo.getAll(
+        List<RecurringBooking> recurringBookings = recurringBookingRepository.getAll(
                 getFirstOfMonth(),
                 getLastOfMonth()
         );

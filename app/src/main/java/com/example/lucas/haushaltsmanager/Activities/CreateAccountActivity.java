@@ -4,11 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 
-import androidx.room.Room;
-
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Accounts.AccountDAO;
+import com.example.lucas.haushaltsmanager.Database.Repositories.AccountDAO;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
@@ -40,9 +38,7 @@ public class CreateAccountActivity extends AbstractAppCompatActivity implements 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_account);
 
-        accountRepo = Room.databaseBuilder(this, AppDatabase.class, "expenses")
-                .allowMainThreadQueries() // TODO: Remove
-                .build().accountDAO();
+        accountRepo = AppDatabase.getDatabase(this).accountDAO();
 
         mAccountNameBtn = findViewById(R.id.new_account_name);
         mAccountBalanceBtn = findViewById(R.id.new_account_balance);

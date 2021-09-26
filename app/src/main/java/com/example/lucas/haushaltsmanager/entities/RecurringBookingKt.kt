@@ -16,28 +16,28 @@ class RecurringBookingKt(
             templateBooking.date = executionDate
         }
 
-    constructor(
-        start: Calendar,
-        end: Calendar,
-        frequency: Frequency,
-        templateBooking: IBooking
-    ) : this(UUID.randomUUID(), start, end, frequency, templateBooking)
-
-    companion object {
-        fun createNextRecurringBooking(recurringBooking: RecurringBookingKt): RecurringBookingKt? {
-            val start = recurringBooking.getNextOccurrence()
-            if (start.after(recurringBooking.end)) {
-                return null
-            }
-
-            return RecurringBookingKt(
-                start,
-                recurringBooking.end,
-                recurringBooking.frequency,
-                recurringBooking.templateBooking
-            )
-        }
-    }
+//    constructor(
+//        start: Calendar,
+//        end: Calendar,
+//        frequency: Frequency,
+//        templateBooking: IBooking
+//    ) : this(UUID.randomUUID(), start, end, frequency, templateBooking)
+//
+//    companion object {
+//        fun createNextRecurringBooking(recurringBooking: RecurringBookingKt): RecurringBookingKt? {
+//            val start = recurringBooking.getNextOccurrence()
+//            if (start.after(recurringBooking.end)) {
+//                return null
+//            }
+//
+//            return RecurringBookingKt(
+//                start,
+//                recurringBooking.end,
+//                recurringBooking.frequency,
+//                recurringBooking.templateBooking
+//            )
+//        }
+//    }
 
     fun getDelayUntilNextExecution(): Delay {
         var timeBetween = getTimeBetweenNowAnd(executionDate)
