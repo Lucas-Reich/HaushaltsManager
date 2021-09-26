@@ -29,7 +29,6 @@ import com.example.lucas.haushaltsmanager.entities.Booking.ParentBooking;
 import com.example.lucas.haushaltsmanager.entities.Price;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 public class ChildExpenseRepository implements ChildExpenseRepositoryInterface {
@@ -79,12 +78,10 @@ public class ChildExpenseRepository implements ChildExpenseRepositoryInterface {
                 ParentBooking parentExpense = getParent(childExpense);
 
                 delete(childExpense);
-                childExpense.setExpenseType(Booking.EXPENSE_TYPES.NORMAL_EXPENSE);
                 mBookingRepo.delete(parentExpense);
             } else {
 
                 delete(childExpense);
-                childExpense.setExpenseType(Booking.EXPENSE_TYPES.NORMAL_EXPENSE);
             }
 
             mBookingRepo.insert(childExpense);
@@ -106,13 +103,11 @@ public class ChildExpenseRepository implements ChildExpenseRepositoryInterface {
 
     public void update(Booking childExpense) throws ChildExpenseNotFoundException {
         ContentValues updatedChild = new ContentValues();
-        updatedChild.put("expense_type", childExpense.getExpenseType().name());
         updatedChild.put("price", childExpense.getUnsignedPrice());
         updatedChild.put("category_id", childExpense.getCategory().getId().toString());
         updatedChild.put("expenditure", childExpense.isExpenditure());
         updatedChild.put("title", childExpense.getTitle());
         updatedChild.put("date", childExpense.getDate().getTimeInMillis());
-        updatedChild.put("notice", childExpense.getNotice());
         updatedChild.put("account_id", childExpense.getAccountId().toString());
 
         try {
@@ -192,7 +187,7 @@ public class ChildExpenseRepository implements ChildExpenseRepositoryInterface {
         return transformer.transform(c);
     }
 
-    public List<Booking> getAll(UUID parentId) {
+    public ArrayList<Booking> getAll(UUID parentId) {
         Cursor c = executeRaw(new GetAllChildBookingsQuery(parentId));
 
         ArrayList<Booking> childBookings = new ArrayList<>();
@@ -282,12 +277,10 @@ public class ChildExpenseRepository implements ChildExpenseRepositoryInterface {
         values.put("parent_id", parentId.toString());
 
         values.put("id", child.getId().toString());
-        values.put("expense_type", Booking.EXPENSE_TYPES.CHILD_EXPENSE.name());
         values.put("price", child.getUnsignedPrice());
         values.put("expenditure", child.isExpenditure() ? 1 : 0);
         values.put("title", child.getTitle());
         values.put("date", child.getDate().getTimeInMillis());
-        values.put("notice", child.getNotice());
         values.put("category_id", child.getCategory().getId().toString());
         values.put("account_id", child.getAccountId().toString());
         values.put("hidden", 0);

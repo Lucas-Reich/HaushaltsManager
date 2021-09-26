@@ -31,7 +31,6 @@
     <string name="created_backup">Successfully created Backup</string>
     <string name="error_missing_content">You have to set all values</string>
     <string name="btn_save">Save</string>
-    <string name="input_notice">Input Notice</string>
     <string name="input_title">Input Title</string>
     <string name="transfer">Transfer</string>
     <string name="edit">Edit</string>
@@ -138,7 +137,6 @@
     <string name="export_currency_name">Currency Name</string>
     <string name="export_account_name">Account Name</string>
     <string name="export_expenditure">is Expenditure</string>
-    <string name="export_notice">Notice</string>
     <string name="export_category_name">Category name</string>
     <string name="release_notes_100">The first app version is now available for download.</string>
     <string name="could_not_update_title">Title could not be updated</string>
@@ -194,7 +192,6 @@
     <string name="mapping_price_value">Amount</string>
     <string name="mapping_category_title">Category</string>
     <string name="mapping_booking_date">Date</string>
-    <string name="mapping_booking_notice">Notice</string>
     <string name="mapping_booking_title">Title</string>
     <string name="activity_show_recurring_bookings">Recurring bookings</string>
     <string name="mapping_price_type">Booking type</string>

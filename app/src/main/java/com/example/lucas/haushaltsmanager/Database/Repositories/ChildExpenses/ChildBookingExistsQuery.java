@@ -17,12 +17,10 @@ class ChildBookingExistsQuery implements QueryInterface {
                 + "WHERE id = %s "
                 + "AND title = '%s' "
                 + "AND price = %s "
-                + "AND expense_type = '%s' "
                 + "AND category_id = %s "
                 + "AND account_id = %s "
                 + "AND expenditure = %s "
                 + "AND date = '%s' "
-                + "AND notice = '%s' "
                 + "AND parent_id IS NOT NULL "
                 + "LIMIT 1;";
     }
@@ -33,12 +31,10 @@ class ChildBookingExistsQuery implements QueryInterface {
                 childBooking.getId().toString(),
                 childBooking.getTitle(),
                 childBooking.getUnsignedPrice(),
-                childBooking.getExpenseType().name(),
                 childBooking.getCategory().getId().toString(),
                 childBooking.getAccountId().toString(),
                 (childBooking.isExpenditure() ? 1 : 0),
-                childBooking.getDate().getTimeInMillis(),
-                childBooking.getNotice()
+                childBooking.getDate().getTimeInMillis()
         };
     }
 }

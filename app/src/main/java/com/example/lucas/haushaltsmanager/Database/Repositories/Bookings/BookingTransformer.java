@@ -5,14 +5,14 @@ import android.database.Cursor;
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.TransformerInterface;
-import com.example.lucas.haushaltsmanager.entities.Category;
 import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
 import com.example.lucas.haushaltsmanager.entities.Booking.IBooking;
 import com.example.lucas.haushaltsmanager.entities.Booking.ParentBooking;
+import com.example.lucas.haushaltsmanager.entities.Category;
 import com.example.lucas.haushaltsmanager.entities.Price;
 
+import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 import java.util.UUID;
 
 public class BookingTransformer implements TransformerInterface<IBooking> {
@@ -27,15 +27,14 @@ public class BookingTransformer implements TransformerInterface<IBooking> {
         UUID id = getId(c);
         String title = c.getString(c.getColumnIndex("title"));
         Calendar date = getDate(c);
-        Booking.EXPENSE_TYPES expenseType = getExpenseType(c);
 
         if (expenseType.equals(Booking.EXPENSE_TYPES.PARENT_EXPENSE)) {
-            List<Booking> children = new ChildExpenseRepository(app.getContext()).getAll(id);
+            ArrayList<Booking> children = new ChildExpenseRepository(app.getContext()).getAll(id);
 
             return new ParentBooking(
                     id,
-                    title,
                     date,
+                    title,
                     children
             );
         }
@@ -46,9 +45,7 @@ public class BookingTransformer implements TransformerInterface<IBooking> {
                 getPrice(c),
                 date,
                 categoryTransformer.transform(c),
-                c.getString(c.getColumnIndex("notice")),
-                getAccountId(c),
-                expenseType
+                getAccountId(c)
         );
     }
 
@@ -78,11 +75,5 @@ public class BookingTransformer implements TransformerInterface<IBooking> {
         date.setTimeInMillis(Long.parseLong(dateString));
 
         return date;
-    }
-
-    private Booking.EXPENSE_TYPES getExpenseType(Cursor c) {
-        String rawExpenseType = c.getString(c.getColumnIndex("expense_type"));
-
-        return Booking.EXPENSE_TYPES.valueOf(rawExpenseType);
     }
 }

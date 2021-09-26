@@ -15,12 +15,10 @@ class GetBookingQuery implements QueryInterface {
     public String sql() {
         return "SELECT "
                 + "BOOKINGS.id, "
-                + "BOOKINGS.expense_type, "
                 + "BOOKINGS.price, "
                 + "BOOKINGS.expenditure, "
                 + "BOOKINGS.title, "
                 + "BOOKINGS.date, "
-                + "BOOKINGS.notice, "
                 + "BOOKINGS.account_id, "
                 + "BOOKINGS.category_id, "
                 + "CATEGORIES.name, "

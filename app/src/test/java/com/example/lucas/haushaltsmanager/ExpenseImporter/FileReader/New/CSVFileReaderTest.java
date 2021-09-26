@@ -1,5 +1,9 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.FileReader.New;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Delimiter.Comma;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Delimiter.IDelimiter;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Delimiter.Semicolon;
@@ -11,10 +15,6 @@ import com.example.lucas.haushaltsmanager.ExpenseImporter.Line.Line;
 import org.junit.Test;
 
 import java.io.FileNotFoundException;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
 
 public class CSVFileReaderTest {
     private static final String TEST_FILE_DIR = "/Users/lucas/StudioProjects/HaushaltsManager/app/src/test/java/com/example/lucas/haushaltsmanager/ExpenseImporter/FileReader/CsvFiles";
@@ -35,7 +35,7 @@ public class CSVFileReaderTest {
 
         String actualHeaderLine = reader.getHeaderLine();
 
-        assertEquals("title,amount,date,category,notice,account", actualHeaderLine);
+        assertEquals("title,amount,date,category,account", actualHeaderLine);
     }
 
     @Test
@@ -45,7 +45,7 @@ public class CSVFileReaderTest {
         moveReaderXTimes(reader, 2);
 
         Line actualLine = reader.getCurrentLine();
-        assertLine("Meine Geile Buchung;100.00;09-08-2019 08:00:00;Haus;;Girokonto", actualLine, new Semicolon());
+        assertLine("Meine Geile Buchung;100.00;09-08-2019 08:00:00;Haus;Girokonto", actualLine, new Semicolon());
     }
 
     @Test

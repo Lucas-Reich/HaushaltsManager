@@ -1,18 +1,22 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality;
 
-import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType;
-import com.example.lucas.haushaltsmanager.entities.Category;
-import com.example.lucas.haushaltsmanager.entities.Color;
-import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
-import com.example.lucas.haushaltsmanager.entities.Booking.ParentBooking;
-import com.example.lucas.haushaltsmanager.entities.Price;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.InsertStrategy.MockInsertStrategy;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.SelectionRules.MockSelectionRules;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBookingItem.ChildExpenseItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.BookingItem.ExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBookingItem.ChildExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ParentBookingItem.ParentBookingItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.MockItemHandler;
+import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType;
+import com.example.lucas.haushaltsmanager.entities.Booking.ParentBooking;
+import com.example.lucas.haushaltsmanager.entities.Category;
+import com.example.lucas.haushaltsmanager.entities.Color;
+import com.example.lucas.haushaltsmanager.entities.Price;
 
 import org.junit.After;
 import org.junit.Before;
@@ -23,10 +27,6 @@ import org.robolectric.RobolectricTestRunner;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.UUID;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 @RunWith(RobolectricTestRunner.class)
 public class RecyclerViewSelectedItemHandlerTest {
@@ -105,9 +105,9 @@ public class RecyclerViewSelectedItemHandlerTest {
         return new ParentBookingItem(
                 new ParentBooking(
                         UUID.randomUUID(),
-                        "Ausgabe",
                         Calendar.getInstance(),
-                        new ArrayList<Booking>()
+                        "Ausgabe",
+                        new ArrayList<>()
                 ), getDummyDate());
     }
 

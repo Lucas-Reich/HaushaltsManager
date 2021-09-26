@@ -14,7 +14,7 @@ import de.psdev.licensesdialog.model.Notices;
 
 public class LicensesWrapperDialog {
 
-    private Context mContext;
+    private final Context mContext;
 
     public LicensesWrapperDialog(Context context) {
 

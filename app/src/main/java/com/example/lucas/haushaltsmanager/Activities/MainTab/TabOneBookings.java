@@ -14,8 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lucas.haushaltsmanager.Activities.ExpenseScreen;
-import com.example.lucas.haushaltsmanager.Database.AppDatabase;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.BookingDAO;
+import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.ActionPayload;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.AddChildMenuItem;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.CombineMenuItem;
@@ -206,10 +205,10 @@ public class TabOneBookings extends AbstractTab implements
     }
 
     private List<IBooking> getVisibleExpenses(int offset) {
-        BookingDAO bookingDAO = AppDatabase.getDatabase(getContext()).bookingDAO();
+        ExpenseRepository repository = new ExpenseRepository(getContext());
 
         List<IBooking> visibleExpenses = new ExpenseFilter().byAccountWithParents(
-                (List<IBooking>) (Object) bookingDAO.getAll(),
+                repository.getAll(),
                 activeAccounts.getActiveAccounts()
         );
 

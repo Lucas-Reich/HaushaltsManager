@@ -63,14 +63,4 @@ public class Converters {
     public static long calendarToLong(Calendar calendar) {
         return calendar.getTimeInMillis();
     }
-
-    @TypeConverter
-    public static Booking.EXPENSE_TYPES expenseTypesFromString(String expenseTypes) {
-        return Booking.EXPENSE_TYPES.valueOf(expenseTypes);
-    }
-
-    @TypeConverter
-    public static String expenseTypesToString(Booking.EXPENSE_TYPES expenseType) {
-        return expenseType.name();
-    }
 }

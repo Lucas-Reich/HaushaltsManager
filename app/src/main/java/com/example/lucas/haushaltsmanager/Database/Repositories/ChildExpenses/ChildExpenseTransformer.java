@@ -23,7 +23,6 @@ public class ChildExpenseTransformer implements TransformerInterface<Booking> {
     public Booking transform(Cursor c) {
         UUID id = getId(c);
         String title = c.getString(c.getColumnIndex("title"));
-        String notice = c.getString(c.getColumnIndex("notice"));
         UUID accountId = getAccountId(c);
         Category expenseCategory = categoryTransformer.transform(c);
         Price price = extractPrice(c);
@@ -39,9 +38,7 @@ public class ChildExpenseTransformer implements TransformerInterface<Booking> {
                 price,
                 date,
                 expenseCategory,
-                notice,
-                accountId,
-                Booking.EXPENSE_TYPES.CHILD_EXPENSE
+                accountId
         );
     }
 

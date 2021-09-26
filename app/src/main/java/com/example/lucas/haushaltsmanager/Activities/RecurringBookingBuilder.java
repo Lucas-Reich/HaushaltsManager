@@ -38,10 +38,8 @@ public class RecurringBookingBuilder {
                 end,
                 frequency,
                 booking.getTitle(),
-                booking.getExpenseType(),
                 booking.getPrice(),
                 booking.getCategory().getId(),
-                booking.getNotice(),
                 booking.getAccountId()
         );
     }

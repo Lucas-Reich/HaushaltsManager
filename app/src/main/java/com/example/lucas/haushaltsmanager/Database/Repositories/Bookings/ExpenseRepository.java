@@ -83,7 +83,6 @@ public class ExpenseRepository {
     public void insert(ParentBooking parentBooking) {
         ContentValues values = new ContentValues();
         values.put("id", parentBooking.getId().toString());
-        values.put("expense_type", Booking.EXPENSE_TYPES.PARENT_EXPENSE.name());
 
         values.put("price", parentBooking.getPrice().getUnsignedValue());
         values.put("expenditure", parentBooking.getPrice().isNegative() ? 1 : 0);
@@ -111,13 +110,11 @@ public class ExpenseRepository {
 
         ContentValues values = new ContentValues();
         values.put("id", expense.getId().toString());
-        values.put("expense_type", expense.getExpenseType().name());
         values.put("price", expense.getUnsignedPrice());
         values.put("category_id", expense.getCategory().getId().toString());
         values.put("expenditure", expense.isExpenditure() ? 1 : 0);
         values.put("title", expense.getTitle());
         values.put("date", expense.getDate().getTimeInMillis());
-        values.put("notice", expense.getNotice());
         values.put("account_id", expense.getAccountId().toString());
         values.put("hidden", 0);
 
@@ -163,12 +160,10 @@ public class ExpenseRepository {
 
     public void update(Booking expense) throws ExpenseNotFoundException {
         ContentValues updatedExpense = new ContentValues();
-        updatedExpense.put("expense_type", expense.getExpenseType().name());
         updatedExpense.put("price", expense.getUnsignedPrice());
         updatedExpense.put("expenditure", expense.isExpenditure() ? 1 : 0);
         updatedExpense.put("title", expense.getTitle());
         updatedExpense.put("date", expense.getDate().getTimeInMillis());
-        updatedExpense.put("notice", expense.getNotice());
         updatedExpense.put("category_id", expense.getCategory().getId().toString());
         updatedExpense.put("account_id", expense.getAccountId().toString());
 

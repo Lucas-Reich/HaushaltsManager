@@ -1,5 +1,7 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.FileReader;
 
+import static junit.framework.TestCase.assertEquals;
+
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.InvalidFileException;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.FileReader.Files.CSVFile;
 
@@ -7,8 +9,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.FileNotFoundException;
-
-import static junit.framework.TestCase.assertEquals;
 
 public class CSVFileTest {
     private final String fileWithHeadline = "/Users/lucas/StudioProjects/HaushaltsManager/app/src/test/java/com/example/lucas/haushaltsmanager/ExpenseImporter/FileReader/CsvFiles/importableExpenseObjects.csv";
@@ -31,7 +31,7 @@ public class CSVFileTest {
     public void canReadFileWithHeader() throws FileNotFoundException {
         CSVFile file = CSVFile.open(fileWithHeadline);
 
-        String expectedHeader = "title,amount,date,category,notice,account";
+        String expectedHeader = "title,amount,date,category,account";
         String actualHeader = file.getHeader();
 
         assertEquals(expectedHeader, actualHeader);
@@ -47,15 +47,14 @@ public class CSVFileTest {
         assertEquals("amount", actualHeader[1]);
         assertEquals("date", actualHeader[2]);
         assertEquals("category", actualHeader[3]);
-        assertEquals("notice", actualHeader[4]);
-        assertEquals("account", actualHeader[5]);
+        assertEquals("account", actualHeader[4]);
     }
 
     @Test
     public void canReadFileWithoutHeader() throws FileNotFoundException {
         CSVFile file = CSVFile.open(fileWithoutHeadline);
 
-        String expectedHeader = "Meine Geile Buchung,100.00,09-08-2019 08:00:00,Essen,,Sparschwein";
+        String expectedHeader = "Meine Geile Buchung,100.00,09-08-2019 08:00:00,Essen,Sparschwein";
         String actualHeader = file.getHeader();
 
         assertEquals(expectedHeader, actualHeader);

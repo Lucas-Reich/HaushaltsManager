@@ -141,7 +141,6 @@ public class CsvBookingExporter {
         expenseString.append(writableBooking.isExpenditure()).append(",");
         expenseString.append(writableBooking.getTitle()).append(",");
         expenseString.append(writableBooking.getDateString()).append(",");
-        expenseString.append(writableBooking.getNotice()).append(",");
         expenseString.append(new Currency().getName()).append(",");
         expenseString.append(writableBooking.getCategory().getName()).append(",");
         Account account = getAccount(writableBooking.getAccountId());

@@ -158,7 +158,6 @@ public class TransferActivity extends AbstractAppCompatActivity {
                 getTransferCategory(),
                 UUID.randomUUID()
         );
-        mFromExpense.setExpenseType(Booking.EXPENSE_TYPES.TRANSFER_EXPENSE);
 
         mToExpense = new Booking(
                 "",
@@ -166,7 +165,6 @@ public class TransferActivity extends AbstractAppCompatActivity {
                 getTransferCategory(),
                 UUID.randomUUID()
         );
-        mToExpense.setExpenseType(Booking.EXPENSE_TYPES.TRANSFER_EXPENSE);
 
         mDateBtn = findViewById(R.id.transfer_date_btn);
         mFromAccountBtn = findViewById(R.id.transfer_from_account_btn);

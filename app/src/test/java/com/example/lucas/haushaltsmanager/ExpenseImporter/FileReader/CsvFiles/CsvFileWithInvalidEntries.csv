@@ -1,3 +1,3 @@
-title,amount,date,category,notice,account
-Eine Buchung,09-08-2019 08:00:00,Essen,,Girokonto
-Eine Buchung,100.00,1565338108,Essen,,Girokonto
+title,amount,date,category,account
+Eine Buchung,09-08-2019 08:00:00,Essen,Girokonto
+Eine Buchung,100.00,1565338108,Essen,Girokonto

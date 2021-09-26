@@ -1,19 +1,24 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.BookingItem.ExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBookingItem.ChildExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ParentBookingItem.ParentBookingItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.ExpenseListRecyclerViewAdapter;
+import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
 import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType;
+import com.example.lucas.haushaltsmanager.entities.Booking.ParentBooking;
 import com.example.lucas.haushaltsmanager.entities.Category;
 import com.example.lucas.haushaltsmanager.entities.Color;
-import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
-import com.example.lucas.haushaltsmanager.entities.Booking.ParentBooking;
 import com.example.lucas.haushaltsmanager.entities.Price;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBookingItem.ChildExpenseItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.BookingItem.ExpenseItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ParentBookingItem.ParentBookingItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.ExpenseListRecyclerViewAdapter;
 
 import org.junit.After;
 import org.junit.Before;
@@ -27,19 +32,13 @@ import java.util.Calendar;
 import java.util.Random;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 @RunWith(RobolectricTestRunner.class)
 public class RecyclerViewExpandableItemHandlerTest {
     private ExpenseListRecyclerViewAdapter mItemHandler;
 
     @Before
     public void setUp() {
-        mItemHandler = new ExpenseListRecyclerViewAdapter(new ArrayList<IRecyclerItem>());
+        mItemHandler = new ExpenseListRecyclerViewAdapter(new ArrayList<>());
 
         RecyclerView rView = new RecyclerView(RuntimeEnvironment.application);
         rView.setAdapter(mItemHandler);
@@ -211,8 +210,8 @@ public class RecyclerViewExpandableItemHandlerTest {
 
         ParentBooking parent = new ParentBooking(
                 UUID.randomUUID(),
-                "",
                 date,
+                "",
                 new ArrayList<>()
         );
 
@@ -237,9 +236,7 @@ public class RecyclerViewExpandableItemHandlerTest {
                 new Price(new Random().nextInt(), true),
                 date,
                 new Category("Kategorie", Color.Companion.black(), ExpenseType.Companion.expense()),
-                "",
-                UUID.randomUUID(),
-                Booking.EXPENSE_TYPES.NORMAL_EXPENSE
+                UUID.randomUUID()
         );
     }
 }

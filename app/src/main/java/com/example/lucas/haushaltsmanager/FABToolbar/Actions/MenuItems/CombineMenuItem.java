@@ -14,8 +14,6 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Expense
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.CannotDeleteChildExpenseException;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
-import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
-import com.example.lucas.haushaltsmanager.entities.Booking.ParentBooking;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.ActionPayload;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.ActionKey;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.IActionKey;
@@ -24,6 +22,8 @@ import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.BookingItem
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBookingItem.ChildExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.IBookingItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
+import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.entities.Booking.ParentBooking;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,11 +32,11 @@ public class CombineMenuItem implements IMenuItem {
     public static final String ACTION_KEY = "combineBookingsAction";
     private static final String TAG = CombineMenuItem.class.getSimpleName();
 
-    private IActionKey mActionKey;
+    private final IActionKey mActionKey;
 
     private ExpenseRepository bookingRepository;
     private ChildExpenseRepository childBookingRepository;
-    private OnSuccessCallback mCallback;
+    private final OnSuccessCallback mCallback;
 
     public CombineMenuItem(OnSuccessCallback callback) {
         mCallback = callback;
@@ -92,28 +92,24 @@ public class CombineMenuItem implements IMenuItem {
     }
 
     private BasicTextInputDialog.OnTextInput getOnTextInputListener(final List<IRecyclerItem> selectedItems) {
-        return new BasicTextInputDialog.OnTextInput() {
+        return combinedExpenseTitle -> {
+            List<IRecyclerItem> removedItems = new ArrayList<>();
 
-            @Override
-            public void onTextInput(String combinedExpenseTitle) {
-                List<IRecyclerItem> removedItems = new ArrayList<>();
+            ParentBooking parent = new ParentBooking(combinedExpenseTitle);
 
-                ParentBooking parent = new ParentBooking(combinedExpenseTitle);
+            for (IRecyclerItem deletedChildItem : selectedItems) {
+                IRecyclerItem deletedChild = deleteItem(deletedChildItem);
 
-                for (IRecyclerItem deletedChildItem : selectedItems) {
-                    IRecyclerItem deletedChild = deleteItem(deletedChildItem);
-
-                    if (null != deletedChild) {
-                        removedItems.add(deletedChild);
-                        parent.addChild((Booking) deletedChild.getContent());
-                    }
+                if (null != deletedChild) {
+                    removedItems.add(deletedChild);
+                    parent.addChild((Booking) deletedChild.getContent());
                 }
+            }
 
-                bookingRepository.insert(parent);
+            bookingRepository.insert(parent);
 
-                if (null != mCallback) {
-                    mCallback.onSuccess(parent, removedItems);
-                }
+            if (null != mCallback) {
+                mCallback.onSuccess(parent, removedItems);
             }
         };
     }

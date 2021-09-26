@@ -1,9 +1,10 @@
 package com.example.lucas.haushaltsmanager.entities;
 
 
-import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType;
-import com.example.lucas.haushaltsmanager.entities.Booking.IBooking;
+import static org.junit.Assert.assertEquals;
+
 import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType;
 
 import org.junit.Test;
 
@@ -13,19 +14,16 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.assertEquals;
-
 public class RecurringBookingTest {
     /**
      * 01.01.2018 + 1 Day = 02.01.2018
      */
     @Test
     public void testGetNextOccurrenceWithDay1() {
-        RecurringBooking recurringBooking = new RecurringBooking(
+        RecurringBooking recurringBooking = createRecurringBooking(
                 getDate(1, Calendar.JANUARY, 2018),
                 getDate(1, Calendar.JANUARY, 2019),
-                new Frequency(Calendar.DATE, 1),
-                getBooking()
+                new Frequency(Calendar.DATE, 1)
         );
 
         RecurringBooking nextRecurringBooking = RecurringBooking.createNextRecurringBooking(recurringBooking);
@@ -40,11 +38,10 @@ public class RecurringBookingTest {
      */
     @Test
     public void testGetNextOccurrenceWithDay2() {
-        RecurringBooking recurringBooking = new RecurringBooking(
+        RecurringBooking recurringBooking = createRecurringBooking(
                 getDate(31, Calendar.JANUARY, 2018),
                 getDate(1, Calendar.JANUARY, 2019),
-                new Frequency(Calendar.DATE, 1),
-                getBooking()
+                new Frequency(Calendar.DATE, 1)
         );
 
         RecurringBooking nextRecurringBooking = RecurringBooking.createNextRecurringBooking(recurringBooking);
@@ -59,11 +56,10 @@ public class RecurringBookingTest {
      */
     @Test
     public void testGetNextOccurrenceWithWeek1() {
-        RecurringBooking recurringBooking = new RecurringBooking(
+        RecurringBooking recurringBooking = createRecurringBooking(
                 getDate(1, Calendar.JANUARY, 2018),
                 getDate(1, Calendar.JANUARY, 2019),
-                new Frequency(Calendar.WEEK_OF_YEAR, 1),
-                getBooking()
+                new Frequency(Calendar.WEEK_OF_YEAR, 1)
         );
 
         RecurringBooking nextRecurringBooking = RecurringBooking.createNextRecurringBooking(recurringBooking);
@@ -78,11 +74,10 @@ public class RecurringBookingTest {
      */
     @Test
     public void testGetNextOccurrenceWithWeek2() {
-        RecurringBooking recurringBooking = new RecurringBooking(
+        RecurringBooking recurringBooking = createRecurringBooking(
                 getDate(28, Calendar.JANUARY, 2018),
                 getDate(1, Calendar.JANUARY, 2019),
-                new Frequency(Calendar.WEEK_OF_YEAR, 1),
-                getBooking()
+                new Frequency(Calendar.WEEK_OF_YEAR, 1)
         );
 
         RecurringBooking nextRecurringBooking = RecurringBooking.createNextRecurringBooking(recurringBooking);
@@ -97,11 +92,10 @@ public class RecurringBookingTest {
      */
     @Test
     public void testGetNextOccurrenceWithMonth1() {
-        RecurringBooking recurringBooking = new RecurringBooking(
+        RecurringBooking recurringBooking = createRecurringBooking(
                 getDate(1, Calendar.JANUARY, 2018),
                 getDate(1, Calendar.JANUARY, 2019),
-                new Frequency(Calendar.MONTH, 1),
-                getBooking()
+                new Frequency(Calendar.MONTH, 1)
         );
 
         RecurringBooking nextRecurringBooking = RecurringBooking.createNextRecurringBooking(recurringBooking);
@@ -116,11 +110,10 @@ public class RecurringBookingTest {
      */
     @Test
     public void testGetNextOccurrenceWithMonth2() {
-        RecurringBooking recurringBooking = new RecurringBooking(
+        RecurringBooking recurringBooking = createRecurringBooking(
                 getDate(31, Calendar.JANUARY, 2018),
                 getDate(1, Calendar.JANUARY, 2019),
-                new Frequency(Calendar.MONTH, 1),
-                getBooking()
+                new Frequency(Calendar.MONTH, 1)
         );
 
         RecurringBooking nextRecurringBooking = RecurringBooking.createNextRecurringBooking(recurringBooking);
@@ -135,11 +128,10 @@ public class RecurringBookingTest {
      */
     @Test
     public void testGetNextOccurrenceWithYear1() {
-        RecurringBooking recurringBooking = new RecurringBooking(
+        RecurringBooking recurringBooking = createRecurringBooking(
                 getDate(31, Calendar.JANUARY, 2018),
                 getDate(1, Calendar.JANUARY, 2020),
-                new Frequency(Calendar.YEAR, 1),
-                getBooking()
+                new Frequency(Calendar.YEAR, 1)
         );
 
         RecurringBooking nextRecurringBooking = RecurringBooking.createNextRecurringBooking(recurringBooking);
@@ -154,11 +146,10 @@ public class RecurringBookingTest {
      */
     @Test
     public void testGetNextOccurrenceWithYear2() {
-        RecurringBooking recurringBooking = new RecurringBooking(
+        RecurringBooking recurringBooking = createRecurringBooking(
                 getDate(29, Calendar.FEBRUARY, 2016),
                 getDate(1, Calendar.JANUARY, 2020),
-                new Frequency(Calendar.YEAR, 1),
-                getBooking()
+                new Frequency(Calendar.YEAR, 1)
         );
 
         RecurringBooking nextRecurringBooking = RecurringBooking.createNextRecurringBooking(recurringBooking);
@@ -173,11 +164,10 @@ public class RecurringBookingTest {
      */
     @Test
     public void testGetCorrectRecurringBookingCount1() {
-        RecurringBooking recurringBooking = new RecurringBooking(
+        RecurringBooking recurringBooking = createRecurringBooking(
                 getDate(1, Calendar.JANUARY, 2018),
                 getDate(2, Calendar.JANUARY, 2019),
-                new Frequency(Calendar.MONTH, 1),
-                getBooking()
+                new Frequency(Calendar.MONTH, 1)
         );
 
         List<RecurringBooking> recurringBookings = new ArrayList<>();
@@ -196,11 +186,10 @@ public class RecurringBookingTest {
      */
     @Test
     public void testGetCorrectRecurringBookingCount2() {
-        RecurringBooking recurringBooking = new RecurringBooking(
+        RecurringBooking recurringBooking = createRecurringBooking(
                 getDate(1, Calendar.JANUARY, 2018),
                 getDate(1, Calendar.JANUARY, 2019),
-                new Frequency(Calendar.MONTH, 1),
-                getBooking()
+                new Frequency(Calendar.MONTH, 1)
         );
 
         List<RecurringBooking> recurringBookings = new ArrayList<>();
@@ -219,11 +208,10 @@ public class RecurringBookingTest {
      */
     @Test
     public void testGetCorrectRecurringBookingCount3() {
-        RecurringBooking recurringBooking = new RecurringBooking(
+        RecurringBooking recurringBooking = createRecurringBooking(
                 getDate(1, Calendar.JANUARY, 2018),
                 getDate(31, Calendar.DECEMBER, 2018),
-                new Frequency(Calendar.MONTH, 1),
-                getBooking()
+                new Frequency(Calendar.MONTH, 1)
         );
 
         List<RecurringBooking> recurringBookings = new ArrayList<>();
@@ -244,11 +232,10 @@ public class RecurringBookingTest {
         Calendar date = Calendar.getInstance();
         date.add(Calendar.DATE, 5);
 
-        RecurringBooking recurringBooking = new RecurringBooking(
+        RecurringBooking recurringBooking = createRecurringBooking(
                 date,
                 getDate(1, Calendar.JANUARY, 3000),
-                new Frequency(Calendar.MONTH, 1),
-                getBooking()
+                new Frequency(Calendar.MONTH, 1)
         );
 
         Delay delay = recurringBooking.getDelayUntilNextExecution();
@@ -262,11 +249,10 @@ public class RecurringBookingTest {
         Calendar yesterday = Calendar.getInstance();
         yesterday.add(Calendar.DATE, -1);
 
-        RecurringBooking recurringBooking = new RecurringBooking(
+        RecurringBooking recurringBooking = createRecurringBooking(
                 yesterday,
                 getDate(1, Calendar.JANUARY, 3000),
-                new Frequency(Calendar.MONTH, 1),
-                getBooking()
+                new Frequency(Calendar.MONTH, 1)
         );
 
         long expectedTimeBetween = getTimeBetweenNowAndNextRecurringBooking(recurringBooking);
@@ -276,22 +262,34 @@ public class RecurringBookingTest {
         assertEquals(TimeUnit.MILLISECONDS, delay.getTimeUnit());
     }
 
+    private RecurringBooking createRecurringBooking(Calendar from, Calendar to, Frequency frequency) {
+        Booking booking = getBooking();
+
+        return new RecurringBooking(
+                from,
+                to,
+                frequency,
+                booking.getTitle(),
+                booking.getPrice(),
+                booking.getCategory().getId(),
+                booking.getAccountId()
+        );
+    }
+
     private long getTimeBetweenNowAndNextRecurringBooking(RecurringBooking recurringBooking) {
         Calendar now = Calendar.getInstance();
 
         return RecurringBooking.createNextRecurringBooking(recurringBooking).getDate().getTimeInMillis() - now.getTimeInMillis();
     }
 
-    private IBooking getBooking() {
+    private Booking getBooking() {
         return new Booking(
                 UUID.randomUUID(),
                 "Ausgabe",
                 new Price(150, true),
                 getDate(1, Calendar.JANUARY, 2019),
                 new Category("Kategorie", Color.Companion.black(), ExpenseType.Companion.expense()),
-                "",
-                UUID.randomUUID(),
-                Booking.EXPENSE_TYPES.NORMAL_EXPENSE
+                UUID.randomUUID()
         );
     }
 

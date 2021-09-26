@@ -58,7 +58,7 @@ public class ExpenseFilter {
     }
 
     private ParentBooking byAccount(ParentBooking parent, List<UUID> accountIds) {
-        List<Booking> childrenWithCorrectAccount = new ArrayList<>();
+        ArrayList<Booking> childrenWithCorrectAccount = new ArrayList<>();
 
         for (Booking child : parent.getChildren()) {
             if (!hasAccount(child, accountIds)) {
@@ -70,8 +70,8 @@ public class ExpenseFilter {
 
         return new ParentBooking(
                 parent.getId(),
-                parent.getTitle(),
                 parent.getDate(),
+                parent.getTitle(),
                 childrenWithCorrectAccount
         );
     }
@@ -97,7 +97,7 @@ public class ExpenseFilter {
     }
 
     private ParentBooking removeInvisibleChildren(ParentBooking expense, List<UUID> accounts) {
-        List<Booking> visibleChildren = new ArrayList<>();
+        ArrayList<Booking> visibleChildren = new ArrayList<>();
         for (Booking child : expense.getChildren()) {
             if (hasAccount(child, accounts)) {
                 visibleChildren.add(child);
@@ -106,8 +106,8 @@ public class ExpenseFilter {
 
         return new ParentBooking(
                 expense.getId(),
-                expense.getTitle(),
                 expense.getDate(),
+                expense.getTitle(),
                 visibleChildren
         );
     }

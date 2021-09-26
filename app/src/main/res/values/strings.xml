@@ -67,7 +67,6 @@
     <string name="export_expenditure">is Expenditure</string>
     <string name="export_title">Title</string>
     <string name="export_date">Date</string>
-    <string name="export_notice">Notice</string>
     <string name="export_currency_name">Currency Name</string>
     <string name="export_category_name">Category Name</string>
     <string name="export_account_name">Account Name</string>
@@ -90,7 +89,6 @@
     <string name="mapping_account_title">Account</string>
     <string name="mapping_category_title">Category</string>
     <string name="mapping_booking_date">Date</string>
-    <string name="mapping_booking_notice">Notice</string>
     <string name="mapping_booking_title">Title</string>
     <string name="mapping_price_value">Amount</string>
     <string name="mapping_price_type">Booking type</string>
@@ -119,7 +117,6 @@
     <!-- TODO: Bessere Übersetzung für "error_missing_content" einfallen lassen -->
     <string name="error_missing_content">You have to set all values</string>
     <string name="input_title">Input Title</string>
-    <string name="input_notice">Input Notice</string>
     <string name="transfer">Transfer</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>

@@ -5,8 +5,6 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
-
 import java.util.Calendar;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -22,13 +20,10 @@ public class RecurringBooking {
     private final Frequency frequency;
 
     private final String title;
-    @ColumnInfo(name = "expense_type")
-    private final Booking.EXPENSE_TYPES expenseType;
     private final Price price;
     private final Calendar date;
     @ColumnInfo(name = "category_id")
     private final UUID categoryId;
-    private final String notice;
     @ColumnInfo(name = "account_id")
     private final UUID accountId;
 
@@ -38,10 +33,8 @@ public class RecurringBooking {
             @NonNull Calendar end,
             @NonNull Frequency frequency,
             @NonNull String title,
-            @NonNull Booking.EXPENSE_TYPES expenseType,
             @NonNull Price price,
             @NonNull UUID categoryId,
-            @NonNull String notice,
             @NonNull UUID accountId
     ) {
         this.id = id;
@@ -50,10 +43,8 @@ public class RecurringBooking {
         this.frequency = frequency;
 
         this.title = title;
-        this.expenseType = expenseType;
         this.price = price;
         this.categoryId = categoryId;
-        this.notice = notice;
         this.accountId = accountId;
     }
 
@@ -62,10 +53,8 @@ public class RecurringBooking {
             @NonNull Calendar end,
             @NonNull Frequency frequency,
             @NonNull String title,
-            @NonNull Booking.EXPENSE_TYPES expenseType,
             @NonNull Price price,
             @NonNull UUID categoryId,
-            @NonNull String notice,
             @NonNull UUID accountId
     ) {
         this(
@@ -74,10 +63,8 @@ public class RecurringBooking {
                 end,
                 frequency,
                 title,
-                expenseType,
                 price,
                 categoryId,
-                notice,
                 accountId
         );
     }
@@ -94,10 +81,8 @@ public class RecurringBooking {
                 recurringBooking.getEnd(),
                 recurringBooking.getFrequency(),
                 recurringBooking.title,
-                recurringBooking.expenseType,
                 recurringBooking.price,
                 recurringBooking.categoryId,
-                recurringBooking.notice,
                 recurringBooking.accountId
         );
     }
@@ -134,20 +119,12 @@ public class RecurringBooking {
         return title;
     }
 
-    public Booking.EXPENSE_TYPES getExpenseType() {
-        return expenseType;
-    }
-
     public Price getPrice() {
         return price;
     }
 
     public UUID getCategoryId() {
         return categoryId;
-    }
-
-    public String getNotice() {
-        return notice;
     }
 
     public UUID getAccountId() {
