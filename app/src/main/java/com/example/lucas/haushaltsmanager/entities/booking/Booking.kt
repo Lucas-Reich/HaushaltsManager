@@ -1,6 +1,9 @@
 package com.example.lucas.haushaltsmanager.entities.booking
 
 import android.os.Parcelable
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.example.lucas.haushaltsmanager.entities.Category
 import com.example.lucas.haushaltsmanager.entities.Price
 import kotlinx.parcelize.Parcelize
@@ -8,14 +11,15 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
+@Entity(tableName = "bookings")
 @Parcelize
 class Booking(
-    private val id: UUID,
+    @PrimaryKey private val id: UUID,
     private var title: String,
     private var price: Price,
     private var date: Calendar,
-    var category: Category,
-    var accountId: UUID
+    var category: Category, // TODO: Create Booking with embedded category
+    @ColumnInfo(name = "account_id") var accountId: UUID
 ) : IBooking, Parcelable {
     constructor(
         title: String,
