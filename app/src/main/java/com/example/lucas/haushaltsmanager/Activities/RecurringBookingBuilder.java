@@ -1,6 +1,6 @@
 package com.example.lucas.haushaltsmanager.Activities;
 
-import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 import com.example.lucas.haushaltsmanager.entities.Frequency;
 import com.example.lucas.haushaltsmanager.entities.RecurringBooking;
 

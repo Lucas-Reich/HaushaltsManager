@@ -1,7 +1,7 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.Bookings;
 
 import com.example.lucas.haushaltsmanager.Database.QueryInterface;
-import com.example.lucas.haushaltsmanager.entities.Booking.IBooking;
+import com.example.lucas.haushaltsmanager.entities.booking.IBooking;
 
 class IsBookingHiddenQuery implements QueryInterface {
     private final IBooking booking;

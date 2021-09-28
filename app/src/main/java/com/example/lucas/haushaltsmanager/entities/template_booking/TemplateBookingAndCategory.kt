@@ -1,7 +1,8 @@
-package com.example.lucas.haushaltsmanager.entities
+package com.example.lucas.haushaltsmanager.entities.template_booking
 
 import androidx.room.Embedded
 import androidx.room.Relation
+import com.example.lucas.haushaltsmanager.entities.Category
 import java.util.*
 
 data class TemplateBookingAndCategory(

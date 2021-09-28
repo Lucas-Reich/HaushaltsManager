@@ -5,7 +5,7 @@ import androidx.annotation.Nullable;
 
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IParentRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
-import com.example.lucas.haushaltsmanager.entities.TemplateBooking;
+import com.example.lucas.haushaltsmanager.entities.template_booking.TemplateBooking;
 
 public class TemplateItem implements IRecyclerItem {
     public static final int VIEW_TYPE = 8;

@@ -1,10 +1,12 @@
-package com.example.lucas.haushaltsmanager.entities
+package com.example.lucas.haushaltsmanager.entities.template_booking
 
 import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.lucas.haushaltsmanager.entities.Booking.Booking
+import com.example.lucas.haushaltsmanager.entities.booking.Booking
+import com.example.lucas.haushaltsmanager.entities.Price
+import com.example.lucas.haushaltsmanager.entities.UUIDParceler
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.WriteWith
 import java.util.*

@@ -1,6 +1,6 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions;
 
-import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
+import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 
 public class CannotDeleteChildExpenseException extends Exception {
     private CannotDeleteChildExpenseException(String message) {

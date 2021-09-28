@@ -2,8 +2,7 @@ package com.example.lucas.haushaltsmanager.Database.Repositories;
 
 import androidx.room.TypeConverter;
 
-import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
-import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType;
+import com.example.lucas.haushaltsmanager.entities.booking.ExpenseType;
 import com.example.lucas.haushaltsmanager.entities.Color;
 import com.example.lucas.haushaltsmanager.entities.Price;
 

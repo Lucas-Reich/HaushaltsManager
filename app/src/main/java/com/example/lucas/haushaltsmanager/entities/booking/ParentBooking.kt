@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager.entities.Booking
+package com.example.lucas.haushaltsmanager.entities.booking
 
 import com.example.lucas.haushaltsmanager.entities.Price
 import java.util.*

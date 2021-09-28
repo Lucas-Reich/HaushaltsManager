@@ -7,8 +7,8 @@ import android.database.CursorIndexOutOfBoundsException;
 import android.database.MatrixCursor;
 
 import com.example.lucas.haushaltsmanager.Database.Repositories.Categories.CategoryTransformer;
-import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
-import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType;
+import com.example.lucas.haushaltsmanager.entities.booking.Booking;
+import com.example.lucas.haushaltsmanager.entities.booking.ExpenseType;
 import com.example.lucas.haushaltsmanager.entities.Category;
 import com.example.lucas.haushaltsmanager.entities.Color;
 import com.example.lucas.haushaltsmanager.entities.Price;

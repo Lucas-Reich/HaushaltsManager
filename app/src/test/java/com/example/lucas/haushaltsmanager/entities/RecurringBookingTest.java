@@ -3,8 +3,8 @@ package com.example.lucas.haushaltsmanager.entities;
 
 import static org.junit.Assert.assertEquals;
 
-import com.example.lucas.haushaltsmanager.entities.Booking.Booking;
-import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType;
+import com.example.lucas.haushaltsmanager.entities.booking.Booking;
+import com.example.lucas.haushaltsmanager.entities.booking.ExpenseType;
 
 import org.junit.Test;
 

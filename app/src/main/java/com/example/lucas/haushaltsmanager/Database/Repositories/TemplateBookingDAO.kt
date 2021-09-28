@@ -3,8 +3,8 @@ package com.example.lucas.haushaltsmanager.Database.Repositories
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import com.example.lucas.haushaltsmanager.entities.TemplateBooking
-import com.example.lucas.haushaltsmanager.entities.TemplateBookingAndCategory
+import com.example.lucas.haushaltsmanager.entities.template_booking.TemplateBooking
+import com.example.lucas.haushaltsmanager.entities.template_booking.TemplateBookingAndCategory
 
 @Dao
 interface TemplateBookingDAO {

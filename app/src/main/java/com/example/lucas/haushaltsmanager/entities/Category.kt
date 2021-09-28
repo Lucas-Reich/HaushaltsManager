@@ -6,7 +6,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.lucas.haushaltsmanager.App.app
 import com.example.lucas.haushaltsmanager.R
-import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType
+import com.example.lucas.haushaltsmanager.entities.booking.ExpenseType
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.WriteWith
 import java.util.*

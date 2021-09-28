@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager.entities.Booking
+package com.example.lucas.haushaltsmanager.entities.booking
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

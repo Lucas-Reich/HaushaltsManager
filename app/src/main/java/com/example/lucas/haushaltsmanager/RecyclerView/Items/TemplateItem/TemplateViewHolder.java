@@ -12,7 +12,7 @@ import com.example.lucas.haushaltsmanager.Views.MoneyTextView;
 import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
 import com.example.lucas.haushaltsmanager.entities.Category;
 import com.example.lucas.haushaltsmanager.entities.Price;
-import com.example.lucas.haushaltsmanager.entities.TemplateBooking;
+import com.example.lucas.haushaltsmanager.entities.template_booking.TemplateBooking;
 
 import java.util.UUID;
 

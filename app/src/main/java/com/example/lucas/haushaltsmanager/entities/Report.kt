@@ -4,9 +4,9 @@ import androidx.annotation.StringRes
 import com.example.lucas.haushaltsmanager.App.app
 import com.example.lucas.haushaltsmanager.R
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSum
-import com.example.lucas.haushaltsmanager.entities.Booking.ExpenseType.Companion.deposit
-import com.example.lucas.haushaltsmanager.entities.Booking.IBooking
-import com.example.lucas.haushaltsmanager.entities.Booking.ParentBooking
+import com.example.lucas.haushaltsmanager.entities.booking.ExpenseType.Companion.deposit
+import com.example.lucas.haushaltsmanager.entities.booking.IBooking
+import com.example.lucas.haushaltsmanager.entities.booking.ParentBooking
 import com.example.lucas.haushaltsmanager.entities.Color.Companion.white
 import java.util.*
 

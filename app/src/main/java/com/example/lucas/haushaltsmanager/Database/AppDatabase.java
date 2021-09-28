@@ -15,7 +15,7 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.TemplateBookingD
 import com.example.lucas.haushaltsmanager.entities.Account;
 import com.example.lucas.haushaltsmanager.entities.Category;
 import com.example.lucas.haushaltsmanager.entities.RecurringBooking;
-import com.example.lucas.haushaltsmanager.entities.TemplateBooking;
+import com.example.lucas.haushaltsmanager.entities.template_booking.TemplateBooking;
 
 @Database(entities = {Account.class, Category.class, TemplateBooking.class, RecurringBooking.class}, version = 1, exportSchema = false)
 @TypeConverters({Converters.class})
