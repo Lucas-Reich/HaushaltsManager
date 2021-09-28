@@ -4,16 +4,13 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import com.example.lucas.haushaltsmanager.entities.template_booking.TemplateBooking
-import com.example.lucas.haushaltsmanager.entities.template_booking.TemplateBookingAndCategory
+import com.example.lucas.haushaltsmanager.entities.template_booking.TemplateBookingWithoutCategory
 
 @Dao
 interface TemplateBookingDAO {
-    @Query("SELECT * FROM template_bookings")
-    fun getAll(): List<TemplateBooking>
-
-    @Query("SELECT * FROM template_bookings")
-    fun getTemplatesAndCategories(): List<TemplateBookingAndCategory>
-
     @Insert
-    fun insert(templateBooking: TemplateBooking);
+    fun insert(templateBooking: TemplateBookingWithoutCategory)
+
+    @Query("SELECT * FROM template_bookings")
+    fun getTemplatesAndCategories(): List<TemplateBooking>
 }

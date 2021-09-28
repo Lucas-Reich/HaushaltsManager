@@ -77,7 +77,7 @@ public class TemplatesActivity extends AbstractAppCompatActivity implements Recy
     }
 
     private List<IRecyclerItem> loadData() {
-        List<TemplateBooking> templateBookings = templateBookingsRepository.getAll();
+        List<TemplateBooking> templateBookings = templateBookingsRepository.getTemplatesAndCategories();
 
         return ItemCreator.createTemplateItems(templateBookings);
     }

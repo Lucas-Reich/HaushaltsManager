@@ -1,32 +1,39 @@
 package com.example.lucas.haushaltsmanager.entities.template_booking
 
 import android.os.Parcelable
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import com.example.lucas.haushaltsmanager.entities.booking.Booking
+import androidx.room.Embedded
+import androidx.room.Relation
+import com.example.lucas.haushaltsmanager.entities.Category
 import com.example.lucas.haushaltsmanager.entities.Price
-import com.example.lucas.haushaltsmanager.entities.UUIDParceler
 import kotlinx.parcelize.Parcelize
-import kotlinx.parcelize.WriteWith
 import java.util.*
 
 @Parcelize
-@Entity(tableName = "template_bookings")
-class TemplateBooking(
-    @PrimaryKey val id: @WriteWith<UUIDParceler> UUID,
-    val title: String,
-    val price: Price,
-    val date: Calendar,
-    @ColumnInfo(name = "category_id") val categoryId: UUID,
-    @ColumnInfo(name = "account_id") val accountId: UUID
-) : Parcelable {
-    constructor(template: Booking) : this(
-        UUID.randomUUID(),
-        template.title,
-        template.price,
-        template.date,
-        template.category.id,
-        template.accountId
+data class TemplateBooking(
+    @Embedded val templateBooking: TemplateBookingWithoutCategory,
+    @Relation(
+        parentColumn = "category_id",
+        entityColumn = "id"
     )
+    val category: Category,
+) : Parcelable {
+    fun getId(): UUID {
+        return templateBooking.id
+    }
+
+    fun getTitle(): String {
+        return templateBooking.title
+    }
+
+    fun getPrice(): Price {
+        return templateBooking.price
+    }
+
+    fun getDate(): Calendar {
+        return templateBooking.date
+    }
+
+    fun getAccountId(): UUID {
+        return templateBooking.accountId
+    }
 }

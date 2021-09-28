@@ -31,12 +31,13 @@ import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
 import com.example.lucas.haushaltsmanager.Utils.MoneyUtils;
 import com.example.lucas.haushaltsmanager.Views.SaveFloatingActionButton;
 import com.example.lucas.haushaltsmanager.entities.Account;
-import com.example.lucas.haushaltsmanager.entities.booking.Booking;
-import com.example.lucas.haushaltsmanager.entities.booking.ExpenseType;
 import com.example.lucas.haushaltsmanager.entities.Category;
 import com.example.lucas.haushaltsmanager.entities.Color;
 import com.example.lucas.haushaltsmanager.entities.Currency;
 import com.example.lucas.haushaltsmanager.entities.Price;
+import com.example.lucas.haushaltsmanager.entities.booking.Booking;
+import com.example.lucas.haushaltsmanager.entities.booking.ExpenseType;
+import com.example.lucas.haushaltsmanager.entities.template_booking.TemplateBooking;
 
 import java.util.Calendar;
 import java.util.List;
@@ -165,7 +166,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
 
                 break;
             case 2:
-                Booking template = data.getParcelableExtra("templateObj");
+                TemplateBooking template = data.getParcelableExtra("templateObj");
                 showExpenseOnScreen(template);
 
                 break;
@@ -230,10 +231,8 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
 
     private Account getExpenseAccount(UUID accountId) {
         try {
-
             return accountRepo.get(accountId);
         } catch (Exception e) {
-
             return mUserPreferences.getActiveAccount();
         }
     }
@@ -309,7 +308,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
         };
     }
 
-    private void showExpenseOnScreen(Booking expense) {
+    private void showExpenseOnScreen(TemplateBooking expense) {
         setPrice(expense.getPrice());
         setTitle(expense.getTitle());
         setCategory(expense.getCategory());
@@ -367,7 +366,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
     }
 
     private void setAccount(Account account) {
-        mExpense.setAccount(account);
+        mExpense.setAccountId(account.getId());
         mAccountTxt.setText(account.getName());
     }
 

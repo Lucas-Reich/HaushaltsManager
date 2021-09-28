@@ -5,17 +5,18 @@ import static org.junit.Assert.assertEquals;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.BookingItem.ExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.TemplateItem.TemplateItem;
-import com.example.lucas.haushaltsmanager.entities.booking.Booking;
-import com.example.lucas.haushaltsmanager.entities.booking.ExpenseType;
 import com.example.lucas.haushaltsmanager.entities.Category;
 import com.example.lucas.haushaltsmanager.entities.Color;
 import com.example.lucas.haushaltsmanager.entities.Price;
+import com.example.lucas.haushaltsmanager.entities.booking.ExpenseType;
+import com.example.lucas.haushaltsmanager.entities.template_booking.TemplateBookingWithoutCategory;
 import com.example.lucas.haushaltsmanager.entities.template_booking.TemplateBooking;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,7 +27,7 @@ public class TemplateBookingListInsertStrategyTest {
     @Test
     public void cannotAddWrongClass() {
         try {
-            insertStrategy.insert(new ExpenseItem(null, null), new ArrayList<IRecyclerItem>());
+            insertStrategy.insert(new ExpenseItem(null, null), new ArrayList<>());
 
             Assert.fail("ExpenseItem could be registered in TemplateList");
         } catch (IllegalArgumentException e) {
@@ -57,14 +58,16 @@ public class TemplateBookingListInsertStrategyTest {
     }
 
     private TemplateBooking getDummyTemplate() {
-        return new TemplateBooking(getDummyExpense());
+        return new TemplateBooking(getDummyExpense(), new Category("Category", Color.Companion.white(), ExpenseType.Companion.expense()));
     }
 
-    private Booking getDummyExpense() {
-        return new Booking(
-                "Ausgabe",
-                new Price(100, false),
-                new Category("Kategorie", Color.Companion.white(), ExpenseType.Companion.expense()),
+    private TemplateBookingWithoutCategory getDummyExpense() {
+        return new TemplateBookingWithoutCategory(
+                UUID.randomUUID(),
+                "title",
+                new Price(-105),
+                Calendar.getInstance(),
+                UUID.randomUUID(),
                 UUID.randomUUID()
         );
     }

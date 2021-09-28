@@ -11,11 +11,11 @@ import java.util.*
 @Parcelize
 class Booking(
     private val id: UUID,
-    private val title: String,
-    private val price: Price,
+    private var title: String,
+    private var price: Price,
     private var date: Calendar,
-    val category: Category,
-    val accountId: UUID
+    var category: Category,
+    var accountId: UUID
 ) : IBooking, Parcelable {
     constructor(
         title: String,
@@ -56,8 +56,16 @@ class Booking(
         return title
     }
 
+    fun setTitle(title: String) {
+        this.title = title
+    }
+
     override fun getPrice(): Price {
         return price
+    }
+
+    fun setPrice(price: Price) {
+        this.price = price
     }
 
     fun getDisplayableDateTime(): String {

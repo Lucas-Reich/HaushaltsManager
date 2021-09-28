@@ -15,9 +15,9 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.TemplateBookingD
 import com.example.lucas.haushaltsmanager.entities.Account;
 import com.example.lucas.haushaltsmanager.entities.Category;
 import com.example.lucas.haushaltsmanager.entities.RecurringBooking;
-import com.example.lucas.haushaltsmanager.entities.template_booking.TemplateBooking;
+import com.example.lucas.haushaltsmanager.entities.template_booking.TemplateBookingWithoutCategory;
 
-@Database(entities = {Account.class, Category.class, TemplateBooking.class, RecurringBooking.class}, version = 1, exportSchema = false)
+@Database(entities = {Account.class, Category.class, TemplateBookingWithoutCategory.class, RecurringBooking.class}, version = 1, exportSchema = false)
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
     private static volatile AppDatabase DATABASE = null;

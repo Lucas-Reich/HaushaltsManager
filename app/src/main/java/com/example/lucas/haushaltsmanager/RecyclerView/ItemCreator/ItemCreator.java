@@ -6,8 +6,8 @@ import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.Strategies.Cr
 import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.Strategies.CreateReportItemsStrategy;
 import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.Strategies.CreateTemplateItemsStrategy;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
-import com.example.lucas.haushaltsmanager.entities.booking.IBooking;
 import com.example.lucas.haushaltsmanager.entities.Category;
+import com.example.lucas.haushaltsmanager.entities.booking.IBooking;
 import com.example.lucas.haushaltsmanager.entities.template_booking.TemplateBooking;
 
 import java.io.File;

@@ -3,8 +3,6 @@ package com.example.lucas.haushaltsmanager.RecyclerView.Items.TemplateItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.example.lucas.haushaltsmanager.App.app;
-import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.AbstractViewHolder;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
@@ -13,8 +11,6 @@ import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
 import com.example.lucas.haushaltsmanager.entities.Category;
 import com.example.lucas.haushaltsmanager.entities.Price;
 import com.example.lucas.haushaltsmanager.entities.template_booking.TemplateBooking;
-
-import java.util.UUID;
 
 public class TemplateViewHolder extends AbstractViewHolder {
     // TODO: Diese Klasse ist fast die gleiche wie ExpenseItemViewHolder.
@@ -42,14 +38,10 @@ public class TemplateViewHolder extends AbstractViewHolder {
 
         TemplateBooking templateBooking = (TemplateBooking) item.getContent();
 
-        setRoundedTextView(getCategory(templateBooking.getCategoryId()));
+        setRoundedTextView(templateBooking.getCategory());
         setTitle(templateBooking.getTitle());
         setPrice(templateBooking.getPrice());
         setUser("");
-    }
-
-    private Category getCategory(UUID categoryId) {
-        return AppDatabase.getDatabase(app.getContext()).categoryDAO().get(categoryId);
     }
 
     private void setRoundedTextView(Category category) {
