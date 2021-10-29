@@ -1,12 +1,12 @@
 package com.example.lucas.haushaltsmanager.entities;
 
-import org.junit.Test;
-
-import java.util.Locale;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
+
+import java.util.Locale;
 
 public class PriceTest {
 
@@ -14,14 +14,12 @@ public class PriceTest {
     public void testCreatePrice() {
         // Arrange
         double expectedValue = 100;
-        boolean expectedIsNegative = false;
 
         // Act
-        Price price = new Price(expectedValue, expectedIsNegative);
+        Price price = new Price(expectedValue);
 
         // Assert
-        assertEquals(expectedValue, price.getSignedValue(), 0);
-        assertEquals(expectedIsNegative, price.isNegative());
+        assertEquals(expectedValue, price.getPrice(), 0);
     }
 
     @Test
@@ -33,7 +31,7 @@ public class PriceTest {
         Price price = new Price(expectedValue);
 
         // Assert
-        assertEquals(expectedValue, price.getSignedValue(), 0);
+        assertEquals(expectedValue, price.getPrice(), 0);
         assertFalse(price.isNegative());
     }
 
@@ -46,7 +44,7 @@ public class PriceTest {
         Price price = new Price(expectedValue);
 
         // Assert
-        assertEquals(expectedValue, price.getSignedValue(), 0);
+        assertEquals(expectedValue, price.getPrice(), 0);
         assertTrue(price.isNegative());
     }
 
@@ -56,7 +54,7 @@ public class PriceTest {
         Price price = new Price("", Locale.GERMANY);
 
         // Assert
-        assertEquals(0, price.getUnsignedValue(), 0);
+        assertEquals(0, price.getAbsoluteValue(), 0);
     }
 
     @Test
@@ -65,7 +63,7 @@ public class PriceTest {
         Price price = new Price("10.000", Locale.GERMANY);
 
         // Assert
-        assertEquals(10000, price.getUnsignedValue(), 0);
+        assertEquals(10000, price.getAbsoluteValue(), 0);
         assertFalse(price.isNegative());
     }
 
@@ -75,7 +73,7 @@ public class PriceTest {
         Price price = new Price("-10.000", Locale.GERMANY);
 
         // Assert
-        assertEquals(10000, price.getUnsignedValue(), 0);
+        assertEquals(10000, price.getAbsoluteValue(), 0);
         assertTrue(price.isNegative());
     }
 
@@ -85,6 +83,6 @@ public class PriceTest {
         Price price = new Price("I am a not valid Price", Locale.GERMANY);
 
         // Assert
-        assertEquals(0, price.getUnsignedValue(), 0);
+        assertEquals(0, price.getAbsoluteValue(), 0);
     }
 }

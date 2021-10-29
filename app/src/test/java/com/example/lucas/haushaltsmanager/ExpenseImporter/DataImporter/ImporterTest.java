@@ -134,8 +134,9 @@ public class ImporterTest {
     public void returnsExpectedRequiredFields() {
         // Set Up
         IImporter importer = new Importer(mock(IFileReader.class), new ImportBookingStrategy(
-                new BookingParser(new PriceParser(), new CategoryParser(), new DateParser()),
+                new BookingParser(new PriceParser(), new DateParser()),
                 new AccountParser(),
+                new CategoryParser(),
                 mock(ISaver.class)
         ));
 

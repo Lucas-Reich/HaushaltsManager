@@ -48,7 +48,7 @@ public class PriceParserTest {
         Price price = parser.parse(line, createPriceMappingList());
 
         assertTrue(price.isNegative());
-        assertEquals(-100D, price.getSignedValue(), 0);
+        assertEquals(-100D, price.getPrice(), 0);
     }
 
     @Test
@@ -58,7 +58,7 @@ public class PriceParserTest {
         Price price = parser.parse(line, createPriceMappingList());
 
         assertFalse(price.isNegative());
-        assertEquals(100D, price.getSignedValue(), 0);
+        assertEquals(100D, price.getPrice(), 0);
     }
 
     @Test
@@ -68,7 +68,7 @@ public class PriceParserTest {
         Price price = parser.parse(line, createPriceMappingList());
 
         assertFalse(price.isNegative());
-        assertEquals(100D, price.getSignedValue(), 0);
+        assertEquals(100D, price.getPrice(), 0);
     }
 
     @Test

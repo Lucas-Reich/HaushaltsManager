@@ -6,13 +6,10 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.work.WorkerParameters;
 
-import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookingDAO;
-import com.example.lucas.haushaltsmanager.entities.booking.Booking;
-import com.example.lucas.haushaltsmanager.entities.Category;
 import com.example.lucas.haushaltsmanager.entities.RecurringBooking;
+import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 
 import java.util.UUID;
 
@@ -61,18 +58,14 @@ public class RecurringBookingWorker extends AbstractRecurringWorker {
     }
 
     private void saveBooking(RecurringBooking recurringBooking) {
-        new ExpenseRepository(getApplicationContext()).insert(new Booking(
+        AppDatabase.getDatabase(getApplicationContext()).bookingDAO().insert(new Booking(
                 UUID.randomUUID(),
                 recurringBooking.getTitle(),
                 recurringBooking.getPrice(),
                 recurringBooking.getDate(),
-                getCategory(recurringBooking.getCategoryId()),
+                recurringBooking.getCategoryId(),
                 recurringBooking.getAccountId()
         ));
-    }
-
-    private Category getCategory(UUID categoryId) {
-        return AppDatabase.getDatabase(app.getContext()).categoryDAO().get(categoryId);
     }
 
     private UUID extractIdFromParameters(WorkerParameters workerParams) {

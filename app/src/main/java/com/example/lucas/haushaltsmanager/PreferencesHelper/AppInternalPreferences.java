@@ -29,8 +29,9 @@ public class AppInternalPreferences {
     }
 
     public void setBackupDirectory(Directory dir) {
-        if (!dir.exists())
+        if (!dir.exists()) {
             dir.mkdir();
+        }
 
         mPreferences.edit().putString(BACKUP_DIRECTORY_KEY, dir.toString()).apply();
     }

@@ -4,15 +4,16 @@ import android.content.Context;
 import android.util.Log;
 import android.view.View;
 
-import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
+import com.example.lucas.haushaltsmanager.Database.AppDatabase;
+import com.example.lucas.haushaltsmanager.Database.Repositories.BookingDAO;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.AddChildToChildException;
-import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.BookingItem.ExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBookingItem.ChildExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ParentBookingItem.ParentBookingItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
+import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 import com.example.lucas.haushaltsmanager.entities.booking.ParentBooking;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -24,14 +25,14 @@ public class RevertExpenseDeletionSnackbar {
 
     private final List<IRecyclerItem> mItems;
     private final ChildExpenseRepository mChildExpenseRepo;
-    private final ExpenseRepository mExpenseRepo;
+    private final BookingDAO bookingRepository;
     private String mSnackbarMessage;
     private OnExpenseRestoredListener mBetterListener;
 
     public RevertExpenseDeletionSnackbar(Context context) {
         mItems = new ArrayList<>();
 
-        mExpenseRepo = new ExpenseRepository(context);
+        bookingRepository = AppDatabase.getDatabase(context).bookingDAO();
         mChildExpenseRepo = new ChildExpenseRepository(context);
 
         mSnackbarMessage = "";
@@ -56,15 +57,12 @@ public class RevertExpenseDeletionSnackbar {
     }
 
     private View.OnClickListener getOnUndoClickListener() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                for (IRecyclerItem item : mItems) {
-                    if (item instanceof ChildExpenseItem) {
-                        restoreChildExpenses((ChildExpenseItem) item);
-                    } else if (item instanceof ExpenseItem) {
-                        restoreExpense((ExpenseItem) item);
-                    }
+        return v -> {
+            for (IRecyclerItem item : mItems) {
+                if (item instanceof ChildExpenseItem) {
+                    restoreChildExpenses((ChildExpenseItem) item);
+                } else if (item instanceof ExpenseItem) {
+                    restoreExpense((ExpenseItem) item);
                 }
             }
         };
@@ -74,7 +72,7 @@ public class RevertExpenseDeletionSnackbar {
         Booking expense = item.getContent();
 
         Log.i(TAG, "Restoring ParentExpense " + expense.getTitle());
-        mExpenseRepo.insert(expense);
+        bookingRepository.insert(expense);
 
         if (mBetterListener != null) {
             mBetterListener.onExpenseRestored(new ExpenseItem(expense, item.getParent()));

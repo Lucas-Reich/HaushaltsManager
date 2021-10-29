@@ -40,11 +40,4 @@ public class DatabaseManager {
 
         return mDatabase;
     }
-
-    public synchronized void closeDatabase() {
-        mOpenCounter -= 1;
-        if (mOpenCounter == 0) {
-            mDatabase.close();
-        }
-    }
 }

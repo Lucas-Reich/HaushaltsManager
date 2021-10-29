@@ -5,8 +5,10 @@ import android.os.Bundle;
 import android.widget.Button;
 
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
+import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.Database.Repositories.AccountDAO;
+import com.example.lucas.haushaltsmanager.Database.Repositories.BookingDAO;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
@@ -19,6 +21,7 @@ import com.example.lucas.haushaltsmanager.Views.SaveFloatingActionButton;
 import com.example.lucas.haushaltsmanager.entities.Account;
 import com.example.lucas.haushaltsmanager.entities.Currency;
 import com.example.lucas.haushaltsmanager.entities.Price;
+import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 
 import java.util.Locale;
 
@@ -30,7 +33,9 @@ public class CreateAccountActivity extends AbstractAppCompatActivity implements 
 
     private Button mAccountNameBtn, mAccountBalanceBtn, mAccountCurrencyBtn;
     private Account mAccount;
+    private Price initialAccountBalance;
     private AccountDAO accountRepo;
+    private BookingDAO bookingRepository;
     private AddAndSetDefaultDecorator addAndSetDefaultDecorator;
 
     @Override
@@ -39,6 +44,9 @@ public class CreateAccountActivity extends AbstractAppCompatActivity implements 
         setContentView(R.layout.activity_new_account);
 
         accountRepo = AppDatabase.getDatabase(this).accountDAO();
+        bookingRepository = AppDatabase.getDatabase(this).bookingDAO();
+
+        initialAccountBalance = new Price(0);
 
         mAccountNameBtn = findViewById(R.id.new_account_name);
         mAccountBalanceBtn = findViewById(R.id.new_account_balance);
@@ -74,17 +82,18 @@ public class CreateAccountActivity extends AbstractAppCompatActivity implements 
             basicDialog.show(getFragmentManager(), "create_account_name");
         });
 
-        mAccountBalanceBtn.setHint(MoneyUtils.formatHumanReadable(mAccount.getPrice(), Locale.getDefault()));
+        mAccountBalanceBtn.setHint(MoneyUtils.formatHumanReadable(mAccount.getBalance(), Locale.getDefault()));
         mAccountBalanceBtn.setOnClickListener(v -> {
             Bundle args = new Bundle();
             args.putString(PriceInputDialog.TITLE, getString(R.string.set_Account_balance));
-            args.putParcelable(PriceInputDialog.HINT, mAccount.getPrice());
+            args.putParcelable(PriceInputDialog.HINT, mAccount.getBalance());
 
             PriceInputDialog priceInputDialog = new PriceInputDialog();
             priceInputDialog.setArguments(args);
             priceInputDialog.setOnPriceSelectedListener(price -> {
-                mAccount.setPrice(price);
-                mAccountBalanceBtn.setText(MoneyUtils.formatHumanReadable(mAccount.getPrice(), Locale.getDefault()));
+
+                initialAccountBalance = price;
+                mAccountBalanceBtn.setText(MoneyUtils.formatHumanReadable(mAccount.getBalance(), Locale.getDefault()));
 
                 enableFabIfAccountIsSaveable(mAccount);
             });
@@ -108,9 +117,19 @@ public class CreateAccountActivity extends AbstractAppCompatActivity implements 
         switch (bundle.getString(INTENT_MODE, INTENT_MODE_CREATE)) {
             case INTENT_MODE_CREATE:
 
-                accountRepo.insert(mAccount);
+                AppDatabase.getDatabase(this).runInTransaction(() -> {
+                    bookingRepository.insert(new Booking(
+                            getString(R.string.initial_account_balance_booking_name),
+                            initialAccountBalance,
+                            app.unassignedCategoryId, // TODO: Which category to take
+                            mAccount.getId()
+                    ));
 
-                addAndSetDefaultDecorator.addAccount(mAccount);
+                    accountRepo.insert(mAccount);
+
+                    addAndSetDefaultDecorator.addAccount(mAccount);
+                });
+
                 break;
             case INTENT_MODE_UPDATE:
 

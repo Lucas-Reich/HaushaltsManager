@@ -31,7 +31,6 @@ public class BookingParserTest {
     public void setUp() {
         parser = new BookingParser(
                 new PriceParser(),
-                new CategoryParser(),
                 new DateParser()
         );
     }

@@ -19,13 +19,11 @@ import java.util.UUID;
 public class BookingParser implements IParser<Booking> {
     public static final IRequiredField BOOKING_TITLE_KEY = new Title();
 
-    private PriceParser priceParser;
-    private CategoryParser categoryParser;
-    private DateParser dateParser;
+    private final PriceParser priceParser;
+    private final DateParser dateParser;
 
-    public BookingParser(PriceParser priceParser, CategoryParser categoryParser, DateParser dateParser) {
+    public BookingParser(PriceParser priceParser, DateParser dateParser) {
         this.priceParser = priceParser;
-        this.categoryParser = categoryParser;
         this.dateParser = dateParser;
     }
 
@@ -34,7 +32,6 @@ public class BookingParser implements IParser<Booking> {
         return new ArrayList<IRequiredField>() {{
             add(BOOKING_TITLE_KEY);
             addAll(priceParser.getRequiredFields());
-            addAll(categoryParser.getRequiredFields());
             addAll(dateParser.getRequiredFields());
         }};
     }
@@ -48,10 +45,8 @@ public class BookingParser implements IParser<Booking> {
                 bookingTitle,
                 priceParser.parse(line, mapping),
                 dateParser.parse(line, mapping),
-                categoryParser.parse(line, mapping),
-                "",
                 UUID.randomUUID(),
-                Booking.EXPENSE_TYPES.NORMAL_EXPENSE
+                UUID.randomUUID()
         );
     }
 

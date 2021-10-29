@@ -1,11 +1,11 @@
 package com.example.lucas.haushaltsmanager.Utils;
 
+import androidx.annotation.Nullable;
+
 import com.example.lucas.haushaltsmanager.entities.Price;
 
 import java.text.NumberFormat;
 import java.util.Locale;
-
-import javax.annotation.Nullable;
 
 public class MoneyUtils {
     private static final String DEFAULT_PRICE = "-,--";
@@ -17,7 +17,7 @@ public class MoneyUtils {
 
         NumberFormat formatter = getDefaultFormatter(locale);
 
-        return formatter.format(price.getSignedValue());
+        return formatter.format(price.getPrice());
     }
 
     private static NumberFormat getDefaultFormatter(Locale locale) {
@@ -33,6 +33,6 @@ public class MoneyUtils {
             return true;
         }
 
-        return 0 == price.getUnsignedValue();
+        return 0 == price.getAbsoluteValue();
     }
 }

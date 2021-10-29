@@ -271,7 +271,7 @@ public class RecurringBookingTest {
                 frequency,
                 booking.getTitle(),
                 booking.getPrice(),
-                booking.getCategory().getId(),
+                booking.getCategoryId(),
                 booking.getAccountId()
         );
     }
@@ -286,9 +286,9 @@ public class RecurringBookingTest {
         return new Booking(
                 UUID.randomUUID(),
                 "Ausgabe",
-                new Price(150, true),
+                new Price(-150),
                 getDate(1, Calendar.JANUARY, 2019),
-                new Category("Kategorie", Color.Companion.black(), ExpenseType.Companion.expense()),
+                UUID.randomUUID(),
                 UUID.randomUUID()
         );
     }

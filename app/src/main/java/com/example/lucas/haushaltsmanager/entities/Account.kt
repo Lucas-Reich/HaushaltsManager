@@ -12,7 +12,7 @@ import java.util.*
 class Account(
     @PrimaryKey val id: @WriteWith<UUIDParceler> UUID,
     var name: String,
-    var price: Price
+    val balance: Price
 ) : Parcelable {
 
     constructor(accountName: String, price: Price) : this(UUID.randomUUID(), accountName, price)
@@ -26,17 +26,15 @@ class Account(
             return false
         }
 
-        return name == other.name && id == other.id
+        return name == other.name
+                && id == other.id
+                && balance == other.balance
     }
 
     override fun hashCode(): Int {
         var result = id.hashCode()
         result = 31 * result + name.hashCode()
-        result = 31 * result + price.hashCode()
+        result = 31 * result + balance.hashCode()
         return result
-    }
-
-    override fun toString(): String {
-        return name
     }
 }

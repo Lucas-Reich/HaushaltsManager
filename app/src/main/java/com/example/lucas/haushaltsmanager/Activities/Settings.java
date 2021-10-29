@@ -141,7 +141,7 @@ public class Settings extends AbstractAppCompatActivity {
             timePicker.createBuilder(Settings.this);
             timePicker.setTitle(getString(R.string.choose_time));
             timePicker.setContent(Arrays.asList(getTimeArray()), -1);
-            timePicker.setOnEntrySelectedListener(time -> setReminderTime(Time.Companion.fromString((String) time)));
+            timePicker.setOnEntrySelectedListener(time -> setReminderTime(Time.fromString((String) time)));
             timePicker.show(getFragmentManager(), "settings_choose_notification_time");
         });
 

@@ -9,6 +9,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.example.lucas.haushaltsmanager.entities.Account;
+import com.example.lucas.haushaltsmanager.entities.Category;
 import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.DataImporter.ImportStrategies.ImportBookingStrategy;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Delimiter.Comma;
@@ -43,8 +44,9 @@ public class ImportBookingStrategyTest {
         mockSaver = mock(ISaver.class);
 
         strategy = new ImportBookingStrategy(
-                new BookingParser(new PriceParser(), new CategoryParser(), new DateParser()),
+                new BookingParser(new PriceParser(), new DateParser()),
                 new AccountParser(),
+                new CategoryParser(),
                 mockSaver
         );
     }
@@ -101,7 +103,7 @@ public class ImportBookingStrategyTest {
 
         // Assert
         verify(mockSaver, times(1))
-                .persist(any(Booking.class), any(Account.class));
+                .persist(any(Booking.class), any(Account.class), any(Category.class));
     }
 
     @Test

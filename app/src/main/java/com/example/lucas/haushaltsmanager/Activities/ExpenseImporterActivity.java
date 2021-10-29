@@ -78,8 +78,9 @@ public class ExpenseImporterActivity extends AbstractAppCompatActivity implement
 
     private Importer buildNewImporter(IFileReader fileReader) {
         return new Importer(fileReader, new ImportBookingStrategy(
-                new BookingParser(new PriceParser(), new CategoryParser(), new DateParser()),
+                new BookingParser(new PriceParser(), new DateParser()),
                 new AccountParser(),
+                new CategoryParser(),
                 Saver.create(this)
         ));
     }

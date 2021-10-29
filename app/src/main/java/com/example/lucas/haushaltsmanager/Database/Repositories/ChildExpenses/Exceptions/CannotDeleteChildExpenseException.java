@@ -7,7 +7,7 @@ public class CannotDeleteChildExpenseException extends Exception {
         super(message);
     }
 
-    public static CannotDeleteChildExpenseException RelatedExpenseNotFound(Booking childExpense) {
+    public static CannotDeleteChildExpenseException relatedExpenseNotFound(Booking childExpense) {
         return new CannotDeleteChildExpenseException(String.format("Could not find Parent for Child Booking %s.", childExpense.getTitle()));
     }
 }

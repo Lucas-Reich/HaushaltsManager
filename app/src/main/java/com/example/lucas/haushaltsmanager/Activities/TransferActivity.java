@@ -12,19 +12,19 @@ import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.Database.Repositories.AccountDAO;
+import com.example.lucas.haushaltsmanager.Database.Repositories.BookingDAO;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.CategoryDAO;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
 import com.example.lucas.haushaltsmanager.Dialogs.DatePickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ErrorAlertDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.SingleChoiceDialog;
+import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.entities.Account;
-import com.example.lucas.haushaltsmanager.entities.booking.Booking;
-import com.example.lucas.haushaltsmanager.entities.booking.ParentBooking;
-import com.example.lucas.haushaltsmanager.entities.Category;
 import com.example.lucas.haushaltsmanager.entities.Currency;
 import com.example.lucas.haushaltsmanager.entities.Price;
-import com.example.lucas.haushaltsmanager.R;
+import com.example.lucas.haushaltsmanager.entities.booking.Booking;
+import com.example.lucas.haushaltsmanager.entities.booking.ParentBooking;
 
 import java.text.DateFormat;
 import java.util.Calendar;
@@ -43,7 +43,6 @@ public class TransferActivity extends AbstractAppCompatActivity {
     //Einnahme
     private Booking mToExpense;
     private AccountDAO accountRepo;
-    private CategoryDAO categoryRepo;
     private ExpenseRepository mBookingRepo;
 
     @Override
@@ -65,7 +64,7 @@ public class TransferActivity extends AbstractAppCompatActivity {
                         new Currency().getSymbol())
                 );
 
-                setToExpense(price.getUnsignedValue());
+                setToExpense(price.getAbsoluteValue());
             });
             expenseInput.show(getFragmentManager(), "transfers_amount_input");
         });
@@ -147,22 +146,21 @@ public class TransferActivity extends AbstractAppCompatActivity {
         setContentView(R.layout.activity_transfers);
 
         accountRepo = AppDatabase.getDatabase(this).accountDAO();
-        categoryRepo = AppDatabase.getDatabase(this).categoryDAO();
         mBookingRepo = new ExpenseRepository(this);
 
         mCalendar = Calendar.getInstance();
 
         mFromExpense = new Booking(
                 "",
-                new Price(0, true),
-                getTransferCategory(),
+                new Price(0),
+                app.transferCategoryId,
                 UUID.randomUUID()
         );
 
         mToExpense = new Booking(
                 "",
-                new Price(0, true),
-                getTransferCategory(),
+                new Price(0),
+                app.transferCategoryId,
                 UUID.randomUUID()
         );
 
@@ -186,10 +184,6 @@ public class TransferActivity extends AbstractAppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    private Category getTransferCategory() {
-        return categoryRepo.get(app.transferCategoryId);
     }
 
     /**
@@ -234,9 +228,6 @@ public class TransferActivity extends AbstractAppCompatActivity {
     }
 
     private void setToExpense(double newPrice) {
-        mToExpense.setPrice(new Price(
-                newPrice,
-                false
-        ));
+        mToExpense.setPrice(new Price(newPrice));
     }
 }

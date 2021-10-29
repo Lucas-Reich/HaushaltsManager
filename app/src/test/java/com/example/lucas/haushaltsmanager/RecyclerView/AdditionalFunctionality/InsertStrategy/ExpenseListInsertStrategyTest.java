@@ -8,12 +8,9 @@ import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBookin
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ParentBookingItem.ParentBookingItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
-import com.example.lucas.haushaltsmanager.entities.booking.Booking;
-import com.example.lucas.haushaltsmanager.entities.booking.ExpenseType;
-import com.example.lucas.haushaltsmanager.entities.booking.ParentBooking;
-import com.example.lucas.haushaltsmanager.entities.Category;
-import com.example.lucas.haushaltsmanager.entities.Color;
 import com.example.lucas.haushaltsmanager.entities.Price;
+import com.example.lucas.haushaltsmanager.entities.booking.Booking;
+import com.example.lucas.haushaltsmanager.entities.booking.ParentBooking;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -153,8 +150,8 @@ public class ExpenseListInsertStrategyTest {
     private Booking createDummyExpense() {
         return new Booking(
                 "Ausgabe",
-                new Price(100, false),
-                new Category("Kategorie", new Color(Color.WHITE), ExpenseType.Companion.expense()),
+                new Price(100),
+                UUID.randomUUID(),
                 UUID.randomUUID()
         );
     }

@@ -19,7 +19,7 @@ public class BackupWorker extends AbstractRecurringWorker {
 
     public static final String TITLE = "title";
 
-    private Backup backup;
+    private final Backup backup;
 
     public BackupWorker(@NonNull Context context, @NonNull WorkerParameters workerParameters) {
         super(context, workerParameters);

@@ -60,7 +60,7 @@ public class AccountAdapter extends ArrayAdapter<Account> {
 
         viewHolder.account_chk.setChecked(mAccountStates.get(account));
         viewHolder.account_name.setText(account.getName());
-        viewHolder.account_balance.setText(MoneyUtils.formatHumanReadable(account.getPrice(), Locale.getDefault()));
+        viewHolder.account_balance.setText(MoneyUtils.formatHumanReadable(account.getBalance(), Locale.getDefault()));
         viewHolder.account_overflow_menu.setOnClickListener(new OnAccountOverflowSelectedListener(getContext(), account));
 
         return convertView;

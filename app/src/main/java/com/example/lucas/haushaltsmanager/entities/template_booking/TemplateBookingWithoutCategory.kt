@@ -26,7 +26,7 @@ class TemplateBookingWithoutCategory(
         template.title,
         template.price,
         template.date,
-        template.category.id,
+        template.categoryId,
         template.accountId
     )
 }

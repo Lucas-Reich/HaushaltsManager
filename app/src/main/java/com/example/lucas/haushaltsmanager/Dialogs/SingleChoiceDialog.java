@@ -21,8 +21,9 @@ public class SingleChoiceDialog<T> extends DialogFragment {
 
         builder.setPositiveButton(R.string.btn_choose, (dialogInterface, i) -> {
 
-            if (mCallback != null && mSelectedEntry != null)
+            if (mCallback != null && mSelectedEntry != null) {
                 mCallback.onPositiveClick(mSelectedEntry);
+            }
 
             dismiss();
         });

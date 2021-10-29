@@ -244,12 +244,10 @@ public class RecyclerViewItemHolderTest {
         return new Booking(
                 UUID.randomUUID(),
                 "Ich bin eine Ausgabe",
-                new Price(105, true),
+                new Price(-105),
                 expenseDate,
-                new Category("Kategorie", Color.Companion.black(), ExpenseType.Companion.expense()),
-                "",
                 UUID.randomUUID(),
-                Booking.EXPENSE_TYPES.NORMAL_EXPENSE
+                UUID.randomUUID()
         );
     }
 

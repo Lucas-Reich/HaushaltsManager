@@ -28,6 +28,7 @@ class RecurringBooking(
     ) : this(UUID.randomUUID(), date, endDate, frequency, title, price, categoryId, accountId)
 
     companion object {
+        @JvmStatic
         fun createNextRecurringBooking(recurringBooking: RecurringBooking): RecurringBooking? {
             val start = recurringBooking.getNextOccurrence();
             if (start.after(recurringBooking.endDate)) {

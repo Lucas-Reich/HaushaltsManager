@@ -8,7 +8,7 @@ public class CannotDeleteExpenseException extends CouldNotDeleteEntityException 
         super(message, null);
     }
 
-    public static CannotDeleteExpenseException BookingAttachedToChildException(IBooking expense) {
+    public static CannotDeleteExpenseException bookingAttachedToChildException(IBooking expense) {
         return new CannotDeleteExpenseException(String.format("Booking %s is attached to a child expense and cannot be deleted.", expense.getTitle()));
     }
 }

@@ -8,18 +8,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.Database.Repositories.AccountDAO;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.ExpenseNotFoundException;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.BookingDAO;
+import com.example.lucas.haushaltsmanager.Database.Repositories.CategoryDAO;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.AddChildToChildException;
-import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.ChildExpenseNotFoundException;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.DatePickerDialog;
@@ -32,11 +30,9 @@ import com.example.lucas.haushaltsmanager.Utils.MoneyUtils;
 import com.example.lucas.haushaltsmanager.Views.SaveFloatingActionButton;
 import com.example.lucas.haushaltsmanager.entities.Account;
 import com.example.lucas.haushaltsmanager.entities.Category;
-import com.example.lucas.haushaltsmanager.entities.Color;
 import com.example.lucas.haushaltsmanager.entities.Currency;
 import com.example.lucas.haushaltsmanager.entities.Price;
 import com.example.lucas.haushaltsmanager.entities.booking.Booking;
-import com.example.lucas.haushaltsmanager.entities.booking.ExpenseType;
 import com.example.lucas.haushaltsmanager.entities.template_booking.TemplateBooking;
 
 import java.util.Calendar;
@@ -57,9 +53,10 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
 
     private UserSettingsPreferences mUserPreferences;
 
-    private ExpenseRepository mExpenseRepo;
+    private BookingDAO bookingRepository;
     private ChildExpenseRepository mChildExpenseRepo;
     private AccountDAO accountRepo;
+    private CategoryDAO categoryRepository;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -68,9 +65,10 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
 
         mUserPreferences = new UserSettingsPreferences(this);
 
-        mExpenseRepo = new ExpenseRepository(this);
+        bookingRepository = AppDatabase.getDatabase(this).bookingDAO();
         mChildExpenseRepo = new ChildExpenseRepository(this);
         accountRepo = AppDatabase.getDatabase(this).accountDAO();
+        categoryRepository = AppDatabase.getDatabase(this).categoryDAO();
 
         initializeToolbar();
 
@@ -117,7 +115,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
             titleDialog.show(getFragmentManager(), "expense_screen_title");
         });
 
-        mCategoryTxt.setHint(mExpense.getCategory().getName());
+        mCategoryTxt.setHint(categoryRepository.get(mExpense.getCategoryId()).getName());
         mCategoryTxt.setOnClickListener(v -> {
             Intent categoryIntent = new Intent(ExpenseScreen.this, CategoryList.class);
             startActivityForResult(categoryIntent, 1);
@@ -146,9 +144,9 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
         saveFab.setOnClickListener(getOnSaveClickListener());
 
         showExpenditureType();
-        mIncomeBtn.setOnClickListener(v -> setPrice(new Price(mExpense.getUnsignedPrice(), false)));
+        mIncomeBtn.setOnClickListener(v -> setPrice(new Price(mExpense.getUnsignedPrice())));
 
-        mExpenseBtn.setOnClickListener(v -> setPrice(new Price(mExpense.getUnsignedPrice(), true)));
+        mExpenseBtn.setOnClickListener(v -> setPrice(new Price(-mExpense.getUnsignedPrice())));
 
         enableFabIfBookingIsSaveable();
     }
@@ -211,16 +209,10 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
             case INTENT_MODE_ADD_CHILD:
                 mParentBooking = (Booking) bundle.getParcelable(INTENT_BOOKING, null);
             case INTENT_MODE_CREATE_BOOKING:
-                Category category = new Category(
-                        getString(R.string.no_name),
-                        Color.Companion.black(),
-                        ExpenseType.Companion.expense()
-                );
-
                 mExpense = new Booking(
                         getString(R.string.no_name),
-                        new Price(0D, true),
-                        category,
+                        new Price(0D),
+                        UUID.randomUUID(),
                         mUserPreferences.getActiveAccount().getId()
                 );
                 break;
@@ -264,25 +256,8 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
 
                 switch (bundle.getString(INTENT_MODE, INTENT_MODE_CREATE_BOOKING)) {
                     case INTENT_MODE_UPDATE_PARENT:
-
-                        try {
-                            Log.d(TAG, "1 Updating expense with id " + mExpense.getId());
-                            mExpenseRepo.update(mExpense);
-                        } catch (ExpenseNotFoundException e) {
-
-                            Toast.makeText(ExpenseScreen.this, R.string.could_not_update_booking, Toast.LENGTH_SHORT).show();
-                            // TODO: Was soll passieren, wenn die zu updatende Buchung nicht gefunden werden konnte?
-                        }
-                        break;
                     case INTENT_MODE_UPDATE_CHILD:
-
-                        try {
-                            mChildExpenseRepo.update(mExpense);
-                        } catch (ChildExpenseNotFoundException e) {
-
-                            Toast.makeText(ExpenseScreen.this, R.string.could_not_update_booking, Toast.LENGTH_SHORT).show();
-                            // TODO: Was soll passieren, wenn die zu updatende KindBuchung nicht gefunden werden konnte?
-                        }
+                        bookingRepository.update(mExpense);
                         break;
                     case INTENT_MODE_ADD_CHILD:
 
@@ -295,8 +270,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
                         }
                         break;
                     case INTENT_MODE_CREATE_BOOKING:
-
-                        mExpenseRepo.insert(mExpense);
+                        bookingRepository.insert(mExpense);
                         break;
                     default:
                         throw new UnsupportedOperationException("Could not handle intent mode " + bundle.getString(INTENT_MODE, null));
@@ -344,11 +318,11 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
     }
 
     private void setCategory(Category category) {
-        mExpense.setCategory(category);
-        mCategoryTxt.setText(mExpense.getCategory().getName());
+        mExpense.setCategoryId(category.getId());
+        mCategoryTxt.setText(category.getName());
 
         // Es kann sein, dass der DefaultExpenseType der Kategorie anders ist, als der der Buchung, von daher muss hier der Preis neu gesetzt werden
-        setPrice(new Price(mExpense.getPrice().getUnsignedValue(), mExpense.getCategory().getDefaultExpenseType().getType()));
+        setPrice(Price.fromValueWithCategory(mExpense.getPrice().getAbsoluteValue(), category));
 
         enableFabIfBookingIsSaveable();
     }

@@ -6,14 +6,15 @@ import android.widget.TextView;
 import androidx.annotation.ColorRes;
 
 import com.example.lucas.haushaltsmanager.App.app;
-import com.example.lucas.haushaltsmanager.entities.Category;
-import com.example.lucas.haushaltsmanager.entities.booking.Booking;
-import com.example.lucas.haushaltsmanager.entities.Price;
+import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.AbstractViewHolder;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.Views.MoneyTextView;
 import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
+import com.example.lucas.haushaltsmanager.entities.Category;
+import com.example.lucas.haushaltsmanager.entities.Price;
+import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 
 public class ExpenseItemViewHolder extends AbstractViewHolder {
     private static final String TAG = ExpenseItemViewHolder.class.getSimpleName();
@@ -40,7 +41,7 @@ public class ExpenseItemViewHolder extends AbstractViewHolder {
 
         Booking expense = (Booking) item.getContent();
 
-        setRoundedTextViewText(expense.getCategory());
+        setRoundedTextViewText(AppDatabase.getDatabase(app.getContext()).categoryDAO().get(expense.getCategoryId())); // TODO: Do differently
         setTitle(expense.getTitle());
         setPrice(expense.getPrice());
         setPerson("");

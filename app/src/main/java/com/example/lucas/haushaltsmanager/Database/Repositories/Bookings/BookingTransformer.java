@@ -3,21 +3,14 @@ package com.example.lucas.haushaltsmanager.Database.Repositories.Bookings;
 import android.database.Cursor;
 
 import com.example.lucas.haushaltsmanager.Database.TransformerInterface;
+import com.example.lucas.haushaltsmanager.entities.Price;
 import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 import com.example.lucas.haushaltsmanager.entities.booking.IBooking;
-import com.example.lucas.haushaltsmanager.entities.Category;
-import com.example.lucas.haushaltsmanager.entities.Price;
 
 import java.util.Calendar;
 import java.util.UUID;
 
 public class BookingTransformer implements TransformerInterface<IBooking> {
-    private final TransformerInterface<Category> categoryTransformer;
-
-    public BookingTransformer(TransformerInterface<Category> categoryTransformer) {
-        this.categoryTransformer = categoryTransformer;
-    }
-
     @Override
     public IBooking transform(Cursor c) {
         UUID id = getId(c);
@@ -29,9 +22,15 @@ public class BookingTransformer implements TransformerInterface<IBooking> {
                 title,
                 getPrice(c),
                 date,
-                categoryTransformer.transform(c),
+                getCategoryId(c),
                 getAccountId(c)
         );
+    }
+
+    private UUID getCategoryId(Cursor c) {
+        String rawCategoryId = c.getString(c.getColumnIndex("category_id"));
+
+        return UUID.fromString(rawCategoryId);
     }
 
     private UUID getId(Cursor c) {
@@ -48,9 +47,8 @@ public class BookingTransformer implements TransformerInterface<IBooking> {
 
     private Price getPrice(Cursor c) {
         double rawPrice = c.getDouble(c.getColumnIndex("price"));
-        boolean expenditure = c.getInt(c.getColumnIndex("expenditure")) == 1;
 
-        return new Price(rawPrice, expenditure);
+        return new Price(rawPrice);
     }
 
     private Calendar getDate(Cursor c) {

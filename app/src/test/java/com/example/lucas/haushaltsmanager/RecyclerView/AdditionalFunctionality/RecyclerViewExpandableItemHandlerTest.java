@@ -233,9 +233,9 @@ public class RecyclerViewExpandableItemHandlerTest {
         return new Booking(
                 UUID.randomUUID(),
                 "Ich bin eine Ausgabe",
-                new Price(new Random().nextInt(), true),
+                new Price(-new Random().nextInt()),
                 date,
-                new Category("Kategorie", Color.Companion.black(), ExpenseType.Companion.expense()),
+                UUID.randomUUID(),
                 UUID.randomUUID()
         );
     }

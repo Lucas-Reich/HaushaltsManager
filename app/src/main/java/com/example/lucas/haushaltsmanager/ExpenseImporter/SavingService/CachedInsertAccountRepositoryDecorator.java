@@ -1,5 +1,7 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.SavingService;
 
+import androidx.annotation.Nullable;
+
 import com.example.lucas.haushaltsmanager.Database.Repositories.AccountDAO;
 import com.example.lucas.haushaltsmanager.entities.Account;
 
@@ -8,8 +10,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import javax.annotation.Nullable;
 
 public class CachedInsertAccountRepositoryDecorator implements AccountDAO {
     private final AccountDAO repository;
@@ -65,6 +65,6 @@ public class CachedInsertAccountRepositoryDecorator implements AccountDAO {
     private boolean areEquals(Account one, Account other) {
         return one.getId().equals(other.getId())
                 && one.getName().equals(other.getName())
-                && one.getPrice().equals(other.getPrice());
+                && one.getBalance().equals(other.getBalance());
     }
 }

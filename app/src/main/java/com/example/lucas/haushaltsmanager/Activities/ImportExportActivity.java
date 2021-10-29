@@ -14,11 +14,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.codekidlabs.storagechooser.StorageChooser;
 import com.example.lucas.haushaltsmanager.CsvBookingExporter;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
+import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ErrorAlertDialog;
-import com.example.lucas.haushaltsmanager.entities.Directory;
-import com.example.lucas.haushaltsmanager.entities.booking.IBooking;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.RecyclerItemClickListener;
 import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.ItemCreator;
@@ -26,6 +24,8 @@ import com.example.lucas.haushaltsmanager.RecyclerView.Items.FileItem.FileItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.FileListRecyclerViewAdapter;
 import com.example.lucas.haushaltsmanager.Utils.FileUtils;
+import com.example.lucas.haushaltsmanager.entities.Directory;
+import com.example.lucas.haushaltsmanager.entities.booking.IBooking;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;
@@ -61,73 +61,60 @@ public class ImportExportActivity extends AbstractAppCompatActivity implements R
         super.onStart();
 
         selectDirectoryBtn.setHint(R.string.hint_choose_directory);
-        selectDirectoryBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!hasFilePermission())
-                    getFilePermission();
-
-                StorageChooser storageChooser = new StorageChooser.Builder()
-                        .withActivity(ImportExportActivity.this)
-                        .withFragmentManager(getFragmentManager())
-                        .withMemoryBar(true)
-                        .allowAddFolder(true)
-                        .allowCustomPath(true)
-                        .setType(StorageChooser.DIRECTORY_CHOOSER)
-                        .build();
-
-                storageChooser.show();
-                storageChooser.setOnSelectListener(new StorageChooser.OnSelectListener() {
-
-                    @Override
-                    public void onSelect(String directory) {
-                        selectedDirectory = new Directory(directory);
-                        selectDirectoryBtn.setText(selectedDirectory.getName());
-
-                        updateListView(selectedDirectory);
-                    }
-                });
+        selectDirectoryBtn.setOnClickListener(v -> {
+            if (!hasFilePermission()) {
+                getFilePermission();
             }
+
+            StorageChooser storageChooser = new StorageChooser.Builder()
+                    .withActivity(ImportExportActivity.this)
+                    .withFragmentManager(getFragmentManager())
+                    .withMemoryBar(true)
+                    .allowAddFolder(true)
+                    .allowCustomPath(true)
+                    .setType(StorageChooser.DIRECTORY_CHOOSER)
+                    .build();
+
+            storageChooser.show();
+            storageChooser.setOnSelectListener(directory -> {
+                selectedDirectory = new Directory(directory);
+                selectDirectoryBtn.setText(selectedDirectory.getName());
+
+                updateListView(selectedDirectory);
+            });
         });
 
-        exportBookingsFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        exportBookingsFab.setOnClickListener(v -> {
+            if (selectedDirectory == null) {
 
-                if (selectedDirectory == null) {
+                Bundle bundle = new Bundle();
+                bundle.putString(ErrorAlertDialog.TITLE, getString(R.string.error));
+                bundle.putString(ErrorAlertDialog.CONTENT, getString(R.string.error_no_directory_selected));
 
-                    Bundle bundle = new Bundle();
-                    bundle.putString(ErrorAlertDialog.TITLE, getString(R.string.error));
-                    bundle.putString(ErrorAlertDialog.CONTENT, getString(R.string.error_no_directory_selected));
+                ErrorAlertDialog errorDialog = new ErrorAlertDialog();
+                errorDialog.setArguments(bundle);
+                errorDialog.show(getFragmentManager(), "import_error_export");
 
-                    ErrorAlertDialog errorDialog = new ErrorAlertDialog();
-                    errorDialog.setArguments(bundle);
-                    errorDialog.show(getFragmentManager(), "import_error_export");
+                return;
+            }
 
+            Bundle bundle = new Bundle();
+            bundle.putString(ConfirmationDialog.TITLE, getString(R.string.create_export));
+            bundle.putString(ConfirmationDialog.CONTENT, getString(R.string.export_directory_confirmation));
+
+            ConfirmationDialog confirmationDialog = new ConfirmationDialog();
+            confirmationDialog.setArguments(bundle);
+            confirmationDialog.setOnConfirmationListener(actionConfirmed -> {
+                if (!actionConfirmed) {
                     return;
                 }
 
-                Bundle bundle = new Bundle();
-                bundle.putString(ConfirmationDialog.TITLE, getString(R.string.create_export));
-                bundle.putString(ConfirmationDialog.CONTENT, getString(R.string.export_directory_confirmation));
+                CsvBookingExporter fileExporter = new CsvBookingExporter(selectedDirectory, ImportExportActivity.this);
+                File createdFile = fileExporter.writeToFile(getAllExpenses());
 
-                ConfirmationDialog confirmationDialog = new ConfirmationDialog();
-                confirmationDialog.setArguments(bundle);
-                confirmationDialog.setOnConfirmationListener(new ConfirmationDialog.OnConfirmationResult() {
-                    @Override
-                    public void onConfirmationResult(boolean actionConfirmed) {
-                        if (!actionConfirmed) {
-                            return;
-                        }
-
-                        CsvBookingExporter fileExporter = new CsvBookingExporter(selectedDirectory, ImportExportActivity.this);
-                        File createdFile = fileExporter.writeToFile(getAllExpenses());
-
-                        adapter.insertItem(new FileItem(createdFile));
-                    }
-                });
-                confirmationDialog.show(getFragmentManager(), "import_confirm_export");
-            }
+                adapter.insertItem(new FileItem(createdFile));
+            });
+            confirmationDialog.show(getFragmentManager(), "import_confirm_export");
         });
 
         updateListView(new Directory(getFilesDir().toString()));
@@ -192,8 +179,6 @@ public class ImportExportActivity extends AbstractAppCompatActivity implements R
 
     private List<IBooking> getAllExpenses() {
         // IMPROVEMENT: Den User fragen, welche Buchung genau exportiert werden sollen (welches Konto, Zeitraum, ...)
-        ExpenseRepository repo = new ExpenseRepository(this);
-
-        return repo.getAll();
+        return AppDatabase.getDatabase(this).bookingDAO().getAll();
     }
 }

@@ -4,7 +4,7 @@ import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.lucas.haushaltsmanager.entities.Category
+import com.example.lucas.haushaltsmanager.entities.Account
 import com.example.lucas.haushaltsmanager.entities.Price
 import kotlinx.parcelize.Parcelize
 import java.text.DateFormat
@@ -18,15 +18,15 @@ class Booking(
     private var title: String,
     private var price: Price,
     private var date: Calendar,
-    var category: Category, // TODO: Create Booking with embedded category
+    @ColumnInfo(name = "category_id") var categoryId: UUID,
     @ColumnInfo(name = "account_id") var accountId: UUID
 ) : IBooking, Parcelable {
     constructor(
         title: String,
         price: Price,
-        category: Category,
+        categoryId: UUID,
         accountId: UUID
-    ) : this(UUID.randomUUID(), title, price, Calendar.getInstance(), category, accountId)
+    ) : this(UUID.randomUUID(), title, price, Calendar.getInstance(), categoryId, accountId)
 
     override fun equals(other: Any?): Boolean {
         if (other !is Booking) {
@@ -34,14 +34,10 @@ class Booking(
         }
 
         return title == other.title
-                && price == price
-                && accountId == accountId
-                && date == date
-                && category == category
-    }
-
-    override fun toString(): String {
-        return "$id $title ${price.unsignedValue}"
+                && price == other.price
+                && accountId == other.accountId
+                && date == other.date
+                && categoryId == other.categoryId
     }
 
     override fun getId(): UUID {
@@ -82,20 +78,23 @@ class Booking(
     }
 
     fun getUnsignedPrice(): Double {
-        return price.unsignedValue
+        return price.absoluteValue
     }
 
     fun getSignedPrice(): Double {
-        return price.signedValue
+        return price.price
     }
 
     fun isExpenditure(): Boolean {
         return price.isNegative
     }
 
+    fun setAccount(account: Account) {
+        this.accountId = account.id
+    }
+
     @Deprecated("Do not use")
-    fun isSet(): Boolean {
+    fun isSet(): Boolean { // TODO: Create booking builder
         return title.isEmpty()
-                && category.isSet()
     }
 }

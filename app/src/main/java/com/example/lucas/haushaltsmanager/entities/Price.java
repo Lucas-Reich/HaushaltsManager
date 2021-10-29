@@ -27,26 +27,26 @@ public class Price implements Parcelable {
         }
     };
 
-    private double value;
-    private boolean isNegative;
-
-    public Price(double value, boolean isNegative) {
-        setPrice(value, isNegative);
-    }
+    private final double value;
 
     public Price(String value, Locale locale) {
-        double parsedPrice = localeAwareDoubleParser(value, locale);
-
-        setPrice(parsedPrice);
+        this.value = localeAwareDoubleParser(value, locale);
     }
 
     public Price(double price) {
-        setPrice(price);
+        this.value = price;
     }
 
     private Price(Parcel source) {
         value = source.readDouble();
-        isNegative = source.readByte() != 0;
+    }
+
+    public static Price fromValueWithCategory(double price, Category category) {
+        if (category.getDefaultExpenseType().getType()) {
+            return new Price(price);
+        }
+
+        return new Price(-price);
     }
 
     @Override
@@ -57,7 +57,7 @@ public class Price implements Parcelable {
 
         Price other = (Price) obj;
 
-        return other.getSignedValue() == getSignedValue();
+        return other.getPrice() == getPrice();
     }
 
     @Override
@@ -68,51 +68,31 @@ public class Price implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeDouble(value);
-        dest.writeByte((byte) (isNegative ? 1 : 0));
     }
 
-    public double getUnsignedValue() {
-        return value;
+    public double getAbsoluteValue() {
+        return Math.abs(value);
     }
 
-    public double getSignedValue() {
-        if (isNegative) {
-            return -value;
-        }
-
+    public double getPrice() {
         return value;
     }
 
     public boolean isNegative() {
-        return isNegative;
+        return value < 0;
     }
 
     @ColorRes
     public int getColor() {
-        if (getSignedValue() > 0) {
+        if (getPrice() > 0) {
             return R.color.booking_income;
         }
 
-        if (getSignedValue() < 0) {
+        if (getPrice() < 0) {
             return R.color.booking_expense;
         }
 
         return R.color.primary_text_color;
-    }
-
-    private void setPrice(double price) {
-        if (price >= 0) {
-            setPrice(price, false);
-
-            return;
-        }
-
-        setPrice(Math.abs(price), true);
-    }
-
-    private void setPrice(double price, boolean isNegative) {
-        this.isNegative = isNegative;
-        this.value = price;
     }
 
     private double localeAwareDoubleParser(String doubleString, Locale locale) {

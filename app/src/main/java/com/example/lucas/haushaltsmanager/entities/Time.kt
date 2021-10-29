@@ -4,6 +4,7 @@ import java.util.*
 
 class Time(val hour: Int, val minute: Int) {
     companion object {
+        @JvmStatic
         fun fromString(stringTime: String): Time {
             val hour = stringTime.substring(0, 2).toInt()
             val minute = stringTime.substring(3, 5).toInt()

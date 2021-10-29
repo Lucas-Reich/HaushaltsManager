@@ -1,6 +1,7 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.SavingService;
 
 import com.example.lucas.haushaltsmanager.entities.Account;
+import com.example.lucas.haushaltsmanager.entities.Category;
 import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 
 public interface ISaver {
@@ -8,5 +9,5 @@ public interface ISaver {
 
     void finish();
 
-    void persist(Booking booking, Account account);
+    void persist(Booking booking, Account account, Category category);
 }

@@ -10,6 +10,7 @@ import androidx.cardview.widget.CardView;
 import com.example.lucas.haushaltsmanager.CardPopulator.LineChartCardPopulator;
 import com.example.lucas.haushaltsmanager.CardPopulator.PieChartCardPopulator;
 import com.example.lucas.haushaltsmanager.CardPopulator.TimeFrameCardPopulator;
+import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.CalendarUtils;
@@ -89,9 +90,7 @@ public class TabThreeYearlyReports extends AbstractTab {
     }
 
     private List<IBooking> getVisibleExpenses() {
-        ExpenseRepository repository = new ExpenseRepository(getContext());
-
-        return repository.getAll();
+        return AppDatabase.getDatabase(getContext()).bookingDAO().getAll();
     }
 
     private double getLastYearAccountBalance(int currentYear, List<IBooking> bookings) {

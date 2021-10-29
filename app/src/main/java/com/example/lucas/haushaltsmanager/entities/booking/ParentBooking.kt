@@ -43,7 +43,7 @@ class ParentBooking(
     override fun getPrice(): Price {
         var price = 0.0
         for (child in children) {
-            price += child.price.signedValue
+            price += child.price.price
         }
 
         return Price(price)

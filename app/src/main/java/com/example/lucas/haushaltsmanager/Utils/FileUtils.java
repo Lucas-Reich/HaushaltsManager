@@ -15,12 +15,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.annotation.RegEx;
-
 public class FileUtils {
     private static final String TAG = FileUtils.class.getSimpleName();
 
-    public static List<File> listFiles(Directory dir, boolean invertList, @RegEx String regex) {
+    public static List<File> listFiles(Directory dir, boolean invertList, String regex) {
         List<File> files = new ArrayList<>();
         for (File file : dir.listFiles()) {
             if (file.getName().matches(regex)) {

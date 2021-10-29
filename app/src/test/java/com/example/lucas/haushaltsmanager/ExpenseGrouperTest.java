@@ -118,12 +118,10 @@ public class ExpenseGrouperTest {
         return new Booking(
                 UUID.randomUUID(),
                 "Ausgabe",
-                new Price(778.4, false),
+                new Price(-778.4),
                 date,
-                category,
-                "",
-                UUID.randomUUID(),
-                Booking.EXPENSE_TYPES.NORMAL_EXPENSE
+                category.getId(),
+                UUID.randomUUID()
         );
     }
 

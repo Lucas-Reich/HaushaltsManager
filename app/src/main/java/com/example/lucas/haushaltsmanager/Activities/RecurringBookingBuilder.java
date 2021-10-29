@@ -39,7 +39,7 @@ public class RecurringBookingBuilder {
                 frequency,
                 booking.getTitle(),
                 booking.getPrice(),
-                booking.getCategory().getId(),
+                booking.getCategoryId(),
                 booking.getAccountId()
         );
     }

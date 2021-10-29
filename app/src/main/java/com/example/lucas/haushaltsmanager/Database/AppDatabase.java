@@ -8,6 +8,7 @@ import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 
 import com.example.lucas.haushaltsmanager.Database.Repositories.AccountDAO;
+import com.example.lucas.haushaltsmanager.Database.Repositories.BookingDAO;
 import com.example.lucas.haushaltsmanager.Database.Repositories.CategoryDAO;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Converters;
 import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookingDAO;
@@ -22,6 +23,7 @@ import com.example.lucas.haushaltsmanager.entities.template_booking.TemplateBook
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
     private static volatile AppDatabase DATABASE = null;
+    private static final String DATABASE_NAME = "user_database.db";
 
     public static AppDatabase getDatabase(Context context) {
         if (DATABASE != null) {
@@ -30,7 +32,7 @@ public abstract class AppDatabase extends RoomDatabase {
 
         synchronized (AppDatabase.class) {
             if (DATABASE == null) {
-                DATABASE = Room.databaseBuilder(context, AppDatabase.class, "user_database")
+                DATABASE = Room.databaseBuilder(context, AppDatabase.class, DATABASE_NAME)
                         .allowMainThreadQueries() // TODO: Remove
                         .build();
             }
@@ -46,4 +48,6 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract TemplateBookingDAO templateBookingDAO();
 
     public abstract RecurringBookingDAO recurringBookingDAO();
+
+    public abstract BookingDAO bookingDAO();
 }

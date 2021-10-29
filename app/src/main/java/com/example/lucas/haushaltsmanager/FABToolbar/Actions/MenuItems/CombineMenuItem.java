@@ -9,7 +9,8 @@ import androidx.annotation.StringRes;
 
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.App.app;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.CannotDeleteExpenseException;
+import com.example.lucas.haushaltsmanager.Database.AppDatabase;
+import com.example.lucas.haushaltsmanager.Database.Repositories.BookingDAO;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.CannotDeleteChildExpenseException;
@@ -35,6 +36,7 @@ public class CombineMenuItem implements IMenuItem {
     private final IActionKey mActionKey;
 
     private ExpenseRepository bookingRepository;
+    private BookingDAO bookingDao;
     private ChildExpenseRepository childBookingRepository;
     private final OnSuccessCallback mCallback;
 
@@ -78,6 +80,7 @@ public class CombineMenuItem implements IMenuItem {
 
     private void initRepos(Context context) {
         bookingRepository = new ExpenseRepository(context);
+        bookingDao = AppDatabase.getDatabase(context).bookingDAO();
         childBookingRepository = new ChildExpenseRepository(context);
     }
 
@@ -117,7 +120,7 @@ public class CombineMenuItem implements IMenuItem {
     private IBookingItem deleteItem(IRecyclerItem item) {
         try {
             if (item instanceof ExpenseItem) {
-                bookingRepository.delete(((ExpenseItem) item).getContent());
+                bookingDao.delete(((ExpenseItem) item).getContent());
 
                 return (IBookingItem) item;
             }
@@ -131,10 +134,6 @@ public class CombineMenuItem implements IMenuItem {
 
             // TODO was soll passieren
             Log.e(TAG, "Could not delete ChildExpense " + ((Booking) item.getContent()).getTitle());
-        } catch (CannotDeleteExpenseException e) {
-
-            // TODO was soll passieren
-            Log.e(TAG, "Could not delete Booking " + ((Booking) item.getContent()).getTitle());
         }
 
         return null;

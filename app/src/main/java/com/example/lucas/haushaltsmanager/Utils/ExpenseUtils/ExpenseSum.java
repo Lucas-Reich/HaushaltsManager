@@ -57,7 +57,7 @@ public class ExpenseSum {
         double sum = 0D;
 
         for (Booking expense : expenses) {
-            sum += expense.getPrice().getSignedValue();
+            sum += expense.getPrice().getPrice();
         }
 
         return sum;
@@ -67,7 +67,7 @@ public class ExpenseSum {
         double sum = 0D;
 
         for (IBooking expense : bookings) {
-            sum += expense.getPrice().getSignedValue();
+            sum += expense.getPrice().getPrice();
         }
 
         return sum;

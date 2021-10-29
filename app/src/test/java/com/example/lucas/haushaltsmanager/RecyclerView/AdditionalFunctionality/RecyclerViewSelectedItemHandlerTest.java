@@ -121,7 +121,7 @@ public class RecyclerViewSelectedItemHandlerTest {
         return new Booking(
                 "Ausgabe",
                 new Price(100),
-                new Category("Kategorie", new Color(Color.WHITE), ExpenseType.Companion.expense()),
+                UUID.randomUUID(),
                 UUID.randomUUID()
         );
     }

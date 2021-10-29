@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import com.example.lucas.haushaltsmanager.Backup.Handler.Decorator.DataImporterBackupHandler;
 import com.example.lucas.haushaltsmanager.Database.Repositories.AccountDAO;
+import com.example.lucas.haushaltsmanager.Database.Repositories.BookingDAO;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.CategoryDAO;
 import com.example.lucas.haushaltsmanager.entities.Account;
@@ -19,7 +20,7 @@ import org.junit.Test;
 
 public class SaverTest {
     private AccountDAO mockAccountRepository;
-    private ExpenseRepository mockExpenseRepository;
+    private BookingDAO mockExpenseRepository;
     private ActiveAccountsPreferences accountPreferences;
     private DataImporterBackupHandler backupHandler;
 
@@ -28,7 +29,7 @@ public class SaverTest {
     @Before
     public void setUp() {
         mockAccountRepository = mock(AccountDAO.class);
-        mockExpenseRepository = mock(ExpenseRepository.class);
+        mockExpenseRepository = mock(BookingDAO.class);
         accountPreferences = mock(ActiveAccountsPreferences.class);
         backupHandler = mock(DataImporterBackupHandler.class);
 
@@ -49,11 +50,11 @@ public class SaverTest {
         Category expectedCategory = mock(Category.class);
 
         Booking booking = mock(Booking.class);
-        when(booking.getCategory()).thenReturn(mock(Category.class));
+        when(booking.getCategoryId()).thenReturn(booking.getCategoryId());
 
 
         // Act
-        saver.persist(booking, account);
+        saver.persist(booking, account, expectedCategory);
 
 
         // Assert
@@ -66,7 +67,7 @@ public class SaverTest {
 
 
         verify(mockExpenseRepository, times(1)).insert(booking);
-        verify(booking, times(1)).setCategory(expectedCategory);
+        verify(booking, times(1)).setCategoryId(expectedCategory.getId());
 
     }
 

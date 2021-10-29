@@ -2,15 +2,15 @@ package com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBooki
 
 import androidx.annotation.NonNull;
 
-import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.IBookingItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IParentRecyclerItem;
+import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 
 public class ChildExpenseItem implements IBookingItem {
     public static final int VIEW_TYPE = 4;
 
-    private IParentRecyclerItem parent;
-    private Booking expense;
+    private final IParentRecyclerItem parent;
+    private final Booking expense;
 
     public ChildExpenseItem(Booking expense, IParentRecyclerItem parent) {
         this.expense = expense;

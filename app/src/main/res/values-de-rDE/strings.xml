@@ -32,7 +32,6 @@
     <string name="error_missing_content">Du musst alle Spalten ausfüllen</string>
     <string name="btn_save">Speichern</string>
     <string name="input_title">Gib der Buchung einen Titel</string>
-    <string name="input_notice">Füge der Buchung eine Notiz hinzu</string>
     <string name="transfer">Überweisung</string>
     <string name="edit">Bearbeiten</string>
     <string name="delete">Löschen</string>
@@ -139,7 +138,6 @@
     <string name="export_currency_name">Währung</string>
     <string name="export_account_name">Konto</string>
     <string name="export_expenditure">ist Ausgabe</string>
-    <string name="export_notice">Notiz</string>
     <string name="export_category_name">Kategorie</string>
     <string name="release_notes_100">Die erste Version der App steht nun zum Download bereit.</string>
     <string name="could_not_update_title">Titel konnte nicht aktualisiert werden</string>
@@ -194,7 +192,6 @@
     <string name="mapping_price_value">Betrag</string>
     <string name="mapping_category_title">Kategorie</string>
     <string name="mapping_booking_date">Datum</string>
-    <string name="mapping_booking_notice">Notiz</string>
     <string name="mapping_booking_title">Titel</string>
     <string name="activity_show_recurring_bookings">Wiederkehrende Buchungen</string>
     <string name="mapping_price_type">Ausgabentyp</string>
@@ -202,4 +199,5 @@
     <string name="release_notes_14_data_importer">CSV Dateiimporer erstellt</string>
     <string name="release_notes_15_code_improvements">Kleinere Anpassungen im Code</string>
     <string name="release_notes_17_migrate_android_x">Zu AndroidX migriert</string>
+    <string name="initial_account_balance_booking_name">Initiale Buchung</string>
 </resources>

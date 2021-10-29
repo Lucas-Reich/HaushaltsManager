@@ -199,4 +199,5 @@
     <string name="release_notes_14_data_importer">Created CSV file importer</string>
     <string name="release_notes_15_code_improvements">Minor code changes</string>
     <string name="release_notes_17_migrate_android_x">Migrate to AndroidX</string>
+    <string name="initial_account_balance_booking_name">Initial Booking</string>
 </resources>

@@ -6,9 +6,9 @@ import android.content.SharedPreferences;
 import com.example.lucas.haushaltsmanager.Activities.Settings;
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.Database.Repositories.AccountDAO;
+import com.example.lucas.haushaltsmanager.Utils.WeekdayUtils;
 import com.example.lucas.haushaltsmanager.entities.Account;
 import com.example.lucas.haushaltsmanager.entities.Time;
-import com.example.lucas.haushaltsmanager.Utils.WeekdayUtils;
 
 import java.util.UUID;
 
@@ -80,7 +80,7 @@ public class UserSettingsPreferences {
                 Settings.DEFAULT_REMINDER_TIME.toString()
         );
 
-        return Time.Companion.fromString(reminderTime);
+        return Time.fromString(reminderTime);
     }
 
     public void setReminderTime(Time reminderTime) {

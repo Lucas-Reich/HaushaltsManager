@@ -1,35 +1,30 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.PriceParser;
 
-import com.example.lucas.haushaltsmanager.entities.Price;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.InvalidInputException;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.NoMappingFoundException;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Line.Line;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.MappingList;
-import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.PriceParser.RequiredFields.Type;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.PriceParser.RequiredFields.Value;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.IParser;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.IRequiredField;
+import com.example.lucas.haushaltsmanager.entities.Price;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class PriceParser implements IParser<Price> {
     public static final IRequiredField PRICE_VALUE_KEY = new Value();
-    public static final IRequiredField PRICE_TYPE_KEY = new Type();
 
-    private final BooleanParser booleanParser;
     private final DoubleParser doubleParser;
 
     public PriceParser() {
-        booleanParser = new BooleanParser();
         doubleParser = new DoubleParser();
     }
 
     @Override
     public List<IRequiredField> getRequiredFields() {
-        return Arrays.asList(
-                PRICE_VALUE_KEY,
-                PRICE_TYPE_KEY
+        return Collections.singletonList(
+                PRICE_VALUE_KEY
         );
     }
 
@@ -37,13 +32,7 @@ public class PriceParser implements IParser<Price> {
         String valueString = line.getAsString(mapping.getMappingForKey(PRICE_VALUE_KEY));
         assertNotEmpty(valueString);
 
-        String typeString = line.getAsString(mapping.getMappingForKey(PRICE_TYPE_KEY));
-        assertNotEmpty(typeString);
-
-        return new Price(
-                parseValue(valueString),
-                parseType(typeString)
-        );
+        return new Price(parseValue(valueString));
     }
 
     private double parseValue(String input) throws InvalidInputException {
@@ -54,23 +43,6 @@ public class PriceParser implements IParser<Price> {
         } catch (NumberFormatException e) {
 
             throw InvalidInputException.invalidPriceValue(input, e);
-        }
-    }
-
-    private boolean parseType(String input) throws InvalidInputException {
-        try {
-
-            return booleanParser.parse(input);
-        } catch (IllegalArgumentException e) {
-
-            try {
-                double value = doubleParser.parse(input);
-
-                return value < 0;
-            } catch (NumberFormatException t) {
-
-                throw InvalidInputException.invalidPriceType(input, t);
-            }
         }
     }
 

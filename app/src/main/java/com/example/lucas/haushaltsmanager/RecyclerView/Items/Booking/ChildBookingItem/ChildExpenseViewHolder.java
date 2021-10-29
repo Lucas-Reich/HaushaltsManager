@@ -6,22 +6,23 @@ import android.widget.TextView;
 import androidx.annotation.ColorRes;
 
 import com.example.lucas.haushaltsmanager.App.app;
-import com.example.lucas.haushaltsmanager.entities.Category;
-import com.example.lucas.haushaltsmanager.entities.booking.Booking;
-import com.example.lucas.haushaltsmanager.entities.Price;
+import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.AbstractViewHolder;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.Views.MoneyTextView;
 import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
+import com.example.lucas.haushaltsmanager.entities.Category;
+import com.example.lucas.haushaltsmanager.entities.Price;
+import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 
 public class ChildExpenseViewHolder extends AbstractViewHolder {
     private static final String TAG = ChildExpenseViewHolder.class.getSimpleName();
 
-    private RoundedTextView roundedTextView;
-    private TextView title;
-    private MoneyTextView price;
-    private TextView person;
+    private final RoundedTextView roundedTextView;
+    private final TextView title;
+    private final MoneyTextView price;
+    private final TextView person;
 
     public ChildExpenseViewHolder(View itemView) {
         super(itemView);
@@ -40,7 +41,7 @@ public class ChildExpenseViewHolder extends AbstractViewHolder {
 
         Booking expense = (Booking) item.getContent();
 
-        setRoundedTextViewText(expense.getCategory());
+        setRoundedTextViewText(AppDatabase.getDatabase(app.getContext()).categoryDAO().get(expense.getCategoryId())); // TODO: Do differently
         setTitle(expense.getTitle());
         setPrice(expense.getPrice());
         setPerson("");
@@ -49,10 +50,11 @@ public class ChildExpenseViewHolder extends AbstractViewHolder {
     }
 
     private void setBackgroundColor() {
-        if (itemView.isSelected())
+        if (itemView.isSelected()) {
             itemView.setBackgroundColor(getColor(R.color.list_item_highlighted));
-        else
+        } else {
             itemView.setBackgroundColor(getColor(R.color.list_item_background));
+        }
     }
 
     private void setRoundedTextViewText(Category category) {

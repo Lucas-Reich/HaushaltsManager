@@ -12,26 +12,24 @@ import androidx.core.content.res.ResourcesCompat;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseGrouper;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSum;
-import com.example.lucas.haushaltsmanager.entities.booking.IBooking;
 import com.example.lucas.haushaltsmanager.entities.Report;
+import com.example.lucas.haushaltsmanager.entities.booking.IBooking;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class LineChartCardPopulator {
-    // IMPROVEMENT: Ich kann die Linie, basierend auf dem Kontostand einfärben. Wenn der Kontostand kleiner als 0 ist Rot größer oder gleich 0 grün
-    // Trello: https://trello.com/c/uAhKQUnK/62-farbe-des-linecharts-im-tabthree-basierend-auf-dem-kontostand-einfärben
     private final CardView mRootView;
     private ViewHolder mViewHolder;
     private Resources mResources;
-    private final double mLastYearAccountBalance; // REFACTOR: Geht das auch anders?
+    private final double mLastYearAccountBalance; // REFACTOR: Can I do that differently?
     private int mCurrentYear;
 
     public LineChartCardPopulator(CardView rootView, double lastYearAccountBalance) {
@@ -102,10 +100,15 @@ public class LineChartCardPopulator {
         return new LineData(lds);
     }
 
-    private IAxisValueFormatter getXAxisLabels() {
+    private ValueFormatter getXAxisLabels() {
         final String[] month = getMonthsShortened();
 
-        return (value, axis) -> month[(int) value - 1];
+        return new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return month[(int) value - 1];
+            }
+        };
     }
 
     private String[] getMonthsShortened() {

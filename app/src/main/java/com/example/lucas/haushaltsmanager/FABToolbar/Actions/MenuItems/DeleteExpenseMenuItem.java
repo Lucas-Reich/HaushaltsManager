@@ -3,18 +3,19 @@ package com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems;
 import android.content.Context;
 import android.util.Log;
 
-import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.Exceptions.CannotDeleteExpenseException;
+import com.example.lucas.haushaltsmanager.Database.AppDatabase;
+import com.example.lucas.haushaltsmanager.Database.Repositories.BookingDAO;
 import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.CannotDeleteChildExpenseException;
-import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.ActionPayload;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.ActionKey;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.IActionKey;
 import com.example.lucas.haushaltsmanager.R;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBookingItem.ChildExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.BookingItem.ExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBookingItem.ChildExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
+import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 
 public class DeleteExpenseMenuItem implements IMenuItem {
     public static final String ACTION_KEY = "deleteAction";
@@ -22,8 +23,8 @@ public class DeleteExpenseMenuItem implements IMenuItem {
 
     private final IActionKey mActionKey;
 
-    private OnSuccessCallback mCallback;
-    private ExpenseRepository mExpenseRepo;
+    private final OnSuccessCallback mCallback;
+    private BookingDAO bookingRepository;
     private ChildExpenseRepository mChildExpenseRepo;
 
     public DeleteExpenseMenuItem(OnSuccessCallback callback) {
@@ -70,7 +71,7 @@ public class DeleteExpenseMenuItem implements IMenuItem {
     }
 
     private void initRepos(Context context) {
-        mExpenseRepo = new ExpenseRepository(context);
+        bookingRepository = AppDatabase.getDatabase(context).bookingDAO();
         mChildExpenseRepo = new ChildExpenseRepository(context);
     }
 
@@ -92,16 +93,10 @@ public class DeleteExpenseMenuItem implements IMenuItem {
     private void deleteExpense(ExpenseItem item) {
         Booking expense = item.getContent();
 
-        try {
-            mExpenseRepo.delete(expense);
+        bookingRepository.delete(expense);
 
-            if (null != mCallback) {
-                mCallback.onSuccess(item);
-            }
-
-        } catch (CannotDeleteExpenseException e) {
-
-            Log.e(TAG, "Could not delete Booking " + expense.getTitle(), e);
+        if (null != mCallback) {
+            mCallback.onSuccess(item);
         }
     }
 

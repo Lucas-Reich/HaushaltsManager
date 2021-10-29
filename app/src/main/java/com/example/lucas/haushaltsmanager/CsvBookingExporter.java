@@ -8,12 +8,12 @@ import androidx.room.Room;
 
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
-import com.example.lucas.haushaltsmanager.Database.Repositories.AccountDAO;
 import com.example.lucas.haushaltsmanager.entities.Account;
+import com.example.lucas.haushaltsmanager.entities.Category;
+import com.example.lucas.haushaltsmanager.entities.Currency;
 import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 import com.example.lucas.haushaltsmanager.entities.booking.IBooking;
 import com.example.lucas.haushaltsmanager.entities.booking.ParentBooking;
-import com.example.lucas.haushaltsmanager.entities.Currency;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -22,21 +22,20 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Klasse um eine Liste von ExpenseObjects in einem CSV Datei zu schreiben und dieses dann abzuspeichern.
- */
 public class CsvBookingExporter {
     private final File targetDirectory;
     private final List<Account> accounts;
+    private final List<Category> categories;
 
     public CsvBookingExporter(File targetDirectory, Context context) {
 
         guardAgainstInvalidDirectory(targetDirectory);
         this.targetDirectory = targetDirectory;
 
-        AccountDAO accountRepo = Room.databaseBuilder(context, AppDatabase.class, "expenses")
-                .build().accountDAO();
-        accounts = accountRepo.getAll();
+        AppDatabase database = Room.databaseBuilder(context, AppDatabase.class, "expenses").build();
+
+        accounts = database.accountDAO().getAll();
+        categories = database.categoryDAO().getAll();
     }
 
     /**
@@ -111,7 +110,6 @@ public class CsvBookingExporter {
                 getStringResource(R.string.export_expenditure) + "," +
                 getStringResource(R.string.export_title) + "," +
                 getStringResource(R.string.export_date) + "," +
-                getStringResource(R.string.export_notice) + "," +
                 getStringResource(R.string.export_currency_name) + "," +
                 getStringResource(R.string.export_category_name) + "," +
                 getStringResource(R.string.export_account_name) + "," + "\r\n";
@@ -142,7 +140,10 @@ public class CsvBookingExporter {
         expenseString.append(writableBooking.getTitle()).append(",");
         expenseString.append(writableBooking.getDateString()).append(",");
         expenseString.append(new Currency().getName()).append(",");
-        expenseString.append(writableBooking.getCategory().getName()).append(",");
+
+        Category category = getCategory(writableBooking.getCategoryId());
+        expenseString.append(category != null ? category.getName() : "").append(",");
+
         Account account = getAccount(writableBooking.getAccountId());
         expenseString.append(account != null ? account.getName() : "").append("\r\n");
 
@@ -227,6 +228,16 @@ public class CsvBookingExporter {
         return String.format("Export_%s.csv", fileName);
     }
 
+    private Category getCategory(UUID id) {
+        for (Category category : categories) {
+            if (category.getId() == id) {
+                return category;
+            }
+        }
+
+        return null; // This should never happen
+    }
+
     private Account getAccount(UUID id) {
         for (Account account : accounts) {
             if (account.getId() == id) {
@@ -234,6 +245,6 @@ public class CsvBookingExporter {
             }
         }
 
-        return null;
+        return null; // This should never happen
     }
 }
