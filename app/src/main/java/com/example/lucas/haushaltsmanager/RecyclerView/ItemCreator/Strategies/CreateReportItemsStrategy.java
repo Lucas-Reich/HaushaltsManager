@@ -1,25 +1,25 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.Strategies;
 
 import com.example.lucas.haushaltsmanager.App.app;
-import com.example.lucas.haushaltsmanager.entities.booking.IBooking;
-import com.example.lucas.haushaltsmanager.entities.Report;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.ReportItem.ReportItem;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseGrouper;
+import com.example.lucas.haushaltsmanager.entities.Report;
+import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class CreateReportItemsStrategy implements RecyclerItemCreatorStrategyInterface<IBooking> {
+public class CreateReportItemsStrategy implements RecyclerItemCreatorStrategyInterface<Booking> {
     private final ExpenseGrouper expenseGrouper;
 
     public CreateReportItemsStrategy() {
         expenseGrouper = new ExpenseGrouper();
     }
 
-    public List<IRecyclerItem> create(List<IBooking> bookings) {
+    public List<IRecyclerItem> create(List<Booking> bookings) {
         if (bookings.isEmpty()) {
             return new ArrayList<>();
         }
@@ -36,7 +36,7 @@ public class CreateReportItemsStrategy implements RecyclerItemCreatorStrategyInt
         return reportItems;
     }
 
-    private List<IBooking> groupExpensesByMonth(int month, List<IBooking> bookings) {
+    private List<Booking> groupExpensesByMonth(int month, List<Booking> bookings) {
         return expenseGrouper.byMonth(
                 bookings,
                 month,

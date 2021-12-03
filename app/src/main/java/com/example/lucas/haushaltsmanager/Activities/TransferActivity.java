@@ -12,9 +12,7 @@ import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.Database.Repositories.AccountDAO;
-import com.example.lucas.haushaltsmanager.Database.Repositories.BookingDAO;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ParentBookingDAO;
 import com.example.lucas.haushaltsmanager.Dialogs.DatePickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ErrorAlertDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
@@ -43,7 +41,7 @@ public class TransferActivity extends AbstractAppCompatActivity {
     //Einnahme
     private Booking mToExpense;
     private AccountDAO accountRepo;
-    private ExpenseRepository mBookingRepo;
+    private ParentBookingDAO parentBookingRepository;
 
     @Override
     protected void onStart() {
@@ -123,7 +121,8 @@ public class TransferActivity extends AbstractAppCompatActivity {
                 ParentBooking parent = new ParentBooking(String.format("%s\n%s -> %s", getString(R.string.transfer), mFromAccount.getName(), mToAccount.getName()));
                 parent.addChild(mFromExpense);
                 parent.addChild(mToExpense);
-                mBookingRepo.insert(parent);
+
+                parentBookingRepository.insert(parent);
 
                 Intent intent = new Intent(TransferActivity.this, ParentActivity.class);
                 TransferActivity.this.startActivity(intent);
@@ -146,7 +145,7 @@ public class TransferActivity extends AbstractAppCompatActivity {
         setContentView(R.layout.activity_transfers);
 
         accountRepo = AppDatabase.getDatabase(this).accountDAO();
-        mBookingRepo = new ExpenseRepository(this);
+        parentBookingRepository = AppDatabase.getDatabase(this).parentBookingDAO();
 
         mCalendar = Calendar.getInstance();
 
@@ -206,7 +205,7 @@ public class TransferActivity extends AbstractAppCompatActivity {
 
         mFromAccount = newAccount;
         mToExpense.setTitle(String.format("%s %s", getString(R.string.transfer_from), mFromAccount.getName()));
-        mFromExpense.setAccount(mFromAccount);
+        mFromExpense.setAccountId(mFromAccount.getId());
         mFromAccountBtn.setText(mFromAccount.getName());
 
         Log.d(TAG, "selected " + mFromAccount.getName() + " as from account");
@@ -221,7 +220,7 @@ public class TransferActivity extends AbstractAppCompatActivity {
 
         mToAccount = newAccount;
         mFromExpense.setTitle(String.format("%s %s", getString(R.string.transfer_to), mToAccount.getName()));
-        mToExpense.setAccount(mToAccount);
+        mToExpense.setAccountId(mToAccount.getId());
         mToAccountBtn.setText(mToAccount.getName());
 
         Log.d(TAG, "selected " + mToAccount.getName() + " as to account");

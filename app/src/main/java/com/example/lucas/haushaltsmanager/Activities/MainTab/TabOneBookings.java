@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lucas.haushaltsmanager.Activities.ExpenseScreen;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
+import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.ActionPayload;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.AddChildMenuItem;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.CombineMenuItem;
@@ -40,7 +40,6 @@ import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.ExpenseListRe
 import com.example.lucas.haushaltsmanager.RevertExpenseDeletionSnackbar.RevertExpenseDeletionSnackbar;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseFilter;
 import com.example.lucas.haushaltsmanager.entities.booking.Booking;
-import com.example.lucas.haushaltsmanager.entities.booking.IBooking;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -204,11 +203,12 @@ public class TabOneBookings extends AbstractTab implements
         return false; // TODO: Check if at least one account exists
     }
 
-    private List<IBooking> getVisibleExpenses(int offset) {
-        ExpenseRepository repository = new ExpenseRepository(getContext());
+    private List<Booking> getVisibleExpenses(int offset) {
+        List<Booking> bookings = AppDatabase.getDatabase(getContext()).bookingDAO().getAll();
+        AppDatabase.getDatabase(getContext()).parentBookingDAO().getAll();
 
-        List<IBooking> visibleExpenses = new ExpenseFilter().byAccountWithParents(
-                repository.getAll(),
+        List<Booking> visibleExpenses = new ExpenseFilter().byAccount(
+                bookings, // TODO: How to add parent bookings?
                 activeAccounts.getActiveAccounts()
         );
 
@@ -224,7 +224,7 @@ public class TabOneBookings extends AbstractTab implements
     }
 
     private List<IRecyclerItem> loadData(int offset) {
-        List<IBooking> visibleExpenses = getVisibleExpenses(offset);
+        List<Booking> visibleExpenses = getVisibleExpenses(offset);
 
         return ItemCreator.createBookingItems(visibleExpenses);
     }

@@ -3,7 +3,6 @@ package com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.annotation.StringRes;
 
@@ -11,9 +10,7 @@ import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.Database.Repositories.BookingDAO;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.CannotDeleteChildExpenseException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ParentBookingDAO;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.ActionPayload;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.ActionKey;
@@ -31,13 +28,11 @@ import java.util.List;
 
 public class CombineMenuItem implements IMenuItem {
     public static final String ACTION_KEY = "combineBookingsAction";
-    private static final String TAG = CombineMenuItem.class.getSimpleName();
 
     private final IActionKey mActionKey;
 
-    private ExpenseRepository bookingRepository;
+    private ParentBookingDAO parentBookingRepository;
     private BookingDAO bookingDao;
-    private ChildExpenseRepository childBookingRepository;
     private final OnSuccessCallback mCallback;
 
     public CombineMenuItem(OnSuccessCallback callback) {
@@ -79,9 +74,8 @@ public class CombineMenuItem implements IMenuItem {
     }
 
     private void initRepos(Context context) {
-        bookingRepository = new ExpenseRepository(context);
         bookingDao = AppDatabase.getDatabase(context).bookingDAO();
-        childBookingRepository = new ChildExpenseRepository(context);
+        parentBookingRepository = AppDatabase.getDatabase(context).parentBookingDAO();
     }
 
     private FragmentManager getFragmentManager(Context context) {
@@ -109,7 +103,7 @@ public class CombineMenuItem implements IMenuItem {
                 }
             }
 
-            bookingRepository.insert(parent);
+            parentBookingRepository.insert(parent);
 
             if (null != mCallback) {
                 mCallback.onSuccess(parent, removedItems);
@@ -118,22 +112,16 @@ public class CombineMenuItem implements IMenuItem {
     }
 
     private IBookingItem deleteItem(IRecyclerItem item) {
-        try {
-            if (item instanceof ExpenseItem) {
-                bookingDao.delete(((ExpenseItem) item).getContent());
+        if (item instanceof ExpenseItem) {
+            bookingDao.delete(((ExpenseItem) item).getContent());
 
-                return (IBookingItem) item;
-            }
+            return (IBookingItem) item;
+        }
 
-            if (item instanceof ChildExpenseItem) {
-                childBookingRepository.delete(((ChildExpenseItem) item).getContent());
+        if (item instanceof ChildExpenseItem) {
+            parentBookingRepository.deleteChildBooking(((ChildExpenseItem) item).getContent());
 
-                return (IBookingItem) item;
-            }
-        } catch (CannotDeleteChildExpenseException e) {
-
-            // TODO was soll passieren
-            Log.e(TAG, "Could not delete ChildExpense " + ((Booking) item.getContent()).getTitle());
+            return (IBookingItem) item;
         }
 
         return null;

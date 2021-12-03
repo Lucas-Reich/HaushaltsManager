@@ -5,7 +5,6 @@ import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.Database.Repositories.CategoryDAO;
 import com.example.lucas.haushaltsmanager.entities.Category;
 import com.example.lucas.haushaltsmanager.entities.booking.Booking;
-import com.example.lucas.haushaltsmanager.entities.booking.IBooking;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -13,35 +12,23 @@ import java.util.HashMap;
 import java.util.List;
 
 public class ExpenseGrouper {
-    /**
-     * Kindbuchungen werden von der Funktion nicht beachtet.
-     */
-    // TODO: Kann ich die Funktion durch byYears() ersetzen?
-    public List<IBooking> byYearNew(List<IBooking> expenses, int year) {
-        List<IBooking> groupedExpenses = new ArrayList<>();
-
-        for (IBooking expense : expenses) {
-            if (isInYear(expense, year)) {
-                groupedExpenses.add(expense);
-            }
-        }
-
-        return groupedExpenses;
+    public List<Booking> byYear(List<Booking> bookings, int year) {
+        return byYears(bookings).get(year);
     }
 
-    public HashMap<Integer, List<Booking>> byYears(List<Booking> expenses) {
-        HashMap<Integer, List<Booking>> groupedExpenses = new HashMap<>();
+    public HashMap<Integer, List<Booking>> byYears(List<Booking> bookings) {
+        HashMap<Integer, List<Booking>> groupedBookings = new HashMap<>();
 
-        for (Booking expense : expenses) {
-            int expenseYear = expense.getDate().get(Calendar.YEAR);
+        for (Booking booking : bookings) {
+            int bookingYear = booking.getDate().get(Calendar.YEAR);
 
-            if (!groupedExpenses.containsKey(expenseYear))
-                groupedExpenses.put(expenseYear, new ArrayList<>());
+            if (!groupedBookings.containsKey(bookingYear))
+                groupedBookings.put(bookingYear, new ArrayList<>());
 
-            groupedExpenses.get(expenseYear).add(expense);
+            groupedBookings.get(bookingYear).add(booking);
         }
 
-        return groupedExpenses;
+        return groupedBookings;
     } // IMPROVEMENT: Tests für Methode byYears() schreiben
 
     /**
@@ -64,17 +51,17 @@ public class ExpenseGrouper {
         return groupedExpenses;
     }
 
-    public List<IBooking> byMonth(List<IBooking> bookings, int month, int year) {
+    public List<Booking> byMonth(List<Booking> bookings, int month, int year) {
         return byMonths(bookings, year).get(month);
     }
 
-    public List<List<IBooking>> byMonths(List<IBooking> bookings, int year) {
-        List<List<IBooking>> groupedExpenses = new ArrayList<>();
+    public List<List<Booking>> byMonths(List<Booking> bookings, int year) {
+        List<List<Booking>> groupedExpenses = new ArrayList<>();
         for (int i = 0; i < 12; i++) {
             groupedExpenses.add(new ArrayList<>());
         }
 
-        for (IBooking booking : bookings) {
+        for (Booking booking : bookings) {
             if (!isInYear(booking, year)) {
                 continue;
             }
@@ -85,11 +72,11 @@ public class ExpenseGrouper {
         return groupedExpenses;
     }
 
-    private int extractMonth(IBooking expense) {
+    private int extractMonth(Booking expense) {
         return expense.getDate().get(Calendar.MONTH);
     }
 
-    private boolean isInYear(IBooking expense, int year) {
+    private boolean isInYear(Booking expense, int year) {
         return expense.getDate().get(Calendar.YEAR) == year;
     }
 }

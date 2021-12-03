@@ -3,7 +3,6 @@ package com.example.lucas.haushaltsmanager.Activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
@@ -16,8 +15,7 @@ import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.Database.Repositories.AccountDAO;
 import com.example.lucas.haushaltsmanager.Database.Repositories.BookingDAO;
 import com.example.lucas.haushaltsmanager.Database.Repositories.CategoryDAO;
-import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.AddChildToChildException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ParentBookingDAO;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.DatePickerDialog;
@@ -33,6 +31,7 @@ import com.example.lucas.haushaltsmanager.entities.Category;
 import com.example.lucas.haushaltsmanager.entities.Currency;
 import com.example.lucas.haushaltsmanager.entities.Price;
 import com.example.lucas.haushaltsmanager.entities.booking.Booking;
+import com.example.lucas.haushaltsmanager.entities.booking.ParentBooking;
 import com.example.lucas.haushaltsmanager.entities.template_booking.TemplateBooking;
 
 import java.util.Calendar;
@@ -54,7 +53,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
     private UserSettingsPreferences mUserPreferences;
 
     private BookingDAO bookingRepository;
-    private ChildExpenseRepository mChildExpenseRepo;
+    private ParentBookingDAO parentBookingRepository;
     private AccountDAO accountRepo;
     private CategoryDAO categoryRepository;
 
@@ -66,9 +65,9 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
         mUserPreferences = new UserSettingsPreferences(this);
 
         bookingRepository = AppDatabase.getDatabase(this).bookingDAO();
-        mChildExpenseRepo = new ChildExpenseRepository(this);
         accountRepo = AppDatabase.getDatabase(this).accountDAO();
         categoryRepository = AppDatabase.getDatabase(this).categoryDAO();
+        parentBookingRepository = AppDatabase.getDatabase(this).parentBookingDAO();
 
         initializeToolbar();
 
@@ -260,15 +259,11 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
                         bookingRepository.update(mExpense);
                         break;
                     case INTENT_MODE_ADD_CHILD:
+                        ParentBooking parentBooking = new ParentBooking(""); // TODO: How to add a title for the new parent booking
+                        parentBooking.addChild(mParentBooking);
+                        parentBooking.addChild(mExpense);
 
-                        try {
-                            mChildExpenseRepo.addChildToBooking(mExpense, mParentBooking);
-                        } catch (AddChildToChildException e) {
-
-                            Log.e(TAG, "Could not addItem Child " + mExpense.getTitle() + " to parent " + mParentBooking.getTitle(), e);
-                            // TODO: Was soll passieren, wenn zu der ParentBuchung keine KindBuchung hinzugefügt werden kann?
-                        }
-                        break;
+                        parentBookingRepository.insert(parentBooking);
                     case INTENT_MODE_CREATE_BOOKING:
                         bookingRepository.insert(mExpense);
                         break;

@@ -1,13 +1,10 @@
 package com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.Database.Repositories.BookingDAO;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.CannotDeleteChildExpenseException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ParentBookingDAO;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.ActionPayload;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.ActionKey;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.IActionKey;
@@ -19,13 +16,12 @@ import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 
 public class DeleteExpenseMenuItem implements IMenuItem {
     public static final String ACTION_KEY = "deleteAction";
-    private static final String TAG = DeleteExpenseMenuItem.class.getSimpleName();
 
     private final IActionKey mActionKey;
 
     private final OnSuccessCallback mCallback;
     private BookingDAO bookingRepository;
-    private ChildExpenseRepository mChildExpenseRepo;
+    private ParentBookingDAO parentBookingRepository;
 
     public DeleteExpenseMenuItem(OnSuccessCallback callback) {
         mCallback = callback;
@@ -72,21 +68,16 @@ public class DeleteExpenseMenuItem implements IMenuItem {
 
     private void initRepos(Context context) {
         bookingRepository = AppDatabase.getDatabase(context).bookingDAO();
-        mChildExpenseRepo = new ChildExpenseRepository(context);
+        parentBookingRepository = AppDatabase.getDatabase(context).parentBookingDAO();
     }
 
     private void deleteChild(ChildExpenseItem item) {
         Booking child = item.getContent();
 
-        try {
-            mChildExpenseRepo.delete(child);
+        parentBookingRepository.deleteChildBooking(child);
 
-            if (null != mCallback) {
-                mCallback.onSuccess(item);
-            }
-        } catch (CannotDeleteChildExpenseException e) {
-
-            Log.e(TAG, "Could not delete ChildExpense " + child.getTitle(), e);
+        if (null != mCallback) {
+            mCallback.onSuccess(item);
         }
     }
 

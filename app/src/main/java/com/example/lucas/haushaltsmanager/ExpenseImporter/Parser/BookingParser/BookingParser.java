@@ -46,7 +46,8 @@ public class BookingParser implements IParser<Booking> {
                 priceParser.parse(line, mapping),
                 dateParser.parse(line, mapping),
                 UUID.randomUUID(),
-                UUID.randomUUID()
+                UUID.randomUUID(),
+                null
         );
     }
 

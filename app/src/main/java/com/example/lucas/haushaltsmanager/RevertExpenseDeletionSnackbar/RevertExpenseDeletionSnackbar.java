@@ -6,8 +6,7 @@ import android.view.View;
 
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.Database.Repositories.BookingDAO;
-import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.AddChildToChildException;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ParentBookingDAO;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.BookingItem.ExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBookingItem.ChildExpenseItem;
@@ -18,14 +17,15 @@ import com.example.lucas.haushaltsmanager.entities.booking.ParentBooking;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class RevertExpenseDeletionSnackbar {
     private static final String TAG = RevertExpenseDeletionSnackbar.class.getSimpleName();
 
     private final List<IRecyclerItem> mItems;
-    private final ChildExpenseRepository mChildExpenseRepo;
     private final BookingDAO bookingRepository;
+    private final ParentBookingDAO parentBookingRepository;
     private String mSnackbarMessage;
     private OnExpenseRestoredListener mBetterListener;
 
@@ -33,7 +33,7 @@ public class RevertExpenseDeletionSnackbar {
         mItems = new ArrayList<>();
 
         bookingRepository = AppDatabase.getDatabase(context).bookingDAO();
-        mChildExpenseRepo = new ChildExpenseRepository(context);
+        parentBookingRepository = AppDatabase.getDatabase(context).parentBookingDAO();
 
         mSnackbarMessage = "";
     }
@@ -80,21 +80,16 @@ public class RevertExpenseDeletionSnackbar {
     }
 
     private void restoreChildExpenses(ChildExpenseItem child) {
-        Booking childExpense = child.getContent();
-        ParentBookingItem parentExpense = (ParentBookingItem) child.getParent();
+        Booking childBooking = child.getContent();
 
-        try {
-            ParentBooking parent = parentExpense.getContent();
+        ParentBookingItem parentBookingItem = (ParentBookingItem) child.getParent();
+        ParentBooking parentBooking = parentBookingItem.getContent();
 
-            Log.i(TAG, "Restoring ChildExpense " + childExpense.getTitle() + " and attaching it to ParentExpense " + parent.getTitle());
-            Booking restoredChild = mChildExpenseRepo.addChildToBooking(childExpense, parent);
+        Log.i(TAG, "Restoring ChildBooking " + childBooking.getTitle() + " and attaching it to ParentBooking " + parentBooking.getTitle());
+        parentBookingRepository.insert(parentBooking, Collections.singletonList(childBooking));
 
-            if (mBetterListener != null) {
-                mBetterListener.onExpenseRestored(new ChildExpenseItem(restoredChild, child.getParent()));
-            }
-
-        } catch (AddChildToChildException e) {
-            Log.e(TAG, "Could not restore ChildExpense " + childExpense.getTitle(), e);
+        if (mBetterListener != null) {
+            mBetterListener.onExpenseRestored(new ChildExpenseItem(childBooking, parentBookingItem));
         }
     }
 

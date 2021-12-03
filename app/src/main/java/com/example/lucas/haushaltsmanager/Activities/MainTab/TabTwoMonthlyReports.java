@@ -15,7 +15,7 @@ import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.ItemCreator;
 import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.MonthlyReportListAdapter;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseFilter;
-import com.example.lucas.haushaltsmanager.entities.booking.IBooking;
+import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 
 import java.util.List;
 
@@ -52,9 +52,9 @@ public class TabTwoMonthlyReports extends AbstractTab {
         adapter.notifyDataSetChanged();
     }
 
-    private List<IBooking> getVisibleExpenses() {
-        List<IBooking> bookings = AppDatabase.getDatabase(getContext()).bookingDAO().getAll();
+    private List<Booking> getVisibleExpenses() {
+        List<Booking> bookings = AppDatabase.getDatabase(getContext()).bookingDAO().getAll();
 
-        return new ExpenseFilter().byAccountNew(bookings, activeAccounts.getActiveAccounts());
+        return new ExpenseFilter().byAccount(bookings, activeAccounts.getActiveAccounts());
     }
 }

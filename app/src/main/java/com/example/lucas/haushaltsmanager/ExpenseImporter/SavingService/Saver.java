@@ -65,7 +65,7 @@ public class Saver implements ISaver {
     }
 
     public void persist(Booking booking, Account account, Category category) {
-        booking.setAccount(account);
+        booking.setAccountId(account.getId());
         saveAccount(account);
 
         categoryRepository.insert(category);

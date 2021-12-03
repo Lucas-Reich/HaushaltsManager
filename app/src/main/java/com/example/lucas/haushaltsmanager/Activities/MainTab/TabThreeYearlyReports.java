@@ -11,13 +11,12 @@ import com.example.lucas.haushaltsmanager.CardPopulator.LineChartCardPopulator;
 import com.example.lucas.haushaltsmanager.CardPopulator.PieChartCardPopulator;
 import com.example.lucas.haushaltsmanager.CardPopulator.TimeFrameCardPopulator;
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.CalendarUtils;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseGrouper;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSum;
-import com.example.lucas.haushaltsmanager.entities.booking.IBooking;
 import com.example.lucas.haushaltsmanager.entities.Report;
+import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +30,7 @@ public class TabThreeYearlyReports extends AbstractTab {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstances) {
         View rootView = inflater.inflate(R.layout.tab_three_yearly_reports, container, false);
 
-        List<IBooking> bookings = getVisibleExpenses();
+        List<Booking> bookings = getVisibleExpenses();
 
         mTimeFrameCardPopulator = new TimeFrameCardPopulator(
                 (CardView) rootView.findViewById(R.id.tab_three_timeframe_report_card),
@@ -89,11 +88,11 @@ public class TabThreeYearlyReports extends AbstractTab {
         mExpenseCardPopulator.setData(report);
     }
 
-    private List<IBooking> getVisibleExpenses() {
+    private List<Booking> getVisibleExpenses() {
         return AppDatabase.getDatabase(getContext()).bookingDAO().getAll();
     }
 
-    private double getLastYearAccountBalance(int currentYear, List<IBooking> bookings) {
+    private double getLastYearAccountBalance(int currentYear, List<Booking> bookings) {
         HashMap<Integer, Double> mAccountBalanceYear = new ExpenseSum().byYear(bookings);
 
         int lastYear = currentYear - 1;
@@ -105,15 +104,15 @@ public class TabThreeYearlyReports extends AbstractTab {
         return 0d;
     }
 
-    private Report createReport(String title, List<IBooking> expenses) {
+    private Report createReport(String title, List<Booking> bookings) {
         return new Report(
                 title,
-                filterByYear(expenses, CalendarUtils.getCurrentYear())
+                filterByYear(bookings, CalendarUtils.getCurrentYear())
         );
     }
 
-    private List<IBooking> filterByYear(List<IBooking> expenses, int year) {
-        return new ExpenseGrouper().byYearNew(expenses, year);
+    private List<Booking> filterByYear(List<Booking> bookings, int year) {
+        return new ExpenseGrouper().byYear(bookings, year);
     }
 
     private String getStringifiedYear() {

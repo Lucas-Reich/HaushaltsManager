@@ -4,13 +4,12 @@ import androidx.annotation.StringRes
 import com.example.lucas.haushaltsmanager.App.app
 import com.example.lucas.haushaltsmanager.R
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSum
-import com.example.lucas.haushaltsmanager.entities.booking.ExpenseType.Companion.deposit
-import com.example.lucas.haushaltsmanager.entities.booking.IBooking
-import com.example.lucas.haushaltsmanager.entities.booking.ParentBooking
 import com.example.lucas.haushaltsmanager.entities.Color.Companion.white
+import com.example.lucas.haushaltsmanager.entities.booking.Booking
+import com.example.lucas.haushaltsmanager.entities.booking.ExpenseType.Companion.deposit
 import java.util.*
 
-class Report(var title: String, val bookings: MutableList<IBooking>) {
+class Report(var title: String, val bookings: MutableList<Booking>) {
     fun getTotal(): Double {
         return getIncoming() + getOutgoing()
     }
@@ -18,21 +17,21 @@ class Report(var title: String, val bookings: MutableList<IBooking>) {
     fun getIncoming(): Double {
         val expenseSum = ExpenseSum()
 
-        return expenseSum.byExpenditureTypeNew(false, bookings)
+        return expenseSum.byExpenditureType(false, bookings)
     }
 
     fun getOutgoing(): Double {
         val expenseSum = ExpenseSum()
 
-        return expenseSum.byExpenditureTypeNew(true, bookings)
+        return expenseSum.byExpenditureType(true, bookings)
     }
 
     fun getBookingCount(): Int {
-        return getBookingCount(bookings)
+        return bookings.size
     }
 
     fun getMostStressedCategory(): Category {
-        val categories = ExpenseSum().byCategoryNew(bookings)
+        val categories = ExpenseSum().byCategory(bookings)
 
         return getMaxEntry(categories)
     }
@@ -62,20 +61,5 @@ class Report(var title: String, val bookings: MutableList<IBooking>) {
         }
 
         return minCategory.key
-    }
-
-    private fun getBookingCount(bookings: List<IBooking>): Int {
-        var count = 0
-
-        for (booking in bookings) {
-            if (booking !is ParentBooking) {
-                count += 1
-                continue
-            }
-
-            count += booking.children.size
-        }
-
-        return count
     }
 }

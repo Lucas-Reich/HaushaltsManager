@@ -1,8 +1,6 @@
 package com.example.lucas.haushaltsmanager.Utils.ExpenseUtils;
 
 import com.example.lucas.haushaltsmanager.entities.booking.Booking;
-import com.example.lucas.haushaltsmanager.entities.booking.IBooking;
-import com.example.lucas.haushaltsmanager.entities.booking.ParentBooking;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,29 +22,10 @@ public class ExpenseFilter {
         return filteredExpenses;
     }
 
-    public List<IBooking> byAccountWithParents(List<IBooking> bookings, List<UUID> accounts) {
-        List<IBooking> filteredExpenses = new ArrayList<>();
+    public List<Booking> byAccount(List<Booking> bookings, List<UUID> accounts) {
+        List<Booking> filteredExpenses = new ArrayList<>();
 
-        for (IBooking booking : bookings) {
-            IBooking visibleExpense = getVisibleExpense(booking, accounts);
-            if (null != visibleExpense) {
-                filteredExpenses.add(visibleExpense);
-            }
-        }
-
-        return filteredExpenses;
-    }
-
-    public List<IBooking> byAccountNew(List<IBooking> bookings, List<UUID> accounts) {
-        List<IBooking> filteredExpenses = new ArrayList<>();
-
-        for (IBooking booking : bookings) {
-            if (booking instanceof ParentBooking) {
-                ParentBooking parent = byAccount((ParentBooking) booking, accounts);
-                filteredExpenses.add(parent);
-                continue;
-            }
-
+        for (Booking booking : bookings) {
             if (!hasAccount((Booking) booking, accounts)) {
                 continue;
             }
@@ -57,58 +36,7 @@ public class ExpenseFilter {
         return filteredExpenses;
     }
 
-    private ParentBooking byAccount(ParentBooking parent, List<UUID> accountIds) {
-        ArrayList<Booking> childrenWithCorrectAccount = new ArrayList<>();
-
-        for (Booking child : parent.getChildren()) {
-            if (!hasAccount(child, accountIds)) {
-                continue;
-            }
-
-            childrenWithCorrectAccount.add(child);
-        }
-
-        return new ParentBooking(
-                parent.getId(),
-                parent.getDate(),
-                parent.getTitle(),
-                childrenWithCorrectAccount
-        );
-    }
-
     private boolean hasAccount(Booking expense, List<UUID> accounts) {
         return accounts.contains(expense.getAccountId());
-    }
-
-    private IBooking getVisibleExpense(IBooking booking, List<UUID> accounts) {
-        if (booking instanceof ParentBooking) {
-            ParentBooking parent = removeInvisibleChildren((ParentBooking) booking, accounts);
-
-            if (parent.getChildren().size() != 0) {
-                return parent;
-            }
-        } else {
-            if (hasAccount((Booking) booking, accounts)) {
-                return booking;
-            }
-        }
-
-        return null;
-    }
-
-    private ParentBooking removeInvisibleChildren(ParentBooking expense, List<UUID> accounts) {
-        ArrayList<Booking> visibleChildren = new ArrayList<>();
-        for (Booking child : expense.getChildren()) {
-            if (hasAccount(child, accounts)) {
-                visibleChildren.add(child);
-            }
-        }
-
-        return new ParentBooking(
-                expense.getId(),
-                expense.getDate(),
-                expense.getTitle(),
-                visibleChildren
-        );
     }
 }

@@ -8,7 +8,7 @@ import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Backup.BackupUtils;
 import com.example.lucas.haushaltsmanager.Backup.Exceptions.SQLiteOpenDatabaseFileException;
 import com.example.lucas.haushaltsmanager.Backup.Handler.FileBackupHandler;
-import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
+import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.entities.Directory;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.InvalidFileException;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences.ActiveAccountsPreferences;
@@ -27,7 +27,7 @@ public class DatabaseBackupHandler {
     private final PreferencesRefresher preferencesRefresher;
 
     public DatabaseBackupHandler(Context context, FileBackupHandler backupHandler) {
-        databaseDir = new Directory(context.getDatabasePath(ExpensesDbHelper.DB_NAME).getParent());
+        databaseDir = new Directory(context.getDatabasePath(AppDatabase.DATABASE_NAME).getParent());
 
         defaultBackupDir = BackupUtils.getBackupDirectory(context);
 
@@ -54,7 +54,7 @@ public class DatabaseBackupHandler {
 
         databaseFileValidator.guardAgainstInvalidDatabaseSchema(database);
 
-        boolean success = backupHandler.restore(database, databaseDir, ExpensesDbHelper.DB_NAME) != null;
+        boolean success = backupHandler.restore(database, databaseDir, AppDatabase.DATABASE_NAME) != null;
 
         rebuildActiveAccountsPreferences();
         // TODO: Was passiert, wenn es den main account nicht mehr gibt?
@@ -64,7 +64,7 @@ public class DatabaseBackupHandler {
     private File getDatabase() {
         return new File(String.format("%s/%s",
                 databaseDir.getPath(),
-                ExpensesDbHelper.DB_NAME
+                AppDatabase.DATABASE_NAME
         ));
     }
 

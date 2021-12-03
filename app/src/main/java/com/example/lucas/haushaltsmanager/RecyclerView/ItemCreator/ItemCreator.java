@@ -7,14 +7,14 @@ import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.Strategies.Cr
 import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.Strategies.CreateTemplateItemsStrategy;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.entities.Category;
-import com.example.lucas.haushaltsmanager.entities.booking.IBooking;
+import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 import com.example.lucas.haushaltsmanager.entities.template_booking.TemplateBooking;
 
 import java.io.File;
 import java.util.List;
 
 public class ItemCreator {
-    public static List<IRecyclerItem> createBookingItems(List<IBooking> bookings) {
+    public static List<IRecyclerItem> createBookingItems(List<Booking> bookings) {
         return new CreateBookingItemsStrategy().create(bookings);
     }
 
@@ -30,7 +30,7 @@ public class ItemCreator {
         return new CreateFileItemsStrategy().create(files);
     }
 
-    public static List<IRecyclerItem> createReportItems(List<IBooking> bookings) {
+    public static List<IRecyclerItem> createReportItems(List<Booking> bookings) {
         return new CreateReportItemsStrategy().create(bookings);
     }
 }

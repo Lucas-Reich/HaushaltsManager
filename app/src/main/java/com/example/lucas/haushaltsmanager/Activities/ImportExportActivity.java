@@ -25,7 +25,7 @@ import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.FileListRecyclerViewAdapter;
 import com.example.lucas.haushaltsmanager.Utils.FileUtils;
 import com.example.lucas.haushaltsmanager.entities.Directory;
-import com.example.lucas.haushaltsmanager.entities.booking.IBooking;
+import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;
@@ -177,7 +177,7 @@ public class ImportExportActivity extends AbstractAppCompatActivity implements R
         );
     }
 
-    private List<IBooking> getAllExpenses() {
+    private List<Booking> getAllExpenses() {
         // IMPROVEMENT: Den User fragen, welche Buchung genau exportiert werden sollen (welches Konto, Zeitraum, ...)
         return AppDatabase.getDatabase(this).bookingDAO().getAll();
     }

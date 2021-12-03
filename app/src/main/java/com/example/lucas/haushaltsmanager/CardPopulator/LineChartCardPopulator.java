@@ -13,7 +13,7 @@ import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseGrouper;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSum;
 import com.example.lucas.haushaltsmanager.entities.Report;
-import com.example.lucas.haushaltsmanager.entities.booking.IBooking;
+import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.XAxis;
@@ -121,10 +121,10 @@ public class LineChartCardPopulator {
         return months;
     }
 
-    private List<Entry> getChartEntries(List<IBooking> bookings) {
+    private List<Entry> getChartEntries(List<Booking> bookings) {
         List<Entry> entries = new ArrayList<>();
 
-        List<List<IBooking>> groupedValues = getAccountBalances(bookings);
+        List<List<Booking>> groupedValues = getAccountBalances(bookings);
 
         float lastValue = (float) mLastYearAccountBalance;
         for (int i = 0; i < 12; i++) {
@@ -137,11 +137,11 @@ public class LineChartCardPopulator {
         return entries;
     }
 
-    private double sum(List<IBooking> bookings) {
-        return new ExpenseSum().sumNew(bookings);
+    private double sum(List<Booking> bookings) {
+        return new ExpenseSum().sum(bookings);
     }
 
-    private List<List<IBooking>> getAccountBalances(List<IBooking> expenses) {
+    private List<List<Booking>> getAccountBalances(List<Booking> expenses) {
         return new ExpenseGrouper().byMonths(expenses, mCurrentYear);
     }
 

@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 
 import com.example.lucas.haushaltsmanager.Backup.Exceptions.SQLiteOpenDatabaseFileException;
-import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
+import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.InvalidFileException;
 
 import java.io.File;
@@ -51,13 +51,13 @@ public class DatabaseFileValidator {
             c.close();
             db.close();
 
-            if (ExpensesDbHelper.DB_VERSION == dbVersion) {
+            if (AppDatabase.DATABASE_VERSION == dbVersion) {
                 return;
             }
 
-            throw SQLiteOpenDatabaseFileException.invalidVersion(ExpensesDbHelper.DB_VERSION, dbVersion);
+            throw SQLiteOpenDatabaseFileException.invalidVersion(AppDatabase.DATABASE_VERSION, dbVersion);
         } catch (SQLiteException e) {
-            throw SQLiteOpenDatabaseFileException.invalidVersion(ExpensesDbHelper.DB_VERSION, -1);
+            throw SQLiteOpenDatabaseFileException.invalidVersion(AppDatabase.DATABASE_VERSION, -1);
         }
     }
 

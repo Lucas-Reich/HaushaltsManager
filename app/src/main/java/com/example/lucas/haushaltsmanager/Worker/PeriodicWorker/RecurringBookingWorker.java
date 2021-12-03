@@ -64,7 +64,8 @@ public class RecurringBookingWorker extends AbstractRecurringWorker {
                 recurringBooking.getPrice(),
                 recurringBooking.getDate(),
                 recurringBooking.getCategoryId(),
-                recurringBooking.getAccountId()
+                recurringBooking.getAccountId(),
+                null
         ));
     }
 

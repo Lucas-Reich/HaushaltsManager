@@ -6,8 +6,6 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.os.Build;
 
-import com.example.lucas.haushaltsmanager.Database.DatabaseManager;
-import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
 import com.example.lucas.haushaltsmanager.R;
 
 import java.util.UUID;
@@ -58,12 +56,5 @@ public class app extends Application {
     public void onCreate() {
         super.onCreate();
         context = this.getApplicationContext();
-
-        initializeDatabase();
-
-    }
-
-    private void initializeDatabase() {
-        DatabaseManager.initializeInstance(new ExpensesDbHelper(context));
     }
 }

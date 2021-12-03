@@ -16,12 +16,10 @@ import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSum;
 import com.example.lucas.haushaltsmanager.Views.MoneyTextView;
 import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
-import com.example.lucas.haushaltsmanager.entities.booking.Booking;
-import com.example.lucas.haushaltsmanager.entities.booking.IBooking;
-import com.example.lucas.haushaltsmanager.entities.booking.ParentBooking;
 import com.example.lucas.haushaltsmanager.entities.Category;
 import com.example.lucas.haushaltsmanager.entities.Price;
 import com.example.lucas.haushaltsmanager.entities.Report;
+import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.PieData;
@@ -146,7 +144,7 @@ public class ReportItemViewHolder extends AbstractViewHolder {
         }
 
         List<PieEntry> pieData = new ArrayList<>();
-        List<Booking> expenses = flattenExpenses(report.getBookings());
+        List<Booking> expenses = report.getBookings();
         for (Map.Entry<Boolean, Double> entry : sumByExpenseType(expenses).entrySet()) {
             pieData.add(dataSetFrom(entry));
         }
@@ -174,19 +172,6 @@ public class ReportItemViewHolder extends AbstractViewHolder {
 
     private String getString(@StringRes int string) {
         return resources.getString(string);
-    }
-
-    private List<Booking> flattenExpenses(List<IBooking> bookings) {
-        List<Booking> extractedChildren = new ArrayList<>();
-
-        for (IBooking booking : bookings) {
-            if (booking instanceof ParentBooking)
-                extractedChildren.addAll(((ParentBooking) booking).getChildren());
-            else
-                extractedChildren.add((Booking) booking);
-        }
-
-        return extractedChildren;
     }
 
     private HashMap<Boolean, Double> sumByExpenseType(List<Booking> expenses) {

@@ -4,10 +4,10 @@ import android.content.Context;
 
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Backup.Handler.FileBackupHandler;
-import com.example.lucas.haushaltsmanager.Database.ExpensesDbHelper;
-import com.example.lucas.haushaltsmanager.entities.Directory;
+import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences.ActiveAccountsPreferences;
 import com.example.lucas.haushaltsmanager.Utils.FileUtils;
+import com.example.lucas.haushaltsmanager.entities.Directory;
 
 import java.io.File;
 
@@ -23,7 +23,7 @@ public class DataImporterBackupHandler {
     public DataImporterBackupHandler(Context context, FileBackupHandler backupHandler) {
         this.backupHandler = backupHandler;
 
-        databaseDir = new Directory(context.getDatabasePath(ExpensesDbHelper.DB_NAME).getParent());
+        databaseDir = new Directory(context.getDatabasePath(AppDatabase.DATABASE_NAME).getParent());
 
         preferencesDir = new Directory(String.format(
                 "data/data/%s/shared_prefs",
@@ -38,7 +38,7 @@ public class DataImporterBackupHandler {
     }
 
     public void restore() {
-        backupHandler.restore(databaseBkp, databaseDir, ExpensesDbHelper.DB_NAME);
+        backupHandler.restore(databaseBkp, databaseDir, AppDatabase.DATABASE_NAME);
 
         if (activeAccountPreferencesBkp != null) {
             backupHandler.restore(activeAccountPreferencesBkp, preferencesDir, ActiveAccountsPreferences.PREFERENCES_NAME);
@@ -57,7 +57,7 @@ public class DataImporterBackupHandler {
     private File getDatabase(Directory databaseDir) {
         return new File(String.format("%s/%s",
                 databaseDir.getPath(),
-                ExpensesDbHelper.DB_NAME
+                AppDatabase.DATABASE_NAME
         ));
     }
 

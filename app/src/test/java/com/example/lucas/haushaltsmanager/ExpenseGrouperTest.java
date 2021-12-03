@@ -1,12 +1,13 @@
 package com.example.lucas.haushaltsmanager;
 
-import com.example.lucas.haushaltsmanager.entities.booking.ExpenseType;
+import static org.junit.Assert.assertEquals;
+
+import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseGrouper;
 import com.example.lucas.haushaltsmanager.entities.Category;
 import com.example.lucas.haushaltsmanager.entities.Color;
-import com.example.lucas.haushaltsmanager.entities.booking.Booking;
-import com.example.lucas.haushaltsmanager.entities.booking.IBooking;
 import com.example.lucas.haushaltsmanager.entities.Price;
-import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseGrouper;
+import com.example.lucas.haushaltsmanager.entities.booking.Booking;
+import com.example.lucas.haushaltsmanager.entities.booking.ExpenseType;
 
 import org.junit.After;
 import org.junit.Before;
@@ -17,8 +18,6 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
-
-import static org.junit.Assert.assertEquals;
 
 public class ExpenseGrouperTest {
     private ExpenseGrouper mExpenseGrouper;
@@ -35,27 +34,27 @@ public class ExpenseGrouperTest {
 
     @Test
     public void testGroupExpenseByMonth() {
-        List<IBooking> expenses = new ArrayList<>();
+        List<Booking> expenses = new ArrayList<>();
         expenses.add(getExpenseWithDate(getSimpleDate(1, Calendar.FEBRUARY, 2018)));
         expenses.add(getExpenseWithDate(getSimpleDate(10, Calendar.JANUARY, 2018)));
         expenses.add(getExpenseWithDate(getSimpleDate(31, Calendar.JANUARY, 2018)));
         expenses.add(getExpenseWithDate(getSimpleDate(1, Calendar.JANUARY, 2018)));
         expenses.add(getExpenseWithDate(getSimpleDate(5, Calendar.JANUARY, 2019)));
 
-        List<IBooking> sortedExpenses = mExpenseGrouper.byMonth(expenses, Calendar.JANUARY, 2018);
+        List<Booking> sortedExpenses = mExpenseGrouper.byMonth(expenses, Calendar.JANUARY, 2018);
 
         assertEquals(3, sortedExpenses.size());
     }
 
     @Test
     public void testGroupByYear() {
-        List<IBooking> expenses = new ArrayList<>();
+        List<Booking> expenses = new ArrayList<>();
         expenses.add(getExpenseWithDate(getSimpleDate(4, Calendar.JUNE, 1970)));
         expenses.add(getExpenseWithDate(getSimpleDate(11, Calendar.JUNE, 2017)));
         expenses.add(getExpenseWithDate(getSimpleDate(4, Calendar.JUNE, 3014)));
         expenses.add(getExpenseWithDate(getSimpleDate(4, Calendar.JUNE, 2017)));
 
-        List<IBooking> groupedExpenses = mExpenseGrouper.byYearNew(expenses, 2017);
+        List<Booking> groupedExpenses = mExpenseGrouper.byYear(expenses, 2017);
 
         assertEquals(2, groupedExpenses.size());
     }
@@ -82,7 +81,7 @@ public class ExpenseGrouperTest {
 
     @Test
     public void testGroupByMonths() {
-        List<IBooking> expenses = new ArrayList<>();
+        List<Booking> expenses = new ArrayList<>();
         expenses.add(getExpenseWithDate(getSimpleDate(1, Calendar.MARCH, 2018)));
         expenses.add(getExpenseWithDate(getSimpleDate(1, Calendar.MARCH, 2017)));
         expenses.add(getExpenseWithDate(getSimpleDate(1, Calendar.JUNE, 2018)));
@@ -90,7 +89,7 @@ public class ExpenseGrouperTest {
         expenses.add(getExpenseWithDate(getSimpleDate(31, Calendar.JANUARY, 2018)));
         expenses.add(getExpenseWithDate(getSimpleDate(31, Calendar.JANUARY, 2018)));
 
-        List<List<IBooking>> groupedExpenses = mExpenseGrouper.byMonths(expenses, 2018);
+        List<List<Booking>> groupedExpenses = mExpenseGrouper.byMonths(expenses, 2018);
 
         assertEquals(2, groupedExpenses.get(Calendar.JANUARY).size());
         assertEquals(0, groupedExpenses.get(Calendar.FEBRUARY).size());
@@ -121,7 +120,8 @@ public class ExpenseGrouperTest {
                 new Price(-778.4),
                 date,
                 category.getId(),
-                UUID.randomUUID()
+                UUID.randomUUID(),
+                null
         );
     }
 

@@ -8,12 +8,11 @@ import static org.mockito.Mockito.when;
 import com.example.lucas.haushaltsmanager.Backup.Handler.Decorator.DataImporterBackupHandler;
 import com.example.lucas.haushaltsmanager.Database.Repositories.AccountDAO;
 import com.example.lucas.haushaltsmanager.Database.Repositories.BookingDAO;
-import com.example.lucas.haushaltsmanager.Database.Repositories.Bookings.ExpenseRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.CategoryDAO;
-import com.example.lucas.haushaltsmanager.entities.Account;
-import com.example.lucas.haushaltsmanager.entities.booking.Booking;
-import com.example.lucas.haushaltsmanager.entities.Category;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences.ActiveAccountsPreferences;
+import com.example.lucas.haushaltsmanager.entities.Account;
+import com.example.lucas.haushaltsmanager.entities.Category;
+import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -63,7 +62,7 @@ public class SaverTest {
 
         verify(mockAccountRepository, times(1)).insert(account);
         verify(accountPreferences, times(1)).addAccount(account);
-        verify(booking, times(1)).setAccount(account);
+        verify(booking, times(1)).setAccountId(account.getId());
 
 
         verify(mockExpenseRepository, times(1)).insert(booking);

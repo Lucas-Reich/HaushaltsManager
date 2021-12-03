@@ -12,7 +12,6 @@ import com.example.lucas.haushaltsmanager.entities.Account;
 import com.example.lucas.haushaltsmanager.entities.Category;
 import com.example.lucas.haushaltsmanager.entities.Currency;
 import com.example.lucas.haushaltsmanager.entities.booking.Booking;
-import com.example.lucas.haushaltsmanager.entities.booking.IBooking;
 import com.example.lucas.haushaltsmanager.entities.booking.ParentBooking;
 
 import java.io.File;
@@ -44,7 +43,7 @@ public class CsvBookingExporter {
      * @param bookings Buchungen die in eine Datei geschrieben werden sollen.
      * @return Die erstellte Datei wird zurückgegeben. Falls die Datei nicht erstellt werden konnte wird NULL zurückgegeben.
      */
-    public File writeToFile(List<IBooking> bookings) {
+    public File writeToFile(List<Booking> bookings) {
         File file = createFile(targetDirectory);
 
         if (file != null && writeExpensesToFile(bookings, file)) {
@@ -72,7 +71,7 @@ public class CsvBookingExporter {
      * @param file     Datei in der die Buchungen gespeichert werden sollen.
      * @return True wenn die Buchungen erfolgreich in die Datei geschrieben werden konnten, False wenn nicht.
      */
-    private boolean writeExpensesToFile(List<IBooking> bookings, File file) {
+    private boolean writeExpensesToFile(List<Booking> bookings, File file) {
         FileOutputStream fileOutput = null;
 
         try {
@@ -80,9 +79,9 @@ public class CsvBookingExporter {
             fileOutput = new FileOutputStream(file);
 
             fileOutput.write(getCsvHeader().getBytes());
-            for (IBooking expense : bookings) {
+            for (Booking booking : bookings) {
 
-                fileOutput.write(expenseToString(expense).getBytes());
+                fileOutput.write(bookingToString(booking).getBytes());
             }
             fileOutput.close();
             return true;
@@ -125,26 +124,19 @@ public class CsvBookingExporter {
      * @param booking ExpenseObject das umgewandelt werden soll
      * @return ExpenseObject mit allen Kindern als String
      */
-    private String expenseToString(IBooking booking) {
+    private String bookingToString(Booking booking) {
         StringBuilder expenseString = new StringBuilder();
 
-        if (booking instanceof ParentBooking) {
-            for (Booking child : ((ParentBooking) booking).getChildren()) {
-                expenseString.append(expenseToString(child));
-            }
-        }
-
-        Booking writableBooking = (Booking) booking;
-        expenseString.append(writableBooking.getUnsignedPrice()).append(",");
-        expenseString.append(writableBooking.isExpenditure()).append(",");
-        expenseString.append(writableBooking.getTitle()).append(",");
-        expenseString.append(writableBooking.getDateString()).append(",");
+        expenseString.append(booking.getUnsignedPrice()).append(",");
+        expenseString.append(booking.isExpenditure()).append(",");
+        expenseString.append(booking.getTitle()).append(",");
+        expenseString.append(booking.getDateString()).append(",");
         expenseString.append(new Currency().getName()).append(",");
 
-        Category category = getCategory(writableBooking.getCategoryId());
+        Category category = getCategory(booking.getCategoryId());
         expenseString.append(category != null ? category.getName() : "").append(",");
 
-        Account account = getAccount(writableBooking.getAccountId());
+        Account account = getAccount(booking.getAccountId());
         expenseString.append(account != null ? account.getName() : "").append("\r\n");
 
         return expenseString.toString();

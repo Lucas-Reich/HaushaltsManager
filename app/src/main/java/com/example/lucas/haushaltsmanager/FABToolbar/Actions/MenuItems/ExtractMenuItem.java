@@ -1,26 +1,24 @@
 package com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems;
 
 import android.content.Context;
-import android.util.Log;
 
-import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.ChildExpenseRepository;
-import com.example.lucas.haushaltsmanager.Database.Repositories.ChildExpenses.Exceptions.ChildExpenseNotFoundException;
-import com.example.lucas.haushaltsmanager.entities.booking.Booking;
+import com.example.lucas.haushaltsmanager.Database.AppDatabase;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ParentBookingDAO;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.ActionPayload;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.ActionKey;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.IActionKey;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBookingItem.ChildExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
+import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 
 public class ExtractMenuItem implements IMenuItem {
     public static final String ACTION_KEY = "extractAction";
-    private static final String TAG = ExtractMenuItem.class.getSimpleName();
 
-    private IActionKey mActionKey;
+    private final IActionKey mActionKey;
 
-    private OnSuccessCallback mCallback;
-    private ChildExpenseRepository mChildExpenseRepo;
+    private final OnSuccessCallback mCallback;
+    private ParentBookingDAO parentBookingRepository;
 
     public ExtractMenuItem(OnSuccessCallback callback) {
         mCallback = callback;
@@ -52,25 +50,18 @@ public class ExtractMenuItem implements IMenuItem {
         initRepo(context);
 
         for (IRecyclerItem selectedItem : actionPayload.getItems()) {
-            extractChild((ChildExpenseItem) selectedItem);
+            Booking childBooking = ((ChildExpenseItem) selectedItem).getContent();
+
+            parentBookingRepository.extractChildFromParent(childBooking);
+
+            if (null != mCallback) {
+                mCallback.onSuccess(selectedItem, childBooking);
+            }
         }
     }
 
     private void initRepo(Context context) {
-        mChildExpenseRepo = new ChildExpenseRepository(context);
-    }
-
-    private void extractChild(ChildExpenseItem child) {
-        try {
-            Booking newExpense = mChildExpenseRepo.extractChildFromBooking(child.getContent());
-
-            if (null != mCallback) {
-                mCallback.onSuccess(child, newExpense);
-            }
-        } catch (ChildExpenseNotFoundException e) {
-
-            Log.e(TAG, "Could not extract ChildExpense " + (child.getContent()).getTitle(), e);
-        }
+        parentBookingRepository = AppDatabase.getDatabase(context).parentBookingDAO();
     }
 
     public interface OnSuccessCallback {

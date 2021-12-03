@@ -4,7 +4,6 @@ import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.lucas.haushaltsmanager.entities.Account
 import com.example.lucas.haushaltsmanager.entities.Price
 import kotlinx.parcelize.Parcelize
 import java.text.DateFormat
@@ -14,13 +13,14 @@ import java.util.*
 @Entity(tableName = "bookings")
 @Parcelize
 class Booking(
-    @PrimaryKey private val id: UUID,
-    private var title: String,
-    private var price: Price,
-    private var date: Calendar,
+    @PrimaryKey val id: UUID,
+    var title: String,
+    var price: Price,
+    var date: Calendar,
     @ColumnInfo(name = "category_id") var categoryId: UUID,
-    @ColumnInfo(name = "account_id") var accountId: UUID
-) : IBooking, Parcelable {
+    @ColumnInfo(name = "account_id") var accountId: UUID,
+    @ColumnInfo(name = "parent_id") var parentId: UUID? = null
+) : Parcelable {
     constructor(
         title: String,
         price: Price,
@@ -40,34 +40,6 @@ class Booking(
                 && categoryId == other.categoryId
     }
 
-    override fun getId(): UUID {
-        return id
-    }
-
-    override fun getDate(): Calendar {
-        return date
-    }
-
-    override fun setDate(date: Calendar) {
-        this.date = date
-    }
-
-    override fun getTitle(): String {
-        return title
-    }
-
-    fun setTitle(title: String) {
-        this.title = title
-    }
-
-    override fun getPrice(): Price {
-        return price
-    }
-
-    fun setPrice(price: Price) {
-        this.price = price
-    }
-
     fun getDisplayableDateTime(): String {
         return DateFormat.getDateInstance(DateFormat.SHORT)
             .format(Date(date.timeInMillis))
@@ -81,16 +53,8 @@ class Booking(
         return price.absoluteValue
     }
 
-    fun getSignedPrice(): Double {
-        return price.price
-    }
-
     fun isExpenditure(): Boolean {
         return price.isNegative
-    }
-
-    fun setAccount(account: Account) {
-        this.accountId = account.id
     }
 
     @Deprecated("Do not use")

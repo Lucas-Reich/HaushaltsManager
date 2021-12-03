@@ -10,11 +10,9 @@ import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseFilter;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSum;
-import com.example.lucas.haushaltsmanager.entities.booking.Booking;
-import com.example.lucas.haushaltsmanager.entities.booking.IBooking;
-import com.example.lucas.haushaltsmanager.entities.booking.ParentBooking;
 import com.example.lucas.haushaltsmanager.entities.Category;
 import com.example.lucas.haushaltsmanager.entities.Report;
+import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
@@ -66,12 +64,10 @@ public class PieChartCardPopulator {
     }
 
 
-    private PieData createDataSet(List<IBooking> bookings) {
-        List<Booking> expensesWithoutParents = extractChildren(bookings);
+    private PieData createDataSet(List<Booking> bookings) {
+        List<Booking> filteredBookings = filterBookingsByExpenditureType(bookings, mShowExpenditures);
 
-        expensesWithoutParents = filterExpenses(expensesWithoutParents, mShowExpenditures);
-
-        HashMap<Category, Double> aggregatedExpenses = sumByCategory(expensesWithoutParents);
+        HashMap<Category, Double> aggregatedExpenses = sumByCategory(filteredBookings);
         return createData(aggregatedExpenses);
     }
 
@@ -93,21 +89,7 @@ public class PieChartCardPopulator {
         return new PieData(dataSet);
     }
 
-    private List<Booking> extractChildren(List<IBooking> bookings) {
-        List<Booking> flatExpenseList = new ArrayList<>();
-
-        for (IBooking booking : bookings) {
-            if (booking instanceof ParentBooking) {
-                flatExpenseList.addAll(((ParentBooking) booking).getChildren());
-            } else {
-                flatExpenseList.add((Booking) booking);
-            }
-        }
-
-        return flatExpenseList;
-    }
-
-    private List<Booking> filterExpenses(List<Booking> expenses, boolean filter) {
+    private List<Booking> filterBookingsByExpenditureType(List<Booking> expenses, boolean filter) {
         ExpenseFilter expenseFilter = new ExpenseFilter();
 
         return expenseFilter.byExpenditureType(expenses, filter);
