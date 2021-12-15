@@ -8,7 +8,6 @@ import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import java.util.ArrayList;
 import java.util.List;
 
-// REFACTORING: Ich kann die Selection Implementierung hiermit https://proandroiddev.com/a-guide-to-recyclerview-selection-3ed9f2381504 austauschen
 public abstract class RecyclerViewSelectedItemHandler extends RecyclerViewExpandableItemHandler {
     private final SelectionRules selectionRules;
     private final List<IRecyclerItem> selectedItems;

@@ -27,22 +27,20 @@ public class CategoryListRecyclerViewAdapter extends RecyclerViewSelectedItemHan
     public AbstractViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 
-        switch (viewType) {
-            case CategoryItem.VIEW_TYPE:
+        if (viewType == CategoryItem.VIEW_TYPE) {
 
-                View parentCategoryView = inflater.inflate(R.layout.recycler_view_parent_category, parent, false);
-                return new CategoryViewHolder(parentCategoryView);
-            default:
-
-                return super.onCreateViewHolder(parent, viewType);
+            View parentCategoryView = inflater.inflate(R.layout.recycler_view_parent_category, parent, false);
+            return new CategoryViewHolder(parentCategoryView);
         }
+
+        return super.onCreateViewHolder(parent, viewType);
     }
 
     @Override
     public void onBindViewHolder(@NonNull AbstractViewHolder holder, int position) {
         IRecyclerItem item = getItem(position);
 
-        holder.itemView.setSelected(isItemSelected(item));
+        holder.itemView.setActivated(isItemSelected(item));
         holder.bind(item);
     }
 }

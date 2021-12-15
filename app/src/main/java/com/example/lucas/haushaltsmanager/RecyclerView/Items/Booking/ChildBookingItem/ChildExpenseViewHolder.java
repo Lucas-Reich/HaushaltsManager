@@ -3,8 +3,6 @@ package com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBooki
 import android.view.View;
 import android.widget.TextView;
 
-import androidx.annotation.ColorRes;
-
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.R;
@@ -45,16 +43,6 @@ public class ChildExpenseViewHolder extends AbstractViewHolder {
         setTitle(expense.getTitle());
         setPrice(expense.getPrice());
         setPerson("");
-
-        setBackgroundColor();
-    }
-
-    private void setBackgroundColor() {
-        if (itemView.isSelected()) {
-            itemView.setBackgroundColor(getColor(R.color.list_item_highlighted));
-        } else {
-            itemView.setBackgroundColor(getColor(R.color.list_item_background));
-        }
     }
 
     private void setRoundedTextViewText(Category category) {
@@ -72,9 +60,5 @@ public class ChildExpenseViewHolder extends AbstractViewHolder {
 
     private void setPerson(String person) {
         this.person.setText(person);
-    }
-
-    private int getColor(@ColorRes int colorRes) {
-        return app.getContext().getResources().getColor(colorRes);
     }
 }

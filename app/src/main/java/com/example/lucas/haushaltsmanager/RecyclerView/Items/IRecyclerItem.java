@@ -14,5 +14,5 @@ public interface IRecyclerItem {
 
     IParentRecyclerItem getParent();
 
-    boolean isSelectable();
+    boolean isSelectable(); // TODO: Replace with ISelectableRecyclerItem interface
 }
