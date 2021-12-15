@@ -100,7 +100,7 @@ public abstract class RecyclerViewItemHandler extends RecyclerView.Adapter<Abstr
         notifyItemRemoved(removedItemIndex);
     }
 
-    private int indexOf(IRecyclerItem item) {
+    public int indexOf(IRecyclerItem item) {
         return items.indexOf(item);
     }
 }

@@ -152,19 +152,19 @@ public class TabOneBookings extends AbstractTab implements
                 Toast.makeText(getContext(), R.string.not_implemented, Toast.LENGTH_SHORT).show();
         }
 
-        mAdapter.clearSelections();
+        mAdapter.clearSelection();
 
         mFABToolbar.toggleToolbarVisibility(false);
     }
 
     @Override
-    public void onClick(View v, IRecyclerItem item, int position) {
+    public void onClick(View v, IRecyclerItem item) {
         if (item instanceof DateItem) {
             return;
         }
 
         if (item instanceof ParentBookingItem) {
-            mAdapter.toggleExpansion(position);
+            mAdapter.toggleExpansion(item);
             return;
         }
 
@@ -173,10 +173,10 @@ public class TabOneBookings extends AbstractTab implements
                 updateItem(item);
             }
         } else {
-            if (mAdapter.isItemSelected(item)) {
-                mAdapter.unselectItem(item, position);
+            if (mAdapter.isSelected(item)) {
+                mAdapter.unselect(item);
             } else {
-                mAdapter.selectItem(item, position);
+                mAdapter.select(item);
             }
 
             updateFABToolbar();
@@ -184,17 +184,18 @@ public class TabOneBookings extends AbstractTab implements
     }
 
     @Override
-    public void onLongClick(View v, IRecyclerItem item, int position) {
-        if (item instanceof DateItem || mAdapter.getSelectedItemCount() != 0)
+    public void onLongClick(View v, IRecyclerItem item) {
+        if (item instanceof DateItem || mAdapter.getSelectedItemCount() != 0) {
             return;
+        }
 
         if (item instanceof ParentBookingItem) {
-            mAdapter.toggleExpansion(position);
+            mAdapter.toggleExpansion(item);
 
             return;
         }
 
-        mAdapter.selectItem(item, position);
+        mAdapter.select(item);
 
         updateFABToolbar();
     }
@@ -261,7 +262,7 @@ public class TabOneBookings extends AbstractTab implements
         // TODO: Kann ich hierfür eine smarte Lösung finden.
         //  Kann ich das auch mit SelectionRules machen, wie sie schon für die RecyclerView genutzt werden.
         int selectedChildren = mAdapter.getSelectedChildCount();
-        int selectedItems = mAdapter.getSelectedItemsCount();
+        int selectedItems = mAdapter.getSelectedParentCount();
 
         // Wenn kein Item ausgewählt ist
         if (selectedChildren == 0 && selectedItems == 0) {

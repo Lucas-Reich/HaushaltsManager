@@ -66,7 +66,7 @@ public class CategoryList extends AbstractAppCompatActivity implements
     }
 
     @Override
-    public void onClick(View v, IRecyclerItem item, int position) {
+    public void onClick(View v, IRecyclerItem item) {
         if (!mRecyclerViewAdapter.isInSelectionMode()) {
             CategoryItem categoryItem = (CategoryItem) item;
 
@@ -75,18 +75,18 @@ public class CategoryList extends AbstractAppCompatActivity implements
             return;
         }
 
-        if (mRecyclerViewAdapter.isItemSelected(item)) {
-            mRecyclerViewAdapter.unselectItem(item, position);
+        if (mRecyclerViewAdapter.isSelected(item)) {
+            mRecyclerViewAdapter.unselect(item);
         } else {
-            mRecyclerViewAdapter.selectItem(item, position);
+            mRecyclerViewAdapter.select(item);
         }
 
         updateFABToolbar();
     }
 
     @Override
-    public void onLongClick(View v, IRecyclerItem item, int position) {
-        mRecyclerViewAdapter.selectItem(item, position);
+    public void onLongClick(View v, IRecyclerItem item) {
+        mRecyclerViewAdapter.select(item);
 
         updateFABToolbar();
     }
@@ -116,7 +116,7 @@ public class CategoryList extends AbstractAppCompatActivity implements
     }
 
     private void updateFABToolbar() {
-        boolean itemsSelected = mRecyclerViewAdapter.getSelectedItemsCount() != 0;
+        boolean itemsSelected = mRecyclerViewAdapter.getSelectedParentCount() != 0;
 
         mFabToolbar.toggleToolbarVisibility(itemsSelected);
     }

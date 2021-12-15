@@ -45,7 +45,7 @@ public class TemplatesActivity extends AbstractAppCompatActivity implements Recy
     }
 
     @Override
-    public void onClick(View v, IRecyclerItem item, int position) {
+    public void onClick(View v, IRecyclerItem item) {
         if (getCallingActivity() == null) {
             return;
         }
@@ -64,7 +64,7 @@ public class TemplatesActivity extends AbstractAppCompatActivity implements Recy
     }
 
     @Override
-    public void onLongClick(View v, IRecyclerItem item, int position) {
+    public void onLongClick(View v, IRecyclerItem item) {
         // Do nothing
     }
 

@@ -7,8 +7,6 @@ import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBookin
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IExpandableRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public abstract class RecyclerViewExpandableItemHandler extends RecyclerViewItemHandler {
@@ -44,12 +42,15 @@ public abstract class RecyclerViewExpandableItemHandler extends RecyclerViewItem
         super.insert(item);
     }
 
-    public void toggleExpansion(int position) {
-        IRecyclerItem item = get(position);
-
+    public void toggleExpansion(IRecyclerItem item) {
         if (!(item instanceof IExpandableRecyclerItem)) {
 
             Log.i(TAG, String.format("Tried to toggle expansion non expandable item: %s", item.getClass().getSimpleName()));
+            return;
+        }
+
+        if (!exists(item)) {
+            Log.i(TAG, "Tried to toggle expansion of non exiting item");
             return;
         }
 

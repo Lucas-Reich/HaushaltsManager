@@ -33,7 +33,7 @@ public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListen
                 if (childView != null && mListener != null) {
                     int position = getPosition(recyclerView, childView);
 
-                    mListener.onLongClick(childView, getItem(recyclerView, position), position);
+                    mListener.onLongClick(childView, getItem(recyclerView, position));
                 }
             }
         });
@@ -46,7 +46,7 @@ public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListen
         if (childView != null && mListener != null && mGestureDetector.onTouchEvent(e)) {
             int position = getPosition(recyclerView, childView);
 
-            mListener.onClick(childView, getItem(recyclerView, position), position);
+            mListener.onClick(childView, getItem(recyclerView, position));
         }
 
         return false;
@@ -69,8 +69,8 @@ public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListen
     }
 
     public interface OnRecyclerItemClickListener {
-        void onClick(View v, IRecyclerItem item, int position);
+        void onClick(View v, IRecyclerItem item);
 
-        void onLongClick(View v, IRecyclerItem item, int position);
+        void onLongClick(View v, IRecyclerItem item);
     }
 }

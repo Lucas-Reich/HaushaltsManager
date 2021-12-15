@@ -26,38 +26,39 @@ public abstract class RecyclerViewSelectedItemHandler extends RecyclerViewExpand
         super.remove(item);
     }
 
-    public void selectItem(IRecyclerItem item, int position) {
+    public void select(IRecyclerItem item) {
         if (!selectionRules.canBeSelected(item, selectedItems)) {
             return;
         }
 
         selectedItems.add(item);
-        notifyItemChanged(position);
+        notifyItemChanged(indexOf(item));
     }
 
-    public void unselectItem(IRecyclerItem item, int position) {
+    public void unselect(IRecyclerItem item) {
         if (!selectedItems.contains(item)) {
             return;
         }
 
         selectedItems.remove(item);
-        notifyItemChanged(position);
+        notifyItemChanged(indexOf(item));
     }
 
-    public void clearSelections() {
+    public void clearSelection() {
         if (selectedItems.isEmpty()) {
             return;
         }
 
-        selectedItems.clear();
-        notifyDataSetChanged();
+        for (IRecyclerItem item : selectedItems) {
+            unselect(item);
+        }
     }
 
     public int getSelectedItemCount() {
         return selectedItems.size();
     }
 
-    public int getSelectedItemsCount() {
+    public int getSelectedParentCount() {
         int itemCount = 0;
 
         for (IRecyclerItem item : selectedItems) {
@@ -67,10 +68,6 @@ public abstract class RecyclerViewSelectedItemHandler extends RecyclerViewExpand
         }
 
         return itemCount;
-    }
-
-    public boolean isInSelectionMode() {
-        return selectedItems.size() > 0;
     }
 
     public int getSelectedChildCount() {
@@ -85,11 +82,15 @@ public abstract class RecyclerViewSelectedItemHandler extends RecyclerViewExpand
         return childCount;
     }
 
+    public boolean isInSelectionMode() {
+        return selectedItems.size() > 0;
+    }
+
     public List<IRecyclerItem> getSelectedItems() {
         return selectedItems;
     }
 
-    public boolean isItemSelected(IRecyclerItem item) {
+    public boolean isSelected(IRecyclerItem item) {
         return selectedItems.contains(item);
     }
 }

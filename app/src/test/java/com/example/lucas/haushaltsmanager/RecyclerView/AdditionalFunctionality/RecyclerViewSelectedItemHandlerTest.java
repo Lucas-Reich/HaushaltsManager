@@ -12,10 +12,7 @@ import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ParentBooki
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.MockItemHandler;
 import com.example.lucas.haushaltsmanager.entities.booking.Booking;
-import com.example.lucas.haushaltsmanager.entities.booking.ExpenseType;
 import com.example.lucas.haushaltsmanager.entities.booking.ParentBooking;
-import com.example.lucas.haushaltsmanager.entities.Category;
-import com.example.lucas.haushaltsmanager.entities.Color;
 import com.example.lucas.haushaltsmanager.entities.Price;
 
 import org.junit.After;
@@ -58,9 +55,9 @@ public class RecyclerViewSelectedItemHandlerTest {
     public void notSelectedItemCanBeUnselected() {
         ChildExpenseItem notSelectedItem = new ChildExpenseItem(getDummyExpense(), getDummyParentItem());
 
-        itemHandler.unselectItem(notSelectedItem, 0);
+        itemHandler.unselect(notSelectedItem);
 
-        assertFalse(itemHandler.isItemSelected(notSelectedItem));
+        assertFalse(itemHandler.isSelected(notSelectedItem));
     }
 
     @Test
@@ -69,14 +66,14 @@ public class RecyclerViewSelectedItemHandlerTest {
 
         itemHandler.insert(item);
 
-        itemHandler.selectItem(item, 1);
-        assertTrue(itemHandler.isItemSelected(item));
+        itemHandler.select(item);
+        assertTrue(itemHandler.isSelected(item));
 
         itemHandler.remove(item);
         assertEquals(itemHandler.getItemCount(), 0);
 
         assertEquals(0, itemHandler.getSelectedItemCount());
-        assertFalse(itemHandler.isItemSelected(item));
+        assertFalse(itemHandler.isSelected(item));
     }
 
     @Test
@@ -88,17 +85,17 @@ public class RecyclerViewSelectedItemHandlerTest {
 
         itemHandler.insert(parent);
 
-        itemHandler.toggleExpansion(1);
+        itemHandler.toggleExpansion(parent);
         assertEquals(3, itemHandler.getItemCount());
 
-        itemHandler.selectItem(child, 2);
-        assertTrue(itemHandler.isItemSelected(child));
+        itemHandler.select(child);
+        assertTrue(itemHandler.isSelected(child));
 
-        itemHandler.toggleExpansion(1);
+        itemHandler.toggleExpansion(parent);
         assertEquals(2, itemHandler.getItemCount());
 
         assertEquals(1, itemHandler.getSelectedItemCount());
-        assertTrue(itemHandler.isItemSelected(child));
+        assertTrue(itemHandler.isSelected(child));
     }
 
     private ParentBookingItem getDummyParentItem() {

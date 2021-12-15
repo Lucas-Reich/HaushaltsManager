@@ -12,6 +12,7 @@ import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.BookingItem
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBookingItem.ChildExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ParentBookingItem.ParentBookingItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.IExpandableRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.ExpenseListRecyclerViewAdapter;
 import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 import com.example.lucas.haushaltsmanager.entities.booking.ParentBooking;
@@ -72,7 +73,7 @@ public class RecyclerViewExpandableItemHandlerTest {
         parentBookingItem.getChildren().remove(1);
 
         mItemHandler.insert(parentBookingItem);
-        mItemHandler.toggleExpansion(1);
+        mItemHandler.toggleExpansion(parentBookingItem);
         assertEquals(3, mItemHandler.getItemCount());
 
         mItemHandler.insert(expectedChildItem);
@@ -100,7 +101,7 @@ public class RecyclerViewExpandableItemHandlerTest {
         ParentBookingItem expectedParentBookingItem = new ParentBookingItem(getParentExpense(3), parent);
 
         mItemHandler.insert(expectedParentBookingItem);
-        mItemHandler.toggleExpansion(1);
+        mItemHandler.toggleExpansion(expectedParentBookingItem);
         assertSame(5, mItemHandler.getItemCount());
 
         mItemHandler.remove(mItemHandler.get(2));
@@ -117,9 +118,10 @@ public class RecyclerViewExpandableItemHandlerTest {
     public void testRemoveLastChildOfParentShouldRemoveParent() {
         DateItem date = new DateItem(createSimpleDate(10, Calendar.MAY, 2019));
 
-        mItemHandler.insert(new ParentBookingItem(getParentExpense(1), date));
+        IExpandableRecyclerItem parentBookingItem = new ParentBookingItem(getParentExpense(1), date);
+        mItemHandler.insert(parentBookingItem);
         mItemHandler.insert(new ExpenseItem(createSimpleExpense(date.getContent()), date));
-        mItemHandler.toggleExpansion(2);
+        mItemHandler.toggleExpansion(parentBookingItem);
         assertSame(4, mItemHandler.getItemCount());
 
         mItemHandler.remove(mItemHandler.get(3));
@@ -133,8 +135,9 @@ public class RecyclerViewExpandableItemHandlerTest {
 
         DateItem parent = new DateItem(createSimpleDate(10, Calendar.JUNE, 2019));
 
-        mItemHandler.insert(new ParentBookingItem(parentBooking, parent));
-        mItemHandler.toggleExpansion(1);
+        IExpandableRecyclerItem parentBookingItem = new ParentBookingItem(parentBooking, parent);
+        mItemHandler.insert(parentBookingItem);
+        mItemHandler.toggleExpansion(parentBookingItem);
         assertSame(3, mItemHandler.getItemCount());
 
         mItemHandler.remove(mItemHandler.get(2));
@@ -151,7 +154,7 @@ public class RecyclerViewExpandableItemHandlerTest {
         mItemHandler.insert(expectedParentBookingItem);
         assertSame(2, mItemHandler.getItemCount());
 
-        mItemHandler.toggleExpansion(1);
+        mItemHandler.toggleExpansion(expectedParentBookingItem);
         assertSame(4, mItemHandler.getItemCount());
 
         assertTrue(((ParentBookingItem) mItemHandler.get(1)).isExpanded());
@@ -167,10 +170,10 @@ public class RecyclerViewExpandableItemHandlerTest {
         ParentBookingItem expectedParentBookingItem = new ParentBookingItem(getParentExpense(2), parent);
 
         mItemHandler.insert(expectedParentBookingItem);
-        mItemHandler.toggleExpansion(1);
+        mItemHandler.toggleExpansion(expectedParentBookingItem);
         assertSame(4, mItemHandler.getItemCount());
 
-        mItemHandler.toggleExpansion(1);
+        mItemHandler.toggleExpansion(expectedParentBookingItem);
 
         assertFalse(((ParentBookingItem) mItemHandler.get(1)).isExpanded());
         assertEquals(expectedParentBookingItem, mItemHandler.get(1));
@@ -182,7 +185,7 @@ public class RecyclerViewExpandableItemHandlerTest {
 
         try {
 
-            mItemHandler.toggleExpansion(1337);
+            mItemHandler.toggleExpansion(new ParentBookingItem(getParentExpense(0), new DateItem(createSimpleDate(10, Calendar.JUNE, 2019))));
             fail("Could toggle expansion of not existing Item");
         } catch (IndexOutOfBoundsException e) {
 
@@ -198,7 +201,7 @@ public class RecyclerViewExpandableItemHandlerTest {
         mItemHandler.insert(expenseItem);
         assertSame(2, mItemHandler.getItemCount());
 
-        mItemHandler.toggleExpansion(1);
+        mItemHandler.toggleExpansion(expenseItem);
         assertSame(2, mItemHandler.getItemCount());
     }
 

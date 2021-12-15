@@ -66,7 +66,7 @@ public class ExpenseListRecyclerViewAdapter extends RecyclerViewSelectedItemHand
     public void onBindViewHolder(@NonNull AbstractViewHolder holder, int position) {
         IRecyclerItem item = get(position);
 
-        holder.itemView.setActivated(isItemSelected(item));
+        holder.itemView.setActivated(isSelected(item));
         holder.bind(item);
     }
 }

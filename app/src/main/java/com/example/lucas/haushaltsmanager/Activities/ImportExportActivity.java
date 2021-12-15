@@ -121,7 +121,7 @@ public class ImportExportActivity extends AbstractAppCompatActivity implements R
     }
 
     @Override
-    public void onClick(View v, IRecyclerItem item, int position) {
+    public void onClick(View v, IRecyclerItem item) {
         Intent expenseImporterIntent = new Intent(ImportExportActivity.this, ExpenseImporterActivity.class);
         expenseImporterIntent.putExtras(createBundleWithSelectedFile(item));
 
@@ -129,7 +129,7 @@ public class ImportExportActivity extends AbstractAppCompatActivity implements R
     }
 
     @Override
-    public void onLongClick(View v, IRecyclerItem item, int position) {
+    public void onLongClick(View v, IRecyclerItem item) {
         // If item (importable file) is long clicked nothing should happen
     }
 
