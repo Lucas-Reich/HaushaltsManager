@@ -61,7 +61,7 @@ public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListen
     }
 
     private IRecyclerItem getItem(RecyclerView recyclerView, int position) {
-        return ((RecyclerViewItemHandler) recyclerView.getAdapter()).getItem(position);
+        return ((RecyclerViewItemHandler) recyclerView.getAdapter()).get(position);
     }
 
     private int getPosition(RecyclerView recyclerView, View childView) {

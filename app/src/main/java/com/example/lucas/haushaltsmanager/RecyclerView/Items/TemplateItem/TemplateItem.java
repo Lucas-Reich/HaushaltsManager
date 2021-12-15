@@ -31,11 +31,6 @@ public class TemplateItem implements IRecyclerItem {
         return null;
     }
 
-    @Override
-    public boolean isSelectable() {
-        return true;
-    }
-
     @NonNull
     @Override
     public String toString() {

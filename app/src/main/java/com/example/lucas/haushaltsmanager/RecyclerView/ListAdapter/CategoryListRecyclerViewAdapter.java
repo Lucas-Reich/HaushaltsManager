@@ -38,7 +38,7 @@ public class CategoryListRecyclerViewAdapter extends RecyclerViewSelectedItemHan
 
     @Override
     public void onBindViewHolder(@NonNull AbstractViewHolder holder, int position) {
-        IRecyclerItem item = getItem(position);
+        IRecyclerItem item = get(position);
 
         holder.itemView.setActivated(isItemSelected(item));
         holder.bind(item);

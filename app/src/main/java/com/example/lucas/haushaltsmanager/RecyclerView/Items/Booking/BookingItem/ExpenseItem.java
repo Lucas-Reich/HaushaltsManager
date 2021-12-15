@@ -48,9 +48,4 @@ public class ExpenseItem implements IBookingItem {
     public DateItem getParent() {
         return parent;
     }
-
-    @Override
-    public boolean isSelectable() {
-        return true;
-    }
 }

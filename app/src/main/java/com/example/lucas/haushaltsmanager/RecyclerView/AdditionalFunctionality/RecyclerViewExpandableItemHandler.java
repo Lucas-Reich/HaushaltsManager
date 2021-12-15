@@ -4,7 +4,6 @@ import android.util.Log;
 
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.InsertStrategy.InsertStrategy;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBookingItem.ChildExpenseItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ParentBookingItem.ParentBookingItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IExpandableRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 
@@ -20,29 +19,37 @@ public abstract class RecyclerViewExpandableItemHandler extends RecyclerViewItem
     }
 
     @Override
-    public void removeItem(IRecyclerItem item) {
-        if (item instanceof ChildExpenseItem) {
+    public void remove(IRecyclerItem item) {
+        super.remove(item);
 
-            ParentBookingItem parent = (ParentBookingItem) item.getParent();
+        if (item instanceof ChildExpenseItem) {
+            IExpandableRecyclerItem parent = item.getParent();
             parent.removeChild(item);
 
-            updateItem(parent);
+            if (0 == parent.getChildren().size()) {
+                super.remove(parent);
+            }
         }
-
-        super.removeItem(item);
     }
 
     @Override
-    public void insertItem(IRecyclerItem item) {
-        super.insertItem(item);
+    public void insert(IRecyclerItem item) {
+        IExpandableRecyclerItem parent = item.getParent();
+        if (null == item.getParent() && exists(parent)) {
+            super.insert(item);
+            return;
+        }
+
+        super.insert(parent);
+        super.insert(item);
     }
 
     public void toggleExpansion(int position) {
-        IRecyclerItem item = getItem(position);
+        IRecyclerItem item = get(position);
 
         if (!(item instanceof IExpandableRecyclerItem)) {
 
-            Log.i(TAG, String.format("Tried to toggle expansion for not expandable item: %s", item.getClass().getSimpleName()));
+            Log.i(TAG, String.format("Tried to toggle expansion non expandable item: %s", item.getClass().getSimpleName()));
             return;
         }
 
@@ -50,32 +57,17 @@ public abstract class RecyclerViewExpandableItemHandler extends RecyclerViewItem
     }
 
     private void handleExpansion(IExpandableRecyclerItem expandableItem) {
-        // TODO: Expansion strategie, ohne auch immer den Parent updaten zu müssen:
-        //  Expand: Children des Parents werden gelöscht und in die Liste eingefügt.
-        //  Collapse: Children werden aus der Liste gelöscht und dem Parent hinzugefügt.
-        List<IRecyclerItem> children = expandableItem.getChildren();
+        for (IRecyclerItem item : expandableItem.getChildren()) {
+            if (expandableItem.isExpanded()) {
+                remove(item);
+                continue;
+            }
 
-        if (expandableItem.isExpanded()) {
-            removeChildren(children);
-            expandableItem.setExpanded(!expandableItem.isExpanded());
-        } else {
-            expandableItem.setExpanded(!expandableItem.isExpanded());
-            insertChildren(children);
+            insert(item);
         }
 
-        updateItem(expandableItem);
-    }
+        expandableItem.setExpanded(!expandableItem.isExpanded());
 
-    private void insertChildren(List<IRecyclerItem> items) {
-        List<IRecyclerItem> copy = new ArrayList<>(items);
-        Collections.reverse(copy);
-
-        insertAll(copy);
-    }
-
-    private void removeChildren(List<IRecyclerItem> items) {
-        for (IRecyclerItem item : items) {
-            deleteItem(item);
-        }
+        update(expandableItem);
     }
 }

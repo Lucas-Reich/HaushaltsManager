@@ -13,7 +13,7 @@ import java.util.List;
 public class DateItem implements IExpandableRecyclerItem {
     public static final int VIEW_TYPE = 0;
 
-    private Calendar date;
+    private final Calendar date;
 
     public DateItem(Calendar date) {
         this.date = date;
@@ -50,11 +50,6 @@ public class DateItem implements IExpandableRecyclerItem {
     @Override
     public IExpandableRecyclerItem getParent() {
         return null;
-    }
-
-    @Override
-    public boolean isSelectable() {
-        return false;
     }
 
     @Override

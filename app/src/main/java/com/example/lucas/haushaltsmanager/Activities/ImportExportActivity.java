@@ -112,7 +112,7 @@ public class ImportExportActivity extends AbstractAppCompatActivity implements R
                 CsvBookingExporter fileExporter = new CsvBookingExporter(selectedDirectory, ImportExportActivity.this);
                 File createdFile = fileExporter.writeToFile(getAllExpenses());
 
-                adapter.insertItem(new FileItem(createdFile));
+                adapter.insert(new FileItem(createdFile));
             });
             confirmationDialog.show(getFragmentManager(), "import_confirm_export");
         });

@@ -231,23 +231,23 @@ public class TabOneBookings extends AbstractTab implements
 
     private void configureFabToolbar() {
         mFABToolbar.addMenuItem(new ExtractMenuItem((extractedItem, extractedExpense) -> {
-            mAdapter.removeItem(extractedItem);
+            mAdapter.remove(extractedItem);
 
-            mAdapter.insertItem(new ExpenseItem(extractedExpense, (DateItem) extractedItem.getParent().getParent()));
+            mAdapter.insert(new ExpenseItem(extractedExpense, (DateItem) extractedItem.getParent().getParent()));
         }), this);
 
         mFABToolbar.addMenuItem(new CombineMenuItem((combinedExpense, removedItems) -> {
             for (IRecyclerItem removedItem : removedItems) {
-                mAdapter.removeItem(removedItem);
+                mAdapter.remove(removedItem);
             }
 
-            mAdapter.insertItem(new ParentBookingItem(combinedExpense, (DateItem) removedItems.get(0).getParent()));
+            mAdapter.insert(new ParentBookingItem(combinedExpense, (DateItem) removedItems.get(0).getParent()));
         }), this);
 
         mFABToolbar.addMenuItem(new AddChildMenuItem(), this);
 
         mFABToolbar.addMenuItem(new DeleteExpenseMenuItem(deletedItem -> {
-            mAdapter.removeItem(deletedItem);
+            mAdapter.remove(deletedItem);
 
             mRevertDeletionSnackbar.addItem(deletedItem);
         }), this);
@@ -314,6 +314,6 @@ public class TabOneBookings extends AbstractTab implements
     private void initializeRevertDeletionSnackbar() {
         mRevertDeletionSnackbar = new RevertExpenseDeletionSnackbar(getContext());
         mRevertDeletionSnackbar.setMessage(getString(R.string.revert_deletion));
-        mRevertDeletionSnackbar.setOnExpenseRestoredListener(item -> mAdapter.insertItem(item));
+        mRevertDeletionSnackbar.setOnExpenseRestoredListener(item -> mAdapter.insert(item));
     }
 }

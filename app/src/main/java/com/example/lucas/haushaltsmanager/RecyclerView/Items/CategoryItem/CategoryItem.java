@@ -28,8 +28,4 @@ public class CategoryItem implements ISelectableRecyclerItem {
     public IExpandableRecyclerItem getParent() {
         return null;
     }
-
-    public boolean isSelectable() {
-        return true;
-    }
 }

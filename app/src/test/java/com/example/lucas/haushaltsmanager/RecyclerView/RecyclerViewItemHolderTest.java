@@ -2,9 +2,6 @@ package com.example.lucas.haushaltsmanager.RecyclerView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.lucas.haushaltsmanager.entities.booking.ExpenseType;
-import com.example.lucas.haushaltsmanager.entities.Category;
-import com.example.lucas.haushaltsmanager.entities.Color;
 import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 import com.example.lucas.haushaltsmanager.entities.Price;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
@@ -56,9 +53,9 @@ public class RecyclerViewItemHolderTest {
     public void testGetItemShouldFindItem() {
         DateItem dateItem = new DateItem(createSimpleDate(2019, Calendar.MAY, 11));
         IRecyclerItem expectedItem = new ExpenseItem(createSimpleExpense(dateItem.getContent()), dateItem);
-        mItemHandler.insertItem(expectedItem);
+        mItemHandler.insert(expectedItem);
 
-        IRecyclerItem actualItem = mItemHandler.getItem(1);
+        IRecyclerItem actualItem = mItemHandler.get(1);
 
         assertEquals(expectedItem, actualItem);
     }
@@ -66,7 +63,7 @@ public class RecyclerViewItemHolderTest {
     @Test
     public void testGetItemShouldThrowExceptionForNotExistingItem() {
         try {
-            mItemHandler.getItem(1337);
+            mItemHandler.get(1337);
             fail("Should not find Item with index 1337");
         } catch (IndexOutOfBoundsException e) {
 
@@ -78,30 +75,30 @@ public class RecyclerViewItemHolderTest {
     public void testCorrectDateOrder() {
         DateItem fifthDateItem = new DateItem(createSimpleDate(2018, Calendar.JUNE, 11));
         IRecyclerItem item1 = new ExpenseItem(createSimpleExpense(fifthDateItem.getContent()), fifthDateItem);
-        mItemHandler.insertItem(item1);
+        mItemHandler.insert(item1);
 
         DateItem secondDateItem = new DateItem(createSimpleDate(2019, Calendar.DECEMBER, 30));
         IRecyclerItem item2 = new ExpenseItem(createSimpleExpense(secondDateItem.getContent()), secondDateItem);
-        mItemHandler.insertItem(item2);
+        mItemHandler.insert(item2);
 
         DateItem firstDateItem = new DateItem(createSimpleDate(2019, Calendar.DECEMBER, 31));
         IRecyclerItem item3 = new ExpenseItem(createSimpleExpense(firstDateItem.getContent()), firstDateItem);
-        mItemHandler.insertItem(item3);
+        mItemHandler.insert(item3);
 
         DateItem thirdDateItem = new DateItem(createSimpleDate(2019, Calendar.JUNE, 11));
         IRecyclerItem item4 = new ExpenseItem(createSimpleExpense(thirdDateItem.getContent()), thirdDateItem);
-        mItemHandler.insertItem(item4);
+        mItemHandler.insert(item4);
 
         DateItem fourthDateItem = new DateItem(createSimpleDate(2019, Calendar.MAY, 6));
         IRecyclerItem item5 = new ExpenseItem(createSimpleExpense(fourthDateItem.getContent()), fourthDateItem);
-        mItemHandler.insertItem(item5);
+        mItemHandler.insert(item5);
 
         assertEquals(10, mItemHandler.getItemCount());
-        assertSameDate(firstDateItem, (DateItem) mItemHandler.getItem(0));
-        assertSameDate(secondDateItem, (DateItem) mItemHandler.getItem(2));
-        assertSameDate(thirdDateItem, (DateItem) mItemHandler.getItem(4));
-        assertSameDate(fourthDateItem, (DateItem) mItemHandler.getItem(6));
-        assertSameDate(fifthDateItem, (DateItem) mItemHandler.getItem(8));
+        assertSameDate(firstDateItem, (DateItem) mItemHandler.get(0));
+        assertSameDate(secondDateItem, (DateItem) mItemHandler.get(2));
+        assertSameDate(thirdDateItem, (DateItem) mItemHandler.get(4));
+        assertSameDate(fourthDateItem, (DateItem) mItemHandler.get(6));
+        assertSameDate(fifthDateItem, (DateItem) mItemHandler.get(8));
     }
 
     @Test
@@ -109,15 +106,15 @@ public class RecyclerViewItemHolderTest {
         DateItem expectedDateItem = new DateItem(createSimpleDate(2019, Calendar.JANUARY, 1));
         ExpenseItem expectedRecyclerItem = new ExpenseItem(createSimpleExpense(expectedDateItem.getContent()), expectedDateItem);
 
-        mItemHandler.insertItem(expectedRecyclerItem);
+        mItemHandler.insert(expectedRecyclerItem);
 
         assertSame(2, mItemHandler.getItemCount());
-        assertSameDate(expectedDateItem, (DateItem) mItemHandler.getItem(0));
-        assertEquals(expectedRecyclerItem, mItemHandler.getItem(1));
+        assertSameDate(expectedDateItem, (DateItem) mItemHandler.get(0));
+        assertEquals(expectedRecyclerItem, mItemHandler.get(1));
     }
 
     @Test
-    public void testInsertItemAfterSet() {
+    public void testinsertAfterSet() {
         List<DateItem> dateItems = new ArrayList<>();
         dateItems.add(new DateItem(createSimpleDate(2019, Calendar.JANUARY, 22)));
         dateItems.add(new DateItem(createSimpleDate(2019, Calendar.JANUARY, 24)));
@@ -126,15 +123,15 @@ public class RecyclerViewItemHolderTest {
         DateItem dateItem = new DateItem(createSimpleDate(2019, Calendar.JANUARY, 21));
         IRecyclerItem expectedItem = new ExpenseItem(createSimpleExpense(dateItem.getContent()), dateItem);
 
-        mItemHandler.insertItem(expectedItem);
+        mItemHandler.insert(expectedItem);
 
         assertSame(6, mItemHandler.getItemCount());
-        assertSameDate(dateItem, (DateItem) mItemHandler.getItem(4));
-        assertEquals(expectedItem, mItemHandler.getItem(5));
+        assertSameDate(dateItem, (DateItem) mItemHandler.get(4));
+        assertEquals(expectedItem, mItemHandler.get(5));
     }
 
     @Test
-    public void testInsertItemInTheMiddleOfSet() {
+    public void testinsertInTheMiddleOfSet() {
         List<DateItem> dateItems = new ArrayList<>();
         dateItems.add(new DateItem(createSimpleDate(2019, Calendar.JANUARY, 22)));
         dateItems.add(new DateItem(createSimpleDate(2019, Calendar.JANUARY, 24)));
@@ -143,15 +140,15 @@ public class RecyclerViewItemHolderTest {
         DateItem dateItem = new DateItem(createSimpleDate(2019, Calendar.JANUARY, 23));
         IRecyclerItem expectedItem = new ExpenseItem(createSimpleExpense(dateItem.getContent()), dateItem);
 
-        mItemHandler.insertItem(expectedItem);
+        mItemHandler.insert(expectedItem);
 
         assertSame(6, mItemHandler.getItemCount());
-        assertSameDate(dateItem, (DateItem) mItemHandler.getItem(2));
-        assertEquals(expectedItem, mItemHandler.getItem(3));
+        assertSameDate(dateItem, (DateItem) mItemHandler.get(2));
+        assertEquals(expectedItem, mItemHandler.get(3));
     }
 
     @Test
-    public void testInsertItemBeforeSet() {
+    public void testinsertBeforeSet() {
         List<DateItem> dateItems = new ArrayList<>();
         dateItems.add(new DateItem(createSimpleDate(2019, Calendar.JANUARY, 22)));
         dateItems.add(new DateItem(createSimpleDate(2019, Calendar.JANUARY, 24)));
@@ -160,11 +157,11 @@ public class RecyclerViewItemHolderTest {
         DateItem dateItem = new DateItem(createSimpleDate(2019, Calendar.JANUARY, 25));
         IRecyclerItem expectedItem = new ExpenseItem(createSimpleExpense(dateItem.getContent()), dateItem);
 
-        mItemHandler.insertItem(expectedItem);
+        mItemHandler.insert(expectedItem);
 
         assertSame(6, mItemHandler.getItemCount());
-        assertSameDate(dateItem, (DateItem) mItemHandler.getItem(0));
-        assertEquals(expectedItem, mItemHandler.getItem(1));
+        assertSameDate(dateItem, (DateItem) mItemHandler.get(0));
+        assertEquals(expectedItem, mItemHandler.get(1));
     }
 
     // TODO: testRemoveExpandedParentShouldRemoveChildren
@@ -173,28 +170,28 @@ public class RecyclerViewItemHolderTest {
     public void testInsertToExistingDate() {
         DateItem parent = new DateItem(createSimpleDate(2019, Calendar.MAY, 6));
         ExpenseItem existingItem = new ExpenseItem(createSimpleExpense(parent.getContent()), parent);
-        mItemHandler.insertItem(existingItem);
+        mItemHandler.insert(existingItem);
 
         ExpenseItem expectedItem = new ExpenseItem(createSimpleExpense(parent.getContent()), parent);
-        mItemHandler.insertItem(expectedItem);
+        mItemHandler.insert(expectedItem);
 
         assertSame(3, mItemHandler.getItemCount());
-        assertSameDate(parent, (DateItem) mItemHandler.getItem(0));
-        assertEquals(existingItem, mItemHandler.getItem(1));
-        assertEquals(expectedItem, mItemHandler.getItem(2));
+        assertSameDate(parent, (DateItem) mItemHandler.get(0));
+        assertEquals(existingItem, mItemHandler.get(1));
+        assertEquals(expectedItem, mItemHandler.get(2));
     }
 
     @Test
     public void testInsertToExistingDate2() {
         DateItem parent = new DateItem(createSimpleDate(2019, Calendar.MAY, 6));
 
-        mItemHandler.insertItem(new ExpenseItem(createSimpleExpense(createSimpleDate(2019, Calendar.MAY, 6)), parent));
+        mItemHandler.insert(new ExpenseItem(createSimpleExpense(createSimpleDate(2019, Calendar.MAY, 6)), parent));
 
         IRecyclerItem expectedItem = new ExpenseItem(createSimpleExpense(createSimpleDate(2019, Calendar.MAY, 6)), parent);
-        mItemHandler.insertItem(expectedItem);
+        mItemHandler.insert(expectedItem);
 
         assertSame(3, mItemHandler.getItemCount());
-        assertEquals(expectedItem, mItemHandler.getItem(2));
+        assertEquals(expectedItem, mItemHandler.get(2));
     }
 
     @Test
@@ -203,12 +200,12 @@ public class RecyclerViewItemHolderTest {
         ExpenseItem expense1 = new ExpenseItem(createSimpleExpense(dateItem.getContent()), dateItem);
         ExpenseItem expense2 = new ExpenseItem(createSimpleExpense(dateItem.getContent()), dateItem);
 
-        mItemHandler.insertItem(expense1);
-        mItemHandler.insertItem(expense2);
+        mItemHandler.insert(expense1);
+        mItemHandler.insert(expense2);
 
         assertEquals(3, mItemHandler.getItemCount());
 
-        mItemHandler.removeItem(expense1);
+        mItemHandler.remove(expense1);
 
         assertEquals(2, mItemHandler.getItemCount());
     }
@@ -218,11 +215,11 @@ public class RecyclerViewItemHolderTest {
         DateItem parent = new DateItem(createSimpleDate(2019, 0, 24));
         ExpenseItem item = new ExpenseItem(createSimpleExpense(parent.getContent()), parent);
 
-        mItemHandler.insertItem(item);
+        mItemHandler.insert(item);
 
         assertEquals(2, mItemHandler.getItemCount());
 
-        mItemHandler.removeItem(item);
+        mItemHandler.remove(item);
 
         assertEquals(0, mItemHandler.getItemCount());
     }
@@ -267,7 +264,7 @@ public class RecyclerViewItemHolderTest {
 
     private void fillHandlerWithItems(List<DateItem> itemDates) {
         for (DateItem dateItem : itemDates) {
-            mItemHandler.insertItem(
+            mItemHandler.insert(
                     new ExpenseItem(createSimpleExpense(dateItem.getContent()), dateItem)
             );
         }

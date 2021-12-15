@@ -1,6 +1,7 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.Items;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 public interface IRecyclerItem {
     @NonNull
@@ -12,7 +13,6 @@ public interface IRecyclerItem {
 
     Object getContent();
 
+    @Nullable
     IExpandableRecyclerItem getParent();
-
-    boolean isSelectable(); // TODO: Replace with ISelectableRecyclerItem interface
 }

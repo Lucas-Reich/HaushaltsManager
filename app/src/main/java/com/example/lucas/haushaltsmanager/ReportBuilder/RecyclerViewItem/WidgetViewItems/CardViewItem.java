@@ -48,9 +48,4 @@ public abstract class CardViewItem implements IRecyclerItem {
 
         return other.getContent().equals(widget);
     }
-
-    @Override
-    public boolean isSelectable() {
-        return false;
-    }
 }

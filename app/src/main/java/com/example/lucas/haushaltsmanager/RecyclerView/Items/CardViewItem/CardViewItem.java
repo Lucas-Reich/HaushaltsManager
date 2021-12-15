@@ -27,9 +27,4 @@ public class CardViewItem implements IRecyclerItem {
     public IExpandableRecyclerItem getParent() {
         return null;
     }
-
-    @Override
-    public boolean isSelectable() {
-        return false;
-    }
 }

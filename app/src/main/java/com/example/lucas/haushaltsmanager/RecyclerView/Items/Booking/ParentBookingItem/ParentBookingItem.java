@@ -54,11 +54,6 @@ public class ParentBookingItem implements IExpandableRecyclerItem {
     }
 
     @Override
-    public boolean isSelectable() {
-        return false;
-    }
-
-    @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof ParentBookingItem)) {
             return false;

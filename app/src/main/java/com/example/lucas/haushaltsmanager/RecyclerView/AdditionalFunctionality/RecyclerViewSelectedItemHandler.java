@@ -20,10 +20,10 @@ public abstract class RecyclerViewSelectedItemHandler extends RecyclerViewExpand
     }
 
     @Override
-    public void removeItem(IRecyclerItem item) {
+    public void remove(IRecyclerItem item) {
         selectedItems.remove(item);
 
-        super.removeItem(item);
+        super.remove(item);
     }
 
     public void selectItem(IRecyclerItem item, int position) {

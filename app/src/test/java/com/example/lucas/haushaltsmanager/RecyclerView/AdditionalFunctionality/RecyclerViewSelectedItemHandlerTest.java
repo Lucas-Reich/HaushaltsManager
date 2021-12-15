@@ -67,12 +67,12 @@ public class RecyclerViewSelectedItemHandlerTest {
     public void deletedItemShouldBeRemovedFromSelectedList() {
         ExpenseItem item = new ExpenseItem(getDummyExpense(), getDummyDate());
 
-        itemHandler.insertItem(item);
+        itemHandler.insert(item);
 
         itemHandler.selectItem(item, 1);
         assertTrue(itemHandler.isItemSelected(item));
 
-        itemHandler.removeItem(item);
+        itemHandler.remove(item);
         assertEquals(itemHandler.getItemCount(), 0);
 
         assertEquals(0, itemHandler.getSelectedItemCount());
@@ -86,7 +86,7 @@ public class RecyclerViewSelectedItemHandlerTest {
         ChildExpenseItem child = new ChildExpenseItem(getDummyExpense(), parent);
         parent.addChild(child);
 
-        itemHandler.insertItem(parent);
+        itemHandler.insert(parent);
 
         itemHandler.toggleExpansion(1);
         assertEquals(3, itemHandler.getItemCount());

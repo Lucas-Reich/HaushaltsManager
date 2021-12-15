@@ -11,7 +11,7 @@ import java.io.File;
 public class FileItem implements IRecyclerItem {
     public static final int VIEW_TYPE = 9;
 
-    private File file;
+    private final File file;
 
     public FileItem(File file) {
         this.file = file;
@@ -30,11 +30,6 @@ public class FileItem implements IRecyclerItem {
     @Override
     public IExpandableRecyclerItem getParent() {
         return null;
-    }
-
-    @Override
-    public boolean isSelectable() {
-        return true;
     }
 
     @NonNull

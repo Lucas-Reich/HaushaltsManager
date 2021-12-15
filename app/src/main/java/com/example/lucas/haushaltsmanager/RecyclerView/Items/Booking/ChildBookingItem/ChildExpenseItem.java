@@ -44,13 +44,9 @@ public class ChildExpenseItem implements IBookingItem {
         return expense.toString();
     }
 
+    @NonNull
     @Override
     public IExpandableRecyclerItem getParent() {
         return parent;
-    }
-
-    @Override
-    public boolean isSelectable() {
-        return true;
     }
 }

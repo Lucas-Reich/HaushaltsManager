@@ -153,6 +153,6 @@ public class CategoryList extends AbstractAppCompatActivity implements
     }
 
     private void setActionHandler() {
-        mFabToolbar.addMenuItem(new DeleteCategoryMenuItem(deletedItem -> mRecyclerViewAdapter.removeItem(deletedItem), categoryRepo), this);
+        mFabToolbar.addMenuItem(new DeleteCategoryMenuItem(deletedItem -> mRecyclerViewAdapter.remove(deletedItem), categoryRepo), this);
     }
 }
