@@ -236,6 +236,7 @@ public class RecyclerViewExpandableItemHandlerTest {
                 new Price(-new Random().nextInt()),
                 date,
                 UUID.randomUUID(),
+                UUID.randomUUID(),
                 UUID.randomUUID()
         );
     }

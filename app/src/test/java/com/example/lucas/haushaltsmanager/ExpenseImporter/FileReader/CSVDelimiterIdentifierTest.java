@@ -11,18 +11,18 @@ import org.junit.Test;
 import static junit.framework.Assert.assertEquals;
 
 public class CSVDelimiterIdentifierTest {
-    private CSVDelimiterIdentifier CSVDelimiterIdentifier;
+    private CSVDelimiterIdentifier csvDelimiterIdentifier;
 
     @Before
     public void setUp() {
-        CSVDelimiterIdentifier = new CSVDelimiterIdentifier();
+        csvDelimiterIdentifier = new CSVDelimiterIdentifier();
     }
 
     @Test
     public void correctlyHandlesNoDelimiter() {
         String stringWithDelimiter = generateStringWithDelimiter("");
 
-        IDelimiter actualDelimiter = CSVDelimiterIdentifier.identifyDelimiter(stringWithDelimiter);
+        IDelimiter actualDelimiter = csvDelimiterIdentifier.identifyDelimiter(stringWithDelimiter);
 
         assertSameInstance(actualDelimiter, CSVDelimiterIdentifier.DEFAULT_DELIMITER);
     }
@@ -32,7 +32,7 @@ public class CSVDelimiterIdentifierTest {
         IDelimiter expectedDelimiter = new Comma();
         String stringWithDelimiter = String.join(expectedDelimiter.getDelimiter(), "1;", "2;", "3;", "4;", "5;", "6;", "7;", "8;", "9");
 
-        IDelimiter actualDelimiter = CSVDelimiterIdentifier.identifyDelimiter(stringWithDelimiter);
+        IDelimiter actualDelimiter = csvDelimiterIdentifier.identifyDelimiter(stringWithDelimiter);
 
         assertSameInstance(actualDelimiter, expectedDelimiter);
     }
@@ -42,9 +42,9 @@ public class CSVDelimiterIdentifierTest {
         String notSupportedDelimiter = "|";
         String stringWithDelimiter = generateStringWithDelimiter(notSupportedDelimiter);
 
-        IDelimiter actualDelimiter = CSVDelimiterIdentifier.identifyDelimiter(stringWithDelimiter);
+        IDelimiter actualDelimiter = csvDelimiterIdentifier.identifyDelimiter(stringWithDelimiter);
 
-        assertSameInstance(actualDelimiter, CSVDelimiterIdentifier.DEFAULT_DELIMITER);
+        assertSameInstance(actualDelimiter, csvDelimiterIdentifier.DEFAULT_DELIMITER);
     }
 
     @Test
@@ -52,7 +52,7 @@ public class CSVDelimiterIdentifierTest {
         IDelimiter expectedDelimiter = new Comma();
         String stringWithDelimiter = generateStringWithDelimiter(expectedDelimiter.getDelimiter());
 
-        IDelimiter actualDelimiter = CSVDelimiterIdentifier.identifyDelimiter(stringWithDelimiter);
+        IDelimiter actualDelimiter = csvDelimiterIdentifier.identifyDelimiter(stringWithDelimiter);
 
         assertSameInstance(actualDelimiter, expectedDelimiter);
     }
@@ -62,7 +62,7 @@ public class CSVDelimiterIdentifierTest {
         IDelimiter expectedDelimiter = new Semicolon();
         String stringWithDelimiter = generateStringWithDelimiter(expectedDelimiter.getDelimiter());
 
-        IDelimiter actualDelimiter = CSVDelimiterIdentifier.identifyDelimiter(stringWithDelimiter);
+        IDelimiter actualDelimiter = csvDelimiterIdentifier.identifyDelimiter(stringWithDelimiter);
 
         assertSameInstance(actualDelimiter, expectedDelimiter);
     }

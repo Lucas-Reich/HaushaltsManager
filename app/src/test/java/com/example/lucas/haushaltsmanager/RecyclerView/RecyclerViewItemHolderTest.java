@@ -247,6 +247,7 @@ public class RecyclerViewItemHolderTest {
                 new Price(-105),
                 expenseDate,
                 UUID.randomUUID(),
+                UUID.randomUUID(),
                 UUID.randomUUID()
         );
     }

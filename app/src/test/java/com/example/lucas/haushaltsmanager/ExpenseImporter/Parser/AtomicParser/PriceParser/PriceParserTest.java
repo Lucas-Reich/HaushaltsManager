@@ -129,7 +129,6 @@ public class PriceParserTest {
     private MappingList createPriceMappingList() {
         MappingList mappingList = new MappingList();
         mappingList.addMapping(PriceParser.PRICE_VALUE_KEY, 0);
-        mappingList.addMapping(PriceParser.PRICE_TYPE_KEY, 1);
 
         return mappingList;
     }

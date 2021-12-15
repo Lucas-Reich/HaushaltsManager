@@ -124,7 +124,6 @@ public class ImportBookingStrategyTest {
         return new MappingList() {{
             addMapping(BookingParser.BOOKING_TITLE_KEY, 0);
             addMapping(PriceParser.PRICE_VALUE_KEY, 1);
-            addMapping(PriceParser.PRICE_TYPE_KEY, 2);
             addMapping(CategoryParser.CATEGORY_TITLE_KEY, 3);
             addMapping(DateParser.BOOKING_DATE_KEY, 4);
             addMapping(AccountParser.ACCOUNT_TITLE_KEY, 5);

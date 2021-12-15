@@ -289,6 +289,7 @@ public class RecurringBookingTest {
                 new Price(-150),
                 getDate(1, Calendar.JANUARY, 2019),
                 UUID.randomUUID(),
+                UUID.randomUUID(),
                 UUID.randomUUID()
         );
     }

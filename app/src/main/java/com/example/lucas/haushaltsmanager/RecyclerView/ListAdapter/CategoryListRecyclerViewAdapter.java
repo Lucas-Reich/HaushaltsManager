@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.InsertStrategy.AppendInsertStrategy;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.RecyclerViewSelectedItemHandler;
-import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.SelectionRules.CategoryListSelectionRules;
+import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.SelectionRules.SelectIfNotSelectedSelectionRule;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.AbstractViewHolder;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.CategoryItem.CategoryItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.CategoryItem.CategoryViewHolder;
@@ -19,7 +19,7 @@ import java.util.List;
 
 public class CategoryListRecyclerViewAdapter extends RecyclerViewSelectedItemHandler {
     public CategoryListRecyclerViewAdapter(List<IRecyclerItem> items) {
-        super(items, new AppendInsertStrategy(), new CategoryListSelectionRules());
+        super(items, new AppendInsertStrategy(), new SelectIfNotSelectedSelectionRule());
     }
 
     @NonNull

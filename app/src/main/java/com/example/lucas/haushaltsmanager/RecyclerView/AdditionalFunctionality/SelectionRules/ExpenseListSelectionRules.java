@@ -1,17 +1,16 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.SelectionRules;
 
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBookingItem.ChildExpenseItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.BookingItem.ExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBookingItem.ChildExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ParentBookingItem.ParentBookingItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.ISelectableRecyclerItem;
 
 import java.util.List;
 
 public class ExpenseListSelectionRules implements SelectionRules {
     @Override
     public boolean canBeSelected(IRecyclerItem item, List<IRecyclerItem> otherSelectedItems) {
-        if (hasWrongClass(item)) {
+        if (!(item instanceof ISelectableRecyclerItem)) {
             return false;
         }
 
@@ -56,17 +55,5 @@ public class ExpenseListSelectionRules implements SelectionRules {
 
     private boolean itemsHaveSameParent(IRecyclerItem item, IRecyclerItem other) {
         return item.getParent().equals(other.getParent());
-    }
-
-    private boolean hasWrongClass(IRecyclerItem item) {
-        if (item instanceof ParentBookingItem) {
-            return true;
-        }
-
-        if (item instanceof DateItem) {
-            return true;
-        }
-
-        return false;
     }
 }

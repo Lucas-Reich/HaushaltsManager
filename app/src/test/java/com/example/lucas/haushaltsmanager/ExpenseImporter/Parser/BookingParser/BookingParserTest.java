@@ -86,7 +86,6 @@ public class BookingParserTest {
         MappingList mappingList = new MappingList();
         mappingList.addMapping(BookingParser.BOOKING_TITLE_KEY, 0);
         mappingList.addMapping(PriceParser.PRICE_VALUE_KEY, 1);
-        mappingList.addMapping(PriceParser.PRICE_TYPE_KEY, 1);
         mappingList.addMapping(DateParser.BOOKING_DATE_KEY, 2);
         mappingList.addMapping(CategoryParser.CATEGORY_TITLE_KEY, 3);
 

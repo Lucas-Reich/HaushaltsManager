@@ -15,12 +15,12 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CategoryListSelectionRulesTest {
-    private CategoryListSelectionRules selectionRules;
+public class SelectIfNotSelectedSelectionRuleTest {
+    private SelectIfNotSelectedSelectionRule selectionRules;
 
     @Before
     public void setUp() {
-        selectionRules = new CategoryListSelectionRules();
+        selectionRules = new SelectIfNotSelectedSelectionRule();
     }
 
     @Test
