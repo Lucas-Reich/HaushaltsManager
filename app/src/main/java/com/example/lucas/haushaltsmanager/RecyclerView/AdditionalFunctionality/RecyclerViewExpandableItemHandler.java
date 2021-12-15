@@ -32,6 +32,11 @@ public abstract class RecyclerViewExpandableItemHandler extends RecyclerViewItem
         super.removeItem(item);
     }
 
+    @Override
+    public void insertItem(IRecyclerItem item) {
+        super.insertItem(item);
+    }
+
     public void toggleExpansion(int position) {
         IRecyclerItem item = getItem(position);
 

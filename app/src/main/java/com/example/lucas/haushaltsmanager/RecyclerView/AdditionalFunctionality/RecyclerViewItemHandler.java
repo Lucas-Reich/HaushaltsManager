@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class RecyclerViewItemHandler extends RecyclerView.Adapter<AbstractViewHolder> {
-    private ListHandler listHandler;
+    private final ListHandler listHandler;
 
     public RecyclerViewItemHandler(List<IRecyclerItem> items, InsertStrategy insertStrategy) {
         listHandler = new ListHandler(insertStrategy);
@@ -61,20 +61,15 @@ public abstract class RecyclerViewItemHandler extends RecyclerView.Adapter<Abstr
     public void insertItem(IRecyclerItem item) {
         IRecyclerItem parent = item.getParent();
 
-        if (null == parent) {
+        if (null == parent || listHandler.parentExists(parent)) {
 
-            listHandler.insertParent(item);
-            return;
-        }
-
-        if (listHandler.parentExists(parent)) {
-
-            listHandler.addItemToParent(item);
+            int insertedItemIndex = listHandler.insert(item);
+            notifyItemInserted(insertedItemIndex);
             return;
         }
 
         insertItem(parent);
-        listHandler.addItemToParent(item);
+        listHandler.insert(item);
     }
 
     /**
@@ -83,7 +78,8 @@ public abstract class RecyclerViewItemHandler extends RecyclerView.Adapter<Abstr
     public void removeItem(IRecyclerItem item) {
         IRecyclerItem parent = item.getParent();
 
-        listHandler.remove(item);
+        int removedItemIndex = listHandler.remove(item);
+        notifyItemRemoved(removedItemIndex);
 
         if (parent != null && !hasChildren(parent)) {
             removeItem(parent);
@@ -98,7 +94,8 @@ public abstract class RecyclerViewItemHandler extends RecyclerView.Adapter<Abstr
      * Diese Funktion wird genutzt, wenn ein Parent zusammengeklappt wird.
      */
     void deleteItem(IRecyclerItem item) {
-        listHandler.remove(item);
+        int removedItemIndex = listHandler.remove(item);
+        notifyItemRemoved(removedItemIndex);
     }
 
     void updateItem(IRecyclerItem item) {
@@ -112,8 +109,8 @@ public abstract class RecyclerViewItemHandler extends RecyclerView.Adapter<Abstr
     }
 
     private class ListHandler {
-        private List<IRecyclerItem> mItems;
-        private InsertStrategy mInsertStrategy;
+        private final List<IRecyclerItem> mItems;
+        private final InsertStrategy mInsertStrategy;
 
         public ListHandler(InsertStrategy insertStrategy) {
             mItems = new ArrayList<>();
@@ -144,30 +141,20 @@ public abstract class RecyclerViewItemHandler extends RecyclerView.Adapter<Abstr
             return mItems.size();
         }
 
-        public void remove(IRecyclerItem item) {
+        public Integer remove(IRecyclerItem item) {
             int itemIndex = mItems.indexOf(item);
 
             mItems.remove(item);
 
-            notifyItemRemoved(itemIndex);
+            return itemIndex;
         }
 
-        public void insertParent(IRecyclerItem parent) {
-            int insertedIndex = mInsertStrategy.insert(parent, mItems);
-
-            notifyItemInserted(insertedIndex);
+        public Integer insert(IRecyclerItem parent) {
+            return mInsertStrategy.insert(parent, mItems);
         }
 
         public int indexOf(IRecyclerItem item) {
             return mItems.indexOf(item);
-        }
-
-        private void addItemToParent(IRecyclerItem item) {
-            int insertedIndex = mInsertStrategy.insert(item, mItems);
-
-            if (insertedIndex != InsertStrategy.INVALID_INDEX) {
-                notifyItemInserted(insertedIndex);
-            }
         }
     }
 }
