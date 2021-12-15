@@ -12,7 +12,7 @@ public interface IRecyclerItem {
 
     Object getContent();
 
-    IParentRecyclerItem getParent();
+    IExpandableRecyclerItem getParent();
 
     boolean isSelectable(); // TODO: Replace with ISelectableRecyclerItem interface
 }

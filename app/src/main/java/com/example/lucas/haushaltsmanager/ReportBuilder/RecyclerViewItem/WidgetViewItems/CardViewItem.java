@@ -4,7 +4,7 @@ package com.example.lucas.haushaltsmanager.ReportBuilder.RecyclerViewItem.Widget
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.IParentRecyclerItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.IExpandableRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.ReportBuilder.Widgets.Widget;
 
@@ -28,7 +28,7 @@ public abstract class CardViewItem implements IRecyclerItem {
     }
 
     @Override
-    public IParentRecyclerItem getParent() {
+    public IExpandableRecyclerItem getParent() {
         return null;
     }
 

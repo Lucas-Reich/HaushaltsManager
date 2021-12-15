@@ -2,7 +2,7 @@ package com.example.lucas.haushaltsmanager.RecyclerView.Items;
 
 import java.util.List;
 
-public interface IParentRecyclerItem extends IRecyclerItem {
+public interface IExpandableRecyclerItem extends IRecyclerItem {
 
     List<IRecyclerItem> getChildren();
 

@@ -3,16 +3,16 @@ package com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBooki
 import androidx.annotation.NonNull;
 
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.IBookingItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.IParentRecyclerItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.IExpandableRecyclerItem;
 import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 
 public class ChildExpenseItem implements IBookingItem {
     public static final int VIEW_TYPE = 4;
 
-    private final IParentRecyclerItem parent;
+    private final IExpandableRecyclerItem parent;
     private final Booking expense;
 
-    public ChildExpenseItem(Booking expense, IParentRecyclerItem parent) {
+    public ChildExpenseItem(Booking expense, IExpandableRecyclerItem parent) {
         this.expense = expense;
         this.parent = parent;
     }
@@ -45,7 +45,7 @@ public class ChildExpenseItem implements IBookingItem {
     }
 
     @Override
-    public IParentRecyclerItem getParent() {
+    public IExpandableRecyclerItem getParent() {
         return parent;
     }
 

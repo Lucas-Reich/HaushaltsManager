@@ -3,13 +3,13 @@ package com.example.lucas.haushaltsmanager.RecyclerView.Items.RecurringBookingIt
 import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 import com.example.lucas.haushaltsmanager.entities.RecurringBooking;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBookingItem.ChildExpenseItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.IParentRecyclerItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.IExpandableRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class RecurringBookingItem implements IParentRecyclerItem {
+public class RecurringBookingItem implements IExpandableRecyclerItem {
     public static final int VIEW_TYPE = 5;
 
     private final RecurringBooking recurringBooking;
@@ -47,7 +47,7 @@ public class RecurringBookingItem implements IParentRecyclerItem {
     }
 
     @Override
-    public IParentRecyclerItem getParent() {
+    public IExpandableRecyclerItem getParent() {
         return null;
     }
 

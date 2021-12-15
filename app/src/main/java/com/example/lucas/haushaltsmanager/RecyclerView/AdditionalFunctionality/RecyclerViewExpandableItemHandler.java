@@ -5,7 +5,7 @@ import android.util.Log;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.InsertStrategy.InsertStrategy;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBookingItem.ChildExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ParentBookingItem.ParentBookingItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.IParentRecyclerItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.IExpandableRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 
 import java.util.ArrayList;
@@ -40,16 +40,16 @@ public abstract class RecyclerViewExpandableItemHandler extends RecyclerViewItem
     public void toggleExpansion(int position) {
         IRecyclerItem item = getItem(position);
 
-        if (!(item instanceof IParentRecyclerItem)) {
+        if (!(item instanceof IExpandableRecyclerItem)) {
 
             Log.i(TAG, String.format("Tried to toggle expansion for not expandable item: %s", item.getClass().getSimpleName()));
             return;
         }
 
-        handleExpansion((IParentRecyclerItem) item);
+        handleExpansion((IExpandableRecyclerItem) item);
     }
 
-    private void handleExpansion(IParentRecyclerItem expandableItem) {
+    private void handleExpansion(IExpandableRecyclerItem expandableItem) {
         // TODO: Expansion strategie, ohne auch immer den Parent updaten zu müssen:
         //  Expand: Children des Parents werden gelöscht und in die Liste eingefügt.
         //  Collapse: Children werden aus der Liste gelöscht und dem Parent hinzugefügt.

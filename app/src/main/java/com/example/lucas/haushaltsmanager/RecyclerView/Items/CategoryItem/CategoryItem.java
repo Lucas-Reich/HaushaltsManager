@@ -1,7 +1,7 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.Items.CategoryItem;
 
 import com.example.lucas.haushaltsmanager.entities.Category;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.IParentRecyclerItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.IExpandableRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 
 public class CategoryItem implements IRecyclerItem {
@@ -24,7 +24,7 @@ public class CategoryItem implements IRecyclerItem {
     }
 
     @Override
-    public IParentRecyclerItem getParent() {
+    public IExpandableRecyclerItem getParent() {
         return null;
     }
 

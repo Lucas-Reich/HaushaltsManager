@@ -3,7 +3,7 @@ package com.example.lucas.haushaltsmanager.RecyclerView.Items.FileItem;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.IParentRecyclerItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.IExpandableRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 
 import java.io.File;
@@ -28,7 +28,7 @@ public class FileItem implements IRecyclerItem {
     }
 
     @Override
-    public IParentRecyclerItem getParent() {
+    public IExpandableRecyclerItem getParent() {
         return null;
     }
 

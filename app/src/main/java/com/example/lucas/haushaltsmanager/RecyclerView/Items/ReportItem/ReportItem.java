@@ -2,7 +2,7 @@ package com.example.lucas.haushaltsmanager.RecyclerView.Items.ReportItem;
 
 import androidx.annotation.NonNull;
 
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.IParentRecyclerItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.IExpandableRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.entities.Report;
 
@@ -26,7 +26,7 @@ public class ReportItem implements IRecyclerItem {
     }
 
     @Override
-    public IParentRecyclerItem getParent() {
+    public IExpandableRecyclerItem getParent() {
         return null;
     }
 

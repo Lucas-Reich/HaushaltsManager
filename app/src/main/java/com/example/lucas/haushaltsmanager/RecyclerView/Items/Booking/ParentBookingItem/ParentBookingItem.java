@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBookingItem.ChildExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.IParentRecyclerItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.IExpandableRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 import com.example.lucas.haushaltsmanager.entities.booking.ParentBooking;
@@ -12,7 +12,7 @@ import com.example.lucas.haushaltsmanager.entities.booking.ParentBooking;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ParentBookingItem implements IParentRecyclerItem {
+public class ParentBookingItem implements IExpandableRecyclerItem {
     public static final int VIEW_TYPE = 2;
 
     private final ParentBooking booking;

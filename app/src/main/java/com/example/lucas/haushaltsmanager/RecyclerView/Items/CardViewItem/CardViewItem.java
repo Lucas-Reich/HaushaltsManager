@@ -1,6 +1,6 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.Items.CardViewItem;
 
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.IParentRecyclerItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.IExpandableRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.ReportBuilder.IChart;
 
@@ -24,7 +24,7 @@ public class CardViewItem implements IRecyclerItem {
     }
 
     @Override
-    public IParentRecyclerItem getParent() {
+    public IExpandableRecyclerItem getParent() {
         return null;
     }
 

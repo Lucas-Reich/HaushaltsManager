@@ -3,7 +3,7 @@ package com.example.lucas.haushaltsmanager.RecyclerView.Items.TemplateItem;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.example.lucas.haushaltsmanager.RecyclerView.Items.IParentRecyclerItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.IExpandableRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.entities.template_booking.TemplateBooking;
 
@@ -27,7 +27,7 @@ public class TemplateItem implements IRecyclerItem {
     }
 
     @Override
-    public IParentRecyclerItem getParent() {
+    public IExpandableRecyclerItem getParent() {
         return null;
     }
 
