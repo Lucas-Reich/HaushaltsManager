@@ -10,6 +10,7 @@ import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.InsertStrategy.InsertStrategy;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.AbstractViewHolder;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.GenericViewHolder;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.IParentRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 
 import java.util.ArrayList;
@@ -59,7 +60,7 @@ public abstract class RecyclerViewItemHandler extends RecyclerView.Adapter<Abstr
     }
 
     public void insertItem(IRecyclerItem item) {
-        IRecyclerItem parent = item.getParent();
+        IParentRecyclerItem parent = item.getParent();
 
         if (null == parent || listHandler.parentExists(parent)) {
 
@@ -76,7 +77,7 @@ public abstract class RecyclerViewItemHandler extends RecyclerView.Adapter<Abstr
      * Diese Funktion wird genutzt, wenn ein Item aus der Liste gelöscht werden soll.
      */
     public void removeItem(IRecyclerItem item) {
-        IRecyclerItem parent = item.getParent();
+        IParentRecyclerItem parent = item.getParent();
 
         int removedItemIndex = listHandler.remove(item);
         notifyItemRemoved(removedItemIndex);
@@ -102,7 +103,7 @@ public abstract class RecyclerViewItemHandler extends RecyclerView.Adapter<Abstr
         notifyItemChanged(listHandler.indexOf(item));
     }
 
-    private boolean hasChildren(IRecyclerItem parent) {
+    private boolean hasChildren(IParentRecyclerItem parent) {
         int children = listHandler.getChildrenCount(parent);
 
         return 0 < children;
@@ -117,7 +118,7 @@ public abstract class RecyclerViewItemHandler extends RecyclerView.Adapter<Abstr
             mInsertStrategy = insertStrategy;
         }
 
-        public boolean parentExists(IRecyclerItem parent) {
+        public boolean parentExists(IParentRecyclerItem parent) {
             return mItems.contains(parent);
         }
 
@@ -125,7 +126,7 @@ public abstract class RecyclerViewItemHandler extends RecyclerView.Adapter<Abstr
             return mItems;
         }
 
-        public int getChildrenCount(IRecyclerItem parent) {
+        public int getChildrenCount(IParentRecyclerItem parent) {
             int index = mItems.indexOf(parent) + 1;
             int childrenCount = 0;
 
