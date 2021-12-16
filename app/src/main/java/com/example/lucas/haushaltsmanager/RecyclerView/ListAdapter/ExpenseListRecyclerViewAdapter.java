@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 
 import com.example.lucas.haushaltsmanager.R;
-import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.InsertStrategy.ExpenseListInsertStrategy;
+import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.InsertStrategy.BookingListInsertStrategy;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.RecyclerViewSelectedItemHandler;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.SelectionRules.ExpenseListSelectionRules;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.AbstractViewHolder;
@@ -27,7 +27,7 @@ import java.util.List;
 
 public class ExpenseListRecyclerViewAdapter extends RecyclerViewSelectedItemHandler {
     public ExpenseListRecyclerViewAdapter(List<IRecyclerItem> items) {
-        super(items, new ExpenseListInsertStrategy(), new ExpenseListSelectionRules());
+        super(items, new BookingListInsertStrategy(), new ExpenseListSelectionRules());
     }
 
     @NonNull

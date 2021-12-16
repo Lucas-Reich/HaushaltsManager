@@ -3,6 +3,8 @@ package com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.BookingItem.ExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBookingItem.ChildExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ParentBookingItem.ParentBookingItem;
@@ -20,8 +22,8 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
 
-public class ExpenseListInsertStrategyTest {
-    private final ExpenseListInsertStrategy insertStrategy = new ExpenseListInsertStrategy();
+public class BookingListInsertStrategyTest {
+    private final BookingListInsertStrategy insertStrategy = new BookingListInsertStrategy();
 
     @Test
     public void newDateItemIsInsertedAtCorrectPosition() {
@@ -86,7 +88,7 @@ public class ExpenseListInsertStrategyTest {
 
 
         assertEquals(2, items.size());
-        assertEquals(insertIndex, InsertStrategy.INVALID_INDEX);
+        assertEquals(insertIndex, RecyclerView.NO_POSITION);
         assertTrue(((ParentBookingItem) items.get(1)).getChildren().contains(childItem));
     }
 
@@ -121,7 +123,7 @@ public class ExpenseListInsertStrategyTest {
         int insertIndex = insertStrategy.insert(expenseItem, items);
 
         assertEquals(0, items.size());
-        assertEquals(InsertStrategy.INVALID_INDEX, insertIndex);
+        assertEquals(RecyclerView.NO_POSITION, insertIndex);
     }
 
     @Test
@@ -135,7 +137,7 @@ public class ExpenseListInsertStrategyTest {
         int insertIndex = insertStrategy.insert(child, items);
 
         assertEquals(0, items.size());
-        assertEquals(InsertStrategy.INVALID_INDEX, insertIndex);
+        assertEquals(RecyclerView.NO_POSITION, insertIndex);
     }
 
     private ParentBooking createDummyParentExpense() {
