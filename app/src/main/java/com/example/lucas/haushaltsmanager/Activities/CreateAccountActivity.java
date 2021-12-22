@@ -171,7 +171,7 @@ public class CreateAccountActivity extends AbstractAppCompatActivity implements 
                 finish();
             }
         });
-        confirmationDialog.show(getFragmentManager(), "new_account_exit");
+        confirmationDialog.show(getSupportFragmentManager(), "new_account_exit");
     }
 
     private void enableFabIfAccountIsSaveable(Account account) {

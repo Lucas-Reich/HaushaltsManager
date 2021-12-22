@@ -134,7 +134,7 @@ public class TransferActivity extends AbstractAppCompatActivity {
 
                 ErrorAlertDialog errorAlert = new ErrorAlertDialog();
                 errorAlert.setArguments(bundle);
-                errorAlert.show(getFragmentManager(), "transfer_activity_error");
+                errorAlert.show(getSupportFragmentManager(), "transfer_activity_error");
             }
         });
     }

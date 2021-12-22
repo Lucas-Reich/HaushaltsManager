@@ -239,7 +239,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
             if (closeScreen)
                 finish();
         });
-        confirmationDialog.show(getFragmentManager(), "expense_screen_exit");
+        confirmationDialog.show(getSupportFragmentManager(), "expense_screen_exit");
     }
 
     private SaveFloatingActionButton.OnClickListener getOnSaveClickListener() {

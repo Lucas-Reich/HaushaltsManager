@@ -164,7 +164,7 @@ public class Settings extends AbstractAppCompatActivity {
                 }
             });
 
-            confirmationDialog.show(getFragmentManager(), "settings_confirm_reset");
+            confirmationDialog.show(getSupportFragmentManager(), "settings_confirm_reset");
         });
     }
 

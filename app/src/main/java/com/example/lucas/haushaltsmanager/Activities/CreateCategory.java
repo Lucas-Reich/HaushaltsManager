@@ -136,7 +136,7 @@ public class CreateCategory extends AbstractAppCompatActivity {
             if (closeScreen)
                 finish();
         });
-        confirmationDialog.show(getFragmentManager(), "create_category_exit");
+        confirmationDialog.show(getSupportFragmentManager(), "create_category_exit");
     }
 
     private void setCategoryTitle(String title) {

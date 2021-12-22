@@ -93,7 +93,7 @@ public class ImportExportActivity extends AbstractAppCompatActivity implements R
 
                 ErrorAlertDialog errorDialog = new ErrorAlertDialog();
                 errorDialog.setArguments(bundle);
-                errorDialog.show(getFragmentManager(), "import_error_export");
+                errorDialog.show(getSupportFragmentManager(), "import_error_export");
 
                 return;
             }
@@ -114,7 +114,7 @@ public class ImportExportActivity extends AbstractAppCompatActivity implements R
 
                 adapter.insert(new FileItem(createdFile));
             });
-            confirmationDialog.show(getFragmentManager(), "import_confirm_export");
+            confirmationDialog.show(getSupportFragmentManager(), "import_confirm_export");
         });
 
         updateListView(new Directory(getFilesDir().toString()));
@@ -178,7 +178,6 @@ public class ImportExportActivity extends AbstractAppCompatActivity implements R
     }
 
     private List<Booking> getAllExpenses() {
-        // IMPROVEMENT: Den User fragen, welche Buchung genau exportiert werden sollen (welches Konto, Zeitraum, ...)
         return AppDatabase.getDatabase(this).bookingDAO().getAll();
     }
 }

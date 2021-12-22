@@ -94,7 +94,7 @@ public class BackupActivity extends AbstractAppCompatActivity {
                 }
             });
             confirmationDialog.setArguments(bundle);
-            confirmationDialog.show(getFragmentManager(), "backup_confirm_restore");
+            confirmationDialog.show(getSupportFragmentManager(), "backup_confirm_restore");
         });
 
         mCreateBackupFab.setOnClickListener(v -> {

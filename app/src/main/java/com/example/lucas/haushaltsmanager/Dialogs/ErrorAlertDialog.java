@@ -2,20 +2,22 @@ package com.example.lucas.haushaltsmanager.Dialogs;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.DialogFragment;
-import android.content.DialogInterface;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
 
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
 
 public class ErrorAlertDialog extends DialogFragment {
-    private static final String TAG = ErrorAlertDialog.class.getSimpleName();
     public static final String TITLE = "title";
     public static final String CONTENT = "content";
 
+    @NonNull
     @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         BundleUtils args = new BundleUtils(getArguments());
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -24,13 +26,7 @@ public class ErrorAlertDialog extends DialogFragment {
 
         builder.setMessage(args.getString(CONTENT, "Error"));
 
-        builder.setPositiveButton(R.string.btn_ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-                dismiss();
-            }
-        });
+        builder.setPositiveButton(R.string.btn_ok, (dialog, which) -> dismiss());
 
         return builder.create();
     }
