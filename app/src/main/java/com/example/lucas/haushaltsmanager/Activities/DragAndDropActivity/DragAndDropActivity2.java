@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager.Activities;
+package com.example.lucas.haushaltsmanager.Activities.DragAndDropActivity;
 
 import android.content.ClipDescription;
 import android.os.Bundle;
@@ -11,6 +11,8 @@ import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.lucas.haushaltsmanager.Activities.AbstractAppCompatActivity;
+import com.example.lucas.haushaltsmanager.Activities.LayoutManagerFactory;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.InsertStrategy.AppendInsertStrategy;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.CardViewItem.CardViewItem;
@@ -111,7 +113,7 @@ public class DragAndDropActivity2 extends AbstractAppCompatActivity implements V
         recyclerView.setAdapter(createAdapter());
     }
 
-    private RecyclerView.Adapter createAdapter() {
+    private CardViewRecyclerViewAdapter createAdapter() {
         List<IRecyclerItem> items = createItemList(10);
 
         return new CardViewRecyclerViewAdapter(items, new AppendInsertStrategy());

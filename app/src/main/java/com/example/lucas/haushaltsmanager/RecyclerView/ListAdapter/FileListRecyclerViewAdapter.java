@@ -6,7 +6,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 
 import com.example.lucas.haushaltsmanager.R;
-import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.InsertStrategy.FileListInsertStrategy;
+import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.InsertStrategy.FileItemInsertStrategy;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.RecyclerViewItemHandler;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.AbstractViewHolder;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.FileItem.FileItem;
@@ -17,7 +17,7 @@ import java.util.List;
 
 public class FileListRecyclerViewAdapter extends RecyclerViewItemHandler {
     public FileListRecyclerViewAdapter(List<IRecyclerItem> items) {
-        super(items, new FileListInsertStrategy());
+        super(items, new FileItemInsertStrategy());
     }
 
     @NonNull

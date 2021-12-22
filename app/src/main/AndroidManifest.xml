@@ -71,8 +71,8 @@
             android:label="@string/activity_show_recurring_bookings"
             android:parentActivityName=".Activities.MainTab.ParentActivity" />
         <activity android:name=".Activities.ExpenseImporterActivity" />
-        <activity android:name=".Activities.DragAndDropActivity" />
-        <activity android:name=".Activities.DragAndDropActivity2" />
+        <activity android:name=".Activities.DragAndDropActivity.DragAndDropActivity" />
+        <activity android:name=".Activities.DragAndDropActivity.DragAndDropActivity2" />
     </application>
 
 </manifest>

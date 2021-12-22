@@ -7,11 +7,7 @@ import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 import java.util.List;
 
 public interface Widget {
-    boolean equals(Object other);
-
     View getView();
-
-    void setData(List<Booking> expenses);
 
     int getIcon();
 }

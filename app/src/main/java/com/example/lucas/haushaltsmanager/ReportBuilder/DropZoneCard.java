@@ -1,5 +1,6 @@
 package com.example.lucas.haushaltsmanager.ReportBuilder;
 
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 
@@ -17,15 +18,14 @@ public class DropZoneCard {
         this.dropZoneCount = 3;
     }
 
-    public void addDroppedView(Widget widget, float x, float y) {
-        // TODO: Disable on click behaviour of widgets in Builder
-        int dropZoneId = translateCoordsToDropzone(new Point(x, y));
+    public void addDroppedView(Widget widget, Point point) {
+        int dropZoneId = translateCoordinatesToDropzone(point);
 
         removeExistingViewFromZone(dropZoneId);
 
         View widgetView = widget.getView();
 
-        addLayoutConstraintsToChild(widgetView, dropZoneId);
+        configureChildView(widgetView, dropZoneId);
 
         addView(widgetView, dropZoneId);
     }
@@ -42,6 +42,12 @@ public class DropZoneCard {
         cardView.addView(view);
 
         cardView.invalidate();
+    }
+
+    private void configureChildView(View view, int dropZoneId) {
+        view.setOnTouchListener((v, event) -> ((View) v.getParent()).onTouchEvent(event)); // Propagates child click to parent
+
+        addLayoutConstraintsToChild(view, dropZoneId);
     }
 
     private void addLayoutConstraintsToChild(View widgetView, int dropZoneId) {
@@ -65,7 +71,7 @@ public class DropZoneCard {
         cardView.removeView(oldView);
     }
 
-    private int translateCoordsToDropzone(Point dropPoint) {
+    private int translateCoordinatesToDropzone(Point dropPoint) {
         int zoneWidth = this.cardView.getWidth() / dropZoneCount;
 
         for (int zone = 0; zone < dropZoneCount; zone++) {

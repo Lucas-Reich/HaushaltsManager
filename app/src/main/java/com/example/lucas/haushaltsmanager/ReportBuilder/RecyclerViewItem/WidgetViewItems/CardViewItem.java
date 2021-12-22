@@ -8,13 +8,19 @@ import com.example.lucas.haushaltsmanager.RecyclerView.Items.IExpandableRecycler
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.ReportBuilder.Widgets.Widget;
 
-public abstract class CardViewItem implements IRecyclerItem {
+public abstract class CardViewItem implements IRecyclerItem, Cloneable {
     public static final int VIEW_TYPE = 9;
 
     private final Widget widget;
 
     public CardViewItem(Widget widget) {
         this.widget = widget;
+    }
+
+    @NonNull
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 
     @Override

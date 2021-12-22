@@ -54,57 +54,51 @@ public class ParentActivity extends AppCompatActivity implements ChooseAccountsD
 
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout_2);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = findViewById(R.id.nav_view_2);
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        navigationView.setNavigationItemSelectedListener(item -> {
+            switch (item.getItemId()) {
 
-                switch (item.getItemId()) {
+                case R.id.categories:
 
-                    case R.id.categories:
+                    Intent categoryIntent = new Intent(ParentActivity.this, CategoryList.class);
+                    ParentActivity.this.startActivity(categoryIntent);
+                    break;
+                case R.id.standing_orders:
 
-                        Intent categoryIntent = new Intent(ParentActivity.this, CategoryList.class);
-                        ParentActivity.this.startActivity(categoryIntent);
-                        break;
-                    case R.id.standing_orders:
+                    Intent recurringBookingIntent = new Intent(ParentActivity.this, RecurringBookingList.class);
+                    ParentActivity.this.startActivity(recurringBookingIntent);
+                    break;
+                case R.id.backup:
 
-                        Intent recurringBookingIntent = new Intent(ParentActivity.this, RecurringBookingList.class);
-                        ParentActivity.this.startActivity(recurringBookingIntent);
-                        break;
-                    case R.id.backup:
+                    Intent backupIntent = new Intent(ParentActivity.this, BackupActivity.class);
+                    ParentActivity.this.startActivity(backupIntent);
+                    break;
+                case R.id.import_export:
 
-                        Intent backupIntent = new Intent(ParentActivity.this, BackupActivity.class);
-                        ParentActivity.this.startActivity(backupIntent);
-                        break;
-                    case R.id.import_export:
+                    Intent importExportIntent = new Intent(ParentActivity.this, ImportExportActivity.class);
+                    ParentActivity.this.startActivity(importExportIntent);
+                    break;
+                case R.id.preferences:
 
-                        Intent importExportIntent = new Intent(ParentActivity.this, ImportExportActivity.class);
-                        ParentActivity.this.startActivity(importExportIntent);
-                        break;
-                    case R.id.preferences:
+                    Intent settingsIntent = new Intent(ParentActivity.this, Settings.class);
+                    ParentActivity.this.startActivity(settingsIntent);
+                    break;
+                case R.id.about:
 
-                        Intent settingsIntent = new Intent(ParentActivity.this, Settings.class);
-                        ParentActivity.this.startActivity(settingsIntent);
-                        break;
-                    case R.id.about:
+                    Intent aboutUsIntent = new Intent(ParentActivity.this, AboutUsActivity.class);
+                    ParentActivity.this.startActivity(aboutUsIntent);
+                    break;
+                default:
 
-                        Intent aboutUsIntent = new Intent(ParentActivity.this, AboutUsActivity.class);
-                        ParentActivity.this.startActivity(aboutUsIntent);
-                        break;
-                    default:
-
-                        Toast.makeText(ParentActivity.this, R.string.not_implemented, Toast.LENGTH_SHORT).show();
-                }
-
-                DrawerLayout drawer = findViewById(R.id.drawer_layout_2);
-                drawer.closeDrawer(GravityCompat.START);
-                return true;
+                    Toast.makeText(ParentActivity.this, R.string.not_implemented, Toast.LENGTH_SHORT).show();
             }
+
+            drawer.closeDrawer(GravityCompat.START);
+            return true;
         });
     }
 

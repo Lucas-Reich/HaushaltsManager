@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.lucas.haushaltsmanager.Activities.DragAndDropActivity.DragAndDropActivity;
 import com.example.lucas.haushaltsmanager.Activities.ExpenseScreen;
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.ActionPayload;
@@ -113,12 +114,11 @@ public class TabOneBookings extends AbstractTab implements
             return;
         }
 
-        Intent createExpenseIntent = new Intent(getContext(), ExpenseScreen.class);
-        createExpenseIntent.putExtra(ExpenseScreen.INTENT_MODE, ExpenseScreen.INTENT_MODE_CREATE_BOOKING);
-        startActivity(createExpenseIntent);
+//        Intent createExpenseIntent = new Intent(getContext(), ExpenseScreen.class);
+//        createExpenseIntent.putExtra(ExpenseScreen.INTENT_MODE, ExpenseScreen.INTENT_MODE_CREATE_BOOKING);
+//        startActivity(createExpenseIntent);
 
-//        Intent openDnD = new Intent(getContext(), DragAndDropActivity.class);
-//        startActivity(openDnD);
+        startActivity(new Intent(getContext(), DragAndDropActivity.class));
     }
 
     @Override

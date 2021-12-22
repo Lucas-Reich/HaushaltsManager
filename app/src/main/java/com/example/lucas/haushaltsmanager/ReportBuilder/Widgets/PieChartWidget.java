@@ -3,7 +3,6 @@ package com.example.lucas.haushaltsmanager.ReportBuilder.Widgets;
 import android.content.Context;
 import android.view.View;
 
-import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 import com.example.lucas.haushaltsmanager.R;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
@@ -11,24 +10,17 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class PieChartWidget implements Widget {
-    private PieChart chart;
+    private final Context context;
 
     public PieChartWidget(Context context) {
-        initChartWithDefaultValues(context);
+        this.context = context;
     }
 
     @Override
     public View getView() {
-        return chart;
-    }
-
-    @Override
-    public void setData(List<Booking> expenses) {
-        // TODO: Create data set from expenses and add to PieChart
-        chart.invalidate();
+        return initChartWithDefaultValues(context);
     }
 
     @Override
@@ -36,30 +28,15 @@ public class PieChartWidget implements Widget {
         return R.drawable.ic_pie_chart;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof PieChartWidget)) {
-            return false;
-        }
+    private PieChart initChartWithDefaultValues(Context context) {
+        PieChart chart = new PieChart(context);
 
-        PieChartWidget other = (PieChartWidget) o;
-
-        return getIcon() == other.getIcon()
-                && getView() == other.getView();
-    }
-
-    @Override
-    public int hashCode() {
-        return chart != null ? chart.hashCode() : 0;
-    }
-
-    private void initChartWithDefaultValues(Context context) {
-        this.chart = new PieChart(context);
-
-        this.chart.setData(new PieData(new PieDataSet(
+        chart.setData(new PieData(new PieDataSet(
                 new ArrayList<PieEntry>() {{
                     add(new PieEntry(100f, "Eintrag"));
                 }}, "Test"
         )));
+
+        return chart;
     }
 }

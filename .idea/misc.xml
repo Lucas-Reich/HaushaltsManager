@@ -1,5 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="../../../../layout/custom_preview.xml" value="0.40520833333333334" />
+        <entry key="app/src/main/res/drawable/recycler_view_item_background.xml" value="0.40625" />
+        <entry key="app/src/main/res/layout/activity_category_list.xml" value="0.39010416666666664" />
+        <entry key="app/src/main/res/layout/activity_drag_and_drop.xml" value="0.31431159420289856" />
+        <entry key="app/src/main/res/layout/activity_main_tab.xml" value="0.31567028985507245" />
+        <entry key="app/src/main/res/layout/bottom_sheet_persistent.xml" value="0.31431159420289856" />
+        <entry key="app/src/main/res/layout/bottom_sheet_test_layout.xml" value="0.31431159420289856" />
+        <entry key="app/src/main/res/layout/dnd_tab_one_date.xml" value="0.3170289855072464" />
+        <entry key="app/src/main/res/layout/dnd_tab_two_configuration.xml" value="0.31431159420289856" />
+        <entry key="app/src/main/res/layout/recycler_view_child_category.xml" value="0.39010416666666664" />
+        <entry key="app/src/main/res/layout/recycler_view_generic.xml" value="0.34601449275362317" />
+        <entry key="app/src/main/res/layout/recycler_view_parent_category.xml" value="0.39010416666666664" />
+        <entry key="app/src/main/res/menu/activity_main_drawer.xml" value="0.39010416666666664" />
+      </map>
+    </option>
+  </component>
   <component name="NullableNotNullManager">
     <option name="myDefaultNullable" value="android.support.annotation.Nullable" />
     <option name="myDefaultNotNull" value="android.annotation.NonNull" />

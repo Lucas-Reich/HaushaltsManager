@@ -2,6 +2,8 @@ package com.example.lucas.haushaltsmanager.ReportBuilder.RecyclerViewItem.Widget
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
+
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.ReportBuilder.Widgets.LineChartWidget;
 
