@@ -12,16 +12,6 @@ import java.util.UUID;
 
 public class Converters {
     @TypeConverter
-    public static UUID uuidFromString(String uuid) {
-        return UUID.fromString(uuid);
-    }
-
-    @TypeConverter
-    public static String uuidToString(UUID uuid) {
-        return uuid.toString();
-    }
-
-    @TypeConverter
     public static Price priceFromDouble(double price) {
         return new Price(price);
     }

@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.widget.Button;
 
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
-import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.Database.Repositories.AccountDAO;
 import com.example.lucas.haushaltsmanager.Database.Repositories.BookingDAO;
@@ -21,7 +20,6 @@ import com.example.lucas.haushaltsmanager.Views.SaveFloatingActionButton;
 import com.example.lucas.haushaltsmanager.entities.Account;
 import com.example.lucas.haushaltsmanager.entities.Currency;
 import com.example.lucas.haushaltsmanager.entities.Price;
-import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 
 import java.util.Locale;
 
@@ -33,7 +31,6 @@ public class CreateAccountActivity extends AbstractAppCompatActivity implements 
 
     private Button mAccountNameBtn, mAccountBalanceBtn, mAccountCurrencyBtn;
     private Account mAccount;
-    private Price initialAccountBalance;
     private AccountDAO accountRepo;
     private BookingDAO bookingRepository;
     private AddAndSetDefaultDecorator addAndSetDefaultDecorator;
@@ -45,8 +42,6 @@ public class CreateAccountActivity extends AbstractAppCompatActivity implements 
 
         accountRepo = AppDatabase.getDatabase(this).accountDAO();
         bookingRepository = AppDatabase.getDatabase(this).bookingDAO();
-
-        initialAccountBalance = new Price(0);
 
         mAccountNameBtn = findViewById(R.id.new_account_name);
         mAccountBalanceBtn = findViewById(R.id.new_account_balance);
@@ -63,9 +58,10 @@ public class CreateAccountActivity extends AbstractAppCompatActivity implements 
     protected void onStart() {
         super.onStart();
 
-        if (!mAccount.isSet()) {
+        if (INTENT_MODE_UPDATE.equals(getIntentMode())) {
             mAccountNameBtn.setHint(mAccount.getName());
         }
+
         mAccountNameBtn.setOnClickListener(v -> {
             Bundle args = new Bundle();
             args.putString(BasicTextInputDialog.TITLE, getString(R.string.set_account_title));
@@ -77,9 +73,9 @@ public class CreateAccountActivity extends AbstractAppCompatActivity implements 
                 mAccount.setName(textInput);
                 mAccountNameBtn.setText(mAccount.getName());
 
-                enableFabIfAccountIsSaveable(mAccount);
+                enableFabIfAccountIsSaveable();
             });
-            basicDialog.show(getFragmentManager(), "create_account_name");
+            basicDialog.show(getSupportFragmentManager(), "create_account_name");
         });
 
         mAccountBalanceBtn.setHint(MoneyUtils.formatHumanReadable(mAccount.getBalance(), Locale.getDefault()));
@@ -91,13 +87,14 @@ public class CreateAccountActivity extends AbstractAppCompatActivity implements 
             PriceInputDialog priceInputDialog = new PriceInputDialog();
             priceInputDialog.setArguments(args);
             priceInputDialog.setOnPriceSelectedListener(price -> {
+                mAccount.setBalance(price);
 
-                initialAccountBalance = price;
-                mAccountBalanceBtn.setText(MoneyUtils.formatHumanReadable(mAccount.getBalance(), Locale.getDefault()));
+                String humanReadableBalance = MoneyUtils.formatHumanReadable(mAccount.getBalance(), Locale.getDefault());
+                mAccountBalanceBtn.setText(humanReadableBalance);
 
-                enableFabIfAccountIsSaveable(mAccount);
+                enableFabIfAccountIsSaveable();
             });
-            priceInputDialog.show(getFragmentManager(), "create_account_price");
+            priceInputDialog.show(getSupportFragmentManager(), "create_account_price");
         });
 
         mAccountCurrencyBtn.setText(new Currency().getShortName().toUpperCase());
@@ -112,18 +109,16 @@ public class CreateAccountActivity extends AbstractAppCompatActivity implements 
 
     @Override
     public void onCheckClick() {
-        BundleUtils bundle = new BundleUtils(getIntent().getExtras());
-
-        switch (bundle.getString(INTENT_MODE, INTENT_MODE_CREATE)) {
+        switch (getIntentMode()) {
             case INTENT_MODE_CREATE:
 
                 AppDatabase.getDatabase(this).runInTransaction(() -> {
-                    bookingRepository.insert(new Booking(
-                            getString(R.string.initial_account_balance_booking_name),
-                            initialAccountBalance,
-                            app.unassignedCategoryId, // TODO: Which category to take
-                            mAccount.getId()
-                    ));
+//                    bookingRepository.insert(new Booking(
+//                            getString(R.string.initial_account_balance_booking_name),
+//                            initialAccountBalance,
+//                            app.unassignedCategoryId, // TODO: Which category should I take
+//                            mAccount.getId()
+//                    ));
 
                     accountRepo.insert(mAccount);
 
@@ -141,22 +136,30 @@ public class CreateAccountActivity extends AbstractAppCompatActivity implements 
         startActivity(startMainTab);
     }
 
+    private String getIntentMode() {
+        BundleUtils bundle = new BundleUtils(getIntent().getExtras());
+
+        return bundle.findString(INTENT_MODE);
+    }
+
     private void resolveMode(Bundle args) {
         BundleUtils bundle = new BundleUtils(args);
 
-        switch (bundle.getString(INTENT_MODE, INTENT_MODE_CREATE)) {
+        String intentMode = getIntentMode();
+        switch (intentMode) {
             case INTENT_MODE_UPDATE:
 
                 mAccount = (Account) bundle.getParcelable(INTENT_ACCOUNT, null);
-                enableFabIfAccountIsSaveable(mAccount);
                 break;
             case INTENT_MODE_CREATE:
 
                 mAccount = new Account("", new Price(0));
                 break;
             default:
-                throw new UnsupportedOperationException("Could not handle intent mode " + bundle.getString(INTENT_MODE, null));
+                throw new UnsupportedOperationException("Could not handle intent mode " + intentMode);
         }
+
+        enableFabIfAccountIsSaveable();
     }
 
     private void showCloseScreenDialog() {
@@ -174,10 +177,10 @@ public class CreateAccountActivity extends AbstractAppCompatActivity implements 
         confirmationDialog.show(getSupportFragmentManager(), "new_account_exit");
     }
 
-    private void enableFabIfAccountIsSaveable(Account account) {
+    private void enableFabIfAccountIsSaveable() {
         SaveFloatingActionButton saveFloatingActionButton = findViewById(R.id.new_account_save);
 
-        if (account.isSet()) {
+        if (!"".equals(mAccount.getName())) {
             saveFloatingActionButton.enable();
         } else {
             saveFloatingActionButton.disable();

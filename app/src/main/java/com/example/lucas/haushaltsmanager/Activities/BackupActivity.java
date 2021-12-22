@@ -116,7 +116,7 @@ public class BackupActivity extends AbstractAppCompatActivity {
                 updateListView();
             });
             basicDialog.setArguments(bundle);
-            basicDialog.show(getFragmentManager(), "backup_name");
+            basicDialog.show(getSupportFragmentManager(), "backup_name");
         });
     }
 

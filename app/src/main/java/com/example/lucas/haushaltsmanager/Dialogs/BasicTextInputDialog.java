@@ -2,18 +2,17 @@ package com.example.lucas.haushaltsmanager.Dialogs;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.DialogFragment;
 import android.os.Bundle;
 import android.text.InputType;
-import android.view.KeyEvent;
-import android.view.View;
-import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
 
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
@@ -27,15 +26,9 @@ public class BasicTextInputDialog extends DialogFragment {
     private String mDialogHint;
     private EditText mTextInput;
 
+    @NonNull
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
-    }
-
-    @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         BundleUtils args = new BundleUtils(getArguments());
 
         mDialogHint = args.getString(HINT, "");
@@ -51,6 +44,29 @@ public class BasicTextInputDialog extends DialogFragment {
         builder.setNegativeButton(R.string.btn_cancel, null);
 
         return builder.create();
+    }
+
+    /**
+     * Methode um nach der Dialog erstellung den OK onClickListener zu setzen.
+     * Das geschieht hier, damit der Dialog nicht automatisch geschlossen wird, wenn der User auf den OK Button klickt.
+     * Quelle: https://stackoverflow.com/a/10661281
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        AlertDialog dialog = (AlertDialog) getDialog();
+        Button okButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        okButton.setOnClickListener(v -> performButtonClickOk());
+    }
+
+    /**
+     * Methode um einen Listener zu registrieren, welcher aufgerufen wird, wenn der User den Text einegegeben hat.
+     *
+     * @param listener Listener, welcher aufgerufen werden soll
+     */
+    public void setOnTextInputListener(OnTextInput listener) {
+        mCallback = listener;
     }
 
     /**
@@ -81,17 +97,14 @@ public class BasicTextInputDialog extends DialogFragment {
         editText.setMaxLines(1);
         editText.setHint(mDialogHint);
         // Sollte ich noch eine ContentDescription hinzufügen, sodass das InputFeld auch duch ScreemReader lesbar ist?
-        editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+        editText.setOnEditorActionListener((v, actionId, event) -> {
 
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    performButtonClickOk();
-                    return true;
-                }
-
-                return false;
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                performButtonClickOk();
+                return true;
             }
+
+            return false;
         });
 
         //Wenn die Anfrage vom CreateAccountActivity kommt, dann müssen Zahlen anstatt Buchstaben im keyboard angezeigt werden
@@ -102,25 +115,6 @@ public class BasicTextInputDialog extends DialogFragment {
 
         mTextInput = editText;
         return editText;
-    }
-
-    /**
-     * Methode um nach der Dialog erstellung den OK onClickListener zu setzen.
-     * Das geschieht hier, damit der Dialog nicht automatisch geschlossen wird, wenn der User auf den OK Button klickt.
-     * Quelle: https://stackoverflow.com/a/10661281
-     */
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        AlertDialog d = (AlertDialog) getDialog();
-        Button okButton = d.getButton(AlertDialog.BUTTON_POSITIVE);
-        okButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                performButtonClickOk();
-            }
-        });
     }
 
     /**
@@ -146,15 +140,6 @@ public class BasicTextInputDialog extends DialogFragment {
 
             dismiss();
         }
-    }
-
-    /**
-     * Methode um einen Listener zu registrieren, welcher aufgerufen wird, wenn der User den Text einegegeben hat.
-     *
-     * @param listener Listener, welcher aufgerufen werden soll
-     */
-    public void setOnTextInputListener(OnTextInput listener) {
-        mCallback = listener;
     }
 
     public interface OnTextInput {

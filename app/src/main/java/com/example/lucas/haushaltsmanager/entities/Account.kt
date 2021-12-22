@@ -12,14 +12,10 @@ import java.util.*
 class Account(
     @PrimaryKey val id: @WriteWith<UUIDParceler> UUID,
     var name: String,
-    val balance: Price
+    var balance: Price
 ) : Parcelable {
 
     constructor(accountName: String, price: Price) : this(UUID.randomUUID(), accountName, price)
-
-    fun isSet(): Boolean {
-        return name != ""
-    }
 
     override fun equals(other: Any?): Boolean {
         if (other !is Account) {

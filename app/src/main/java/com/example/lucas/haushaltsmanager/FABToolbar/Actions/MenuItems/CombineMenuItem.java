@@ -1,10 +1,10 @@
 package com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems;
 
-import android.app.FragmentManager;
 import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.StringRes;
+import androidx.fragment.app.FragmentManager;
 
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.App.app;
@@ -81,7 +81,7 @@ public class CombineMenuItem implements IMenuItem {
     private FragmentManager getFragmentManager(Context context) {
         ParentActivity activity = (ParentActivity) context;
 
-        return activity.getFragmentManager();
+        return activity.getSupportFragmentManager();
     }
 
     private String getString(@StringRes int stringRes) {

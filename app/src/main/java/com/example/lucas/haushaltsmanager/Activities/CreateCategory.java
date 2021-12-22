@@ -65,7 +65,7 @@ public class CreateCategory extends AbstractAppCompatActivity {
             BasicTextInputDialog nameDialog = new BasicTextInputDialog();
             nameDialog.setArguments(bundle);
             nameDialog.setOnTextInputListener(this::setCategoryTitle);
-            nameDialog.show(getFragmentManager(), "create_category_name");
+            nameDialog.show(getSupportFragmentManager(), "create_category_name");
         });
 
         setColor(mCategory.getColor());

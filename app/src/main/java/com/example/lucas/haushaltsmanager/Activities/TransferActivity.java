@@ -64,7 +64,7 @@ public class TransferActivity extends AbstractAppCompatActivity {
 
                 setToExpense(price.getAbsoluteValue());
             });
-            expenseInput.show(getFragmentManager(), "transfers_amount_input");
+            expenseInput.show(getSupportFragmentManager(), "transfers_amount_input");
         });
 
         mFromAccountBtn.setHint(R.string.input_account);

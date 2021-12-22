@@ -97,7 +97,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
             PriceInputDialog priceInput = new PriceInputDialog();
             priceInput.setArguments(bundle);
             priceInput.setOnPriceSelectedListener(this::setPrice);
-            priceInput.show(getFragmentManager(), "expense_screen_price");
+            priceInput.show(getSupportFragmentManager(), "expense_screen_price");
         });
 
         setExpenseCurrency();
@@ -111,7 +111,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
             BasicTextInputDialog titleDialog = new BasicTextInputDialog();
             titleDialog.setArguments(bundle);
             titleDialog.setOnTextInputListener(this::setTitle);
-            titleDialog.show(getFragmentManager(), "expense_screen_title");
+            titleDialog.show(getSupportFragmentManager(), "expense_screen_title");
         });
 
         mCategoryTxt.setHint(categoryRepository.get(mExpense.getCategoryId()).getName());
