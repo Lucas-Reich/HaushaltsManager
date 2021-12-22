@@ -1,5 +1,7 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.FileReader.Files.Utils;
 
+import com.example.lucas.haushaltsmanager.Utils.FileUtils;
+
 public class FileTypeVerifier {
     private final String expectedExtension;
 
@@ -8,7 +10,7 @@ public class FileTypeVerifier {
     }
 
     public boolean verifyType(String filePath) {
-        String actualFileExtension = filePath.substring(filePath.indexOf("."));
+        String actualFileExtension = FileUtils.getType(filePath);
 
         return actualFileExtension.equals(expectedExtension);
     }

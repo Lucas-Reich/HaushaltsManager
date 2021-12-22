@@ -91,6 +91,10 @@ public class FileUtils {
         return oldestFile;
     }
 
+    public static String getType(String file) {
+        return getType(new File(file));
+    }
+
     public static String getType(File file) {
         String extension = "";
         String fileName = file.getName();

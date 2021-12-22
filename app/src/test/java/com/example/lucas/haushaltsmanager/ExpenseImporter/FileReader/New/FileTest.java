@@ -1,12 +1,12 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.FileReader.New;
 
+import static org.junit.Assert.assertEquals;
+
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.InvalidFileException;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.FileReader.Files.File;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.FileReader.Files.IFile;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class FileTest {
     private final String BASE_PATH = "/Users/lucas/StudioProjects/HaushaltsManager/app/src/test/java/com/example/lucas/haushaltsmanager/ExpenseImporter/FileReader/TextFiles";

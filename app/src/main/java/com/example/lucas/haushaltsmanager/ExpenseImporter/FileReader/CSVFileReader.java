@@ -5,17 +5,18 @@ import com.example.lucas.haushaltsmanager.ExpenseImporter.FileReader.Files.Utils
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Line.Line;
 
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.Scanner;
 
 public class CSVFileReader implements IFileReader {
     private final int lineCount;
 
-    private Scanner scanner;
+    private final Scanner scanner;
+    private final CSVFile file;
     private String currentLine;
-    private CSVFile file;
 
     public CSVFileReader(CSVFile file) throws FileNotFoundException {
-        scanner = new Scanner(new java.io.FileReader(file));
+        scanner = new Scanner(new FileReader(file));
 
         this.file = file;
         this.lineCount = new LineCounter(file.getPath()).getLineCount();

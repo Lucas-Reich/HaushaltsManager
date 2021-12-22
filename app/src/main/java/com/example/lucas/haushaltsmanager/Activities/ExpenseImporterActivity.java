@@ -1,8 +1,8 @@
 package com.example.lucas.haushaltsmanager.Activities;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -24,7 +24,6 @@ import com.example.lucas.haushaltsmanager.ExpenseImporter.SavingService.Saver;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
 import com.example.lucas.haushaltsmanager.Views.ButtonContainer;
-import com.example.lucas.haushaltsmanager.Views.HeaderView;
 import com.example.lucas.haushaltsmanager.Views.RequiredFieldsView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -61,8 +60,8 @@ public class ExpenseImporterActivity extends AbstractAppCompatActivity implement
         importer = buildNewImporter(tryCreateFileReader(importFile));
 
         requiredFieldsView.configure(
-                new ButtonContainer((LinearLayout) findViewById(R.id.expense_importer_button_container)),
-                (HeaderView) findViewById(R.id.expense_importer_header),
+                new ButtonContainer(findViewById(R.id.expense_importer_button_container)),
+                findViewById(R.id.expense_importer_header),
                 importFile.getHeaders(),
                 importer.getRequiredFields()
         );
@@ -109,6 +108,7 @@ public class ExpenseImporterActivity extends AbstractAppCompatActivity implement
         try {
             return CSVFile.open(path);
         } catch (FileNotFoundException | InvalidFileException e) {
+            Log.e("Importer", "Could not open file", e);
             return null;
         }
     }
@@ -116,13 +116,10 @@ public class ExpenseImporterActivity extends AbstractAppCompatActivity implement
     private void showImportFAB() {
         startImportFAB.setVisibility(View.VISIBLE); // TODO: Add nice FAB popUp animation (inflating)
 
-        startImportFAB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new ProgressBarDialog(ExpenseImporterActivity.this, importer).show();
+        startImportFAB.setOnClickListener(v -> {
+            new ProgressBarDialog(ExpenseImporterActivity.this, importer).show();
 
-                new Thread(importer).start();
-            }
+            new Thread(importer).start();
         });
     }
 

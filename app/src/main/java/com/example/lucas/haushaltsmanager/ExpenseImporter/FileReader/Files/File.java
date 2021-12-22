@@ -11,8 +11,6 @@ public class File extends java.io.File implements IFile {
         super(path);
 
         this.path = path;
-
-        assertIsFile();
     }
 
     @Override
@@ -28,7 +26,7 @@ public class File extends java.io.File implements IFile {
         return path;
     }
 
-    private void assertIsFile() throws InvalidFileException {
+    protected void assertIsFile() throws InvalidFileException {
         if (isFile()) {
             return;
         }

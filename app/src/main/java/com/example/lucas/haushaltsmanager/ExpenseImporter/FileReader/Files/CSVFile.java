@@ -4,6 +4,7 @@ import com.example.lucas.haushaltsmanager.ExpenseImporter.Delimiter.IDelimiter;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.InvalidFileException;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.FileReader.Files.Utils.DelimiterIdentifier.CSVDelimiterIdentifier;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.FileReader.Files.Utils.FileTypeVerifier;
+import com.example.lucas.haushaltsmanager.Utils.FileUtils;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -12,13 +13,14 @@ import java.util.Scanner;
 
 // TODO: Gibt es ein Design Pattern mit dem ich das erweitern vermeiden kann?
 public class CSVFile extends File {
-    private static final String REQUIRED_FILE_EXTENSION = ".csv";
+    private static final String REQUIRED_FILE_EXTENSION = "csv";
 
-    private IDelimiter delimiter;
-    private String header;
+    private final IDelimiter delimiter;
+    private final String header;
 
     private CSVFile(String filePath) throws FileNotFoundException, InvalidFileException {
         super(filePath);
+        assertIsFile();
 
         header = readFirstLine(filePath);
 
@@ -50,7 +52,7 @@ public class CSVFile extends File {
             return;
         }
 
-        throw InvalidFileException.invalidType(REQUIRED_FILE_EXTENSION, file);
+        throw InvalidFileException.invalidType(REQUIRED_FILE_EXTENSION, file, FileUtils.getType(file));
     }
 
     private String readFirstLine(String filePath) throws FileNotFoundException {

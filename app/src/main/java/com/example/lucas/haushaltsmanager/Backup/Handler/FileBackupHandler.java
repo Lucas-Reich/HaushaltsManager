@@ -44,7 +44,7 @@ public class FileBackupHandler {
         String fileType = FileUtils.getType(file);
 
         if (!BACKUP_EXTENSION.equals(fileType)) {
-            throw InvalidFileException.invalidType(BACKUP_EXTENSION, file.getPath());
+            throw InvalidFileException.invalidType(BACKUP_EXTENSION, file.getPath(), fileType);
         }
     }
 
