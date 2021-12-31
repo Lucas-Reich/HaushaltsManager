@@ -33,7 +33,7 @@ public class TabThreeYearlyReports extends AbstractTab {
         List<Booking> bookings = getVisibleExpenses();
 
         mTimeFrameCardPopulator = new TimeFrameCardPopulator(
-                (CardView) rootView.findViewById(R.id.tab_three_timeframe_report_card),
+                rootView.findViewById(R.id.tab_three_timeframe_report_card),
                 getResources()
         );
         mTimeFrameCardPopulator.setData(createReport(
@@ -42,7 +42,7 @@ public class TabThreeYearlyReports extends AbstractTab {
         ));
 
         mIncomeCardPopulator = new PieChartCardPopulator(
-                (CardView) rootView.findViewById(R.id.tab_three_income_card)
+                rootView.findViewById(R.id.tab_three_income_card)
         );
         mIncomeCardPopulator.showIncome();
         mIncomeCardPopulator.setData(createReport(
@@ -51,7 +51,7 @@ public class TabThreeYearlyReports extends AbstractTab {
         ));
 
         mExpenseCardPopulator = new PieChartCardPopulator(
-                (CardView) rootView.findViewById(R.id.tab_three_expense_card)
+                rootView.findViewById(R.id.tab_three_expense_card)
         );
         mExpenseCardPopulator.showExpense();
         mExpenseCardPopulator.setData(createReport(
@@ -60,7 +60,7 @@ public class TabThreeYearlyReports extends AbstractTab {
         ));
 
         mLineChartPopulator = new LineChartCardPopulator(
-                (CardView) rootView.findViewById(R.id.tab_three_line_chart),
+                rootView.findViewById(R.id.tab_three_line_chart),
                 getLastYearAccountBalance(CalendarUtils.getCurrentYear(), bookings)
         );
         mLineChartPopulator.setResources(getResources(), CalendarUtils.getCurrentYear());

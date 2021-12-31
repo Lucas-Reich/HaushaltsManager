@@ -45,10 +45,12 @@ public class Saver implements ISaver {
 
         CategoryDAO categoryRepo = AppDatabase.getDatabase(context).categoryDAO();
 
+        BookingDAO bookingRepo = AppDatabase.getDatabase(context).bookingDAO();
+
         return new Saver(
                 new CachedInsertAccountRepositoryDecorator(accountRepo),
                 new CachedInsertCategoryRepositoryDecorator(categoryRepo),
-                AppDatabase.getDatabase(context).bookingDAO(),
+                bookingRepo,
                 new AddAndSetDefaultDecorator(new ActiveAccountsPreferences(context), context),
                 new DataImporterBackupHandler(context, new FileBackupHandler())
         );
@@ -65,10 +67,20 @@ public class Saver implements ISaver {
     }
 
     public void persist(Booking booking, Account account, Category category) {
-        booking.setAccountId(account.getId());
         saveAccount(account);
 
         categoryRepository.insert(category);
+
+        saveBooking(booking, account, category);
+    }
+
+    private void saveBooking(Booking booking, Account account, Category category) {
+        Account accountWithCorrectId = accountRepository.getByName(account.getName());
+        booking.setAccountId(accountWithCorrectId.getId());
+
+        Category categoryWithCorrectId = categoryRepository.getByName(category.getName());
+        booking.setCategoryId(categoryWithCorrectId.getId());
+
 
         bookingRepository.insert(booking);
     }

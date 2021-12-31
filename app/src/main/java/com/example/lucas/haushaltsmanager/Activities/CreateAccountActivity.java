@@ -32,7 +32,6 @@ public class CreateAccountActivity extends AbstractAppCompatActivity implements 
     private Button mAccountNameBtn, mAccountBalanceBtn, mAccountCurrencyBtn;
     private Account mAccount;
     private AccountDAO accountRepo;
-    private BookingDAO bookingRepository;
     private AddAndSetDefaultDecorator addAndSetDefaultDecorator;
 
     @Override
@@ -41,7 +40,6 @@ public class CreateAccountActivity extends AbstractAppCompatActivity implements 
         setContentView(R.layout.activity_new_account);
 
         accountRepo = AppDatabase.getDatabase(this).accountDAO();
-        bookingRepository = AppDatabase.getDatabase(this).bookingDAO();
 
         mAccountNameBtn = findViewById(R.id.new_account_name);
         mAccountBalanceBtn = findViewById(R.id.new_account_balance);

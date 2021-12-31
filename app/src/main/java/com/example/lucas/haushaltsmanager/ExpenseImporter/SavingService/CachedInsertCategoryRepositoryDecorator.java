@@ -1,5 +1,6 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.SavingService;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.lucas.haushaltsmanager.Database.Repositories.CategoryDAO;
@@ -18,27 +19,40 @@ public class CachedInsertCategoryRepositoryDecorator implements CategoryDAO {
     }
 
     @Override
-    public Category get(UUID id) {
+    public Category get(@NonNull UUID id) {
         return repository.get(id);
     }
 
     @Override
+    @NonNull
+    public Category getByName(@NonNull String categoryName) {
+        Category category = getCategoryByNameFromCache(categoryName);
+
+        if (null != category) {
+            return category;
+        }
+
+        return repository.getByName(categoryName);
+    }
+
+    @Override
+    @NonNull
     public List<Category> getAll() {
         return repository.getAll();
     }
 
     @Override
-    public void delete(Category category) {
+    public void delete(@NonNull Category category) {
         repository.delete(category);
     }
 
     @Override
-    public void update(Category category) {
+    public void update(@NonNull Category category) {
         repository.update(category);
     }
 
     @Override
-    public void insert(Category category) {
+    public void insert(@NonNull Category category) {
         Category cachedCategory = getCachedCategory(category);
         if (null != cachedCategory) {
             return;
@@ -46,6 +60,19 @@ public class CachedInsertCategoryRepositoryDecorator implements CategoryDAO {
 
         repository.insert(category);
         cachedCategories.add(category);
+    }
+
+    @Nullable
+    private Category getCategoryByNameFromCache(String categoryName) {
+        for (Category existingCategory : cachedCategories) {
+            if (!categoryName.equals(existingCategory.getName())) {
+                continue;
+            }
+
+            return existingCategory;
+        }
+
+        return null;
     }
 
     @Nullable

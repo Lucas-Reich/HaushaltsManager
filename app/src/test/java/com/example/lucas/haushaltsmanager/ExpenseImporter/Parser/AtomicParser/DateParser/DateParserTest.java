@@ -1,5 +1,8 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.DateParser;
 
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertTrue;
+
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Delimiter.Comma;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Delimiter.IDelimiter;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.InvalidInputException;
@@ -16,9 +19,6 @@ import org.junit.Test;
 import java.util.Calendar;
 import java.util.List;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
-
 public class DateParserTest {
     private DateParser parser;
 
@@ -29,15 +29,17 @@ public class DateParserTest {
 
     @Test
     public void getRequiredFieldReturnsExpectedFields() {
+        // Arrange
         List<IRequiredField> requiredFields = parser.getRequiredFields();
 
+        // Assert
         assertEquals(1, requiredFields.size());
-        assertTrue((requiredFields.get(0) instanceof Date));
+        assertTrue(requiredFields.get(0) instanceof Date);
     }
 
     @Test
     public void parserCreateDate() {
-        // SetUp
+        // Arrange
         String expectedDate = "06.09.2019";
         Line line = buildLine(expectedDate);
 
@@ -66,7 +68,18 @@ public class DateParserTest {
         try {
             parser.parse(line, createDateMappingList());
         } catch (InvalidInputException e) {
-            assertEquals("Could not create Calendar from 'empty string', invalid input.", e.getMessage());
+            assertEquals("Could not create 'Calendar' from 'empty string', invalid input.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void parserThrowsExceptionForDateWithInvalidFormat() {
+        Line line = buildLine("Montag");
+
+        try {
+            parser.parse(line, createDateMappingList());
+        } catch (InvalidInputException e) {
+            assertEquals("Could not create 'Date' from 'Montag', invalid format.", e.getMessage());
         }
     }
 

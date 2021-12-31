@@ -1,5 +1,7 @@
 package com.example.lucas.haushaltsmanager;
 
+import androidx.annotation.NonNull;
+
 import com.example.lucas.haushaltsmanager.Database.Repositories.CategoryDAO;
 import com.example.lucas.haushaltsmanager.entities.Category;
 
@@ -29,6 +31,12 @@ public class MockCategoryRepository implements CategoryDAO {
 
     @Override
     public Category get(UUID id) {
+        return null;
+    }
+
+    @NonNull
+    @Override
+    public Category getByName(@NonNull String categoryName) {
         return null;
     }
 }

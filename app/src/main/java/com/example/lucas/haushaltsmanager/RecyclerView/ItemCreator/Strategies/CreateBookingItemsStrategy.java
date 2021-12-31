@@ -28,8 +28,9 @@ public class CreateBookingItemsStrategy implements RecyclerItemCreatorStrategyIn
         DateItem currentDate = new DateItem(bookings.get(0).getDate());
 
         List<IRecyclerItem> recyclerItems = new ArrayList<>();
+        recyclerItems.add(currentDate);
         for (Booking booking : bookings) {
-            if (changeDate(booking, currentDate, SORT_DESC)) {
+            if (isBookingOnDifferentDate(booking, currentDate, SORT_DESC)) {
                 currentDate = new DateItem(booking.getDate());
 
                 recyclerItems.add(currentDate);
@@ -41,7 +42,7 @@ public class CreateBookingItemsStrategy implements RecyclerItemCreatorStrategyIn
         return recyclerItems;
     }
 
-    private boolean changeDate(Booking booking, DateItem currentDate, String order) {
+    private boolean isBookingOnDifferentDate(Booking booking, DateItem currentDate, String order) {
         if (order.equals(SORT_ASC)) {
             return CalendarUtils.beforeByDate(booking.getDate(), currentDate.getContent());
         }

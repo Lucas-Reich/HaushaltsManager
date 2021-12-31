@@ -23,7 +23,8 @@ public class CSVFileTest {
             Assert.fail("CSVFileReader with invalid extension could be opened");
         } catch (InvalidFileException e) {
 
-            assertEquals("Could not open file: file/with/invalid/extension.txt. Expected file of type .csv.", e.getMessage());
+            String expectedErrMessage = "Could not open file: 'file/with/invalid/extension.txt'. Expected file of type 'csv' but got 'txt'.";
+            assertEquals(expectedErrMessage, e.getMessage());
         }
     }
 
@@ -54,7 +55,7 @@ public class CSVFileTest {
     public void canReadFileWithoutHeader() throws FileNotFoundException {
         CSVFile file = CSVFile.open(fileWithoutHeadline);
 
-        String expectedHeader = "Meine Geile Buchung,100.00,09-08-2019 08:00:00,Essen,Sparschwein";
+        String expectedHeader = "Meine Geile Buchung,100.00,09-08-2019 08:00:00,Essen,,Sparschwein";
         String actualHeader = file.getHeader();
 
         assertEquals(expectedHeader, actualHeader);

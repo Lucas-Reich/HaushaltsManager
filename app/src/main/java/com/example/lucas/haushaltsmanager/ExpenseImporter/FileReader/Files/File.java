@@ -22,6 +22,7 @@ public class File extends java.io.File implements IFile {
     }
 
     @Override
+    @NonNull
     public String getPath() {
         return path;
     }

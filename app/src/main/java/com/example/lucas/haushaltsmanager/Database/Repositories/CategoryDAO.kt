@@ -19,5 +19,8 @@ interface CategoryDAO {
     fun delete(category: Category)
 
     @Query("SELECT * FROM categories WHERE id = :id")
-    fun get(id: UUID): Category
+    fun get(id: UUID): Category?
+
+    @Query("SELECT * FROM categories WHERE name = :categoryName")
+    fun getByName(categoryName: String): Category
 }

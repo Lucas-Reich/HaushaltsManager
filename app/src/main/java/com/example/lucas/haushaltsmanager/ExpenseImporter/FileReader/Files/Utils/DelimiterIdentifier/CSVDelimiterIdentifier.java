@@ -10,7 +10,7 @@ import java.util.Map;
 public class CSVDelimiterIdentifier implements IDelimiterIdentifier {
     public static final IDelimiter DEFAULT_DELIMITER = new Comma();
 
-    private HashMap<IDelimiter, Integer> validDelimiter;
+    private final HashMap<IDelimiter, Integer> validDelimiter;
 
     public CSVDelimiterIdentifier() {
         validDelimiter = new HashMap<>();

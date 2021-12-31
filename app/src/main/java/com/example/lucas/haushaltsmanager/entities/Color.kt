@@ -22,10 +22,13 @@ class Color(val color: String) : Parcelable, Color() {
     )
 
     companion object {
+        @JvmStatic
         fun black() = Color("#000000")
 
+        @JvmStatic
         fun white() = Color("#FFFFFF")
 
+        @JvmStatic
         fun random(): com.example.lucas.haushaltsmanager.entities.Color {
             val randomInt = Random().nextInt(0xffffff + 1)
 

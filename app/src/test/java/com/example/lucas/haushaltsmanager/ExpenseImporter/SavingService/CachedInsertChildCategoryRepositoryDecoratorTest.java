@@ -1,21 +1,21 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.SavingService;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+
 import com.example.lucas.haushaltsmanager.Database.Repositories.CategoryDAO;
-import com.example.lucas.haushaltsmanager.entities.booking.ExpenseType;
 import com.example.lucas.haushaltsmanager.entities.Category;
 import com.example.lucas.haushaltsmanager.entities.Color;
+import com.example.lucas.haushaltsmanager.entities.booking.ExpenseType;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
 
 public class CachedInsertChildCategoryRepositoryDecoratorTest {
     private CategoryDAO repository;
@@ -43,20 +43,20 @@ public class CachedInsertChildCategoryRepositoryDecoratorTest {
     @Test
     public void whenChildCategoryIsNotCachedADatabaseCallIsMade() {
         // SetUp
-        Category category = mock(Category.class);
+        Category category = createCategory();
 
         // Act
         decorator.insert(category);
 
         // Assert
-        verify(repository, times(1)).insert(any(Category.class));
+        verify(repository, times(1)).insert(category);
     }
 
     private Category createCategory() {
         return new Category(
                 "any string",
-                mock(Color.class),
-                ExpenseType.Companion.expense()
+                Color.random(),
+                ExpenseType.expense()
         );
     }
 

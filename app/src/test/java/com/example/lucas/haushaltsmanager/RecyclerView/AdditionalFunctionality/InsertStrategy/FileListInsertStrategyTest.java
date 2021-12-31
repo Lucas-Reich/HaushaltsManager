@@ -15,7 +15,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 public class FileListInsertStrategyTest {
-    private FileListInsertStrategy insertStrategy = new FileListInsertStrategy();
+    private final FileItemInsertStrategy insertStrategy = new FileItemInsertStrategy();
 
     @Test
     public void cannotInsertItemOfWrongClass() {

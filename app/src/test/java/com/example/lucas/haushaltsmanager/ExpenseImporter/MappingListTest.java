@@ -1,14 +1,12 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter;
 
+import static org.junit.Assert.assertEquals;
+
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.NoMappingFoundException;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.IRequiredField;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
 
 public class MappingListTest {
     private MappingList mappingList;
@@ -21,28 +19,30 @@ public class MappingListTest {
     @Test
     public void throwExceptionIfNoMappingIsFound() {
         try {
-            mappingList.getMappingForKey(mock(IRequiredField.class));
-
-            Assert.fail("Found mapping for not existing Key.");
+            mappingList.getMappingForKey(new TestRequiredField());
         } catch (NoMappingFoundException e) {
-
-            // Ich kann die Fehlernachricht nicht auswerten, da die RequiredField Klasse von Mockito auto generiert ist.
+            assertEquals("No mapping defined for key 'TestRequiredField'.", e.getMessage());
         }
     }
 
     @Test
     public void getMappingForExistingField() {
-        // Set Up
-        IRequiredField requiredField = mock(IRequiredField.class);
+        // Arrange
+        IRequiredField requiredField = new TestRequiredField();
         int expectedMapping = 101;
-
 
         // Act
         mappingList.addMapping(requiredField, expectedMapping);
         int actualMapping = mappingList.getMappingForKey(requiredField);
 
-
         // Assert
         assertEquals(expectedMapping, actualMapping);
+    }
+
+    private static class TestRequiredField implements IRequiredField {
+        @Override
+        public int getTranslationKey() {
+            return 0;
+        }
     }
 }

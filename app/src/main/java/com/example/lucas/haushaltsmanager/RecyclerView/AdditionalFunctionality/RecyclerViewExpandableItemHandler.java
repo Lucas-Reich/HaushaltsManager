@@ -33,7 +33,12 @@ public abstract class RecyclerViewExpandableItemHandler extends RecyclerViewItem
     @Override
     public void insert(IRecyclerItem item) {
         IExpandableRecyclerItem parent = item.getParent();
-        if (null == item.getParent() && exists(parent)) {
+        if (null == parent) {
+            super.insert(item);
+            return;
+        }
+
+        if (exists(parent)) {
             super.insert(item);
             return;
         }

@@ -3,7 +3,7 @@ package com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.C
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.IRequiredField;
 import com.example.lucas.haushaltsmanager.R;
 
-public final class Title implements IRequiredField {
+public final class CategoryTitle implements IRequiredField {
 
     @Override
     public int getTranslationKey() {

@@ -1,7 +1,6 @@
 package com.example.lucas.haushaltsmanager.Dialogs.ChangeAccounts;
 
 import android.app.Dialog;
-import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,15 +8,18 @@ import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.DialogFragment;
 
 import com.example.lucas.haushaltsmanager.Activities.CreateAccountActivity;
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.Database.Repositories.AccountDAO;
-import com.example.lucas.haushaltsmanager.entities.Account;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences.ActiveAccountsPreferences;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
+import com.example.lucas.haushaltsmanager.entities.Account;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,8 +42,9 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Acco
         mUserPreferences = new UserSettingsPreferences(getActivity());
     }
 
+    @NonNull
     @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         mInitialAccountState = new HashMap<>();
 
         for (Account account : accountRepo.getAll()) {
@@ -108,7 +111,7 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Acco
     }
 
     @Override
-    public void onCancel(DialogInterface dialog) {
+    public void onCancel(@NonNull DialogInterface dialog) {
         super.onCancel(dialog);
         revertUserInteractions();
     }
@@ -117,9 +120,6 @@ public class ChooseAccountsDialogFragment extends DialogFragment implements Acco
         mCallback = listener;
     }
 
-    /**
-     * Methode um die ListView zu erzeugen und mit Funktionalität zu versorgen.
-     */
     private void prepareListView() {
 
         AccountAdapter adapter = new AccountAdapter(mInitialAccountState, getActivity());

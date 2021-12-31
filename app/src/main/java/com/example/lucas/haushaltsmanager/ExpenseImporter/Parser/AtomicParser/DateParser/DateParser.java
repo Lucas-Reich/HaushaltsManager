@@ -1,5 +1,7 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.DateParser;
 
+import androidx.annotation.NonNull;
+
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.InvalidInputException;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.NoMappingFoundException;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Line.Line;
@@ -22,11 +24,14 @@ public class DateParser implements IParser<Calendar> {
     }
 
     @Override
+    @NonNull
     public List<IRequiredField> getRequiredFields() {
         return Collections.singletonList(BOOKING_DATE_KEY);
     }
 
-    public Calendar parse(Line line, MappingList mapping) throws NoMappingFoundException, InvalidInputException {
+    @Override
+    @NonNull
+    public Calendar parse(@NonNull Line line, @NonNull MappingList mapping) throws NoMappingFoundException, InvalidInputException {
         String stringifiedDate = line.getAsString(mapping.getMappingForKey(BOOKING_DATE_KEY));
 
         assertNotEmpty(stringifiedDate);

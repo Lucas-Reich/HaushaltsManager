@@ -2,7 +2,10 @@ package com.example.lucas.haushaltsmanager.ExpenseImporter.FileReader;
 
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Line.Line;
 
-public interface IFileReader {
+import java.io.Closeable;
+import java.util.Iterator;
+
+public interface IFileReader extends Closeable {
     int getLineCount();
 
     /**

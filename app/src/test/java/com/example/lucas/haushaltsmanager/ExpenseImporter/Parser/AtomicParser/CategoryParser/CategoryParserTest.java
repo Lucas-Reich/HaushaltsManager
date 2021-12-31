@@ -1,22 +1,23 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.CategoryParser;
 
-import com.example.lucas.haushaltsmanager.entities.Category;
+import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Delimiter.Comma;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Delimiter.IDelimiter;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.InvalidInputException;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.NoMappingFoundException;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Line.Line;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.MappingList;
-import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.CategoryParser.RequiredFields.Title;
+import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.CategoryParser.RequiredFields.CategoryTitle;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.IRequiredField;
+import com.example.lucas.haushaltsmanager.entities.Category;
+import com.example.lucas.haushaltsmanager.entities.booking.ExpenseType;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
-
-import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class CategoryParserTest {
     private CategoryParser parser;
@@ -28,44 +29,47 @@ public class CategoryParserTest {
 
     @Test
     public void getRequiredFieldReturnsExpectedFields() {
+        // Act
         List<IRequiredField> requiredFields = parser.getRequiredFields();
 
+        // Assert
         assertEquals(1, requiredFields.size());
-        assertTrue((requiredFields.get(0) instanceof Title));
+        assertTrue(requiredFields.get(0) instanceof CategoryTitle);
     }
 
     @Test
     public void parserCreatesCategory() {
-        // SetUp
+        // Arrange
         String expectedCategoryTitle = "any string";
-        Line line = buildLine(expectedCategoryTitle);
+        Line line = buildCommandDelimitedLine(expectedCategoryTitle);
 
         // Act
         Category category = parser.parse(line, createCategoryMappingList());
 
         // Assert
         assertEquals(expectedCategoryTitle, category.getName());
+        assertEquals(ExpenseType.Companion.expense(), category.getDefaultExpenseType());
     }
 
     @Test
     public void parserThrowsExceptionIfMappingNotFound() {
-        Line line = buildLine("any string");
+        Line line = buildCommandDelimitedLine("any string");
 
         try {
             parser.parse(line, new MappingList());
         } catch (NoMappingFoundException e) {
-            assertEquals("No mapping defined for key 'Title'.", e.getMessage());
+            assertEquals("No mapping defined for key 'CategoryTitle'.", e.getMessage());
         }
     }
 
     @Test
     public void parserThrowsExceptionForEmptyCategoryTitle() {
-        Line line = buildLine("");
+        Line line = buildCommandDelimitedLine("");
 
         try {
             parser.parse(line, createCategoryMappingList());
         } catch (InvalidInputException e) {
-            assertEquals("Could not create Category from 'empty string', invalid input.", e.getMessage());
+            assertEquals("Could not create 'Category' from 'empty string', invalid input.", e.getMessage());
         }
     }
 
@@ -76,7 +80,7 @@ public class CategoryParserTest {
         return mappingList;
     }
 
-    private Line buildLine(String... input) {
+    private Line buildCommandDelimitedLine(String... input) {
         IDelimiter delimiter = new Comma();
 
         return new Line(

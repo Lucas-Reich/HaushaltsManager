@@ -1,49 +1,71 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.Line;
 
+import static org.junit.Assert.assertEquals;
+
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Delimiter.Comma;
+import com.example.lucas.haushaltsmanager.ExpenseImporter.Delimiter.IDelimiter;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import java.util.ArrayList;
+import java.util.List;
 
 public class LineTest {
-    @Test
-    public void lineCanBeCreatedFromFilledInputFields() {
-        String input = "31-12-2015,0,Berichtigung Kontostand,51.89,Girokonto Sparda";
-
-        new Line(input, new Comma());
-    }
+    private static final IDelimiter DEFAULT_DELIMITER = new Comma();
 
     @Test
-    public void lineCanBeCreatedFromPartiallyFilledInputFields() {
-        String input = "31-12-2015,0,,51.89,";
-
-        new Line(input, new Comma());
-    }
-
-    @Test
-    public void lineCanBeCreatedFromEmptyInputFields() {
-        String input = ",,,,";
-
-        new Line(input, new Comma());
+    public void lineCanBeCreatedFromValidInput() {
+        for (String[] input : validLineInputDataProvider()) {
+            // Act
+            new Line(String.join(DEFAULT_DELIMITER.getDelimiter(), input), DEFAULT_DELIMITER);
+        }
     }
 
     @Test
     public void getAsStringReturnsStringValue() {
-        String input = "31-12-2015,0,Berichtigung Kontostand,51.89,";
+        for (String[] validInput : validLineInputDataProvider()) {
+            // Act
+            Line line = new Line(String.join(DEFAULT_DELIMITER.getDelimiter(), validInput), DEFAULT_DELIMITER);
 
-        Line line = new Line(input, new Comma());
+            // Assert
+            for (int i = 0; i < validInput.length; i++) {
+                assertEquals(validInput[i], line.getAsString(i));
+            }
+        }
+    }
 
-        assertEquals("Berichtigung Kontostand", line.getAsString(2));
+    private List<String[]> validLineInputDataProvider() {
+        return new ArrayList<String[]>() {{
+            add(new String[]{"31-12-2015", "0", "Title Of Booking", "51.89", "Bank Account 1"});
+            add(new String[]{"31-12-2015", "0", "", "-51.89", ""});
+            add(new String[]{"", "", "", "", ""});
+        }};
     }
 
     @Test
-    public void getAsStringReturnsDefaultValueForNotExistingField() {
-        String input = "1,2,3,4,5";
+    public void lineThrowsExceptionWhenGettingValueWithInvalidIndex() {
+        // Arrange
+        Line line = new Line("", new Comma());
 
-        Line line = new Line(input, new Comma());
-        String fieldValue = line.getAsString(101);
+        for (int invalidIndex : invalidIndexDataProvider()) {
+            try {
+                // Act
+                line.getAsString(invalidIndex);
+            } catch (IndexOutOfBoundsException e) {
+                // Assert
+                String expectedErrorMessage = String.format(
+                        "Could not retrieve value from index at position '%d'. Line only has '1' values",
+                        invalidIndex
+                );
+                assertEquals(expectedErrorMessage, e.getMessage());
+            }
+        }
+    }
 
-        assertEquals("", fieldValue);
+    private List<Integer> invalidIndexDataProvider() {
+        return new ArrayList<Integer>() {{
+            add(-1);
+            add(1000);
+        }};
     }
 }

@@ -8,26 +8,31 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.example.lucas.haushaltsmanager.entities.Account;
-import com.example.lucas.haushaltsmanager.entities.Category;
-import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.DataImporter.ImportStrategies.ImportBookingStrategy;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Delimiter.Comma;
+import com.example.lucas.haushaltsmanager.ExpenseImporter.Delimiter.IDelimiter;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.InvalidInputException;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.NoMappingFoundException;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Line.Line;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.MappingList;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.AccountParser.AccountParser;
+import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.AccountParser.RequiredFields.AccountTitle;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.CategoryParser.CategoryParser;
+import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.CategoryParser.RequiredFields.CategoryTitle;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.DateParser.DateParser;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.DateParser.RequiredFields.Date;
-import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.PriceParser.PriceParser;
-import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.PriceParser.RequiredFields.Type;
-import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.PriceParser.RequiredFields.Value;
+import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.DoubleParser.AbsDoubleParser;
+import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.DoubleParser.RequiredFields.PriceValue;
+import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.PriceTypeParser.IPriceTypeParser;
+import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.PriceTypeParser.RequiredFields.PriceType;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.BookingParser.BookingParser;
-import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.BookingParser.RequiredFields.Title;
+import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.BookingParser.RequiredFields.BookingTitle;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.IRequiredField;
+import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.PriceParser.PriceParser;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.SavingService.ISaver;
+import com.example.lucas.haushaltsmanager.entities.Account;
+import com.example.lucas.haushaltsmanager.entities.Category;
+import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -35,8 +40,9 @@ import org.junit.Test;
 import java.util.List;
 
 public class ImportBookingStrategyTest {
-    private ISaver mockSaver;
+    private static final IDelimiter DEFAULT_DELIMITER = new Comma();
 
+    private ISaver mockSaver;
     private ImportBookingStrategy strategy;
 
     @Before
@@ -44,7 +50,7 @@ public class ImportBookingStrategyTest {
         mockSaver = mock(ISaver.class);
 
         strategy = new ImportBookingStrategy(
-                new BookingParser(new PriceParser(), new DateParser()),
+                new BookingParser(new PriceParser(new AbsDoubleParser()), new DateParser()),
                 new AccountParser(),
                 new CategoryParser(),
                 mockSaver
@@ -56,74 +62,86 @@ public class ImportBookingStrategyTest {
         // Act
         List<IRequiredField> requiredFields = strategy.getRequiredFields();
 
-
         // Assert
         assertEquals(6, requiredFields.size());
-        assertTrue(requiredFields.get(0) instanceof Title);
-        assertTrue(requiredFields.get(1) instanceof Value);
-        assertTrue(requiredFields.get(2) instanceof Type);
-        assertTrue(requiredFields.get(3) instanceof com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.CategoryParser.RequiredFields.Title);
-        assertTrue(requiredFields.get(4) instanceof Date);
-        assertTrue(requiredFields.get(5) instanceof com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.AccountParser.RequiredFields.Title);
+        assertTrue(requiredFields.get(0) instanceof BookingTitle);
+        assertTrue(requiredFields.get(1) instanceof PriceValue);
+        assertTrue(requiredFields.get(2) instanceof PriceType);
+        assertTrue(requiredFields.get(3) instanceof Date);
+        assertTrue(requiredFields.get(4) instanceof AccountTitle);
+        assertTrue(requiredFields.get(5) instanceof CategoryTitle);
+    }
+
+    @Test
+    public void parsesLineAndPersist() {
+        // Arrange
+        Line line = buildLine("BookingTitle", "100", "1", "Category", "01.01.2019", "Bank Account");
+
+        // Act
+        strategy.handle(line, getDefaultMappingList());
+
+        // Assert
+        verify(mockSaver, times(1)).persist(
+                any(Booking.class),
+                any(Account.class),
+                any(Category.class)
+        );
     }
 
     @Test
     public void throwsExceptionOnParsingError() {
-        Line lineWithEmptyBookingTitle = new Line(",100,1,Kategorie,01.01.2019,Konto", new Comma());
+        Line lineWithEmptyBookingTitle = buildLine("", "100", "1", "Category", "01.01.2019", "Bank Account");
 
         try {
             strategy.handle(lineWithEmptyBookingTitle, getDefaultMappingList());
 
-            fail("Expected Exception wasn't thrown");
+            fail("Expected 'InvalidInputException' wasn't thrown");
         } catch (InvalidInputException e) {
-            assertEquals("Could not create ExpenseObject from 'empty string', invalid input.", e.getMessage());
+            assertEquals("Could not create 'Booking' from 'empty string', invalid input.", e.getMessage());
         }
     }
 
     @Test
     public void throwsExceptionOnMissingMapping() {
         try {
-            strategy.handle(new Line("", new Comma()), new MappingList());
+            strategy.handle(buildLine(""), new MappingList());
 
-            fail("Expected Exception wasn't thrown");
+            fail("Expected 'NoMappingFoundException' wasn't thrown");
         } catch (NoMappingFoundException e) {
-            assertEquals("No mapping defined for key 'Title'.", e.getMessage());
+            assertEquals("No mapping defined for key 'AccountTitle'.", e.getMessage());
         }
     }
 
     @Test
-    public void parsesLineAndPersist() {
-        // Set Up
-        Line line = new Line("BookingTitle,100,1,Kategorie,01.01.2019,Konto", new Comma());
-
-
-        // Act
-        strategy.handle(line, getDefaultMappingList());
-
-
-        // Assert
-        verify(mockSaver, times(1))
-                .persist(any(Booking.class), any(Account.class), any(Category.class));
-    }
-
-    @Test
     public void abortWillRevertDatabaseChanges() {
+        // Act
         strategy.abort();
 
+        // Assert
         verify(mockSaver, times(1)).revert();
     }
 
     @Test
     public void finishWillReleaseResources() {
+        // Act
         strategy.finish();
 
+        // Assert
         verify(mockSaver, times(1)).finish();
+    }
+
+    private Line buildLine(String... input) {
+        return new Line(
+                String.join(DEFAULT_DELIMITER.getDelimiter(), input),
+                DEFAULT_DELIMITER
+        );
     }
 
     private MappingList getDefaultMappingList() {
         return new MappingList() {{
             addMapping(BookingParser.BOOKING_TITLE_KEY, 0);
-            addMapping(PriceParser.PRICE_VALUE_KEY, 1);
+            addMapping(AbsDoubleParser.PRICE_VALUE_KEY, 1);
+            addMapping(IPriceTypeParser.Companion.getPRICE_TYPE_KEY(), 2);
             addMapping(CategoryParser.CATEGORY_TITLE_KEY, 3);
             addMapping(DateParser.BOOKING_DATE_KEY, 4);
             addMapping(AccountParser.ACCOUNT_TITLE_KEY, 5);

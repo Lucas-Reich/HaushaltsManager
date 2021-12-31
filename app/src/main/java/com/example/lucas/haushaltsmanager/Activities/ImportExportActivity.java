@@ -66,7 +66,7 @@ public class ImportExportActivity extends AbstractAppCompatActivity implements R
                 getFilePermission();
             }
 
-            StorageChooser storageChooser = new StorageChooser.Builder()
+            StorageChooser storageChooser = new StorageChooser.Builder() // TODO: Look for new DirectoryPicker as this one is not working anymore.
                     .withActivity(ImportExportActivity.this)
                     .withFragmentManager(getFragmentManager())
                     .withMemoryBar(true)
@@ -108,6 +108,8 @@ public class ImportExportActivity extends AbstractAppCompatActivity implements R
                 if (!actionConfirmed) {
                     return;
                 }
+
+                // TODO: Use Worker to export bookings into a file
 
                 CsvBookingExporter fileExporter = new CsvBookingExporter(selectedDirectory, ImportExportActivity.this);
                 File createdFile = fileExporter.writeToFile(getAllExpenses());

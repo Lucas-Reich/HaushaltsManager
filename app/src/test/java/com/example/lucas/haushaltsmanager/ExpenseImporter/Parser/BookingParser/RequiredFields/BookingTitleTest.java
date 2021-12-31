@@ -7,10 +7,10 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class TitleTest {
+public class BookingTitleTest {
     @Test
     public void returnsExpectedTranslationKey() {
-        IRequiredField field = new Title();
+        IRequiredField field = new BookingTitle();
 
         assertEquals(R.string.mapping_booking_title, field.getTranslationKey());
     }

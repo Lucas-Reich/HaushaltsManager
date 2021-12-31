@@ -1,28 +1,31 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.BookingParser;
 
-import com.example.lucas.haushaltsmanager.entities.booking.Booking;
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertTrue;
+
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Delimiter.Comma;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Delimiter.IDelimiter;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.InvalidInputException;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.NoMappingFoundException;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Line.Line;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.MappingList;
-import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.CategoryParser.CategoryParser;
+import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.CategoryParser.RequiredFields.CategoryTitle;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.DateParser.DateParser;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.DateParser.RequiredFields.Date;
-import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.PriceParser.PriceParser;
-import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.PriceParser.RequiredFields.Type;
-import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.PriceParser.RequiredFields.Value;
-import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.BookingParser.RequiredFields.Title;
+import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.DoubleParser.AbsDoubleParser;
+import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.DoubleParser.RequiredFields.PriceValue;
+import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.PriceTypeParser.IPriceTypeParser;
+import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.PriceTypeParser.RequiredFields.PriceType;
+import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.BookingParser.RequiredFields.BookingTitle;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.IRequiredField;
+import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.PriceParser.PriceParser;
+import com.example.lucas.haushaltsmanager.Utils.CalendarUtils;
+import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
-
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
 
 public class BookingParserTest {
     private BookingParser parser;
@@ -30,64 +33,76 @@ public class BookingParserTest {
     @Before
     public void setUp() {
         parser = new BookingParser(
-                new PriceParser(),
+                new PriceParser(new AbsDoubleParser()),
                 new DateParser()
         );
     }
 
     @Test
     public void getRequiredFieldReturnsExpectedFields() {
+        // Act
         List<IRequiredField> requiredFields = parser.getRequiredFields();
 
-        assertEquals(5, requiredFields.size());
-        assertTrue(requiredFields.get(0) instanceof Title);
-        assertTrue(requiredFields.get(1) instanceof Value);
-        assertTrue(requiredFields.get(2) instanceof Type);
-        assertTrue(requiredFields.get(3) instanceof com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.CategoryParser.RequiredFields.Title);
-        assertTrue(requiredFields.get(4) instanceof Date);
+        // Assert
+        assertEquals(4, requiredFields.size());
+
+        assertTrue(requiredFields.get(0) instanceof BookingTitle);
+        assertTrue(requiredFields.get(1) instanceof PriceValue);
+        assertTrue(requiredFields.get(2) instanceof PriceType);
+        assertTrue(requiredFields.get(3) instanceof Date);
     }
 
     @Test
     public void parserCreatesBooking() {
         // SetUp
         String expectedBookingTitle = "any string";
-        Line line = buildLine(expectedBookingTitle, "-100", "06.09.2019", "any string");
+        String expectedDate = "06.09.2019";
+        double expectedValue = -100;
+        Line line = buildLine(
+                expectedBookingTitle,
+                String.valueOf(expectedValue),
+                expectedDate
+        );
 
         // Act
-        Booking booking = parser.parse(line, createBookingMappingList());
+        Booking booking = parser.parse(line, createMapping());
 
         // Assert
         assertEquals(expectedBookingTitle, booking.getTitle());
-    }
+        assertEquals(expectedValue, booking.getPrice().getPrice(), 0);
 
-    @Test
-    public void parserThrowsExceptionIfMappingNotFound() {
-        Line line = buildLine("any string", "any string", "", "");
-
-        try {
-            parser.parse(line, new MappingList());
-        } catch (NoMappingFoundException e) {
-            assertEquals("No mapping defined for key 'Title'.", e.getMessage());
-        }
+        String actualDate = CalendarUtils.formatHumanReadable(booking.getDate());
+        assertEquals(expectedDate, actualDate);
     }
 
     @Test
     public void parserThrowsExceptionForEmptyBookingTitle() {
-        Line line = buildLine("", "", "", "");
+        Line line = buildLine("", "", "");
 
         try {
-            parser.parse(line, createBookingMappingList());
+            parser.parse(line, createMapping());
         } catch (InvalidInputException e) {
-            assertEquals("Could not create ExpenseObject from 'empty string', invalid input.", e.getMessage());
+            assertEquals("Could not create 'Booking' from 'empty string', invalid input.", e.getMessage());
         }
     }
 
-    private MappingList createBookingMappingList() {
+    @Test
+    public void parserThrowsExceptionIfMappingNotFound() {
+        Line line = buildLine("any title", "100", "01.01.2020");
+
+        try {
+            parser.parse(line, new MappingList());
+        } catch (NoMappingFoundException e) {
+            assertEquals("No mapping defined for key 'BookingTitle'.", e.getMessage());
+        }
+    }
+
+    private MappingList createMapping() {
         MappingList mappingList = new MappingList();
         mappingList.addMapping(BookingParser.BOOKING_TITLE_KEY, 0);
-        mappingList.addMapping(PriceParser.PRICE_VALUE_KEY, 1);
+        mappingList.addMapping(AbsDoubleParser.PRICE_VALUE_KEY, 1);
+        mappingList.addMapping(IPriceTypeParser.Companion.getPRICE_TYPE_KEY(), 1);
         mappingList.addMapping(DateParser.BOOKING_DATE_KEY, 2);
-        mappingList.addMapping(CategoryParser.CATEGORY_TITLE_KEY, 3);
 
         return mappingList;
     }

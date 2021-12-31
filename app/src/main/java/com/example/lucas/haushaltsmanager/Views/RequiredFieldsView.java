@@ -4,6 +4,8 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+
 import com.example.lucas.haushaltsmanager.ExpenseImporter.MappingList;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.IRequiredField;
 
@@ -42,18 +44,15 @@ public class RequiredFieldsView extends View {
 
         buttonContainer.createButtons(availableHeader);
 
-        buttonContainer.setOnButtonClickListener(new ButtonContainer.OnButtonContainerClick() {
-            @Override
-            public void onClick(String buttonText, int buttonIndex) {
-                mappingList.addMapping(header.getBoundField(), buttonIndex);
+        buttonContainer.setOnButtonClickListener((buttonText, buttonIndex) -> {
+            mappingList.addMapping(header.getBoundField(), buttonIndex);
 
-                if (isLast()) {
-                    listener.onMappingCreated(mappingList);
+            if (isLast()) {
+                listener.onMappingCreated(mappingList);
 
-                    buttonContainer.disableButtons();
-                } else {
-                    showNext();
-                }
+                buttonContainer.disableButtons();
+            } else {
+                showNext();
             }
         });
 
@@ -87,6 +86,6 @@ public class RequiredFieldsView extends View {
     }
 
     public interface OnMappingCreated {
-        void onMappingCreated(MappingList mapping);
+        void onMappingCreated(@NonNull MappingList mapping);
     }
 }

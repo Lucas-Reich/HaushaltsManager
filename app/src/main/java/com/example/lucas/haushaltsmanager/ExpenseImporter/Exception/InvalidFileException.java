@@ -9,7 +9,7 @@ public class InvalidFileException extends RuntimeException {
 
     public static InvalidFileException invalidType(String requiredExtension, String path, String givenFileType) {
         return new InvalidFileException(String.format(
-                "Could not open file: '%s'. Expected file of type '%s.' but got '%s'",
+                "Could not open file: '%s'. Expected file of type '%s' but got '%s'.",
                 path,
                 requiredExtension,
                 givenFileType

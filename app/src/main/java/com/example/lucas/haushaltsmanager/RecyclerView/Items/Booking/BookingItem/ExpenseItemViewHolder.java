@@ -5,6 +5,7 @@ import android.widget.TextView;
 
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
+import com.example.lucas.haushaltsmanager.Database.Repositories.CategoryDAO;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.AbstractViewHolder;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
@@ -39,7 +40,9 @@ public class ExpenseItemViewHolder extends AbstractViewHolder {
 
         Booking expense = (Booking) item.getContent();
 
-        setRoundedTextViewText(AppDatabase.getDatabase(app.getContext()).categoryDAO().get(expense.getCategoryId())); // TODO: Do differently
+        CategoryDAO categoryRepository = AppDatabase.getDatabase(app.getContext()).categoryDAO();
+        Category category = categoryRepository.get(expense.getCategoryId()); // TODO: Do differently
+        setRoundedTextViewText(category);
         setTitle(expense.getTitle());
         setPrice(expense.getPrice());
         setPerson("");

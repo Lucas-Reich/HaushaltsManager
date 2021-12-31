@@ -1,5 +1,7 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.Exception;
 
+import androidx.annotation.NonNull;
+
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.IRequiredField;
 
 public class NoMappingFoundException extends DataImporterException {
@@ -7,8 +9,10 @@ public class NoMappingFoundException extends DataImporterException {
         super(message, cause);
     }
 
-    public static NoMappingFoundException withRequiredField(IRequiredField key) {
-        return new NoMappingFoundException(String.format("No mapping defined for key '%s'.",
+    @NonNull
+    public static NoMappingFoundException forRequiredField(@NonNull IRequiredField key) {
+        return new NoMappingFoundException(String.format(
+                "No mapping defined for key '%s'.",
                 key.getClass().getSimpleName()
         ), null);
     }

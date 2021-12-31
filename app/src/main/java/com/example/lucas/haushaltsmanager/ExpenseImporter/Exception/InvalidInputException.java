@@ -1,13 +1,14 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.Exception;
 
-import com.example.lucas.haushaltsmanager.entities.Price;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 public class InvalidInputException extends DataImporterException {
-    private InvalidInputException(String object, String argument, String exceptionType, Throwable cause) {
-        super(String.format("Could not create %s from '%s', invalid %s.", object, argument, exceptionType), cause);
+    private InvalidInputException(String object, String invalidInput, String exceptionType, Throwable cause) {
+        super(String.format("Could not create '%s' from '%s', invalid %s.", object, invalidInput, exceptionType), cause);
     }
 
-    public static InvalidInputException invalidDateFormat(String invalidDate) {
+    public static InvalidInputException invalidDateFormat(@NonNull String invalidDate) {
         return new InvalidInputException(
                 "Date",
                 invalidDate,
@@ -16,7 +17,7 @@ public class InvalidInputException extends DataImporterException {
         );
     }
 
-    public static InvalidInputException emptyInput(Class clazz) {
+    public static InvalidInputException emptyInput(@NonNull Class clazz) {
         return new InvalidInputException(
                 clazz.getSimpleName(),
                 "empty string",
@@ -25,20 +26,20 @@ public class InvalidInputException extends DataImporterException {
         );
     }
 
-    public static InvalidInputException invalidPriceValue(String invalidValue, Throwable t) {
+    public static InvalidInputException invalidBooleanValue(@NonNull String invalidType, @Nullable Throwable t) {
         return new InvalidInputException(
-                Price.class.getSimpleName(),
-                invalidValue,
-                "value",
+                Boolean.class.getSimpleName(),
+                invalidType,
+                "input",
                 t
         );
     }
 
-    public static InvalidInputException invalidPriceType(String invalidType, Throwable t) {
+    public static InvalidInputException invalidNumericValue(@NonNull String invalidType, @Nullable Throwable t) {
         return new InvalidInputException(
-                Price.class.getSimpleName(),
+                Boolean.class.getSimpleName(),
                 invalidType,
-                "type",
+                "numeric value given",
                 t
         );
     }

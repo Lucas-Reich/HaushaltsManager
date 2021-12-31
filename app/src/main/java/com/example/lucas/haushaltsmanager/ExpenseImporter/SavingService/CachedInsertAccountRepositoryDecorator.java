@@ -1,5 +1,6 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.SavingService;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.lucas.haushaltsmanager.Database.Repositories.AccountDAO;
@@ -20,7 +21,7 @@ public class CachedInsertAccountRepositoryDecorator implements AccountDAO {
     }
 
     @Override
-    public void insert(Account account) {
+    public void insert(@NonNull Account account) {
         Account createdAccount = getAccountFromList(account);
 
         if (null != createdAccount) {
@@ -32,12 +33,13 @@ public class CachedInsertAccountRepositoryDecorator implements AccountDAO {
     }
 
     @Override
+    @NonNull
     public List<Account> getAll() {
         return repository.getAll();
     }
 
     @Override
-    public void delete(Account account) {
+    public void delete(@NonNull Account account) {
         repository.delete(account);
     }
 
@@ -47,8 +49,34 @@ public class CachedInsertAccountRepositoryDecorator implements AccountDAO {
     }
 
     @Override
-    public Account get(UUID index) {
+    @NonNull
+    public Account get(@NonNull UUID index) {
         return repository.get(index);
+    }
+
+    @Override
+    @NonNull
+    public Account getByName(@NonNull String accountName) {
+        Account account = getAccountByNameFromCache(accountName);
+
+        if (null != account) {
+            return account;
+        }
+
+        return repository.getByName(accountName);
+    }
+
+    @Nullable
+    private Account getAccountByNameFromCache(String name) {
+        for (Account account : cachedAccounts) {
+            if (!name.equals(account.getName())) {
+                continue;
+            }
+
+            return account;
+        }
+
+        return null;
     }
 
     @Nullable
@@ -63,8 +91,7 @@ public class CachedInsertAccountRepositoryDecorator implements AccountDAO {
     }
 
     private boolean areEquals(Account one, Account other) {
-        return one.getId().equals(other.getId())
-                && one.getName().equals(other.getName())
+        return one.getName().equals(other.getName())
                 && one.getBalance().equals(other.getBalance());
     }
 }

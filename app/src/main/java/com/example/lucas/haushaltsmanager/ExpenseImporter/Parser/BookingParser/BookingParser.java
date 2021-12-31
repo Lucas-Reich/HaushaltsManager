@@ -1,23 +1,24 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.BookingParser;
 
-import com.example.lucas.haushaltsmanager.entities.booking.Booking;
+import androidx.annotation.NonNull;
+
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.InvalidInputException;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.NoMappingFoundException;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Line.Line;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.MappingList;
-import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.CategoryParser.CategoryParser;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.DateParser.DateParser;
-import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.PriceParser.PriceParser;
-import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.BookingParser.RequiredFields.Title;
+import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.BookingParser.RequiredFields.BookingTitle;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.IParser;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.IRequiredField;
+import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.PriceParser.PriceParser;
+import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class BookingParser implements IParser<Booking> {
-    public static final IRequiredField BOOKING_TITLE_KEY = new Title();
+    public static final IRequiredField BOOKING_TITLE_KEY = new BookingTitle();
 
     private final PriceParser priceParser;
     private final DateParser dateParser;
@@ -28,6 +29,7 @@ public class BookingParser implements IParser<Booking> {
     }
 
     @Override
+    @NonNull
     public List<IRequiredField> getRequiredFields() {
         return new ArrayList<IRequiredField>() {{
             add(BOOKING_TITLE_KEY);
@@ -36,7 +38,9 @@ public class BookingParser implements IParser<Booking> {
         }};
     }
 
-    public Booking parse(Line line, MappingList mapping) throws NoMappingFoundException, InvalidInputException {
+    @Override
+    @NonNull
+    public Booking parse(@NonNull Line line, @NonNull MappingList mapping) throws NoMappingFoundException, InvalidInputException {
         String bookingTitle = line.getAsString(mapping.getMappingForKey(BOOKING_TITLE_KEY));
         assertNotEmpty(bookingTitle);
 
@@ -45,8 +49,8 @@ public class BookingParser implements IParser<Booking> {
                 bookingTitle,
                 priceParser.parse(line, mapping),
                 dateParser.parse(line, mapping),
-                UUID.randomUUID(),
-                UUID.randomUUID(),
+                UUID.randomUUID(), // The Account Id will be set by the ImportStrategy
+                UUID.randomUUID(), // The Category Id will be set by the ImportStrategy
                 null
         );
     }

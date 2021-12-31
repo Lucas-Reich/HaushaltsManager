@@ -1,7 +1,6 @@
 package com.example.lucas.haushaltsmanager.Dialogs;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -15,9 +14,9 @@ import com.example.lucas.haushaltsmanager.ExpenseImporter.ISub;
 import com.example.lucas.haushaltsmanager.R;
 
 public class ProgressBarDialog extends AlertDialog implements ISub {
-    private ProgressBar progressBar;
-    private TextView secondaryTitle;
-    private IImporter observableAction;
+    private final ProgressBar progressBar;
+    private final TextView secondaryTitle;
+    private final IImporter observableAction;
 
     public ProgressBarDialog(@NonNull Context context, final IImporter observableAction) {
         super(context);
@@ -35,13 +34,10 @@ public class ProgressBarDialog extends AlertDialog implements ISub {
 
         setSubTitle(context.getString(R.string.import_file_sub_title_reading_content));
 
-        setButton(BUTTON_NEGATIVE, context.getString(R.string.btn_abort), new OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                observableAction.abort();
+        setButton(BUTTON_NEGATIVE, context.getString(R.string.btn_abort), (dialog, which) -> {
+            observableAction.abort();
 
-                dialog.dismiss();
-            }
+            dialog.dismiss();
         });
 
 

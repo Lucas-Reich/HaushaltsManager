@@ -1,5 +1,6 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.SavingService;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -12,75 +13,119 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.CategoryDAO;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences.ActiveAccountsPreferences;
 import com.example.lucas.haushaltsmanager.entities.Account;
 import com.example.lucas.haushaltsmanager.entities.Category;
+import com.example.lucas.haushaltsmanager.entities.Color;
+import com.example.lucas.haushaltsmanager.entities.Price;
 import com.example.lucas.haushaltsmanager.entities.booking.Booking;
+import com.example.lucas.haushaltsmanager.entities.booking.ExpenseType;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.UUID;
+
 public class SaverTest {
     private AccountDAO mockAccountRepository;
     private BookingDAO mockExpenseRepository;
+    private CategoryDAO mockCategoryRepository;
+
     private ActiveAccountsPreferences accountPreferences;
     private DataImporterBackupHandler backupHandler;
-
-    private ISaver saver;
 
     @Before
     public void setUp() {
         mockAccountRepository = mock(AccountDAO.class);
         mockExpenseRepository = mock(BookingDAO.class);
+        mockCategoryRepository = mock(CategoryDAO.class);
         accountPreferences = mock(ActiveAccountsPreferences.class);
         backupHandler = mock(DataImporterBackupHandler.class);
-
-        saver = new Saver(
-                mockAccountRepository,
-                mock(CategoryDAO.class),
-                mockExpenseRepository,
-                accountPreferences,
-                backupHandler
-        );
     }
 
     @Test
-    public void expenseIsSavedWithNewlyCreatedAccountAndCategory() {
-        // SetUp
-        Account account = mock(Account.class);
-
-        Category expectedCategory = mock(Category.class);
-
-        Booking booking = mock(Booking.class);
-        when(booking.getCategoryId()).thenReturn(booking.getCategoryId());
-
-
+    public void backupIsCreatedWhenSaverIsInitialized() {
         // Act
-        saver.persist(booking, account, expectedCategory);
-
+        buildSaver();
 
         // Assert
         verify(backupHandler, times(1)).backup();
+    }
 
+    @Test
+    public void bookingIsSavedWithNewlyCreatedAccountAndCategory() {
+        // Arrange
+        Account account = createDummyAccount();
+        when(mockAccountRepository.getByName(account.getName())).thenReturn(account);
 
-        verify(mockAccountRepository, times(1)).insert(account);
-        verify(accountPreferences, times(1)).addAccount(account);
-        verify(booking, times(1)).setAccountId(account.getId());
+        Category category = createDummyCategory();
+        when(mockCategoryRepository.getByName(category.getName())).thenReturn(category);
 
+        Booking booking = createDummyBooking();
 
+        // Act
+        buildSaver().persist(booking, account, category);
+
+        // Assert
+        assertThatAccountIsCorrectlyPersisted(account);
+        assertThatCategoryIsCorrectlyPersisted(category);
+
+        assertEquals(account.getId(), booking.getAccountId());
+        assertEquals(category.getId(), booking.getCategoryId());
         verify(mockExpenseRepository, times(1)).insert(booking);
-        verify(booking, times(1)).setCategoryId(expectedCategory.getId());
-
     }
 
     @Test
     public void revertRestoresFiles() {
-        saver.revert();
+        buildSaver().revert();
 
         verify(backupHandler, times(1)).restore();
     }
 
     @Test
     public void finishRemovesUnusedResources() {
-        saver.finish();
+        buildSaver().finish();
 
         verify(backupHandler, times(1)).remove();
+    }
+
+    private void assertThatCategoryIsCorrectlyPersisted(Category category) {
+        verify(mockCategoryRepository, times(1)).insert(category);
+    }
+
+    private void assertThatAccountIsCorrectlyPersisted(Account account) {
+        verify(mockAccountRepository, times(1)).insert(account);
+        verify(accountPreferences, times(1)).addAccount(account);
+    }
+
+    private ISaver buildSaver() {
+        return new Saver(
+                mockAccountRepository,
+                mockCategoryRepository,
+                mockExpenseRepository,
+                accountPreferences,
+                backupHandler
+        );
+    }
+
+    private Booking createDummyBooking() {
+        return new Booking(
+                "Booking Title",
+                new Price(0),
+                UUID.randomUUID(),
+                UUID.randomUUID()
+        );
+    }
+
+    private Category createDummyCategory() {
+        return new Category(
+                "Category 1",
+                Color.white(),
+                ExpenseType.expense()
+        );
+    }
+
+    private Account createDummyAccount() {
+        return new Account(
+                "Bank Account 1",
+                new Price(0)
+        );
     }
 }

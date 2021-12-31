@@ -37,6 +37,10 @@ public class Price implements Parcelable {
         this.value = price;
     }
 
+    public Price(double absPrice, boolean isNegative) {
+        this.value = isNegative ? -absPrice : absPrice;
+    }
+
     private Price(Parcel source) {
         value = source.readDouble();
     }
