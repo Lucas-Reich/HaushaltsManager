@@ -11,10 +11,11 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
+import androidx.work.WorkRequest;
 
 import com.codekidlabs.storagechooser.StorageChooser;
-import com.example.lucas.haushaltsmanager.CsvBookingExporter;
-import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ErrorAlertDialog;
 import com.example.lucas.haushaltsmanager.R;
@@ -24,8 +25,8 @@ import com.example.lucas.haushaltsmanager.RecyclerView.Items.FileItem.FileItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.FileListRecyclerViewAdapter;
 import com.example.lucas.haushaltsmanager.Utils.FileUtils;
+import com.example.lucas.haushaltsmanager.Worker.BookingExportWorker;
 import com.example.lucas.haushaltsmanager.entities.Directory;
-import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;
@@ -108,13 +109,18 @@ public class ImportExportActivity extends AbstractAppCompatActivity implements R
                 if (!actionConfirmed) {
                     return;
                 }
+                WorkManager workManager = WorkManager.getInstance(this);
 
-                // TODO: Use Worker to export bookings into a file
+                WorkRequest exportBookingsRequest = BookingExportWorker.createWorkRequest(selectedDirectory.getAbsolutePath());
+                workManager.enqueue(exportBookingsRequest);
 
-                CsvBookingExporter fileExporter = new CsvBookingExporter(selectedDirectory, ImportExportActivity.this);
-                File createdFile = fileExporter.writeToFile(getAllExpenses());
+                workManager.getWorkInfoByIdLiveData(exportBookingsRequest.getId()).observe(confirmationDialog.getViewLifecycleOwner(), workInfo -> {
+                    if (workInfo.getState() == WorkInfo.State.SUCCEEDED) {
+                        String outputFile = workInfo.getOutputData().getString(BookingExportWorker.OUTPUT_DATA_CREATED_FILE);
 
-                adapter.insert(new FileItem(createdFile));
+                        adapter.insert(new FileItem(new File(outputFile)));
+                    }
+                });
             });
             confirmationDialog.show(getSupportFragmentManager(), "import_confirm_export");
         });
@@ -177,9 +183,5 @@ public class ImportExportActivity extends AbstractAppCompatActivity implements R
                 false,
                 IMPORTABLE_FILE_CSV_REGEX
         );
-    }
-
-    private List<Booking> getAllExpenses() {
-        return AppDatabase.getDatabase(this).bookingDAO().getAll();
     }
 }

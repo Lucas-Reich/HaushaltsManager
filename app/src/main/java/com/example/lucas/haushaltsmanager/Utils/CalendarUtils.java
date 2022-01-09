@@ -90,6 +90,17 @@ public class CalendarUtils {
         return calendar;
     }
 
+    public static String getCurrentDate() {
+        Calendar date = Calendar.getInstance();
+
+        return date.get(Calendar.DAY_OF_MONTH) + "_"
+                + date.get(Calendar.MONTH) + "_"
+                + date.get(Calendar.YEAR) + "_"
+                + date.get(Calendar.HOUR_OF_DAY) + ":"
+                + date.get(Calendar.MINUTE) + ":"
+                + date.get(Calendar.SECOND);
+    }
+
     private static Date parseTimeString(String timeString, String format) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.US);
 

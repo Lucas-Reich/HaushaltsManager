@@ -1,6 +1,10 @@
 package com.example.lucas.haushaltsmanager.Utils;
 
+import android.os.Environment;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.example.lucas.haushaltsmanager.entities.Directory;
 
@@ -17,6 +21,24 @@ import java.util.List;
 
 public class FileUtils {
     private static final String TAG = FileUtils.class.getSimpleName();
+
+    @Nullable
+    public static File create(@NonNull String fileName,@NonNull Directory directory) {
+        if (hasEnoughFreeSpace(directory) && isMediumAvailable(directory) && directory.canWrite()) {
+            File file = new File(directory.getAbsolutePath() + "/" + fileName);
+
+            try {
+                if (file.createNewFile()) {
+                    return file;
+                }
+            } catch (IOException e) {
+
+                return null;
+            }
+        }
+
+        return null;
+    }
 
     public static List<File> listFiles(Directory dir, boolean invertList, String regex) {
         List<File> files = new ArrayList<>();
@@ -71,13 +93,6 @@ public class FileUtils {
         return false;
     }
 
-
-    /**
-     * Methode um das älteste Backup aus einer Liste von Backups zu bekommen.
-     *
-     * @param fileList List mit Datein
-     * @return Älteste Datei in der Liste
-     */
     public static File getOldestFile(List<File> fileList) {
         if (fileList == null || fileList.isEmpty())
             throw new IllegalArgumentException();
@@ -105,5 +120,22 @@ public class FileUtils {
         }
 
         return extension;
+    }
+
+    private static boolean hasEnoughFreeSpace(@NonNull Directory targetDirectory) {
+        long totalStorageSpace = targetDirectory.getTotalSpace();
+        long freeStorageSpace = targetDirectory.getFreeSpace();
+
+        return freeStorageSpace / totalStorageSpace <= 0.9;
+    }
+
+    private static boolean isMediumAvailable(@NonNull Directory targetDirectory) {
+        String externalStoragePath = Environment.getExternalStorageDirectory().getPath();
+
+        if (targetDirectory.getPath().contains(externalStoragePath)) {
+            return Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState());
+        }
+
+        return true;
     }
 }
