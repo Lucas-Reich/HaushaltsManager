@@ -48,8 +48,8 @@ public class Saver implements ISaver {
         BookingDAO bookingRepo = AppDatabase.getDatabase(context).bookingDAO();
 
         return new Saver(
-                new CachedInsertAccountRepositoryDecorator(accountRepo),
-                new CachedInsertCategoryRepositoryDecorator(categoryRepo),
+                new CachedAccountReadRepositoryDecorator(accountRepo),
+                new CachedCategoryReadRepositoryDecorator(categoryRepo),
                 bookingRepo,
                 new AddAndSetDefaultDecorator(new ActiveAccountsPreferences(context), context),
                 new DataImporterBackupHandler(context, new FileBackupHandler())

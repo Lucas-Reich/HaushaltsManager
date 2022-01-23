@@ -7,6 +7,8 @@ import androidx.annotation.StringRes;
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.Repositories.AccountDAO;
 import com.example.lucas.haushaltsmanager.Database.Repositories.CategoryDAO;
+import com.example.lucas.haushaltsmanager.ExpenseImporter.SavingService.CachedAccountReadRepositoryDecorator;
+import com.example.lucas.haushaltsmanager.ExpenseImporter.SavingService.CachedCategoryReadRepositoryDecorator;
 import com.example.lucas.haushaltsmanager.Utils.CalendarUtils;
 import com.example.lucas.haushaltsmanager.Utils.FileUtils;
 import com.example.lucas.haushaltsmanager.entities.Account;
@@ -18,14 +20,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
-import java.util.UUID;
 
 public class CsvBookingExporter {
     private static final String EXPORT_FILE_NAME = "Export_%s.csv";
 
     private final Directory targetDirectory;
-    private final List<Account> accounts;
-    private final List<Category> categories;
+    private final AccountDAO cachedAccountRepository;
+    private final CategoryDAO cachedCategoryRepository;
     private final BookingToStringTransformer bookingToStringTransformer;
 
     public CsvBookingExporter(
@@ -36,8 +37,8 @@ public class CsvBookingExporter {
         guardAgainstInvalidDirectory(targetDirectory);
         this.targetDirectory = targetDirectory;
 
-        accounts = accountRepository.getAll();
-        categories = categoryRepository.getAll();
+        cachedAccountRepository = new CachedAccountReadRepositoryDecorator(accountRepository);
+        cachedCategoryRepository = new CachedCategoryReadRepositoryDecorator(categoryRepository);
         bookingToStringTransformer = new BookingToStringTransformer();
     }
 
@@ -67,8 +68,8 @@ public class CsvBookingExporter {
 
             fileOutput.write(getCsvHeader().getBytes());
             for (Booking booking : bookings) {
-                Account account = getAccount(booking.getId());
-                Category category = getCategory(booking.getId());
+                Account account = cachedAccountRepository.get(booking.getId());
+                Category category = cachedCategoryRepository.get(booking.getId());
 
                 String stringifiedBooking = bookingToStringTransformer.transform(booking, category, account);
 
@@ -109,28 +110,6 @@ public class CsvBookingExporter {
         String fileName = CalendarUtils.getCurrentDate();
 
         return String.format(EXPORT_FILE_NAME, fileName);
-    }
-
-    @Nullable
-    private Category getCategory(@NonNull UUID id) {
-        for (Category category : categories) {
-            if (category.getId() == id) {
-                return category;
-            }
-        }
-
-        return null; // This should never happen
-    }
-
-    @Nullable
-    private Account getAccount(@NonNull UUID id) {
-        for (Account account : accounts) {
-            if (account.getId() == id) {
-                return account;
-            }
-        }
-
-        return null; // This should never happen
     }
 }
 

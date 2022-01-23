@@ -1,6 +1,5 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.SavingService;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -19,12 +18,12 @@ import java.util.ArrayList;
 
 public class CachedInsertChildCategoryRepositoryDecoratorTest {
     private CategoryDAO repository;
-    private CachedInsertCategoryRepositoryDecorator decorator;
+    private CachedCategoryReadRepositoryDecorator decorator;
 
     @Before
     public void setUp() {
         repository = mock(CategoryDAO.class);
-        decorator = new CachedInsertCategoryRepositoryDecorator(repository);
+        decorator = new CachedCategoryReadRepositoryDecorator(repository);
     }
 
     @Test
@@ -61,7 +60,7 @@ public class CachedInsertChildCategoryRepositoryDecoratorTest {
     }
 
     private void injectToCache(final Category category) throws Exception {
-        Field accounts = CachedInsertCategoryRepositoryDecorator.class.getDeclaredField("cachedCategories");
+        Field accounts = CachedCategoryReadRepositoryDecorator.class.getDeclaredField("cache");
 
         accounts.setAccessible(true);
         accounts.set(decorator, new ArrayList<Category>() {{
