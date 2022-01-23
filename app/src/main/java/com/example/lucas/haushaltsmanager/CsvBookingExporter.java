@@ -60,30 +60,29 @@ public class CsvBookingExporter {
     }
 
     private boolean writeExpensesToFile(List<Booking> bookings, File file) {
-        FileOutputStream fileOutput = null;
+        FileOutputStream outputFile = null;
 
         try {
+            outputFile = new FileOutputStream(file);
 
-            fileOutput = new FileOutputStream(file);
-
-            fileOutput.write(getCsvHeader().getBytes());
+            outputFile.write(getCsvHeader().getBytes());
             for (Booking booking : bookings) {
                 Account account = cachedAccountRepository.get(booking.getId());
                 Category category = cachedCategoryRepository.get(booking.getId());
 
                 String stringifiedBooking = bookingToStringTransformer.transform(booking, category, account);
 
-                fileOutput.write(stringifiedBooking.getBytes());
+                outputFile.write(stringifiedBooking.getBytes());
             }
-            fileOutput.close();
+            outputFile.close();
             return true;
         } catch (Exception e) {
 
             return false;
         } finally {
-            if (fileOutput != null) {
+            if (outputFile != null) {
                 try {
-                    fileOutput.close();
+                    outputFile.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -92,24 +91,18 @@ public class CsvBookingExporter {
     }
 
     private String getCsvHeader() {
-        return getStringResource(R.string.export_price) + ","
-                + getStringResource(R.string.export_expenditure) + ","
-                + getStringResource(R.string.export_title) + ","
-                + getStringResource(R.string.export_date) + ","
-                + getStringResource(R.string.export_currency_name) + ","
-                + getStringResource(R.string.export_category_name) + ","
-                + getStringResource(R.string.export_account_name) + ","
+        return app.getStringResource(R.string.export_price) + ","
+                + app.getStringResource(R.string.export_expenditure) + ","
+                + app.getStringResource(R.string.export_title) + ","
+                + app.getStringResource(R.string.export_date) + ","
+                + app.getStringResource(R.string.export_currency_name) + ","
+                + app.getStringResource(R.string.export_category_name) + ","
+                + app.getStringResource(R.string.export_account_name) + ","
                 + "\r\n";
     }
 
-    private String getStringResource(@StringRes int id) {
-        return app.getContext().getString(id);
-    }
-
     private String createOutputFileName() {
-        String fileName = CalendarUtils.getCurrentDate();
-
-        return String.format(EXPORT_FILE_NAME, fileName);
+        return String.format(EXPORT_FILE_NAME, CalendarUtils.getCurrentDate());
     }
 }
 

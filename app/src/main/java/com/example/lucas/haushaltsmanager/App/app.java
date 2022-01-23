@@ -5,6 +5,8 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 
+import androidx.annotation.StringRes;
+
 import com.example.lucas.haushaltsmanager.R;
 
 import java.util.UUID;
@@ -18,6 +20,10 @@ public class app extends Application {
 
     public static Context getContext() {
         return context;
+    }
+
+    public static String getStringResource(@StringRes int resourceId) {
+        return context.getString(resourceId);
     }
 
     /**
