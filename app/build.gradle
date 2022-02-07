@@ -54,6 +54,10 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
     implementation 'androidx.gridlayout:gridlayout:1.0.0'
 
+    // Paging library
+    def paging_version = "3.1.0"
+    implementation "androidx.paging:paging-runtime:$paging_version"
+
 
     // Database stuff
     def room_version = "2.4.0"

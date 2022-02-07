@@ -125,7 +125,7 @@ public class ImportExportActivity extends AbstractAppCompatActivity implements R
             confirmationDialog.show(getSupportFragmentManager(), "import_confirm_export");
         });
 
-        updateListView(new Directory(getFilesDir().toString()));
+        updateListView(new Directory(getFilesDir().toString())); // TODO: Use user selected directory
     }
 
     @Override
