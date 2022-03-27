@@ -7,6 +7,7 @@ import androidx.annotation.ColorRes;
 
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
+import com.example.lucas.haushaltsmanager.Database.Repositories.CategoryDAO;
 import com.example.lucas.haushaltsmanager.entities.Category;
 import com.example.lucas.haushaltsmanager.entities.Price;
 import com.example.lucas.haushaltsmanager.entities.RecurringBooking;
@@ -23,18 +24,20 @@ public class RecurringBookingViewHolder extends AbstractViewHolder {
     // --> kann man diese beiden ViewHolder irgendwie zusammen legen?
     private static final String TAG = RecurringBookingViewHolder.class.getSimpleName();
 
-    private RoundedTextView mRoundedTextView;
-    private TextView mTitle;
-    private MoneyTextView mPrice;
-    private TextView mPerson;
+    private final RoundedTextView mRoundedTextView;
+    private final TextView mTitle;
+    private final MoneyTextView mPrice;
+    private final TextView mPerson;
+    private final CategoryDAO categoryRepository;
 
-    public RecurringBookingViewHolder(View itemView) {
+    public RecurringBookingViewHolder(View itemView, CategoryDAO categoryRepository) {
         super(itemView);
 
         mRoundedTextView = itemView.findViewById(R.id.recycler_view_expense_rounded_text_view);
         mTitle = itemView.findViewById(R.id.recycler_view_expense_title);
         mPrice = itemView.findViewById(R.id.recycler_view_expense_price);
         mPerson = itemView.findViewById(R.id.recycler_view_expense_person);
+        this.categoryRepository = categoryRepository;
     }
 
     @Override
@@ -45,7 +48,7 @@ public class RecurringBookingViewHolder extends AbstractViewHolder {
 
         RecurringBooking recurringBooking = (RecurringBooking) item.getContent();
 
-        setRoundedTextViewText(getCategory(recurringBooking.getCategoryId()));
+        setRoundedTextViewText(categoryRepository.get(recurringBooking.getCategoryId()));
         setTitle(recurringBooking.getTitle());
         setPrice(recurringBooking.getPrice());
         setPerson("");
@@ -63,10 +66,6 @@ public class RecurringBookingViewHolder extends AbstractViewHolder {
     private void setRoundedTextViewText(Category category) {
         mRoundedTextView.setCircleColorConsiderBrightness(category.getColor().getColorInt());
         mRoundedTextView.setCenterText(category.getName().charAt(0) + "");
-    }
-
-    private Category getCategory(UUID categoryId) {
-        return AppDatabase.getDatabase(app.getContext()).categoryDAO().get(categoryId);
     }
 
     private void setTitle(String title) {

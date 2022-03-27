@@ -19,9 +19,9 @@ public class TemplateMenuItem implements IMenuItem {
     private final IActionKey mActionKey = new ActionKey(ACTION_KEY);
     private final TemplateBookingDAO templateRepository;
 
-    public TemplateMenuItem(OnSuccessCallback callback) {
+    public TemplateMenuItem(OnSuccessCallback callback, TemplateBookingDAO templateRepository) {
         mCallback = callback;
-        templateRepository = AppDatabase.getDatabase(app.getContext()).templateBookingDAO();
+        this.templateRepository = templateRepository;
     }
 
     @Override

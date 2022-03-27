@@ -59,7 +59,7 @@ public class PieChartCardPopulator {
     }
 
     private void setPieChart(Report report) {
-        mViewHolder.pieChart.setNoDataText(app.getContext().getString(R.string.no_bookings_in_year));
+        mViewHolder.pieChart.setNoDataText(mRootView.getContext().getString(R.string.no_bookings_in_year));
         mViewHolder.pieChart.setData(createDataSet(report.getBookings()));
     }
 

@@ -79,11 +79,6 @@ public class RoundedTextView extends ViewUtils {
         mTextPaint.setColor(textColor);
     }
 
-    @NonNull
-    public String getCenterText() {
-        return mCenterText;
-    }
-
     public void setCenterText(@NonNull String centerText) {
         mCenterText = centerText.toUpperCase();
     }
@@ -138,6 +133,6 @@ public class RoundedTextView extends ViewUtils {
     }
 
     private int getColor(@ColorRes int color) {
-        return app.getContext().getResources().getColor(color);
+        return getContext().getResources().getColor(color);
     }
 }

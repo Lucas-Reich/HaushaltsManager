@@ -99,7 +99,7 @@ public class CreateCategory extends AbstractAppCompatActivity {
                 );
                 break;
             default:
-                throw new UnsupportedOperationException("Could not handle intent mode " + bundle.getString(INTENT_MODE, null));
+                throw new UnsupportedOperationException("Could not handle intent mode " + bundle.getString(INTENT_MODE, ""));
         }
     }
 

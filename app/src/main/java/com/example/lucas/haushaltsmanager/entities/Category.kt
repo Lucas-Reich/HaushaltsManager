@@ -28,7 +28,7 @@ class Category(
     )
 
     fun isSet(): Boolean {
-        return name != app.getContext().getString(R.string.no_name)
+        return name != app.getStringResource(R.string.no_name)
     }
 
     override fun toString() = name

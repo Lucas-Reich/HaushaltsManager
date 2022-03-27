@@ -259,12 +259,12 @@ public class AppReleaseHistory implements ReleaseHistory {
                 null,
                 getDate(1, Calendar.JANUARY, 2019),
                 getString(R.string.release_notes_100),
-                new ArrayList<ChangelogItem>()
+                new ArrayList<>()
         );
     }
 
     private String getString(@StringRes int stringId) {
-        return app.getContext().getString(stringId);
+        return app.getStringResource(stringId);
     }
 
     private Calendar getDate(int day, int month, int year) {

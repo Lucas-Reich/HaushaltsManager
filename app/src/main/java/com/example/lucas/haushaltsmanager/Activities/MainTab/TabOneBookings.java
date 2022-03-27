@@ -42,6 +42,7 @@ import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.ExpenseListRe
 import com.example.lucas.haushaltsmanager.RevertExpenseDeletionSnackbar.RevertExpenseDeletionSnackbar;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseFilter;
 import com.example.lucas.haushaltsmanager.entities.booking.Booking;
+import com.example.lucas.haushaltsmanager.entities.template_booking.TemplateBookingWithoutCategory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -256,7 +257,9 @@ public class TabOneBookings extends AbstractTab implements
             mRevertDeletionSnackbar.addItem(deletedItem);
         }), this);
 
-        mFABToolbar.addMenuItem(new TemplateMenuItem(templateBooking -> Toast.makeText(getContext(), R.string.saved_as_template, Toast.LENGTH_SHORT).show()), this);
+        mFABToolbar.addMenuItem(new TemplateMenuItem(templateBooking -> {
+            Toast.makeText(TabOneBookings.this.getContext(), R.string.saved_as_template, Toast.LENGTH_SHORT).show();
+        }, AppDatabase.getDatabase(getContext()).templateBookingDAO()), this);
 
         mFABToolbar.addMenuItem(new RecurringMenuItem(), this);
     }

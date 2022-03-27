@@ -13,7 +13,6 @@ import java.util.UUID;
 
 public class app extends Application {
     public static final UUID transferCategoryId = UUID.fromString("eed05d4b-866d-4f20-b580-c50901066d73");
-    public static final UUID unassignedCategoryId = UUID.fromString("a56664b4-e1c6-44aa-90ec-399cfe925cb4");
 
     private static final String CHANNEL_ID = "reminder";
     private static Context context;

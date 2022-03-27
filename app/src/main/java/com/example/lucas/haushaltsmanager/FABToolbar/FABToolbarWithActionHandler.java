@@ -20,8 +20,8 @@ import com.github.fafaldo.fabtoolbar.widget.FABToolbarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class FABToolbarWithActionHandler {
-    private FABToolbarLayout mRootLayout;
-    private LinearLayout mItemBar;
+    private final FABToolbarLayout mRootLayout;
+    private final LinearLayout mItemBar;
 
     public FABToolbarWithActionHandler(FABToolbarLayout layout) {
         mRootLayout = layout;
@@ -67,19 +67,14 @@ public class FABToolbarWithActionHandler {
         imageView.setTag(actionHandler.getActionKey().toString());
         imageView.setLayoutParams(layoutParams);
         imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-        imageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                listener.onFABMenuItemClick(actionHandler);
-            }
-        });
+        imageView.setOnClickListener(v -> listener.onFABMenuItemClick(actionHandler));
         TooltipCompat.setTooltipText(imageView, getString(actionHandler.getHintRes()));
 
         return imageView;
     }
 
     private String getString(@StringRes int stringRes) {
-        return app.getContext().getResources().getString(stringRes);
+        return mRootLayout.getContext().getString(stringRes);
     }
 
     // TODO: Only show inflation animation when deflation animation is finished

@@ -37,7 +37,7 @@ class Report(var title: String, val bookings: MutableList<Booking>) {
     }
 
     private fun getResourceString(@StringRes stringRes: Int): String {
-        return app.getContext().getString(stringRes)
+        return app.getStringResource(stringRes)
     }
 
     private fun getPlaceholderCategory(@StringRes titleRes: Int): Category {

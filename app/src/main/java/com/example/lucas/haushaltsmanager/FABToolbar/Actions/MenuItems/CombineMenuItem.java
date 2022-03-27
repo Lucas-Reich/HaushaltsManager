@@ -3,11 +3,9 @@ package com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems;
 import android.content.Context;
 import android.os.Bundle;
 
-import androidx.annotation.StringRes;
 import androidx.fragment.app.FragmentManager;
 
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
-import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.Database.Repositories.BookingDAO;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ParentBookingDAO;
@@ -32,7 +30,7 @@ public class CombineMenuItem implements IMenuItem {
     private final IActionKey mActionKey;
 
     private ParentBookingDAO parentBookingRepository;
-    private BookingDAO bookingDao;
+    private BookingDAO bookingRepository;
     private final OnSuccessCallback mCallback;
 
     public CombineMenuItem(OnSuccessCallback callback) {
@@ -65,7 +63,7 @@ public class CombineMenuItem implements IMenuItem {
         initRepos(context);
 
         Bundle bundle = new Bundle();
-        bundle.putString(BasicTextInputDialog.TITLE, getString(R.string.input_title));
+        bundle.putString(BasicTextInputDialog.TITLE, context.getString(R.string.input_title));
 
         BasicTextInputDialog textInputDialog = new BasicTextInputDialog();
         textInputDialog.setArguments(bundle);
@@ -74,7 +72,7 @@ public class CombineMenuItem implements IMenuItem {
     }
 
     private void initRepos(Context context) {
-        bookingDao = AppDatabase.getDatabase(context).bookingDAO();
+        bookingRepository = AppDatabase.getDatabase(context).bookingDAO();
         parentBookingRepository = AppDatabase.getDatabase(context).parentBookingDAO();
     }
 
@@ -82,10 +80,6 @@ public class CombineMenuItem implements IMenuItem {
         ParentActivity activity = (ParentActivity) context;
 
         return activity.getSupportFragmentManager();
-    }
-
-    private String getString(@StringRes int stringRes) {
-        return app.getContext().getString(stringRes);
     }
 
     private BasicTextInputDialog.OnTextInput getOnTextInputListener(final List<IRecyclerItem> selectedItems) {
@@ -113,7 +107,7 @@ public class CombineMenuItem implements IMenuItem {
 
     private IBookingItem deleteItem(IRecyclerItem item) {
         if (item instanceof ExpenseItem) {
-            bookingDao.delete(((ExpenseItem) item).getContent());
+            bookingRepository.delete(((ExpenseItem) item).getContent());
 
             return (IBookingItem) item;
         }

@@ -94,7 +94,7 @@ public class TimeFrameCardPopulator {
         mViewHolder.mPieChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override
             public void onValueSelected(Entry e, Highlight h) {
-                Toast.makeText(app.getContext(), "" + e.getY(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(app.getContext(), "" + e.getY(), Toast.LENGTH_SHORT).show(); // TODO: Can this dependency be removed?
             }
 
             @Override

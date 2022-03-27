@@ -21,15 +21,17 @@ public class ExpenseItemViewHolder extends AbstractViewHolder {
     private final RoundedTextView roundedTextView;
     private final TextView title;
     private final TextView person;
+    private final CategoryDAO categoryRepository;
     private final MoneyTextView price;
 
-    public ExpenseItemViewHolder(View itemView) {
+    public ExpenseItemViewHolder(View itemView, CategoryDAO categoryDAO) {
         super(itemView);
 
         roundedTextView = itemView.findViewById(R.id.recycler_view_expense_rounded_text_view);
         title = itemView.findViewById(R.id.recycler_view_expense_title);
         price = itemView.findViewById(R.id.recycler_view_expense_price);
         person = itemView.findViewById(R.id.recycler_view_expense_person);
+        this.categoryRepository = categoryDAO;
     }
 
     @Override
@@ -40,8 +42,7 @@ public class ExpenseItemViewHolder extends AbstractViewHolder {
 
         Booking expense = (Booking) item.getContent();
 
-        CategoryDAO categoryRepository = AppDatabase.getDatabase(app.getContext()).categoryDAO();
-        Category category = categoryRepository.get(expense.getCategoryId()); // TODO: Do differently
+        Category category = this.categoryRepository.get(expense.getCategoryId()); // TODO: Do differently
         setRoundedTextViewText(category);
         setTitle(expense.getTitle());
         setPrice(expense.getPrice());

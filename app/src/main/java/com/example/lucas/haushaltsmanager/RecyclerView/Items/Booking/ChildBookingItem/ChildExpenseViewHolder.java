@@ -5,6 +5,7 @@ import android.widget.TextView;
 
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
+import com.example.lucas.haushaltsmanager.Database.Repositories.CategoryDAO;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.AbstractViewHolder;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
@@ -21,14 +22,16 @@ public class ChildExpenseViewHolder extends AbstractViewHolder {
     private final TextView title;
     private final MoneyTextView price;
     private final TextView person;
+    private final CategoryDAO categoryRepository;
 
-    public ChildExpenseViewHolder(View itemView) {
+    public ChildExpenseViewHolder(View itemView, CategoryDAO categoryRepository) {
         super(itemView);
 
         roundedTextView = itemView.findViewById(R.id.recycler_view_expense_rounded_text_view);
         title = itemView.findViewById(R.id.recycler_view_child_title);
         price = itemView.findViewById(R.id.recycler_view_child_price);
         person = itemView.findViewById(R.id.recycler_view_child_person);
+        this.categoryRepository = categoryRepository;
     }
 
     @Override
@@ -39,7 +42,7 @@ public class ChildExpenseViewHolder extends AbstractViewHolder {
 
         Booking expense = (Booking) item.getContent();
 
-        setRoundedTextViewText(AppDatabase.getDatabase(app.getContext()).categoryDAO().get(expense.getCategoryId())); // TODO: Do differently
+        setRoundedTextViewText(categoryRepository.get(expense.getCategoryId())); // TODO: Do differently
         setTitle(expense.getTitle());
         setPrice(expense.getPrice());
         setPerson("");

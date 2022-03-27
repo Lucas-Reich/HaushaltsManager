@@ -6,6 +6,8 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 
+import com.example.lucas.haushaltsmanager.Database.AppDatabase;
+import com.example.lucas.haushaltsmanager.Database.Repositories.CategoryDAO;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.InsertStrategy.BookingListInsertStrategy;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.RecyclerViewSelectedItemHandler;
@@ -34,6 +36,7 @@ public class ExpenseListRecyclerViewAdapter extends RecyclerViewSelectedItemHand
     @Override
     public AbstractViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        CategoryDAO categoryRepository = AppDatabase.getDatabase(parent.getContext()).categoryDAO();
 
         switch (viewType) {
             case DateItem.VIEW_TYPE:
@@ -43,7 +46,7 @@ public class ExpenseListRecyclerViewAdapter extends RecyclerViewSelectedItemHand
             case ExpenseItem.VIEW_TYPE:
 
                 View expenseView = inflater.inflate(R.layout.recycler_view_child_expense, parent, false);
-                return new ExpenseItemViewHolder(expenseView);
+                return new ExpenseItemViewHolder(expenseView, categoryRepository);
             case ParentBookingItem.VIEW_TYPE:
 
                 View parentExpenseView = inflater.inflate(R.layout.recycler_view_parent_expense, parent, false);
@@ -51,11 +54,11 @@ public class ExpenseListRecyclerViewAdapter extends RecyclerViewSelectedItemHand
             case ChildExpenseItem.VIEW_TYPE:
 
                 View childExpenseView = inflater.inflate(R.layout.recycler_view_child, parent, false);
-                return new ChildExpenseViewHolder(childExpenseView);
+                return new ChildExpenseViewHolder(childExpenseView, categoryRepository);
             case RecurringBookingItem.VIEW_TYPE:
 
                 View recurringBookingView = inflater.inflate(R.layout.recycler_view_child_expense, parent, false);
-                return new RecurringBookingViewHolder(recurringBookingView);
+                return new RecurringBookingViewHolder(recurringBookingView, categoryRepository);
             default:
 
                 return super.onCreateViewHolder(parent, viewType);
