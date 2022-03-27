@@ -27,6 +27,7 @@ import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.Da
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.DateParser.RequiredFields.Date;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.DoubleParser.AbsDoubleParser;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.DoubleParser.RequiredFields.PriceValue;
+import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.PriceTypeParser.NumericPriceTypeParser;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.PriceTypeParser.RequiredFields.PriceType;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.BookingParser.BookingParser;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.BookingParser.RequiredFields.BookingTitle;
@@ -147,7 +148,7 @@ public class ImporterTest {
 
 
         // Assert
-        verify(sub, times(1)).notifyFailure();
+        verify(sub, times(1)).notifyFailure(any());
     }
 
     @Test
@@ -192,7 +193,7 @@ public class ImporterTest {
     public void returnsExpectedRequiredFields() {
         // Set Up
         IImporter importer = new Importer(mock(IFileReader.class), new ImportBookingStrategy(
-                new BookingParser(new PriceParser(new AbsDoubleParser()), new DateParser()),
+                new BookingParser(new PriceParser(new AbsDoubleParser(), new NumericPriceTypeParser()), new DateParser()),
                 new AccountParser(),
                 new CategoryParser(),
                 mock(ISaver.class)

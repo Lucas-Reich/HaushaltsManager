@@ -10,15 +10,16 @@ import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.NoMappingFou
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Line.Line;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.MappingList;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.DoubleParser.AbsDoubleParser;
-import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.PriceTypeParser.IPriceTypeParser;
-import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.PriceTypeParser.RequiredFields.PriceType;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.DoubleParser.RequiredFields.PriceValue;
+import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.PriceTypeParser.NumericPriceTypeParser;
+import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.PriceTypeParser.RequiredFields.PriceType;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.IRequiredField;
 import com.example.lucas.haushaltsmanager.entities.Price;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PriceParserTest {
@@ -26,7 +27,7 @@ public class PriceParserTest {
 
     @Before
     public void setUp() {
-        this.parser = new PriceParser(new AbsDoubleParser());
+        this.parser = new PriceParser(new AbsDoubleParser(), new NumericPriceTypeParser());
     }
 
     @Test
@@ -42,26 +43,13 @@ public class PriceParserTest {
 
     @Test
     public void parserCanCreatePriceFromSingleColumn() {
-        // Arrange
-        Line line = buildLine("100");
+        for (Line line : validPositiveSingleColumnValues()) {
+            // Act
+            Price actualPrice = parser.parse(line, createMappingForValueAndTypeInSameValue());
 
-        // Act
-        Price actualPrice = parser.parse(line, createMappingForValueAndTypeInSameValue());
-
-        // Assert
-        assertEquals(100D, actualPrice.getPrice(), 0);
-    }
-
-    @Test
-    public void parserCanCreatePriceFromTwoColumns() {
-        // Arrange
-        Line line = buildLine("100", "1");
-
-        // Act
-        Price actualPrice = parser.parse(line, createMappingForValueAndInSeparateValues());
-
-        // Assert
-        assertEquals(-100D, actualPrice.getPrice(), 0);
+            // Assert
+            assertEquals(100D, actualPrice.getPrice(), 0);
+        }
     }
 
     @Test
@@ -84,18 +72,20 @@ public class PriceParserTest {
         }
     }
 
+    private List<Line> validPositiveSingleColumnValues() {
+        return new ArrayList<Line>() {{
+            add(buildLine("100"));
+            add(buildLine("100.0"));
+            add(buildLine("100,0"));
+            add(buildLine("100.00"));
+            add(buildLine("100,00"));
+        }};
+    }
+
     private MappingList createMappingForValueAndTypeInSameValue() {
         MappingList mapping = new MappingList();
         mapping.addMapping(AbsDoubleParser.PRICE_VALUE_KEY, 0);
-        mapping.addMapping(IPriceTypeParser.Companion.getPRICE_TYPE_KEY(), 0);
-
-        return mapping;
-    }
-
-    private MappingList createMappingForValueAndInSeparateValues() {
-        MappingList mapping = new MappingList();
-        mapping.addMapping(AbsDoubleParser.PRICE_VALUE_KEY, 0);
-        mapping.addMapping(IPriceTypeParser.Companion.getPRICE_TYPE_KEY(), 1);
+        mapping.addMapping(NumericPriceTypeParser.PRICE_TYPE_KEY, 0);
 
         return mapping;
     }

@@ -7,6 +7,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 
 import com.example.lucas.haushaltsmanager.ExpenseImporter.DataImporter.IImporter;
@@ -56,14 +57,14 @@ public class ProgressBarDialog extends AlertDialog implements ISub {
     public void notifySuccess() {
         increaseProgressBarProgress();
 
-        log(true);
+        log(true, null);
     }
 
     @Override
-    public void notifyFailure() {
+    public void notifyFailure(Exception exception) {
         increaseProgressBarProgress();
 
-        log(false);
+        log(false, exception);
     }
 
     public void setSubTitle(String subTitle) {
@@ -80,13 +81,13 @@ public class ProgressBarDialog extends AlertDialog implements ISub {
         }
     }
 
-    private void log(boolean result) {
+    private void log(boolean result, @Nullable Exception exception) {
         Log.i(ProgressBarDialog.class.getSimpleName(), String.format(
                 "Progress %s/%s, %s.",
                 progressBar.getProgress(),
                 progressBar.getMax(),
                 result ? "Success" : "Failure"
-        ));
+        ), exception);
     }
 
     private void attachAlertDialogTo(IImporter observableAction) {

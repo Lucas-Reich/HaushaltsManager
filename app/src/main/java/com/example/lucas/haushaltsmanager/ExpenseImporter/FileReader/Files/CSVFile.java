@@ -1,5 +1,7 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.FileReader.Files;
 
+import android.util.Log;
+
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Delimiter.IDelimiter;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.InvalidFileException;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.FileReader.Files.Utils.DelimiterIdentifier.CSVDelimiterIdentifier;

@@ -6,9 +6,6 @@ import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.InvalidInput
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.NoMappingFoundException;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Line.Line;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.MappingList;
-import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.DoubleParser.AbsDoubleParser;
-import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.PriceTypeParser.BooleanPriceTypeParser;
-import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.PriceTypeParser.IPriceTypeParser;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.PriceTypeParser.NumericPriceTypeParser;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.IParser;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.IRequiredField;
@@ -19,10 +16,11 @@ import java.util.List;
 
 public class PriceParser implements IParser<Price> {
     private final IParser<Double> valueParser;
-    private IParser<Boolean> priceTypeParser = null;
+    private final IParser<Boolean> priceTypeParser;
 
-    public PriceParser(IParser<Double> valueParser) {
+    public PriceParser(IParser<Double> valueParser, IParser<Boolean> priceTypeParse) {
         this.valueParser = valueParser;
+        this.priceTypeParser = priceTypeParse;
     }
 
     @Override
@@ -30,38 +28,25 @@ public class PriceParser implements IParser<Price> {
     public List<IRequiredField> getRequiredFields() {
         return new ArrayList<IRequiredField>() {{
             addAll(valueParser.getRequiredFields());
-            add(IPriceTypeParser.Companion.getPRICE_TYPE_KEY());
+            addAll(priceTypeParser.getRequiredFields());
         }};
     }
 
     @Override
     @NonNull
     public Price parse(@NonNull Line line, @NonNull MappingList mapping) throws NoMappingFoundException, InvalidInputException {
-        boolean priceType = isPriceNegative(line, mapping);
+        boolean priceType = this.priceTypeParser.parse(line, mapping);
+
+        if (priceType == NumericPriceTypeParser.VALUE_NEGATIVE) {
+            return new Price(
+                    valueParser.parse(line, mapping),
+                    NumericPriceTypeParser.VALUE_NEGATIVE
+            );
+        }
 
         return new Price(
                 valueParser.parse(line, mapping),
-                priceType
+                NumericPriceTypeParser.VALUE_POSITIVE
         );
-    }
-
-    private boolean isPriceNegative(Line line, MappingList mapping) {
-        if (null == priceTypeParser) {
-            initializeBooleanParser(mapping);
-        }
-
-        return priceTypeParser.parse(line, mapping);
-    }
-
-    private void initializeBooleanParser(MappingList mapping) {
-        int typeIndex = mapping.getMappingForKey(IPriceTypeParser.Companion.getPRICE_TYPE_KEY());
-        int valueIndex = mapping.getMappingForKey(AbsDoubleParser.PRICE_VALUE_KEY);
-
-        if (typeIndex == valueIndex) {
-            priceTypeParser = new NumericPriceTypeParser();
-            return;
-        }
-
-        priceTypeParser = new BooleanPriceTypeParser();
     }
 }

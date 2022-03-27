@@ -16,6 +16,7 @@ import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.Ac
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.CategoryParser.CategoryParser
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.DateParser.DateParser
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.DoubleParser.AbsDoubleParser
+import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.PriceTypeParser.NumericPriceTypeParser
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.BookingParser.BookingParser
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.PriceParser.PriceParser
 import com.example.lucas.haushaltsmanager.ExpenseImporter.SavingService.Saver
@@ -73,7 +74,7 @@ class ExpenseImporterActivity : AbstractAppCompatActivity() {
     private fun buildNewImporter(fileReader: IFileReader?): Importer {
         return Importer(
             fileReader!!, ImportBookingStrategy(
-                BookingParser(PriceParser(AbsDoubleParser()), DateParser()),
+                BookingParser(PriceParser(AbsDoubleParser(), NumericPriceTypeParser()), DateParser()),
                 AccountParser(),
                 CategoryParser(),
                 Saver.create(this)

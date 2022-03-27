@@ -9,12 +9,11 @@ import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.InvalidInput
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.NoMappingFoundException;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Line.Line;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.MappingList;
-import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.CategoryParser.RequiredFields.CategoryTitle;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.DateParser.DateParser;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.DateParser.RequiredFields.Date;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.DoubleParser.AbsDoubleParser;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.DoubleParser.RequiredFields.PriceValue;
-import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.PriceTypeParser.IPriceTypeParser;
+import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.PriceTypeParser.NumericPriceTypeParser;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.PriceTypeParser.RequiredFields.PriceType;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.BookingParser.RequiredFields.BookingTitle;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.IRequiredField;
@@ -33,7 +32,7 @@ public class BookingParserTest {
     @Before
     public void setUp() {
         parser = new BookingParser(
-                new PriceParser(new AbsDoubleParser()),
+                new PriceParser(new AbsDoubleParser(), new NumericPriceTypeParser()),
                 new DateParser()
         );
     }
@@ -101,7 +100,7 @@ public class BookingParserTest {
         MappingList mappingList = new MappingList();
         mappingList.addMapping(BookingParser.BOOKING_TITLE_KEY, 0);
         mappingList.addMapping(AbsDoubleParser.PRICE_VALUE_KEY, 1);
-        mappingList.addMapping(IPriceTypeParser.Companion.getPRICE_TYPE_KEY(), 1);
+        mappingList.addMapping(NumericPriceTypeParser.PRICE_TYPE_KEY, 1);
         mappingList.addMapping(DateParser.BOOKING_DATE_KEY, 2);
 
         return mappingList;

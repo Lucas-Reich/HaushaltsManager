@@ -55,6 +55,8 @@ public class AbsDoubleParserTest {
             add(buildLine("-100"));
             add(buildLine("100.00"));
             add(buildLine("-100.00"));
+            add(buildLine("100,00"));
+            add(buildLine("-100,00"));
         }};
     }
 

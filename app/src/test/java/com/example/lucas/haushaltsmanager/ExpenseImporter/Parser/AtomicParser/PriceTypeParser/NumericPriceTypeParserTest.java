@@ -43,7 +43,7 @@ public class NumericPriceTypeParserTest {
             boolean actualPriceType = parser.parse(line, createMapping());
 
             // Assert
-            assertEquals(IPriceTypeParser.VALUE_POSITIVE, actualPriceType);
+            assertEquals(NumericPriceTypeParser.VALUE_POSITIVE, actualPriceType);
         }
     }
 
@@ -52,6 +52,7 @@ public class NumericPriceTypeParserTest {
             add(buildLine("0"));
             add(buildLine("1"));
             add(buildLine("10.5"));
+            add(buildLine("10,5"));
             add(buildLine("100"));
             add(buildLine("1000000"));
         }};
@@ -64,7 +65,7 @@ public class NumericPriceTypeParserTest {
             boolean actualPriceType = parser.parse(line, createMapping());
 
             // Assert
-            assertEquals(IPriceTypeParser.VALUE_NEGATIVE, actualPriceType);
+            assertEquals(NumericPriceTypeParser.VALUE_NEGATIVE, actualPriceType);
         }
     }
 
@@ -72,6 +73,7 @@ public class NumericPriceTypeParserTest {
         return new ArrayList<Line>() {{
             add(buildLine("-1"));
             add(buildLine("-10.5"));
+            add(buildLine("-10,5"));
             add(buildLine("-100"));
             add(buildLine("-1000000"));
         }};
@@ -113,7 +115,7 @@ public class NumericPriceTypeParserTest {
 
     private MappingList createMapping() {
         MappingList mappingList = new MappingList();
-        mappingList.addMapping(IPriceTypeParser.Companion.getPRICE_TYPE_KEY(), 0);
+        mappingList.addMapping(NumericPriceTypeParser.PRICE_TYPE_KEY, 0);
 
         return mappingList;
     }

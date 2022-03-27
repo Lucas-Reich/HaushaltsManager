@@ -21,11 +21,11 @@ class Importer(
                 val line = fileReader.currentLine
                 importStrategy.handle(line, mappingList)
 
-                notifySubs(true)
+                notifySubs(true, null)
             } catch (e: NoMappingFoundException) {
-                notifySubs(false)
+                notifySubs(false, e)
             } catch (e: InvalidInputException) {
-                notifySubs(false)
+                notifySubs(false, e)
             }
         }
 
@@ -65,14 +65,14 @@ class Importer(
         importStrategy.finish()
     }
 
-    private fun notifySubs(successful: Boolean) {
+    private fun notifySubs(successful: Boolean, exception: Exception?) {
         for (sub in subs) {
             if (successful) {
                 sub.notifySuccess()
                 break
             }
 
-            sub.notifyFailure()
+            sub.notifyFailure(exception)
         }
     }
 }

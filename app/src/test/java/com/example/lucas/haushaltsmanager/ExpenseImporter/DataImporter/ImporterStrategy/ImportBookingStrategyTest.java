@@ -23,7 +23,7 @@ import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.Da
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.DateParser.RequiredFields.Date;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.DoubleParser.AbsDoubleParser;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.DoubleParser.RequiredFields.PriceValue;
-import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.PriceTypeParser.IPriceTypeParser;
+import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.PriceTypeParser.NumericPriceTypeParser;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.PriceTypeParser.RequiredFields.PriceType;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.BookingParser.BookingParser;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.BookingParser.RequiredFields.BookingTitle;
@@ -50,7 +50,7 @@ public class ImportBookingStrategyTest {
         mockSaver = mock(ISaver.class);
 
         strategy = new ImportBookingStrategy(
-                new BookingParser(new PriceParser(new AbsDoubleParser()), new DateParser()),
+                new BookingParser(new PriceParser(new AbsDoubleParser(), new NumericPriceTypeParser()), new DateParser()),
                 new AccountParser(),
                 new CategoryParser(),
                 mockSaver
@@ -141,7 +141,7 @@ public class ImportBookingStrategyTest {
         return new MappingList() {{
             addMapping(BookingParser.BOOKING_TITLE_KEY, 0);
             addMapping(AbsDoubleParser.PRICE_VALUE_KEY, 1);
-            addMapping(IPriceTypeParser.Companion.getPRICE_TYPE_KEY(), 2);
+            addMapping(NumericPriceTypeParser.PRICE_TYPE_KEY, 2);
             addMapping(CategoryParser.CATEGORY_TITLE_KEY, 3);
             addMapping(DateParser.BOOKING_DATE_KEY, 4);
             addMapping(AccountParser.ACCOUNT_TITLE_KEY, 5);
