@@ -13,7 +13,13 @@ import java.util.List;
 
 public class ExpenseGrouper {
     public List<Booking> byYear(List<Booking> bookings, int year) {
-        return byYears(bookings).get(year);
+        List<Booking> bookingForYear = byYears(bookings).get(year);
+
+        if (null != bookingForYear) {
+            return bookingForYear;
+        }
+
+        return new ArrayList<>();
     }
 
     public HashMap<Integer, List<Booking>> byYears(List<Booking> bookings) {
