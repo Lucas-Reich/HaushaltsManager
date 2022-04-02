@@ -20,7 +20,7 @@ import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ErrorAlertDialog;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.RecyclerItemClickListener;
-import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.ItemCreator;
+import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.RecyclerItemFactory;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.FileItem.FileItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.FileListRecyclerViewAdapter;
@@ -174,7 +174,7 @@ public class ImportExportActivity extends AbstractAppCompatActivity implements R
     private List<IRecyclerItem> loadData(Directory selectedDirectory) {
         List<File> importableFileList = getImportableFilesInDirectory(selectedDirectory);
 
-        return ItemCreator.createFileItems(importableFileList);
+        return RecyclerItemFactory.createFileItems(importableFileList);
     }
 
     private List<File> getImportableFilesInDirectory(Directory dir) {

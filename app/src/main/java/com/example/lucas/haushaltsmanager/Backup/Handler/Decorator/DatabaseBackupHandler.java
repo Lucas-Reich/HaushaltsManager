@@ -9,11 +9,11 @@ import com.example.lucas.haushaltsmanager.Backup.BackupUtils;
 import com.example.lucas.haushaltsmanager.Backup.Exceptions.SQLiteOpenDatabaseFileException;
 import com.example.lucas.haushaltsmanager.Backup.Handler.FileBackupHandler;
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
-import com.example.lucas.haushaltsmanager.entities.Directory;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Exception.InvalidFileException;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences.ActiveAccountsPreferences;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences.ActiveAccountsPreferencesRebuildStrategy;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.PreferencesRefresher;
+import com.example.lucas.haushaltsmanager.entities.Directory;
 
 import java.io.File;
 
@@ -48,6 +48,7 @@ public class DatabaseBackupHandler {
     }
 
     public boolean restore(File database) throws SQLiteOpenDatabaseFileException, InvalidFileException {
+
         databaseFileValidator.guardAgainstNoDatabase(database);
 
         databaseFileValidator.guardAgainstWrongDatabaseVersion(database);
@@ -57,7 +58,6 @@ public class DatabaseBackupHandler {
         boolean success = backupHandler.restore(database, databaseDir, AppDatabase.DATABASE_NAME) != null;
 
         rebuildActiveAccountsPreferences();
-        // TODO: Was passiert, wenn es den main account nicht mehr gibt?
         return success;
     }
 

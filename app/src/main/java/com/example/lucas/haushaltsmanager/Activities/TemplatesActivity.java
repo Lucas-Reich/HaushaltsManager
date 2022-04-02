@@ -11,7 +11,7 @@ import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.Database.Repositories.TemplateBookingDAO;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.RecyclerItemClickListener;
-import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.ItemCreator;
+import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.RecyclerItemFactory;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.TemplateItem.TemplateItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.TemplateListRecyclerViewAdapter;
@@ -79,6 +79,6 @@ public class TemplatesActivity extends AbstractAppCompatActivity implements Recy
     private List<IRecyclerItem> loadData() {
         List<TemplateBooking> templateBookings = templateBookingsRepository.getTemplatesAndCategories();
 
-        return ItemCreator.createTemplateItems(templateBookings);
+        return RecyclerItemFactory.createTemplateBookingItems(templateBookings);
     }
 }

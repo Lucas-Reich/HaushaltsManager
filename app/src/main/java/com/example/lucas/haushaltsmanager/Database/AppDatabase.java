@@ -25,7 +25,7 @@ import com.example.lucas.haushaltsmanager.entities.template_booking.TemplateBook
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
     public static final String DATABASE_NAME = "user_database.db";
-    public static final int DATABASE_VERSION = 1; // Update when version
+    public static final int DATABASE_VERSION = 1;
     private static volatile AppDatabase DATABASE = null;
 
     public static AppDatabase getDatabase(Context context) {

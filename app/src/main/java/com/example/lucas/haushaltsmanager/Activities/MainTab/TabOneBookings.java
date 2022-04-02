@@ -17,6 +17,8 @@ import com.example.lucas.haushaltsmanager.Activities.DragAndDropActivity.DragAnd
 import com.example.lucas.haushaltsmanager.Activities.ExpenseScreen;
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.Database.Repositories.BookingDAO;
+import com.example.lucas.haushaltsmanager.Database.Repositories.BookingRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ParentBookingDAO;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.ActionPayload;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.AddChildMenuItem;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.CombineMenuItem;
@@ -32,7 +34,7 @@ import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPrefer
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.EndlessRecyclerViewScrollListener;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.RecyclerItemClickListener;
-import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.ItemCreator;
+import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.RecyclerItemFactory;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.BookingItem.ExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ChildBookingItem.ChildExpenseItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ParentBookingItem.ParentBookingItem;
@@ -40,9 +42,8 @@ import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.ExpenseListRecyclerViewAdapter;
 import com.example.lucas.haushaltsmanager.RevertExpenseDeletionSnackbar.RevertExpenseDeletionSnackbar;
-import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseFilter;
 import com.example.lucas.haushaltsmanager.entities.booking.Booking;
-import com.example.lucas.haushaltsmanager.entities.template_booking.TemplateBookingWithoutCategory;
+import com.example.lucas.haushaltsmanager.entities.booking.IBooking;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,11 +62,16 @@ public class TabOneBookings extends AbstractTab implements
     private RevertExpenseDeletionSnackbar mRevertDeletionSnackbar;
     private ActiveAccountsPreferences activeAccounts;
 
+    private BookingDAO bookingRepository;
+    private ParentBookingDAO parentBookingRepository;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         activeAccounts = new ActiveAccountsPreferences(getActivity());
+        bookingRepository = AppDatabase.getDatabase(getContext()).bookingDAO();
+        parentBookingRepository = AppDatabase.getDatabase(getContext()).parentBookingDAO();
     }
 
     @Nullable
@@ -92,7 +98,7 @@ public class TabOneBookings extends AbstractTab implements
 
     @Override
     public void updateView(View rootView) {
-        mAdapter = new ExpenseListRecyclerViewAdapter(loadData(0));
+        mAdapter = new ExpenseListRecyclerViewAdapter(loadDataIncludingParents(0));
 
         mRecyclerView.setAdapter(mAdapter);
 
@@ -102,7 +108,7 @@ public class TabOneBookings extends AbstractTab implements
             public void onLoadMore(int page, final int offset, RecyclerView view) {
                 // Methode muss darf erst nach einer bestimmten Zeit ausgeführt werden, da sonst die Liste falsch geupdated wird
                 // Link: https://stackoverflow.com/a/39981688
-                mRecyclerView.post(() -> mAdapter.insertAll(loadData(offset)));
+                mRecyclerView.post(() -> mAdapter.insertAll(loadDataIncludingParents(offset)));
             }
         });
     }
@@ -206,32 +212,29 @@ public class TabOneBookings extends AbstractTab implements
         return false; // TODO: Check if at least one account exists
     }
 
-    private List<Booking> getVisibleExpenses(int offset) {
-        BookingDAO bookingRepository = AppDatabase.getDatabase(getContext()).bookingDAO();
-        List<Booking> bookings = bookingRepository.getAll();
+    private List<IRecyclerItem> loadDataIncludingParents(int offset) {
+        BookingRepository bookingRepo = new BookingRepository(bookingRepository, parentBookingRepository);
 
-        // TODO: Get ParentBookings
+        // Get Bookings and ParentBookings
+        List<IBooking> bookings = bookingRepo.getBookingsWithAccount(activeAccounts.getActiveAccounts());
 
-        List<Booking> visibleExpenses = new ExpenseFilter().byAccount(
-                bookings, // TODO: How to add parent bookings?
-                activeAccounts.getActiveAccounts()
-        );
+        // apply offset
+        bookings = extractVisibleBookings(bookings, offset);
 
-        if (visibleExpenses.size() <= offset) {
+        // transform items to recycler items
+        return RecyclerItemFactory.createBookingsItems(bookings);
+    }
+
+    private List<IBooking> extractVisibleBookings(List<IBooking> bookings, int offset) {
+        if (bookings.size() <= offset) {
             return new ArrayList<>();
         }
 
-        if (visibleExpenses.size() < (offset + BATCH_SIZE)) {
-            return visibleExpenses.subList(offset, visibleExpenses.size());
+        if (bookings.size() < (offset + BATCH_SIZE)) {
+            return bookings.subList(offset, bookings.size());
         }
 
-        return visibleExpenses.subList(offset, offset + BATCH_SIZE);
-    }
-
-    private List<IRecyclerItem> loadData(int offset) {
-        List<Booking> visibleExpenses = getVisibleExpenses(offset);
-
-        return ItemCreator.createBookingItems(visibleExpenses);
+        return bookings.subList(offset, offset + BATCH_SIZE);
     }
 
     private void configureFabToolbar() {

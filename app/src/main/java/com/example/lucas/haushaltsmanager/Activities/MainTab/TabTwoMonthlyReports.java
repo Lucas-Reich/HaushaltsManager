@@ -10,11 +10,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lucas.haushaltsmanager.Activities.LayoutManagerFactory;
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
+import com.example.lucas.haushaltsmanager.Database.Repositories.BookingDAO;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.ActiveAccountsPreferences.ActiveAccountsPreferences;
 import com.example.lucas.haushaltsmanager.R;
-import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.ItemCreator;
+import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.RecyclerItemFactory;
 import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.MonthlyReportListAdapter;
-import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseFilter;
 import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 
 import java.util.List;
@@ -22,12 +22,14 @@ import java.util.List;
 public class TabTwoMonthlyReports extends AbstractTab {
     private RecyclerView mRecyclerView;
     private ActiveAccountsPreferences activeAccounts;
+    private BookingDAO bookingDAO;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        activeAccounts = new ActiveAccountsPreferences(getActivity());
+        activeAccounts = new ActiveAccountsPreferences(getContext());
+        bookingDAO = AppDatabase.getDatabase(getContext()).bookingDAO();
     }
 
     @Override
@@ -43,7 +45,7 @@ public class TabTwoMonthlyReports extends AbstractTab {
 
     public void updateView(View rootView) {
         MonthlyReportListAdapter adapter = new MonthlyReportListAdapter(
-                ItemCreator.createReportItems(getVisibleExpenses())
+                RecyclerItemFactory.createReportItems(getVisibleExpenses())
         );
 
         mRecyclerView.setLayoutManager(LayoutManagerFactory.vertical(getContext()));
@@ -53,8 +55,6 @@ public class TabTwoMonthlyReports extends AbstractTab {
     }
 
     private List<Booking> getVisibleExpenses() {
-        List<Booking> bookings = AppDatabase.getDatabase(getContext()).bookingDAO().getAll();
-
-        return new ExpenseFilter().byAccount(bookings, activeAccounts.getActiveAccounts());
+        return bookingDAO.getAllWithAccounts(activeAccounts.getActiveAccounts());
     }
 }

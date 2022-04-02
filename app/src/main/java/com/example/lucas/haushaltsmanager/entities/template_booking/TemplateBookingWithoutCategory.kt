@@ -25,7 +25,7 @@ class TemplateBookingWithoutCategory(
         UUID.randomUUID(),
         template.title,
         template.price,
-        template.date,
+        template.getDate(),
         template.categoryId,
         template.accountId
     )

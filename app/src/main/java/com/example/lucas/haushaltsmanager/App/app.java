@@ -9,7 +9,10 @@ import androidx.annotation.StringRes;
 
 import com.example.lucas.haushaltsmanager.R;
 
+import java.util.Currency;
 import java.util.UUID;
+
+import kotlin.jvm.JvmStatic;
 
 public class app extends Application {
     public static final UUID transferCategoryId = UUID.fromString("eed05d4b-866d-4f20-b580-c50901066d73");
@@ -23,6 +26,11 @@ public class app extends Application {
 
     public static String getStringResource(@StringRes int resourceId) {
         return context.getString(resourceId);
+    }
+
+    @JvmStatic
+    public static Currency getDefaultCurrency() {
+        return Currency.getInstance("EUR");
     }
 
     /**

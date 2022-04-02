@@ -23,7 +23,7 @@ import com.example.lucas.haushaltsmanager.FABToolbar.OnFABToolbarFABClickListene
 import com.example.lucas.haushaltsmanager.FABToolbar.OnFABToolbarItemClickListener;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.RecyclerItemClickListener;
-import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.ItemCreator;
+import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.RecyclerItemFactory;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.CategoryItem.CategoryItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.CategoryListRecyclerViewAdapter;
@@ -149,7 +149,7 @@ public class CategoryList extends AbstractAppCompatActivity implements
     private List<IRecyclerItem> loadData() {
         List<Category> categories = categoryRepo.getAll();
 
-        return ItemCreator.createCategoryItems(categories);
+        return RecyclerItemFactory.createCategoryItems(categories);
     }
 
     private void setActionHandler() {

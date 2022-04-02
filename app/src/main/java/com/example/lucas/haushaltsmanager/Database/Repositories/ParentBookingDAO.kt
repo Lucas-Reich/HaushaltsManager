@@ -4,12 +4,16 @@ import androidx.room.*
 import androidx.room.OnConflictStrategy.REPLACE
 import com.example.lucas.haushaltsmanager.entities.booking.Booking
 import com.example.lucas.haushaltsmanager.entities.booking.ParentBooking
+import java.util.*
 
 @Dao
 abstract class ParentBookingDAO {
 
     @Query("SELECT * FROM parent_bookings JOIN bookings on parent_bookings.id = bookings.parent_id")
     abstract fun getAll(): Map<ParentBooking, List<Booking>>
+
+    @Query("SELECT * FROM parent_bookings JOIN bookings on parent_bookings.id = bookings.parent_id WHERE bookings.id IN (:accountIds)")
+    abstract fun getAllWithAccounts(accountIds: List<UUID>): Map<ParentBooking, List<Booking>>
 
     @Insert
     fun insert(parentBooking: ParentBooking) {

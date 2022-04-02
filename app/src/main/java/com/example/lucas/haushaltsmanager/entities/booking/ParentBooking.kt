@@ -8,17 +8,23 @@ import java.util.*
 
 @Entity(tableName = "parent_bookings")
 class ParentBooking(
-    @PrimaryKey var id: UUID, // Cannot make this final for some reason
-    var date: Calendar,
+    @PrimaryKey var id: UUID,
+    private var date: Calendar,
     val title: String,
     @Ignore val children: ArrayList<Booking>
-) {
+): IBooking {
     constructor(title: String) : this(
         UUID.randomUUID(),
         Calendar.getInstance(),
         title,
         ArrayList<Booking>()
     )
+
+    fun addChildren(bookings: List<Booking>) {
+        for (booking in bookings) {
+            addChild(booking)
+        }
+    }
 
     fun addChild(booking: Booking) {
         if (children.contains(booking)) {
@@ -36,6 +42,14 @@ class ParentBooking(
         }
 
         return Price(price)
+    }
+
+    override fun getDate(): Calendar {
+        return date
+    }
+
+    fun setDate(date: Calendar) {
+        this.date = date
     }
 
     override fun equals(other: Any?): Boolean {

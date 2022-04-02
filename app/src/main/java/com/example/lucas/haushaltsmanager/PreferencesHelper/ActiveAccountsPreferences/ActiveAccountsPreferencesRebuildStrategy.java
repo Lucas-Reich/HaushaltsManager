@@ -20,8 +20,7 @@ public class ActiveAccountsPreferencesRebuildStrategy implements RebuildStrategy
     }
 
     private List<Account> getAccountsList(Context context) {
-        return Room.databaseBuilder(context, AppDatabase.class, "expenses")
-                .build().accountDAO().getAll();
+        return AppDatabase.getDatabase(context).accountDAO().getAll();
     }
 
     private void addAccountsToPreferences(Context context, List<Account> accounts) {

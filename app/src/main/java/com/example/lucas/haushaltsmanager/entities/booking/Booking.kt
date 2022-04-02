@@ -16,17 +16,25 @@ class Booking(
     @PrimaryKey val id: UUID,
     var title: String,
     var price: Price,
-    var date: Calendar,
+    private var date: Calendar,
     @ColumnInfo(name = "category_id") var categoryId: UUID,
     @ColumnInfo(name = "account_id") var accountId: UUID,
     @ColumnInfo(name = "parent_id") var parentId: UUID? = null
-) : Parcelable {
+) : Parcelable, IBooking {
     constructor(
         title: String,
         price: Price,
         categoryId: UUID,
         accountId: UUID
     ) : this(UUID.randomUUID(), title, price, Calendar.getInstance(), categoryId, accountId)
+
+    override fun getDate(): Calendar {
+        return date
+    }
+
+    fun setDate(date: Calendar) {
+        this.date = date
+    }
 
     override fun equals(other: Any?): Boolean {
         if (other !is Booking) {

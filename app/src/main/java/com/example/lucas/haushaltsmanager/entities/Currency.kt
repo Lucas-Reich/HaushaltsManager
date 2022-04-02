@@ -1,16 +1,20 @@
 package com.example.lucas.haushaltsmanager.entities
 
-// TODO: Check if I can replace this class with the Java.util implementation?
+import com.example.lucas.haushaltsmanager.App.app
+
+/**
+ * TODO: Remove this class if no errors are reported regarding the Java.Currency implementation
+ */
 class Currency {
     fun getName(): String {
-        return "Euro"
+        return app.getDefaultCurrency().displayName
     }
 
     fun getShortName(): String {
-        return "EUR"
+        return app.getDefaultCurrency().currencyCode
     }
 
     fun getSymbol(): String {
-        return "€"
+        return app.getDefaultCurrency().symbol
     }
 }

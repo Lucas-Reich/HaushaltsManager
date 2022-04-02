@@ -1,21 +1,24 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.Strategies;
 
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.BookingItem.ExpenseItem;
+import com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.ParentBookingItem.ParentBookingItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.DateItem.DateItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.Utils.CalendarUtils;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSorter;
 import com.example.lucas.haushaltsmanager.entities.booking.Booking;
+import com.example.lucas.haushaltsmanager.entities.booking.IBooking;
+import com.example.lucas.haushaltsmanager.entities.booking.ParentBooking;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CreateBookingItemsStrategy implements RecyclerItemCreatorStrategyInterface<Booking> {
+public class CreateBookingItemsStrategy implements RecyclerItemCreatorStrategyInterface<IBooking> {
     private static final String SORT_DESC = "DESC";
     private static final String SORT_ASC = "ASC";
 
     @Override
-    public List<IRecyclerItem> create(List<Booking> bookings) {
+    public List<IRecyclerItem> create(List<IBooking> bookings) {
         if (bookings.isEmpty()) {
             return new ArrayList<>();
         }
@@ -29,20 +32,24 @@ public class CreateBookingItemsStrategy implements RecyclerItemCreatorStrategyIn
 
         List<IRecyclerItem> recyclerItems = new ArrayList<>();
         recyclerItems.add(currentDate);
-        for (Booking booking : bookings) {
+        for (IBooking booking : bookings) {
             if (isBookingOnDifferentDate(booking, currentDate, SORT_DESC)) {
                 currentDate = new DateItem(booking.getDate());
 
                 recyclerItems.add(currentDate);
             }
 
-            recyclerItems.add(new ExpenseItem(booking, currentDate));
+            if (booking instanceof ParentBooking) {
+                recyclerItems.add(new ParentBookingItem((ParentBooking) booking, currentDate));
+            } else if (booking instanceof Booking) {
+                recyclerItems.add(new ExpenseItem((Booking) booking, currentDate));
+            }
         }
 
         return recyclerItems;
     }
 
-    private boolean isBookingOnDifferentDate(Booking booking, DateItem currentDate, String order) {
+    private boolean isBookingOnDifferentDate(IBooking booking, DateItem currentDate, String order) {
         if (order.equals(SORT_ASC)) {
             return CalendarUtils.beforeByDate(booking.getDate(), currentDate.getContent());
         }

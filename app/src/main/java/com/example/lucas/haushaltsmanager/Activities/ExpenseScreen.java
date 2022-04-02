@@ -46,7 +46,6 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
     public static final String INTENT_MODE_UPDATE_PARENT = "updateParent";
     public static final String INTENT_MODE_ADD_CHILD = "addChild";
     public static final String INTENT_MODE_CREATE_BOOKING = "createBooking";
-    private static final String TAG = ExpenseScreen.class.getSimpleName();
     private Button mPriceBtn, mTitleTxt, mAccountTxt, mCategoryTxt, mDateTxt, mIncomeBtn, mExpenseBtn, mCurrencyBtn;
     private Booking mExpense, mParentBooking;
 
@@ -181,7 +180,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case 5:  // TODO: How to fix this?
+            case 5:
                 Intent chooseTemplateIntent = new Intent(this, TemplatesActivity.class);
                 startActivityForResult(chooseTemplateIntent, 2);
 

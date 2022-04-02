@@ -7,7 +7,6 @@ import android.widget.Button;
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.Database.Repositories.AccountDAO;
-import com.example.lucas.haushaltsmanager.Database.Repositories.BookingDAO;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.PriceInputDialog;
