@@ -29,13 +29,16 @@ public class CombineMenuItem implements IMenuItem {
 
     private final IActionKey mActionKey;
 
-    private ParentBookingDAO parentBookingRepository;
-    private BookingDAO bookingRepository;
+    private final ParentBookingDAO parentBookingRepository;
+    private final BookingDAO bookingRepository;
     private final OnSuccessCallback mCallback;
 
-    public CombineMenuItem(OnSuccessCallback callback) {
+    public CombineMenuItem(OnSuccessCallback callback, Context context) {
         mCallback = callback;
         mActionKey = new ActionKey(ACTION_KEY);
+
+        parentBookingRepository = AppDatabase.getDatabase(context).parentBookingDAO();
+        bookingRepository = AppDatabase.getDatabase(context).bookingDAO();
     }
 
     @Override
@@ -60,8 +63,6 @@ public class CombineMenuItem implements IMenuItem {
 
     @Override
     public void handleClick(ActionPayload payload, Context context) {
-        initRepos(context);
-
         Bundle bundle = new Bundle();
         bundle.putString(BasicTextInputDialog.TITLE, context.getString(R.string.input_title));
 
@@ -69,11 +70,6 @@ public class CombineMenuItem implements IMenuItem {
         textInputDialog.setArguments(bundle);
         textInputDialog.setOnTextInputListener(getOnTextInputListener(payload.getItems()));
         textInputDialog.show(getFragmentManager(context), "");
-    }
-
-    private void initRepos(Context context) {
-        bookingRepository = AppDatabase.getDatabase(context).bookingDAO();
-        parentBookingRepository = AppDatabase.getDatabase(context).parentBookingDAO();
     }
 
     private FragmentManager getFragmentManager(Context context) {

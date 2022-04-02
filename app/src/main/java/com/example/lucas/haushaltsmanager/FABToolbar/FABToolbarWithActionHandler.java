@@ -30,12 +30,7 @@ public class FABToolbarWithActionHandler {
 
     public void setOnFabClickListener(final OnFABToolbarFABClickListener listener) {
         FloatingActionButton fab = mRootLayout.findViewById(R.id.fabtoolbar_fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                listener.onFabClick();
-            }
-        });
+        fab.setOnClickListener(v -> listener.onFabClick());
     }
 
     public void addMenuItem(IMenuItem actionHandler, OnFABToolbarItemClickListener listener) {
@@ -57,7 +52,6 @@ public class FABToolbarWithActionHandler {
         toggleVisibilityWithAnimation(imV, isVisible);
     }
 
-    // TODO: Can I fill FABToolbar with MenuItems?
     private ImageView createToolbarMenuItemFrom(final IMenuItem actionHandler, final OnFABToolbarItemClickListener listener) {
         ViewGroup.LayoutParams layoutParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f);
 

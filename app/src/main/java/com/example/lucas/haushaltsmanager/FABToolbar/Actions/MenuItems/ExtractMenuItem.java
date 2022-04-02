@@ -18,11 +18,12 @@ public class ExtractMenuItem implements IMenuItem {
     private final IActionKey mActionKey;
 
     private final OnSuccessCallback mCallback;
-    private ParentBookingDAO parentBookingRepository;
+    private final ParentBookingDAO parentBookingRepository;
 
-    public ExtractMenuItem(OnSuccessCallback callback) {
+    public ExtractMenuItem(OnSuccessCallback callback, Context context) {
         mCallback = callback;
         mActionKey = new ActionKey(ACTION_KEY);
+        parentBookingRepository = AppDatabase.getDatabase(context).parentBookingDAO();
     }
 
     @Override
@@ -47,8 +48,6 @@ public class ExtractMenuItem implements IMenuItem {
 
     @Override
     public void handleClick(ActionPayload actionPayload, Context context) {
-        initRepo(context);
-
         for (IRecyclerItem selectedItem : actionPayload.getItems()) {
             Booking childBooking = ((ChildExpenseItem) selectedItem).getContent();
 
@@ -58,10 +57,6 @@ public class ExtractMenuItem implements IMenuItem {
                 mCallback.onSuccess(selectedItem, childBooking);
             }
         }
-    }
-
-    private void initRepo(Context context) {
-        parentBookingRepository = AppDatabase.getDatabase(context).parentBookingDAO();
     }
 
     public interface OnSuccessCallback {

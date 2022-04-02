@@ -13,7 +13,7 @@ import com.example.lucas.haushaltsmanager.R;
 public class RecurringMenuItem implements IMenuItem {
     public static final String ACTION_KEY = "recurringAction";
 
-    private IActionKey mActionKey;
+    private final IActionKey mActionKey;
 
     public RecurringMenuItem() {
         mActionKey = new ActionKey(ACTION_KEY);

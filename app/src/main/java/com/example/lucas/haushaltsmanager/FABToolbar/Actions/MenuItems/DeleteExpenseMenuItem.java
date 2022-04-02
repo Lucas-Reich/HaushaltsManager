@@ -20,12 +20,15 @@ public class DeleteExpenseMenuItem implements IMenuItem {
     private final IActionKey mActionKey;
 
     private final OnSuccessCallback mCallback;
-    private BookingDAO bookingRepository;
-    private ParentBookingDAO parentBookingRepository;
+    private final BookingDAO bookingRepository;
+    private final ParentBookingDAO parentBookingRepository;
 
-    public DeleteExpenseMenuItem(OnSuccessCallback callback) {
+    public DeleteExpenseMenuItem(OnSuccessCallback callback, Context context) {
         mCallback = callback;
         mActionKey = new ActionKey(ACTION_KEY);
+
+        bookingRepository = AppDatabase.getDatabase(context).bookingDAO();
+        parentBookingRepository = AppDatabase.getDatabase(context).parentBookingDAO();
     }
 
     @Override
@@ -50,8 +53,6 @@ public class DeleteExpenseMenuItem implements IMenuItem {
 
     @Override
     public void handleClick(ActionPayload actionPayload, Context context) {
-        initRepos(context);
-
         for (IRecyclerItem selectedExpense : actionPayload.getItems()) {
 
             if (selectedExpense instanceof ExpenseItem) {
@@ -64,11 +65,6 @@ public class DeleteExpenseMenuItem implements IMenuItem {
                 deleteChild((ChildExpenseItem) selectedExpense);
             }
         }
-    }
-
-    private void initRepos(Context context) {
-        bookingRepository = AppDatabase.getDatabase(context).bookingDAO();
-        parentBookingRepository = AppDatabase.getDatabase(context).parentBookingDAO();
     }
 
     private void deleteChild(ChildExpenseItem item) {

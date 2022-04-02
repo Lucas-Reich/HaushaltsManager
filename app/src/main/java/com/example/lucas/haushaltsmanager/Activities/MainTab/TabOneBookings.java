@@ -242,7 +242,7 @@ public class TabOneBookings extends AbstractTab implements
             mAdapter.remove(extractedItem);
 
             mAdapter.insert(new ExpenseItem(extractedExpense, (DateItem) extractedItem.getParent().getParent()));
-        }), this);
+        }, getContext()), this);
 
         mFABToolbar.addMenuItem(new CombineMenuItem((combinedExpense, removedItems) -> {
             for (IRecyclerItem removedItem : removedItems) {
@@ -250,7 +250,7 @@ public class TabOneBookings extends AbstractTab implements
             }
 
             mAdapter.insert(new ParentBookingItem(combinedExpense, (DateItem) removedItems.get(0).getParent()));
-        }), this);
+        }, getContext()), this);
 
         mFABToolbar.addMenuItem(new AddChildMenuItem(), this);
 
@@ -258,7 +258,7 @@ public class TabOneBookings extends AbstractTab implements
             mAdapter.remove(deletedItem);
 
             mRevertDeletionSnackbar.addItem(deletedItem);
-        }), this);
+        }, getContext()), this);
 
         mFABToolbar.addMenuItem(new TemplateMenuItem(templateBooking -> {
             Toast.makeText(TabOneBookings.this.getContext(), R.string.saved_as_template, Toast.LENGTH_SHORT).show();
