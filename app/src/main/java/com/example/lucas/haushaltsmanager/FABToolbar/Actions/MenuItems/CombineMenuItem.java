@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentManager;
 
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ParentBookingRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.BookingDAO;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ParentBookingDAO;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
@@ -29,7 +30,8 @@ public class CombineMenuItem implements IMenuItem {
 
     private final IActionKey mActionKey;
 
-    private final ParentBookingDAO parentBookingRepository;
+    private final ParentBookingDAO parentBookingDAO;
+    private final ParentBookingRepository parentBookingRepository;
     private final BookingDAO bookingRepository;
     private final OnSuccessCallback mCallback;
 
@@ -37,8 +39,10 @@ public class CombineMenuItem implements IMenuItem {
         mCallback = callback;
         mActionKey = new ActionKey(ACTION_KEY);
 
-        parentBookingRepository = AppDatabase.getDatabase(context).parentBookingDAO();
+        parentBookingDAO = AppDatabase.getDatabase(context).parentBookingDAO();
         bookingRepository = AppDatabase.getDatabase(context).bookingDAO();
+
+        parentBookingRepository = new ParentBookingRepository(parentBookingDAO, bookingRepository);
     }
 
     @Override
@@ -93,7 +97,7 @@ public class CombineMenuItem implements IMenuItem {
                 }
             }
 
-            parentBookingRepository.insert(parent);
+            parentBookingDAO.insert(parent, parent.getChildren());
 
             if (null != mCallback) {
                 mCallback.onSuccess(parent, removedItems);

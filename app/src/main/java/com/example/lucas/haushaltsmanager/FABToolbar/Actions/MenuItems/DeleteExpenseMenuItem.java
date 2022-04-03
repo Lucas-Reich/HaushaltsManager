@@ -3,6 +3,7 @@ package com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems;
 import android.content.Context;
 
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ParentBookingRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.BookingDAO;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ParentBookingDAO;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.ActionPayload;
@@ -21,14 +22,16 @@ public class DeleteExpenseMenuItem implements IMenuItem {
 
     private final OnSuccessCallback mCallback;
     private final BookingDAO bookingRepository;
-    private final ParentBookingDAO parentBookingRepository;
+    private final ParentBookingRepository parentBookingRepository;
 
     public DeleteExpenseMenuItem(OnSuccessCallback callback, Context context) {
         mCallback = callback;
         mActionKey = new ActionKey(ACTION_KEY);
 
         bookingRepository = AppDatabase.getDatabase(context).bookingDAO();
-        parentBookingRepository = AppDatabase.getDatabase(context).parentBookingDAO();
+
+        ParentBookingDAO parentBookingDAO = AppDatabase.getDatabase(context).parentBookingDAO();
+        parentBookingRepository = new ParentBookingRepository(parentBookingDAO, bookingRepository);
     }
 
     @Override

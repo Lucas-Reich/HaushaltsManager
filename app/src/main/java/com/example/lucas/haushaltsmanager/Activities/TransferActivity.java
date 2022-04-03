@@ -122,7 +122,7 @@ public class TransferActivity extends AbstractAppCompatActivity {
                 parent.addChild(mFromExpense);
                 parent.addChild(mToExpense);
 
-                parentBookingRepository.insert(parent);
+                parentBookingRepository.insert(parent, parent.getChildren());
 
                 Intent intent = new Intent(TransferActivity.this, ParentActivity.class);
                 TransferActivity.this.startActivity(intent);

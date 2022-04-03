@@ -19,5 +19,5 @@ interface BookingDAO {
     fun update(booking: Booking)
 
     @Delete
-    fun delete(booking: Booking) // TODO: Do not delete if booking has children attached
+    fun delete(booking: Booking)
 }

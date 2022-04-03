@@ -1,44 +1,24 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Insert
 import androidx.room.OnConflictStrategy.REPLACE
+import androidx.room.Query
 import com.example.lucas.haushaltsmanager.entities.booking.Booking
 import com.example.lucas.haushaltsmanager.entities.booking.ParentBooking
 import java.util.*
 
 @Dao
-abstract class ParentBookingDAO {
-
+interface ParentBookingDAO {
     @Query("SELECT * FROM parent_bookings JOIN bookings on parent_bookings.id = bookings.parent_id")
-    abstract fun getAll(): Map<ParentBooking, List<Booking>>
+    fun getAll(): Map<ParentBooking, List<Booking>>
 
     @Query("SELECT * FROM parent_bookings JOIN bookings on parent_bookings.id = bookings.parent_id WHERE bookings.id IN (:accountIds)")
-    abstract fun getAllWithAccounts(accountIds: List<UUID>): Map<ParentBooking, List<Booking>>
+    fun getAllWithAccounts(accountIds: List<UUID>): Map<ParentBooking, List<Booking>>
 
-    @Insert
-    fun insert(parentBooking: ParentBooking) {
-        insert(parentBooking, parentBooking.children)
-    }
+    @Query("DELETE FROM parent_bookings WHERE id = :parentId AND :parentId NOT IN (SELECT parent_id FROM bookings)")
+    fun deleteParentWhenNotReferenced(parentId: UUID)
 
     @Insert(onConflict = REPLACE)
-    abstract fun insert(parentBooking: ParentBooking, children: List<Booking>)
-
-    fun extractChildFromParent(childExpense: Booking): Booking {
-        childExpense.parentId = null // TODO: Check if parent needs to be deleted
-        updateChildBooking(childExpense)
-
-        return childExpense
-    }
-
-    @Update
-    abstract fun updateChildBooking(childBooking: Booking);
-
-    fun deleteChildBooking(childBooking: Booking) {
-        // TODO: Delete parent if child was the last one
-
-        delete(childBooking)
-    }
-
-    @Delete
-    abstract fun delete(childBooking: Booking)
+    fun insert(parentBooking: ParentBooking, children: List<Booking>)
 }

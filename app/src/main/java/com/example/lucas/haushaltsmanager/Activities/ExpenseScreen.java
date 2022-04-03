@@ -262,7 +262,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
                         parentBooking.addChild(mParentBooking);
                         parentBooking.addChild(mExpense);
 
-                        parentBookingRepository.insert(parentBooking);
+                        parentBookingRepository.insert(parentBooking, parentBooking.getChildren());
                     case INTENT_MODE_CREATE_BOOKING:
                         bookingRepository.insert(mExpense);
                         break;

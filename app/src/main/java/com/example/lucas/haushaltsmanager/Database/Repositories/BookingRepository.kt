@@ -7,7 +7,6 @@ class BookingRepository(
     private val bookingDAO: BookingDAO,
     private val parentBookingDAO: ParentBookingDAO
 ) {
-
     fun getBookingsWithAccount(accounts: List<UUID>): List<IBooking> {
         val bookings = bookingDAO.getAllWithAccounts(accounts)
 

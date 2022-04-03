@@ -3,6 +3,8 @@ package com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems;
 import android.content.Context;
 
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
+import com.example.lucas.haushaltsmanager.Database.Repositories.ParentBookingRepository;
+import com.example.lucas.haushaltsmanager.Database.Repositories.BookingDAO;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ParentBookingDAO;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.ActionPayload;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.ActionKey;
@@ -18,12 +20,15 @@ public class ExtractMenuItem implements IMenuItem {
     private final IActionKey mActionKey;
 
     private final OnSuccessCallback mCallback;
-    private final ParentBookingDAO parentBookingRepository;
+    private final ParentBookingRepository parentBookingRepository;
 
     public ExtractMenuItem(OnSuccessCallback callback, Context context) {
         mCallback = callback;
         mActionKey = new ActionKey(ACTION_KEY);
-        parentBookingRepository = AppDatabase.getDatabase(context).parentBookingDAO();
+
+        ParentBookingDAO parentBookingDAO = AppDatabase.getDatabase(context).parentBookingDAO();
+        BookingDAO bookingDAO = AppDatabase.getDatabase(context).bookingDAO();
+        parentBookingRepository = new ParentBookingRepository(parentBookingDAO, bookingDAO);
     }
 
     @Override
