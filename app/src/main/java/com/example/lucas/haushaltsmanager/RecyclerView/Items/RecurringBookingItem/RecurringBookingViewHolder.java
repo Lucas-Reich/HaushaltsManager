@@ -6,18 +6,15 @@ import android.widget.TextView;
 import androidx.annotation.ColorRes;
 
 import com.example.lucas.haushaltsmanager.App.app;
-import com.example.lucas.haushaltsmanager.Database.AppDatabase;
-import com.example.lucas.haushaltsmanager.Database.Repositories.CategoryDAO;
-import com.example.lucas.haushaltsmanager.entities.Category;
-import com.example.lucas.haushaltsmanager.entities.Price;
-import com.example.lucas.haushaltsmanager.entities.RecurringBooking;
+import com.example.lucas.haushaltsmanager.Database.Repositories.CategoryRepository;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.AbstractViewHolder;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.Views.MoneyTextView;
 import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
-
-import java.util.UUID;
+import com.example.lucas.haushaltsmanager.entities.Price;
+import com.example.lucas.haushaltsmanager.entities.RecurringBooking;
+import com.example.lucas.haushaltsmanager.entities.category.Category;
 
 public class RecurringBookingViewHolder extends AbstractViewHolder {
     // TODO: Dieser ViewHolder hat exakt die gleiche Struktur die auch der ExpenseViewHolder hat
@@ -28,9 +25,9 @@ public class RecurringBookingViewHolder extends AbstractViewHolder {
     private final TextView mTitle;
     private final MoneyTextView mPrice;
     private final TextView mPerson;
-    private final CategoryDAO categoryRepository;
+    private final CategoryRepository categoryRepository;
 
-    public RecurringBookingViewHolder(View itemView, CategoryDAO categoryRepository) {
+    public RecurringBookingViewHolder(View itemView, CategoryRepository categoryRepository) {
         super(itemView);
 
         mRoundedTextView = itemView.findViewById(R.id.recycler_view_expense_rounded_text_view);

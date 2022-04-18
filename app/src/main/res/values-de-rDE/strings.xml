@@ -200,4 +200,5 @@
     <string name="release_notes_15_code_improvements">Kleinere Anpassungen im Code</string>
     <string name="release_notes_17_migrate_android_x">Zu AndroidX migriert</string>
     <string name="initial_account_balance_booking_name">Initiale Buchung</string>
+    <string name="category_unassigned">Nich Zugeordnet</string>
 </resources>

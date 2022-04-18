@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import androidx.annotation.ColorRes;
 
 import com.example.lucas.haushaltsmanager.R;
+import com.example.lucas.haushaltsmanager.entities.category.Category;
 
 import java.text.NumberFormat;
 import java.text.ParseException;

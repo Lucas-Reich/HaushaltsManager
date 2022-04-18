@@ -9,7 +9,7 @@ import com.example.lucas.haushaltsmanager.ExpenseImporter.MappingList;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.AtomicParser.CategoryParser.RequiredFields.CategoryTitle;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.IParser;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.IRequiredField;
-import com.example.lucas.haushaltsmanager.entities.Category;
+import com.example.lucas.haushaltsmanager.entities.category.Category;
 import com.example.lucas.haushaltsmanager.entities.Color;
 import com.example.lucas.haushaltsmanager.entities.booking.ExpenseType;
 

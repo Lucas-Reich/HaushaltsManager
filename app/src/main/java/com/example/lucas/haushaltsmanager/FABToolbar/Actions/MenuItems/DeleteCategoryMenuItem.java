@@ -2,25 +2,25 @@ package com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems;
 
 import android.content.Context;
 
-import com.example.lucas.haushaltsmanager.Database.Repositories.CategoryDAO;
-import com.example.lucas.haushaltsmanager.entities.Category;
+import com.example.lucas.haushaltsmanager.Database.Repositories.CategoryRepository;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.ActionPayload;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.ActionKey;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.ActionKey.IActionKey;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.CategoryItem.CategoryItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
+import com.example.lucas.haushaltsmanager.entities.category.Category;
 
 public class DeleteCategoryMenuItem implements IMenuItem {
     public static final String ACTION_KEY = "deleteCategoryAction";
 
     private final OnSuccessCallback mCallback;
     private final IActionKey mActionKey = new ActionKey(ACTION_KEY);
-    private final CategoryDAO categoryRepository;
+    private final CategoryRepository categoryRepository;
 
     public DeleteCategoryMenuItem(
             OnSuccessCallback callback,
-            CategoryDAO categoryRepository
+            CategoryRepository categoryRepository
     ) {
         mCallback = callback;
         this.categoryRepository = categoryRepository;

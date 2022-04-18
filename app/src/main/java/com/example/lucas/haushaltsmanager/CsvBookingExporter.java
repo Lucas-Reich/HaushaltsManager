@@ -2,7 +2,6 @@ package com.example.lucas.haushaltsmanager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
 
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.Repositories.AccountDAO;
@@ -12,9 +11,9 @@ import com.example.lucas.haushaltsmanager.ExpenseImporter.SavingService.CachedCa
 import com.example.lucas.haushaltsmanager.Utils.CalendarUtils;
 import com.example.lucas.haushaltsmanager.Utils.FileUtils;
 import com.example.lucas.haushaltsmanager.entities.Account;
-import com.example.lucas.haushaltsmanager.entities.Category;
 import com.example.lucas.haushaltsmanager.entities.Directory;
 import com.example.lucas.haushaltsmanager.entities.booking.Booking;
+import com.example.lucas.haushaltsmanager.entities.category.Category;
 
 import java.io.File;
 import java.io.FileOutputStream;

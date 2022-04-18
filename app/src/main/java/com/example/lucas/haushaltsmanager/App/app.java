@@ -16,6 +16,7 @@ import kotlin.jvm.JvmStatic;
 
 public class app extends Application {
     public static final UUID transferCategoryId = UUID.fromString("eed05d4b-866d-4f20-b580-c50901066d73");
+    public static final UUID notAssignedCategoryId = UUID.fromString("58779da4-54cf-495f-82ae-163d38ca9a8c");
 
     private static final String CHANNEL_ID = "reminder";
     private static Context context;

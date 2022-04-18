@@ -2,9 +2,9 @@ package com.example.lucas.haushaltsmanager.Utils.ExpenseUtils;
 
 import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
-import com.example.lucas.haushaltsmanager.Database.Repositories.CategoryDAO;
-import com.example.lucas.haushaltsmanager.entities.Category;
+import com.example.lucas.haushaltsmanager.Database.Repositories.CategoryRepository;
 import com.example.lucas.haushaltsmanager.entities.booking.Booking;
+import com.example.lucas.haushaltsmanager.entities.category.Category;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -43,7 +43,7 @@ public class ExpenseGrouper {
     public HashMap<Category, List<Booking>> byCategory(List<Booking> expenses) {
         HashMap<Category, List<Booking>> groupedExpenses = new HashMap<>();
 
-        CategoryDAO categoryRepository = AppDatabase.getDatabase(app.getContext()).categoryDAO();
+        CategoryRepository categoryRepository = new CategoryRepository(AppDatabase.getDatabase(app.getContext()).categoryDAO());
 
         for (Booking expense : expenses) {
             Category expenseCategory = categoryRepository.get(expense.getCategoryId()); // TODO: Do differently

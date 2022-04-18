@@ -1,7 +1,7 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.SavingService;
 
 import com.example.lucas.haushaltsmanager.entities.Account;
-import com.example.lucas.haushaltsmanager.entities.Category;
+import com.example.lucas.haushaltsmanager.entities.category.Category;
 import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 
 public interface ISaver {

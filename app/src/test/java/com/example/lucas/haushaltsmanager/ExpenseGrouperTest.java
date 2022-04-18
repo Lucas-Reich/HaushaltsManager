@@ -3,7 +3,7 @@ package com.example.lucas.haushaltsmanager;
 import static org.junit.Assert.assertEquals;
 
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseGrouper;
-import com.example.lucas.haushaltsmanager.entities.Category;
+import com.example.lucas.haushaltsmanager.entities.category.Category;
 import com.example.lucas.haushaltsmanager.entities.Color;
 import com.example.lucas.haushaltsmanager.entities.Price;
 import com.example.lucas.haushaltsmanager.entities.booking.Booking;

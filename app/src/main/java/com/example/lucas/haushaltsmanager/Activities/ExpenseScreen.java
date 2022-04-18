@@ -14,7 +14,7 @@ import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.Database.Repositories.AccountDAO;
 import com.example.lucas.haushaltsmanager.Database.Repositories.BookingDAO;
-import com.example.lucas.haushaltsmanager.Database.Repositories.CategoryDAO;
+import com.example.lucas.haushaltsmanager.Database.Repositories.CategoryRepository;
 import com.example.lucas.haushaltsmanager.Database.Repositories.ParentBookingDAO;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
@@ -27,11 +27,11 @@ import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
 import com.example.lucas.haushaltsmanager.Utils.MoneyUtils;
 import com.example.lucas.haushaltsmanager.Views.SaveFloatingActionButton;
 import com.example.lucas.haushaltsmanager.entities.Account;
-import com.example.lucas.haushaltsmanager.entities.Category;
 import com.example.lucas.haushaltsmanager.entities.Currency;
 import com.example.lucas.haushaltsmanager.entities.Price;
 import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 import com.example.lucas.haushaltsmanager.entities.booking.ParentBooking;
+import com.example.lucas.haushaltsmanager.entities.category.Category;
 import com.example.lucas.haushaltsmanager.entities.template_booking.TemplateBooking;
 
 import java.util.Calendar;
@@ -54,7 +54,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
     private BookingDAO bookingRepository;
     private ParentBookingDAO parentBookingRepository;
     private AccountDAO accountRepo;
-    private CategoryDAO categoryRepository;
+    private CategoryRepository categoryRepository;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -65,7 +65,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
 
         bookingRepository = AppDatabase.getDatabase(this).bookingDAO();
         accountRepo = AppDatabase.getDatabase(this).accountDAO();
-        categoryRepository = AppDatabase.getDatabase(this).categoryDAO();
+        categoryRepository = new CategoryRepository(AppDatabase.getDatabase(this).categoryDAO());
         parentBookingRepository = AppDatabase.getDatabase(this).parentBookingDAO();
 
         initializeToolbar();

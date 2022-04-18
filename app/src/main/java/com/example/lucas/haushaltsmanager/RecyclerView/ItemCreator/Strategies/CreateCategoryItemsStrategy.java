@@ -1,6 +1,6 @@
 package com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.Strategies;
 
-import com.example.lucas.haushaltsmanager.entities.Category;
+import com.example.lucas.haushaltsmanager.entities.category.Category;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.CategoryItem.CategoryItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 

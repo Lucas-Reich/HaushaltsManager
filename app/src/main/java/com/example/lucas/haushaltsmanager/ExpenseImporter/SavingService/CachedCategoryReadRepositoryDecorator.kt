@@ -1,9 +1,8 @@
 package com.example.lucas.haushaltsmanager.ExpenseImporter.SavingService
 
 import com.example.lucas.haushaltsmanager.Database.Repositories.CategoryDAO
-import com.example.lucas.haushaltsmanager.entities.Category
+import com.example.lucas.haushaltsmanager.entities.category.Category
 import java.util.*
-import kotlin.collections.ArrayList
 
 class CachedCategoryReadRepositoryDecorator(
     private val repository: CategoryDAO

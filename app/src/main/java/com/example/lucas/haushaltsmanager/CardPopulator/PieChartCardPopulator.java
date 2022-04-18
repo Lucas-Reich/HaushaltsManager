@@ -6,11 +6,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 
-import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseFilter;
 import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSum;
-import com.example.lucas.haushaltsmanager.entities.Category;
+import com.example.lucas.haushaltsmanager.entities.category.Category;
 import com.example.lucas.haushaltsmanager.entities.Report;
 import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 import com.github.mikephil.charting.charts.PieChart;

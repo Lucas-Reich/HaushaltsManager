@@ -3,17 +3,15 @@ package com.example.lucas.haushaltsmanager.RecyclerView.Items.Booking.BookingIte
 import android.view.View;
 import android.widget.TextView;
 
-import com.example.lucas.haushaltsmanager.App.app;
-import com.example.lucas.haushaltsmanager.Database.AppDatabase;
-import com.example.lucas.haushaltsmanager.Database.Repositories.CategoryDAO;
+import com.example.lucas.haushaltsmanager.Database.Repositories.CategoryRepository;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.AbstractViewHolder;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.Views.MoneyTextView;
 import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
-import com.example.lucas.haushaltsmanager.entities.Category;
 import com.example.lucas.haushaltsmanager.entities.Price;
 import com.example.lucas.haushaltsmanager.entities.booking.Booking;
+import com.example.lucas.haushaltsmanager.entities.category.Category;
 
 public class ExpenseItemViewHolder extends AbstractViewHolder {
     private static final String TAG = ExpenseItemViewHolder.class.getSimpleName();
@@ -21,17 +19,17 @@ public class ExpenseItemViewHolder extends AbstractViewHolder {
     private final RoundedTextView roundedTextView;
     private final TextView title;
     private final TextView person;
-    private final CategoryDAO categoryRepository;
+    private final CategoryRepository categoryRepository;
     private final MoneyTextView price;
 
-    public ExpenseItemViewHolder(View itemView, CategoryDAO categoryDAO) {
+    public ExpenseItemViewHolder(View itemView, CategoryRepository categoryRepository) {
         super(itemView);
 
         roundedTextView = itemView.findViewById(R.id.recycler_view_expense_rounded_text_view);
         title = itemView.findViewById(R.id.recycler_view_expense_title);
         price = itemView.findViewById(R.id.recycler_view_expense_price);
         person = itemView.findViewById(R.id.recycler_view_expense_person);
-        this.categoryRepository = categoryDAO;
+        this.categoryRepository = categoryRepository;
     }
 
     @Override

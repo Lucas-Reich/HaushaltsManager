@@ -13,8 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
-import com.example.lucas.haushaltsmanager.Database.Repositories.CategoryDAO;
-import com.example.lucas.haushaltsmanager.entities.Category;
+import com.example.lucas.haushaltsmanager.Database.Repositories.CategoryRepository;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.ActionPayload;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.DeleteCategoryMenuItem;
 import com.example.lucas.haushaltsmanager.FABToolbar.Actions.MenuItems.IMenuItem;
@@ -27,6 +26,7 @@ import com.example.lucas.haushaltsmanager.RecyclerView.ItemCreator.RecyclerItemF
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.CategoryItem.CategoryItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem;
 import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.CategoryListRecyclerViewAdapter;
+import com.example.lucas.haushaltsmanager.entities.category.Category;
 
 import java.util.List;
 
@@ -37,7 +37,7 @@ public class CategoryList extends AbstractAppCompatActivity implements
     private RecyclerView mRecyclerView;
     private FABToolbarWithActionHandler mFabToolbar;
     private CategoryListRecyclerViewAdapter mRecyclerViewAdapter;
-    private CategoryDAO categoryRepo;
+    private CategoryRepository categoryRepository;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -48,7 +48,7 @@ public class CategoryList extends AbstractAppCompatActivity implements
         mRecyclerView.setLayoutManager(LayoutManagerFactory.vertical(this));
         mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, mRecyclerView, this));
 
-        categoryRepo = AppDatabase.getDatabase(this).categoryDAO();
+        categoryRepository = new CategoryRepository(AppDatabase.getDatabase(this).categoryDAO());
 
         mFabToolbar = new FABToolbarWithActionHandler(findViewById(R.id.category_list_fab_toolbar));
         mFabToolbar.setOnFabClickListener(this);
@@ -147,12 +147,12 @@ public class CategoryList extends AbstractAppCompatActivity implements
     }
 
     private List<IRecyclerItem> loadData() {
-        List<Category> categories = categoryRepo.getAll();
+        List<Category> categories = categoryRepository.getAll();
 
         return RecyclerItemFactory.createCategoryItems(categories);
     }
 
     private void setActionHandler() {
-        mFabToolbar.addMenuItem(new DeleteCategoryMenuItem(deletedItem -> mRecyclerViewAdapter.remove(deletedItem), categoryRepo), this);
+        mFabToolbar.addMenuItem(new DeleteCategoryMenuItem(deletedItem -> mRecyclerViewAdapter.remove(deletedItem), categoryRepository), this);
     }
 }

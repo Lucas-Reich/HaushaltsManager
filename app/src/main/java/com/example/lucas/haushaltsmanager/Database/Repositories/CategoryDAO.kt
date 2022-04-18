@@ -1,7 +1,7 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories
 
 import androidx.room.*
-import com.example.lucas.haushaltsmanager.entities.Category
+import com.example.lucas.haushaltsmanager.entities.category.Category
 import java.util.*
 
 @Dao

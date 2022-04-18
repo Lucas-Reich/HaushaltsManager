@@ -6,7 +6,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
-import com.example.lucas.haushaltsmanager.Database.Repositories.CategoryDAO;
+import com.example.lucas.haushaltsmanager.Database.Repositories.CategoryRepository;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.InsertStrategy.AppendInsertStrategy;
 import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.RecyclerViewItemHandler;
@@ -26,7 +26,7 @@ public class RecurringBookingsViewAdapter extends RecyclerViewItemHandler {
     @Override
     public AbstractViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        CategoryDAO categoryRepository = AppDatabase.getDatabase(parent.getContext()).categoryDAO();
+        CategoryRepository categoryRepository = new CategoryRepository(AppDatabase.getDatabase(parent.getContext()).categoryDAO());
 
         if (viewType == RecurringBookingItem.VIEW_TYPE) {
             return new RecurringBookingViewHolder(inflater.inflate(

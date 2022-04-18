@@ -3,7 +3,7 @@ package com.example.lucas.haushaltsmanager.entities.template_booking
 import android.os.Parcelable
 import androidx.room.Embedded
 import androidx.room.Relation
-import com.example.lucas.haushaltsmanager.entities.Category
+import com.example.lucas.haushaltsmanager.entities.category.Category
 import com.example.lucas.haushaltsmanager.entities.Price
 import kotlinx.parcelize.Parcelize
 import java.util.*

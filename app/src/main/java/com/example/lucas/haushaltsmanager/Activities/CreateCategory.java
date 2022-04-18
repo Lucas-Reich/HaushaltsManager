@@ -6,16 +6,16 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
-import com.example.lucas.haushaltsmanager.Database.Repositories.CategoryDAO;
+import com.example.lucas.haushaltsmanager.Database.Repositories.CategoryRepository;
 import com.example.lucas.haushaltsmanager.Dialogs.BasicTextInputDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ColorPickerDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
-import com.example.lucas.haushaltsmanager.entities.booking.ExpenseType;
-import com.example.lucas.haushaltsmanager.entities.Category;
-import com.example.lucas.haushaltsmanager.entities.Color;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
 import com.example.lucas.haushaltsmanager.Views.RoundedTextView;
+import com.example.lucas.haushaltsmanager.entities.Color;
+import com.example.lucas.haushaltsmanager.entities.booking.ExpenseType;
+import com.example.lucas.haushaltsmanager.entities.category.Category;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class CreateCategory extends AbstractAppCompatActivity {
@@ -30,14 +30,14 @@ public class CreateCategory extends AbstractAppCompatActivity {
     private RoundedTextView mColorView;
     private FloatingActionButton mSaveFAB;
 
-    private CategoryDAO categoryRepo;
+    private CategoryRepository categoryRepository;
 
     @Override
     protected void onCreate(Bundle savedInstances) {
         super.onCreate(savedInstances);
         setContentView(R.layout.activity_new_category);
 
-        categoryRepo = AppDatabase.getDatabase(this).categoryDAO();
+        categoryRepository = new CategoryRepository(AppDatabase.getDatabase(this).categoryDAO());
 
         initializeToolbar();
 
@@ -114,10 +114,10 @@ public class CreateCategory extends AbstractAppCompatActivity {
 
             switch (bundle.getString(INTENT_MODE, INTENT_MODE_CREATE)) {
                 case INTENT_MODE_CREATE:
-                    categoryRepo.insert(mCategory);
+                    categoryRepository.insert(mCategory);
                     break;
                 case INTENT_MODE_UPDATE:
-                    categoryRepo.update(mCategory);
+                    categoryRepository.update(mCategory);
                     break;
             }
 

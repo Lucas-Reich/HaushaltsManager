@@ -10,7 +10,7 @@ import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.BookingParser.B
 import com.example.lucas.haushaltsmanager.ExpenseImporter.Parser.IRequiredField;
 import com.example.lucas.haushaltsmanager.ExpenseImporter.SavingService.ISaver;
 import com.example.lucas.haushaltsmanager.entities.Account;
-import com.example.lucas.haushaltsmanager.entities.Category;
+import com.example.lucas.haushaltsmanager.entities.category.Category;
 import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 
 import java.util.ArrayList;

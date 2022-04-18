@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager.entities
+package com.example.lucas.haushaltsmanager.entities.category
 
 import android.os.Parcelable
 import androidx.room.ColumnInfo
@@ -6,6 +6,8 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.lucas.haushaltsmanager.App.app
 import com.example.lucas.haushaltsmanager.R
+import com.example.lucas.haushaltsmanager.entities.Color
+import com.example.lucas.haushaltsmanager.entities.UUIDParceler
 import com.example.lucas.haushaltsmanager.entities.booking.ExpenseType
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.WriteWith
@@ -13,7 +15,7 @@ import java.util.*
 
 @Parcelize
 @Entity(tableName = "categories")
-class Category(
+open class Category(
     @PrimaryKey val id: @WriteWith<UUIDParceler> UUID,
     var name: String,
     var color: Color,

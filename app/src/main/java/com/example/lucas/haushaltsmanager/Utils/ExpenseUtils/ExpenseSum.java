@@ -1,6 +1,6 @@
 package com.example.lucas.haushaltsmanager.Utils.ExpenseUtils;
 
-import com.example.lucas.haushaltsmanager.entities.Category;
+import com.example.lucas.haushaltsmanager.entities.category.Category;
 import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 
 import java.util.HashMap;

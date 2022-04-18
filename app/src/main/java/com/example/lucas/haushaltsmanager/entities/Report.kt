@@ -7,6 +7,7 @@ import com.example.lucas.haushaltsmanager.Utils.ExpenseUtils.ExpenseSum
 import com.example.lucas.haushaltsmanager.entities.Color.Companion.white
 import com.example.lucas.haushaltsmanager.entities.booking.Booking
 import com.example.lucas.haushaltsmanager.entities.booking.ExpenseType.Companion.deposit
+import com.example.lucas.haushaltsmanager.entities.category.Category
 import java.util.*
 
 class Report(var title: String, val bookings: MutableList<Booking>) {
