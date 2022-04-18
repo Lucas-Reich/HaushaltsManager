@@ -13,6 +13,13 @@ class ParentBooking(
     val title: String,
     @Ignore val children: ArrayList<Booking>
 ): IBooking {
+
+    init {
+        for(child in children) {
+            child.parentId = id
+        }
+    }
+
     constructor(title: String) : this(
         UUID.randomUUID(),
         Calendar.getInstance(),

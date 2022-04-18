@@ -68,6 +68,9 @@ dependencies {
 
     // Dependencies welche benötigt werden, um die AndroidTests auszuführen
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    def androidXTestVersion = "1.4.0"
+    androidTestImplementation "androidx.test:runner:$androidXTestVersion"
+    androidTestImplementation "androidx.test:rules:$androidXTestVersion"
 
     // API welche ich benutze um Hintergrundaufgaben laufen zu lassen
     def work_manager_version = "2.7.1"

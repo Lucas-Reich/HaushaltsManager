@@ -1,6 +1,7 @@
 package com.example.lucas.haushaltsmanager.Database.Repositories
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy.REPLACE
 import androidx.room.Query
@@ -17,7 +18,7 @@ interface ParentBookingDAO {
     fun getAllWithAccounts(accountIds: List<UUID>): Map<ParentBooking, List<Booking>>
 
     @Query("DELETE FROM parent_bookings WHERE id = :parentId AND :parentId NOT IN (SELECT parent_id FROM bookings)")
-    fun deleteParentWhenNotReferenced(parentId: UUID)
+    fun deleteParentWhenNotReferenced(parentId: UUID) // TODO: Should I replace this logic with a trigger that whenever a Booking is deleted checks if the corresponding parent can be deleted as well
 
     @Insert(onConflict = REPLACE)
     fun insert(parentBooking: ParentBooking, children: List<Booking>)

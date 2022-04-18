@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 public class ColorTest {
@@ -20,9 +21,10 @@ public class ColorTest {
 
         // Act
         Parcel parcel = writeToParcel(color);
-        Color createdFromParcel = Color.CREATOR.createFromParcel(parcel);
+        Object createdFromParcel = Color.CREATOR.createFromParcel(parcel);
 
         // Assert
+        assertTrue(createdFromParcel instanceof Color);
         assertEquals(color, createdFromParcel);
     }
 
