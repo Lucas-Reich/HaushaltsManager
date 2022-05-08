@@ -10,12 +10,13 @@ import androidx.work.WorkRequest;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
+import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Worker.WorkRequestBuilder;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import java.util.List;
 
-abstract class AbstractRecurringWorker extends Worker {
+abstract class AbstractRecurringWorker extends Worker { // TODO: Replace with recurring work functionality from WorkManager: https://medium.com/androiddevelopers/workmanager-periodicity-ff35185ff006
     private static final String TAG = AbstractRecurringWorker.class.getSimpleName();
 
     AbstractRecurringWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
@@ -24,7 +25,7 @@ abstract class AbstractRecurringWorker extends Worker {
 
     static boolean isWorkerScheduled(String tag) {
         ListenableFuture<List<WorkInfo>> statuses = WorkManager
-                .getInstance()
+                .getInstance(app.getContext()) // TODO: Don't use the app.getContext() method
                 .getWorkInfosByTag(tag);
 
         try {

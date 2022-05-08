@@ -3,9 +3,9 @@ package com.example.lucas.haushaltsmanager.Views;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
-import android.view.View;
 
 import androidx.annotation.DrawableRes;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.example.lucas.haushaltsmanager.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -26,14 +26,11 @@ public class SaveFloatingActionButton extends FloatingActionButton {
     }
 
     public void setOnClickListener(final OnClickListener listener) {
-        setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mEnabled)
-                    listener.onCheckClick();
-                else
-                    listener.onCrossClick();
-            }
+        setOnClickListener(v -> {
+            if (mEnabled)
+                listener.onCheckClick();
+            else
+                listener.onCrossClick();
         });
     }
 
@@ -61,7 +58,7 @@ public class SaveFloatingActionButton extends FloatingActionButton {
     }
 
     private Drawable getDrawableRes(@DrawableRes int drawable) {
-        return getContext().getResources().getDrawable(drawable);
+        return ResourcesCompat.getDrawable(getContext().getResources(), drawable, null);
     }
 
     public interface OnClickListener {

@@ -26,7 +26,7 @@ public class RevertExpenseDeletionSnackbar {
     private final List<IRecyclerItem> mItems;
     private final BookingDAO bookingRepository;
     private final ParentBookingDAO parentBookingRepository;
-    private String mSnackbarMessage;
+    private String mSnackbarMessage = "";
     private OnExpenseRestoredListener mBetterListener;
 
     public RevertExpenseDeletionSnackbar(Context context) {
@@ -34,8 +34,6 @@ public class RevertExpenseDeletionSnackbar {
 
         bookingRepository = AppDatabase.getDatabase(context).bookingDAO();
         parentBookingRepository = AppDatabase.getDatabase(context).parentBookingDAO();
-
-        mSnackbarMessage = "";
     }
 
     public void setOnExpenseRestoredListener(OnExpenseRestoredListener listener) {
