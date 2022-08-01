@@ -11,25 +11,23 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.work.ExistingWorkPolicy;
-import androidx.work.OneTimeWorkRequest;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
-import androidx.work.WorkRequest;
 
 import com.codekidlabs.storagechooser.StorageChooser;
 import com.example.lucas.haushaltsmanager.Dialogs.ConfirmationDialog;
 import com.example.lucas.haushaltsmanager.Dialogs.SingleChoiceDialog;
-import com.example.lucas.haushaltsmanager.entities.Backup;
-import com.example.lucas.haushaltsmanager.entities.Directory;
-import com.example.lucas.haushaltsmanager.entities.Notification;
-import com.example.lucas.haushaltsmanager.entities.Time;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.AppInternalPreferences;
 import com.example.lucas.haushaltsmanager.PreferencesHelper.UserSettingsPreferences;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.WeekdayUtils;
-import com.example.lucas.haushaltsmanager.Worker.PeriodicWorker.BackupWorker;
-import com.example.lucas.haushaltsmanager.Worker.PeriodicWorker.NotificationWorker;
-import com.example.lucas.haushaltsmanager.Worker.WorkRequestBuilder;
+import com.example.lucas.haushaltsmanager.worker.periodicWorker.BackupWorker;
+import com.example.lucas.haushaltsmanager.worker.periodicWorker.NotificationWorker;
+import com.example.lucas.haushaltsmanager.entities.Backup;
+import com.example.lucas.haushaltsmanager.entities.Directory;
+import com.example.lucas.haushaltsmanager.entities.Notification;
+import com.example.lucas.haushaltsmanager.entities.Time;
 
 import java.util.Arrays;
 
@@ -249,16 +247,16 @@ public class Settings extends AbstractAppCompatActivity {
     private void scheduleBackupWorker() {
         Backup backup = new Backup(null);
 
-        WorkRequest backupWorkRequest = WorkRequestBuilder.from(backup);
-        WorkManager.getInstance(this).enqueueUniqueWork(
+        PeriodicWorkRequest backupWorkRequest = BackupWorker.createWorkRequest(backup);
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
                 BackupWorker.WORKER_TAG,
-                ExistingWorkPolicy.REPLACE,
-                (OneTimeWorkRequest) backupWorkRequest
+                ExistingPeriodicWorkPolicy.REPLACE,
+                backupWorkRequest
         );
     }
 
     private void stopBackupWorker() {
-        BackupWorker.cancelWorker(this);
+        BackupWorker.stopWorker(this);
     }
 
     /**
@@ -339,11 +337,11 @@ public class Settings extends AbstractAppCompatActivity {
                 R.mipmap.ic_launcher
         );
 
-        WorkRequest notificationWorkRequest = WorkRequestBuilder.from(notification);
-        WorkManager.getInstance(this).enqueueUniqueWork(
+        PeriodicWorkRequest notificationWorkRequest = NotificationWorker.createWorkRequest(notification);
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
                 NotificationWorker.WORKER_TAG,
-                ExistingWorkPolicy.REPLACE,
-                (OneTimeWorkRequest) notificationWorkRequest
+                ExistingPeriodicWorkPolicy.REPLACE,
+                notificationWorkRequest
         );
     }
 
@@ -381,8 +379,6 @@ public class Settings extends AbstractAppCompatActivity {
         mUserSettings.setReminderTime(time);
         notificationTimeTxt.setText(time.toString());
 
-        if (NotificationWorker.isRunning()) {
-            scheduleNotificationWorker();
-        }
+        scheduleNotificationWorker();
     }
 }

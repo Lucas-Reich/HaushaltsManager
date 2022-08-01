@@ -5,8 +5,8 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
-import androidx.work.WorkRequest;
 
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookingDAO;
@@ -17,10 +17,10 @@ import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.Utils.BundleUtils;
 import com.example.lucas.haushaltsmanager.Utils.CalendarUtils;
 import com.example.lucas.haushaltsmanager.Views.SaveFloatingActionButton;
-import com.example.lucas.haushaltsmanager.Worker.WorkRequestBuilder;
-import com.example.lucas.haushaltsmanager.entities.booking.Booking;
+import com.example.lucas.haushaltsmanager.worker.periodicWorker.RecurringBookingWorker;
 import com.example.lucas.haushaltsmanager.entities.Frequency;
 import com.example.lucas.haushaltsmanager.entities.RecurringBooking;
+import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 
 import java.util.Calendar;
 
@@ -136,7 +136,8 @@ public class EditRecurringBooking extends AbstractAppCompatActivity {
     }
 
     private void scheduleWorkRequestFor(RecurringBooking recurringBooking) {
-        WorkRequest recurringBookingWorkRequest = WorkRequestBuilder.from(recurringBooking);
+        PeriodicWorkRequest recurringBookingWorkRequest = RecurringBookingWorker.createWorkRequest(recurringBooking);
+
         WorkManager.getInstance(this).enqueue(recurringBookingWorkRequest);
     }
 

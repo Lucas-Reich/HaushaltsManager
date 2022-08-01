@@ -4,7 +4,13 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/HaushaltsManager.iml" filepath="$PROJECT_DIR$/HaushaltsManager.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/HaushaltsManager.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/HaushaltsManager.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/HaushaltsManager.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/HaushaltsManager.app.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/HaushaltsManager.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/HaushaltsManager.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/HaushaltsManager.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/HaushaltsManager.app.unitTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/changelogdialog/HaushaltsManager.changelogdialog.iml" filepath="$PROJECT_DIR$/.idea/modules/changelogdialog/HaushaltsManager.changelogdialog.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/changelogdialog/HaushaltsManager.changelogdialog.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/changelogdialog/HaushaltsManager.changelogdialog.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/changelogdialog/HaushaltsManager.changelogdialog.main.iml" filepath="$PROJECT_DIR$/.idea/modules/changelogdialog/HaushaltsManager.changelogdialog.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/changelogdialog/HaushaltsManager.changelogdialog.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/changelogdialog/HaushaltsManager.changelogdialog.unitTest.iml" />
     </modules>
   </component>
 </project>

@@ -1,4 +1,4 @@
-package com.example.lucas.haushaltsmanager.Worker
+package com.example.lucas.haushaltsmanager.worker
 
 import android.content.Context
 import androidx.work.*
