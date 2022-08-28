@@ -53,7 +53,6 @@ class DragAndDropActivity : AbstractAppCompatActivity(), View.OnDragListener {
     }
 
     private fun setUpTabView() {
-        // TODO: Can I save the configuration so that I can add the configuration to whatever new widget is added to the dropzone?
         val viewPager: ViewPager2 = findViewById(R.id.view_pager)
         viewPager.adapter = object : FragmentStateAdapter(this) {
             override fun getItemCount(): Int = 2
@@ -73,8 +72,12 @@ class DragAndDropActivity : AbstractAppCompatActivity(), View.OnDragListener {
             }
         }
 
-        // TODO: How to properly set the title of the page
-        TabLayoutMediator(configurationTabView, viewPager) { tab, position -> tab.text = "OBJECT ${{ position + 1 }}" }.attach()
+        TabLayoutMediator(configurationTabView, viewPager) { tab, position ->
+            tab.text = when (position) {
+                1 -> "Configuration"
+                else -> "Date Selection"
+            }
+        }.attach()
     }
 
     override fun onDrag(targetView: View?, event: DragEvent?): Boolean {
