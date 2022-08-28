@@ -5,13 +5,13 @@ import android.util.Log
 import android.view.DragEvent
 import android.view.View
 import android.widget.Button
-import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import com.example.lucas.haushaltsmanager.Activities.AbstractAppCompatActivity
+import com.example.lucas.haushaltsmanager.Activities.DragAndDropActivity.BottomSheetTabs.OnConfigurationChanged
 import com.example.lucas.haushaltsmanager.Activities.DragAndDropActivity.BottomSheetTabs.TabOneDate
 import com.example.lucas.haushaltsmanager.Activities.DragAndDropActivity.BottomSheetTabs.TabTwoConfiguration
 import com.example.lucas.haushaltsmanager.Activities.LayoutManagerFactory
@@ -24,13 +24,12 @@ import com.example.lucas.haushaltsmanager.ReportBuilder.Point
 import com.example.lucas.haushaltsmanager.ReportBuilder.RecyclerViewItem.WidgetViewItems.LineChartCardViewItem
 import com.example.lucas.haushaltsmanager.ReportBuilder.RecyclerViewItem.WidgetViewItems.PieChartCardViewItem
 import com.example.lucas.haushaltsmanager.ReportBuilder.Widgets.Widget
-import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.example.lucas.haushaltsmanager.entities.booking.Booking
 import com.google.android.material.tabs.TabLayout
 
 class DragAndDropActivity : AbstractAppCompatActivity(), View.OnDragListener {
     private lateinit var recyclerView: RecyclerView
     private lateinit var dropZoneCard: DropZoneCard
-    private lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,7 +40,7 @@ class DragAndDropActivity : AbstractAppCompatActivity(), View.OnDragListener {
         setUpRecyclerView()
 
         // Open bottom sheet modal to get configuration for the widget
-        setUpBottomSheet()
+        setUpTabView()
 
         // Show preview of data in the configurator or should I just display dummy data?
 
@@ -49,23 +48,7 @@ class DragAndDropActivity : AbstractAppCompatActivity(), View.OnDragListener {
 
         findViewById<ConstraintLayout>(R.id.drop_zone_root).setOnDragListener(this)
 
-        val dropZoneView: CardView = findViewById(R.id.drop_zone)
-        dropZoneView.setOnClickListener {
-            // get tapped view
-
-            // blur background
-
-            // move view to upper third of the screen
-            it.animate().x(0.toFloat()).y(0.toFloat()).duration = 2000
-
-            // increase size of selected view
-
-            // open bottom sheet modal
-            if (bottomSheetBehavior.state != BottomSheetBehavior.STATE_EXPANDED) {
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-            }
-        }
-        dropZoneCard = DropZoneCard(dropZoneView)
+        dropZoneCard = DropZoneCard(findViewById(R.id.drop_zone))
 
         findViewById<Button>(R.id.drop_zone_1).setOnClickListener { dropZoneCard.setDropZoneCount(1) }
         findViewById<Button>(R.id.drop_zone_2).setOnClickListener { dropZoneCard.setDropZoneCount(2) }
@@ -81,9 +64,15 @@ class DragAndDropActivity : AbstractAppCompatActivity(), View.OnDragListener {
             }
 
             override fun getItem(position: Int): Fragment {
+                val tabOne = TabOneDate()
+                tabOne.setOnConfigurationChangedListener(object : OnConfigurationChanged {
+                    override fun configurationChanged(configurationObject: ConfigurationObject) {
+                        dropZoneCard.updateConfiguration(configurationObject)
+                    }
+                })
                 return when (position) {
                     1 -> TabTwoConfiguration()
-                    else -> TabOneDate()
+                    else -> tabOne
                 }
             }
 
@@ -97,16 +86,6 @@ class DragAndDropActivity : AbstractAppCompatActivity(), View.OnDragListener {
 
         val tabLayout: TabLayout = findViewById(R.id.tab_layout)
         tabLayout.setupWithViewPager(viewPager)
-    }
-
-    private fun setUpBottomSheet() {
-        bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottomSheet))
-        bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {}
-            override fun onStateChanged(bottomSheet: View, newState: Int) {}
-        })
-
-        setUpTabView()
     }
 
     override fun onDrag(targetView: View?, event: DragEvent?): Boolean {
@@ -148,5 +127,17 @@ class DragAndDropActivity : AbstractAppCompatActivity(), View.OnDragListener {
         items.add(LineChartCardViewItem(this))
 
         recyclerView.adapter = CardViewRecyclerViewAdapter(items, AppendInsertStrategy())
+    }
+}
+
+class ConfigurationObject {
+    private var bookings: ArrayList<Booking> = ArrayList()
+
+    fun addBookings(bookings: List<Booking>) {
+        this.bookings.addAll(bookings)
+    }
+
+    fun getBookings(): List<Booking> {
+        return this.bookings
     }
 }

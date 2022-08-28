@@ -1,21 +1,26 @@
 package com.example.lucas.haushaltsmanager.ReportBuilder;
 
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 
+import com.example.lucas.haushaltsmanager.Activities.DragAndDropActivity.ConfigurationObject;
 import com.example.lucas.haushaltsmanager.ReportBuilder.Widgets.Widget;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class DropZoneCard {
     private int dropZoneCount;
     private final CardView cardView;
+    private final HashMap<Integer, Widget> widgetMap;
 
     public DropZoneCard(@NonNull CardView cardView) {
         this.cardView = cardView;
         this.dropZoneCount = 3;
+        widgetMap = new HashMap<>();
     }
 
     public void addDroppedView(Widget widget, Point point) {
@@ -28,6 +33,7 @@ public class DropZoneCard {
         configureChildView(widgetView, dropZoneId);
 
         addView(widgetView, dropZoneId);
+        widgetMap.put(dropZoneId, widget);
     }
 
     public void setDropZoneCount(int dropZoneCount) {
@@ -35,6 +41,13 @@ public class DropZoneCard {
 
         cardView.removeAllViews();
         cardView.invalidate();
+    }
+
+    public void updateConfiguration(ConfigurationObject configuration) {
+        for (Map.Entry<Integer, Widget> entry : widgetMap.entrySet()) {
+            Widget value = entry.getValue();
+            value.updateView(configuration);
+        }
     }
 
     private void addView(View view, int zoneId) {
@@ -69,6 +82,7 @@ public class DropZoneCard {
         }
 
         cardView.removeView(oldView);
+        widgetMap.remove(dropZoneId);
     }
 
     private int translateCoordinatesToDropzone(Point dropPoint) {

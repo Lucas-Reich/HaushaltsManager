@@ -10,27 +10,31 @@ import com.example.lucas.haushaltsmanager.ReportBuilder.RecyclerViewItem.WidgetV
 import com.example.lucas.haushaltsmanager.ReportBuilder.Widgets.Widget
 
 class WidgetViewHolder(itemView: View) : AbstractViewHolder(itemView), View.OnLongClickListener {
-    private val iconHolder: ImageView = itemView.findViewById(R.id.imageView)
+    private val iconHolder: ImageView
     private var widget: Widget? = null
 
     override fun bind(item: IRecyclerItem) {
         if (item !is CardViewItem) {
-            throw IllegalArgumentException(String.format(
-                "Could not bind '%s' to ViewHolder of type '%s'!",
-                item.javaClass.toString(),
-                WidgetViewHolder::class.java
-            ))
+            throw IllegalArgumentException(
+                String.format(
+                    "Could not bind '%s' to ViewHolder of type '%s'!",
+                    item.javaClass.toString(),
+                    WidgetViewHolder::class.java
+                )
+            )
         }
         widget = item.content
 
         setWidgetIcon(item.content.icon)
+
+        itemView.setOnLongClickListener(this)
     }
 
     override fun onLongClick(v: View): Boolean {
         v.startDragAndDrop(
             ClipData.newPlainText("widget_tag", "widget_tag"),
             View.DragShadowBuilder(v),
-            widget,
+            widget?.cloneWidget(v.context), // The widget needs to be cloned so that the contained view is newly instantiated, otherwise adding the same widget twice would cause the app to crash
             0
         )
 
@@ -39,5 +43,9 @@ class WidgetViewHolder(itemView: View) : AbstractViewHolder(itemView), View.OnLo
 
     private fun setWidgetIcon(widgetIcon: Int) {
         iconHolder.setImageResource(widgetIcon)
+    }
+
+    init {
+        this.iconHolder = itemView.findViewById(R.id.imageView)
     }
 }
