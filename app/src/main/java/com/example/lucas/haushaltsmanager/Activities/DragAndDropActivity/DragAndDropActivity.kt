@@ -7,9 +7,9 @@ import android.view.View
 import android.widget.Button
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentPagerAdapter
 import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager.widget.ViewPager
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.ViewPager2
 import com.example.lucas.haushaltsmanager.Activities.AbstractAppCompatActivity
 import com.example.lucas.haushaltsmanager.Activities.DragAndDropActivity.BottomSheetTabs.OnConfigurationChanged
 import com.example.lucas.haushaltsmanager.Activities.DragAndDropActivity.BottomSheetTabs.TabOneDate
@@ -26,10 +26,12 @@ import com.example.lucas.haushaltsmanager.ReportBuilder.RecyclerViewItem.WidgetV
 import com.example.lucas.haushaltsmanager.ReportBuilder.Widgets.Widget
 import com.example.lucas.haushaltsmanager.entities.booking.Booking
 import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 
 class DragAndDropActivity : AbstractAppCompatActivity(), View.OnDragListener {
     private lateinit var recyclerView: RecyclerView
     private lateinit var dropZoneCard: DropZoneCard
+    private lateinit var configurationTabView: TabLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,12 +41,8 @@ class DragAndDropActivity : AbstractAppCompatActivity(), View.OnDragListener {
         recyclerView.setOnDragListener(this)
         setUpRecyclerView()
 
-        // Open bottom sheet modal to get configuration for the widget
+        configurationTabView = findViewById(R.id.tab_layout)
         setUpTabView()
-
-        // Show preview of data in the configurator or should I just display dummy data?
-
-        // Save widgets and their configuration in db
 
         findViewById<ConstraintLayout>(R.id.drop_zone_root).setOnDragListener(this)
 
@@ -56,36 +54,28 @@ class DragAndDropActivity : AbstractAppCompatActivity(), View.OnDragListener {
     }
 
     private fun setUpTabView() {
-        // TODO: Add configuration options inside tabs
-        val viewPager: ViewPager = findViewById(R.id.view_pager)
-        viewPager.adapter = object : FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
-            override fun getCount(): Int {
-                return 2
-            }
+        // TODO: Can I save the configuration so that I can add the configuration to whatever new widget is added to the dropzone?
+        val viewPager: ViewPager2 = findViewById(R.id.view_pager)
+        viewPager.adapter = object : FragmentStateAdapter(this) {
+            override fun getItemCount(): Int = 2
 
-            override fun getItem(position: Int): Fragment {
+            override fun createFragment(position: Int): Fragment {
                 val tabOne = TabOneDate()
                 tabOne.setOnConfigurationChangedListener(object : OnConfigurationChanged {
                     override fun configurationChanged(configurationObject: ConfigurationObject) {
                         dropZoneCard.updateConfiguration(configurationObject)
                     }
                 })
+
                 return when (position) {
                     1 -> TabTwoConfiguration()
                     else -> tabOne
                 }
             }
-
-            override fun getPageTitle(position: Int): CharSequence {
-                return when (position) {
-                    1 -> "Chart Conf"
-                    else -> "Booking Conf"
-                }
-            }
         }
 
-        val tabLayout: TabLayout = findViewById(R.id.tab_layout)
-        tabLayout.setupWithViewPager(viewPager)
+        // TODO: How to properly set the title of the page
+        TabLayoutMediator(configurationTabView, viewPager) { tab, position -> tab.text = "OBJECT ${{ position + 1 }}" }.attach()
     }
 
     override fun onDrag(targetView: View?, event: DragEvent?): Boolean {
