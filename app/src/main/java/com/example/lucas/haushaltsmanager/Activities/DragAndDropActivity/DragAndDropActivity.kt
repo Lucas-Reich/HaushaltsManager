@@ -81,6 +81,12 @@ class DragAndDropActivity : AbstractAppCompatActivity(), View.OnDragListener {
     }
 
     override fun onDrag(targetView: View?, event: DragEvent?): Boolean {
+        // TODO: Can I show a preview when the user hovers the widget over an area but hasn't dropped it yet?
+        //  This can also be used instead of the buttons selecting the amount of widget within the card.
+        //  If the User hovers a new widget over the card and and there is still a zone free the widget currently in the dropzone becomes smaller.
+        //  If there is no zone left the dropped view would replace the one currently below it.
+        //  .
+        //  The only question would be how to remove widgets from the card without directly setting a new one.
         when (event?.action) {
             DragEvent.ACTION_DRAG_STARTED -> return true
             DragEvent.ACTION_DRAG_ENTERED -> return true
