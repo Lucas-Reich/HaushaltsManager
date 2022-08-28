@@ -18,7 +18,7 @@ public class LineChartWidget implements Widget {
     private LineChart lineChart;
 
     public LineChartWidget(Context context) {
-        this.lineChart = initChartWithDefaultValues(context);
+        this.lineChart = new LineChart(context);
     }
 
     @Override
@@ -60,19 +60,5 @@ public class LineChartWidget implements Widget {
         }
 
         return new LineData(new LineDataSet(dataSet, "Meine Daten"));
-    }
-
-    private LineChart initChartWithDefaultValues(Context context) {
-        LineChart chart = new LineChart(context);
-
-        chart.setData(new LineData(new LineDataSet(new ArrayList<Entry>() {{
-            add(new Entry(0, 30));
-            add(new Entry(5, 60));
-            add(new Entry(10, 120));
-            add(new Entry(15, 240));
-            add(new Entry(20, 480));
-        }}, "Meine Daten")));
-
-        return chart;
     }
 }

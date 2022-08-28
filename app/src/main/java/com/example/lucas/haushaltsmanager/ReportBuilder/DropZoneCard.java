@@ -16,13 +16,13 @@ public class DropZoneCard {
     private int dropZoneCount;
     private final CardView cardView;
     private final HashMap<Integer, Widget> widgetMap;
-    private ConfigurationObject configuration; // TODO: I could pre-populate the configuration here to not do it in the Widget implementation
+    private ConfigurationObject configuration;
 
     public DropZoneCard(@NonNull CardView cardView) {
         this.cardView = cardView;
         this.dropZoneCount = 3;
         widgetMap = new HashMap<>();
-        configuration = new ConfigurationObject();
+        configuration = ConfigurationObject.createWithDefaults();
     }
 
     public void addDroppedView(Widget widget, Point point) {

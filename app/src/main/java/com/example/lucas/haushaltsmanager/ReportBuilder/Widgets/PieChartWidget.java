@@ -18,7 +18,7 @@ public class PieChartWidget implements Widget {
     private PieChart pieChart;
 
     public PieChartWidget(Context context) {
-        this.pieChart = initChartWithDefaultValues(context);
+        this.pieChart = new PieChart(context);
     }
 
     @Override
@@ -57,17 +57,5 @@ public class PieChartWidget implements Widget {
         }
 
         return new PieData(new PieDataSet(dataSet, "Meine Daten"));
-    }
-
-    private PieChart initChartWithDefaultValues(Context context) {
-        PieChart chart = new PieChart(context);
-
-        chart.setData(new PieData(new PieDataSet(
-                new ArrayList<PieEntry>() {{
-                    add(new PieEntry(100f, "Eintrag"));
-                }}, "Test"
-        )));
-
-        return chart;
     }
 }
