@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.example.lucas.haushaltsmanager.Activities.AbstractAppCompatActivity
-import com.example.lucas.haushaltsmanager.Activities.DragAndDropActivity.BottomSheetTabs.OnConfigurationChanged
+import com.example.lucas.haushaltsmanager.Activities.DragAndDropActivity.BottomSheetTabs.OnConfigurationChangeListener
 import com.example.lucas.haushaltsmanager.Activities.DragAndDropActivity.BottomSheetTabs.TabOneDate
 import com.example.lucas.haushaltsmanager.Activities.DragAndDropActivity.BottomSheetTabs.TabTwoConfiguration
 import com.example.lucas.haushaltsmanager.Activities.LayoutManagerFactory
@@ -24,7 +24,6 @@ import com.example.lucas.haushaltsmanager.ReportBuilder.Point
 import com.example.lucas.haushaltsmanager.ReportBuilder.RecyclerViewItem.WidgetViewItems.LineChartCardViewItem
 import com.example.lucas.haushaltsmanager.ReportBuilder.RecyclerViewItem.WidgetViewItems.PieChartCardViewItem
 import com.example.lucas.haushaltsmanager.ReportBuilder.Widgets.Widget
-import com.example.lucas.haushaltsmanager.entities.booking.Booking
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
@@ -61,8 +60,8 @@ class DragAndDropActivity : AbstractAppCompatActivity(), View.OnDragListener {
 
             override fun createFragment(position: Int): Fragment {
                 val tabOne = TabOneDate()
-                tabOne.setOnConfigurationChangedListener(object : OnConfigurationChanged {
-                    override fun configurationChanged(configurationObject: ConfigurationObject) {
+                tabOne.setOnConfigurationChangedListener(object : OnConfigurationChangeListener {
+                    override fun onConfigurationChange(configurationObject: ConfigurationObject) {
                         dropZoneCard.updateConfiguration(configurationObject)
                     }
                 })
@@ -120,14 +119,3 @@ class DragAndDropActivity : AbstractAppCompatActivity(), View.OnDragListener {
     }
 }
 
-class ConfigurationObject {
-    private var bookings: ArrayList<Booking> = ArrayList()
-
-    fun addBookings(bookings: List<Booking>) {
-        this.bookings.addAll(bookings)
-    }
-
-    fun getBookings(): List<Booking> {
-        return this.bookings
-    }
-}

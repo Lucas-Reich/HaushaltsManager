@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.RecyclerView
 import com.example.lucas.haushaltsmanager.Activities.DragAndDropActivity.ConfigurationObject
 import com.example.lucas.haushaltsmanager.R
 import com.example.lucas.haushaltsmanager.entities.Price
@@ -14,7 +13,7 @@ import com.example.lucas.haushaltsmanager.entities.booking.Booking
 import java.util.*
 
 class TabOneDate : Fragment() {
-    private lateinit var configurationListener: OnConfigurationChanged
+    private lateinit var configurationListener: OnConfigurationChangeListener
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.dnd_tab_one_date, container, false)
@@ -25,7 +24,7 @@ class TabOneDate : Fragment() {
         return rootView
     }
 
-    fun setOnConfigurationChangedListener(listener: OnConfigurationChanged) {
+    fun setOnConfigurationChangedListener(listener: OnConfigurationChangeListener) {
         this.configurationListener = listener
     }
 
@@ -40,10 +39,6 @@ class TabOneDate : Fragment() {
         val configuration = ConfigurationObject()
         configuration.addBookings(bookings)
 
-        configurationListener.configurationChanged(configuration)
+        configurationListener.onConfigurationChange(configuration)
     }
-}
-
-interface OnConfigurationChanged {
-    fun configurationChanged(configurationObject: ConfigurationObject)
 }
