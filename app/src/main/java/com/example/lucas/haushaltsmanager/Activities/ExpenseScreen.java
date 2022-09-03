@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import androidx.annotation.Nullable;
 
 import com.example.lucas.haushaltsmanager.Activities.MainTab.ParentActivity;
+import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.Database.Repositories.AccountDAO;
 import com.example.lucas.haushaltsmanager.Database.Repositories.BookingDAO;
@@ -210,7 +211,7 @@ public class ExpenseScreen extends AbstractAppCompatActivity {
                 mExpense = new Booking(
                         getString(R.string.no_name),
                         new Price(0D),
-                        UUID.randomUUID(),
+                        app.notAssignedCategoryId,
                         mUserPreferences.getActiveAccount().getId()
                 );
                 break;

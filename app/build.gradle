@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-parcelize'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 32 // Android 13
@@ -58,7 +59,8 @@ dependencies {
     // Database stuff
     def room_version = "2.4.3"
     implementation "androidx.room:room-runtime:$room_version"
-    annotationProcessor "androidx.room:room-compiler:$room_version"
+//    annotationProcessor "androidx.room:room-compiler:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
 
 
     // Library um den Hintergrund weichzuzeichnen
@@ -87,4 +89,14 @@ dependencies {
 
     implementation "androidx.core:core-ktx:1.8.0"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+
+    // Room Query builder for generating dynamic room queries: https://github.com/andob/ROOM-Dynamic-Dao
+    implementation 'ro.andob.fieldschema:annotations:0.3.4'
+    kapt 'ro.andob.fieldschema:fs-processor:0.3.4'
+    kapt 'ro.andob.fieldschema:ts-processor-room:0.3.4'
+
+    def dynamic_dao_version = "1.2.1"
+    implementation ("ro.andob.roomdynamicdao:dyndao:$dynamic_dao_version") { exclude group: 'androidx.room' }
+    implementation "ro.andob.roomdynamicdao:basefilter:$dynamic_dao_version"
 }

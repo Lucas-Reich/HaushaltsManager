@@ -7,22 +7,33 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 
 import com.example.lucas.haushaltsmanager.Activities.DragAndDropActivity.ConfigurationObject;
+import com.example.lucas.haushaltsmanager.App.app;
+import com.example.lucas.haushaltsmanager.Database.AppDatabase;
+import com.example.lucas.haushaltsmanager.Database.Repositories.BookingDAO;
+import com.example.lucas.haushaltsmanager.Database.Repositories.BookingRepository;
 import com.example.lucas.haushaltsmanager.ReportBuilder.Widgets.Widget;
+import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class DropZoneCard {
     private int dropZoneCount;
     private final CardView cardView;
     private final HashMap<Integer, Widget> widgetMap;
     private ConfigurationObject configuration;
+    private final BookingDAO bookingRepository;
 
     public DropZoneCard(@NonNull CardView cardView) {
         this.cardView = cardView;
         this.dropZoneCount = 3;
         widgetMap = new HashMap<>();
         configuration = ConfigurationObject.createWithDefaults();
+
+        bookingRepository = AppDatabase.getDatabase(cardView.getContext()).bookingDAO();
     }
 
     public void addDroppedView(Widget widget, Point point) {
@@ -30,7 +41,7 @@ public class DropZoneCard {
 
         removeExistingViewFromZone(dropZoneId);
 
-        widget.updateView(configuration);
+        widget.updateView(getBookingsForConfiguration());
         View widgetView = widget.getView();
 
         configureChildView(widgetView, dropZoneId);
@@ -48,11 +59,20 @@ public class DropZoneCard {
 
     public void updateConfiguration(ConfigurationObject configuration) {
         this.configuration = configuration;
+        List<Booking> bookings = getBookingsForConfiguration();
 
         for (Map.Entry<Integer, Widget> entry : widgetMap.entrySet()) {
             Widget value = entry.getValue();
-            value.updateView(this.configuration);
+            value.updateView(bookings);
         }
+    }
+
+    private List<Booking> getBookingsForConfiguration() {
+        if (null == this.configuration.getQuery()) {
+            return ConfigurationObject.createWithDefaults().getBookings();
+        }
+
+        return bookingRepository.getFilteredList(this.configuration.getQuery());
     }
 
     private void addView(View view, int zoneId) {

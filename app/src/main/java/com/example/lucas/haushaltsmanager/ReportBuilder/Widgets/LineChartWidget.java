@@ -3,7 +3,6 @@ package com.example.lucas.haushaltsmanager.ReportBuilder.Widgets;
 import android.content.Context;
 import android.view.View;
 
-import com.example.lucas.haushaltsmanager.Activities.DragAndDropActivity.ConfigurationObject;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 import com.github.mikephil.charting.charts.LineChart;
@@ -32,8 +31,8 @@ public class LineChartWidget implements Widget {
     }
 
     @Override
-    public void updateView(ConfigurationObject configuration) {
-        LineData data = createDataFromBookings(configuration.getBookings());
+    public void updateView(List<Booking> bookings) {
+        LineData data = createDataFromBookings(bookings);
 
         lineChart.setData(data);
 

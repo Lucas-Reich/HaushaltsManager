@@ -15,10 +15,10 @@ import com.example.lucas.haushaltsmanager.Database.Repositories.ParentBookingDAO
 import com.example.lucas.haushaltsmanager.Database.Repositories.RecurringBookingDAO;
 import com.example.lucas.haushaltsmanager.Database.Repositories.TemplateBookingDAO;
 import com.example.lucas.haushaltsmanager.entities.Account;
-import com.example.lucas.haushaltsmanager.entities.category.Category;
 import com.example.lucas.haushaltsmanager.entities.RecurringBooking;
 import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 import com.example.lucas.haushaltsmanager.entities.booking.ParentBooking;
+import com.example.lucas.haushaltsmanager.entities.category.Category;
 import com.example.lucas.haushaltsmanager.entities.template_booking.TemplateBookingWithoutCategory;
 
 @Database(entities = {Account.class, Booking.class, ParentBooking.class, Category.class, TemplateBookingWithoutCategory.class, RecurringBooking.class}, version = 1, exportSchema = false)

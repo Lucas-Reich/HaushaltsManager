@@ -73,10 +73,7 @@ class DragAndDropActivity : AbstractAppCompatActivity(), View.OnDragListener {
         }
 
         TabLayoutMediator(configurationTabView, viewPager) { tab, position ->
-            tab.text = when (position) {
-                1 -> "Configuration"
-                else -> "Date Selection"
-            }
+            tab.text = "Tab ${position + 1}"
         }.attach()
     }
 

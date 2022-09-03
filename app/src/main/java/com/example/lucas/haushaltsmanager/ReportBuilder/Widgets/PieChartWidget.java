@@ -3,7 +3,6 @@ package com.example.lucas.haushaltsmanager.ReportBuilder.Widgets;
 import android.content.Context;
 import android.view.View;
 
-import com.example.lucas.haushaltsmanager.Activities.DragAndDropActivity.ConfigurationObject;
 import com.example.lucas.haushaltsmanager.R;
 import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 import com.github.mikephil.charting.charts.PieChart;
@@ -32,8 +31,8 @@ public class PieChartWidget implements Widget {
     }
 
     @Override
-    public void updateView(ConfigurationObject configuration) {
-        PieData pieData = createDataFromBookings(configuration.getBookings());
+    public void updateView(List<Booking> bookings) {
+        PieData pieData = createDataFromBookings(bookings);
 
         this.pieChart.setData(pieData);
 

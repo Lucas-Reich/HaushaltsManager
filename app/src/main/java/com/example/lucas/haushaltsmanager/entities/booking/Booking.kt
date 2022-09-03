@@ -5,6 +5,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.lucas.haushaltsmanager.entities.Price
+import com.yatatsu.fieldschema.annotations.FieldSchemaClass
 import kotlinx.parcelize.Parcelize
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -12,6 +13,7 @@ import java.util.*
 
 @Entity(tableName = "bookings")
 @Parcelize
+@FieldSchemaClass
 class Booking(
     @PrimaryKey val id: UUID,
     var title: String,
@@ -67,6 +69,6 @@ class Booking(
 
     @Deprecated("Do not use")
     fun isSet(): Boolean { // TODO: Create booking builder
-        return title.isEmpty()
+        return !title.isEmpty()
     }
 }

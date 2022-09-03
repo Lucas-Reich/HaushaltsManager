@@ -6,6 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
+import androidx.sqlite.db.SimpleSQLiteQuery
+import com.example.lucas.haushaltsmanager.Activities.DragAndDropActivity.BookingFilter
+import com.example.lucas.haushaltsmanager.Activities.DragAndDropActivity.BookingQueryBuilder
 import com.example.lucas.haushaltsmanager.Activities.DragAndDropActivity.ConfigurationObject
 import com.example.lucas.haushaltsmanager.R
 import com.example.lucas.haushaltsmanager.entities.Price
@@ -38,6 +41,13 @@ class TabOneDate : Fragment() {
 
         val configuration = ConfigurationObject()
         configuration.addBookings(bookings)
+
+        val filter = BookingFilter()
+        filter.accountId = "7C4F706EB81641A0B5B036708D0D4489"
+        configuration.addQuery(BookingQueryBuilder(filter).build())
+
+//        val query = SimpleSQLiteQuery("Select * from bookings where account_id = '6E68C2AD5C8E422BB3E986DD13BB5C67';")
+//        configuration.addQuery(query)
 
         configurationListener.onConfigurationChange(configuration)
     }
