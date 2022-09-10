@@ -7,20 +7,16 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 
 import com.example.lucas.haushaltsmanager.Activities.DragAndDropActivity.ConfigurationObject;
-import com.example.lucas.haushaltsmanager.App.app;
 import com.example.lucas.haushaltsmanager.Database.AppDatabase;
 import com.example.lucas.haushaltsmanager.Database.Repositories.BookingDAO;
-import com.example.lucas.haushaltsmanager.Database.Repositories.BookingRepository;
 import com.example.lucas.haushaltsmanager.ReportBuilder.Widgets.Widget;
 import com.example.lucas.haushaltsmanager.entities.booking.Booking;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
-public class DropZoneCard {
+public class DropZoneCard implements View.OnLongClickListener {
     private int dropZoneCount;
     private final CardView cardView;
     private final HashMap<Integer, Widget> widgetMap;
@@ -29,11 +25,18 @@ public class DropZoneCard {
 
     public DropZoneCard(@NonNull CardView cardView) {
         this.cardView = cardView;
+        this.cardView.setOnLongClickListener(this);
         this.dropZoneCount = 3;
         widgetMap = new HashMap<>();
         configuration = ConfigurationObject.createWithDefaults();
 
         bookingRepository = AppDatabase.getDatabase(cardView.getContext()).bookingDAO();
+    }
+
+    @Override
+    public boolean onLongClick(View view) {
+        // TODO: Get coordinates
+        return false;
     }
 
     public void addDroppedView(Widget widget, Point point) {

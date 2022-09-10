@@ -1,6 +1,6 @@
 package com.example.lucas.haushaltsmanager.Activities.DragAndDropActivity
 
-import androidx.sqlite.db.SimpleSQLiteQuery
+import androidx.sqlite.db.SupportSQLiteQuery
 import com.example.lucas.haushaltsmanager.entities.Price
 import com.example.lucas.haushaltsmanager.entities.booking.Booking
 import java.util.*
@@ -9,7 +9,7 @@ import java.util.*
  * This object is used to transfer data between the configuration tabs e.g. TabOneDate and the widgets currently in the dropzone.
  */
 class ConfigurationObject {
-    private var query: SimpleSQLiteQuery? = null
+    private var query: SupportSQLiteQuery? = null
     private var bookings: ArrayList<Booking> = ArrayList()
 
     companion object {
@@ -33,7 +33,7 @@ class ConfigurationObject {
         this.bookings.addAll(bookings)
     }
 
-    fun addQuery(query: SimpleSQLiteQuery) {
+    fun addQuery(query: SupportSQLiteQuery) {
         this.query = query
     }
 
@@ -41,7 +41,7 @@ class ConfigurationObject {
         return this.bookings
     }
 
-    fun getQuery(): SimpleSQLiteQuery? {
+    fun getQuery(): SupportSQLiteQuery? {
         return this.query
     }
 }

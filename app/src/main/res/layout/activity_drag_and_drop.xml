@@ -52,8 +52,8 @@
             app:layout_constraintStart_toEndOf="@+id/drop_zone_2"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/drop_zone"
+        <com.example.lucas.haushaltsmanager.ReportBuilder.DropZoneCardKt
+            android:id="@+id/drop_zone_card"
             android:layout_width="0dp"
             android:layout_height="250dp"
             app:cardBackgroundColor="#000000"
