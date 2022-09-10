@@ -11,6 +11,7 @@ import com.example.lucas.haushaltsmanager.Database.AppDatabase
 import com.example.lucas.haushaltsmanager.Database.Repositories.BookingDAO
 import com.example.lucas.haushaltsmanager.ReportBuilder.Widgets.Widget
 import com.example.lucas.haushaltsmanager.entities.booking.Booking
+import kotlin.math.floor
 
 class DropZoneCardKt @JvmOverloads constructor(
     context: Context,
@@ -76,26 +77,13 @@ class DropZoneCardKt @JvmOverloads constructor(
             LinearLayout.LayoutParams.MATCH_PARENT
         )
 
-        view.x = dropZoneId.toFloat() * widgetWidth.toFloat()
+        view.x = (dropZoneId * widgetWidth).toFloat()
     }
 
     private fun translateCoordinatesToDropzone(point: Point, dropZoneCount: Int): Int {
         val zoneWidth = width / dropZoneCount
 
-        for (zone in 0 until dropZoneCount) {
-            val zoneStart = zone * zoneWidth
-            val zoneEnd = zoneStart + zoneWidth
-
-            if (isPointInRange(point, zoneStart, zoneEnd)) {
-                return zone
-            }
-        }
-
-        throw RuntimeException("Registered Drop outside of DropZone")
-    }
-
-    private fun isPointInRange(point: Point, startX: Int, endX: Int): Boolean {
-        return point.x >= startX && point.x < endX
+        return floor(point.x / zoneWidth).toInt()
     }
 
     private fun getBookingsForConfiguration(): List<Booking> {
