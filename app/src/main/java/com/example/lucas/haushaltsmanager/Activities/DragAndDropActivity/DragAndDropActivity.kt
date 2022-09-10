@@ -36,7 +36,7 @@ class DragAndDropActivity : AbstractAppCompatActivity(), View.OnDragListener {
 
         recyclerView = findViewById(R.id.recycler_view)
         recyclerView.setOnDragListener(this)
-        setUpRecyclerView()
+        setUpWidgetListRecyclerView()
 
         configurationTabView = findViewById(R.id.tab_layout)
         setUpTabView()
@@ -74,17 +74,27 @@ class DragAndDropActivity : AbstractAppCompatActivity(), View.OnDragListener {
         when (event?.action) {
             DragEvent.ACTION_DRAG_STARTED -> return true
             DragEvent.ACTION_DRAG_ENTERED -> return true
-            DragEvent.ACTION_DRAG_LOCATION -> return true
-            DragEvent.ACTION_DRAG_EXITED -> return true
+            DragEvent.ACTION_DRAG_LOCATION -> {
+                if (targetView != dropZoneCardKt) {
+                    return false
+                }
+
+                dropZoneCardKt.addWidgetWithPreview(event.localState as Widget, Point.fromDragEvent(event))
+            }
+            DragEvent.ACTION_DRAG_EXITED -> {
+                if (targetView != dropZoneCardKt) {
+                    return false
+                }
+
+                dropZoneCardKt.removeWidget(event.localState as Widget)
+            }
             DragEvent.ACTION_DRAG_ENDED -> return true
             DragEvent.ACTION_DROP -> {
                 if (targetView != dropZoneCardKt) {
-                    return true
+                    return false
                 }
 
-                val widget: Widget = event.localState as Widget
-
-                dropZoneCardKt.addWidgetAutoAssignDropzone(widget, Point.fromDragEvent(event))
+                dropZoneCardKt.addPreview()
                 return true
             }
             else -> Log.e("DragDrop Example", "Unknown action type received by OnDragListener.")
@@ -93,54 +103,7 @@ class DragAndDropActivity : AbstractAppCompatActivity(), View.OnDragListener {
         return false
     }
 
-//    override fun onDragShowPreview(targetView: View?, event: DragEvent?): Boolean {
-//        // TODO: Can I show a preview when the user hovers the widget over an area but hasn't dropped it yet?
-//        //  This can also be used instead of the buttons selecting the amount of widget within the card.
-//        //  If the User hovers a new widget over the card and and there is still a zone free the widget currently in the dropzone becomes smaller.
-//        //  If there is no zone left the dropped view would replace the one currently below it.
-//        //  .
-//        //  The only question would be how to remove widgets from the card without directly setting a new one.
-//        when (event?.action) {
-//            DragEvent.ACTION_DRAG_STARTED -> return true
-//            DragEvent.ACTION_DRAG_ENTERED -> {
-//                if (targetView != dropZoneCardKt) {
-//                    return false
-//                }
-//
-//                // TODO: Try add widget if enough space
-//                val widget: Widget = event.localState as Widget
-//                Log.e("DragAndDropActivity", "Drag Entered X: ${event.x}, Y: ${event.y}")
-//                dropZoneCardKt.tryAddWidget(widget, Point.fromDragEvent(event))
-//
-//                return true
-//            }
-//            DragEvent.ACTION_DRAG_LOCATION -> return true
-//            DragEvent.ACTION_DRAG_EXITED -> {
-//                // TODO: Try remove widget if added
-//                val widget: Widget = event.localState as Widget
-//                dropZoneCardKt.tryRemoveWidget(widget)
-//
-//                return true
-//            }
-//            DragEvent.ACTION_DRAG_ENDED -> return true
-//            DragEvent.ACTION_DROP -> {
-//                if (targetView != dropZoneCardKt) {
-//                    return false
-//                }
-//                // TODO: Replace hovered view if not added by drag_entered
-//
-//                val widget: Widget = event.localState as Widget
-//
-//                dropZoneCardKt.tryAddWidget(widget, Point.fromDragEvent(event))
-//                return true
-//            }
-//            else -> Log.e("DragDrop Example", "Unknown action type received by OnDragListener.")
-//        }
-//
-//        return false
-//    }
-
-    private fun setUpRecyclerView() {
+    private fun setUpWidgetListRecyclerView() {
         recyclerView.layoutManager = LayoutManagerFactory.horizontal(this)
 
         val items: MutableList<IRecyclerItem> = ArrayList()
