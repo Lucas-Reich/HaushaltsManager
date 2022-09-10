@@ -2,6 +2,8 @@ package com.example.lucas.haushaltsmanager.ReportBuilder
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.Log
+import android.view.DragEvent
 import android.view.MotionEvent
 import android.view.View
 import android.widget.LinearLayout
@@ -29,8 +31,30 @@ class DropZoneCardKt @JvmOverloads constructor(
         bookingRepository = AppDatabase.getDatabase(context).bookingDAO()
     }
 
-    // TODO: Add OnDragListener method from DragAndDropActivity by overriding onDragEvent method
     // TODO: Remove widget on long click or long click and remove view by dragging
+
+    override fun onDragEvent(event: DragEvent?): Boolean {
+        when (event?.action) {
+            DragEvent.ACTION_DRAG_STARTED -> return true
+            DragEvent.ACTION_DRAG_ENTERED -> return true
+            DragEvent.ACTION_DRAG_LOCATION -> {
+                addWidgetWithPreview(event.localState as Widget, Point.fromDragEvent(event))
+                return true
+            }
+            DragEvent.ACTION_DRAG_EXITED -> {
+                removeWidget(event.localState as Widget)
+                return true
+            }
+            DragEvent.ACTION_DRAG_ENDED -> return true
+            DragEvent.ACTION_DROP -> {
+                overriddenWidget = null
+                return true
+            }
+            else -> Log.e("DragDrop Example", "Unknown action type received by OnDragListener.")
+        }
+
+        return false
+    }
 
     fun addWidgetAutoAssignDropzone(newWidget: Widget, point: Point) {
         newWidget.updateView(getBookingsForConfiguration())
@@ -80,10 +104,6 @@ class DropZoneCardKt @JvmOverloads constructor(
 
         removeView(widget.view)
         drawWidgets()
-    }
-
-    fun addPreview() {
-        overriddenWidget = null
     }
 
     fun updateConfiguration(configuration: ConfigurationObject) {

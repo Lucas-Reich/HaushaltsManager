@@ -1,9 +1,6 @@
 package com.example.lucas.haushaltsmanager.Activities.DragAndDropActivity
 
 import android.os.Bundle
-import android.util.Log
-import android.view.DragEvent
-import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -18,14 +15,12 @@ import com.example.lucas.haushaltsmanager.RecyclerView.AdditionalFunctionality.I
 import com.example.lucas.haushaltsmanager.RecyclerView.Items.IRecyclerItem
 import com.example.lucas.haushaltsmanager.RecyclerView.ListAdapter.CardViewRecyclerViewAdapter
 import com.example.lucas.haushaltsmanager.ReportBuilder.DropZoneCardKt
-import com.example.lucas.haushaltsmanager.ReportBuilder.Point
 import com.example.lucas.haushaltsmanager.ReportBuilder.RecyclerViewItem.WidgetViewItems.LineChartCardViewItem
 import com.example.lucas.haushaltsmanager.ReportBuilder.RecyclerViewItem.WidgetViewItems.PieChartCardViewItem
-import com.example.lucas.haushaltsmanager.ReportBuilder.Widgets.Widget
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
-class DragAndDropActivity : AbstractAppCompatActivity(), View.OnDragListener {
+class DragAndDropActivity : AbstractAppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var configurationTabView: TabLayout
     private lateinit var dropZoneCardKt: DropZoneCardKt
@@ -35,14 +30,12 @@ class DragAndDropActivity : AbstractAppCompatActivity(), View.OnDragListener {
         setContentView(R.layout.activity_drag_and_drop)
 
         recyclerView = findViewById(R.id.recycler_view)
-        recyclerView.setOnDragListener(this)
         setUpWidgetListRecyclerView()
 
         configurationTabView = findViewById(R.id.tab_layout)
         setUpTabView()
 
         dropZoneCardKt = findViewById(R.id.drop_zone_card)
-        dropZoneCardKt.setOnDragListener(this)
     }
 
     private fun setUpTabView() {
@@ -68,39 +61,6 @@ class DragAndDropActivity : AbstractAppCompatActivity(), View.OnDragListener {
         TabLayoutMediator(configurationTabView, viewPager) { tab, position ->
             tab.text = "Tab ${position + 1}"
         }.attach()
-    }
-
-    override fun onDrag(targetView: View?, event: DragEvent?): Boolean {
-        when (event?.action) {
-            DragEvent.ACTION_DRAG_STARTED -> return true
-            DragEvent.ACTION_DRAG_ENTERED -> return true
-            DragEvent.ACTION_DRAG_LOCATION -> {
-                if (targetView != dropZoneCardKt) {
-                    return false
-                }
-
-                dropZoneCardKt.addWidgetWithPreview(event.localState as Widget, Point.fromDragEvent(event))
-            }
-            DragEvent.ACTION_DRAG_EXITED -> {
-                if (targetView != dropZoneCardKt) {
-                    return false
-                }
-
-                dropZoneCardKt.removeWidget(event.localState as Widget)
-            }
-            DragEvent.ACTION_DRAG_ENDED -> return true
-            DragEvent.ACTION_DROP -> {
-                if (targetView != dropZoneCardKt) {
-                    return false
-                }
-
-                dropZoneCardKt.addPreview()
-                return true
-            }
-            else -> Log.e("DragDrop Example", "Unknown action type received by OnDragListener.")
-        }
-
-        return false
     }
 
     private fun setUpWidgetListRecyclerView() {
