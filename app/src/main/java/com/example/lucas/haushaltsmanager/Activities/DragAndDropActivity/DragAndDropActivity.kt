@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.DragEvent
 import android.view.View
-import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -44,10 +43,6 @@ class DragAndDropActivity : AbstractAppCompatActivity(), View.OnDragListener {
 
         dropZoneCardKt = findViewById(R.id.drop_zone_card)
         dropZoneCardKt.setOnDragListener(this)
-
-        findViewById<Button>(R.id.drop_zone_1).setOnClickListener { dropZoneCardKt.setDropzoneCount(1) }
-        findViewById<Button>(R.id.drop_zone_2).setOnClickListener { dropZoneCardKt.setDropzoneCount(2) }
-        findViewById<Button>(R.id.drop_zone_3).setOnClickListener { dropZoneCardKt.setDropzoneCount(3) }
     }
 
     private fun setUpTabView() {
@@ -89,7 +84,7 @@ class DragAndDropActivity : AbstractAppCompatActivity(), View.OnDragListener {
 
                 val widget: Widget = event.localState as Widget
 
-                dropZoneCardKt.addDroppedView(widget, Point.fromDragEvent(event))
+                dropZoneCardKt.addWidgetAutoAssignDropzone(widget, Point.fromDragEvent(event))
                 return true
             }
             else -> Log.e("DragDrop Example", "Unknown action type received by OnDragListener.")

@@ -17,9 +17,8 @@ class DropZoneCardKt @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : CardView(context, attrs, defStyleAttr) {
-    private var dropZoneCount = 3
-    private var maxDropZoneCount = 3
-    private val widgetMap: HashMap<Int, Widget> = HashMap()
+    private val maxDropZoneCount = 3
+    private var widgetMap: HashMap<Int, Widget> = HashMap()
     private var configuration: ConfigurationObject
     private val bookingRepository: BookingDAO
 
@@ -32,25 +31,49 @@ class DropZoneCardKt @JvmOverloads constructor(
     // TODO: Dynamically reassign size of current widgets if a view is added or removed
     // TODO: Remove widget on long click
 
-    fun addDroppedView(widget: Widget, point: Point) {
-        val dropZoneId = translateCoordinatedToDropzone(point)
+    fun addWidgetAutoAssignDropzone(newWidget: Widget, point: Point) {
+        newWidget.updateView(getBookingsForConfiguration())
 
-        removeExistingViewFromZone(dropZoneId)
+        // get dropzone of new widget, dropzone is now current count + 1 if less than maxCount
+        if (widgetMap.size < maxDropZoneCount) { // Max widget count is not yet reached, new widget can simply be added
+            val tempWidgetMap = HashMap<Int, Widget>()
 
-        widget.updateView(getBookingsForConfiguration())
-        val widgetView = widget.view
+            // get dropZone for new widget
+            val dropZoneIdOfNewWidget = translateCoordinatesToDropzone(point, widgetMap.size + 1)
 
-        configureChildView(widgetView, dropZoneId)
+            // add new widget to tempWidgetMap
+            tempWidgetMap[dropZoneIdOfNewWidget] = newWidget
 
-        addViewInternal(widgetView, dropZoneId)
-        widgetMap.put(dropZoneId, widget)
-    }
+            // add currently added widgets to tempWidgetMap all widgets with dropZoneId >= newWidgetDropZone need to be increase by 1
+            widgetMap.forEach { (dropZone, widget) ->
+                if (dropZone >= dropZoneIdOfNewWidget) {
+                    tempWidgetMap[dropZone + 1] = widget
+                } else {
+                    tempWidgetMap[dropZone] = widget
+                }
+            }
 
-    fun setDropzoneCount(dropZoneCount: Int) {
-        this.dropZoneCount = dropZoneCount
+            // overwrite current widgetMap with updatedWidgetMap
+            widgetMap = tempWidgetMap
+        } else { // Max widget count is already reached => currently added widget at dropZone needs to be replaced with new widget
+            // get dropZone for new widget
+            val dropZoneId = translateCoordinatesToDropzone(point, widgetMap.size)
 
+            // replace current widget at dropZone
+            widgetMap[dropZoneId] = newWidget
+        }
+
+        // remove current child views
         removeAllViews()
-        invalidate()
+
+        // redraw card
+        widgetMap.forEach { (dropZone, widget) ->
+            val widgetView = widget.view
+
+            configureChildView(widgetView, dropZone)
+
+            addView(widgetView)
+        }
     }
 
     fun updateConfiguration(configuration: ConfigurationObject) {
@@ -61,13 +84,6 @@ class DropZoneCardKt @JvmOverloads constructor(
         widgetMap.forEach { (dropZone, widget) -> widget.updateView(bookings) }
     }
 
-    private fun addViewInternal(view: View, dropZoneId: Int) {
-        view.id = dropZoneId
-        addView(view)
-
-        invalidate()
-    }
-
     private fun configureChildView(view: View, dropZoneId: Int) {
         view.setOnTouchListener { v: View, event: MotionEvent? -> (v.parent as View).onTouchEvent(event) } // Propagates child click to parent
 
@@ -75,24 +91,17 @@ class DropZoneCardKt @JvmOverloads constructor(
     }
 
     private fun addLayoutConstraintsToChild(view: View, dropZoneId: Int) {
-        val widgetWidth = width / dropZoneCount
+        val widgetWidth = width / widgetMap.size
 
         view.layoutParams = LinearLayout.LayoutParams(
             widgetWidth,
-            height
+            LinearLayout.LayoutParams.MATCH_PARENT
         )
 
         view.x = dropZoneId.toFloat() * widgetWidth.toFloat()
     }
 
-    private fun removeExistingViewFromZone(dropZoneId: Int) {
-        val oldView = findViewById<View>(dropZoneId) ?: return
-
-        removeView(oldView)
-        widgetMap.remove(dropZoneId)
-    }
-
-    private fun translateCoordinatedToDropzone(point: Point): Int {
+    private fun translateCoordinatesToDropzone(point: Point, dropZoneCount: Int): Int {
         val zoneWidth = width / dropZoneCount
 
         for (zone in 0 until dropZoneCount) {
