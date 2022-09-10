@@ -18,7 +18,7 @@ class DropZoneCardKt @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : CardView(context, attrs, defStyleAttr) {
     private val maxDropZoneCount = 3
-    private var widgetMap: HashMap<Int, Widget> = HashMap()
+    private val widgetList: ArrayList<Widget> = ArrayList()
     private var configuration: ConfigurationObject
     private val bookingRepository: BookingDAO
 
@@ -28,46 +28,24 @@ class DropZoneCardKt @JvmOverloads constructor(
     }
 
     // TODO: Overwrite OnDragListener
-    // TODO: Dynamically reassign size of current widgets if a view is added or removed
     // TODO: Remove widget on long click
 
     fun addWidgetAutoAssignDropzone(newWidget: Widget, point: Point) {
         newWidget.updateView(getBookingsForConfiguration())
 
-        // get dropzone of new widget, dropzone is now current count + 1 if less than maxCount
-        if (widgetMap.size < maxDropZoneCount) { // Max widget count is not yet reached, new widget can simply be added
-            val tempWidgetMap = HashMap<Int, Widget>()
+        if (widgetList.size < maxDropZoneCount) {
+            val dropZoneIdOfNewWidget = translateCoordinatesToDropzone(point, widgetList.size + 1)
 
-            // get dropZone for new widget
-            val dropZoneIdOfNewWidget = translateCoordinatesToDropzone(point, widgetMap.size + 1)
+            widgetList.add(dropZoneIdOfNewWidget, newWidget)
+        } else {
+            val dropZoneId = translateCoordinatesToDropzone(point, widgetList.size)
 
-            // add new widget to tempWidgetMap
-            tempWidgetMap[dropZoneIdOfNewWidget] = newWidget
-
-            // add currently added widgets to tempWidgetMap all widgets with dropZoneId >= newWidgetDropZone need to be increase by 1
-            widgetMap.forEach { (dropZone, widget) ->
-                if (dropZone >= dropZoneIdOfNewWidget) {
-                    tempWidgetMap[dropZone + 1] = widget
-                } else {
-                    tempWidgetMap[dropZone] = widget
-                }
-            }
-
-            // overwrite current widgetMap with updatedWidgetMap
-            widgetMap = tempWidgetMap
-        } else { // Max widget count is already reached => currently added widget at dropZone needs to be replaced with new widget
-            // get dropZone for new widget
-            val dropZoneId = translateCoordinatesToDropzone(point, widgetMap.size)
-
-            // replace current widget at dropZone
-            widgetMap[dropZoneId] = newWidget
+            widgetList[dropZoneId] = newWidget
         }
 
-        // remove current child views
         removeAllViews()
 
-        // redraw card
-        widgetMap.forEach { (dropZone, widget) ->
+        widgetList.forEachIndexed { dropZone, widget ->
             val widgetView = widget.view
 
             configureChildView(widgetView, dropZone)
@@ -81,7 +59,7 @@ class DropZoneCardKt @JvmOverloads constructor(
 
         val bookings = getBookingsForConfiguration()
 
-        widgetMap.forEach { (dropZone, widget) -> widget.updateView(bookings) }
+        widgetList.forEach { widget -> widget.updateView(bookings) }
     }
 
     private fun configureChildView(view: View, dropZoneId: Int) {
@@ -91,7 +69,7 @@ class DropZoneCardKt @JvmOverloads constructor(
     }
 
     private fun addLayoutConstraintsToChild(view: View, dropZoneId: Int) {
-        val widgetWidth = width / widgetMap.size
+        val widgetWidth = width / widgetList.size
 
         view.layoutParams = LinearLayout.LayoutParams(
             widgetWidth,
