@@ -223,4 +223,5 @@
     <string name="release_notes_17_migrate_android_x">Migrate to AndroidX</string>
     <string name="initial_account_balance_booking_name">Initial Booking</string>
     <string name="category_unassigned">Unassigned</string>
+    <string name="long_click_for_removal">Long click the widget to remove it!</string>
 </resources>

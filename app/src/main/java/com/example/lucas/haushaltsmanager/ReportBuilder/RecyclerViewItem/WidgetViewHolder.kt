@@ -11,7 +11,7 @@ import com.example.lucas.haushaltsmanager.ReportBuilder.Widgets.Widget
 
 class WidgetViewHolder(itemView: View) : AbstractViewHolder(itemView), View.OnLongClickListener {
     private val iconHolder: ImageView
-    private var widget: Widget? = null
+    private lateinit var widget: Widget
 
     override fun bind(item: IRecyclerItem) {
         if (item !is CardViewItem) {
@@ -34,7 +34,7 @@ class WidgetViewHolder(itemView: View) : AbstractViewHolder(itemView), View.OnLo
         v.startDragAndDrop(
             ClipData.newPlainText("widget_tag", "widget_tag"),
             View.DragShadowBuilder(v),
-            widget?.cloneWidget(v.context), // The widget needs to be cloned so that the contained view is newly instantiated, otherwise adding the same widget twice would cause the app to crash
+            widget.cloneWidget(v.context), // The widget needs to be cloned so that the contained view is newly instantiated, otherwise adding the same widget twice would cause the app to crash
             0
         )
 

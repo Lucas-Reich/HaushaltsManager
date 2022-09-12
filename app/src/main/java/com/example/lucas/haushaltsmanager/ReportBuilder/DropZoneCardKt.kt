@@ -1,16 +1,20 @@
 package com.example.lucas.haushaltsmanager.ReportBuilder
 
+import android.content.ClipData
 import android.content.Context
 import android.util.AttributeSet
 import android.util.Log
+import android.util.TypedValue
 import android.view.DragEvent
-import android.view.MotionEvent
 import android.view.View
+import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.cardview.widget.CardView
 import com.example.lucas.haushaltsmanager.Activities.DragAndDropActivity.ConfigurationObject
 import com.example.lucas.haushaltsmanager.Database.AppDatabase
 import com.example.lucas.haushaltsmanager.Database.Repositories.BookingDAO
+import com.example.lucas.haushaltsmanager.R
 import com.example.lucas.haushaltsmanager.ReportBuilder.Widgets.Widget
 import com.example.lucas.haushaltsmanager.entities.booking.Booking
 import kotlin.math.floor
@@ -20,7 +24,7 @@ class DropZoneCardKt @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : CardView(context, attrs, defStyleAttr) {
-    private val maxDropZoneCount = 3
+    private val maxDropZoneCount = 3 // TODO: Should I make this number dynamic based on the screen width or just hardcode it?
     private val widgetList: ArrayList<Widget> = ArrayList()
     private var configuration: ConfigurationObject
     private val bookingRepository: BookingDAO
@@ -31,7 +35,7 @@ class DropZoneCardKt @JvmOverloads constructor(
         bookingRepository = AppDatabase.getDatabase(context).bookingDAO()
     }
 
-    // TODO: Remove widget on long click or long click and remove view by dragging
+    // TODO: Disable interaction with widgets
 
     override fun onDragEvent(event: DragEvent?): Boolean {
         when (event?.action) {
@@ -45,7 +49,10 @@ class DropZoneCardKt @JvmOverloads constructor(
                 removeWidget(event.localState as Widget)
                 return true
             }
-            DragEvent.ACTION_DRAG_ENDED -> return true
+            DragEvent.ACTION_DRAG_ENDED -> {
+                overriddenWidget = null
+                return false
+            }
             DragEvent.ACTION_DROP -> {
                 overriddenWidget = null
                 return true
@@ -84,14 +91,14 @@ class DropZoneCardKt @JvmOverloads constructor(
         }
 
         if (widgetList.size == maxDropZoneCount) {
-            overriddenWidget = widgetList.get(dropZoneId)
+            overriddenWidget = widgetList[dropZoneId]
         }
 
         addWidgetAutoAssignDropzone(newWidget, point)
     }
 
     fun removeWidget(widget: Widget) {
-        if (null != overriddenWidget) {
+        if (null != overriddenWidget && widget != overriddenWidget) {
             val indexOfPreviewWidget = widgetList.indexOf(widget)
 
             widgetList.removeAt(indexOfPreviewWidget)
@@ -114,10 +121,37 @@ class DropZoneCardKt @JvmOverloads constructor(
         widgetList.forEach { widget -> widget.updateView(bookings) }
     }
 
-    private fun configureChildView(view: View, dropZoneId: Int) {
-        view.setOnTouchListener { v: View, event: MotionEvent? -> (v.parent as View).onTouchEvent(event); performClick() } // Propagates child click to parent
+    private fun dpToPixels(valueInDps: Int): Int {
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, valueInDps.toFloat(), resources.displayMetrics).toInt()
+    }
 
-        addLayoutConstraintsToChild(view, dropZoneId)
+    private fun configureChildView(widget: Widget, dropZoneId: Int) {
+        addLayoutConstraintsToChild(widget.view, dropZoneId)
+
+        widget.view.setOnClickListener {
+            Toast.makeText(it.context, R.string.long_click_for_removal, Toast.LENGTH_SHORT).show()
+        }
+
+        widget.view.setOnLongClickListener {
+            val imageView = ImageView(context)
+            imageView.layout(0, 0, dpToPixels(81), dpToPixels(81)) // TODO: Can I somehow not set the layout dimensions?
+            imageView.setImageResource(widget.icon)
+
+            val cardView = CardView(context)
+            cardView.radius = dpToPixels(8).toFloat()
+            cardView.layout(0, 0, dpToPixels(84), dpToPixels(84))
+            cardView.addView(imageView)
+
+            it.startDragAndDrop(
+                ClipData.newPlainText("widget_tag", "widget_tag"),
+                DragShadowBuilder(cardView),
+                widget,
+                0
+            )
+
+            overriddenWidget = widget
+            true
+        }
     }
 
     private fun addLayoutConstraintsToChild(view: View, dropZoneId: Int) {
@@ -135,11 +169,9 @@ class DropZoneCardKt @JvmOverloads constructor(
         removeAllViews()
 
         widgetList.forEachIndexed { dropZone, widget ->
-            val widgetView = widget.view
+            configureChildView(widget, dropZone)
 
-            configureChildView(widgetView, dropZone)
-
-            addView(widgetView)
+            addView(widget.view)
         }
     }
 
