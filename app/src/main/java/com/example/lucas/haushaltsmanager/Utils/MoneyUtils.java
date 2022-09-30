@@ -20,6 +20,18 @@ public class MoneyUtils {
         return formatter.format(price.getPrice());
     }
 
+    public static String formatHumanReadableWithCurrency(@Nullable Price price, Locale locale) {
+        if (isNullOrEmpty(price)) {
+            return getMoneyFormatter(locale).format(0);
+        }
+
+        return getMoneyFormatter(locale).format(price.getPrice());
+    }
+
+    private static NumberFormat getMoneyFormatter(Locale locale) {
+        return NumberFormat.getCurrencyInstance(locale);
+    }
+
     private static NumberFormat getDefaultFormatter(Locale locale) {
         NumberFormat formatter = NumberFormat.getNumberInstance(locale);
         formatter.setMinimumFractionDigits(2);

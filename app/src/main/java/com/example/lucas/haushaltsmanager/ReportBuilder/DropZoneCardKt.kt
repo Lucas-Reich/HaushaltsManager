@@ -26,16 +26,15 @@ class DropZoneCardKt @JvmOverloads constructor(
 ) : CardView(context, attrs, defStyleAttr) {
     private val maxDropZoneCount = 3 // TODO: Should I make this number dynamic based on the screen width or just hardcode it?
     private val widgetList: ArrayList<Widget> = ArrayList()
-    private var configuration: ConfigurationObject
     private val bookingRepository: BookingDAO
+
+    private var configuration: ConfigurationObject
     private var overriddenWidget: Widget? = null
 
     init {
         configuration = ConfigurationObject.createWithDefaults()
         bookingRepository = AppDatabase.getDatabase(context).bookingDAO()
     }
-
-    // TODO: Disable interaction with widgets
 
     override fun onDragEvent(event: DragEvent?): Boolean {
         when (event?.action) {
@@ -63,7 +62,7 @@ class DropZoneCardKt @JvmOverloads constructor(
         return false
     }
 
-    fun addWidgetAutoAssignDropzone(newWidget: Widget, point: Point) {
+    private fun addWidgetAutoAssignDropzone(newWidget: Widget, point: Point) {
         newWidget.updateView(getBookingsForConfiguration())
 
         if (widgetList.size < maxDropZoneCount) {
@@ -79,7 +78,7 @@ class DropZoneCardKt @JvmOverloads constructor(
         drawWidgets()
     }
 
-    fun addWidgetWithPreview(newWidget: Widget, point: Point) {
+    private fun addWidgetWithPreview(newWidget: Widget, point: Point) {
         val dropZoneId = translateCoordinatesToDropzone(point, widgetList.size)
 
         if (widgetList.indexOf(newWidget) == dropZoneId) {
@@ -97,7 +96,7 @@ class DropZoneCardKt @JvmOverloads constructor(
         addWidgetAutoAssignDropzone(newWidget, point)
     }
 
-    fun removeWidget(widget: Widget) {
+    private fun removeWidget(widget: Widget) {
         if (null != overriddenWidget && widget != overriddenWidget) {
             val indexOfPreviewWidget = widgetList.indexOf(widget)
 

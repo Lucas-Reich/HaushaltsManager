@@ -2,10 +2,10 @@ package com.example.lucas.haushaltsmanager.ReportBuilder.RecyclerViewItem.Widget
 
 import android.content.Context;
 
-import com.example.lucas.haushaltsmanager.ReportBuilder.Widgets.PieChartWidget;
+import com.example.lucas.haushaltsmanager.ReportBuilder.Widgets.IncomeExpensePieChartWidget;
 
 public class PieChartCardViewItem extends CardViewItem {
     public PieChartCardViewItem(Context context) {
-        super(new PieChartWidget(context));
+        super(new IncomeExpensePieChartWidget(context));
     }
 }

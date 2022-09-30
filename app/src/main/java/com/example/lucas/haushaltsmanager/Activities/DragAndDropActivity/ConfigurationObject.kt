@@ -21,7 +21,7 @@ class ConfigurationObject {
                     Booking("Booking 1", Price(100.00), UUID.randomUUID(), UUID.randomUUID()),
                     Booking("Booking 2", Price(50.00), UUID.randomUUID(), UUID.randomUUID()),
                     Booking("Booking 3", Price(200.00), UUID.randomUUID(), UUID.randomUUID()),
-                    Booking("Booking 4", Price(300.00), UUID.randomUUID(), UUID.randomUUID()),
+                    Booking("Booking 4", Price(-300.00), UUID.randomUUID(), UUID.randomUUID()),
                 )
             )
 
