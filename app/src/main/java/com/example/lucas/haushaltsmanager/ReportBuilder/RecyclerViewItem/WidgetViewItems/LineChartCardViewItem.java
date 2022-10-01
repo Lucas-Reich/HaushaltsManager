@@ -2,13 +2,10 @@ package com.example.lucas.haushaltsmanager.ReportBuilder.RecyclerViewItem.Widget
 
 import android.content.Context;
 
-import androidx.annotation.NonNull;
-
-import com.example.lucas.haushaltsmanager.R;
-import com.example.lucas.haushaltsmanager.ReportBuilder.Widgets.LineChartWidget;
+import com.example.lucas.haushaltsmanager.ReportBuilder.Widgets.TotalExpenseTrendLineChart;
 
 public class LineChartCardViewItem extends CardViewItem {
     public LineChartCardViewItem(Context context) {
-        super(new LineChartWidget(context));
+        super(new TotalExpenseTrendLineChart(context));
     }
 }

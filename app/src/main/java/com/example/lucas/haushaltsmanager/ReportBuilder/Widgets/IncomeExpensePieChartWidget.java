@@ -36,6 +36,7 @@ public class IncomeExpensePieChartWidget implements Widget {
         this.pieChart.getLegend().setEnabled(false);
         this.pieChart.setEntryLabelColor(this.textColor);
         this.pieChart.setEntryLabelTextSize(this.textSize);
+        this.pieChart.getDescription().setEnabled(false);
     }
 
     @Override
