@@ -4,11 +4,11 @@ apply plugin: 'kotlin-parcelize'
 apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion 32 // Android 13
+    compileSdkVersion 33 // Android 13
     defaultConfig {
         applicationId "com.lucas.ausgabenmanager"
         minSdkVersion 29 // Android 10
-        targetSdkVersion 32 // Android 13
+        targetSdkVersion 33 // Android 13
         versionCode 12
         versionName '1.7'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -38,7 +38,7 @@ repositories {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'androidx.appcompat:appcompat:1.5.0'
+    implementation 'androidx.appcompat:appcompat:1.5.1'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'com.google.android.material:material:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
@@ -59,13 +59,15 @@ dependencies {
     // Database stuff
     def room_version = "2.4.3"
     implementation "androidx.room:room-runtime:$room_version"
-//    annotationProcessor "androidx.room:room-compiler:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
 
 
     // Library um den Hintergrund weichzuzeichnen
     implementation 'jp.wasabeef:blurry:3.0.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+
+    // DatePicker used in WidgetBuilder TabOne
+    implementation 'com.andrewjapar.rangedatepicker:rangedatepicker:0.3'
 
 
     // Dependencies welche benötigt werden, um die AndroidTests auszuführen
@@ -87,7 +89,7 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:2.20.0'
     testImplementation 'junit:junit:4.12'
 
-    implementation "androidx.core:core-ktx:1.8.0"
+    implementation "androidx.core:core-ktx:1.9.0"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
 

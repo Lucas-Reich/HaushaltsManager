@@ -12,6 +12,14 @@ class BookingQueryBuilder(filter: BookingFilter) : QueryBuilder<BookingFilter>(f
             conditions.add("${TS.Booking_accountId} IN (x'${filter.accountId}')")
         }
 
+        if (filter.fromDate != null) {
+            conditions.add("${TS.Booking_date} >= ${filter.fromDate}")
+        }
+
+        if (filter.toDate != null) {
+            conditions.add("${TS.Booking_date} < ${filter.toDate}")
+        }
+
         return conditions.mergeWithAnd();
     }
 }

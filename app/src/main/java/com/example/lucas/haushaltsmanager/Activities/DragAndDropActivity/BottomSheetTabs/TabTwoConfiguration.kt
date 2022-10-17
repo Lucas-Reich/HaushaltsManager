@@ -10,6 +10,10 @@ import com.example.lucas.haushaltsmanager.R
 class TabTwoConfiguration : Fragment() {
     private lateinit var configurationListener: OnConfigurationChangeListener
 
+    companion object {
+        var title: Int = R.string.dnd_tab_two_configuration_title
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // TODO: Call configurationListener when the user changed the configuration in this tab
         return inflater.inflate(R.layout.dnd_tab_two_configuration, container, false)

@@ -5,13 +5,14 @@
     android:layout_height="match_parent"
     android:background="#9C27B0">
 
-    <Button
-        android:id="@+id/dnd_tab_one_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Tab One Button"
+    <com.andrewjapar.rangedatepicker.CalendarPicker
+        android:id="@+id/calendar_picker"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:pickerType="range" />
 </androidx.constraintlayout.widget.ConstraintLayout>

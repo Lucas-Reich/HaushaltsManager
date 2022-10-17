@@ -54,7 +54,8 @@ public class IncomeExpensePieChartWidget implements Widget {
         PieData pieData = createDataFromBookings(bookings);
 
         this.pieChart.setData(pieData);
-        pieChart.notifyDataSetChanged();
+        this.pieChart.notifyDataSetChanged();
+        this.pieChart.invalidate();
     }
 
     public Widget cloneWidget(Context context) {

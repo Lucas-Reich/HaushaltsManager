@@ -19,6 +19,7 @@ import com.example.lucas.haushaltsmanager.ReportBuilder.RecyclerViewItem.WidgetV
 import com.example.lucas.haushaltsmanager.ReportBuilder.RecyclerViewItem.WidgetViewItems.PieChartCardViewItem
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import kotlin.collections.ArrayList
 
 class DragAndDropActivity : AbstractAppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
@@ -59,7 +60,10 @@ class DragAndDropActivity : AbstractAppCompatActivity() {
         }
 
         TabLayoutMediator(configurationTabView, viewPager) { tab, position ->
-            tab.text = "Tab ${position + 1}"
+            tab.text = when (position) {
+                1 -> this.getString(TabTwoConfiguration.title)
+                else -> this.getString(TabOneDate.title)
+            }
         }.attach()
     }
 

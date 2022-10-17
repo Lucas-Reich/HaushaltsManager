@@ -79,8 +79,9 @@ public class TotalExpenseTrendLineChart implements Widget {
     public void updateView(List<Booking> bookings) {
         LineData data = createDataFromBookings(bookings);
 
-        lineChart.setData(data);
-        lineChart.notifyDataSetChanged();
+        this.lineChart.setData(data);
+        this.lineChart.notifyDataSetChanged();
+        this.lineChart.invalidate();
     }
 
     public Widget cloneWidget(Context context) {

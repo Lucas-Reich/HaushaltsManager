@@ -203,4 +203,6 @@
     <string name="category_unassigned">Unassigned</string>
     <string name="long_click_for_removal">Long click the widget to remove it!</string>
     <string name="no_data">No Data</string>
+    <string name="dnd_tab_two_configuration_title">Configuration</string>
+    <string name="dnd_tab_one_date_title">Date</string>
 </resources>

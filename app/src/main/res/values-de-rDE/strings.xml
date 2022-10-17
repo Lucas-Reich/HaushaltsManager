@@ -203,4 +203,6 @@
     <string name="category_unassigned">Nich Zugeordnet</string>
     <string name="long_click_for_removal">Drücke lange auf das Widget um es zu entfernen!</string>
     <string name="no_data">Keine Daten</string>
+    <string name="dnd_tab_two_configuration_title">Konfiguration</string>
+    <string name="dnd_tab_one_date_title">Datum</string>
 </resources>
